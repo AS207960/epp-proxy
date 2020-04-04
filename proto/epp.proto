@@ -1,0 +1,168 @@
+syntax = "proto3";
+package epp;
+
+import "google/protobuf/timestamp.proto";
+
+service EPPProxy {
+    rpc DomainCheck  (DomainCheckRequest)  returns (DomainCheckReply);
+    rpc DomainInfo   (DomainInfoRequest)   returns (DomainInfoReply);
+    rpc HostCheck    (HostCheckRequest)    returns (HostCheckReply);
+    rpc HostInfo     (HostInfoRequest)     returns (HostInfoReply);
+    rpc HostCreate   (HostCreateRequest)   returns (HostCreateReply);
+    rpc HostDelete   (HostDeleteRequest)   returns (HostDeleteReply);
+    rpc HostUpdate   (HostUpdateRequest)   returns (HostUpdateReply);
+    rpc ContactCheck (ContactCheckRequest) returns (ContactCheckReply);
+    rpc ContactInfo  (ContactInfoRequest)  returns (ContactInfoReply);
+}
+
+enum IPVersion {
+    UNKNOWN = 0;
+    IPv4 = 1;
+    IPv6 = 2;
+}
+
+message Address {
+    string address = 1;
+    IPVersion type = 2;
+}
+
+message DomainCheckRequest {
+    string name = 1;
+}
+
+message DomainCheckReply {
+    bool available = 1;
+    string reason = 2;
+}
+
+message DomainInfoRequest {
+    string name = 1;
+}
+
+message DomainInfoReply {
+    message Contact {
+        string id = 1;
+        string type = 2;
+    }
+    message NameServer {
+        string host = 1;
+        Address address = 2;
+    }
+
+    string name = 1;
+    string registry_id = 2;
+    repeated string statuses = 3;
+    string registrant = 4;
+    repeated Contact contacts = 5;
+    repeated NameServer nameservers = 6;
+    repeated string hosts = 7;
+    string client_id = 8;
+    string client_created_id = 9;
+    google.protobuf.Timestamp creation_date = 10;
+    google.protobuf.Timestamp expiry_date = 11;
+    string last_updated_client = 12;
+    google.protobuf.Timestamp last_updated_date = 13;
+    google.protobuf.Timestamp last_transfer_date = 14;
+}
+
+message HostCheckRequest {
+    string name = 1;
+}
+
+message HostCheckReply {
+    bool available = 1;
+    string reason = 2;
+}
+
+message HostInfoRequest {
+    string name = 1;
+}
+
+message HostInfoReply {
+    string name = 1;
+    string registry_id = 2;
+    repeated string statuses = 3;
+    repeated Address addresses = 4;
+    string client_id = 5;
+    string client_created_id = 6;
+    google.protobuf.Timestamp creation_date = 7;
+    string last_updated_client = 8;
+    google.protobuf.Timestamp last_updated_date = 9;
+    google.protobuf.Timestamp last_transfer_date = 10;
+}
+
+message HostCreateRequest {
+    string name = 1;
+    repeated Address addresses = 2;
+}
+
+message HostCreateReply {
+    bool pending = 1;
+    google.protobuf.Timestamp creation_date = 2;
+}
+
+message HostDeleteRequest {
+    string name = 1;
+}
+
+message HostDeleteReply {
+    bool pending = 1;
+}
+
+message HostUpdateRequest {
+    message Param {
+        oneof param {
+            Address address = 1;
+            string state = 2;
+        }
+    }
+
+    string name = 1;
+    repeated Param add = 2;
+    repeated Param remove = 3;
+    string new_name = 4;
+}
+
+message HostUpdateReply {
+    bool pending = 1;
+}
+
+message ContactCheckRequest {
+    string id = 1;
+}
+
+message ContactCheckReply {
+    bool available = 1;
+    string reason = 2;
+}
+
+message ContactInfoRequest {
+    string id = 1;
+}
+
+message ContactInfoReply {
+    message Address {
+        string name = 2;
+        string organisation = 3;
+        repeated string streets = 4;
+        string city = 5;
+        string province = 6;
+        string postal_code = 7;
+        string country_code = 8;
+    }
+
+    string id = 1;
+    string registry_id = 2;
+    repeated string statuses = 3;
+    Address local_address = 4;
+    Address internationalised_address = 5;
+    string phone = 6;
+    string fax = 7;
+    string email = 8;
+    string client_id = 9;
+    string client_created_id = 10;
+    google.protobuf.Timestamp creation_date = 11;
+    string last_updated_client = 12;
+    google.protobuf.Timestamp last_updated_date = 13;
+    google.protobuf.Timestamp last_transfer_date = 14;
+}
