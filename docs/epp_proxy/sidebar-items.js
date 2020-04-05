@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["main",""]],"mod":[["client","Async/await EPP client."],["grpc","Implements the gRPC interface for the EPP client"],["proto","Serde structs for serialisation and deserialisation of EPP XML messages (these are insane, stay away if you value your sanity)"],["xml_ser","Custom serde XML serializer"]],"struct":[["ConfigFile",""]]});

@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Router","A stack based `Service` router."],["Server","A default batteries included `transport` server."]],"trait":[["Connected","Trait that connected IO resources implement."],["NamedService","A trait to provide a static reference to the service's name. This is used for routing service's within the router."]]});
