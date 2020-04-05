@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["DeError","(De)serialization error"]],"fn":[["from_reader","Deserialize from a reader"],["from_str","Deserialize a xml string"]],"struct":[["Deserializer","An xml deserializer"]]});
