@@ -1,0 +1,3 @@
+(function() {var implementors = {};
+implementors["epp_proxy"] = [{"text":"impl&lt;'a&gt; <a class=\"trait\" href=\"https://docs.rs/serde/1.0.106/serde/ser/trait.Serializer.html\" title=\"trait serde::ser::Serializer\">Serializer</a> for &amp;'a mut <a class=\"struct\" href=\"epp_proxy/xml_ser/struct.Serializer.html\" title=\"struct epp_proxy::xml_ser::Serializer\">Serializer</a>","synthetic":false,"types":["epp_proxy::xml_ser::Serializer"]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()
