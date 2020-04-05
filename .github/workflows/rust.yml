@@ -13,6 +13,12 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - name: Install latest nightly
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: nightly
+        override: true
+        components: rustfmt, clippy
     - name: Check
       run: cargo check
     - name: Format
@@ -20,7 +26,7 @@ jobs:
     - name: Clippy
       run: cargo clippy -- -D warnings
     - name: Build docs
-      run: cargo rustdoc -- --enable-index-page --document-private-items
+      run: cargo rustdoc -- --enable-index-page -Z unstable-options --document-private-items
     - name: Setup git
       run: git config --global user.name ${GITHUB_ACTOR} && git config --global user.email ${GITHUB_ACTOR}@users.noreply.github.com
     - name: Push docs
