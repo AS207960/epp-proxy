@@ -3,13 +3,13 @@ use chrono::prelude::*;
 #[derive(Debug, Serialize)]
 pub struct EPPHostCheck {
     #[serde(rename = "host:name")]
-    pub name: String
+    pub name: String,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct EPPHostCheckData {
     #[serde(rename = "cd", default)]
-    pub data: Vec<EPPHostCheckDatum>
+    pub data: Vec<EPPHostCheckDatum>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -17,7 +17,7 @@ pub struct EPPHostCheckDatum {
     #[serde(rename = "name")]
     pub name: EPPHostCheckName,
     #[serde(rename = "reason")]
-    pub reason: Option<String>
+    pub reason: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -25,7 +25,7 @@ pub struct EPPHostCheckName {
     #[serde(rename = "$value")]
     pub name: String,
     #[serde(rename = "avail")]
-    pub available: bool
+    pub available: bool,
 }
 
 #[derive(Debug, Deserialize)]
@@ -41,26 +41,38 @@ pub struct EPPHostInfoData {
     pub client_id: String,
     #[serde(rename = "crID")]
     pub client_created_id: Option<String>,
-    #[serde(rename = "crDate", deserialize_with = "super::deserialize_datetime_opt", default)]
+    #[serde(
+        rename = "crDate",
+        deserialize_with = "super::deserialize_datetime_opt",
+        default
+    )]
     pub creation_date: Option<DateTime<Utc>>,
     #[serde(rename = "upID")]
     pub last_updated_client: Option<String>,
-    #[serde(rename = "upDate", deserialize_with = "super::deserialize_datetime_opt", default)]
+    #[serde(
+        rename = "upDate",
+        deserialize_with = "super::deserialize_datetime_opt",
+        default
+    )]
     pub last_updated_date: Option<DateTime<Utc>>,
-    #[serde(rename = "trDate", deserialize_with = "super::deserialize_datetime_opt", default)]
+    #[serde(
+        rename = "trDate",
+        deserialize_with = "super::deserialize_datetime_opt",
+        default
+    )]
     pub last_transfer_date: Option<DateTime<Utc>>,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct EPPHostStatus {
     #[serde(rename = "s", default)]
-    pub status: String
+    pub status: String,
 }
 
 #[derive(Debug, Serialize)]
 pub struct EPPHostStatusSer {
     #[serde(rename = "$attr:s")]
-    pub status: String
+    pub status: String,
 }
 
 #[derive(Debug, Deserialize)]
@@ -68,7 +80,7 @@ pub struct EPPHostAddress {
     #[serde(rename = "$value")]
     pub address: String,
     #[serde(rename = "ip", default)]
-    pub ip_version: EPPHostAddressVersion
+    pub ip_version: EPPHostAddressVersion,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -76,7 +88,7 @@ pub enum EPPHostAddressVersion {
     #[serde(rename = "v4")]
     IPv4,
     #[serde(rename = "v6")]
-    IPv6
+    IPv6,
 }
 
 impl std::default::Default for EPPHostAddressVersion {
@@ -90,7 +102,7 @@ pub struct EPPHostCreate {
     #[serde(rename = "host:name")]
     pub name: String,
     #[serde(rename = "host:addr")]
-    pub addresses: Vec<EPPHostAddressSer>
+    pub addresses: Vec<EPPHostAddressSer>,
 }
 
 #[derive(Debug, Serialize)]
@@ -98,14 +110,18 @@ pub struct EPPHostAddressSer {
     #[serde(rename = "$value")]
     pub address: String,
     #[serde(rename = "$attr:ip", default)]
-    pub ip_version: EPPHostAddressVersion
+    pub ip_version: EPPHostAddressVersion,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct EPPHostCreateData {
     pub name: String,
-    #[serde(rename = "crDate", deserialize_with = "super::deserialize_datetime_opt", default)]
-    pub creation_date: Option<DateTime<Utc>>
+    #[serde(
+        rename = "crDate",
+        deserialize_with = "super::deserialize_datetime_opt",
+        default
+    )]
+    pub creation_date: Option<DateTime<Utc>>,
 }
 
 #[derive(Debug, Serialize)]
@@ -129,19 +145,19 @@ pub struct EPPHostUpdate {
 #[derive(Debug, Serialize)]
 pub struct EPPHostUpdateAdd {
     #[serde(rename = "$value")]
-    pub params: Vec<EPPHostUpdateParam>
+    pub params: Vec<EPPHostUpdateParam>,
 }
 
 #[derive(Debug, Serialize)]
 pub struct EPPHostUpdateRemove {
     #[serde(rename = "$value")]
-    pub params: Vec<EPPHostUpdateParam>
+    pub params: Vec<EPPHostUpdateParam>,
 }
 
 #[derive(Debug, Serialize)]
 pub struct EPPHostUpdateChange {
     #[serde(rename = "host:name")]
-    pub name: String
+    pub name: String,
 }
 
 #[derive(Debug, Serialize)]

@@ -1,9 +1,12 @@
+//! Serde structs for serialisation and deserialisation of EPP XML messages
+//! (these are insane, stay away if you value your sanity)
+
 use chrono::prelude::*;
 use std::collections::HashMap;
 
+pub mod contact;
 pub mod domain;
 pub mod host;
-pub mod contact;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub enum EPPMessageType {
@@ -20,7 +23,7 @@ pub enum EPPMessageType {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct EPPMessage {
     #[serde(rename = "$value")]
-    pub message: EPPMessageType
+    pub message: EPPMessageType,
 }
 
 #[derive(Debug, Deserialize)]
@@ -30,7 +33,7 @@ pub struct EPPGreeting {
     #[serde(rename = "svDate")]
     pub server_date: DateTime<Utc>,
     #[serde(rename = "svcMenu")]
-    pub service_menu: EPPServiceMenu
+    pub service_menu: EPPServiceMenu,
 }
 
 #[derive(Debug, Deserialize)]
@@ -92,24 +95,20 @@ pub struct EPPResponse {
 impl EPPResponse {
     pub fn is_success(&self) -> bool {
         match self.results.first() {
-            Some(r) => {
-                r.code.is_success()
-            },
-            None => false
+            Some(r) => r.code.is_success(),
+            None => false,
         }
     }
     pub fn is_pending(&self) -> bool {
         match self.results.first() {
             Some(r) => r.code == EPPResultCode::SuccessActionPending,
-            None => false
+            None => false,
         }
     }
     pub fn is_server_error(&self) -> bool {
         match self.results.first() {
-            Some(r) => {
-                r.code.is_server_error()
-            },
-            None => false
+            Some(r) => r.code.is_server_error(),
+            None => false,
         }
     }
 
@@ -117,16 +116,26 @@ impl EPPResponse {
         let mut output = vec![];
         for r in &self.results {
             match r.extra_values.as_ref().map(|v| {
-                v.iter().map(|e| {
-                    let val = e.value.iter().next().map(|(k, v)| {
-                        format!("{}: {}", k, v)
-                    }).unwrap_or("".to_string());
-                    format!("({}) {}", val, e.reason)
-                }).collect::<Vec<_>>()
+                v.iter()
+                    .map(|e| {
+                        let val = e
+                            .value
+                            .iter()
+                            .next()
+                            .map(|(k, v)| format!("{}: {}", k, v))
+                            .unwrap_or("".to_string());
+                        format!("({}) {}", val, e.reason)
+                    })
+                    .collect::<Vec<_>>()
             }) {
                 Some(extra) => {
-                    output.push(format!("({:?}) {}: {}", r.code, r.message, extra.join(", ")));
-                },
+                    output.push(format!(
+                        "({:?}) {}: {}",
+                        r.code,
+                        r.message,
+                        extra.join(", ")
+                    ));
+                }
                 None => {
                     output.push(format!("({:?}) {}", r.code, r.message));
                 }
@@ -183,32 +192,38 @@ enum EPPResultCode {
     CommandFailedServerClosingConnection,
     AuthenticationServerClosingConnection,
     SessionLimitExceededServerClosingConnection,
-    Other(u16)
+    Other(u16),
 }
 
 impl EPPResultCode {
     fn is_success(&self) -> bool {
         match self {
-            EPPResultCode::Success | EPPResultCode::SuccessActionPending |
-            EPPResultCode::SuccessNoMessages | EPPResultCode::SuccessAckToDequeue |
-            EPPResultCode::SuccessEndingSession => true,
-            _ => false
+            EPPResultCode::Success
+            | EPPResultCode::SuccessActionPending
+            | EPPResultCode::SuccessNoMessages
+            | EPPResultCode::SuccessAckToDequeue
+            | EPPResultCode::SuccessEndingSession => true,
+            _ => false,
         }
     }
 
     fn is_closing(&self) -> bool {
         match self {
-            EPPResultCode::SuccessEndingSession | EPPResultCode::CommandFailedServerClosingConnection |
-            EPPResultCode::AuthenticationServerClosingConnection | EPPResultCode::SessionLimitExceededServerClosingConnection => true,
-            _ => false
+            EPPResultCode::SuccessEndingSession
+            | EPPResultCode::CommandFailedServerClosingConnection
+            | EPPResultCode::AuthenticationServerClosingConnection
+            | EPPResultCode::SessionLimitExceededServerClosingConnection => true,
+            _ => false,
         }
     }
 
     fn is_server_error(&self) -> bool {
         match self {
-            EPPResultCode::CommandFailed | EPPResultCode::CommandFailedServerClosingConnection |
-            EPPResultCode::AuthenticationServerClosingConnection | EPPResultCode::SessionLimitExceededServerClosingConnection => true,
-            _ => false
+            EPPResultCode::CommandFailed
+            | EPPResultCode::CommandFailedServerClosingConnection
+            | EPPResultCode::AuthenticationServerClosingConnection
+            | EPPResultCode::SessionLimitExceededServerClosingConnection => true,
+            _ => false,
         }
     }
 }
@@ -250,15 +265,15 @@ impl From<u16> for EPPResultCode {
             2500 => EPPResultCode::CommandFailedServerClosingConnection,
             2501 => EPPResultCode::AuthenticationServerClosingConnection,
             2502 => EPPResultCode::SessionLimitExceededServerClosingConnection,
-            o => EPPResultCode::Other(o)
+            o => EPPResultCode::Other(o),
         }
     }
 }
 
 impl<'de> serde::Deserialize<'de> for EPPResultCode {
     fn deserialize<D>(deserializer: D) -> Result<EPPResultCode, D::Error>
-        where
-            D: serde::Deserializer<'de>,
+    where
+        D: serde::Deserializer<'de>,
     {
         struct U16Visitor;
 
@@ -270,22 +285,22 @@ impl<'de> serde::Deserialize<'de> for EPPResultCode {
             }
 
             fn visit_u8<E>(self, value: u8) -> Result<Self::Value, E>
-                where
-                    E: serde::de::Error,
+            where
+                E: serde::de::Error,
             {
                 Ok(u16::from(value))
             }
 
             fn visit_u16<E>(self, value: u16) -> Result<Self::Value, E>
-                where
-                    E: serde::de::Error,
+            where
+                E: serde::de::Error,
             {
                 Ok(value)
             }
 
             fn visit_u32<E>(self, value: u32) -> Result<Self::Value, E>
-                where
-                    E: serde::de::Error,
+            where
+                E: serde::de::Error,
             {
                 use std::u16;
                 if value >= u32::from(u16::MIN) && value <= u32::from(u16::MAX) {
@@ -296,8 +311,8 @@ impl<'de> serde::Deserialize<'de> for EPPResultCode {
             }
 
             fn visit_u64<E>(self, value: u64) -> Result<Self::Value, E>
-                where
-                    E: serde::de::Error,
+            where
+                E: serde::de::Error,
             {
                 use std::u16;
                 if value >= u64::from(u16::MIN) && value <= u64::from(u16::MAX) {
@@ -310,7 +325,7 @@ impl<'de> serde::Deserialize<'de> for EPPResultCode {
 
         match deserializer.deserialize_u16(U16Visitor) {
             Ok(i) => Ok(EPPResultCode::from(i)),
-            Err(e) => Err(e)
+            Err(e) => Err(e),
         }
     }
 }
@@ -334,7 +349,7 @@ pub struct EPPMessageQueue {
 #[derive(Debug, Deserialize)]
 pub struct EPPResultData {
     #[serde(rename = "$value")]
-    pub value: EPPResultDataValue
+    pub value: EPPResultDataValue,
 }
 
 #[derive(Debug, Deserialize)]
@@ -434,38 +449,41 @@ struct DateTimeVisitor;
 impl<'de> serde::de::Visitor<'de> for DateTimeVisitor {
     type Value = Option<DateTime<Utc>>;
 
-    fn expecting(&self, formatter: &mut std::fmt::Formatter) -> std::fmt::Result
-    {
+    fn expecting(&self, formatter: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(formatter, "a formatted date and time string")
     }
 
     fn visit_str<E>(self, value: &str) -> Result<Self::Value, E>
-        where E: serde::de::Error
+    where
+        E: serde::de::Error,
     {
         match value.parse::<DateTime<Utc>>() {
             Ok(v) => Ok(Some(v.with_timezone(&Utc))),
-            Err(_) => {
-                Utc.datetime_from_str("2019-04-04T20:00:09", "%FT%T")
-                    .map_err(|err| E::custom(err))
-                    .map(|d| Some(d))
-            }
+            Err(_) => Utc
+                .datetime_from_str("2019-04-04T20:00:09", "%FT%T")
+                .map_err(|err| E::custom(err))
+                .map(|d| Some(d)),
         }
     }
 
     fn visit_none<E>(self) -> Result<Self::Value, E>
-        where E: serde::de::Error
+    where
+        E: serde::de::Error,
     {
         Ok(None)
     }
 
     fn visit_some<D>(self, d: D) -> Result<Self::Value, D::Error>
-        where D: serde::de::Deserializer<'de>,
+    where
+        D: serde::de::Deserializer<'de>,
     {
         d.deserialize_str(DateTimeVisitor)
     }
 }
 
 fn deserialize_datetime_opt<'de, D>(d: D) -> Result<Option<DateTime<Utc>>, D::Error>
-    where D: serde::de::Deserializer<'de> {
+where
+    D: serde::de::Deserializer<'de>,
+{
     d.deserialize_option(DateTimeVisitor)
 }

@@ -1,16 +1,20 @@
+//! Routes requests into and out of the EPP client by keeping track of
+
 use std::collections::HashMap;
 
+/// Responses from EPP client, see [`super::Error`] for explanations of errors
 #[derive(Debug)]
 pub enum Response<T> {
     Ok(T),
     Err(String),
     NotReady,
     Unsupported,
-    InternalServerError
+    InternalServerError,
 }
 
 macro_rules! router {
     ($($n:ident, $req:path, $res:path, $req_handle:path, $res_handle:path);*) => {
+        /// Request into the EPP client, see sibling modules for explanation of requests
         #[derive(Debug)]
         pub enum Request {
             $($n($req),)*

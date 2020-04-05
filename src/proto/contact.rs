@@ -3,13 +3,13 @@ use chrono::prelude::*;
 #[derive(Debug, Serialize)]
 pub struct EPPContactCheck {
     #[serde(rename = "contact:id")]
-    pub id: String
+    pub id: String,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct EPPContactCheckData {
     #[serde(rename = "cd", default)]
-    pub data: Vec<EPPContactCheckDatum>
+    pub data: Vec<EPPContactCheckDatum>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -17,7 +17,7 @@ pub struct EPPContactCheckDatum {
     #[serde(rename = "id")]
     pub id: EPPContactCheckID,
     #[serde(rename = "reason")]
-    pub reason: Option<String>
+    pub reason: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -25,7 +25,7 @@ pub struct EPPContactCheckID {
     #[serde(rename = "$value")]
     pub id: String,
     #[serde(rename = "avail")]
-    pub available: bool
+    pub available: bool,
 }
 
 #[derive(Debug, Deserialize)]
@@ -45,13 +45,25 @@ pub struct EPPContactInfoData {
     pub client_id: String,
     #[serde(rename = "crID")]
     pub client_created_id: Option<String>,
-    #[serde(rename = "crDate", deserialize_with = "super::deserialize_datetime_opt", default)]
+    #[serde(
+        rename = "crDate",
+        deserialize_with = "super::deserialize_datetime_opt",
+        default
+    )]
     pub creation_date: Option<DateTime<Utc>>,
     #[serde(rename = "upID")]
     pub last_updated_client: Option<String>,
-    #[serde(rename = "upDate", deserialize_with = "super::deserialize_datetime_opt", default)]
+    #[serde(
+        rename = "upDate",
+        deserialize_with = "super::deserialize_datetime_opt",
+        default
+    )]
     pub last_updated_date: Option<DateTime<Utc>>,
-    #[serde(rename = "trDate", deserialize_with = "super::deserialize_datetime_opt", default)]
+    #[serde(
+        rename = "trDate",
+        deserialize_with = "super::deserialize_datetime_opt",
+        default
+    )]
     pub last_transfer_date: Option<DateTime<Utc>>,
     pub disclose: Option<EPPContactDisclosure>,
 }
@@ -59,13 +71,13 @@ pub struct EPPContactInfoData {
 #[derive(Debug, Deserialize)]
 pub struct EPPContactStatus {
     #[serde(rename = "s")]
-    pub status: String
+    pub status: String,
 }
 
 #[derive(Debug, Serialize)]
 pub struct EPPContactStatusSer {
     #[serde(rename = "$attr:s")]
-    pub status: String
+    pub status: String,
 }
 
 #[derive(Debug, Deserialize)]
@@ -76,7 +88,7 @@ pub struct EPPContactPostalInfo {
     #[serde(rename = "org")]
     pub organisation: Option<String>,
     #[serde(rename = "addr")]
-    pub address: EPPContactAddress
+    pub address: EPPContactAddress,
 }
 
 #[derive(Debug, Deserialize)]
@@ -97,13 +109,13 @@ pub enum EPPContactPostalInfoType {
     #[serde(rename = "int")]
     Internationalised,
     #[serde(rename = "loc")]
-    Local
+    Local,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct EPPContactDisclosure {
     #[serde(rename = "flag")]
-    pub flag: bool
+    pub flag: bool,
 }
 
 //#[derive(Debug, Deserialize, Serialize)]

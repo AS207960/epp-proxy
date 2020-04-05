@@ -1,6 +1,7 @@
-use chrono::prelude::*;
+//! EPP commands relating to contact objects
 
-use super::{EPPClientServerFeatures, proto, Request, Response, Sender};
+use super::{proto, EPPClientServerFeatures, Request, Response, Sender};
+use chrono::prelude::*;
 
 #[derive(Debug)]
 pub struct CheckRequest {
@@ -8,9 +9,12 @@ pub struct CheckRequest {
     pub return_path: Sender<CheckResponse>,
 }
 
+/// Response to a contact check query
 #[derive(Debug)]
 pub struct CheckResponse {
+    /// Is the contact available for creation commands
     pub avail: bool,
+    /// An optional reason for the ID's status
     pub reason: Option<String>,
 }
 
@@ -20,33 +24,52 @@ pub struct InfoRequest {
     pub return_path: Sender<InfoResponse>,
 }
 
+/// Response to a contact info query
 #[derive(Debug)]
 pub struct InfoResponse {
+    /// The contact's ID
     pub id: String,
+    /// The contact's internal registry ID
     pub registry_id: String,
+    /// Statuses currently set on the contact
     pub statuses: Vec<String>,
+    /// The localised address of the contact
     pub local_address: Option<Address>,
+    /// The internationalised address of the contact
     pub internationalised_addresses: Option<Address>,
+    /// Voice phone number of the contact
     pub phone: Option<String>,
+    /// Fax number of the contact
     pub fax: Option<String>,
+    /// Email address of the contact
     pub email: String,
+    /// Sponsoring client ID
     pub client_id: String,
+    /// ID of the client that created the contact
     pub client_created_id: Option<String>,
+    /// Date of creation
     pub creation_date: Option<DateTime<Utc>>,
+    /// ID of the client that last updated the contact
     pub last_updated_client: Option<String>,
+    /// Date of last update
     pub last_updated_date: Option<DateTime<Utc>>,
+    /// Date of last transfer
     pub last_transfer_date: Option<DateTime<Utc>>,
 }
 
-
 #[derive(Debug)]
 pub struct Address {
+    /// Name of the contact
     pub name: String,
+    /// Organisation of the contact
     pub organisation: Option<String>,
+    /// 1-3 street address lines
     pub streets: Vec<String>,
     pub city: String,
+    /// Province or state
     pub province: Option<String>,
     pub postal_code: Option<String>,
+    /// ISO 2 letter country code
     pub country_code: String,
 }
 
@@ -100,16 +123,20 @@ pub struct Address {
 //    pub pending: bool,
 //}
 
-pub fn handle_check(client: &EPPClientServerFeatures, req: &CheckRequest) -> Result<proto::EPPCommandType, Response<CheckResponse>> {
+pub fn handle_check(
+    client: &EPPClientServerFeatures,
+    req: &CheckRequest,
+) -> Result<proto::EPPCommandType, Response<CheckResponse>> {
     if !client.contact_supported {
         return Err(Response::Unsupported);
     }
-    if let 3..=16 = req.id.len() {} else {
-        return Err(Response::Err("contact id has a min length of 3 and a max length of 16".to_string()));
+    if let 3..=16 = req.id.len() {
+    } else {
+        return Err(Response::Err(
+            "contact id has a min length of 3 and a max length of 16".to_string(),
+        ));
     }
-    let command = proto::EPPCheck::Contact(proto::contact::EPPContactCheck {
-        id: req.id.clone()
-    });
+    let command = proto::EPPCheck::Contact(proto::contact::EPPContactCheck { id: req.id.clone() });
     Ok(proto::EPPCommandType::Check(command))
 }
 
@@ -126,44 +153,47 @@ pub fn handle_check_response(response: proto::EPPResponse) -> Response<CheckResp
                     Response::InternalServerError
                 }
             }
-            _ => Response::InternalServerError
+            _ => Response::InternalServerError,
         },
-        None => {
-            Response::InternalServerError
-        }
+        None => Response::InternalServerError,
     }
 }
 
-pub fn handle_info(client: &EPPClientServerFeatures, req: &InfoRequest) -> Result<proto::EPPCommandType, Response<InfoResponse>> {
+pub fn handle_info(
+    client: &EPPClientServerFeatures,
+    req: &InfoRequest,
+) -> Result<proto::EPPCommandType, Response<InfoResponse>> {
     if !client.contact_supported {
         return Err(Response::Unsupported);
     }
-    if let 3..=16 = req.id.len() {} else {
-        return Err(Response::Err("contact id has a min length of 3 and a max length of 16".to_string()));
+    if let 3..=16 = req.id.len() {
+    } else {
+        return Err(Response::Err(
+            "contact id has a min length of 3 and a max length of 16".to_string(),
+        ));
     }
-    let command = proto::EPPInfo::Contact(proto::contact::EPPContactCheck {
-        id: req.id.clone()
-    });
+    let command = proto::EPPInfo::Contact(proto::contact::EPPContactCheck { id: req.id.clone() });
     Ok(proto::EPPCommandType::Info(command))
 }
 
 pub fn handle_info_response(response: proto::EPPResponse) -> Response<InfoResponse> {
     match response.data {
-        Some(value) => match value.value {
-            proto::EPPResultDataValue::EPPContactInfoResult(contact_info) => {
-                let map_addr = |a: Option<&proto::contact::EPPContactPostalInfo>| match a {
-                    Some(p) => Some(Address {
-                        name: p.name.clone(),
-                        organisation: p.organisation.clone(),
-                        streets: p.address.streets.clone(),
-                        city: p.address.city.clone(),
-                        province: p.address.province.clone(),
-                        postal_code: p.address.postal_code.clone(),
-                        country_code: p.address.country_code.clone(),
-                    }),
-                    None => None
-                };
-                Response::Ok(InfoResponse {
+        Some(value) => {
+            match value.value {
+                proto::EPPResultDataValue::EPPContactInfoResult(contact_info) => {
+                    let map_addr = |a: Option<&proto::contact::EPPContactPostalInfo>| match a {
+                        Some(p) => Some(Address {
+                            name: p.name.clone(),
+                            organisation: p.organisation.clone(),
+                            streets: p.address.streets.clone(),
+                            city: p.address.city.clone(),
+                            province: p.address.province.clone(),
+                            postal_code: p.address.postal_code.clone(),
+                            country_code: p.address.country_code.clone(),
+                        }),
+                        None => None,
+                    };
+                    Response::Ok(InfoResponse {
                     id: contact_info.id,
                     statuses: contact_info.statuses.into_iter().map(|s| s.status).collect(),
                     registry_id: contact_info.registry_id,
@@ -183,12 +213,11 @@ pub fn handle_info_response(response: proto::EPPResponse) -> Response<InfoRespon
                     last_updated_date: contact_info.last_updated_date,
                     last_transfer_date: contact_info.last_transfer_date,
                 })
-            },
-            _ => Response::InternalServerError
-        },
-        None => {
-            Response::InternalServerError
+                }
+                _ => Response::InternalServerError,
+            }
         }
+        None => Response::InternalServerError,
     }
 }
 //
@@ -381,20 +410,46 @@ pub fn handle_info_response(response: proto::EPPResponse) -> Response<InfoRespon
 //    Ok(())
 //}
 
-pub async fn check(id: & str, client_sender: & mut futures::channel::mpsc::Sender < Request > ) -> Result < CheckResponse, super::Error > {
+/// Checks if a contact ID exists
+///
+/// # Arguments
+/// * `id` - The ID in question
+/// * `client_sender` - Reference to the tokio channel into the client
+pub async fn check(
+    id: &str,
+    client_sender: &mut futures::channel::mpsc::Sender<Request>,
+) -> Result<CheckResponse, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
-    super::send_epp_client_request(client_sender, Request::ContactCheck(CheckRequest {
-        id: id.to_string(),
-        return_path: sender
-    }), receiver).await
+    super::send_epp_client_request(
+        client_sender,
+        Request::ContactCheck(CheckRequest {
+            id: id.to_string(),
+            return_path: sender,
+        }),
+        receiver,
+    )
+    .await
 }
 
-pub async fn info(id: & str, client_sender: & mut futures::channel::mpsc::Sender < Request > ) -> Result < InfoResponse, super::Error > {
+/// Fetches information about a specific contact
+///
+/// # Arguments
+/// * `id` - The ID in question
+/// * `client_sender` - Reference to the tokio channel into the client
+pub async fn info(
+    id: &str,
+    client_sender: &mut futures::channel::mpsc::Sender<Request>,
+) -> Result<InfoResponse, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
-    super::send_epp_client_request(client_sender, Request::ContactInfo(InfoRequest {
-        id: id.to_string(),
-        return_path: sender
-    }), receiver).await
+    super::send_epp_client_request(
+        client_sender,
+        Request::ContactInfo(InfoRequest {
+            id: id.to_string(),
+            return_path: sender,
+        }),
+        receiver,
+    )
+    .await
 }
 
 //pub async fn create(host: &str, addresses: Vec<Address>, client_sender: &mut futures::channel::mpsc::Sender<Request>) -> Result<CreateResponse, super::Error> {
