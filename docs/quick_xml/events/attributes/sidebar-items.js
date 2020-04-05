@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["Attribute","A struct representing a key/value XML attribute."],["Attributes","Iterator over XML attributes."]]});
