@@ -24,4 +24,4 @@ jobs:
     - name: Setup git
       run: git config --global user.name ${GITHUB_ACTOR} && git config --global user.email ${GITHUB_ACTOR}@users.noreply.github.com
     - name: Push docs
-      run: mv target/doc docs && git add docs && git commit -m "Autogen docs" && git push
+      run: rm -rf docs && mv target/doc docs && git add docs && git commit -m "Autogen docs" && git push
