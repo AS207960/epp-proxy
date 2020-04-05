@@ -19,3 +19,7 @@ jobs:
       run: cargo fmt --all
     - name: Clippy
       run: cargo clippy -- -D warnings
+    - name: Build docs
+      run: cargo doc --document-private-items
+    - name: Push docs
+      run: mv target/doc docs && git add docs && git commit -m "Autogen docs"
