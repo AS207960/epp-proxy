@@ -1,1 +1,0 @@
-initSidebarItems({"enum":[["EPPContactPostalInfoType",""]],"struct":[["EPPContactAddress",""],["EPPContactCheck",""],["EPPContactCheckData",""],["EPPContactCheckDatum",""],["EPPContactCheckID",""],["EPPContactDisclosure",""],["EPPContactInfoData",""],["EPPContactPostalInfo",""],["EPPContactStatus",""],["EPPContactStatusSer",""]]});
