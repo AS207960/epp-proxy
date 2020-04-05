@@ -21,5 +21,7 @@ jobs:
       run: cargo clippy -- -D warnings
     - name: Build docs
       run: cargo doc --document-private-items
+    - name: Setup git
+      run: git config --global user.name ${GITHUB_ACTOR} && git config --global user.email ${GITHUB_ACTOR}@users.noreply.github.com
     - name: Push docs
-      run: mv target/doc docs && git add docs && git commit -m "Autogen docs"
+      run: mv target/doc docs && git add docs && git commit -m "Autogen docs" && git push
