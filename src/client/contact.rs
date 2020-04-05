@@ -198,10 +198,10 @@ pub fn handle_info_response(response: proto::EPPResponse) -> Response<InfoRespon
                     statuses: contact_info.statuses.into_iter().map(|s| s.status).collect(),
                     registry_id: contact_info.registry_id,
                     local_address: map_addr(
-                        contact_info.postal_info.iter().filter(|p| p.addr_type == proto::contact::EPPContactPostalInfoType::Local).next()
+                        contact_info.postal_info.iter().find(|p| p.addr_type == proto::contact::EPPContactPostalInfoType::Local)
                     ),
                     internationalised_addresses: map_addr(
-                        contact_info.postal_info.iter().filter(|p| p.addr_type == proto::contact::EPPContactPostalInfoType::Internationalised).next()
+                        contact_info.postal_info.iter().find(|p| p.addr_type == proto::contact::EPPContactPostalInfoType::Internationalised)
                     ),
                     phone: contact_info.phone,
                     fax: contact_info.fax,

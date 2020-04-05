@@ -268,6 +268,7 @@ impl EPPClient {
                         return Err(());
                     }
                 };
+                let is_closing = response.is_closing();
                 let transaction_id = match uuid::Uuid::parse_str(&transaction_id) {
                     Ok(i) => i,
                     Err(e) => {
@@ -278,7 +279,12 @@ impl EPPClient {
                         return Err(());
                     }
                 };
-                self.router.handle_response(&transaction_id, response).await
+                self.router.handle_response(&transaction_id, response).await?;
+                if is_closing {
+                    Err(())
+                } else {
+                    Ok(())
+                }
             }
             o => {
                 warn!(
@@ -323,7 +329,7 @@ impl EPPClient {
                     return Err(false);
                 }
             }
-            return Ok(());
+            Ok(())
         } else {
             error!(
                 "Didn't receive greeting as first message from {}",
@@ -331,8 +337,8 @@ impl EPPClient {
             );
             info!("Restarting connection...");
             self._close(sock).await;
-            return Err(false);
-        };
+            Err(false)
+        }
     }
 
     async fn _process_greeting(&mut self, greeting: proto::EPPGreeting) -> Result<(), ()> {
@@ -373,7 +379,7 @@ impl EPPClient {
             error!("No common supported objects with {}", greeting.server_id);
             return Err(());
         }
-        return Ok(());
+        Ok(())
     }
 
     async fn _login(&self, sock: &mut tokio_tls::TlsStream<TcpStream>) -> Result<(), ()> {
@@ -552,7 +558,7 @@ impl EPPClient {
                 return Err(());
             }
         };
-        return Ok(socket);
+        Ok(socket)
     }
 }
 

@@ -49,7 +49,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
 
         let reply = epp_proto::DomainCheckReply {
             available: res.avail,
-            reason: res.reason.unwrap_or("".to_string()),
+            reason: res.reason.unwrap_or_default(),
         };
 
         Ok(tonic::Response::new(reply))
@@ -108,10 +108,10 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                 .collect(),
             hosts: res.hosts,
             client_id: res.client_id,
-            client_created_id: res.client_created_id.unwrap_or("".to_string()),
+            client_created_id: res.client_created_id.unwrap_or_default(),
             creation_date: chrono_to_proto(res.creation_date),
             expiry_date: chrono_to_proto(res.expiry_date),
-            last_updated_client: res.last_updated_client.unwrap_or("".to_string()),
+            last_updated_client: res.last_updated_client.unwrap_or_default(),
             last_updated_date: chrono_to_proto(res.last_updated_date),
             last_transfer_date: chrono_to_proto(res.last_transfer_date),
         };
@@ -129,7 +129,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
 
         let reply = epp_proto::HostCheckReply {
             available: res.avail,
-            reason: res.reason.unwrap_or("".to_string()),
+            reason: res.reason.unwrap_or_default(),
         };
 
         Ok(tonic::Response::new(reply))
@@ -159,9 +159,9 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                 })
                 .collect(),
             client_id: res.client_id,
-            client_created_id: res.client_created_id.unwrap_or("".to_string()),
+            client_created_id: res.client_created_id.unwrap_or_default(),
             creation_date: chrono_to_proto(res.creation_date),
-            last_updated_client: res.last_updated_client.unwrap_or("".to_string()),
+            last_updated_client: res.last_updated_client.unwrap_or_default(),
             last_updated_date: chrono_to_proto(res.last_updated_date),
             last_transfer_date: chrono_to_proto(res.last_transfer_date),
         };
@@ -237,7 +237,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
 
         let mut add = vec![];
         let mut remove = vec![];
-        let new_name = if request.new_name.len() > 0 {
+        let new_name = if !request.new_name.is_empty() {
             Some(request.new_name)
         } else {
             None
@@ -307,7 +307,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
 
         let reply = epp_proto::ContactCheckReply {
             available: res.avail,
-            reason: res.reason.unwrap_or("".to_string()),
+            reason: res.reason.unwrap_or_default(),
         };
 
         Ok(tonic::Response::new(reply))
@@ -323,11 +323,11 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
 
         let map_addr = |a: client::contact::Address| epp_proto::contact_info_reply::Address {
             name: a.name,
-            organisation: a.organisation.unwrap_or("".to_string()),
+            organisation: a.organisation.unwrap_or_default(),
             streets: a.streets,
             city: a.city,
-            province: a.province.unwrap_or("".to_string()),
-            postal_code: a.postal_code.unwrap_or("".to_string()),
+            province: a.province.unwrap_or_default(),
+            postal_code: a.postal_code.unwrap_or_default(),
             country_code: a.country_code,
         };
 
@@ -337,13 +337,13 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
             statuses: res.statuses,
             local_address: res.local_address.map(map_addr),
             internationalised_address: res.internationalised_addresses.map(map_addr),
-            phone: res.phone.unwrap_or("".to_string()),
-            fax: res.fax.unwrap_or("".to_string()),
+            phone: res.phone.unwrap_or_default(),
+            fax: res.fax.unwrap_or_default(),
             email: res.email,
             client_id: res.client_id,
-            client_created_id: res.client_created_id.unwrap_or("".to_string()),
+            client_created_id: res.client_created_id.unwrap_or_default(),
             creation_date: chrono_to_proto(res.creation_date),
-            last_updated_client: res.last_updated_client.unwrap_or("".to_string()),
+            last_updated_client: res.last_updated_client.unwrap_or_default(),
             last_updated_date: chrono_to_proto(res.last_updated_date),
             last_transfer_date: chrono_to_proto(res.last_transfer_date),
         };

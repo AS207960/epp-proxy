@@ -98,7 +98,7 @@ pub fn handle_check(
     if !client.host_supported {
         return Err(Response::Unsupported);
     }
-    if req.name.len() < 1 {
+    if req.name.is_empty() {
         return Err(Response::Err("host name has a min length of 1".to_string()));
     }
     let command = proto::EPPCheck::Host(proto::host::EPPHostCheck {
@@ -133,7 +133,7 @@ pub fn handle_info(
     if !client.host_supported {
         return Err(Response::Unsupported);
     }
-    if req.name.len() < 1 {
+    if req.name.is_empty() {
         return Err(Response::Err("host name has a min length of 1".to_string()));
     }
     let command = proto::EPPInfo::Host(proto::host::EPPHostCheck {
@@ -180,7 +180,7 @@ pub fn handle_create(
     if !client.host_supported {
         return Err(Response::Unsupported);
     }
-    if req.name.len() < 1 {
+    if req.name.is_empty() {
         return Err(Response::Err("host name has a min length of 1".to_string()));
     }
     let command = proto::EPPCreate::Host(proto::host::EPPHostCreate {
@@ -234,7 +234,7 @@ pub fn handle_delete(
     if !client.host_supported {
         return Err(Response::Unsupported);
     }
-    if req.name.len() < 1 {
+    if req.name.is_empty() {
         return Err(Response::Err("host name has a min length of 1".to_string()));
     }
     let command = proto::EPPDelete::Host(proto::host::EPPHostDelete {
@@ -256,17 +256,17 @@ pub fn handle_update(
     if !client.host_supported {
         return Err(Response::Unsupported);
     }
-    if req.name.len() < 1 {
+    if req.name.is_empty() {
         return Err(Response::Err("host name has a min length of 1".to_string()));
     }
-    if req.add.len() < 1 && req.remove.len() < 1 && req.new_name.is_none() {
+    if req.add.is_empty() && req.remove.is_empty() && req.new_name.is_none() {
         return Err(Response::Err(
             "at least one operation must be specified".to_string(),
         ));
     }
     match &req.new_name {
         Some(n) => {
-            if n.len() < 1 {
+            if n.is_empty() {
                 return Err(Response::Err(
                     "new host name has a min length of 1".to_string(),
                 ));

@@ -44,11 +44,11 @@ impl _SerializerData {
         match self {
             _SerializerData::String(s) => s.clone(),
             _SerializerData::Seq(s) => s
-                .into_iter()
+                .iter()
                 .map(|d| d.as_str())
                 .collect::<Vec<_>>()
                 .join(""),
-            _SerializerData::Struct { contents, attrs: _ } => contents.clone(),
+            _SerializerData::Struct { contents, .. } => contents.clone(),
         }
     }
 }
@@ -389,7 +389,7 @@ impl<'a> ser::SerializeMap for MapSerializer<'a> {
         T: ?Sized + Serialize,
     {
         let val = key.serialize(&mut *self.parent)?;
-        self.cur_key = val.as_str().to_string();
+        self.cur_key = val.as_str();
         Ok(())
     }
 

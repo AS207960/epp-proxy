@@ -50,7 +50,7 @@ macro_rules! router {
                 }
             }
 
-            pub async fn handle_response(&mut self, transaction_id: &uuid::Uuid, response: super::proto::EPPResponse) -> Result<(), ()> {
+            pub async fn handle_response(&mut self, transaction_id: &uuid::Uuid, response: Box<super::proto::EPPResponse>) -> Result<(), ()> {
                 $(if let Some(return_path) = self.$n.remove(transaction_id) {
                     let _ = if !response.is_success() {
                         if response.is_server_error() {
@@ -59,7 +59,7 @@ macro_rules! router {
                             return_path.send(Response::Err(response.response_msg()))
                         }
                     } else {
-                        return_path.send($res_handle(response))
+                        return_path.send($res_handle(*response))
                     };
                 } else)* {}
                 Ok(())

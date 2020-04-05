@@ -92,7 +92,7 @@ pub fn handle_check(
     if !client.domain_supported {
         return Err(Response::Unsupported);
     }
-    if req.name.len() < 1 {
+    if req.name.is_empty() {
         return Err(Response::Err(
             "domain name has a min length of 1".to_string(),
         ));
@@ -129,7 +129,7 @@ pub fn handle_info(
     if !client.domain_supported {
         return Err(Response::Unsupported);
     }
-    if req.name.len() < 1 {
+    if req.name.is_empty() {
         return Err(Response::Err(
             "domain name has a min length of 1".to_string(),
         ));

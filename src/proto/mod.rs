@@ -10,14 +10,14 @@ pub mod host;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub enum EPPMessageType {
-    #[serde(rename = "hello", skip_deserializing)]
-    Hello,
+//    #[serde(rename = "hello", skip_deserializing)]
+//    Hello,
     #[serde(rename = "greeting", skip_serializing)]
     Greeting(EPPGreeting),
     #[serde(rename = "command", skip_deserializing)]
     Command(EPPCommand),
     #[serde(rename = "response", skip_serializing)]
-    Response(EPPResponse),
+    Response(Box<EPPResponse>),
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -58,8 +58,8 @@ pub struct EPPServiceExtension {
 pub enum EPPCommandType {
     #[serde(rename = "login")]
     Login(EPPLogin),
-    #[serde(rename = "logout")]
-    Logout,
+//    #[serde(rename = "logout")]
+//    Logout,
     #[serde(rename = "check")]
     Check(EPPCheck),
     #[serde(rename = "info")]
@@ -99,6 +99,12 @@ impl EPPResponse {
             None => false,
         }
     }
+    pub fn is_closing(&self) -> bool {
+        match self.results.first() {
+            Some(r) => r.code.is_closing(),
+            None => false,
+        }
+    }
     pub fn is_pending(&self) -> bool {
         match self.results.first() {
             Some(r) => r.code == EPPResultCode::SuccessActionPending,
@@ -123,7 +129,7 @@ impl EPPResponse {
                             .iter()
                             .next()
                             .map(|(k, v)| format!("{}: {}", k, v))
-                            .unwrap_or("".to_string());
+                            .unwrap_or_default();
                         format!("({}) {}", val, e.reason)
                     })
                     .collect::<Vec<_>>()
@@ -357,17 +363,17 @@ pub enum EPPResultDataValue {
     #[serde(rename = "domain:chkData")]
     EPPDomainCheckResult(domain::EPPDomainCheckData),
     #[serde(rename = "domain:infData")]
-    EPPDomainInfoResult(domain::EPPDomainInfoData),
+    EPPDomainInfoResult(Box<domain::EPPDomainInfoData>),
     #[serde(rename = "host:chkData")]
     EPPHostCheckResult(host::EPPHostCheckData),
     #[serde(rename = "host:infData")]
-    EPPHostInfoResult(host::EPPHostInfoData),
+    EPPHostInfoResult(Box<host::EPPHostInfoData>),
     #[serde(rename = "host:creData")]
     EPPHostCreateResult(host::EPPHostCreateData),
     #[serde(rename = "contact:chkData")]
     EPPContactCheckResult(contact::EPPContactCheckData),
     #[serde(rename = "contact:infData")]
-    EPPContactInfoResult(contact::EPPContactInfoData),
+    EPPContactInfoResult(Box<contact::EPPContactInfoData>),
 }
 
 #[derive(Debug, Deserialize)]
@@ -461,8 +467,8 @@ impl<'de> serde::de::Visitor<'de> for DateTimeVisitor {
             Ok(v) => Ok(Some(v.with_timezone(&Utc))),
             Err(_) => Utc
                 .datetime_from_str("2019-04-04T20:00:09", "%FT%T")
-                .map_err(|err| E::custom(err))
-                .map(|d| Some(d)),
+                .map_err( E::custom)
+                .map(Some),
         }
     }
 
