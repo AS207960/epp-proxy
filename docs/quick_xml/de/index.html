@@ -1,0 +1,113 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="API documentation for the Rust `de` mod in crate `quick_xml`."><meta name="keywords" content="rust, rustlang, rust-lang, de"><title>quick_xml::de - Rust</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css"><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="shortcut icon" href="../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc mod"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../quick_xml/index.html'><div class='logo-container'><img src='../../rust-logo.png' alt='logo'></div></a><p class='location'>Module de</p><div class="sidebar-elems"><div class="block items"><ul><li><a href="#structs">Structs</a></li><li><a href="#enums">Enums</a></li><li><a href="#functions">Functions</a></li></ul></div><p class='location'><a href='../index.html'>quick_xml</a></p><script>window.sidebarCurrent = {name: 'de', ty: 'mod', relpath: '../'};</script><script defer src="../sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class='fqn'><span class='out-of-band'><span id='render-detail'><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class='inner'>&#x2212;</span>]</a></span><a class='srclink' href='../../src/quick_xml/de/mod.rs.html#1-569' title='goto source code'>[src]</a></span><span class='in-band'>Module <a href='../index.html'>quick_xml</a>::<wbr><a class="mod" href=''>de</a></span></h1><div class='docblock'><p>Serde <code>Deserializer</code> module</p>
+<h1 id="examples" class="section-header"><a href="#examples">Examples</a></h1>
+<p>Here is a simple example parsing <a href="https://crates.io/">crates.io</a> source code.</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered">
+<span class="comment">// Cargo.toml</span>
+<span class="comment">// [dependencies]</span>
+<span class="comment">// serde = { version = &quot;1.0&quot;, features = [ &quot;derive&quot; ] }</span>
+<span class="comment">// quick_xml = { version = &quot;0.17&quot;, features = [ &quot;serialize&quot; ] }</span>
+<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">serde</span>;
+<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">quick_xml</span>;
+
+<span class="kw">use</span> <span class="ident">serde</span>::<span class="ident">Deserialize</span>;
+<span class="kw">use</span> <span class="ident">quick_xml</span>::<span class="ident">de</span>::{<span class="ident">from_str</span>, <span class="ident">DeError</span>};
+
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">PartialEq</span>)]</span>
+<span class="kw">struct</span> <span class="ident">Link</span> {
+    <span class="ident">rel</span>: <span class="ident">String</span>,
+    <span class="ident">href</span>: <span class="ident">String</span>,
+    <span class="ident">sizes</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+}
+
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">PartialEq</span>)]</span>
+<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;lowercase&quot;</span>)]</span>
+<span class="kw">enum</span> <span class="ident">Lang</span> {
+    <span class="ident">En</span>,
+    <span class="ident">Fr</span>,
+    <span class="ident">De</span>,
+}
+
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">PartialEq</span>)]</span>
+<span class="kw">struct</span> <span class="ident">Head</span> {
+    <span class="ident">title</span>: <span class="ident">String</span>,
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;link&quot;</span>, <span class="ident">default</span>)]</span>
+    <span class="ident">links</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Link</span><span class="op">&gt;</span>,
+}
+
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">PartialEq</span>)]</span>
+<span class="kw">struct</span> <span class="ident">Script</span> {
+    <span class="ident">src</span>: <span class="ident">String</span>,
+    <span class="ident">integrity</span>: <span class="ident">String</span>,
+}
+
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">PartialEq</span>)]</span>
+<span class="kw">struct</span> <span class="ident">Body</span> {
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;script&quot;</span>, <span class="ident">default</span>)]</span>
+    <span class="ident">scripts</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Script</span><span class="op">&gt;</span>,
+}
+
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">PartialEq</span>)]</span>
+<span class="kw">struct</span> <span class="ident">Html</span> {
+    <span class="ident">lang</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="ident">head</span>: <span class="ident">Head</span>,
+    <span class="ident">body</span>: <span class="ident">Body</span>,
+}
+
+<span class="kw">fn</span> <span class="ident">crates_io</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Html</span>, <span class="ident">DeError</span><span class="op">&gt;</span> {
+    <span class="kw">let</span> <span class="ident">xml</span> <span class="op">=</span> <span class="string">&quot;&lt;!DOCTYPE html&gt;
+        &lt;html lang=\&quot;en\&quot;&gt;
+          &lt;head&gt;
+            &lt;meta charset=\&quot;utf-8\&quot;&gt;
+            &lt;meta http-equiv=\&quot;X-UA-Compatible\&quot; content=\&quot;IE=edge\&quot;&gt;
+            &lt;meta name=\&quot;viewport\&quot; content=\&quot;width=device-width, initial-scale=1\&quot;&gt;
+
+            &lt;title&gt;crates.io: Rust Package Registry&lt;/title&gt;
+
+
+        &lt;meta name=\&quot;cargo/config/environment\&quot; content=\&quot;%7B%22modulePrefix%22%3A%22cargo%22%2C%22environment%22%3A%22production%22%2C%22rootURL%22%3A%22%2F%22%2C%22locationType%22%3A%22router-scroll%22%2C%22historySupportMiddleware%22%3Atrue%2C%22EmberENV%22%3A%7B%22FEATURES%22%3A%7B%7D%2C%22EXTEND_PROTOTYPES%22%3A%7B%22Date%22%3Afalse%7D%7D%2C%22APP%22%3A%7B%22name%22%3A%22cargo%22%2C%22version%22%3A%22b7796c9%22%7D%2C%22fastboot%22%3A%7B%22hostWhitelist%22%3A%5B%22crates.io%22%2C%7B%7D%2C%7B%7D%5D%7D%2C%22ember-cli-app-version%22%3A%7B%22version%22%3A%22b7796c9%22%7D%2C%22ember-cli-mirage%22%3A%7B%22usingProxy%22%3Afalse%2C%22useDefaultPassthroughs%22%3Atrue%7D%2C%22exportApplicationGlobal%22%3Afalse%7D\&quot; /&gt;
+        &lt;!-- EMBER_CLI_FASTBOOT_TITLE --&gt;&lt;!-- EMBER_CLI_FASTBOOT_HEAD --&gt;
+        &lt;link rel=\&quot;manifest\&quot; href=\&quot;/manifest.webmanifest\&quot;&gt;
+        &lt;link rel=\&quot;apple-touch-icon\&quot; href=\&quot;/cargo-835dd6a18132048a52ac569f2615b59d.png\&quot; sizes=\&quot;227x227\&quot;&gt;
+        &lt;meta name=\&quot;theme-color\&quot; content=\&quot;#f9f7ec\&quot;&gt;
+        &lt;meta name=\&quot;apple-mobile-web-app-capable\&quot; content=\&quot;yes\&quot;&gt;
+        &lt;meta name=\&quot;apple-mobile-web-app-title\&quot; content=\&quot;crates.io: Rust Package Registry\&quot;&gt;
+        &lt;meta name=\&quot;apple-mobile-web-app-status-bar-style\&quot; content=\&quot;default\&quot;&gt;
+
+            &lt;link rel=\&quot;stylesheet\&quot; href=\&quot;/assets/vendor-8d023d47762d5431764f589a6012123e.css\&quot; integrity=\&quot;sha256-EoB7fsYkdS7BZba47+C/9D7yxwPZojsE4pO7RIuUXdE= sha512-/SzGQGR0yj5AG6YPehZB3b6MjpnuNCTOGREQTStETobVRrpYPZKneJwcL/14B8ufcvobJGFDvnTKdcDDxbh6/A==\&quot; &gt;
+            &lt;link rel=\&quot;stylesheet\&quot; href=\&quot;/assets/cargo-cedb8082b232ce89dd449d869fb54b98.css\&quot; integrity=\&quot;sha256-S9K9jZr6nSyYicYad3JdiTKrvsstXZrvYqmLUX9i3tc= sha512-CDGjy3xeyiqBgUMa+GelihW394pqAARXwsU+HIiOotlnp1sLBVgO6v2ZszL0arwKU8CpvL9wHyLYBIdfX92YbQ==\&quot; &gt;
+
+
+            &lt;link rel=\&quot;shortcut icon\&quot; href=\&quot;/favicon.ico\&quot; type=\&quot;image/x-icon\&quot;&gt;
+            &lt;link rel=\&quot;icon\&quot; href=\&quot;/cargo-835dd6a18132048a52ac569f2615b59d.png\&quot; type=\&quot;image/png\&quot;&gt;
+            &lt;link rel=\&quot;search\&quot; href=\&quot;/opensearch.xml\&quot; type=\&quot;application/opensearchdescription+xml\&quot; title=\&quot;Cargo\&quot;&gt;
+          &lt;/head&gt;
+          &lt;body&gt;
+            &lt;!-- EMBER_CLI_FASTBOOT_BODY --&gt;
+            &lt;noscript&gt;
+                &lt;div id=\&quot;main\&quot;&gt;
+                    &lt;div class=&#39;noscript&#39;&gt;
+                        This site requires JavaScript to be enabled.
+                    &lt;/div&gt;
+                &lt;/div&gt;
+            &lt;/noscript&gt;
+
+            &lt;script src=\&quot;/assets/vendor-bfe89101b20262535de5a5ccdc276965.js\&quot; integrity=\&quot;sha256-U12Xuwhz1bhJXWyFW/hRr+Wa8B6FFDheTowik5VLkbw= sha512-J/cUUuUN55TrdG8P6Zk3/slI0nTgzYb8pOQlrXfaLgzr9aEumr9D1EzmFyLy1nrhaDGpRN1T8EQrU21Jl81pJQ==\&quot; &gt;&lt;/script&gt;
+            &lt;script src=\&quot;/assets/cargo-4023b68501b7b3e17b2bb31f50f5eeea.js\&quot; integrity=\&quot;sha256-9atimKc1KC6HMJF/B07lP3Cjtgr2tmET8Vau0Re5mVI= sha512-XJyBDQU4wtA1aPyPXaFzTE5Wh/mYJwkKHqZ/Fn4p/ezgdKzSCFu6FYn81raBCnCBNsihfhrkb88uF6H5VraHMA==\&quot; &gt;&lt;/script&gt;
+
+
+          &lt;/body&gt;
+        &lt;/html&gt;
+}&quot;</span>;
+    <span class="kw">let</span> <span class="ident">html</span>: <span class="ident">Html</span> <span class="op">=</span> <span class="ident">from_str</span>(<span class="ident">xml</span>)<span class="question-mark">?</span>;
+    <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw-2">&amp;</span><span class="ident">html</span>.<span class="ident">head</span>.<span class="ident">title</span>, <span class="string">&quot;crates.io: Rust Package Registr&quot;</span>);
+    <span class="prelude-val">Ok</span>(<span class="ident">html</span>)
+}</pre></div>
+</div><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
+<table><tr class='module-item'><td><a class="struct" href="struct.Deserializer.html" title='quick_xml::de::Deserializer struct'>Deserializer</a></td><td class='docblock-short'><p>An xml deserializer</p>
+</td></tr></table><h2 id='enums' class='section-header'><a href="#enums">Enums</a></h2>
+<table><tr class='module-item'><td><a class="enum" href="enum.DeError.html" title='quick_xml::de::DeError enum'>DeError</a></td><td class='docblock-short'><p>(De)serialization error</p>
+</td></tr></table><h2 id='functions' class='section-header'><a href="#functions">Functions</a></h2>
+<table><tr class='module-item'><td><a class="fn" href="fn.from_reader.html" title='quick_xml::de::from_reader fn'>from_reader</a></td><td class='docblock-short'><p>Deserialize from a reader</p>
+</td></tr><tr class='module-item'><td><a class="fn" href="fn.from_str.html" title='quick_xml::de::from_str fn'>from_str</a></td><td class='docblock-short'><p>Deserialize a xml string</p>
+</td></tr></table></section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../";window.currentCrate = "quick_xml";</script><script src="../../aliases.js"></script><script src="../../main.js"></script><script defer src="../../search-index.js"></script></body></html>
