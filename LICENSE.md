@@ -1,6 +1,6 @@
 MIT License
 
-Copyright (c) 2020 AS207960
+Copyright (c) 2020 [AS207960 Cyfynegedig](https://as207960.net)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
