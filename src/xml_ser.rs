@@ -102,7 +102,7 @@ fn format_tag(key: &str, val: &_SerializerData) -> String {
                 let open_tag_str = open_tag("", false);
                 output += &format!("{}<![CDATA[{}]]>{}", open_tag_str, s, close_tag);
             }
-        },
+        }
         _SerializerData::String(s) => {
             if s.is_empty() {
                 let open_tag_str = open_tag("", true);

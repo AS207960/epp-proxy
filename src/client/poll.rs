@@ -1,7 +1,7 @@
 //! EPP commands relating to domain objects
 
-use super::{proto, EPPClientServerFeatures, Request, Response, Sender};
 use super::router::HandleReqReturn;
+use super::{proto, EPPClientServerFeatures, Request, Response, Sender};
 use chrono::prelude::*;
 
 #[derive(Debug)]
@@ -40,7 +40,7 @@ pub struct PollAckResponse {
 pub fn handle_poll(
     _client: &EPPClientServerFeatures,
     _req: &PollRequest,
-) -> HandleReqReturn<Option<PollResponse>>{
+) -> HandleReqReturn<Option<PollResponse>> {
     let command = proto::EPPPoll {
         operation: proto::EPPPollOperation::Request,
         message_id: None,
@@ -73,7 +73,7 @@ pub fn handle_poll_response(response: proto::EPPResponse) -> Response<Option<Pol
 pub fn handle_poll_ack(
     _client: &EPPClientServerFeatures,
     req: &PollAckRequest,
-) -> HandleReqReturn<PollAckResponse>{
+) -> HandleReqReturn<PollAckResponse> {
     let command = proto::EPPPoll {
         operation: proto::EPPPollOperation::Acknowledge,
         message_id: Some(req.id.clone()),

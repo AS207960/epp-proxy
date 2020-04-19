@@ -12,7 +12,13 @@ pub enum Response<T> {
     InternalServerError,
 }
 
-pub type HandleReqReturn<T> = Result<(super::proto::EPPCommandType, Option<super::proto::EPPCommandExtensionType>), Response<T>>;
+pub type HandleReqReturn<T> = Result<
+    (
+        super::proto::EPPCommandType,
+        Option<super::proto::EPPCommandExtensionType>,
+    ),
+    Response<T>,
+>;
 
 macro_rules! router {
     ($($n:ident, $req:ty, $res:ty, $req_handle:path, $res_handle:path);*) => {

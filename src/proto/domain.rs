@@ -79,7 +79,7 @@ pub struct EPPDomainStatus {
     #[serde(rename = "s")]
     pub status: EPPDomainStatusType,
     #[serde(rename = "$value")]
-    pub message: Option<String>
+    pub message: Option<String>,
 }
 
 #[derive(Debug, Serialize)]
@@ -87,7 +87,7 @@ pub struct EPPDomainStatusSer {
     #[serde(rename = "$attr:s", default)]
     pub status: EPPDomainStatusType,
     #[serde(rename = "$value")]
-    pub message: Option<String>
+    pub message: Option<String>,
 }
 
 #[derive(Debug, Deserialize, Serialize, PartialEq)]
@@ -190,7 +190,11 @@ pub struct EPPDomainTransferData {
     pub act_client_id: String,
     #[serde(rename = "acDate", deserialize_with = "super::deserialize_datetime")]
     pub act_date: DateTime<Utc>,
-    #[serde(rename = "exDate", deserialize_with = "super::deserialize_datetime_opt", default)]
+    #[serde(
+        rename = "exDate",
+        deserialize_with = "super::deserialize_datetime_opt",
+        default
+    )]
     pub expiry_date: Option<DateTime<Utc>>,
 }
 
@@ -270,10 +274,7 @@ pub enum EPPDomainPeriodUnit {
 #[derive(Debug, Deserialize)]
 pub struct EPPDomainCreateData {
     pub name: String,
-    #[serde(
-        rename = "crDate",
-        deserialize_with = "super::deserialize_datetime",
-    )]
+    #[serde(rename = "crDate", deserialize_with = "super::deserialize_datetime")]
     pub creation_date: DateTime<Utc>,
     #[serde(
         rename = "exDate",
@@ -361,10 +362,7 @@ pub struct EPPDomainPanData {
     pub name: EPPDomainPanDomain,
     #[serde(rename = "paTRID")]
     pub transaction_id: super::EPPTransactionIdentifier,
-    #[serde(
-        rename = "paDate",
-        deserialize_with = "super::deserialize_datetime",
-    )]
+    #[serde(rename = "paDate", deserialize_with = "super::deserialize_datetime")]
     pub action_date: DateTime<Utc>,
 }
 

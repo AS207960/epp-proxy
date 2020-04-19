@@ -4,18 +4,18 @@
 use chrono::prelude::*;
 use std::collections::HashMap;
 
+pub mod change_poll;
 pub mod contact;
 pub mod domain;
 pub mod host;
 pub mod nominet;
-pub mod switch;
-pub mod change_poll;
 pub mod rgp;
+pub mod switch;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub enum EPPMessageType {
     #[serde(rename = "hello", skip_deserializing)]
-    Hello{},
+    Hello {},
     #[serde(rename = "greeting", skip_serializing)]
     Greeting(EPPGreeting),
     #[serde(rename = "command", skip_deserializing)]
@@ -57,7 +57,9 @@ impl EPPServiceMenu {
         self.objects.iter().any(|e| e == obj)
     }
     pub fn supports_ext(&self, obj: &str) -> bool {
-        self.extension.as_ref().map_or(false,|e| e.extensions.iter().any(|e| e == obj))
+        self.extension
+            .as_ref()
+            .map_or(false, |e| e.extensions.iter().any(|e| e == obj))
     }
 }
 
@@ -72,7 +74,7 @@ pub enum EPPCommandType {
     #[serde(rename = "login")]
     Login(EPPLogin),
     #[serde(rename = "logout")]
-    Logout{},
+    Logout {},
     #[serde(rename = "check")]
     Check(EPPCheck),
     #[serde(rename = "info")]
@@ -93,12 +95,16 @@ pub enum EPPCommandType {
 
 #[derive(Debug, Serialize)]
 pub enum EPPCommandExtensionType {
-    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/contact-nom-ext-1.0}contact-nom-ext:create")]
+    #[serde(
+        rename = "{http://www.nominet.org.uk/epp/xml/contact-nom-ext-1.0}contact-nom-ext:create"
+    )]
     NominetContactExtCreate(nominet::EPPContactInfoSet),
-    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/contact-nom-ext-1.0}contact-nom-ext:update")]
+    #[serde(
+        rename = "{http://www.nominet.org.uk/epp/xml/contact-nom-ext-1.0}contact-nom-ext:update"
+    )]
     NominetContactExtUpdate(nominet::EPPContactInfoSet),
     #[serde(rename = "{urn:ietf:params:xml:ns:rgp-1.0}rgp:update")]
-    EPPRGPUpdate(rgp::EPPRGPUpdate)
+    EPPRGPUpdate(rgp::EPPRGPUpdate),
 }
 
 #[derive(Debug, Serialize)]
@@ -130,7 +136,7 @@ pub enum EPPResponseExtensionType {
 #[derive(Debug, Deserialize)]
 pub struct EPPResponseExtension {
     #[serde(rename = "$value")]
-    pub value: Vec<EPPResponseExtensionType>
+    pub value: Vec<EPPResponseExtensionType>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -500,10 +506,10 @@ pub enum EPPInfo {
     #[serde(rename = "{urn:ietf:params:xml:ns:contact-1.0}contact:info")]
     Contact(contact::EPPContactCheck),
     #[serde(rename = "{http://www.nominet.org.uk/epp/xml/nom-tag-1.0}tag:list")]
-    TagList{},
+    TagList {},
     #[serde(rename = "{https://www.nic.ch/epp/balance-1.0}balance:info")]
     #[allow(dead_code)]
-    SwitchBalace{},
+    SwitchBalace {},
 }
 
 #[derive(Debug, Serialize)]
@@ -651,7 +657,6 @@ where
     d.deserialize_str(DateTimeVisitor)
 }
 
-
 fn deserialize_datetime_opt<'de, D>(d: D) -> Result<Option<DateTime<Utc>>, D::Error>
 where
     D: serde::de::Deserializer<'de>,
@@ -661,8 +666,8 @@ where
 
 #[allow(clippy::trivially_copy_pass_by_ref)]
 fn serialize_date<S>(d: &Date<Utc>, s: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::ser::Serializer,
+where
+    S: serde::ser::Serializer,
 {
     s.serialize_str(&d.format("%Y-%m-%d").to_string())
 }

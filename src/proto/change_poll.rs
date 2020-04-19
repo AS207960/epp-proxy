@@ -21,7 +21,7 @@ pub enum EPPChangeState {
     #[serde(rename = "before")]
     Before,
     #[serde(rename = "after")]
-    After
+    After,
 }
 
 impl Default for EPPChangeState {
@@ -35,7 +35,7 @@ pub struct EPPChangeOperation {
     #[serde(rename = "op")]
     pub operation: String,
     #[serde(rename = "$value")]
-    pub op_type: EPPChangeOperationType
+    pub op_type: EPPChangeOperationType,
 }
 
 #[derive(Debug, Deserialize)]
@@ -59,7 +59,7 @@ pub enum EPPChangeOperationType {
     #[serde(rename = "autoPurge")]
     AutoPurge,
     #[serde(rename = "custom")]
-    Custom
+    Custom,
 }
 
 #[derive(Debug, Deserialize)]
@@ -67,7 +67,7 @@ pub struct EPPChangeCaseId {
     #[serde(rename = "type")]
     pub case_type: EPPChangeCaseIdType,
     #[serde(rename = "$value")]
-    pub case_id: String
+    pub case_id: String,
 }
 
 #[derive(Debug, Deserialize)]
@@ -77,5 +77,5 @@ pub enum EPPChangeCaseIdType {
     #[serde(rename = "urs")]
     URS,
     #[serde(rename = "custom")]
-    Custom
+    Custom,
 }

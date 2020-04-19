@@ -1,7 +1,7 @@
 //! EPP commands relating to host (nameserver) objects
 
-use super::{proto, EPPClientServerFeatures, Request, Response, Sender};
 use super::router::HandleReqReturn;
+use super::{proto, EPPClientServerFeatures, Request, Response, Sender};
 use chrono::prelude::*;
 
 #[derive(Debug)]
@@ -145,7 +145,7 @@ impl From<&Status> for proto::host::EPPHostStatusType {
 pub fn handle_check(
     client: &EPPClientServerFeatures,
     req: &CheckRequest,
-) -> HandleReqReturn<CheckResponse>{
+) -> HandleReqReturn<CheckResponse> {
     if !client.host_supported {
         return Err(Response::Unsupported);
     }
@@ -180,7 +180,7 @@ pub fn handle_check_response(response: proto::EPPResponse) -> Response<CheckResp
 pub fn handle_info(
     client: &EPPClientServerFeatures,
     req: &InfoRequest,
-) -> HandleReqReturn<InfoResponse>{
+) -> HandleReqReturn<InfoResponse> {
     if !client.host_supported {
         return Err(Response::Unsupported);
     }
@@ -199,7 +199,11 @@ pub fn handle_info_response(response: proto::EPPResponse) -> Response<InfoRespon
             proto::EPPResultDataValue::EPPHostInfoResult(host_info) => Response::Ok(InfoResponse {
                 name: host_info.name,
                 registry_id: host_info.registry_id,
-                statuses: host_info.statuses.into_iter().map(|s| s.status.into()).collect(),
+                statuses: host_info
+                    .statuses
+                    .into_iter()
+                    .map(|s| s.status.into())
+                    .collect(),
                 addresses: host_info
                     .addresses
                     .into_iter()
@@ -227,7 +231,7 @@ pub fn handle_info_response(response: proto::EPPResponse) -> Response<InfoRespon
 pub fn handle_create(
     client: &EPPClientServerFeatures,
     req: &CreateRequest,
-) -> HandleReqReturn<CreateResponse>{
+) -> HandleReqReturn<CreateResponse> {
     if !client.host_supported {
         return Err(Response::Unsupported);
     }
@@ -281,7 +285,7 @@ pub fn handle_create_response(response: proto::EPPResponse) -> Response<CreateRe
 pub fn handle_delete(
     client: &EPPClientServerFeatures,
     req: &DeleteRequest,
-) -> HandleReqReturn<DeleteResponse>{
+) -> HandleReqReturn<DeleteResponse> {
     if !client.host_supported {
         return Err(Response::Unsupported);
     }
@@ -303,7 +307,7 @@ pub fn handle_delete_response(response: proto::EPPResponse) -> Response<DeleteRe
 pub fn handle_update(
     client: &EPPClientServerFeatures,
     req: &UpdateRequest,
-) -> HandleReqReturn<UpdateResponse>{
+) -> HandleReqReturn<UpdateResponse> {
     if !client.host_supported {
         return Err(Response::Unsupported);
     }
@@ -370,15 +374,11 @@ pub fn handle_update(
         name: req.name.clone(),
         add: match adds.len() {
             0 => None,
-            _ => Some(proto::host::EPPHostUpdateAdd {
-                params: adds,
-            }),
+            _ => Some(proto::host::EPPHostUpdateAdd { params: adds }),
         },
         remove: match rems.len() {
             0 => None,
-            _ => Some(proto::host::EPPHostUpdateRemove {
-                params: rems,
-            }),
+            _ => Some(proto::host::EPPHostUpdateRemove { params: rems }),
         },
         change: req
             .new_name
