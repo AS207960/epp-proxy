@@ -79,8 +79,8 @@ impl Router {
     fn add_config(&mut self, config: &ConfigFile, log_dir: std::path::PathBuf) {
         let epp_client = client::EPPClient::new(
             &config.server, &config.tag, &config.password, log_dir,
-            config.client_cert.as_ref().map(|c| c.as_str()),
-            config.old_password.as_ref().map(|c| c.as_str())
+            config.client_cert.as_deref(),
+            config.old_password.as_deref()
         );
         let epp_client_sender = epp_client.start();
 
