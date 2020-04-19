@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["handle_tag_list",""],["handle_tag_list_response",""],["tag_list","Fetches a list of registered tags"]],"struct":[["Tag",""],["TagListRequest",""],["TagListResponse","Response to a tag list query"]]});
