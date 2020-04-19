@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0"><response><result code="2200"><msg lang="en">Authentication error</msg></result><trID><clTRID>0121b98b-69c6-4646-ba73-a3559253daa8</clTRID><svTRID>1587159310385</svTRID></trID></response></epp>

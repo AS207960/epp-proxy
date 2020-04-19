@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0"><response><result code="2308"><msg lang="en">Data management policy violation</msg><extValue><value><domain:hostObj xmlns:domain="urn:ietf:params:xml:ns:domain-1.0"><![CDATA[ns3.TEST-REGISTRAR-B-domain-1.ch]]></domain:hostObj></value><reason lang="en">The host:name does not exist</reason></extValue></result><trID><clTRID>6b5ad2a2-24c1-41e3-bd17-79d89739bd45</clTRID><svTRID>20200417.92460487.973186563</svTRID></trID></response></epp>

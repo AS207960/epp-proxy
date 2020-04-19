@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id: std-release-1.0.xsd 29904 2009-10-26 13:38:48Z ed $ -->
+  <schema targetNamespace="http://www.nominet.org.uk/epp/xml/std-release-1.0"
+    xmlns="http://www.w3.org/2001/XMLSchema"
+    xmlns:release="http://www.nominet.org.uk/epp/xml/std-release-1.0"
+    xmlns:eppcom="urn:ietf:params:xml:ns:eppcom-1.0"
+    elementFormDefault="qualified">
+  
+    <!-- Import common element types. -->
+    <import namespace="urn:ietf:params:xml:ns:epp-1.0" schemaLocation="epp-1.0.xsd"/>
+    <import namespace="urn:ietf:params:xml:ns:eppcom-1.0" schemaLocation="eppcom-1.0.xsd"/>
+    <annotation>
+    <documentation>
+      EPP standard extension release schema.
+    </documentation>
+  </annotation>
+  
+  <!-- release domains to another tag -->
+  <element name="release" type="release:releaseDataType"></element>
+  
+  <!-- release response when handshake requested -->
+  <element name="releasePending" type="release:releasePendingDataType"></element>
+  
+  <!-- release data types -->
+  <complexType name="releaseDataType">
+    <sequence>
+      <choice>
+        <element name="domainName" type="eppcom:labelType"/>
+        <element name="registrant" type="eppcom:clIDType"/>
+      </choice>
+      <element name="registrarTag" type="eppcom:clIDType"/>
+    </sequence>
+  </complexType>
+
+<simpleType name="releasePendingDataType">
+  <restriction base="string"/>
+</simpleType>
+
+</schema>

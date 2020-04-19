@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0"><response><result code="1500"><msg lang="en">Command completed successfully; ending session</msg></result><trID><clTRID>b69dcbc6-4676-4dbd-903f-e9279f5484b7</clTRID><svTRID>20200417.92460646.973189309</svTRID></trID></response></epp>

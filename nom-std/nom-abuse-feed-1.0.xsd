@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id: nom-abuse-feed-1.0.xsd 30206 2009-11-11 12:10:30Z judyb $ -->
+<schema targetNamespace="http://www.nominet.org.uk/epp/xml/nom-abuse-feed-1.0"
+    xmlns:abuse-feed="http://www.nominet.org.uk/epp/xml/nom-abuse-feed-1.0"
+    xmlns:epp="urn:ietf:params:xml:ns:epp-1.0"
+    xmlns:eppcom="urn:ietf:params:xml:ns:eppcom-1.0"
+    xmlns="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+    
+    <!-- Import common element types.  -->
+    <import namespace="urn:ietf:params:xml:ns:eppcom-1.0" schemaLocation="eppcom-1.0.xsd"/>
+    
+    <annotation>
+        <documentation>
+            Extensible Provisioning Protocol v1.0
+            abuse notification schema.
+        </documentation>
+    </annotation>
+    
+    <element name="infData" type="abuse-feed:infDataType"/>
+    <element name="listData"  type="abuse-feed:listDataType"/>
+    
+    <!-- New domain in feed notification -->
+    <complexType name="infDataType">
+        <sequence>
+            <element name="key" type="eppcom:labelType" />            
+            <element name="activity" type="eppcom:labelType" />            
+            <element name="source" type="eppcom:labelType" />            
+            <element name="hostname" type="eppcom:labelType" />            
+            <element name="url" type="eppcom:labelType" minOccurs="0"/>            
+            <element name="date" type="dateTime" />            
+            <element name="ip" type="eppcom:labelType" minOccurs="0" />            
+            <element name="nameserver" type="eppcom:labelType" minOccurs="0" />            
+            <element name="dnsAdmin" type="eppcom:labelType" minOccurs="0" />            
+            <element name="target" type="eppcom:labelType" minOccurs="0" />            
+            <element name="wholeDomain" type="eppcom:labelType" minOccurs="0" />            
+        </sequence>
+    </complexType>
+
+
+    <complexType name="listDataType">
+        <sequence>
+            <element name="infData" type="abuse-feed:infDataType" maxOccurs="unbounded"/>
+        </sequence>
+        <attribute name="noDomains" type="nonNegativeInteger"/>
+    </complexType>
+</schema>

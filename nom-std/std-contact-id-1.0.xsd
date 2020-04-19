@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id: std-contact-id-1.0.xsd 29904 2009-10-26 13:38:48Z ed $ -->
+  <schema targetNamespace="http://www.nominet.org.uk/epp/xml/std-contact-id-1.0"
+    xmlns="http://www.w3.org/2001/XMLSchema"
+    xmlns:cid="http://www.nominet.org.uk/epp/xml/std-contact-id-1.0"
+    xmlns:eppcom="urn:ietf:params:xml:ns:eppcom-1.0"
+    elementFormDefault="qualified">
+  
+    <!-- Import common element types. -->
+    <import namespace="urn:ietf:params:xml:ns:epp-1.0" schemaLocation="epp-1.0.xsd"/>
+    <import namespace="urn:ietf:params:xml:ns:eppcom-1.0" schemaLocation="eppcom-1.0.xsd"/>
+    <annotation>
+    <documentation>
+      EPP standard extension contact id schema.
+    </documentation>
+  </annotation>
+  
+  <!-- change id for a contact -->
+  <element name="update" type="cid:updateDataType"></element>
+  
+  <!-- update data types -->
+  <complexType name="updateDataType">
+    <sequence>
+        <element name="id" type="eppcom:clIDType"/>
+        <element name="chg" type="cid:chgType"/>
+    </sequence>
+  </complexType>
+
+<complexType name="chgType">
+  <sequence>
+    <element name="id" type="eppcom:clIDType"/>
+  </sequence>
+</complexType>
+
+</schema>

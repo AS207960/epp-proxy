@@ -1,0 +1,157 @@
+syntax = "proto3";
+package epp.domain;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+import "common.proto";
+import "rgp.proto";
+
+message Contact {
+    string id = 1;
+    string type = 2;
+}
+message NameServer {
+    string host = 1;
+    common.IPAddress address = 2;
+}
+message Period {
+    enum Unit {
+        Years = 0;
+        Months = 1;
+    }
+
+    uint32 value = 1;
+    Unit unit = 2;
+}
+
+enum DomainStatus {
+    ClientDeleteProhibited = 0;
+    ClientHold = 1;
+    ClientRenewProhibited = 2;
+    ClientTransferProhibited = 3;
+    ClientUpdateProhibited = 4;
+    Inactive = 5;
+    Ok = 6;
+    PendingCreate = 7;
+    PendingDelete = 8;
+    PendingRenew = 9;
+    PendingTransfer = 10;
+    PendingUpdate = 11;
+    ServerDeleteProhibited = 12;
+    ServerHold = 13;
+    ServerRenewProhibited = 14;
+    ServerTransferProhibited = 15;
+    ServerUpdateProhibited = 16;
+}
+
+message DomainCheckRequest {
+    string name = 1;
+}
+
+message DomainCheckReply {
+    bool available = 1;
+    google.protobuf.StringValue reason = 2;
+    string registry_name = 3;
+}
+
+message DomainInfoRequest {
+    string name = 1;
+}
+
+message DomainInfoReply {
+    string name = 1;
+    string registry_id = 2;
+    repeated DomainStatus statuses = 3;
+    string registrant = 4;
+    repeated Contact contacts = 5;
+    repeated NameServer nameservers = 6;
+    repeated string hosts = 7;
+    string client_id = 8;
+    google.protobuf.StringValue client_created_id = 9;
+    google.protobuf.Timestamp creation_date = 10;
+    google.protobuf.Timestamp expiry_date = 11;
+    google.protobuf.StringValue last_updated_client = 12;
+    google.protobuf.Timestamp last_updated_date = 13;
+    google.protobuf.Timestamp last_transfer_date = 14;
+    string registry_name = 15;
+    rgp.RGPState rgp_state = 16;
+}
+
+message DomainCreateRequest {
+    string name = 1;
+    Period period = 2;
+    string registrant = 3;
+    repeated Contact contacts = 4;
+    repeated NameServer nameservers = 5;
+    string auth_info = 6;
+}
+
+message DomainCreateReply {
+    bool pending = 1;
+    google.protobuf.Timestamp creation_date = 2;
+    google.protobuf.Timestamp expiry_date = 3;
+    string registry_name = 4;
+}
+
+message DomainDeleteRequest {
+    string name = 1;
+}
+
+message DomainDeleteReply {
+    bool pending = 1;
+    string registry_name = 2;
+}
+
+message DomainUpdateRequest {
+    message Param {
+        oneof param {
+            NameServer nameserver = 1;
+            Contact contact = 2;
+            DomainStatus state = 3;
+        }
+    }
+
+    string name = 1;
+    repeated Param add = 2;
+    repeated Param remove = 3;
+    google.protobuf.StringValue new_registrant = 4;
+    google.protobuf.StringValue new_auth_info = 5;
+}
+
+message DomainUpdateReply {
+    bool pending = 1;
+    string registry_name = 2;
+}
+
+message DomainRenewRequest {
+    string name = 1;
+    Period period = 2;
+    google.protobuf.Timestamp current_expiry_date = 3;
+}
+
+message DomainRenewReply {
+    bool pending = 1;
+    google.protobuf.Timestamp expiry_date = 2;
+    string registry_name = 3;
+}
+
+message DomainTransferQueryRequest {
+    string name = 1;
+}
+
+message DomainTransferRequestRequest {
+    string name = 1;
+    Period period = 2;
+    string auth_info = 3;
+}
+
+message DomainTransferReply {
+    bool pending = 1;
+    common.TransferStatus status = 2;
+    string requested_client_id = 3;
+    google.protobuf.Timestamp requested_date = 4;
+    string act_client_id = 5;
+    google.protobuf.Timestamp act_date = 6;
+    google.protobuf.Timestamp expiry_date = 7;
+    string registry_name = 8;
+}

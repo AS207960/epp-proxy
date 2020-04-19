@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0"><response><result code="2202"><msg lang="en">Invalid authorization information</msg></result><trID><clTRID>17c19d2a-29df-4d0e-b903-238557597185</clTRID><svTRID>20200417.92461413.973199976</svTRID></trID></response></epp>

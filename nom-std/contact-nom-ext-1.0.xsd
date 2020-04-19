@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id: contact-nom-ext-1.0.xsd 31261 2010-01-29 13:29:09Z alistairb $ -->
+  <schema targetNamespace="http://www.nominet.org.uk/epp/xml/contact-nom-ext-1.0"
+    xmlns:contact="http://www.nominet.org.uk/epp/xml/contact-nom-ext-1.0"
+    xmlns:epp="urn:ietf:params:xml:ns:epp-1.0"
+    xmlns:eppcom="urn:ietf:params:xml:ns:eppcom-1.0"
+    xmlns:contact-std="urn:ietf:params:xml:ns:contact-1.0"
+    xmlns="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+
+    <!-- Import common element types.  -->
+    <import namespace="urn:ietf:params:xml:ns:eppcom-1.0" schemaLocation="eppcom-1.0.xsd"/>
+  <import namespace="urn:ietf:params:xml:ns:contact-1.0" schemaLocation="contact-1.0.xsd"/>
+  <import namespace="urn:ietf:params:xml:ns:epp-1.0" schemaLocation="epp-1.0.xsd"/>
+ 
+    <annotation>
+      <documentation>
+        Extensible Provisioning Protocol v1.0
+        contact extension provisioning schema.
+      </documentation>
+    </annotation>
+
+    <!-- Child elements found in EPP commands. -->
+    <element name="info" type="contact:infoType"/>
+    <element name="update" type="contact:updateType"/>
+    <element name="create" type="contact:createType"/>
+    
+    <!-- Child elements of the <info> command.  -->
+    <complexType name="infoType">
+      <sequence>
+         <element name="roid" type="contact:idType"/>
+      </sequence>
+    </complexType>
+
+    <simpleType name="idType">
+      <restriction base="token">
+	<pattern value="C[0-9]*(-UK)?"/>
+      </restriction>
+    </simpleType> 
+
+    <!-- Child elements of the <update> command. 
+      roid is required when the identifier cannot be determined from
+      a surrounding contact:updateType element -->
+    <complexType name="updateType">
+      <sequence>
+        <element name="trad-name" type="contact:tradNameType"
+          minOccurs="0"/>
+        <element name="type" type="contact:typeType"
+          minOccurs="0"/>
+        <element name="co-no" type="contact:coNoType"
+          minOccurs="0"/>
+        <element name="opt-out" type="contact:flagType"
+          minOccurs="0"/>
+      </sequence>
+    </complexType>
+
+    <!-- Child response elements.  -->
+    <element name="infData" type="contact:infDataType"/>
+
+    <!-- <info> response elements. -
+       This needs to contain elements that don't appear in the main schema - 
+       -->
+    <complexType name="infDataType">
+      <sequence>
+        <element name="trad-name" type="contact:tradNameType"
+          minOccurs="0"/>
+        <element name="type" type="contact:typeType"
+          minOccurs="0"/>
+        <element name="co-no" type="contact:coNoType"
+          minOccurs="0"/>
+        <element name="opt-out" type="contact:flagType"
+          minOccurs="0"/>
+      </sequence>
+    </complexType>
+    
+    <!-- y/n flag -->
+    <simpleType name="flagType">
+       <restriction base="token">
+         <enumeration value="y"/>
+         <enumeration value="Y"/>
+         <enumeration value="n"/>
+         <enumeration value="N"/>
+       </restriction>
+    </simpleType>
+
+    <simpleType name="typeType">
+      <restriction base="token">
+        <enumeration value="LTD"/>
+        <enumeration value="PLC"/>
+        <enumeration value="IND"/>
+        <enumeration value="FIND"/>
+        <enumeration value="RCHAR"/>
+        <enumeration value="SCH"/>
+        <enumeration value="LLP"/>
+        <enumeration value="STRA"/>
+        <enumeration value="PTNR"/>
+        <enumeration value="GOV"/>
+        <enumeration value="CRC"/>
+        <enumeration value="STAT"/>
+        <enumeration value="FCORP"/>
+        <enumeration value="IP"/>
+        <enumeration value="FOTHER"/>
+        <enumeration value="OTHER"/>
+        <enumeration value="UNKNOWN"/>
+      </restriction>
+    </simpleType>
+    
+    <simpleType name="coNoType">
+      <restriction base="token">
+        <maxLength value="255"/>
+      </restriction>
+    </simpleType>
+    
+    <simpleType name="tradNameType">
+      <restriction base="token">
+        <maxLength value="255"/>
+      </restriction>
+    </simpleType>
+
+     <complexType name="createType">
+      <sequence>
+        <element name="trad-name" type="contact:tradNameType"
+          minOccurs="0"/>
+        <element name="type" type="contact:typeType"
+          minOccurs="0"/>
+        <element name="co-no" type="contact:coNoType"
+          minOccurs="0"/>
+        <element name="opt-out" type="contact:flagType"
+          minOccurs="0"/>
+      </sequence>
+    </complexType>
+
+    <simpleType name="emailType">
+      <restriction base="token">
+        <minLength value="1"/>
+        <!--<pattern value="^[a-z0-9\-\.]*@[a-z0-9\-\.]*$"/>-->
+        <pattern value=".*"/>
+      </restriction>
+    </simpleType>
+
+
+  </schema>
+  
+  
+  

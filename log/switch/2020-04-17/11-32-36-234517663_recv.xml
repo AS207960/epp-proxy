@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0"><response><result code="2001"><msg lang="en">Command syntax error</msg><extValue><value><epp /></value><reason lang="en">Error on line 1: cvc-complex-type.2.4.a: Invalid content was found starting with element '{"urn:ietf:params:xml:ns:domain-1.0":ns}'. One of '{"urn:ietf:params:xml:ns:domain-1.0":contact, "urn:ietf:params:xml:ns:domain-1.0":status}' is expected.</reason></extValue></result><trID><svTRID>20200417.92460427.973185607</svTRID></trID></response></epp>

@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0"><response><result code="1000"><msg lang="en">Command completed successfully</msg></result><resData><domain:chkData xmlns:domain="urn:ietf:params:xml:ns:domain-1.0"><domain:cd><domain:name avail="1">TEST-REGISTRAR-B-domain-2.ch</domain:name></domain:cd></domain:chkData></resData><trID><clTRID>bed90dab-2e91-4800-bc12-8daa18e8265c</clTRID><svTRID>20200417.92460470.973186429</svTRID></trID></response></epp>

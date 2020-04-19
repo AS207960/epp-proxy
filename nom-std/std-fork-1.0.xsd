@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id: std-fork-1.0.xsd 66907 2016-03-08 14:13:24Z barbara $ -->
+<schema targetNamespace="http://www.nominet.org.uk/epp/xml/std-fork-1.0"
+  xmlns="http://www.w3.org/2001/XMLSchema"
+  xmlns:fork="http://www.nominet.org.uk/epp/xml/std-fork-1.0"
+  xmlns:eppcom="urn:ietf:params:xml:ns:eppcom-1.0"
+  elementFormDefault="qualified">
+  
+  <!-- Import common element types. -->
+  <import namespace="urn:ietf:params:xml:ns:epp-1.0" schemaLocation="epp-1.0.xsd"/>
+  <import namespace="urn:ietf:params:xml:ns:eppcom-1.0" schemaLocation="eppcom-1.0.xsd"/>
+  <annotation>
+    <documentation>
+      EPP standard extension schema for contact fork.
+    </documentation>
+  </annotation>
+
+  <element name="fork" type="fork:forkType"/>
+    
+  <complexType name="forkType">
+     <sequence>
+        <element name="contactId" type="eppcom:clIDType"
+          minOccurs="0"/>
+        <element name="newContactId" type="eppcom:clIDType"
+          minOccurs="0"/>
+        <element name="domainName" type="eppcom:labelType"
+          minOccurs="0" maxOccurs="unbounded"/>
+     </sequence>
+  </complexType>
+
+</schema>

@@ -1,0 +1,1 @@
+<?xml version="1.0" encoding="UTF-8"?><epp xmlns="urn:ietf:params:xml:ns:epp-1.0"><command><transfer op="query"><domain:transfer xmlns:domain="urn:ietf:params:xml:ns:domain-1.0"><domain:name><![CDATA[TEST-REGISTRAR-domain-1.ch]]></domain:name></domain:transfer></transfer><clTRID><![CDATA[982f23b5-b620-4a45-a128-2b236d7fe728]]></clTRID></command></epp>

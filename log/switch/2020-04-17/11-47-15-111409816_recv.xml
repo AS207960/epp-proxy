@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0"><response><result code="2308"><msg lang="en">Data management policy violation</msg><extValue><value><domain:name xmlns:domain="urn:ietf:params:xml:ns:domain-1.0"><![CDATA[TEST-REGISTRAR-A-domain-1.ch]]></domain:name></value><reason lang="en">Only one domain:tech element is allowed</reason></extValue></result><trID><clTRID>cab5aabd-7166-4988-878c-baad525e2ade</clTRID><svTRID>20200417.92460460.973186250</svTRID></trID></response></epp>

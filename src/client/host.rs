@@ -1,6 +1,7 @@
 //! EPP commands relating to host (nameserver) objects
 
 use super::{proto, EPPClientServerFeatures, Request, Response, Sender};
+use super::router::HandleReqReturn;
 use chrono::prelude::*;
 
 #[derive(Debug)]
@@ -25,7 +26,7 @@ pub struct InfoRequest {
 pub struct InfoResponse {
     pub name: String,
     pub registry_id: String,
-    pub statuses: Vec<String>,
+    pub statuses: Vec<Status>,
     pub addresses: Vec<Address>,
     pub client_id: String,
     pub client_created_id: Option<String>,
@@ -83,7 +84,7 @@ pub struct UpdateRequest {
 #[derive(Debug)]
 pub enum UpdateObject {
     Address(Address),
-    Status(String),
+    Status(Status),
 }
 
 #[derive(Debug)]
@@ -91,10 +92,60 @@ pub struct UpdateResponse {
     pub pending: bool,
 }
 
+#[derive(Debug)]
+pub enum Status {
+    ClientDeleteProhibited,
+    ClientUpdateProhibited,
+    Linked,
+    Ok,
+    PendingCreate,
+    PendingDelete,
+    PendingTransfer,
+    PendingUpdate,
+    ServerDeleteProhibited,
+    ServerUpdateProhibited,
+}
+
+impl From<proto::host::EPPHostStatusType> for Status {
+    fn from(from: proto::host::EPPHostStatusType) -> Self {
+        use proto::host::EPPHostStatusType;
+        match from {
+            EPPHostStatusType::ClientDeleteProhibited => Status::ClientDeleteProhibited,
+            EPPHostStatusType::ClientUpdateProhibited => Status::ClientUpdateProhibited,
+            EPPHostStatusType::Linked => Status::Linked,
+            EPPHostStatusType::Ok => Status::Ok,
+            EPPHostStatusType::PendingCreate => Status::PendingCreate,
+            EPPHostStatusType::PendingDelete => Status::PendingDelete,
+            EPPHostStatusType::PendingTransfer => Status::PendingTransfer,
+            EPPHostStatusType::PendingUpdate => Status::PendingUpdate,
+            EPPHostStatusType::ServerDeleteProhibited => Status::ServerDeleteProhibited,
+            EPPHostStatusType::ServerUpdateProhibited => Status::ServerUpdateProhibited,
+        }
+    }
+}
+
+impl From<&Status> for proto::host::EPPHostStatusType {
+    fn from(from: &Status) -> Self {
+        use proto::host::EPPHostStatusType;
+        match from {
+            Status::ClientDeleteProhibited => EPPHostStatusType::ClientDeleteProhibited,
+            Status::ClientUpdateProhibited => EPPHostStatusType::ClientUpdateProhibited,
+            Status::Linked => EPPHostStatusType::Linked,
+            Status::Ok => EPPHostStatusType::Ok,
+            Status::PendingCreate => EPPHostStatusType::PendingCreate,
+            Status::PendingDelete => EPPHostStatusType::PendingDelete,
+            Status::PendingTransfer => EPPHostStatusType::PendingTransfer,
+            Status::PendingUpdate => EPPHostStatusType::PendingUpdate,
+            Status::ServerDeleteProhibited => EPPHostStatusType::ServerDeleteProhibited,
+            Status::ServerUpdateProhibited => EPPHostStatusType::ServerUpdateProhibited,
+        }
+    }
+}
+
 pub fn handle_check(
     client: &EPPClientServerFeatures,
     req: &CheckRequest,
-) -> Result<proto::EPPCommandType, Response<CheckResponse>> {
+) -> HandleReqReturn<CheckResponse>{
     if !client.host_supported {
         return Err(Response::Unsupported);
     }
@@ -104,7 +155,7 @@ pub fn handle_check(
     let command = proto::EPPCheck::Host(proto::host::EPPHostCheck {
         name: req.name.clone(),
     });
-    Ok(proto::EPPCommandType::Check(command))
+    Ok((proto::EPPCommandType::Check(command), None))
 }
 
 pub fn handle_check_response(response: proto::EPPResponse) -> Response<CheckResponse> {
@@ -129,7 +180,7 @@ pub fn handle_check_response(response: proto::EPPResponse) -> Response<CheckResp
 pub fn handle_info(
     client: &EPPClientServerFeatures,
     req: &InfoRequest,
-) -> Result<proto::EPPCommandType, Response<InfoResponse>> {
+) -> HandleReqReturn<InfoResponse>{
     if !client.host_supported {
         return Err(Response::Unsupported);
     }
@@ -139,7 +190,7 @@ pub fn handle_info(
     let command = proto::EPPInfo::Host(proto::host::EPPHostCheck {
         name: req.name.clone(),
     });
-    Ok(proto::EPPCommandType::Info(command))
+    Ok((proto::EPPCommandType::Info(command), None))
 }
 
 pub fn handle_info_response(response: proto::EPPResponse) -> Response<InfoResponse> {
@@ -148,7 +199,7 @@ pub fn handle_info_response(response: proto::EPPResponse) -> Response<InfoRespon
             proto::EPPResultDataValue::EPPHostInfoResult(host_info) => Response::Ok(InfoResponse {
                 name: host_info.name,
                 registry_id: host_info.registry_id,
-                statuses: host_info.statuses.into_iter().map(|s| s.status).collect(),
+                statuses: host_info.statuses.into_iter().map(|s| s.status.into()).collect(),
                 addresses: host_info
                     .addresses
                     .into_iter()
@@ -176,7 +227,7 @@ pub fn handle_info_response(response: proto::EPPResponse) -> Response<InfoRespon
 pub fn handle_create(
     client: &EPPClientServerFeatures,
     req: &CreateRequest,
-) -> Result<proto::EPPCommandType, Response<CreateResponse>> {
+) -> HandleReqReturn<CreateResponse>{
     if !client.host_supported {
         return Err(Response::Unsupported);
     }
@@ -209,7 +260,7 @@ pub fn handle_create(
             Err(e) => return Err(e),
         },
     });
-    Ok(proto::EPPCommandType::Create(command))
+    Ok((proto::EPPCommandType::Create(command), None))
 }
 
 pub fn handle_create_response(response: proto::EPPResponse) -> Response<CreateResponse> {
@@ -230,17 +281,17 @@ pub fn handle_create_response(response: proto::EPPResponse) -> Response<CreateRe
 pub fn handle_delete(
     client: &EPPClientServerFeatures,
     req: &DeleteRequest,
-) -> Result<proto::EPPCommandType, Response<DeleteResponse>> {
+) -> HandleReqReturn<DeleteResponse>{
     if !client.host_supported {
         return Err(Response::Unsupported);
     }
     if req.name.is_empty() {
         return Err(Response::Err("host name has a min length of 1".to_string()));
     }
-    let command = proto::EPPDelete::Host(proto::host::EPPHostDelete {
+    let command = proto::EPPDelete::Host(proto::host::EPPHostCheck {
         name: req.name.clone(),
     });
-    Ok(proto::EPPCommandType::Delete(command))
+    Ok((proto::EPPCommandType::Delete(command), None))
 }
 
 pub fn handle_delete_response(response: proto::EPPResponse) -> Response<DeleteResponse> {
@@ -252,7 +303,7 @@ pub fn handle_delete_response(response: proto::EPPResponse) -> Response<DeleteRe
 pub fn handle_update(
     client: &EPPClientServerFeatures,
     req: &UpdateRequest,
-) -> Result<proto::EPPCommandType, Response<UpdateResponse>> {
+) -> HandleReqReturn<UpdateResponse>{
     if !client.host_supported {
         return Err(Response::Unsupported);
     }
@@ -274,6 +325,9 @@ pub fn handle_update(
         }
         None => {}
     }
+
+    let mut adds = vec![];
+    let mut rems = vec![];
     let map_obj = |a: &UpdateObject| {
         Ok(match a {
             UpdateObject::Address(addr) => {
@@ -293,31 +347,37 @@ pub fn handle_update(
             }
             UpdateObject::Status(s) => {
                 proto::host::EPPHostUpdateParam::Status(proto::host::EPPHostStatusSer {
-                    status: s.to_string(),
+                    status: s.into(),
                 })
             }
         })
     };
+    for add in &req.add {
+        adds.push(map_obj(add)?);
+    }
+    for rem in &req.remove {
+        rems.push(map_obj(rem)?);
+    }
+
+    let update_as_i32 = |u: &proto::host::EPPHostUpdateParam| match u {
+        proto::host::EPPHostUpdateParam::Address(_) => 0,
+        proto::host::EPPHostUpdateParam::Status(_) => 1,
+    };
+    adds.sort_unstable_by(|a, b| (update_as_i32(a)).cmp(&update_as_i32(b)));
+    rems.sort_unstable_by(|a, b| (update_as_i32(a)).cmp(&update_as_i32(b)));
+
     let command = proto::EPPUpdate::Host(proto::host::EPPHostUpdate {
         name: req.name.clone(),
-        add: match req.add.len() {
+        add: match adds.len() {
             0 => None,
             _ => Some(proto::host::EPPHostUpdateAdd {
-                params: req
-                    .add
-                    .iter()
-                    .map(map_obj)
-                    .collect::<Result<_, Response<UpdateResponse>>>()?,
+                params: adds,
             }),
         },
-        remove: match req.remove.len() {
+        remove: match rems.len() {
             0 => None,
             _ => Some(proto::host::EPPHostUpdateRemove {
-                params: req
-                    .remove
-                    .iter()
-                    .map(map_obj)
-                    .collect::<Result<_, Response<UpdateResponse>>>()?,
+                params: rems,
             }),
         },
         change: req
@@ -325,7 +385,7 @@ pub fn handle_update(
             .as_ref()
             .map(|n| proto::host::EPPHostUpdateChange { name: n.clone() }),
     });
-    Ok(proto::EPPCommandType::Update(command))
+    Ok((proto::EPPCommandType::Update(command), None))
 }
 
 pub fn handle_update_response(response: proto::EPPResponse) -> Response<UpdateResponse> {
@@ -341,10 +401,10 @@ pub async fn check(
     let (sender, receiver) = futures::channel::oneshot::channel();
     super::send_epp_client_request(
         client_sender,
-        Request::HostCheck(CheckRequest {
+        Request::HostCheck(Box::new(CheckRequest {
             name: host.to_string(),
             return_path: sender,
-        }),
+        })),
         receiver,
     )
     .await
@@ -357,10 +417,10 @@ pub async fn info(
     let (sender, receiver) = futures::channel::oneshot::channel();
     super::send_epp_client_request(
         client_sender,
-        Request::HostInfo(InfoRequest {
+        Request::HostInfo(Box::new(InfoRequest {
             name: host.to_string(),
             return_path: sender,
-        }),
+        })),
         receiver,
     )
     .await
@@ -374,11 +434,11 @@ pub async fn create(
     let (sender, receiver) = futures::channel::oneshot::channel();
     super::send_epp_client_request(
         client_sender,
-        Request::HostCreate(CreateRequest {
+        Request::HostCreate(Box::new(CreateRequest {
             name: host.to_string(),
             addresses,
             return_path: sender,
-        }),
+        })),
         receiver,
     )
     .await
@@ -391,10 +451,10 @@ pub async fn delete(
     let (sender, receiver) = futures::channel::oneshot::channel();
     super::send_epp_client_request(
         client_sender,
-        Request::HostDelete(DeleteRequest {
+        Request::HostDelete(Box::new(DeleteRequest {
             name: host.to_string(),
             return_path: sender,
-        }),
+        })),
         receiver,
     )
     .await
@@ -410,13 +470,13 @@ pub async fn update<N: Into<Option<String>>>(
     let (sender, receiver) = futures::channel::oneshot::channel();
     super::send_epp_client_request(
         client_sender,
-        Request::HostUpdate(UpdateRequest {
+        Request::HostUpdate(Box::new(UpdateRequest {
             name: host.to_string(),
             add,
             remove,
             new_name: new_name.into(),
             return_path: sender,
-        }),
+        })),
         receiver,
     )
     .await

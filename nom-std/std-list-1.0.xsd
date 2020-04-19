@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id: std-list-1.0.xsd 47230 2012-10-26 14:34:55Z judyb $ -->
+<schema targetNamespace="http://www.nominet.org.uk/epp/xml/std-list-1.0"
+  xmlns="http://www.w3.org/2001/XMLSchema"
+  xmlns:list="http://www.nominet.org.uk/epp/xml/std-list-1.0"
+  xmlns:eppcom="urn:ietf:params:xml:ns:eppcom-1.0"
+  elementFormDefault="qualified">
+  
+  <!-- Import common element types. -->
+  <import namespace="urn:ietf:params:xml:ns:epp-1.0" schemaLocation="epp-1.0.xsd"/>
+  <import namespace="urn:ietf:params:xml:ns:eppcom-1.0" schemaLocation="eppcom-1.0.xsd"/>
+  <annotation>
+    <documentation>
+      EPP standard extension schema for domain list.
+    </documentation>
+  </annotation>
+
+  <!-- domain list command -->
+  <element name="list" type="list:domainListType"/>
+
+  <!-- Response to successful command -->
+  <element name="listData" type="list:listDataType"/>
+
+  <!-- Data types -->
+  <complexType name="domainListType">
+     <sequence>
+        <choice>
+           <element name="month" type="list:listDateType"/>
+           <element name="expiry" type="list:listDateType"/>
+        </choice>
+     </sequence>
+     <attribute name="fields" type="list:listFieldsType" default="none"/>
+  </complexType>
+
+  <simpleType name="listFieldsType">
+     <restriction base="string">
+        <enumeration value="none"/>          
+     </restriction>
+  </simpleType>
+
+  <simpleType name="listDateType">
+     <restriction base="string">
+        <pattern value="\d\d\d\d-\d\d"/>
+     </restriction>
+  </simpleType>
+
+  <!-- The list response contains a list of domain names matching the request -->
+  <complexType name="listDataType">
+     <sequence>
+        <element name="domainName" type="eppcom:labelType" minOccurs="0" maxOccurs="unbounded"/>
+     </sequence>
+     <attribute name="noDomains" type="nonNegativeInteger"/>
+  </complexType>
+
+</schema>

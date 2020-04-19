@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0"><response><result code="2201"><msg lang="en">Authorization error</msg></result><trID><clTRID>85b6a574-0a60-4e36-b3d9-877278221a03</clTRID><svTRID>20200417.92460470.973186325</svTRID></trID></response></epp>

@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0"><response><result code="2308"><msg lang="en">Data management policy violation</msg><extValue><value><domain:registrant xmlns:domain="urn:ietf:params:xml:ns:domain-1.0"><![CDATA[TEST-CONTACT-2]]></domain:registrant></value><reason lang="en">Some contacts are not yours</reason></extValue></result><trID><clTRID>cd70e50e-d9df-43af-8b83-21521da8e723</clTRID><svTRID>20200417.92460487.973186568</svTRID></trID></response></epp>

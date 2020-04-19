@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.nominet.org.uk/epp/xml/epp-1.0 epp-1.0.xsd">
+    <greeting>
+    <svID>Nominet EPP server testbed-epp.nominet.org.uk</svID>
+    <svDate>2020-04-17T13:06:38Z</svDate>
+    <svcMenu>
+      <version>1.0</version>
+      <lang>en</lang>
+      <objURI>http://www.nominet.org.uk/epp/xml/nom-tag-1.0</objURI>
+    </svcMenu>
+    <dcp>
+      <access><all/></access>
+      <statement>
+        <purpose><admin/><prov/></purpose>
+        <recipient><ours/></recipient>
+        <retention><business/></retention>
+      </statement>
+    </dcp>
+  </greeting>
+</epp>

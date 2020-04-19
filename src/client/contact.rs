@@ -1,7 +1,9 @@
 //! EPP commands relating to contact objects
 
-use super::{proto, EPPClientServerFeatures, Request, Response, Sender};
 use chrono::prelude::*;
+use regex::Regex;
+use super::{proto, EPPClientServerFeatures, Request, Response, Sender};
+use super::router::HandleReqReturn;
 
 #[derive(Debug)]
 pub struct CheckRequest {
@@ -32,11 +34,11 @@ pub struct InfoResponse {
     /// The contact's internal registry ID
     pub registry_id: String,
     /// Statuses currently set on the contact
-    pub statuses: Vec<String>,
+    pub statuses: Vec<Status>,
     /// The localised address of the contact
     pub local_address: Option<Address>,
     /// The internationalised address of the contact
-    pub internationalised_addresses: Option<Address>,
+    pub internationalised_address: Option<Address>,
     /// Voice phone number of the contact
     pub phone: Option<String>,
     /// Fax number of the contact
@@ -55,6 +57,10 @@ pub struct InfoResponse {
     pub last_updated_date: Option<DateTime<Utc>>,
     /// Date of last transfer
     pub last_transfer_date: Option<DateTime<Utc>>,
+    pub entity_type: EntityType,
+    pub trading_name: Option<String>,
+    pub company_number: Option<String>,
+    pub disclosure: Vec<DisclosureType>,
 }
 
 #[derive(Debug)]
@@ -73,71 +79,283 @@ pub struct Address {
     pub country_code: String,
 }
 
-//#[derive(Debug)]
-//pub enum AddressVersion {
-//    IPv4,
-//    IPv6
-//}
-//
-//#[derive(Debug)]
-//pub struct CreateRequest {
-//    name: String,
-//    addresses: Vec<Address>,
-//    pub return_path: Sender<CreateResponse>
-//}
-//
-//#[derive(Debug)]
-//pub struct CreateResponse {
-//    pub pending: bool,
-//    pub creation_date: Option<DateTime<Utc>>,
-//}
-//
-//#[derive(Debug)]
-//pub struct DeleteRequest {
-//    name: String,
-//    pub return_path: Sender<DeleteResponse>
-//}
-//
-//#[derive(Debug)]
-//pub struct DeleteResponse {
-//    pub pending: bool,
-//}
-//
-//#[derive(Debug)]
-//pub struct UpdateRequest {
-//    name: String,
-//    add: Vec<UpdateObject>,
-//    remove: Vec<UpdateObject>,
-//    new_name: Option<String>,
-//    pub return_path: Sender<UpdateResponse>
-//}
-//
-//#[derive(Debug)]
-//pub enum UpdateObject {
-//    Address(Address),
-//    Status(String)
-//}
-//
-//#[derive(Debug)]
-//pub struct UpdateResponse {
-//    pub pending: bool,
-//}
+#[derive(Debug)]
+pub enum EntityType {
+    UkLimitedCompany,
+    UkPublicLimitedCompany,
+    UkPartnership,
+    UkSoleTrader,
+    UkLimitedLiabilityPartnership,
+    UkIndustrialProvidentRegisteredCompany,
+    UkIndividual,
+    UkSchool,
+    UkRegisteredCharity,
+    UkGovernmentBody,
+    UkCorporationByRoyalCharter,
+    UkStatutoryBody,
+    NonUkIndividual,
+    NonUkCompany,
+    OtherUkEntity,
+    OtherNonUkEntity,
+    Unknown
+}
+
+impl From<&proto::nominet::EPPContactType> for EntityType {
+    fn from(from: &proto::nominet::EPPContactType) -> Self {
+        use proto::nominet::EPPContactType;
+        match from {
+            EPPContactType::UkLimitedCompany => EntityType::UkLimitedCompany,
+            EPPContactType::UkPublicLimitedCompany => EntityType::UkLimitedCompany,
+            EPPContactType::UkPartnership => EntityType::UkPartnership,
+            EPPContactType::UkSoleTrader => EntityType::UkSoleTrader,
+            EPPContactType::UkLimitedLiabilityPartnership => EntityType::UkLimitedLiabilityPartnership,
+            EPPContactType::UkIndustrialProvidentRegisteredCompany => EntityType::UkIndustrialProvidentRegisteredCompany,
+            EPPContactType::UkIndividual => EntityType::UkIndividual,
+            EPPContactType::UkSchool => EntityType::UkSchool,
+            EPPContactType::UkRegisteredCharity => EntityType::UkRegisteredCharity,
+            EPPContactType::UkGovernmentBody => EntityType::UkGovernmentBody,
+            EPPContactType::UkCorporationByRoyalCharter => EntityType::UkCorporationByRoyalCharter,
+            EPPContactType::UkStatutoryBody => EntityType::UkStatutoryBody,
+            EPPContactType::NonUkIndividual => EntityType::NonUkIndividual,
+            EPPContactType::NonUkCompany => EntityType::NonUkCompany,
+            EPPContactType::OtherUkEntity => EntityType::OtherUkEntity,
+            EPPContactType::OtherNonUkEntity => EntityType::OtherNonUkEntity,
+            EPPContactType::Unknown => EntityType::Unknown
+        }
+    }
+}
+
+impl From<&EntityType> for proto::nominet::EPPContactType {
+    fn from(from: &EntityType) -> Self {
+        use proto::nominet::EPPContactType;
+        match from {
+            EntityType::UkLimitedCompany => EPPContactType::UkLimitedCompany,
+            EntityType::UkPublicLimitedCompany => EPPContactType::UkPublicLimitedCompany,
+            EntityType::UkPartnership => EPPContactType::UkPartnership,
+            EntityType::UkSoleTrader => EPPContactType::UkSoleTrader,
+            EntityType::UkLimitedLiabilityPartnership => EPPContactType::UkLimitedLiabilityPartnership,
+            EntityType::UkIndustrialProvidentRegisteredCompany => EPPContactType::UkIndustrialProvidentRegisteredCompany,
+            EntityType::UkIndividual => EPPContactType::UkIndividual,
+            EntityType::UkSchool => EPPContactType::UkSchool,
+            EntityType::UkRegisteredCharity => EPPContactType::UkRegisteredCharity,
+            EntityType::UkGovernmentBody => EPPContactType::UkGovernmentBody,
+            EntityType::UkCorporationByRoyalCharter => EPPContactType::UkCorporationByRoyalCharter,
+            EntityType::UkStatutoryBody => EPPContactType::UkStatutoryBody,
+            EntityType::NonUkIndividual => EPPContactType::NonUkIndividual,
+            EntityType::NonUkCompany => EPPContactType::NonUkCompany,
+            EntityType::OtherUkEntity => EPPContactType::OtherUkEntity,
+            EntityType::OtherNonUkEntity => EPPContactType::OtherNonUkEntity,
+            EntityType::Unknown => EPPContactType::Unknown
+        }
+    }
+}
+
+#[derive(Debug, Copy, Clone)]
+pub enum DisclosureType {
+    LocalName = 1,
+    InternationalisedName = 2,
+    LocalOrganisation = 3,
+    InternationalisedOrganisation = 4,
+    LocalAddress = 5,
+    InternationalisedAddress = 6,
+    Voice = 7,
+    Fax = 8,
+    Email = 9,
+}
+
+impl From<&DisclosureType> for proto::contact::EPPContactDisclosureItemSer {
+    fn from(from: &DisclosureType) -> Self {
+        use proto::contact::EPPContactDisclosureItemSer;
+        use proto::contact::EPPContactPostalInfoType;
+        match from {
+            DisclosureType::LocalName => EPPContactDisclosureItemSer::Name {
+                addr_type: EPPContactPostalInfoType::Local
+            },
+            DisclosureType::InternationalisedName => EPPContactDisclosureItemSer::Name {
+                addr_type: EPPContactPostalInfoType::Internationalised
+            },
+            DisclosureType::LocalOrganisation => EPPContactDisclosureItemSer::Organisation {
+                addr_type: EPPContactPostalInfoType::Local
+            },
+            DisclosureType::InternationalisedOrganisation => EPPContactDisclosureItemSer::Organisation {
+                addr_type: EPPContactPostalInfoType::Internationalised
+            },
+            DisclosureType::LocalAddress => EPPContactDisclosureItemSer::Address {
+                addr_type: EPPContactPostalInfoType::Local
+            },
+            DisclosureType::InternationalisedAddress => EPPContactDisclosureItemSer::Address {
+                addr_type: EPPContactPostalInfoType::Internationalised
+            },
+            DisclosureType::Voice => EPPContactDisclosureItemSer::Voice {},
+            DisclosureType::Fax => EPPContactDisclosureItemSer::Fax {},
+            DisclosureType::Email => EPPContactDisclosureItemSer::Email {},
+        }
+    }
+}
+
+impl From<&proto::contact::EPPContactDisclosureItem> for DisclosureType {
+    fn from(from: &proto::contact::EPPContactDisclosureItem) -> Self {
+        use proto::contact::EPPContactDisclosureItem;
+        use proto::contact::EPPContactPostalInfoType;
+        match from {
+            EPPContactDisclosureItem::Name {
+                addr_type: EPPContactPostalInfoType::Local
+            } => DisclosureType::LocalName,
+            EPPContactDisclosureItem::Name {
+                addr_type: EPPContactPostalInfoType::Internationalised
+            } => DisclosureType::InternationalisedName ,
+            EPPContactDisclosureItem::Organisation {
+                addr_type: EPPContactPostalInfoType::Local
+            } => DisclosureType::LocalOrganisation,
+            EPPContactDisclosureItem::Organisation {
+                addr_type: EPPContactPostalInfoType::Internationalised
+            } => DisclosureType::InternationalisedOrganisation,
+            EPPContactDisclosureItem::Address {
+                addr_type: EPPContactPostalInfoType::Local
+            } => DisclosureType::LocalAddress,
+            EPPContactDisclosureItem::Address {
+                addr_type: EPPContactPostalInfoType::Internationalised
+            } => DisclosureType::InternationalisedAddress,
+            EPPContactDisclosureItem::Voice => DisclosureType::Voice,
+            EPPContactDisclosureItem::Fax => DisclosureType::Fax,
+            EPPContactDisclosureItem::Email => DisclosureType::Email,
+        }
+    }
+}
+
+#[derive(Debug, Copy, Clone)]
+pub enum Status {
+    ClientDeleteProhibited,
+    ClientTransferProhibited,
+    ClientUpdateProhibited,
+    Linked,
+    Ok,
+    PendingCreate,
+    PendingDelete,
+    PendingTransfer,
+    PendingUpdate,
+    ServerDeleteProhibited,
+    ServerTransferProhibited,
+    ServerUpdateProhibited,
+}
+
+impl From<proto::contact::EPPContactStatusType> for Status {
+    fn from(from: proto::contact::EPPContactStatusType) -> Self {
+        use proto::contact::EPPContactStatusType;
+        match from {
+            EPPContactStatusType::ClientDeleteProhibited => Status::ClientDeleteProhibited,
+            EPPContactStatusType::ClientTransferProhibited => Status::ClientTransferProhibited,
+            EPPContactStatusType::ClientUpdateProhibited => Status::ClientUpdateProhibited,
+            EPPContactStatusType::Linked => Status::Linked,
+            EPPContactStatusType::Ok => Status::Ok,
+            EPPContactStatusType::PendingCreate => Status::PendingCreate,
+            EPPContactStatusType::PendingDelete => Status::PendingDelete,
+            EPPContactStatusType::PendingTransfer => Status::PendingTransfer,
+            EPPContactStatusType::PendingUpdate => Status::PendingUpdate,
+            EPPContactStatusType::ServerDeleteProhibited => Status::ServerDeleteProhibited,
+            EPPContactStatusType::ServerTransferProhibited => Status::ServerTransferProhibited,
+            EPPContactStatusType::ServerUpdateProhibited => Status::ServerUpdateProhibited,
+        }
+    }
+}
+
+impl From<&Status> for proto::contact::EPPContactStatusType {
+    fn from(from: &Status) -> Self {
+        use proto::contact::EPPContactStatusType;
+        match from {
+            Status::ClientDeleteProhibited => EPPContactStatusType::ClientDeleteProhibited,
+            Status::ClientTransferProhibited => EPPContactStatusType::ClientTransferProhibited,
+            Status::ClientUpdateProhibited => EPPContactStatusType::ClientUpdateProhibited,
+            Status::Linked => EPPContactStatusType::Linked,
+            Status::Ok => EPPContactStatusType::Ok,
+            Status::PendingCreate => EPPContactStatusType::PendingCreate,
+            Status::PendingDelete => EPPContactStatusType::PendingDelete,
+            Status::PendingTransfer => EPPContactStatusType::PendingTransfer,
+            Status::PendingUpdate => EPPContactStatusType::PendingUpdate,
+            Status::ServerDeleteProhibited => EPPContactStatusType::ServerDeleteProhibited,
+            Status::ServerTransferProhibited => EPPContactStatusType::ServerTransferProhibited,
+            Status::ServerUpdateProhibited => EPPContactStatusType::ServerUpdateProhibited,
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct CreateRequest {
+    id: String,
+    local_address: Option<Address>,
+    internationalised_address: Option<Address>,
+    phone: Option<String>,
+    fax: Option<String>,
+    email: String,
+    entity_type: Option<EntityType>,
+    trading_name: Option<String>,
+    company_number: Option<String>,
+    pub return_path: Sender<CreateResponse>,
+}
+
+#[derive(Debug)]
+pub struct CreateResponse {
+    /// Was the request completed instantly or not
+    pub pending: bool,
+    /// What date did the server log as the date of creation
+    pub creation_date: Option<DateTime<Utc>>,
+}
+
+#[derive(Debug)]
+pub struct DeleteRequest {
+    id: String,
+    pub return_path: Sender<DeleteResponse>,
+}
+
+#[derive(Debug)]
+pub struct DeleteResponse {
+    /// Was the request completed instantly or not
+    pub pending: bool,
+}
+
+#[derive(Debug)]
+pub struct UpdateRequest {
+    id: String,
+    add_statuses: Vec<Status>,
+    remove_statuses: Vec<Status>,
+    new_local_address: Option<Address>,
+    new_internationalised_address: Option<Address>,
+    new_phone: Option<String>,
+    new_fax: Option<String>,
+    new_email: Option<String>,
+    new_entity_type: Option<EntityType>,
+    new_trading_name: Option<String>,
+    new_company_number: Option<String>,
+    new_disclosure: Option<Vec<DisclosureType>>,
+    pub return_path: Sender<UpdateResponse>,
+}
+
+#[derive(Debug)]
+pub struct UpdateResponse {
+    /// Was the request completed instantly or not
+    pub pending: bool,
+}
+
+fn check_id<T>(id: &str) -> Result<(), Response<T>> {
+    if let 3..=16 = id.len() {
+        Ok(())
+    } else {
+        Err(Response::Err(
+            "contact id has a min length of 3 and a max length of 16".to_string(),
+        ))
+    }
+}
 
 pub fn handle_check(
     client: &EPPClientServerFeatures,
     req: &CheckRequest,
-) -> Result<proto::EPPCommandType, Response<CheckResponse>> {
+) -> HandleReqReturn<CheckResponse> {
     if !client.contact_supported {
         return Err(Response::Unsupported);
     }
-    if let 3..=16 = req.id.len() {
-    } else {
-        return Err(Response::Err(
-            "contact id has a min length of 3 and a max length of 16".to_string(),
-        ));
-    }
+    check_id(&req.id)?;
     let command = proto::EPPCheck::Contact(proto::contact::EPPContactCheck { id: req.id.clone() });
-    Ok(proto::EPPCommandType::Check(command))
+    Ok((proto::EPPCommandType::Check(command), None))
 }
 
 pub fn handle_check_response(response: proto::EPPResponse) -> Response<CheckResponse> {
@@ -162,18 +380,13 @@ pub fn handle_check_response(response: proto::EPPResponse) -> Response<CheckResp
 pub fn handle_info(
     client: &EPPClientServerFeatures,
     req: &InfoRequest,
-) -> Result<proto::EPPCommandType, Response<InfoResponse>> {
+) -> HandleReqReturn<InfoResponse> {
     if !client.contact_supported {
         return Err(Response::Unsupported);
     }
-    if let 3..=16 = req.id.len() {
-    } else {
-        return Err(Response::Err(
-            "contact id has a min length of 3 and a max length of 16".to_string(),
-        ));
-    }
+    check_id(&req.id)?;
     let command = proto::EPPInfo::Contact(proto::contact::EPPContactCheck { id: req.id.clone() });
-    Ok(proto::EPPCommandType::Info(command))
+    Ok((proto::EPPCommandType::Info(command), None))
 }
 
 pub fn handle_info_response(response: proto::EPPResponse) -> Response<InfoResponse> {
@@ -193,26 +406,66 @@ pub fn handle_info_response(response: proto::EPPResponse) -> Response<InfoRespon
                         }),
                         None => None,
                     };
+                    let ext_info = match response.extension {
+                        Some(e) => match e.value.into_iter().find(|e| match e {
+                            proto::EPPResponseExtensionType::NominetContactExtInfo(_) => true,
+                            _ => false
+                        }) {
+                            Some(e) => match e {
+                                proto::EPPResponseExtensionType::NominetContactExtInfo(e) => Some(e),
+                                _ => unreachable!()
+                            },
+                            None => None
+                        },
+                        None => None
+                    };
                     Response::Ok(InfoResponse {
-                    id: contact_info.id,
-                    statuses: contact_info.statuses.into_iter().map(|s| s.status).collect(),
-                    registry_id: contact_info.registry_id,
-                    local_address: map_addr(
-                        contact_info.postal_info.iter().find(|p| p.addr_type == proto::contact::EPPContactPostalInfoType::Local)
-                    ),
-                    internationalised_addresses: map_addr(
-                        contact_info.postal_info.iter().find(|p| p.addr_type == proto::contact::EPPContactPostalInfoType::Internationalised)
-                    ),
-                    phone: contact_info.phone,
-                    fax: contact_info.fax,
-                    email: contact_info.email,
-                    client_id: contact_info.client_id,
-                    client_created_id: contact_info.client_created_id,
-                    creation_date: contact_info.creation_date,
-                    last_updated_client: contact_info.last_updated_client,
-                    last_updated_date: contact_info.last_updated_date,
-                    last_transfer_date: contact_info.last_transfer_date,
-                })
+                        id: contact_info.id,
+                        statuses: contact_info
+                            .statuses
+                            .into_iter()
+                            .map(|s| s.status.into())
+                            .collect(),
+                        registry_id: contact_info.registry_id,
+                        local_address: map_addr(contact_info.postal_info.iter().find(|p| {
+                            p.addr_type == proto::contact::EPPContactPostalInfoType::Local
+                        })),
+                        internationalised_address: map_addr(contact_info.postal_info.iter().find(
+                            |p| {
+                                p.addr_type
+                                    == proto::contact::EPPContactPostalInfoType::Internationalised
+                            },
+                        )),
+                        phone: contact_info.phone,
+                        fax: contact_info.fax,
+                        email: contact_info.email,
+                        client_id: contact_info.client_id,
+                        client_created_id: contact_info.client_created_id,
+                        creation_date: contact_info.creation_date,
+                        last_updated_client: contact_info.last_updated_client,
+                        last_updated_date: contact_info.last_updated_date,
+                        last_transfer_date: contact_info.last_transfer_date,
+                        trading_name: match &ext_info {
+                            Some(e) => e.trading_name.clone(),
+                            None => None
+                        },
+                        company_number: match &ext_info {
+                            Some(e) => e.company_number.clone(),
+                            None => None
+                        },
+                        entity_type: match &ext_info {
+                            Some(e) => e.contact_type.as_ref().map(|e| (&e.value).into()).unwrap_or(EntityType::Unknown),
+                            None => EntityType::Unknown
+                        },
+                        disclosure: match contact_info.disclose {
+                            Some(d) => if d.flag {
+                                d.elements.iter().map(|e| e.into()).collect()
+                            } else {
+                                vec![]
+                            },
+                            None => vec![]
+                        }
+                    })
                 }
                 _ => Response::InternalServerError,
             }
@@ -220,195 +473,274 @@ pub fn handle_info_response(response: proto::EPPResponse) -> Response<InfoRespon
         None => Response::InternalServerError,
     }
 }
-//
-//pub async fn handle_create(client: &mut EPPClient, sock: Sock<'_>, req: CreateRequest) -> Result<(), ()> {
-//    if !client.host_supported {
-//        let _ = req.return_path.send(Response::Unsupported);
-//        return Ok(())
-//    }
-//    if req.name.len() < 1 {
-//        let _ = req.return_path.send(Response::Err("host name has a min length of 1".to_string()));
-//        return Ok(())
-//    }
-//    let command = proto::EPPCreate::Host(proto::host::EPPHostCreate {
-//        name: req.name,
-//        addresses: match req.addresses.into_iter().map(|a| Ok(proto::host::EPPHostAddressSer {
-//            address: if let 3..=45 = a.address.len() {
-//                a.address
-//            } else {
-//                return Err(Response::Err("address has a min length of 3 and a max length of 45".to_string()));
-//            },
-//            ip_version: match a.ip_version {
-//                AddressVersion::IPv4 => proto::host::EPPHostAddressVersion::IPv4,
-//                AddressVersion::IPv6 => proto::host::EPPHostAddressVersion::IPv6,
-//            }
-//        })).collect() {
-//            Ok(a) => a,
-//            Err(e) => {
-//                let _ = req.return_path.send(e);
-//                return Ok(())
-//            }
-//        }
-//    });
-//    let command_id = match client._send_command(proto::EPPCommandType::Create(command), sock).await {
-//        Ok(i) => i,
-//        Err(_) => return Err(())
-//    };
-//    client.pending_host_create_responses.insert(command_id, req.return_path);
-//    Ok(())
-//}
-//
-//pub async fn handle_create_response(return_path: Sender<CreateResponse>, response: proto::EPPResponse) -> Result<(), ()> {
-//    let _ = if !response.is_success() {
-//        if response.is_server_error() {
-//            return_path.send(Response::InternalServerError)
-//        } else {
-//            return_path.send(Response::Err(response.response_msg()))
-//        }
-//    } else {
-//        match response.data {
-//            Some(ref value) => match &value.value {
-//                proto::EPPResultDataValue::EPPHostCreateResult(host_create) => {
-//                    return_path.send(Response::Ok(CreateResponse {
-//                        pending: response.is_pending(),
-//                        creation_date: host_create.creation_date
-//                    }))
-//                },
-//                _ => return_path.send(Response::InternalServerError)
-//            },
-//            None => {
-//                return_path.send(Response::InternalServerError)
-//            }
-//        }
-//    };
-//    Ok(())
-//}
-//
-//pub async fn handle_delete(client: &mut EPPClient, sock: Sock<'_>, req: DeleteRequest) -> Result<(), ()> {
-//    if !client.host_supported {
-//        let _ = req.return_path.send(Response::Unsupported);
-//        return Ok(())
-//    }
-//    if req.name.len() < 1 {
-//        let _ = req.return_path.send(Response::Err("host name has a min length of 1".to_string()));
-//        return Ok(())
-//    }
-//    let command = proto::EPPDelete::Host(proto::host::EPPHostDelete {
-//        name: req.name,
-//    });
-//    let command_id = match client._send_command(proto::EPPCommandType::Delete(command), sock).await {
-//        Ok(i) => i,
-//        Err(_) => return Err(())
-//    };
-//    client.pending_host_delete_responses.insert(command_id, req.return_path);
-//    Ok(())
-//}
-//
-//pub async fn handle_delete_response(return_path: Sender<DeleteResponse>, response: proto::EPPResponse) -> Result<(), ()> {
-//    let _ = if !response.is_success() {
-//        if response.is_server_error() {
-//            return_path.send(Response::InternalServerError)
-//        } else {
-//            return_path.send(Response::Err(response.response_msg()))
-//        }
-//    } else {
-//         return_path.send(Response::Ok(DeleteResponse {
-//            pending: response.is_pending(),
-//        }))
-//    };
-//    Ok(())
-//}
-//
-//pub async fn handle_update(client: &mut EPPClient, sock: Sock<'_>, req: UpdateRequest) -> Result<(), ()> {
-//    if !client.host_supported {
-//        let _ = req.return_path.send(Response::Unsupported);
-//        return Ok(())
-//    }
-//    if req.name.len() < 1 {
-//        let _ = req.return_path.send(Response::Err("host name has a min length of 1".to_string()));
-//        return Ok(())
-//    }
-//    if req.add.len() < 1 && req.remove.len() < 1 && req.new_name.is_none() {
-//        let _ = req.return_path.send(Response::Err("at least one operation must be specified".to_string()));
-//        return Ok(())
-//    }
-//    match &req.new_name {
-//        Some(n) => {
-//            if n.len() < 1 {
-//                let _ = req.return_path.send(Response::Err("new host name has a min length of 1".to_string()));
-//                return Ok(())
-//            }
-//        },
-//        None => {}
-//    }
-//    let map_obj = |a| Ok(match a {
-//        UpdateObject::Address(addr) => proto::host::EPPHostUpdateParam::Address(proto::host::EPPHostAddressSer {
-//            address: if let 3..=45 = addr.address.len() {
-//                addr.address
-//            } else {
-//               return Err(Response::Err("address has a min length of 3 and a max length of 45".to_string()));
-//            },
-//            ip_version: match addr.ip_version {
-//                AddressVersion::IPv4 => proto::host::EPPHostAddressVersion::IPv4,
-//                AddressVersion::IPv6 => proto::host::EPPHostAddressVersion::IPv6,
-//            }
-//        }),
-//        UpdateObject::Status(s) => proto::host::EPPHostUpdateParam::Status(proto::host::EPPHostStatusSer {
-//            status: s
-//        })
-//    });
-//    let command = proto::EPPUpdate::Host(proto::host::EPPHostUpdate {
-//        name: req.name,
-//        add: match req.add.len() {
-//            0 => None,
-//            _ => Some(proto::host::EPPHostUpdateAdd {
-//                params: match req.add.into_iter().map(map_obj).collect() {
-//                    Ok(p) => p,
-//                    Err(e) => {
-//                        let _ = req.return_path.send(e);
-//                        return Ok(())
-//                    }
-//                }
-//            })
-//        },
-//        remove: match req.remove.len() {
-//            0 => None,
-//            _ => Some(proto::host::EPPHostUpdateRemove {
-//                params: match req.remove.into_iter().map(map_obj).collect() {
-//                    Ok(p) => p,
-//                    Err(e) => {
-//                        let _ = req.return_path.send(e);
-//                        return Ok(())
-//                    }
-//                }
-//            })
-//        },
-//        change: req.new_name.map(|n| proto::host::EPPHostUpdateChange {
-//            name: n
-//        })
-//    });
-//    let command_id = match client._send_command(proto::EPPCommandType::Update(command), sock).await {
-//        Ok(i) => i,
-//        Err(_) => return Err(())
-//    };
-//    client.pending_host_update_responses.insert(command_id, req.return_path);
-//    Ok(())
-//}
-//
-//pub async fn handle_update_response(return_path: Sender<UpdateResponse>, response: proto::EPPResponse) -> Result<(), ()> {
-//    let _ = if !response.is_success() {
-//        if response.is_server_error() {
-//            return_path.send(Response::InternalServerError)
-//        } else {
-//            return_path.send(Response::Err(response.response_msg()))
-//        }
-//    } else {
-//        return_path.send(Response::Ok(UpdateResponse {
-//            pending: response.is_pending(),
-//        }))
-//    };
-//    Ok(())
-//}
+
+pub fn handle_create(
+    client: &EPPClientServerFeatures,
+    req: &CreateRequest,
+) -> HandleReqReturn<CreateResponse> {
+    if !client.contact_supported {
+        return Err(Response::Unsupported);
+    }
+    check_id(&req.id)?;
+    if req.email.is_empty() {
+        return Err(Response::Err("contact email cannot be empty".to_string()));
+    }
+    let phone_re = Regex::new(r"^\+\d+\.\d+$").unwrap();
+    if let Some(phone) = &req.phone {
+        if !phone_re.is_match(&phone) {
+            return Err(Response::Err("invalid phone number format".to_string()));
+        }
+    }
+    if let Some(fax) = &req.fax {
+        if !phone_re.is_match(&fax) {
+            return Err(Response::Err("invalid fax number format".to_string()));
+        }
+    }
+    if req.local_address.is_none() && req.internationalised_address.is_none() {
+        return Err(Response::Err(
+            "either a local or internationalised address must be specified format".to_string(),
+        ));
+    }
+
+    let map_addr = |a: &Address, t: proto::contact::EPPContactPostalInfoType| {
+        if a.name.is_empty() {
+            return Err(Response::Err("contact name cannot be empty".to_string()));
+        }
+        if a.city.is_empty() {
+            return Err(Response::Err("contact city cannot be empty".to_string()));
+        }
+        if a.country_code.len() != 2 {
+            return Err(Response::Err(
+                "contact country code must be of length 2".to_string(),
+            ));
+        }
+        if a.streets.is_empty() {
+            return Err(Response::Err("contact streets cannot be empty".to_string()));
+        }
+        Ok(proto::contact::EPPContactPostalInfoSer {
+            addr_type: t,
+            name: a.name.clone(),
+            organisation: a.organisation.clone(),
+            address: proto::contact::EPPContactAddressSer {
+                streets: a.streets.clone(),
+                city: a.city.clone(),
+                province: a.province.clone(),
+                postal_code: a.postal_code.clone(),
+                country_code: a.country_code.clone(),
+            },
+        })
+    };
+
+    let mut postal_info = vec![];
+    if let Some(local_address) = &req.local_address {
+        postal_info.push(map_addr(
+            local_address,
+            proto::contact::EPPContactPostalInfoType::Local,
+        )?)
+    }
+    if let Some(internationalised_address) = &req.internationalised_address {
+        postal_info.push(map_addr(
+            internationalised_address,
+            proto::contact::EPPContactPostalInfoType::Internationalised,
+        )?)
+    }
+
+    let extension = if client.nominet_contact_ext {
+        Some(proto::EPPCommandExtensionType::NominetContactExtCreate(proto::nominet::EPPContactInfoSet {
+            contact_type: req.entity_type.as_ref().map(|t| proto::nominet::EPPContactTypeVal {
+                value: t.into()
+            }),
+            trading_name: req.trading_name.clone(),
+            company_number: req.company_number.clone()
+        }))
+    } else {
+        None
+    };
+
+    let command = proto::EPPCreate::Contact(proto::contact::EPPContactCreate {
+        id: req.id.clone(),
+        postal_info,
+        phone: req.phone.clone(),
+        fax: req.fax.clone(),
+        email: req.email.clone(),
+        auth_info: proto::contact::EPPContactAuthInfo {
+            password: String::new(),
+        },
+        disclose: None
+    });
+    Ok((proto::EPPCommandType::Create(command), extension))
+}
+
+pub fn handle_create_response(response: proto::EPPResponse) -> Response<CreateResponse> {
+    match response.data {
+        Some(ref value) => match &value.value {
+            proto::EPPResultDataValue::EPPContactCreateResult(contact_create) => {
+                Response::Ok(CreateResponse {
+                    pending: response.is_pending(),
+                    creation_date: contact_create.creation_date,
+                })
+            }
+            _ => Response::InternalServerError,
+        },
+        None => Response::InternalServerError,
+    }
+}
+
+pub fn handle_delete(
+    client: &EPPClientServerFeatures,
+    req: &DeleteRequest,
+) -> HandleReqReturn<DeleteResponse> {
+    if !client.contact_supported {
+        return Err(Response::Unsupported);
+    }
+    if req.id.is_empty() {
+        return Err(Response::Err(
+            "contact id has a min length of 1".to_string(),
+        ));
+    }
+    let command =
+        proto::EPPDelete::Contact(proto::contact::EPPContactCheck { id: req.id.clone() });
+    Ok((proto::EPPCommandType::Delete(command), None))
+}
+
+pub fn handle_delete_response(response: proto::EPPResponse) -> Response<DeleteResponse> {
+    Response::Ok(DeleteResponse {
+        pending: response.is_pending(),
+    })
+}
+
+pub fn handle_update(
+    client: &EPPClientServerFeatures,
+    req: &UpdateRequest,
+) -> HandleReqReturn<UpdateResponse> {
+    if !client.contact_supported {
+        return Err(Response::Unsupported);
+    }
+    if req.id.is_empty() {
+        return Err(Response::Err(
+            "contact id has a min length of 1".to_string(),
+        ));
+    }
+    let is_not_change = req.new_email.is_none()
+        && req.new_phone.is_none()
+        && req.new_fax.is_none()
+        && req.new_local_address.is_none()
+        && req.new_internationalised_address.is_none()
+        && req.new_disclosure.is_none();
+    let is_not_nom_change = req.new_entity_type.is_none()
+        && req.new_trading_name.is_none()
+        && req.new_company_number.is_none();
+    if req.add_statuses.is_empty() && req.remove_statuses.is_empty() && is_not_change {
+        if is_not_nom_change {
+            return Err(Response::Err(
+                "at least one operation must be specified".to_string(),
+            ));
+        } else if !client.nominet_contact_ext {
+            return Err(Response::Ok(UpdateResponse {
+                pending: false,
+            }))
+        }
+    }
+    let mut postal_info = vec![];
+    let map_addr = |a: &Address, t: proto::contact::EPPContactPostalInfoType| {
+        if a.name.is_empty() {
+            return Err(Response::Err("contact name cannot be empty".to_string()));
+        }
+        if a.city.is_empty() {
+            return Err(Response::Err("contact city cannot be empty".to_string()));
+        }
+        if a.country_code.len() != 2 {
+            return Err(Response::Err(
+                "contact country code must be of length 2".to_string(),
+            ));
+        }
+        if a.streets.is_empty() {
+            return Err(Response::Err("contact streets cannot be empty".to_string()));
+        }
+        Ok(proto::contact::EPPContactUpdatePostalInfo {
+            addr_type: t,
+            name: Some(a.name.clone()),
+            organisation: a.organisation.clone(),
+            address: Some(proto::contact::EPPContactAddressSer {
+                streets: a.streets.clone(),
+                city: a.city.clone(),
+                province: a.province.clone(),
+                postal_code: a.postal_code.clone(),
+                country_code: a.country_code.clone(),
+            }),
+        })
+    };
+    if let Some(new_local_address) = &req.new_local_address {
+        postal_info.push(map_addr(
+            new_local_address,
+            proto::contact::EPPContactPostalInfoType::Local,
+        )?)
+    }
+    if let Some(new_internationalised_address) = &req.new_internationalised_address {
+        postal_info.push(map_addr(
+            new_internationalised_address,
+            proto::contact::EPPContactPostalInfoType::Internationalised,
+        )?)
+    }
+    let command = proto::EPPUpdate::Contact(proto::contact::EPPContactUpdate {
+        id: req.id.clone(),
+        add: if req.add_statuses.is_empty() {
+            None
+        } else {
+            Some(proto::contact::EPPContactUpdateAdd {
+                statuses: req.add_statuses.iter().map(|s| proto::contact::EPPContactStatusSer {
+                    status: s.into()
+                }).collect(),
+            })
+        },
+        remove: if req.remove_statuses.is_empty() {
+            None
+        } else {
+            Some(proto::contact::EPPContactUpdateRemove {
+                statuses: req.remove_statuses.iter().map(|s| proto::contact::EPPContactStatusSer {
+                    status: s.into()
+                }).collect()
+            })
+        },
+        change: if is_not_change {
+            None
+        } else {
+            Some(proto::contact::EPPContactUpdateChange {
+                email: req.new_email.clone(),
+                phone: req.new_phone.clone(),
+                fax: req.new_fax.clone(),
+                postal_info,
+                disclose: req.new_disclosure.clone().map(|mut d| {
+                    d.sort_unstable_by(|a, b| (*a as i32).cmp(&(*b as i32)));
+                    proto::contact::EPPContactDisclosureSer {
+                        flag: "1".to_string(),
+                        elements: d.iter().map(|e| e.into()).collect()
+                    }
+                })
+            })
+        },
+    });
+
+    let extension = if client.nominet_contact_ext {
+        Some(proto::EPPCommandExtensionType::NominetContactExtUpdate(proto::nominet::EPPContactInfoSet {
+            contact_type: req.new_entity_type.as_ref().map(|t| proto::nominet::EPPContactTypeVal {
+                value: t.into()
+            }),
+            trading_name: req.new_trading_name.clone(),
+            company_number: req.new_company_number.clone()
+        }))
+    } else {
+        None
+    };
+
+    Ok((proto::EPPCommandType::Update(command), extension))
+}
+
+pub fn handle_update_response(response: proto::EPPResponse) -> Response<UpdateResponse> {
+    Response::Ok(UpdateResponse {
+        pending: response.is_pending(),
+    })
+}
 
 /// Checks if a contact ID exists
 ///
@@ -422,10 +754,10 @@ pub async fn check(
     let (sender, receiver) = futures::channel::oneshot::channel();
     super::send_epp_client_request(
         client_sender,
-        Request::ContactCheck(CheckRequest {
+        Request::ContactCheck(Box::new(CheckRequest {
             id: id.to_string(),
             return_path: sender,
-        }),
+        })),
         receiver,
     )
     .await
@@ -434,7 +766,7 @@ pub async fn check(
 /// Fetches information about a specific contact
 ///
 /// # Arguments
-/// * `id` - The ID in question
+/// * `id` - The ID of the contact
 /// * `client_sender` - Reference to the tokio channel into the client
 pub async fn info(
     id: &str,
@@ -443,39 +775,139 @@ pub async fn info(
     let (sender, receiver) = futures::channel::oneshot::channel();
     super::send_epp_client_request(
         client_sender,
-        Request::ContactInfo(InfoRequest {
+        Request::ContactInfo(Box::new(InfoRequest {
             id: id.to_string(),
             return_path: sender,
-        }),
+        })),
         receiver,
     )
     .await
 }
 
-//pub async fn create(host: &str, addresses: Vec<Address>, client_sender: &mut futures::channel::mpsc::Sender<Request>) -> Result<CreateResponse, super::Error> {
-//    let (sender, receiver) = futures::channel::oneshot::channel();
-//    super::send_epp_client_request(client_sender, Request::HostCreate(CreateRequest {
-//        name: host.to_string(),
-//        addresses,
-//        return_path: sender
-//    }), receiver).await
-//}
-//
-//pub async fn delete(host: &str, client_sender: &mut futures::channel::mpsc::Sender<Request>) -> Result<DeleteResponse, super::Error> {
-//    let (sender, receiver) = futures::channel::oneshot::channel();
-//    super::send_epp_client_request(client_sender, Request::HostDelete(DeleteRequest {
-//        name: host.to_string(),
-//        return_path: sender
-//    }), receiver).await
-//}
-//
-//pub async fn update<N: Into<Option<String>>>(host: &str, add: Vec<UpdateObject>, remove: Vec<UpdateObject>, new_name: N, client_sender: &mut futures::channel::mpsc::Sender<Request>) -> Result<UpdateResponse, super::Error> {
-//    let (sender, receiver) = futures::channel::oneshot::channel();
-//    super::send_epp_client_request(client_sender, Request::HostUpdate(UpdateRequest {
-//        name: host.to_string(),
-//        add,
-//        remove,
-//        new_name: new_name.into(),
-//        return_path: sender
-//    }), receiver).await
-//}
+/// Creates a new contact
+///
+/// At least one of `local_address` or `internationalised_address` must be set. Contact numbers must
+/// be in `+cc.xxxxxxxxxx` format where `c` is the country dialing code and `x` is the country local
+/// number
+///
+/// # Arguments
+/// * `id` - The desired contact ID
+/// * `local_address` - Localised address of the contact
+/// * `internationalised_address` - Internationalised address of the contact
+/// * `phone` - Voice phone number of the contact
+/// * `fax` - Fax number of the contact
+/// * `email` - Email address of the contact
+/// * `client_sender` - Reference to the tokio channel into the client
+pub async fn create(
+    id: &str,
+    local_address: Option<Address>,
+    internationalised_address: Option<Address>,
+    phone: Option<String>,
+    fax: Option<String>,
+    email: String,
+    entity_type: Option<EntityType>,
+    trading_name: Option<String>,
+    company_number: Option<String>,
+    client_sender: &mut futures::channel::mpsc::Sender<Request>,
+) -> Result<CreateResponse, super::Error> {
+    let (sender, receiver) = futures::channel::oneshot::channel();
+    super::send_epp_client_request(
+        client_sender,
+        Request::ContactCreate(Box::new(CreateRequest {
+            id: id.to_string(),
+            local_address,
+            internationalised_address,
+            phone,
+            fax,
+            email,
+            entity_type,
+            trading_name,
+            company_number,
+            return_path: sender,
+        })),
+        receiver,
+    )
+    .await
+}
+
+/// Deletes a contact contact
+///
+/// # Arguments
+/// * `id` - The ID of the contact
+/// * `client_sender` - Reference to the tokio channel into the client
+pub async fn delete(
+    id: &str,
+    client_sender: &mut futures::channel::mpsc::Sender<Request>,
+) -> Result<DeleteResponse, super::Error> {
+    let (sender, receiver) = futures::channel::oneshot::channel();
+    super::send_epp_client_request(
+        client_sender,
+        Request::ContactDelete(Box::new(DeleteRequest {
+            id: id.to_string(),
+            return_path: sender,
+        })),
+        receiver,
+    )
+    .await
+}
+
+pub struct NewContactData {
+    ///  New localised address of the contact
+    pub local_address: Option<Address>,
+    /// New internationalised address of the contact
+    pub internationalised_address: Option<Address>,
+    /// New voice phone number of the contact
+    pub phone: Option<String>,
+    /// New fax number of the contact
+    pub fax: Option<String>,
+    /// New email address of the contact
+    pub email: Option<String>,
+    /// New entity type of the contact
+    pub entity_type: Option<EntityType>,
+    /// New trading of the contact
+    pub trading_name: Option<String>,
+    /// New company number of the contact
+    pub company_number: Option<String>,
+    /// Elements the contact has consented to disclosure of
+    pub disclosure: Option<Vec<DisclosureType>>,
+}
+/// Updates an existing contact
+///
+/// Contact numbers must be in `+cc.xxxxxxxxxx` format where `c` is the country dialing code and
+/// `x` is the country local number
+///
+/// # Arguments
+/// * `id` - The ID of said contact
+/// * `add_statuses` - Statuses to be set on the contact
+/// * `remove_statuses` - Statuses to be removed from the contact
+/// * `new_contact_data` - New data to be set on the contact
+/// * `client_sender` - Reference to the tokio channel into the client
+pub async fn update(
+    id: &str,
+    add_statuses: Vec<Status>,
+    remove_statuses: Vec<Status>,
+    new_data: NewContactData,
+    client_sender: &mut futures::channel::mpsc::Sender<Request>,
+) -> Result<UpdateResponse, super::Error> {
+    let (sender, receiver) = futures::channel::oneshot::channel();
+    super::send_epp_client_request(
+        client_sender,
+        Request::ContactUpdate(Box::new(UpdateRequest {
+            id: id.to_string(),
+            add_statuses,
+            remove_statuses,
+            new_local_address: new_data.local_address,
+            new_internationalised_address: new_data.internationalised_address,
+            new_phone: new_data.phone,
+            new_fax: new_data.fax,
+            new_email: new_data.email,
+            new_entity_type: new_data.entity_type,
+            new_trading_name: new_data.trading_name,
+            new_company_number: new_data.company_number,
+            new_disclosure: new_data.disclosure,
+            return_path: sender,
+        })),
+        receiver,
+    )
+    .await
+}

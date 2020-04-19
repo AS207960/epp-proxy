@@ -1,0 +1,2 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<epp xmlns='urn:ietf:params:xml:ns:epp-1.0' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='urn:ietf:params:xml:ns:epp-1.0 epp-1.0.xsd'><response><result code='1000'><msg lang='en-US'>Command completed successfully</msg></result><trID><clTRID>7f38e898-ec77-4583-9009-de8f6c5284f6</clTRID><svTRID>SRO-1587157260294</svTRID></trID></response></epp>

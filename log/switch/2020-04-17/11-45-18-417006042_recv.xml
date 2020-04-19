@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0"><response><result code="2308"><msg lang="en">Data management policy violation</msg><extValue><value><domain:hostObj xmlns:domain="urn:ietf:params:xml:ns:domain-1.0"><![CDATA[ns1.TEST-REGISTRAR-A-domain-1.ch]]></domain:hostObj></value><reason lang="en">The internal host is invalid</reason></extValue></result><trID><clTRID>bd6ec5be-ea67-4c62-992f-6f3a8a39ef63</clTRID><svTRID>20200417.92460460.973186175</svTRID></trID></response></epp>

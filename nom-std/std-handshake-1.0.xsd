@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id: std-handshake-1.0.xsd 29904 2009-10-26 13:38:48Z ed $ -->
+<schema targetNamespace="http://www.nominet.org.uk/epp/xml/std-handshake-1.0"
+  xmlns="http://www.w3.org/2001/XMLSchema"
+  xmlns:handshake="http://www.nominet.org.uk/epp/xml/std-handshake-1.0"
+  xmlns:eppcom="urn:ietf:params:xml:ns:eppcom-1.0"
+  elementFormDefault="qualified">
+  
+  <!-- Import common element types. -->
+  <import namespace="urn:ietf:params:xml:ns:epp-1.0" schemaLocation="epp-1.0.xsd"/>
+  <import namespace="urn:ietf:params:xml:ns:eppcom-1.0" schemaLocation="eppcom-1.0.xsd"/>
+  <annotation>
+    <documentation>
+      EPP standard extension handshake schema.
+    </documentation>
+  </annotation>
+  
+  <!-- Accept handshake -->
+  <element name="accept" type="handshake:acceptDataType"/>
+  
+  <!-- Reject handshake -->
+  <element name="reject" type="handshake:rejectDataType"/>
+  
+  <!-- Response to successful command -->
+  <element name="hanData" type="handshake:hanDataType"/>
+  
+  <!-- Data types -->
+  <complexType name="acceptDataType">
+    <sequence>
+      <element name="caseId" type="handshake:caseIDType"/>
+      <element name="registrant" type="eppcom:clIDType" minOccurs="0" />
+    </sequence>
+  </complexType>
+  
+  <complexType name="rejectDataType">
+    <sequence>
+      <element name="caseId" type="handshake:caseIDType"/>
+    </sequence>
+  </complexType>
+  
+  <complexType name="hanDataType">
+    <sequence>
+      <element name="caseId" type="handshake:caseIDType"/>
+      <element name="domainListData" type="handshake:domainListType" minOccurs="0"/>
+    </sequence>
+  </complexType>
+  
+  <complexType name="domainListType">
+    <sequence>
+      <element name="domainName" maxOccurs="unbounded" type="eppcom:labelType"/>  
+    </sequence>
+    <attribute name="noDomains" type="nonNegativeInteger"/>
+  </complexType>
+  
+  <simpleType name="caseIDType">
+    <restriction base="token">
+      <maxLength value="12"/>
+    </restriction>
+  </simpleType>
+  
+</schema>

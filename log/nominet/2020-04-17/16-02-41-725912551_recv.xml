@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.nominet.org.uk/epp/xml/epp-1.0 epp-1.0.xsd">
+    <greeting>
+    <svID>Nominet EPP server testbed-epp.nominet.org.uk</svID>
+    <svDate>2020-04-17T16:02:41Z</svDate>
+    <svcMenu>
+      <version>1.0</version>
+      <lang>en</lang>
+      <objURI>urn:ietf:params:xml:ns:contact-1.0</objURI>
+      <objURI>urn:ietf:params:xml:ns:domain-1.0</objURI>
+      <objURI>urn:ietf:params:xml:ns:host-1.0</objURI>
+      <svcExtension>
+        <extURI>http://www.nominet.org.uk/epp/xml/contact-nom-ext-1.0</extURI>
+        <extURI>http://www.nominet.org.uk/epp/xml/nom-data-quality-1.1</extURI>
+        <extURI>http://www.nominet.org.uk/epp/xml/std-notifications-1.2</extURI>
+        <extURI>http://www.nominet.org.uk/epp/xml/std-warning-1.1</extURI>
+      </svcExtension>
+    </svcMenu>
+    <dcp>
+      <access><all/></access>
+      <statement>
+        <purpose><admin/><prov/></purpose>
+        <recipient><ours/></recipient>
+        <retention><business/></retention>
+      </statement>
+    </dcp>
+  </greeting>
+</epp>

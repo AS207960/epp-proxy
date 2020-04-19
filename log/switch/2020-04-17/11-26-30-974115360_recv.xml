@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0"><response><result code="1000"><msg lang="en">Command completed successfully</msg></result><resData><contact:creData xmlns:contact="urn:ietf:params:xml:ns:contact-1.0"><contact:id>TEST-CONTACT-1</contact:id><contact:crDate>2020-04-17T13:26:30+02:00</contact:crDate></contact:creData></resData><trID><clTRID>88a8a27d-5887-4be8-ad87-b736a0856844</clTRID><svTRID>20200417.92460415.973185272</svTRID></trID></response></epp>

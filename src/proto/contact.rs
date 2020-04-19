@@ -71,13 +71,41 @@ pub struct EPPContactInfoData {
 #[derive(Debug, Deserialize)]
 pub struct EPPContactStatus {
     #[serde(rename = "s")]
-    pub status: String,
+    pub status: EPPContactStatusType,
 }
 
 #[derive(Debug, Serialize)]
 pub struct EPPContactStatusSer {
     #[serde(rename = "$attr:s")]
-    pub status: String,
+    pub status: EPPContactStatusType,
+}
+
+#[derive(Debug, Deserialize, Serialize, PartialEq)]
+pub enum EPPContactStatusType {
+    #[serde(rename = "clientDeleteProhibited")]
+    ClientDeleteProhibited,
+    #[serde(rename = "clientTransferProhibited")]
+    ClientTransferProhibited,
+    #[serde(rename = "clientUpdateProhibited")]
+    ClientUpdateProhibited,
+    #[serde(rename = "linked")]
+    Linked,
+    #[serde(rename = "ok")]
+    Ok,
+    #[serde(rename = "pendingCreate")]
+    PendingCreate,
+    #[serde(rename = "pendingDelete")]
+    PendingDelete,
+    #[serde(rename = "pendingTransfer")]
+    PendingTransfer,
+    #[serde(rename = "pendingUpdate")]
+    PendingUpdate,
+    #[serde(rename = "serverDeleteProhibited")]
+    ServerDeleteProhibited,
+    #[serde(rename = "serverTransferProhibited")]
+    ServerTransferProhibited,
+    #[serde(rename = "serverUpdateProhibited")]
+    ServerUpdateProhibited,
 }
 
 #[derive(Debug, Deserialize)]
@@ -104,7 +132,7 @@ pub struct EPPContactAddress {
     pub country_code: String,
 }
 
-#[derive(Debug, Deserialize, PartialEq)]
+#[derive(Debug, Deserialize, Serialize, PartialEq)]
 pub enum EPPContactPostalInfoType {
     #[serde(rename = "int")]
     Internationalised,
@@ -116,85 +144,175 @@ pub enum EPPContactPostalInfoType {
 pub struct EPPContactDisclosure {
     #[serde(rename = "flag")]
     pub flag: bool,
+    #[serde(rename = "$value")]
+    pub elements: Vec<EPPContactDisclosureItem>
 }
 
-//#[derive(Debug, Deserialize, Serialize)]
-//pub enum EPPHostAddressVersion {
-//    #[serde(rename = "v4")]
-//    IPv4,
-//    #[serde(rename = "v6")]
-//    IPv6
-//}
-//
-//impl std::default::Default for EPPHostAddressVersion {
-//    fn default() -> Self {
-//        Self::IPv4
-//    }
-//}
-//
-//#[derive(Debug, Serialize)]
-//pub struct EPPHostCreate {
-//    #[serde(rename = "host:name")]
-//    pub name: String,
-//    #[serde(rename = "host:addr")]
-//    pub addresses: Vec<EPPHostAddressSer>
-//}
-//
-//#[derive(Debug, Serialize)]
-//pub struct EPPHostAddressSer {
-//    #[serde(rename = "$value")]
-//    pub address: String,
-//    #[serde(rename = "$attr:ip", default)]
-//    pub ip_version: EPPHostAddressVersion
-//}
-//
-//#[derive(Debug, Deserialize)]
-//pub struct EPPHostCreateData {
-//    pub name: String,
-//    #[serde(rename = "crDate", deserialize_with = "super::deserialize_datetime_opt", default)]
-//    pub creation_date: Option<DateTime<Utc>>
-//}
-//
-//#[derive(Debug, Serialize)]
-//pub struct EPPHostDelete {
-//    #[serde(rename = "host:name")]
-//    pub name: String,
-//}
-//
-//#[derive(Debug, Serialize)]
-//pub struct EPPHostUpdate {
-//    #[serde(rename = "host:name")]
-//    pub name: String,
-//    #[serde(rename = "host:add", skip_serializing_if = "Option::is_none")]
-//    pub add: Option<EPPHostUpdateAdd>,
-//    #[serde(rename = "host:rem", skip_serializing_if = "Option::is_none")]
-//    pub remove: Option<EPPHostUpdateRemove>,
-//    #[serde(rename = "host:chg", skip_serializing_if = "Option::is_none")]
-//    pub change: Option<EPPHostUpdateChange>,
-//}
-//
-//#[derive(Debug, Serialize)]
-//pub struct EPPHostUpdateAdd {
-//    #[serde(rename = "$value")]
-//    pub params: Vec<EPPHostUpdateParam>
-//}
-//
-//#[derive(Debug, Serialize)]
-//pub struct EPPHostUpdateRemove {
-//    #[serde(rename = "$value")]
-//    pub params: Vec<EPPHostUpdateParam>
-//}
-//
-//#[derive(Debug, Serialize)]
-//pub struct EPPHostUpdateChange {
-//    #[serde(rename = "host:name")]
-//    pub name: String
-//}
-//
-//#[derive(Debug, Serialize)]
-//pub enum EPPHostUpdateParam {
-//    #[serde(rename = "host:addr")]
-//    Address(EPPHostAddressSer),
-//    #[serde(rename = "host:status")]
-//    Status(EPPHostStatusSer),
-//}
+#[derive(Debug, Serialize)]
+pub struct EPPContactDisclosureSer {
+    #[serde(rename = "$attr:flag")]
+    pub flag: String,
+    #[serde(rename = "$value")]
+    pub elements: Vec<EPPContactDisclosureItemSer>
+}
+
+#[derive(Debug, Deserialize)]
+pub enum EPPContactDisclosureItem {
+    #[serde(rename = "contact:name")]
+    Name {
+        #[serde(rename = "type")]
+        addr_type: EPPContactPostalInfoType
+    },
+    #[serde(rename = "contact:org")]
+    Organisation {
+        #[serde(rename = "type")]
+        addr_type: EPPContactPostalInfoType
+    },
+    #[serde(rename = "contact:addr")]
+    Address {
+        #[serde(rename = "type")]
+        addr_type: EPPContactPostalInfoType
+    },
+    #[serde(rename = "contact:voice")]
+    Voice,
+    #[serde(rename = "contact:fax")]
+    Fax,
+    #[serde(rename = "contact:email")]
+    Email
+}
+
+#[derive(Debug, Serialize)]
+pub enum EPPContactDisclosureItemSer {
+    #[serde(rename = "contact:name")]
+    Name {
+        #[serde(rename = "$attr:type")]
+        addr_type: EPPContactPostalInfoType
+    },
+    #[serde(rename = "contact:org")]
+    Organisation {
+        #[serde(rename = "$attr:type")]
+        addr_type: EPPContactPostalInfoType
+    },
+    #[serde(rename = "contact:addr")]
+    Address {
+        #[serde(rename = "$attr:type")]
+        addr_type: EPPContactPostalInfoType
+    },
+    #[serde(rename = "contact:voice")]
+    Voice {},
+    #[serde(rename = "contact:fax")]
+    Fax {},
+    #[serde(rename = "contact:email")]
+    Email {}
+}
+
+#[derive(Debug, Serialize)]
+pub struct EPPContactCreate {
+    #[serde(rename = "contact:id")]
+    pub id: String,
+    #[serde(rename = "contact:postalInfo")]
+    pub postal_info: Vec<EPPContactPostalInfoSer>,
+    #[serde(rename = "contact:voice", skip_serializing_if = "Option::is_none")]
+    pub phone: Option<String>,
+    #[serde(rename = "contact:fax", skip_serializing_if = "Option::is_none")]
+    pub fax: Option<String>,
+    #[serde(rename = "contact:email")]
+    pub email: String,
+    #[serde(rename = "contact:authInfo")]
+    pub auth_info: EPPContactAuthInfo,
+    #[serde(rename = "contact:disclose", skip_serializing_if = "Option::is_none")]
+    pub disclose: Option<EPPContactDisclosureSer>,
+}
+
+#[derive(Debug, Serialize)]
+pub struct EPPContactPostalInfoSer {
+    #[serde(rename = "$attr:type")]
+    pub addr_type: EPPContactPostalInfoType,
+    #[serde(rename = "contact:name")]
+    pub name: String,
+    #[serde(rename = "contact:org", skip_serializing_if = "Option::is_none")]
+    pub organisation: Option<String>,
+    #[serde(rename = "contact:addr")]
+    pub address: EPPContactAddressSer,
+}
+
+#[derive(Debug, Serialize)]
+pub struct EPPContactAddressSer {
+    #[serde(rename = "contact:street")]
+    pub streets: Vec<String>,
+    #[serde(rename = "contact:city")]
+    pub city: String,
+    #[serde(rename = "contact:sp", skip_serializing_if = "Option::is_none")]
+    pub province: Option<String>,
+    #[serde(rename = "contact:pc", skip_serializing_if = "Option::is_none")]
+    pub postal_code: Option<String>,
+    #[serde(rename = "contact:cc")]
+    pub country_code: String,
+}
+
+#[derive(Debug, Serialize)]
+pub struct EPPContactAuthInfo {
+    #[serde(rename = "contact:pw")]
+    pub password: String,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct EPPContactCreateData {
+    pub id: String,
+    #[serde(
+        rename = "crDate",
+        deserialize_with = "super::deserialize_datetime_opt",
+        default
+    )]
+    pub creation_date: Option<DateTime<Utc>>,
+}
+
+#[derive(Debug, Serialize)]
+pub struct EPPContactUpdate {
+    #[serde(rename = "contact:id")]
+    pub id: String,
+    #[serde(rename = "contact:add", skip_serializing_if = "Option::is_none")]
+    pub add: Option<EPPContactUpdateAdd>,
+    #[serde(rename = "contact:rem", skip_serializing_if = "Option::is_none")]
+    pub remove: Option<EPPContactUpdateRemove>,
+    #[serde(rename = "contact:chg", skip_serializing_if = "Option::is_none")]
+    pub change: Option<EPPContactUpdateChange>,
+}
+
+#[derive(Debug, Serialize)]
+pub struct EPPContactUpdateAdd {
+    #[serde(rename = "$value")]
+    pub statuses: Vec<EPPContactStatusSer>,
+}
+
+#[derive(Debug, Serialize)]
+pub struct EPPContactUpdateRemove {
+    #[serde(rename = "$value")]
+    pub statuses: Vec<EPPContactStatusSer>,
+}
+
+#[derive(Debug, Serialize)]
+pub struct EPPContactUpdateChange {
+    #[serde(rename = "contact:postalInfo")]
+    pub postal_info: Vec<EPPContactUpdatePostalInfo>,
+    #[serde(rename = "contact:voice", skip_serializing_if = "Option::is_none")]
+    pub phone: Option<String>,
+    #[serde(rename = "contact:fax", skip_serializing_if = "Option::is_none")]
+    pub fax: Option<String>,
+    #[serde(rename = "contact:email", skip_serializing_if = "Option::is_none")]
+    pub email: Option<String>,
+    #[serde(rename = "contact:disclose", skip_serializing_if = "Option::is_none")]
+    pub disclose: Option<EPPContactDisclosureSer>,
+}
+
+#[derive(Debug, Serialize)]
+pub struct EPPContactUpdatePostalInfo {
+    #[serde(rename = "$attr:type")]
+    pub addr_type: EPPContactPostalInfoType,
+    #[serde(rename = "contact:name", skip_serializing_if = "Option::is_none")]
+    pub name: Option<String>,
+    #[serde(rename = "contact:org", skip_serializing_if = "Option::is_none")]
+    pub organisation: Option<String>,
+    #[serde(rename = "contact:addr", skip_serializing_if = "Option::is_none")]
+    pub address: Option<EPPContactAddressSer>,
+}

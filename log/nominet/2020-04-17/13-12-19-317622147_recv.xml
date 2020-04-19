@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.nominet.org.uk/epp/xml/epp-1.0 epp-1.0.xsd">
+  <response>
+    <result code="1000">
+      <msg>
+        Command completed successfully
+      </msg>
+    </result>
+    <trID>
+      <clTRID>54fc10c3-dbda-48d4-9f66-9bff2850355d</clTRID>
+      <svTRID>15346115432</svTRID>
+    </trID>
+  </response>
+</epp>

@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0"><response><result code="2308"><msg lang="en">Data management policy violation</msg><extValue><value><domain:contact xmlns:domain="urn:ietf:params:xml:ns:domain-1.0" type="tech"><![CDATA[TEST-CONTACT-2]]></domain:contact></value><reason lang="en">Object is not associated with the domain object</reason></extValue></result><trID><clTRID>0ba0a306-e18a-433b-9b33-68095ecd89ea</clTRID><svTRID>20200417.92460470.973186285</svTRID></trID></response></epp>

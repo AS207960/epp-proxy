@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0"><response><result code="1000"><msg lang="en">Command completed successfully</msg></result><trID><clTRID>42eccd72-7bd7-42a2-a45f-190eb966023a</clTRID><svTRID>20200417.92460470.973186276</svTRID></trID></response></epp>

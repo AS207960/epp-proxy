@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id: domain-nom-ext-1.2.xsd 43628 2012-02-10 14:30:31Z judyb $ -->
+  <schema targetNamespace="http://www.nominet.org.uk/epp/xml/domain-nom-ext-1.2"
+    xmlns:domain="http://www.nominet.org.uk/epp/xml/domain-nom-ext-1.2"
+    xmlns:epp="urn:ietf:params:xml:ns:epp-1.0"
+    xmlns:eppcom="urn:ietf:params:xml:ns:eppcom-1.0"
+    xmlns:domain-std="urn:ietf:params:xml:ns:domain-1.0"
+    xmlns="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+
+    <!-- Import common element types.  -->
+    <import namespace="urn:ietf:params:xml:ns:epp-1.0" schemaLocation="epp-1.0.xsd"/>
+    <import namespace="urn:ietf:params:xml:ns:eppcom-1.0" schemaLocation="eppcom-1.0.xsd"/>
+    <import namespace="urn:ietf:params:xml:ns:domain-1.0" schemaLocation="domain-1.0.xsd"/>
+     
+    <annotation>
+      <documentation>
+        Extensible Provisioning Protocol v1.0
+        domain extension provisioning schema.
+      </documentation>
+    </annotation>
+
+    <!-- Command element extensions -->
+    <element name="create" type="domain:createType"/>
+    <element name="update" type="domain:updateType"/>
+   
+    <!--
+      Child elements of the <create> command.
+    -->
+    <complexType name="createType">
+      <sequence>
+        <element name="first-bill" type="domain:billCodeType"
+          minOccurs="0"/>
+        <element name="recur-bill" type="domain:billCodeType"
+          minOccurs="0"/>
+        <element name="auto-bill" type="domain:autoRenewType"
+          minOccurs="0"/>
+        <element name="next-bill" type="domain:autoRenewType"
+          minOccurs="0"/>
+        <element name="auto-period" type="domain:autoPeriodType"
+          minOccurs="0"/>
+        <element name="next-period" type="domain:nextPeriodType"
+          minOccurs="0"/>
+        <element name="notes" type="domain:noteType"
+          minOccurs="0" maxOccurs="20"/>
+        <element name="reseller" type="eppcom:labelType"
+          minOccurs="0"/>
+      </sequence>
+    </complexType>
+    
+    <simpleType name="billCodeType">
+      <restriction base="token">
+        <enumeration value="bc"/>
+        <enumeration value="th"/>
+      </restriction>
+    </simpleType>
+    
+    <simpleType name="autoRenewType">
+      <restriction base="unsignedShort">
+        <minInclusive value="0"/>
+        <maxInclusive value="182"/>
+      </restriction>
+    </simpleType>
+    
+    <simpleType name="noteType">
+      <restriction base="token">
+        <minLength value="0"/>
+        <maxLength value="200"/>
+      </restriction>
+    </simpleType>
+    
+    <simpleType name="autoPeriodType">
+      <restriction base="unsignedShort">
+        <minInclusive value="1"/>
+        <maxInclusive value="9"/>
+      </restriction>
+    </simpleType>
+    
+    <simpleType name="nextPeriodType">
+      <restriction base="unsignedShort">
+        <minInclusive value="1"/>
+        <maxInclusive value="9"/>
+      </restriction>
+    </simpleType>
+    
+    <!--
+      Child elements of the <update> command.
+    -->
+    <complexType name="updateType">
+      <sequence>
+        <element name="first-bill" type="domain:billCodeUpdateType"
+          minOccurs="0"/>
+        <element name="recur-bill" type="domain:billCodeUpdateType"
+          minOccurs="0"/>
+        <element name="auto-bill" type="domain:autoRenewUpdateType"
+          minOccurs="0"/>
+        <element name="next-bill" type="domain:autoRenewUpdateType"
+        minOccurs="0"/>
+        <element name="auto-period" type="domain:autoPeriodUpdateType"
+          minOccurs="0"/>
+        <element name="next-period" type="domain:nextPeriodUpdateType"
+          minOccurs="0"/>
+        <element name="renew-not-required" type="domain:flagTypeYN"
+          minOccurs="0"/>
+        <element name="notes" type="domain:noteType"
+          minOccurs="0" maxOccurs="unbounded"/>
+        <element name="reseller" type="domain:resellerUpdateType"
+          minOccurs="0"/>
+      </sequence>
+    </complexType>
+    
+    <simpleType name="autoRenewUpdateType">
+      <union memberTypes="domain:autoRenewType domain:emptyType"/>
+    </simpleType>
+    
+    <simpleType name="billCodeUpdateType">
+      <union memberTypes="domain:billCodeType domain:emptyType"/>
+    </simpleType>
+    
+    <simpleType name="autoPeriodUpdateType">
+      <union memberTypes="domain:autoPeriodType domain:emptyType"/>
+    </simpleType>
+    
+    <simpleType name="nextPeriodUpdateType">
+      <union memberTypes="domain:nextPeriodType domain:emptyType"/>
+    </simpleType>
+
+    <simpleType name="emptyType">
+      <restriction base="string">
+        <minLength value="0"/>
+        <maxLength value="0"/>
+      </restriction>
+    </simpleType>
+    
+    <simpleType name="resellerUpdateType">
+      <restriction base="token">
+        <minLength value="0"/>
+        <maxLength value="255"/>
+      </restriction>
+    </simpleType>
+
+    <!--
+      Child response elements.
+    -->
+    
+    <element name="chkData" type="domain:chkDataType"/>
+
+    <complexType name="chkDataType">
+      <attribute name="abuse-limit" type="nonNegativeInteger"/>
+    </complexType>
+
+    <element name="infData" type="domain:infDataType"/>
+    
+    <complexType name="infDataType">
+      <sequence>
+        <element name="reg-status" type="domain:regStatusType"/>
+        <element name="first-bill" type="domain:billCodeType"
+          minOccurs="0"/>
+        <element name="recur-bill" type="domain:billCodeType"
+          minOccurs="0"/>
+        <element name="auto-bill" type="domain:autoRenewType"
+          minOccurs="0"/>
+        <element name="auto-period" type="domain:autoPeriodType"
+          minOccurs="0"/>
+        <element name="next-bill" type="domain:autoRenewType"
+        minOccurs="0"/>
+        <element name="next-period" type="domain:nextPeriodType"
+          minOccurs="0"/>
+        <element name="renew-not-required" type="domain:flagTypeY"
+          minOccurs="0"/>
+        <element name="notes" type="domain:noteType"
+          minOccurs="0" maxOccurs="unbounded"/>
+        <element name="reseller" type="eppcom:labelType"
+          minOccurs="0"/>
+      </sequence>
+    </complexType>
+    
+    <simpleType name="regStatusType">
+      <restriction base="string">
+        <enumeration value="Registered until expiry date."/>
+        <enumeration value="Renewal required."/>
+        <enumeration value="No longer required"/>
+      </restriction>
+    </simpleType>
+
+    <!-- y/n flag -->
+    <simpleType name="flagType">
+       <restriction base="token">
+         <enumeration value="y"/>
+         <enumeration value="Y"/>
+         <enumeration value="n"/>
+         <enumeration value="N"/>
+       </restriction>
+    </simpleType>
+
+    <!-- y flag -->
+    <simpleType name="flagTypeY">
+      <restriction base="token">
+        <enumeration value="y"/>
+        <enumeration value="Y"/>
+      </restriction>
+    </simpleType>
+
+    <!-- y/n/null flag -->
+    <simpleType name="flagTypeYN">
+      <restriction base="token">
+         <!-- An empty flag will clear the value (same as "n" or N") -->
+        <enumeration value=""/>
+        <enumeration value="y"/>
+        <enumeration value="Y"/>
+        <enumeration value="n"/>
+        <enumeration value="N"/>
+      </restriction>
+    </simpleType>
+
+  </schema>

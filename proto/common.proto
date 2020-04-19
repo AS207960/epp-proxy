@@ -1,0 +1,23 @@
+syntax = "proto3";
+package epp.common;
+
+message IPAddress {
+    enum IPVersion {
+        UNKNOWN = 0;
+        IPv4 = 1;
+        IPv6 = 2;
+    }
+
+    string address = 1;
+    IPVersion type = 2;
+}
+
+enum TransferStatus {
+    UnknownStatus = 0;
+    ClientApproved = 1;
+    ClientCancelled = 2;
+    ClientRejected = 3;
+    Pending = 4;
+    ServerApproved = 5;
+    ServerCancelled = 6;
+}

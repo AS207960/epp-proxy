@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0"><response><result code="2303"><msg lang="en">Object does not exist</msg><extValue><value><host:name xmlns:host="urn:ietf:params:xml:ns:host-1.0"><![CDATA[ns1.TEST-REGISTRAR-domain-1.ch]]></host:name></value><reason lang="en">The object does not exist</reason></extValue></result><trID><clTRID>bb5e54e1-51bd-4e3c-a145-b520584c6e05</clTRID><svTRID>20200417.92460470.973186364</svTRID></trID></response></epp>

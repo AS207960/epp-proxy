@@ -1,0 +1,1 @@
+<?xml version="1.0" encoding="UTF-8"?><epp xmlns="urn:ietf:params:xml:ns:epp-1.0"><command><create><host:create xmlns:host="urn:ietf:params:xml:ns:host-1.0"><host:name><![CDATA[ns1.TEST-REGISTRAR-B-domain-2.ch]]></host:name><host:addr ip="v4"><![CDATA[240.1.1.1]]></host:addr></host:create></create><clTRID><![CDATA[9b93b3b2-dfa9-4894-a656-1918fc7577e5]]></clTRID></command></epp>

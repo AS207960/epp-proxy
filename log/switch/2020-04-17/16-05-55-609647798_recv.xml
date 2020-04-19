@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0"><response><result code="1000"><msg lang="en">Command completed successfully</msg></result><resData><host:creData xmlns:host="urn:ietf:params:xml:ns:host-1.0"><host:name>ns3.test-registrar-b-domain-1.ch</host:name><host:crDate>2020-04-17T18:05:55+02:00</host:crDate></host:creData></resData><trID><clTRID>3228af0f-2e80-4f88-a1c1-8136ee7d5cc7</clTRID><svTRID>20200417.92461413.973201037</svTRID></trID></response></epp>

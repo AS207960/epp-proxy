@@ -1,0 +1,1 @@
+<?xml version="1.0" encoding="UTF-8"?><epp xmlns="urn:ietf:params:xml:ns:epp-1.0"><command><delete><domain:delete xmlns:domain="urn:ietf:params:xml:ns:domain-1.0"><domain:name><![CDATA[TEST-REGISTRAR-C-domain-1.ch]]></domain:name></domain:delete></delete><clTRID><![CDATA[273fe2cd-d74b-4147-a604-e71dc7e17587]]></clTRID></command></epp>

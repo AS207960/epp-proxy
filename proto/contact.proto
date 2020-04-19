@@ -1,0 +1,151 @@
+syntax = "proto3";
+package epp.contact;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+
+enum EntityType {
+    NotSet = 0;
+    UnknownEntity = 1;
+    UkLimitedCompany = 2;
+    UkPublicLimitedCompany = 3;
+    UkPartnership = 4;
+    UkSoleTrader = 5;
+    UkLimitedLiabilityPartnership = 6;
+    UkIndustrialProvidentRegisteredCompany = 7;
+    UkIndividual = 8;
+    UkSchool = 9;
+    UkRegisteredCharity = 10;
+    UkGovernmentBody = 11;
+    UkCorporationByRoyalCharter = 12;
+    UkStatutoryBody = 13;
+    NonUkIndividual = 14;
+    NonUkCompany = 15;
+    OtherUkEntity = 16;
+    OtherNonUkEntity = 17;
+}
+
+enum DisclosureType {
+    LocalName = 0;
+    InternationalisedName = 1;
+    LocalOrganisation = 2;
+    InternationalisedOrganisation = 3;
+    LocalAddress = 4;
+    InternationalisedAddress = 5;
+    Voice = 6;
+    Fax = 7;
+    Email = 8;
+}
+
+message PostalAddress {
+    string name = 2;
+    google.protobuf.StringValue organisation = 3;
+    repeated string streets = 4;
+    string city = 5;
+    google.protobuf.StringValue province = 6;
+    google.protobuf.StringValue postal_code = 7;
+    string country_code = 8;
+}
+
+enum ContactStatus {
+    ClientDeleteProhibited = 0;
+    ClientTransferProhibited = 1;
+    ClientUpdateProhibited = 2;
+    Linked = 3;
+    Ok = 4;
+    PendingCreate = 5;
+    PendingDelete = 6;
+    PendingTransfer = 7;
+    PendingUpdate = 8;
+    ServerDeleteProhibited = 9;
+    ServerTransferProhibited = 10;
+    ServerUpdateProhibited = 11;
+}
+
+message ContactCheckRequest {
+    string id = 1;
+    string registry_name = 2;
+}
+
+message ContactCheckReply {
+    bool available = 1;
+    google.protobuf.StringValue reason = 2;
+}
+
+message ContactInfoRequest {
+    string id = 1;
+    string registry_name = 2;
+}
+
+message ContactInfoReply {
+    string id = 1;
+    string registry_id = 2;
+    repeated ContactStatus statuses = 3;
+    PostalAddress local_address = 4;
+    PostalAddress internationalised_address = 5;
+    google.protobuf.StringValue phone = 6;
+    google.protobuf.StringValue fax = 7;
+    string email = 8;
+    string client_id = 9;
+    google.protobuf.StringValue client_created_id = 10;
+    google.protobuf.Timestamp creation_date = 11;
+    google.protobuf.StringValue last_updated_client = 12;
+    google.protobuf.Timestamp last_updated_date = 13;
+    google.protobuf.Timestamp last_transfer_date = 14;
+    EntityType entity_type = 15;
+    google.protobuf.StringValue trading_name = 16;
+    google.protobuf.StringValue company_number = 17;
+    repeated DisclosureType disclosure = 18;
+}
+
+message ContactCreateRequest {
+    string id = 1;
+    PostalAddress local_address = 2;
+    PostalAddress internationalised_address = 3;
+    google.protobuf.StringValue phone = 4;
+    google.protobuf.StringValue fax = 5;
+    string email = 6;
+    EntityType entity_type = 7;
+    google.protobuf.StringValue trading_name = 8;
+    google.protobuf.StringValue company_number = 9;
+    repeated DisclosureType disclosure = 10;
+    string registry_name = 11;
+}
+
+message ContactCreateReply {
+    bool pending = 1;
+    google.protobuf.Timestamp creation_date = 2;
+}
+
+message ContactDeleteRequest {
+    string id = 1;
+    string registry_name = 2;
+}
+
+message ContactDeleteReply {
+    bool pending = 1;
+}
+
+message ContactUpdateRequest {
+    message Disclosure {
+        repeated DisclosureType disclosure = 1;
+    }
+
+    string id = 1;
+    repeated ContactStatus add_statuses = 2;
+    repeated ContactStatus remove_statuses = 3;
+    PostalAddress new_local_address = 4;
+    PostalAddress new_internationalised_address = 5;
+    google.protobuf.StringValue new_phone = 6;
+    google.protobuf.StringValue new_fax = 7;
+    google.protobuf.StringValue new_email = 8;
+    EntityType new_entity_type = 9;
+    google.protobuf.StringValue new_trading_name = 10;
+    google.protobuf.StringValue new_company_number = 11;
+    Disclosure disclosure = 12;
+    string registry_name = 13;
+}
+
+message ContactUpdateReply {
+    bool pending = 1;
+}

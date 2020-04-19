@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id: std-warning-1.1.xsd 31721 2010-03-03 13:56:14Z alistairb $ -->
+<schema targetNamespace="http://www.nominet.org.uk/epp/xml/std-warning-1.1"
+    xmlns:warning="http://www.nominet.org.uk/epp/xml/std-warning-1.1"
+    xmlns="http://www.w3.org/2001/XMLSchema"
+    elementFormDefault="qualified">
+
+    <!--
+    Child elements found in warning.
+    -->
+
+    <element name="credit-limit" type="warning:creditLimitType"/>
+    <element name="glue-removed" type="warning:glueRemovedType"/>
+    <element name="glue-ignored" type="warning:glueIgnoredType"/>
+    <element name="deprecated-field" type="warning:deprecatedFieldType"/>
+    <element name="reg-type-set" type="warning:regTypeSetType"/>
+    <element name="account-id-ignored" type="token"/>
+    <element name="contact-moved" type="warning:contactMovedType"/>
+    <element name="ignored-field" type="warning:unusedFieldType"/>
+    <element name="ignored-attribute" type="warning:unusedAttributeType"/>
+    <element name="postalInfo-ignored" type="warning:postalInfoIgnoredType"/>
+    <element name="truncated-field" type="warning:truncatedFieldType"/>
+    <element name="host-ignored" type="warning:hostIgnoredFieldType"/>
+    <element name="registrar-account-forked" type="warning:registrarAccountForkedType"/>
+    
+    <!-- Warn of credit limit being approached -->
+    <complexType name="creditLimitType">
+        <simpleContent>
+            <extension base="string">
+                <attribute name="remaining" type="unsignedShort"/>
+            </extension>
+        </simpleContent>
+    </complexType>
+
+    <!-- Warn of superfluous glue having been dropped -->
+    <complexType name="glueRemovedType">
+        <simpleContent>
+            <extension base="token">
+                <attribute name="nameserverName" type="token"/>
+            </extension>
+        </simpleContent>
+    </complexType>
+
+    <!-- Warn of glue in request having been ignored -->
+    <complexType name="glueIgnoredType">
+        <simpleContent>
+            <extension base="token">
+                <attribute name="ip" type="token"/>
+            </extension>
+        </simpleContent>
+    </complexType>
+
+    <!-- Warn of use of deprecated field, indicate whether the field was used or ignored -->
+    <complexType name="deprecatedFieldType">
+        <simpleContent>
+            <extension base="token">
+                <attribute name="field-name" type="token"/>
+                <attribute name="processed" type="warning:flagType"/>
+            </extension>
+        </simpleContent>
+    </complexType>
+    
+    <!-- Warn of use of unused postalInfo fields -->
+    <complexType name="postalInfoIgnoredType">
+        <simpleContent>
+            <extension base="token">
+                <attribute name="type" type="token"/>
+            </extension>
+        </simpleContent>
+    </complexType>
+    
+    <!-- Warn of use of unused fields -->
+    <complexType name="unusedFieldType">
+        <simpleContent>
+            <extension base="token">
+                <attribute name="field-name" type="token"/>
+            </extension>
+        </simpleContent>
+    </complexType>
+    
+    <!-- Warn of use of unused attributes -->
+    <complexType name="unusedAttributeType">
+        <simpleContent>
+            <extension base="token">
+                <attribute name="attribute-name" type="token"/>
+            </extension>
+        </simpleContent>
+    </complexType>
+
+    <!-- Warn of reg-type being set, e.g. ltd.uk domain with NULL type -->
+    <complexType name="regTypeSetType">
+        <simpleContent>
+            <extension base="token">
+                <attribute name="setTo" type="token"/>
+            </extension>
+        </simpleContent>
+    </complexType>
+
+    <!-- Warn of account-id supplied when not needed (e.g. handshake reject)
+         this one doesn't have its own type as token will do -->
+
+    <!-- Warn of contact slot shuffle -->
+    <complexType name="contactMovedType">
+        <simpleContent>
+            <extension base="token">
+                <attribute name="original" type="token"/>
+                <attribute name="final" type="token"/>
+            </extension>
+        </simpleContent>
+    </complexType>
+
+    <!-- Warn of a truncated field -->
+    <complexType name="truncatedFieldType">
+        <simpleContent>
+            <extension base="token">
+                <attribute name="field-name" type="token"/>
+            </extension>
+        </simpleContent>
+    </complexType>
+
+    <complexType name="hostIgnoredFieldType">
+        <simpleContent>
+            <extension base="token">
+                <attribute name="host-name" type="token"/>
+            </extension>
+        </simpleContent>
+    </complexType>
+
+    <complexType name="registrarAccountForkedType">
+        <simpleContent>
+            <extension base="token">
+                <attribute name="registrant" type="token"/>
+            </extension>
+        </simpleContent>
+    </complexType>
+
+    <!-- y/n flag -->
+    <simpleType name="flagType">
+       <restriction base="token">
+         <enumeration value="Y"/>
+         <enumeration value="N"/>
+       </restriction>
+   </simpleType>
+
+</schema>

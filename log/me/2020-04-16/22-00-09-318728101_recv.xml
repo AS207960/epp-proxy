@@ -1,0 +1,2 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<epp xmlns='urn:ietf:params:xml:ns:epp-1.0' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='urn:ietf:params:xml:ns:epp-1.0 epp-1.0.xsd'><response><result code='2200'><msg lang='en-US'>Authentication error</msg><value xmlns:oxrs='urn:afilias:params:xml:ns:oxrs-1.1'><oxrs:xcp>2200:Authentication error</oxrs:xcp></value></result><trID><clTRID>12c003fa-9d62-45d0-91d0-5281c46133ad</clTRID><svTRID>SRO-1587074409253</svTRID></trID></response></epp>
