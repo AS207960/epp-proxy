@@ -102,8 +102,8 @@ fn period_unit_from_i32(from: i32) -> client::domain::PeriodUnit {
 fn disclosure_type_from_i32(from: Vec<i32>) -> Vec<client::contact::DisclosureType> {
     let mut out = vec![];
     for i in from {
-        match epp_proto::contact::DisclosureType::from_i32(i) {
-            Some(e) => out.push(match e {
+        if let Some(e) = epp_proto::contact::DisclosureType::from_i32(i) {
+           out.push(match e {
                 epp_proto::contact::DisclosureType::LocalName => client::contact::DisclosureType::LocalName,
                 epp_proto::contact::DisclosureType::InternationalisedName => client::contact::DisclosureType::InternationalisedAddress,
                 epp_proto::contact::DisclosureType::LocalOrganisation => client::contact::DisclosureType::LocalOrganisation,
@@ -113,8 +113,7 @@ fn disclosure_type_from_i32(from: Vec<i32>) -> Vec<client::contact::DisclosureTy
                 epp_proto::contact::DisclosureType::Voice => client::contact::DisclosureType::Voice,
                 epp_proto::contact::DisclosureType::Fax => client::contact::DisclosureType::Fax,
                 epp_proto::contact::DisclosureType::Email => client::contact::DisclosureType::Email,
-            }),
-            None => {}
+            })
         }
     }
     out
@@ -123,8 +122,8 @@ fn disclosure_type_from_i32(from: Vec<i32>) -> Vec<client::contact::DisclosureTy
 fn contact_status_from_i32(from: Vec<i32>) -> Vec<client::contact::Status> {
     let mut out = vec![];
     for i in from {
-        match epp_proto::contact::ContactStatus::from_i32(i) {
-            Some(e) => out.push(match e {
+        if let Some(e) =  epp_proto::contact::ContactStatus::from_i32(i) {
+            out.push(match e {
                 epp_proto::contact::ContactStatus::ClientDeleteProhibited => client::contact::Status::ClientDeleteProhibited,
                 epp_proto::contact::ContactStatus::ClientTransferProhibited => client::contact::Status::ClientTransferProhibited,
                 epp_proto::contact::ContactStatus::ClientUpdateProhibited => client::contact::Status::ClientUpdateProhibited,
@@ -137,8 +136,7 @@ fn contact_status_from_i32(from: Vec<i32>) -> Vec<client::contact::Status> {
                 epp_proto::contact::ContactStatus::ServerDeleteProhibited => client::contact::Status::ServerDeleteProhibited,
                 epp_proto::contact::ContactStatus::ServerTransferProhibited => client::contact::Status::ServerTransferProhibited,
                 epp_proto::contact::ContactStatus::ServerUpdateProhibited => client::contact::Status::ServerUpdateProhibited,
-        }),
-            None => {}
+            })
         }
     }
     out
@@ -863,14 +861,17 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
 
         let res = client::contact::create(
             &request.id,
-            request.local_address.map(addr_map),
-            request.internationalised_address.map(addr_map),
-            request.phone,
-            request.fax,
-            request.email,
-            entity_type_from_i32(request.entity_type),
-            request.trading_name,
-            request.company_number,
+            client::contact::NewContactData {
+                local_address: request.local_address.map(addr_map),
+                internationalised_address: request.internationalised_address.map(addr_map),
+                phone: request.phone,
+                fax: request.fax,
+                email: request.email,
+                entity_type: entity_type_from_i32(request.entity_type),
+                trading_name: request.trading_name,
+                company_number: request.company_number,
+                disclosure: request.disclosure.map(|d| disclosure_type_from_i32(d.disclosure)),
+            },
             &mut sender,
         )
         .await?;
@@ -920,7 +921,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
             &request.id,
             contact_status_from_i32(request.add_statuses),
             contact_status_from_i32(request.remove_statuses),
-            client::contact::NewContactData {
+            client::contact::UpdateContactData {
                 local_address: request.new_local_address.map(addr_map),
                 internationalised_address: request.new_internationalised_address.map(addr_map),
                 phone: request.new_phone,
@@ -953,7 +954,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let mut sender = client_by_id(&self.client_router,&request.registry_name)?;
 
         tokio::spawn(async move {
-            let mut should_delay = true;
+            let should_delay = true;
             loop {
                 match client::poll::poll(&mut sender).await {
                     Ok(resp) => if let Some(message) = resp {
@@ -962,19 +963,25 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                         //                            }
                         match tx
                             .send(Ok(epp_proto::PollReply {
-                                msg_id: message.id,
+                                msg_id: message.id.clone(),
                                 enqueue_date: chrono_to_proto(Some(message.enqueue_time)),
                                 message: message.message,
                             }))
                             .await
                         {
-                            Ok(_) => {}
+                            Ok(_) => {
+                                match client::poll::poll_ack(&message.id, &mut sender).await {
+                                    Ok(_) => {},
+                                    Err(err) => match tx.send(Err(err.into())).await {
+                                        Ok(_) => {}
+                                        Err(_) => break,
+                                    }
+                                }
+                            }
                             Err(_) => break,
                         }
-                    } else {
-                        if tx.is_closed() {
-                            break
-                        }
+                    } else if tx.is_closed() {
+                        break
                     },
                     Err(err) => match tx.send(Err(err.into())).await {
                         Ok(_) => {}

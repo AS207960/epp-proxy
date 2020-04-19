@@ -77,7 +77,12 @@ message ContactInfoRequest {
     string registry_name = 2;
 }
 
+message Disclosure {
+    repeated DisclosureType disclosure = 1;
+}
+
 message ContactInfoReply {
+
     string id = 1;
     string registry_id = 2;
     repeated ContactStatus statuses = 3;
@@ -108,7 +113,7 @@ message ContactCreateRequest {
     EntityType entity_type = 7;
     google.protobuf.StringValue trading_name = 8;
     google.protobuf.StringValue company_number = 9;
-    repeated DisclosureType disclosure = 10;
+    Disclosure disclosure = 10;
     string registry_name = 11;
 }
 
@@ -127,10 +132,6 @@ message ContactDeleteReply {
 }
 
 message ContactUpdateRequest {
-    message Disclosure {
-        repeated DisclosureType disclosure = 1;
-    }
-
     string id = 1;
     repeated ContactStatus add_statuses = 2;
     repeated ContactStatus remove_statuses = 3;

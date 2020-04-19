@@ -290,6 +290,7 @@ pub struct CreateRequest {
     entity_type: Option<EntityType>,
     trading_name: Option<String>,
     company_number: Option<String>,
+    disclosure: Option<Vec<DisclosureType>>,
     pub return_path: Sender<CreateResponse>,
 }
 
@@ -566,7 +567,13 @@ pub fn handle_create(
         auth_info: proto::contact::EPPContactAuthInfo {
             password: String::new(),
         },
-        disclose: None
+        disclose: req.disclosure.clone().map(|mut d| {
+            d.sort_unstable_by(|a, b| (*a as i32).cmp(&(*b as i32)));
+            proto::contact::EPPContactDisclosureSer {
+                flag: "1".to_string(),
+                elements: d.iter().map(|e| e.into()).collect()
+            }
+        })
     });
     Ok((proto::EPPCommandType::Create(command), extension))
 }
@@ -733,7 +740,7 @@ pub fn handle_update(
         None
     };
 
-    Ok((proto::EPPCommandType::Update(command), extension))
+    Ok((proto::EPPCommandType::Update(Box::new(command)), extension))
 }
 
 pub fn handle_update_response(response: proto::EPPResponse) -> Response<UpdateResponse> {
@@ -784,6 +791,28 @@ pub async fn info(
     .await
 }
 
+
+pub struct NewContactData {
+    /// Localised address of the contact
+    pub local_address: Option<Address>,
+    /// Internationalised address of the contact
+    pub internationalised_address: Option<Address>,
+    /// Voice phone number of the contact
+    pub phone: Option<String>,
+    /// Fax number of the contact
+    pub fax: Option<String>,
+    /// Email address of the contact
+    pub email: String,
+    /// New entity type of the contact
+    pub entity_type: Option<EntityType>,
+    /// New trading of the contact
+    pub trading_name: Option<String>,
+    /// New company number of the contact
+    pub company_number: Option<String>,
+    /// Elements the contact has consented to disclosure of
+    pub disclosure: Option<Vec<DisclosureType>>,
+}
+
 /// Creates a new contact
 ///
 /// At least one of `local_address` or `internationalised_address` must be set. Contact numbers must
@@ -792,22 +821,11 @@ pub async fn info(
 ///
 /// # Arguments
 /// * `id` - The desired contact ID
-/// * `local_address` - Localised address of the contact
-/// * `internationalised_address` - Internationalised address of the contact
-/// * `phone` - Voice phone number of the contact
-/// * `fax` - Fax number of the contact
-/// * `email` - Email address of the contact
+/// * `data` - Data for the new contact
 /// * `client_sender` - Reference to the tokio channel into the client
 pub async fn create(
     id: &str,
-    local_address: Option<Address>,
-    internationalised_address: Option<Address>,
-    phone: Option<String>,
-    fax: Option<String>,
-    email: String,
-    entity_type: Option<EntityType>,
-    trading_name: Option<String>,
-    company_number: Option<String>,
+    data: NewContactData,
     client_sender: &mut futures::channel::mpsc::Sender<Request>,
 ) -> Result<CreateResponse, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
@@ -815,14 +833,15 @@ pub async fn create(
         client_sender,
         Request::ContactCreate(Box::new(CreateRequest {
             id: id.to_string(),
-            local_address,
-            internationalised_address,
-            phone,
-            fax,
-            email,
-            entity_type,
-            trading_name,
-            company_number,
+            local_address: data.local_address,
+            internationalised_address: data.internationalised_address,
+            phone: data.phone,
+            fax: data.fax,
+            email: data.email,
+            entity_type: data.entity_type,
+            trading_name: data.trading_name,
+            company_number: data.company_number,
+            disclosure: data.disclosure,
             return_path: sender,
         })),
         receiver,
@@ -851,7 +870,7 @@ pub async fn delete(
     .await
 }
 
-pub struct NewContactData {
+pub struct UpdateContactData {
     ///  New localised address of the contact
     pub local_address: Option<Address>,
     /// New internationalised address of the contact
@@ -886,7 +905,7 @@ pub async fn update(
     id: &str,
     add_statuses: Vec<Status>,
     remove_statuses: Vec<Status>,
-    new_data: NewContactData,
+    new_data: UpdateContactData,
     client_sender: &mut futures::channel::mpsc::Sender<Request>,
 ) -> Result<UpdateResponse, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();

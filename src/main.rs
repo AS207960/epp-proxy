@@ -103,13 +103,10 @@ impl Router {
         let mut domain_parts = domain.split('.').collect::<Vec<_>>();
         domain_parts.reverse();
         loop {
-            match self.zone_to_client.get(&domain_parts.clone().into_iter().rev().collect::<Vec<_>>().join(".")) {
-                Some(c) => return Some(c.clone()),
-                None => {}
+            if let Some(c) = self.zone_to_client.get(&domain_parts.clone().into_iter().rev().collect::<Vec<_>>().join(".")) {
+                return Some(c.clone())
             }
-            if let None = domain_parts.pop() {
-                return None
-            }
+            domain_parts.pop()?;
         }
     }
 }
@@ -201,7 +198,7 @@ async fn main() {
         router.add_config(&config, log_dir);
     }
 
-    let handles: Vec<_> = router.id_to_client.values().into_iter().map(|v| v.clone()).collect();
+    let handles: Vec<_> = router.id_to_client.values().cloned().collect();
     tokio::spawn(async move {
         use futures::future::FutureExt;
         let mut term_stream = tokio::signal::unix::signal(tokio::signal::unix::SignalKind::terminate()).unwrap();
