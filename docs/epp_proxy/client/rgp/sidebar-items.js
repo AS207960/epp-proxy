@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["RGPState",""]],"fn":[["handle_restore",""],["handle_restore_response",""],["request","Checks if a domain name"]],"struct":[["RestoreRequest",""],["RestoreResponse","Response to a RGP query"]]});

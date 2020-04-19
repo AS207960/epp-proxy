@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["EPPContactType",""]],"struct":[["EPPContactInfo",""],["EPPContactInfoSet",""],["EPPContactTypeVal",""],["EPPDataQualityDomainListInfo",""],["EPPDataQualityInfo",""],["EPPIgnoredField",""],["EPPTagInfoData",""],["EPPTagListData",""]]});
