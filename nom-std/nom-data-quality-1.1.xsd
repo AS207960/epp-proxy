@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+    <schema targetNamespace="http://www.nominet.org.uk/epp/xml/nom-data-quality-1.1"
+     xmlns:data-quality="http://www.nominet.org.uk/epp/xml/nom-data-quality-1.1"
+     xmlns="http://www.w3.org/2001/XMLSchema"
+     xmlns:eppcom="urn:ietf:params:xml:ns:eppcom-1.0"
+     elementFormDefault="qualified">
+  
+    <!-- Import common element types. -->
+    <import namespace="urn:ietf:params:xml:ns:epp-1.0" schemaLocation="epp-1.0.xsd"/>
+    <import namespace="urn:ietf:params:xml:ns:eppcom-1.0" schemaLocation="eppcom-1.0.xsd"/>
+    <annotation>
+        <documentation>
+            EPP Data Quality schema.
+        </documentation>
+    </annotation>
+  
+    <!-- Update contacts data quality -->
+    <element name="update" type="data-quality:updateType"></element>
+      
+    <!-- Response with contact:infData -->
+    <element name="infData" type="data-quality:infDataType"></element>
+      
+    <!-- Update data types -->
+    <complexType name="updateType">
+        <sequence>
+            <element name="validate" type="data-quality:validateType" />
+        </sequence>
+    </complexType>
+
+    <complexType name="validateType" />
+
+    <!-- Contact infData data types -->
+    <complexType name="infDataType">
+        <sequence>
+            <element name="status" type="data-quality:statusType" />
+            <element name="reason" type="data-quality:reasonType" minOccurs="0" maxOccurs="1" />
+            <element name="dateCommenced" type="dateTime" minOccurs="0" maxOccurs="1" />
+            <element name= "dateToSuspend" type="dateTime" minOccurs="0" maxOccurs="1" />
+            <element name="lockApplied" type="data-quality:flagType" minOccurs="0" maxOccurs="1"/>
+            <element name="domainListData" type="data-quality:domainListType" minOccurs="0" maxOccurs="1"/>
+        </sequence>
+    </complexType>
+      
+    <!-- Status is a non-empty string -->
+    <simpleType name="statusType">
+        <restriction base="string">
+            <minLength value="1" />
+        </restriction>
+    </simpleType>
+     
+     <!-- reason is a non-empty string -->
+    <simpleType name="reasonType">
+        <restriction base="string">
+            <minLength value="1" />
+        </restriction>
+    </simpleType>           
+ 
+     <!-- y/n flag -->
+     <simpleType name="flagType">
+         <restriction base="token">
+             <enumeration value="y"/>
+             <enumeration value="Y"/>
+             <enumeration value="n"/>
+             <enumeration value="N"/>
+         </restriction>
+     </simpleType>
+ 
+     <!-- List of domains on the contact -->
+     <complexType name="domainListType">
+         <sequence>
+             <element name="domainName" type="eppcom:labelType" minOccurs="0" maxOccurs="unbounded"/>
+         </sequence>
+         <attribute name="noDomains" type="nonNegativeInteger"/>
+     </complexType>
+
+</schema>

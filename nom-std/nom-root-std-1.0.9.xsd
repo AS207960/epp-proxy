@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id: nom-root-std-1.0.9.xsd 62136 2015-04-20 08:48:51Z judyb $ -->
+<schema targetNamespace="urn:ietf:params:xml:ns:dummy-1.0"
+    xmlns:epp="urn:ietf:params:xml:ns:epp-1.0"
+    xmlns:eppcom="urn:ietf:params:xml:ns:eppcom-1.0"
+    xmlns="http://www.w3.org/2001/XMLSchema"
+    elementFormDefault="qualified">
+
+    <!--
+    Import standard element types.
+    -->
+    <import namespace="urn:ietf:params:xml:ns:epp-1.0" schemaLocation="epp-1.0.xsd"/>
+    <import namespace="urn:ietf:params:xml:ns:eppcom-1.0" schemaLocation="eppcom-1.0.xsd"/>
+    <import namespace="urn:ietf:params:xml:ns:contact-1.0" schemaLocation="contact-1.0.xsd"/>
+    <import namespace="urn:ietf:params:xml:ns:domain-1.0" schemaLocation="domain-1.0.xsd"/>
+    <import namespace="urn:ietf:params:xml:ns:host-1.0" schemaLocation="host-1.0.xsd"/>
+    <import namespace="urn:ietf:params:xml:ns:secDNS-1.1" schemaLocation="secDNS-1.1.xsd"/>
+
+    <!--
+    Import our extensions to the above.
+    -->
+    <import namespace="http://www.nominet.org.uk/epp/xml/domain-nom-ext-1.2" schemaLocation="domain-nom-ext-1.2.xsd"/>
+    <import namespace="http://www.nominet.org.uk/epp/xml/contact-nom-ext-1.0" schemaLocation="contact-nom-ext-1.0.xsd"/>
+    <import namespace="http://www.nominet.org.uk/epp/xml/std-warning-1.1" schemaLocation="std-warning-1.1.xsd"/>
+    <import namespace="http://www.nominet.org.uk/epp/xml/std-contact-id-1.0" schemaLocation="std-contact-id-1.0.xsd"/>
+    <import namespace="http://www.nominet.org.uk/epp/xml/std-release-1.0" schemaLocation="std-release-1.0.xsd"/>
+    <import namespace="http://www.nominet.org.uk/epp/xml/std-handshake-1.0" schemaLocation="std-handshake-1.0.xsd"/>
+    <import namespace="http://www.nominet.org.uk/epp/xml/std-notifications-1.2" schemaLocation="std-notifications-1.2.xsd"/>
+    <import namespace="http://www.nominet.org.uk/epp/xml/nom-abuse-feed-1.0" schemaLocation="nom-abuse-feed-1.0.xsd"/>
+    <import namespace="http://www.nominet.org.uk/epp/xml/std-fork-1.0" schemaLocation="std-fork-1.0.xsd"/>
+    <import namespace="http://www.nominet.org.uk/epp/xml/std-list-1.0" schemaLocation="std-list-1.0.xsd"/>
+    <import namespace="http://www.nominet.org.uk/epp/xml/std-locks-1.0" schemaLocation="std-locks-1.0.xsd"/>
+    <import namespace="http://www.nominet.org.uk/epp/xml/std-unrenew-1.0" schemaLocation="std-unrenew-1.0.xsd"/>
+    <import namespace="http://www.nominet.org.uk/epp/xml/nom-direct-rights-1.0" schemaLocation="nom-direct-rights-1.0.xsd"/>
+    <import namespace="http://www.nominet.org.uk/epp/xml/nom-data-quality-1.1" schemaLocation="nom-data-quality-1.1.xsd"/>
+
+    <annotation>
+        <documentation>
+            Extensible Provisioning Protocol v1.0 schema, with Nominet extensions.
+        </documentation>
+    </annotation>
+
+    <!--
+    End of schema.
+    -->
+</schema>
+
+

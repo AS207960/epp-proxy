@@ -6,6 +6,7 @@
 use crate::{proto, xml_ser};
 use chrono::prelude::*;
 use futures::future::FutureExt;
+use futures::sink::SinkExt;
 use futures::stream::StreamExt;
 use native_tls::TlsConnector;
 use tokio::net::TcpStream;
@@ -14,11 +15,28 @@ use tokio::prelude::*;
 pub mod contact;
 pub mod domain;
 pub mod host;
+pub mod poll;
+pub mod nominet;
+pub mod rgp;
 pub mod router;
 
 pub use router::{Request, Response};
+use crate::proto::EPPServiceExtension;
 
 type Sender<T> = futures::channel::oneshot::Sender<Response<T>>;
+pub type RequestSender = futures::channel::mpsc::Sender<router::Request>;
+
+async fn write_msg_log(msg: &str, msg_type: &str, root: &std::path::Path) -> tokio::io::Result<()> {
+    let now = Utc::now();
+    let date = now.format("%F").to_string();
+    let time = now.format("%H-%M-%S-%f").to_string();
+    let dir = root.join(date);
+    let file_path = dir.join(format!("{}_{}.xml", time, msg_type));
+    tokio::fs::create_dir_all(&dir).await?;
+    let mut file = tokio::fs::File::create(file_path).await?;
+    file.write(msg.as_bytes()).await?;
+    Ok(())
+}
 
 /// Attempts to read and decode an EPP message.
 ///
@@ -30,15 +48,25 @@ type Sender<T> = futures::channel::oneshot::Sender<Response<T>>;
 /// # Arguments
 /// * `sock` - A tokio async reader
 /// * `host` - Host name for error reporting
+/// * `root` - Root dir for storing message logs
 async fn recv_msg<R: std::marker::Unpin + tokio::io::AsyncRead>(
     sock: &mut R,
     host: &str,
-) -> Result<proto::EPPMessage, ()> {
+    root: &std::path::Path
+) -> Result<proto::EPPMessage, bool> {
     let data_len = match sock.read_u32().await {
         Ok(l) => l - 4,
         Err(err) => {
-            error!("Error reading next data unit length from {}: {}", host, err);
-            return Err(());
+            return Err(match err.kind() {
+                std::io::ErrorKind::UnexpectedEof => {
+                    warn!("{} has closed the connection", host);
+                    true
+                },
+                _ => {
+                    error!("Error reading next data unit length from {}: {}", host, err);
+                    false
+                }
+            });
         }
     };
     let mut data_buf = vec![0u8; data_len as usize];
@@ -46,27 +74,36 @@ async fn recv_msg<R: std::marker::Unpin + tokio::io::AsyncRead>(
         Ok(n) => {
             if n != data_len as usize {
                 error!("Read less data than expected from {}", host);
-                return Err(());
+                return Err(false);
             }
         }
         Err(err) => {
             error!("Error reading next data from {}: {}", host, err);
-            return Err(());
+            return Err(match err.kind() {
+                std::io::ErrorKind::UnexpectedEof => true,
+                _ => false
+            });
         }
     }
     let data = match String::from_utf8(data_buf) {
         Ok(s) => s,
         Err(err) => {
             error!("Invalid UTF8 from {}: {}", host, err);
-            return Err(());
+            return Err(false);
         }
     };
     debug!("Received EPP message with contents: {}", data);
+    match write_msg_log(&data, "recv", root).await {
+        Ok(_) => {},
+        Err(e) => {
+            error!("Failed writing received message to message log: {}", e);
+        }
+    }
     let message: proto::EPPMessage = match quick_xml::de::from_str(&data) {
         Ok(m) => m,
         Err(err) => {
             error!("Invalid XML from {}: {}", host, err);
-            return Err(());
+            return Err(false);
         }
     };
     debug!("Decoded EPP message to: {:#?}", message);
@@ -79,21 +116,30 @@ struct EPPClientReceiver {
     host: String,
     /// Read half of the TLS stream used to connect to the server
     reader: tokio::io::ReadHalf<tokio_tls::TlsStream<TcpStream>>,
+    /// Path to store received messages in
+    root: std::path::PathBuf,
 }
 
 impl EPPClientReceiver {
     /// Starts the tokio task, and returns the receiving end of the channel to read messages from.
-    fn run(mut self) -> futures::channel::mpsc::Receiver<Result<proto::EPPMessage, ()>> {
+    fn run(mut self) -> futures::channel::mpsc::Receiver<Result<proto::EPPMessage, bool>> {
         let (mut sender, receiver) =
-            futures::channel::mpsc::channel::<Result<proto::EPPMessage, ()>>(16);
+            futures::channel::mpsc::channel::<Result<proto::EPPMessage, bool>>(16);
         tokio::spawn(async move {
             loop {
-                let msg = recv_msg(&mut self.reader, &self.host).await;
-                match futures::future::poll_fn(|cx| sender.poll_ready(cx)).await {
+                let msg = recv_msg(&mut self.reader, &self.host, &self.root).await;
+                let is_close = if let Err(c) = &msg {
+                    *c
+                } else {
+                    false
+                };
+                match sender.send(msg).await {
                     Ok(_) => {}
                     Err(_) => break,
                 }
-                sender.start_send(msg).unwrap();
+                if is_close {
+                    break
+                }
             }
         });
         receiver
@@ -103,26 +149,46 @@ impl EPPClientReceiver {
 /// Main client struct for the EEP client
 #[derive(Debug, Default)]
 pub struct EPPClient {
+    log_dir: std::path::PathBuf,
     host: String,
     tag: String,
     password: String,
+    old_password: Option<String>,
+    client_cert: Option<String>,
     server_id: String,
     /// Is the EPP server in a state to receive and process commands
     ready: bool,
     router: router::Router,
     /// What features does the server support
     features: EPPClientServerFeatures,
+    nominet_tag_list_subordinate: bool,
+    nominet_tag_list_subordinate_client: Option<futures::channel::mpsc::Sender<Request>>,
 }
 
 /// Features supported by the EPP server
 #[derive(Debug, Default)]
 pub struct EPPClientServerFeatures {
+    language: String,
     /// RFC 5731 support
     domain_supported: bool,
     /// RFC 5732 support
     host_supported: bool,
     /// RFC 5733 support
     contact_supported: bool,
+    /// RFC 8590 support
+    change_poll_supported: bool,
+    /// RFC 3915 support
+    rgp_supported: bool,
+    /// http://www.nominet.org.uk/epp/xml/std-notifications-1.2 support
+    nominet_notifications: bool,
+    /// http://www.nominet.org.uk/epp/xml/nom-tag-1.0 support
+    nominet_tag_list: bool,
+    /// http://www.nominet.org.uk/epp/xml/contact-nom-ext-1.0 support
+    nominet_contact_ext: bool,
+    /// http://www.nominet.org.uk/epp/xml/nom-data-quality-1.1 support
+    nominet_data_quality: bool,
+    /// https://www.nic.ch/epp/balance-1.0 support
+    switch_balance: bool,
 }
 
 impl EPPClient {
@@ -132,11 +198,14 @@ impl EPPClient {
     /// * `host` - The server connection string, in the form `domain:port`
     /// * `tag` - The client ID/tag to login with
     /// * `password` - The password to login with
-    pub fn new(host: &str, tag: &str, password: &str) -> Self {
+    pub fn new<'a, C: Into<Option<&'a str>>>(host: &str, tag: &str, password: &str, log_dir: std::path::PathBuf, client_cert: C, old_password: C) -> Self {
         Self {
+            log_dir,
             host: host.to_string(),
             tag: tag.to_string(),
             password: password.to_string(),
+            client_cert: client_cert.into().map(|c| c.to_string()),
+            old_password: old_password.into().map(|c| c.to_string()),
             ..Default::default()
         }
     }
@@ -145,6 +214,9 @@ impl EPPClient {
     /// commands into the client to be processed
     pub fn start(mut self) -> futures::channel::mpsc::Sender<Request> {
         info!("EPP Client for {} starting...", &self.host);
+        if self.nominet_tag_list_subordinate {
+            info!("This is a Nominet Tag list subordinate server");
+        }
         let (sender, receiver) = futures::channel::mpsc::channel::<Request>(16);
         tokio::spawn(async move {
             self._main_loop(receiver).await;
@@ -193,9 +265,9 @@ impl EPPClient {
                     Ok(_) => {}
                     Err(r) => {
                         if r {
-                            tokio::time::delay_for(tokio::time::Duration::new(5, 0)).await;
                             break;
                         } else {
+                            tokio::time::delay_for(tokio::time::Duration::new(5, 0)).await;
                             continue;
                         }
                     }
@@ -206,25 +278,21 @@ impl EPPClient {
             let msg_receiver = EPPClientReceiver {
                 host: self.host.clone(),
                 reader: sock_read,
+                root: self.log_dir.clone()
             };
             let mut message_channel = msg_receiver.run().fuse();
+            let mut keepalive_interval =
+                tokio::time::interval(tokio::time::Duration::new(120, 0)).fuse();
 
             loop {
                 futures::select! {
                     r = receiver.next() => {
                         match r {
-                            Some(r) => {
-                                match self.router.handle_request(&self.features, r).await {
-                                    Some((command, command_id)) => {
-                                        match self._send_command(command, &mut sock_write, command_id).await {
-                                            Ok(_) => {},
-                                            Err(_) => {
-                                                tokio::time::delay_for(tokio::time::Duration::new(5, 0)).await;
-                                                break;
-                                            }
-                                        }
-                                    }
-                                    None => {}
+                            Some(r) => match self._handle_request(r, &mut sock_write).await {
+                                Ok(_) => {},
+                                Err(_) => {
+                                    tokio::time::delay_for(tokio::time::Duration::new(5, 0)).await;
+                                    break;
                                 }
                             },
                             None => return
@@ -234,12 +302,27 @@ impl EPPClient {
                         match m {
                             Some(m) => match m {
                                 Ok(m) => match self._handle_response(m).await {
-                                    Ok(_) => {},
+                                    Ok(c) => if c {
+                                        return
+                                    },
                                     Err(_) => break
                                 },
-                                Err(_) => break
+                                Err(c) => if c {
+                                    return
+                                } else {
+                                    break
+                                }
                             },
                             None => break
+                        }
+                    }
+                    _ = keepalive_interval.next() => {
+                        match self._send_keepalive(&mut sock_write).await {
+                            Ok(_) => {},
+                            Err(_) => {
+                                tokio::time::delay_for(tokio::time::Duration::new(5, 0)).await;
+                                break;
+                            }
                         }
                     }
                 }
@@ -248,7 +331,50 @@ impl EPPClient {
         }
     }
 
-    async fn _handle_response(&mut self, res: proto::EPPMessage) -> Result<(), ()> {
+    async fn _send_keepalive<W: std::marker::Unpin + tokio::io::AsyncWrite>(
+        &mut self,
+        sock_write: &mut W,
+    ) -> Result<(), ()> {
+        let message = proto::EPPMessage {
+            message: proto::EPPMessageType::Hello{},
+        };
+        match self._send_msg(&message, sock_write).await {
+            Ok(_) => Ok(()),
+            Err(_) => {
+                error!("Failed to send hello keepalive command");
+                Err(())
+            }
+        }
+    }
+
+    async fn _handle_request<W: std::marker::Unpin + tokio::io::AsyncWrite>(&mut self, req: router::Request, sock_write: &mut W) -> Result<(), ()> {
+        match (req, self.nominet_tag_list_subordinate) {
+            (router::Request::NominetTagList(t), false) => {
+                let client = match &mut self.nominet_tag_list_subordinate_client {
+                    Some(c) => c,
+                    None => unreachable!()
+                };
+                match client.send(router::Request::NominetTagList(t)).await {
+                    Ok(_) => Ok(()),
+                    Err(e) => {
+                        warn!("Failed to send to subordinate server: {}", e);
+                        Err(())
+                    }
+                }
+            },
+            (req, _) => {
+                match self.router.handle_request(&self.features, req).await {
+                    Some((command, extension, command_id)) => match self._send_command(command, extension,sock_write, command_id).await {
+                        Ok(_) => Ok(()),
+                        Err(_) => Err(())
+                    }
+                    None => Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _handle_response(&mut self, res: proto::EPPMessage) -> Result<bool, ()> {
         match res.message {
             proto::EPPMessageType::Response(response) => {
                 if !response.is_success() {
@@ -279,19 +405,26 @@ impl EPPClient {
                         return Err(());
                     }
                 };
-                self.router.handle_response(&transaction_id, response).await?;
-                if is_closing {
-                    Err(())
-                } else {
-                    Ok(())
+                self.router
+                    .handle_response(&transaction_id, response)
+                    .await?;
+                Ok(is_closing)
+            }
+            proto::EPPMessageType::Greeting(greeting) => {
+                if (greeting.server_date - Utc::now()).num_minutes() >= 5 {
+                    warn!(
+                        "Local time out by more than 5 minutes from time reported by {}",
+                        greeting.server_id
+                    );
                 }
+                Ok(false)
             }
             o => {
                 warn!(
                     "Received unexpected response from {}: {:?}",
                     self.server_id, o
                 );
-                Ok(())
+                Ok(false)
             }
         }
     }
@@ -300,7 +433,7 @@ impl EPPClient {
         &mut self,
         sock: &mut tokio_tls::TlsStream<TcpStream>,
     ) -> Result<(), bool> {
-        let msg = match recv_msg(sock, &self.host).await {
+        let msg = match recv_msg(sock, &self.host, &self.log_dir).await {
             Ok(m) => m,
             Err(_) => {
                 info!("Restarting connection...");
@@ -346,7 +479,11 @@ impl EPPClient {
             error!("No common supported version with {}", greeting.server_id);
             return Err(());
         }
-        if !greeting.service_menu.languages.contains(&"en".to_string()) {
+        if greeting.service_menu.languages.contains(&"en".to_string()) {
+            self.features.language = "en".to_string();
+        } else if greeting.service_menu.languages.contains(&"en-US".to_string()) {
+            self.features.language = "en-US".to_string();
+        } else {
             error!("No common supported language with {}", greeting.server_id);
             return Err(());
         }
@@ -356,21 +493,16 @@ impl EPPClient {
                 greeting.server_id
             );
         }
-        self.features.contact_supported = greeting
-            .service_menu
-            .objects
-            .iter()
-            .any(|e| e == "urn:ietf:params:xml:ns:contact-1.0");
-        self.features.domain_supported = greeting
-            .service_menu
-            .objects
-            .iter()
-            .any(|e| e == "urn:ietf:params:xml:ns:domain-1.0");
-        self.features.host_supported = greeting
-            .service_menu
-            .objects
-            .iter()
-            .any(|e| e == "urn:ietf:params:xml:ns:host-1.0");
+        self.features.contact_supported = greeting.service_menu.supports("urn:ietf:params:xml:ns:contact-1.0");
+        self.features.domain_supported = greeting.service_menu.supports("urn:ietf:params:xml:ns:domain-1.0");
+        self.features.host_supported = greeting.service_menu.supports("urn:ietf:params:xml:ns:host-1.0");
+        self.features.change_poll_supported = greeting.service_menu.supports_ext("urn:ietf:params:xml:ns:changePoll-1.0");
+        self.features.rgp_supported = greeting.service_menu.supports_ext("urn:ietf:params:xml:ns:rgp-1.0");
+        self.features.nominet_notifications = greeting.service_menu.supports_ext("http://www.nominet.org.uk/epp/xml/std-notifications-1.2");
+        self.features.nominet_tag_list = greeting.service_menu.supports("http://www.nominet.org.uk/epp/xml/nom-tag-1.0");
+        self.features.nominet_contact_ext = greeting.service_menu.supports_ext("http://www.nominet.org.uk/epp/xml/contact-nom-ext-1.0");
+        self.features.nominet_data_quality = greeting.service_menu.supports_ext("http://www.nominet.org.uk/epp/xml/nom-data-quality-1.1");
+        self.features.switch_balance = greeting.service_menu.supports_ext("https://www.nic.ch/epp/balance-1.0");
 
         if !(self.features.contact_supported
             | self.features.domain_supported
@@ -382,48 +514,114 @@ impl EPPClient {
         Ok(())
     }
 
-    async fn _login(&self, sock: &mut tokio_tls::TlsStream<TcpStream>) -> Result<(), ()> {
+    async fn _login(&mut self, sock: &mut tokio_tls::TlsStream<TcpStream>) -> Result<(), ()> {
         let mut objects = vec![];
+        let mut ext_objects = vec![];
 
-        if self.features.contact_supported {
-            objects.push("urn:ietf:params:xml:ns:contact-1.0".to_string())
-        }
-        if self.features.domain_supported {
-            objects.push("urn:ietf:params:xml:ns:domain-1.0".to_string())
-        }
-        if self.features.host_supported {
-            objects.push("urn:ietf:params:xml:ns:host-1.0".to_string())
+        if self.nominet_tag_list_subordinate {
+            objects.push("http://www.nominet.org.uk/epp/xml/nom-tag-1.0".to_string())
+        } else {
+            if self.features.contact_supported {
+                objects.push("urn:ietf:params:xml:ns:contact-1.0".to_string())
+            }
+            if self.features.domain_supported {
+                objects.push("urn:ietf:params:xml:ns:domain-1.0".to_string())
+            }
+            if self.features.host_supported {
+                objects.push("urn:ietf:params:xml:ns:host-1.0".to_string())
+            }
+            if self.features.change_poll_supported {
+                ext_objects.push("urn:ietf:params:xml:ns:changePoll-1.0".to_string())
+            }
+            if self.features.rgp_supported {
+                ext_objects.push("urn:ietf:params:xml:ns:rgp-1.0".to_string())
+            }
+            if self.features.nominet_notifications {
+                ext_objects.push("http://www.nominet.org.uk/epp/xml/std-notifications-1.2".to_string())
+            }
+            if self.features.nominet_contact_ext {
+                ext_objects.push("http://www.nominet.org.uk/epp/xml/contact-nom-ext-1.0".to_string())
+            }
+            if self.features.nominet_data_quality {
+                ext_objects.push("http://www.nominet.org.uk/epp/xml/nom-data-quality-1.1".to_string())
+            }
+            if self.features.switch_balance {
+                ext_objects.push("https://www.nic.ch/epp/balance-1.0".to_string())
+            }
+            if self.features.nominet_tag_list {
+                let new_client = Self {
+                    host: self.host.clone(),
+                    tag: self.tag.clone(),
+                    password: self.password.clone(),
+                    nominet_tag_list_subordinate: true,
+                    log_dir: self.log_dir.clone(),
+                    client_cert: self.client_cert.clone(),
+                    ..Default::default()
+                };
+                self.nominet_tag_list_subordinate_client = Some(new_client.start());
+            }
         }
 
-        let login_command = proto::EPPLogin {
+        match self._try_login(
+            self.password.clone(), None, objects.clone(), ext_objects.clone(), sock
+        ).await {
+            Ok(_) => return Ok(()),
+            Err(e) => if e {
+                return Err(())
+            }
+        }
+        if let Some(old_password) = &self.old_password {
+            let old_password = old_password.clone();
+            match self._try_login(
+                old_password, Some(self.password.clone()), objects, ext_objects, sock
+            ).await {
+                Ok(_) => Ok(()),
+                Err(_) => Err(())
+            }
+        } else {
+            Err(())
+        }
+    }
+
+    async fn _try_login(
+        &mut self, password: String, new_password: Option<String>, objects: Vec<String>,
+        ext_objects: Vec<String>, sock: &mut tokio_tls::TlsStream<TcpStream>
+    ) -> Result<(), bool> {
+
+        let command = proto::EPPLogin {
             client_id: self.tag.clone(),
-            password: self.password.clone(),
-            new_password: None,
+            password,
+            new_password,
             options: proto::EPPLoginOptions {
                 version: "1.0".to_string(),
-                language: "en".to_string(),
+                language: self.features.language.clone(),
             },
             services: proto::EPPLoginServices {
                 objects,
-                extension: None,
+                extension: if ext_objects.is_empty() {
+                    None
+                } else {
+                    Some(EPPServiceExtension {
+                        extensions: ext_objects
+                    })
+                },
             },
         };
-
         match self
-            ._send_command(proto::EPPCommandType::Login(login_command), sock, None)
+            ._send_command(proto::EPPCommandType::Login(command),  None, sock, None)
             .await
-        {
-            Ok(i) => i,
-            Err(_) => {
-                error!("Failed to send login command");
-                return Err(());
-            }
-        };
-        let msg = match recv_msg(sock, &self.host).await {
+            {
+                Ok(i) => i,
+                Err(_) => {
+                    error!("Failed to send login command");
+                    return Err(true);
+                }
+            };
+        let msg = match recv_msg(sock, &self.host, &self.log_dir).await {
             Ok(msg) => msg,
             Err(_) => {
                 error!("Failed to receive login response");
-                return Err(());
+                return Err(true);
             }
         };
         if let proto::EPPMessageType::Response(response) = msg.message {
@@ -433,7 +631,7 @@ impl EPPClient {
                     self.server_id,
                     response.response_msg()
                 );
-                Err(())
+                Err(false)
             } else {
                 info!("Successfully logged into {}", self.server_id);
                 Ok(())
@@ -443,16 +641,18 @@ impl EPPClient {
                 "Didn't receive response to login command from {}",
                 self.server_id
             );
-            Err(())
+            Err(true)
         }
     }
 
     async fn _send_command<
         W: std::marker::Unpin + tokio::io::AsyncWrite,
         M: Into<Option<uuid::Uuid>>,
+        E: Into<Option<proto::EPPCommandExtensionType>>,
     >(
         &self,
         command: proto::EPPCommandType,
+        extension: E,
         sock: &mut W,
         message_id: M,
     ) -> Result<uuid::Uuid, ()> {
@@ -462,10 +662,11 @@ impl EPPClient {
         };
         let command = proto::EPPCommand {
             command,
+            extension: extension.into(),
             client_transaction_id: Some(message_id.to_hyphenated().to_string()),
         };
         let message = proto::EPPMessage {
-            message: proto::EPPMessageType::Command(command),
+            message: proto::EPPMessageType::Command(Box::new(command)),
         };
         match self._send_msg(&message, sock).await {
             Ok(_) => Ok(message_id),
@@ -491,12 +692,19 @@ impl EPPClient {
             }
         };
         match sock.write(&msg_bytes).await {
-            Ok(_) => Ok(()),
+            Ok(_) => {},
             Err(err) => {
                 error!("Error writing data unit to {}: {}", &self.host, err);
-                Err(())
+                return Err(());
             }
         }
+        match write_msg_log(&encoded_msg, "send", &self.log_dir).await {
+            Ok(_) => {},
+            Err(e) => {
+                error!("Failed writing sent message to message log: {}", e);
+            }
+        }
+        Ok(())
     }
 
     async fn _close(&mut self, sock: &mut tokio_tls::TlsStream<TcpStream>) {
@@ -529,6 +737,7 @@ impl EPPClient {
     }
 
     async fn _try_connect(&self) -> Result<tokio_tls::TlsStream<TcpStream>, ()> {
+        let hostname = self.host.rsplitn(2, ':').collect::<Vec<_>>().pop().unwrap();
         let addr = match tokio::net::lookup_host(&self.host).await {
             Ok(mut s) => match s.next() {
                 Some(s) => s,
@@ -549,9 +758,26 @@ impl EPPClient {
                 return Err(());
             }
         };
-        let cx = TlsConnector::builder().build().unwrap();
-        let cx = tokio_tls::TlsConnector::from(cx);
-        let socket = match cx.connect(&self.host, socket).await {
+        let mut cx = TlsConnector::builder();
+        if let Some(client_cert) = &self.client_cert {
+            let pkcs = match std::fs::read(client_cert) {
+                Ok(p) => p,
+                Err(err) => {
+                    error!("Unable read client cert {}: {}", client_cert, err);
+                    return Err(());
+                }
+            };
+            let identity = match native_tls::Identity::from_pkcs12(&pkcs, "") {
+                Ok(i) => i,
+                Err(err) => {
+                    error!("Unable read client cert {}: {}", client_cert, err);
+                    return Err(());
+                }
+            };
+            cx.identity(identity);
+        }
+        let cx = tokio_tls::TlsConnector::from(cx.build().unwrap());
+        let socket = match cx.connect(&hostname, socket).await {
             Ok(s) => s,
             Err(err) => {
                 error!("Unable to start TLS session to {}: {}", self.host, err);
@@ -602,4 +828,62 @@ pub enum Error {
     Timeout,
     /// The EPP server returned an error message (probably invalid parameters)
     Err(String),
+}
+
+#[derive(Debug)]
+pub enum TransferStatus {
+    ClientApproved,
+    ClientCancelled,
+    ClientRejected,
+    Pending,
+    ServerApproved,
+    ServerCancelled,
+}
+
+
+impl From<&proto::EPPTransferStatus> for TransferStatus {
+    fn from(from: &proto::EPPTransferStatus) -> Self {
+        use proto::EPPTransferStatus;
+        match from {
+            EPPTransferStatus::ClientApproved => TransferStatus::ClientApproved,
+            EPPTransferStatus::ClientCancelled => TransferStatus::ClientCancelled,
+            EPPTransferStatus::ClientRejected => TransferStatus::ClientRejected,
+            EPPTransferStatus::Pending => TransferStatus::Pending,
+            EPPTransferStatus::ServerApproved => TransferStatus::ServerApproved,
+            EPPTransferStatus::ServerCancelled => TransferStatus::ServerCancelled,
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct LogoutRequest {
+    pub return_path: Sender<()>,
+}
+
+pub fn handle_logout(
+    _client: &EPPClientServerFeatures,
+    _req: &LogoutRequest,
+) -> router::HandleReqReturn<()> {
+    Ok((proto::EPPCommandType::Logout{}, None))
+}
+
+pub fn handle_logout_response(_response: proto::EPPResponse) -> Response<()> {
+   Response::Ok(())
+}
+
+/// Ends an EPP session
+///
+/// # Arguments
+/// * `client_sender` - Reference to the tokio channel into the client
+pub async fn logout(
+    client_sender: &mut futures::channel::mpsc::Sender<Request>,
+) -> Result<(), Error> {
+    let (sender, receiver) = futures::channel::oneshot::channel();
+    send_epp_client_request(
+        client_sender,
+        Request::Logout(Box::new(LogoutRequest {
+            return_path: sender,
+        })),
+        receiver,
+    ).await
 }

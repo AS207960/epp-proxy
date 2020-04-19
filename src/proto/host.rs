@@ -65,14 +65,38 @@ pub struct EPPHostInfoData {
 
 #[derive(Debug, Deserialize)]
 pub struct EPPHostStatus {
-    #[serde(rename = "s", default)]
-    pub status: String,
+    #[serde(rename = "s")]
+    pub status: EPPHostStatusType,
 }
 
 #[derive(Debug, Serialize)]
 pub struct EPPHostStatusSer {
     #[serde(rename = "$attr:s")]
-    pub status: String,
+    pub status: EPPHostStatusType,
+}
+
+#[derive(Debug, Deserialize, Serialize, PartialEq)]
+pub enum EPPHostStatusType {
+    #[serde(rename = "clientDeleteProhibited")]
+    ClientDeleteProhibited,
+    #[serde(rename = "clientUpdateProhibited")]
+    ClientUpdateProhibited,
+    #[serde(rename = "linked")]
+    Linked,
+    #[serde(rename = "ok")]
+    Ok,
+    #[serde(rename = "pendingCreate")]
+    PendingCreate,
+    #[serde(rename = "pendingDelete")]
+    PendingDelete,
+    #[serde(rename = "pendingTransfer")]
+    PendingTransfer,
+    #[serde(rename = "pendingUpdate")]
+    PendingUpdate,
+    #[serde(rename = "serverDeleteProhibited")]
+    ServerDeleteProhibited,
+    #[serde(rename = "serverUpdateProhibited")]
+    ServerUpdateProhibited,
 }
 
 #[derive(Debug, Deserialize)]
@@ -122,12 +146,6 @@ pub struct EPPHostCreateData {
         default
     )]
     pub creation_date: Option<DateTime<Utc>>,
-}
-
-#[derive(Debug, Serialize)]
-pub struct EPPHostDelete {
-    #[serde(rename = "host:name")]
-    pub name: String,
 }
 
 #[derive(Debug, Serialize)]

@@ -1,0 +1,23 @@
+syntax = "proto3";
+package epp.rgp;
+
+enum RGPState {
+    Unknown = 0;
+    AddPeriod = 1;
+    AutoRenewPeriod = 2;
+    RenewPeriod = 3;
+    TransferPeriod = 4;
+    RedemptionPeriod = 5;
+    PendingRestore = 6;
+    PendingDelete = 7;
+}
+
+message RequestRequest {
+    string name = 1;
+}
+
+message RestoreReply {
+    bool pending = 1;
+    RGPState state = 2;
+    string registry_name = 3;
+}

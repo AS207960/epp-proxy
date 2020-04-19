@@ -34,6 +34,7 @@ where
 
 #[derive(Debug)]
 pub enum _SerializerData {
+    CData(String),
     String(String),
     Seq(Vec<_SerializerData>),
     Struct { attrs: String, contents: String },
@@ -42,12 +43,9 @@ pub enum _SerializerData {
 impl _SerializerData {
     fn as_str(&self) -> String {
         match self {
+            _SerializerData::CData(s) => s.clone(),
             _SerializerData::String(s) => s.clone(),
-            _SerializerData::Seq(s) => s
-                .iter()
-                .map(|d| d.as_str())
-                .collect::<Vec<_>>()
-                .join(""),
+            _SerializerData::Seq(s) => s.iter().map(|d| d.as_str()).collect::<Vec<_>>().join(""),
             _SerializerData::Struct { contents, .. } => contents.clone(),
         }
     }
@@ -57,28 +55,30 @@ fn format_tag(key: &str, val: &_SerializerData) -> String {
     let mut output = String::new();
     let re = regex::Regex::new(r"^(?:\{(?P<n>.+)\})?(?:(?P<p>.+):)?(?P<e>.+)$").unwrap();
     let caps = re.captures(key).unwrap();
-    let open_tag = |attrs| {
+    let open_tag = |attrs, empty: bool| {
         if key != "$value" {
             if let Some(ns) = caps.name("n") {
                 if let Some(p) = caps.name("p") {
                     format!(
-                        "<{}:{} xmlns:{}=\"{}\"{}>",
+                        "<{}:{} xmlns:{}=\"{}\"{}{}>",
                         p.as_str(),
                         caps.name("e").unwrap().as_str(),
                         p.as_str(),
                         ns.as_str(),
-                        attrs
+                        attrs,
+                        if empty { "/" } else { "" }
                     )
                 } else {
                     format!(
-                        "<{} xmlns=\"{}\"{}>",
+                        "<{} xmlns=\"{}\"{}{}>",
                         caps.name("e").unwrap().as_str(),
                         ns.as_str(),
-                        attrs
+                        attrs,
+                        if empty { "/" } else { "" }
                     )
                 }
             } else {
-                format!("<{}{}>", key, attrs)
+                format!("<{}{}{}>", key, attrs, if empty { "/" } else { "" })
             }
         } else {
             "".to_string()
@@ -94,9 +94,23 @@ fn format_tag(key: &str, val: &_SerializerData) -> String {
         "".to_string()
     };
     match val {
+        _SerializerData::CData(s) => {
+            if s.is_empty() {
+                let open_tag_str = open_tag("", true);
+                output += &open_tag_str;
+            } else {
+                let open_tag_str = open_tag("", false);
+                output += &format!("{}<![CDATA[{}]]>{}", open_tag_str, s, close_tag);
+            }
+        },
         _SerializerData::String(s) => {
-            let open_tag_str = open_tag("");
-            output += &format!("{}{}{}", open_tag_str, s, close_tag);
+            if s.is_empty() {
+                let open_tag_str = open_tag("", true);
+                output += &open_tag_str;
+            } else {
+                let open_tag_str = open_tag("", false);
+                output += &format!("{}{}{}", open_tag_str, s, close_tag);
+            }
         }
         _SerializerData::Seq(s) => {
             for i in s {
@@ -104,8 +118,21 @@ fn format_tag(key: &str, val: &_SerializerData) -> String {
             }
         }
         _SerializerData::Struct { attrs, contents } => {
-            let open_tag_str = open_tag(&format!(" {}", attrs));
-            output += &format!("{}{}{}", open_tag_str, contents, close_tag);
+            if contents.is_empty() {
+                let open_tag_str = if !attrs.is_empty() {
+                    open_tag(&format!(" {}", attrs), true)
+                } else {
+                    open_tag("", true)
+                };
+                output += &open_tag_str;
+            } else {
+                let open_tag_str = if !attrs.is_empty() {
+                    open_tag(&format!(" {}", attrs), false)
+                } else {
+                    open_tag("", false)
+                };
+                output += &format!("{}{}{}", open_tag_str, contents, close_tag);
+            }
         }
     }
     output
@@ -172,7 +199,7 @@ impl<'a> ser::Serializer for &'a mut Serializer {
     }
 
     fn serialize_str(self, v: &str) -> Result<_SerializerData, Self::Error> {
-        Ok(_SerializerData::String(v.to_string()))
+        Ok(_SerializerData::CData(v.to_string()))
     }
 
     fn serialize_bytes(self, v: &[u8]) -> Result<_SerializerData, Self::Error> {

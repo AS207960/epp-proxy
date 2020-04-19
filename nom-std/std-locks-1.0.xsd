@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id: std-locks-1.0.xsd 46750 2012-09-28 10:22:31Z judyb $ -->
+<schema targetNamespace="http://www.nominet.org.uk/epp/xml/std-locks-1.0"
+  xmlns="http://www.w3.org/2001/XMLSchema"
+  xmlns:locks="http://www.nominet.org.uk/epp/xml/std-locks-1.0"
+  xmlns:eppcom="urn:ietf:params:xml:ns:eppcom-1.0"
+  elementFormDefault="qualified">
+  
+  <!-- Import common element types. -->
+  <import namespace="urn:ietf:params:xml:ns:epp-1.0" schemaLocation="epp-1.0.xsd"/>
+  <import namespace="urn:ietf:params:xml:ns:eppcom-1.0" schemaLocation="eppcom-1.0.xsd"/>
+  <annotation>
+    <documentation>
+      EPP standard extension schema for Nominet lock and unlock operations.
+    </documentation>
+  </annotation>
+
+  <!-- lock and unlock operations -->
+  <element name="lock"   type="locks:lockType"/>
+  <element name="unlock" type="locks:unlockType"/>
+
+  <!-- Data types -->
+  <complexType name="lockType">
+     <sequence>
+        <choice>
+           <element name="contactId" type="eppcom:clIDType"/>
+           <element name="domainName" type="eppcom:labelType"/>
+        </choice>
+     </sequence>
+     <attribute name="object" type="locks:lockObjectType" use="required"/>
+     <attribute name="type" type="eppcom:labelType" use="required"/>
+  </complexType>
+
+  <complexType name="unlockType">
+     <sequence>
+        <choice>
+           <element name="contactId" type="eppcom:clIDType"/>
+           <element name="domainName" type="eppcom:labelType"/>
+        </choice>
+     </sequence>
+     <attribute name="object" type="locks:lockObjectType" use="required"/>
+     <attribute name="type" type="eppcom:labelType" use="required"/>
+  </complexType>
+
+  <simpleType name="lockObjectType">
+     <restriction base="string">
+        <enumeration value="domain"/>
+        <enumeration value="contact"/>
+     </restriction>
+  </simpleType>
+    
+  
+</schema>

@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id: std-notifications-1.2.xsd 36989 2011-04-11 07:35:41Z judyb $ -->
+<schema targetNamespace="http://www.nominet.org.uk/epp/xml/std-notifications-1.2"
+  xmlns="http://www.w3.org/2001/XMLSchema"
+  xmlns:n="http://www.nominet.org.uk/epp/xml/std-notifications-1.2"
+  xmlns:eppcom="urn:ietf:params:xml:ns:eppcom-1.0"
+  xmlns:domain="urn:ietf:params:xml:ns:domain-1.0"
+  xmlns:contact="urn:ietf:params:xml:ns:contact-1.0"
+  xmlns:host="urn:ietf:params:xml:ns:host-1.0"
+  elementFormDefault="qualified">
+  
+  <!-- Import common element types. -->
+  <import namespace="urn:ietf:params:xml:ns:epp-1.0" schemaLocation="epp-1.0.xsd"/>
+  <import namespace="urn:ietf:params:xml:ns:eppcom-1.0" schemaLocation="eppcom-1.0.xsd"/>
+  <import namespace="urn:ietf:params:xml:ns:domain-1.0" schemaLocation="domain-1.0.xsd"/>
+  <import namespace="urn:ietf:params:xml:ns:contact-1.0" schemaLocation="contact-1.0.xsd"/>
+  <import namespace="urn:ietf:params:xml:ns:host-1.0" schemaLocation="host-1.0.xsd"/>
+  <annotation>
+    <documentation>
+      EPP standard notifications extension schema.
+    </documentation>
+  </annotation>
+  
+  <!-- registrar change notification -->
+  <element name="rcData" type="n:rcDataType"/>
+  <element name="domainListData" type="n:domainListType"/>
+  <element name="hostListData" type="n:hostListType"/>
+  <element name="relData" type="n:relDataType"/>
+  <element name="cancData" type="n:cancDataType"/>
+  <element name="suspData" type="n:suspDataType"/>
+  <element name="trnAuthData" type="n:trnAuthDataType"/>
+  <element name="trnData" type="n:trnDataType"/>
+  <element name="processData" type="n:processDataType"/>
+  <element name="pqData" type="n:pqDataType"/>  
+  <element name="domainFailData" type="n:domainFailDataType"/>
+  <element name="hostCancData" type="n:hostCancDataType"/>
+  <element name="contactDelData" type="n:contactDelDataDataType"/>
+
+
+  <complexType name="suspDataType">
+    <sequence>
+      <element name="reason" type="string"/>
+      <element name="cancelDate" type="dateTime" minOccurs="0"/>
+      <element name="domainListData" type="n:domainListType"/>
+    </sequence>
+  </complexType>
+  
+  <complexType name="rcDataType">
+    <sequence>
+      <element name="orig" type="eppcom:minTokenType"/>
+      <element name="registrarTag" type="eppcom:clIDType"/>
+      <element name="caseId" type="n:caseIDType" minOccurs="0"/>
+      <element name="domainListData" type="n:domainListType" minOccurs="0"/>
+      <element ref="contact:infData"/>
+    </sequence>  
+  </complexType>
+  
+  <simpleType name="caseIDType">
+    <restriction base="token">
+      <maxLength value="12"/>
+    </restriction>
+  </simpleType>
+  
+  <complexType name="domainListType">
+    <choice>
+      <element ref="domain:infData" maxOccurs="unbounded" />
+      <element name="domainName" maxOccurs="unbounded" type="eppcom:labelType"/>
+    </choice>
+    <attribute name="noDomains" type="nonNegativeInteger"/>
+  </complexType>
+  
+  <complexType name="hostCancDataType">
+    <sequence>
+      <element name="hostListData" type="n:hostListType"/>
+      <element name="domainListData" type="n:domainListType"/>
+    </sequence>
+  </complexType>
+  
+  <complexType name="hostListType">
+    <choice>
+      <element ref="host:infData" maxOccurs="unbounded" />
+      <element name="hostObj" maxOccurs="unbounded" type="eppcom:labelType"/>
+    </choice>
+    <attribute name="noHosts" type="nonNegativeInteger"/>
+  </complexType>
+  
+  <complexType name="relDataType">
+    <sequence>
+      <element name="accountId" type="n:movedAccountIdType"/>
+      <element name="from" type="eppcom:clIDType"/>
+      <element name="registrarTag" type="eppcom:clIDType"/>
+      <element name="domainListData" type="n:domainListType" minOccurs="0"/>
+    </sequence>
+  </complexType>
+  
+  <complexType name="movedAccountIdType">
+    <simpleContent>
+      <extension base="eppcom:minTokenType">
+        <attribute name="moved" type="n:flagType"/>
+      </extension>
+    </simpleContent>
+  </complexType>
+  
+  <complexType name="cancDataType">
+    <sequence>
+      <element name="domainName" type="n:domainNameType" maxOccurs="unbounded"/>
+      <element name="orig" type="eppcom:minTokenType"/>
+    </sequence>
+  </complexType>
+  
+  <simpleType name="domainNameType">
+    <restriction base="token">
+      <pattern value="[A-Za-z\d\.\-]*"/>
+    </restriction> 
+  </simpleType>
+  
+  <complexType name="trnAuthDataType">
+    <sequence>
+      <element name="orig" type="eppcom:minTokenType"/>
+      <element name="caseId" type="n:caseIDType" />
+      <element name="domainListData" type="n:domainListType" minOccurs="0"/>
+      <element ref="contact:infData"/>
+    </sequence>
+  </complexType>
+  
+  <complexType name="trnDataType">
+    <sequence>
+      <element name="orig" type="eppcom:minTokenType"/>
+      <element name="accountId" type="eppcom:clIDType" minOccurs="0"/>
+      <element name="oldAccountId" type="eppcom:clIDType" minOccurs="0"/>
+      <element name="caseId" type="n:caseIDType" minOccurs="0"/>
+      <element name="domainListData" type="n:domainListType" minOccurs="0"/>
+      <element ref="contact:infData"/>
+    </sequence>
+  </complexType>
+  
+  <complexType name="processDataType">
+    <sequence>
+      <element ref="contact:infData"/>
+      <element name="processType" type="string"/>
+      <element name="suspendDate" type="dateTime" minOccurs="0"/>
+      <element name="cancelDate" type="dateTime" minOccurs="0"/>
+      <element name="domainListData" type="n:domainListType" minOccurs="0"/>
+    </sequence>
+    <attribute name="stage" type="n:processStageType"/>
+  </complexType>
+  
+  <simpleType name="processStageType">
+    <restriction base="token">
+      <enumeration value="initial"/>
+      <enumeration value="updated"/>
+    </restriction>
+  </simpleType>
+
+  <complexType name="pqDataType">
+    <sequence>
+      <element ref="contact:infData"/>
+      <element name="suspendDate" type="dateTime" minOccurs="0"/>
+      <element name="cancelDate" type="dateTime" minOccurs="0"/>
+      <element name="domainListData" type="n:domainListType" minOccurs="0"/>
+    </sequence>
+    <attribute name="stage" type="n:pqStageType"/>
+  </complexType>
+  
+  <simpleType name="pqStageType">
+    <restriction base="token">
+      <enumeration value="initial"/>
+      <enumeration value="suspend"/>
+      <enumeration value="cancel"/>
+      <enumeration value="updated"/>
+    </restriction>
+  </simpleType>
+
+  <!-- error message structure. -->
+  <complexType name="domainFailDataType">
+    <sequence>
+      <element name="domainName" type="eppcom:labelType"/>
+      <element name="reason" type="eppcom:labelType"/> 
+    </sequence>
+  </complexType>
+  
+  <!-- y/n flag -->
+  <simpleType name="flagType">
+    <restriction base="token">
+      <enumeration value="Y"/>
+      <enumeration value="N"/>
+    </restriction>
+  </simpleType>
+  
+  <complexType name="contactDelDataDataType">
+    <sequence>
+      <element name="contactId" type="eppcom:clIDType" minOccurs="0"/>
+      <element name="roid" type="eppcom:roidType"/>
+    </sequence>
+  </complexType>
+  
+</schema>

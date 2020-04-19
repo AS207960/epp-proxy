@@ -1,0 +1,12 @@
+Nominet Schemas for Standard EPP (with optional Nominet Extensions)
+Version 1.0.8
+Please check website for documentation
+ (http://registrars.nominet.org.uk/namespace/uk/registration-and-domain-management/registrar-systems/epp)
+
+To help check commands against these schemas, a root schema 
+  "nom-root-std-1.0.9.xsd" is included, simply importing the relevant schemas.  
+You can use an XML schema validator to check an XML command for schema 
+  validity.
+
+For example, using Sun's Multi-Schema Validator (https://msv.dev.java.net/)
+  "java -jar /path/to/msv.jsr nom-root-std-1.0.8.xsd your_command.xml"

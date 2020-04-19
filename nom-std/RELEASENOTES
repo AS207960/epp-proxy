@@ -1,0 +1,66 @@
+===========
+2016 Apr
+fix to std-fork-1.0 schema
+
+===========
+2015 May
+added nom-data-quality-1.1 schema
+
+===========
+2014 September 22
+added nom-data-quality-1.0 schema
+
+===========
+2014 April 8
+added nom-direct-rights-1.0 schema
+
+===========
+2012 Dec 11
+added new schemas: std-fork-1.0, std-list-1.0, std-locks-1.0, std-unrenew-1.0
+
+===========
+2012 Mar 29
+updated domain-nom-ext schema to domain-nom-ext-1.2
+
+===========
+2011 Sep 06
+updated std-notifications schema to std-notifications-1.2
+
+===========
+2011 Feb 02
+added secDNS-1.1
+
+===========
+2010 June 04
+added new warning "registrar account forked"
+
+===========
+2010 June 03
+fix to domain-nom-ext-1.1 to remove unused transfer command
+
+===========
+2010 Mar 09
+updated domain-nom-ext schema to domain-nom-ext-1.1
+fix to contact-nom-ext-1.0.xsd to allow trad-name field to be cleared
+
+===========
+2010 Jan 20
+addition of nom-abuse-feed-1.0 schema
+
+===========
+2009 Sept 29
+updated std-warning schema to std-warning-1.1
+updated std-notifications schema to std-notifications-1.1
+
+===========
+2009 May 13
+added std-handshake-1.0 schema
+
+===========
+2009 Apr 30
+fixed std-warning-1.0 to add "ignored-attribute"
+
+===========
+2009 Apr 23
+initial publication
+

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+  <schema targetNamespace="http://www.nominet.org.uk/epp/xml/nom-direct-rights-1.0"
+    xmlns:direct-rights="http://www.nominet.org.uk/epp/xml/nom-direct-rights-1.0"
+    xmlns="http://www.w3.org/2001/XMLSchema"
+    xmlns:eppcom="urn:ietf:params:xml:ns:eppcom-1.0"
+    xmlns:contact="urn:ietf:params:xml:ns:contact-1.0"
+    elementFormDefault="qualified">
+  
+    <!-- Import common element types. -->
+    <import namespace="urn:ietf:params:xml:ns:epp-1.0" schemaLocation="epp-1.0.xsd"/>
+    <import namespace="urn:ietf:params:xml:ns:eppcom-1.0" schemaLocation="eppcom-1.0.xsd"/>
+    <import namespace="urn:ietf:params:xml:ns:contact-1.0" schemaLocation="contact-1.0.xsd"/>
+    <annotation>
+    <documentation>
+      EPP Direct rights schema.
+    </documentation>
+  </annotation>
+  
+  <!-- release domains to another tag -->
+  <element name="check" type="direct-rights:checkType"></element>
+  
+  <!-- release response when handshake requested -->
+  <element name="chkData" type="direct-rights:chkDataType"></element>
+  
+  <!-- release data types -->
+  <complexType name="checkType">
+    <choice>
+       <sequence>
+          <element name="postalInfo" type="contact:postalInfoType"/>
+          <element name="email" type="eppcom:minTokenType"/>
+       </sequence>
+       <element name="registrant" type="eppcom:clIDType"/>
+    </choice>
+  </complexType>
+
+  <complexType name="chkDataType">
+     <sequence>
+        <element name="ror" type="direct-rights:rorLabelType"/>
+     </sequence>
+  </complexType>
+  
+  <simpleType name="rorLabelType">
+	<restriction base="token">
+		<minLength value="0" />
+		<maxLength value="255" />
+	</restriction>
+  </simpleType>           
+</schema>
