@@ -9,7 +9,7 @@ pub struct EPPRGPData {
 #[derive(Debug, Deserialize)]
 pub struct EPPRGPStatus {
     #[serde(rename = "s")]
-    pub state: EPPRGPState
+    pub state: EPPRGPState,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -27,7 +27,7 @@ pub enum EPPRGPState {
     #[serde(rename = "pendingRestore")]
     PendingRestore,
     #[serde(rename = "pendingDelete")]
-    PendingDelete
+    PendingDelete,
 }
 
 #[derive(Debug, Serialize)]
@@ -41,7 +41,7 @@ pub struct EPPRGPRestore {
     #[serde(rename = "$attr:op")]
     pub operation: EPPRGPRestoreOperation,
     #[serde(rename = "rgp:report", skip_serializing_if = "Option::is_none")]
-    pub report: Option<EPPRGPReport>
+    pub report: Option<EPPRGPReport>,
 }
 
 #[derive(Debug, Serialize)]
@@ -50,7 +50,7 @@ pub enum EPPRGPRestoreOperation {
     Request,
     #[serde(rename = "report")]
     #[allow(dead_code)]
-    Report
+    Report,
 }
 
 #[derive(Debug, Serialize)]
@@ -68,5 +68,5 @@ pub struct EPPRGPReport {
     #[serde(rename = "rgp:statement")]
     pub statement: Vec<String>,
     #[serde(rename = "rgp:other", skip_serializing_if = "Option::is_none")]
-    pub other: Option<String>
+    pub other: Option<String>,
 }

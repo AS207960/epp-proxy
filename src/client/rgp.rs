@@ -1,7 +1,7 @@
 //! EPP commands relating to nominet specific features
 
-use super::{proto, EPPClientServerFeatures, Request, Response, Sender};
 use super::router::HandleReqReturn;
+use super::{proto, EPPClientServerFeatures, Request, Response, Sender};
 
 #[derive(Debug)]
 pub struct RestoreRequest {
@@ -25,7 +25,7 @@ pub enum RGPState {
     TransferPeriod,
     RedemptionPeriod,
     PendingRestore,
-    PendingDelete
+    PendingDelete,
 }
 
 impl From<&proto::rgp::EPPRGPState> for RGPState {
@@ -61,16 +61,19 @@ pub fn handle_restore(
         remove: None,
         change: Some(proto::domain::EPPDomainUpdateChange {
             registrant: None,
-            auth_info: None
-        })
+            auth_info: None,
+        }),
     });
     let ext = proto::rgp::EPPRGPUpdate {
         restore: proto::rgp::EPPRGPRestore {
             operation: proto::rgp::EPPRGPRestoreOperation::Request,
-            report: None
-        }
+            report: None,
+        },
     };
-    Ok((proto::EPPCommandType::Update(Box::new(command)), Some(proto::EPPCommandExtensionType::EPPRGPUpdate(ext))))
+    Ok((
+        proto::EPPCommandType::Update(Box::new(command)),
+        Some(proto::EPPCommandExtensionType::EPPRGPUpdate(ext)),
+    ))
 }
 
 pub fn handle_restore_response(response: proto::EPPResponse) -> Response<RestoreResponse> {
@@ -79,17 +82,17 @@ pub fn handle_restore_response(response: proto::EPPResponse) -> Response<Restore
             Some(proto::EPPResponseExtensionType::EPPRGPUpdate(rgp_info)) => {
                 Response::Ok(RestoreResponse {
                     pending: response.is_pending(),
-                    state: (&rgp_info.state.state).into()
+                    state: (&rgp_info.state.state).into(),
                 })
             }
             _ => Response::Ok(RestoreResponse {
                 pending: response.is_pending(),
-                state: RGPState::Unknown
+                state: RGPState::Unknown,
             }),
         },
         None => Response::Ok(RestoreResponse {
             pending: response.is_pending(),
-            state: RGPState::Unknown
+            state: RGPState::Unknown,
         }),
     }
 }

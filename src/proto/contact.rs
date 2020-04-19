@@ -145,7 +145,7 @@ pub struct EPPContactDisclosure {
     #[serde(rename = "flag")]
     pub flag: bool,
     #[serde(rename = "$value")]
-    pub elements: Vec<EPPContactDisclosureItem>
+    pub elements: Vec<EPPContactDisclosureItem>,
 }
 
 #[derive(Debug, Serialize)]
@@ -153,7 +153,7 @@ pub struct EPPContactDisclosureSer {
     #[serde(rename = "$attr:flag")]
     pub flag: String,
     #[serde(rename = "$value")]
-    pub elements: Vec<EPPContactDisclosureItemSer>
+    pub elements: Vec<EPPContactDisclosureItemSer>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -161,24 +161,24 @@ pub enum EPPContactDisclosureItem {
     #[serde(rename = "contact:name")]
     Name {
         #[serde(rename = "type")]
-        addr_type: EPPContactPostalInfoType
+        addr_type: EPPContactPostalInfoType,
     },
     #[serde(rename = "contact:org")]
     Organisation {
         #[serde(rename = "type")]
-        addr_type: EPPContactPostalInfoType
+        addr_type: EPPContactPostalInfoType,
     },
     #[serde(rename = "contact:addr")]
     Address {
         #[serde(rename = "type")]
-        addr_type: EPPContactPostalInfoType
+        addr_type: EPPContactPostalInfoType,
     },
     #[serde(rename = "contact:voice")]
     Voice,
     #[serde(rename = "contact:fax")]
     Fax,
     #[serde(rename = "contact:email")]
-    Email
+    Email,
 }
 
 #[derive(Debug, Serialize)]
@@ -186,24 +186,24 @@ pub enum EPPContactDisclosureItemSer {
     #[serde(rename = "contact:name")]
     Name {
         #[serde(rename = "$attr:type")]
-        addr_type: EPPContactPostalInfoType
+        addr_type: EPPContactPostalInfoType,
     },
     #[serde(rename = "contact:org")]
     Organisation {
         #[serde(rename = "$attr:type")]
-        addr_type: EPPContactPostalInfoType
+        addr_type: EPPContactPostalInfoType,
     },
     #[serde(rename = "contact:addr")]
     Address {
         #[serde(rename = "$attr:type")]
-        addr_type: EPPContactPostalInfoType
+        addr_type: EPPContactPostalInfoType,
     },
     #[serde(rename = "contact:voice")]
     Voice {},
     #[serde(rename = "contact:fax")]
     Fax {},
     #[serde(rename = "contact:email")]
-    Email {}
+    Email {},
 }
 
 #[derive(Debug, Serialize)]

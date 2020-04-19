@@ -1,7 +1,7 @@
 //! EPP commands relating to nominet specific features
 
-use super::{proto, EPPClientServerFeatures, Request, Response, Sender};
 use super::router::HandleReqReturn;
+use super::{proto, EPPClientServerFeatures, Request, Response, Sender};
 
 #[derive(Debug)]
 pub struct TagListRequest {
@@ -12,7 +12,7 @@ pub struct TagListRequest {
 #[derive(Debug)]
 pub struct TagListResponse {
     /// Tags returned
-    pub tags: Vec<Tag>
+    pub tags: Vec<Tag>,
 }
 
 #[derive(Debug)]
@@ -24,7 +24,7 @@ pub struct Tag {
     /// Trading name of the tag
     pub trading_name: Option<String>,
     /// Does this tag require handshaking
-    pub handshake: bool
+    pub handshake: bool,
 }
 
 pub fn handle_tag_list(
@@ -43,19 +43,26 @@ pub fn handle_tag_list_response(response: proto::EPPResponse) -> Response<TagLis
         Some(value) => match value.value {
             proto::EPPResultDataValue::EPPNominetTagInfoResult(tag_list) => {
                 Response::Ok(TagListResponse {
-                    tags: match tag_list.tags.into_iter().map(|t| Ok(Tag {
-                        tag: t.tag,
-                        name: t.name,
-                        trading_name: t.trading_name,
-                        handshake: match t.handshake.as_str() {
-                            "Y" => true,
-                            "N" => false,
-                            _ => return Err(Response::InternalServerError)
-                        }
-                    })).collect() {
+                    tags: match tag_list
+                        .tags
+                        .into_iter()
+                        .map(|t| {
+                            Ok(Tag {
+                                tag: t.tag,
+                                name: t.name,
+                                trading_name: t.trading_name,
+                                handshake: match t.handshake.as_str() {
+                                    "Y" => true,
+                                    "N" => false,
+                                    _ => return Err(Response::InternalServerError),
+                                },
+                            })
+                        })
+                        .collect()
+                    {
                         Ok(t) => t,
-                        Err(e) => return e
-                    }
+                        Err(e) => return e,
+                    },
                 })
             }
             _ => Response::InternalServerError,

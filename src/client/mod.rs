@@ -15,13 +15,13 @@ use tokio::prelude::*;
 pub mod contact;
 pub mod domain;
 pub mod host;
-pub mod poll;
 pub mod nominet;
+pub mod poll;
 pub mod rgp;
 pub mod router;
 
-pub use router::{Request, Response};
 use crate::proto::EPPServiceExtension;
+pub use router::{Request, Response};
 
 type Sender<T> = futures::channel::oneshot::Sender<Response<T>>;
 pub type RequestSender = futures::channel::mpsc::Sender<router::Request>;
@@ -52,7 +52,7 @@ async fn write_msg_log(msg: &str, msg_type: &str, root: &std::path::Path) -> tok
 async fn recv_msg<R: std::marker::Unpin + tokio::io::AsyncRead>(
     sock: &mut R,
     host: &str,
-    root: &std::path::Path
+    root: &std::path::Path,
 ) -> Result<proto::EPPMessage, bool> {
     let data_len = match sock.read_u32().await {
         Ok(l) => l - 4,
@@ -61,7 +61,7 @@ async fn recv_msg<R: std::marker::Unpin + tokio::io::AsyncRead>(
                 std::io::ErrorKind::UnexpectedEof => {
                     warn!("{} has closed the connection", host);
                     true
-                },
+                }
                 _ => {
                     error!("Error reading next data unit length from {}: {}", host, err);
                     false
@@ -81,7 +81,7 @@ async fn recv_msg<R: std::marker::Unpin + tokio::io::AsyncRead>(
             error!("Error reading next data from {}: {}", host, err);
             return Err(match err.kind() {
                 std::io::ErrorKind::UnexpectedEof => true,
-                _ => false
+                _ => false,
             });
         }
     }
@@ -94,7 +94,7 @@ async fn recv_msg<R: std::marker::Unpin + tokio::io::AsyncRead>(
     };
     debug!("Received EPP message with contents: {}", data);
     match write_msg_log(&data, "recv", root).await {
-        Ok(_) => {},
+        Ok(_) => {}
         Err(e) => {
             error!("Failed writing received message to message log: {}", e);
         }
@@ -128,17 +128,13 @@ impl EPPClientReceiver {
         tokio::spawn(async move {
             loop {
                 let msg = recv_msg(&mut self.reader, &self.host, &self.root).await;
-                let is_close = if let Err(c) = &msg {
-                    *c
-                } else {
-                    false
-                };
+                let is_close = if let Err(c) = &msg { *c } else { false };
                 match sender.send(msg).await {
                     Ok(_) => {}
                     Err(_) => break,
                 }
                 if is_close {
-                    break
+                    break;
                 }
             }
         });
@@ -198,7 +194,14 @@ impl EPPClient {
     /// * `host` - The server connection string, in the form `domain:port`
     /// * `tag` - The client ID/tag to login with
     /// * `password` - The password to login with
-    pub fn new<'a, C: Into<Option<&'a str>>>(host: &str, tag: &str, password: &str, log_dir: std::path::PathBuf, client_cert: C, old_password: C) -> Self {
+    pub fn new<'a, C: Into<Option<&'a str>>>(
+        host: &str,
+        tag: &str,
+        password: &str,
+        log_dir: std::path::PathBuf,
+        client_cert: C,
+        old_password: C,
+    ) -> Self {
         Self {
             log_dir,
             host: host.to_string(),
@@ -278,7 +281,7 @@ impl EPPClient {
             let msg_receiver = EPPClientReceiver {
                 host: self.host.clone(),
                 reader: sock_read,
-                root: self.log_dir.clone()
+                root: self.log_dir.clone(),
             };
             let mut message_channel = msg_receiver.run().fuse();
             let mut keepalive_interval =
@@ -336,7 +339,7 @@ impl EPPClient {
         sock_write: &mut W,
     ) -> Result<(), ()> {
         let message = proto::EPPMessage {
-            message: proto::EPPMessageType::Hello{},
+            message: proto::EPPMessageType::Hello {},
         };
         match self._send_msg(&message, sock_write).await {
             Ok(_) => Ok(()),
@@ -347,12 +350,16 @@ impl EPPClient {
         }
     }
 
-    async fn _handle_request<W: std::marker::Unpin + tokio::io::AsyncWrite>(&mut self, req: router::Request, sock_write: &mut W) -> Result<(), ()> {
+    async fn _handle_request<W: std::marker::Unpin + tokio::io::AsyncWrite>(
+        &mut self,
+        req: router::Request,
+        sock_write: &mut W,
+    ) -> Result<(), ()> {
         match (req, self.nominet_tag_list_subordinate) {
             (router::Request::NominetTagList(t), false) => {
                 let client = match &mut self.nominet_tag_list_subordinate_client {
                     Some(c) => c,
-                    None => unreachable!()
+                    None => unreachable!(),
                 };
                 match client.send(router::Request::NominetTagList(t)).await {
                     Ok(_) => Ok(()),
@@ -361,16 +368,17 @@ impl EPPClient {
                         Err(())
                     }
                 }
-            },
-            (req, _) => {
-                match self.router.handle_request(&self.features, req).await {
-                    Some((command, extension, command_id)) => match self._send_command(command, extension,sock_write, command_id).await {
-                        Ok(_) => Ok(()),
-                        Err(_) => Err(())
-                    }
-                    None => Ok(())
-                }
             }
+            (req, _) => match self.router.handle_request(&self.features, req).await {
+                Some((command, extension, command_id)) => match self
+                    ._send_command(command, extension, sock_write, command_id)
+                    .await
+                {
+                    Ok(_) => Ok(()),
+                    Err(_) => Err(()),
+                },
+                None => Ok(()),
+            },
         }
     }
 
@@ -481,7 +489,11 @@ impl EPPClient {
         }
         if greeting.service_menu.languages.contains(&"en".to_string()) {
             self.features.language = "en".to_string();
-        } else if greeting.service_menu.languages.contains(&"en-US".to_string()) {
+        } else if greeting
+            .service_menu
+            .languages
+            .contains(&"en-US".to_string())
+        {
             self.features.language = "en-US".to_string();
         } else {
             error!("No common supported language with {}", greeting.server_id);
@@ -493,16 +505,36 @@ impl EPPClient {
                 greeting.server_id
             );
         }
-        self.features.contact_supported = greeting.service_menu.supports("urn:ietf:params:xml:ns:contact-1.0");
-        self.features.domain_supported = greeting.service_menu.supports("urn:ietf:params:xml:ns:domain-1.0");
-        self.features.host_supported = greeting.service_menu.supports("urn:ietf:params:xml:ns:host-1.0");
-        self.features.change_poll_supported = greeting.service_menu.supports_ext("urn:ietf:params:xml:ns:changePoll-1.0");
-        self.features.rgp_supported = greeting.service_menu.supports_ext("urn:ietf:params:xml:ns:rgp-1.0");
-        self.features.nominet_notifications = greeting.service_menu.supports_ext("http://www.nominet.org.uk/epp/xml/std-notifications-1.2");
-        self.features.nominet_tag_list = greeting.service_menu.supports("http://www.nominet.org.uk/epp/xml/nom-tag-1.0");
-        self.features.nominet_contact_ext = greeting.service_menu.supports_ext("http://www.nominet.org.uk/epp/xml/contact-nom-ext-1.0");
-        self.features.nominet_data_quality = greeting.service_menu.supports_ext("http://www.nominet.org.uk/epp/xml/nom-data-quality-1.1");
-        self.features.switch_balance = greeting.service_menu.supports_ext("https://www.nic.ch/epp/balance-1.0");
+        self.features.contact_supported = greeting
+            .service_menu
+            .supports("urn:ietf:params:xml:ns:contact-1.0");
+        self.features.domain_supported = greeting
+            .service_menu
+            .supports("urn:ietf:params:xml:ns:domain-1.0");
+        self.features.host_supported = greeting
+            .service_menu
+            .supports("urn:ietf:params:xml:ns:host-1.0");
+        self.features.change_poll_supported = greeting
+            .service_menu
+            .supports_ext("urn:ietf:params:xml:ns:changePoll-1.0");
+        self.features.rgp_supported = greeting
+            .service_menu
+            .supports_ext("urn:ietf:params:xml:ns:rgp-1.0");
+        self.features.nominet_notifications = greeting
+            .service_menu
+            .supports_ext("http://www.nominet.org.uk/epp/xml/std-notifications-1.2");
+        self.features.nominet_tag_list = greeting
+            .service_menu
+            .supports("http://www.nominet.org.uk/epp/xml/nom-tag-1.0");
+        self.features.nominet_contact_ext = greeting
+            .service_menu
+            .supports_ext("http://www.nominet.org.uk/epp/xml/contact-nom-ext-1.0");
+        self.features.nominet_data_quality = greeting
+            .service_menu
+            .supports_ext("http://www.nominet.org.uk/epp/xml/nom-data-quality-1.1");
+        self.features.switch_balance = greeting
+            .service_menu
+            .supports_ext("https://www.nic.ch/epp/balance-1.0");
 
         if !(self.features.contact_supported
             | self.features.domain_supported
@@ -537,13 +569,16 @@ impl EPPClient {
                 ext_objects.push("urn:ietf:params:xml:ns:rgp-1.0".to_string())
             }
             if self.features.nominet_notifications {
-                ext_objects.push("http://www.nominet.org.uk/epp/xml/std-notifications-1.2".to_string())
+                ext_objects
+                    .push("http://www.nominet.org.uk/epp/xml/std-notifications-1.2".to_string())
             }
             if self.features.nominet_contact_ext {
-                ext_objects.push("http://www.nominet.org.uk/epp/xml/contact-nom-ext-1.0".to_string())
+                ext_objects
+                    .push("http://www.nominet.org.uk/epp/xml/contact-nom-ext-1.0".to_string())
             }
             if self.features.nominet_data_quality {
-                ext_objects.push("http://www.nominet.org.uk/epp/xml/nom-data-quality-1.1".to_string())
+                ext_objects
+                    .push("http://www.nominet.org.uk/epp/xml/nom-data-quality-1.1".to_string())
             }
             if self.features.switch_balance {
                 ext_objects.push("https://www.nic.ch/epp/balance-1.0".to_string())
@@ -562,21 +597,37 @@ impl EPPClient {
             }
         }
 
-        match self._try_login(
-            self.password.clone(), None, objects.clone(), ext_objects.clone(), sock
-        ).await {
+        match self
+            ._try_login(
+                self.password.clone(),
+                None,
+                objects.clone(),
+                ext_objects.clone(),
+                sock,
+            )
+            .await
+        {
             Ok(_) => return Ok(()),
-            Err(e) => if e {
-                return Err(())
+            Err(e) => {
+                if e {
+                    return Err(());
+                }
             }
         }
         if let Some(old_password) = &self.old_password {
             let old_password = old_password.clone();
-            match self._try_login(
-                old_password, Some(self.password.clone()), objects, ext_objects, sock
-            ).await {
+            match self
+                ._try_login(
+                    old_password,
+                    Some(self.password.clone()),
+                    objects,
+                    ext_objects,
+                    sock,
+                )
+                .await
+            {
                 Ok(_) => Ok(()),
-                Err(_) => Err(())
+                Err(_) => Err(()),
             }
         } else {
             Err(())
@@ -584,10 +635,13 @@ impl EPPClient {
     }
 
     async fn _try_login(
-        &mut self, password: String, new_password: Option<String>, objects: Vec<String>,
-        ext_objects: Vec<String>, sock: &mut tokio_tls::TlsStream<TcpStream>
+        &mut self,
+        password: String,
+        new_password: Option<String>,
+        objects: Vec<String>,
+        ext_objects: Vec<String>,
+        sock: &mut tokio_tls::TlsStream<TcpStream>,
     ) -> Result<(), bool> {
-
         let command = proto::EPPLogin {
             client_id: self.tag.clone(),
             password,
@@ -602,21 +656,21 @@ impl EPPClient {
                     None
                 } else {
                     Some(EPPServiceExtension {
-                        extensions: ext_objects
+                        extensions: ext_objects,
                     })
                 },
             },
         };
         match self
-            ._send_command(proto::EPPCommandType::Login(command),  None, sock, None)
+            ._send_command(proto::EPPCommandType::Login(command), None, sock, None)
             .await
-            {
-                Ok(i) => i,
-                Err(_) => {
-                    error!("Failed to send login command");
-                    return Err(true);
-                }
-            };
+        {
+            Ok(i) => i,
+            Err(_) => {
+                error!("Failed to send login command");
+                return Err(true);
+            }
+        };
         let msg = match recv_msg(sock, &self.host, &self.log_dir).await {
             Ok(msg) => msg,
             Err(_) => {
@@ -692,14 +746,14 @@ impl EPPClient {
             }
         };
         match sock.write(&msg_bytes).await {
-            Ok(_) => {},
+            Ok(_) => {}
             Err(err) => {
                 error!("Error writing data unit to {}: {}", &self.host, err);
                 return Err(());
             }
         }
         match write_msg_log(&encoded_msg, "send", &self.log_dir).await {
-            Ok(_) => {},
+            Ok(_) => {}
             Err(e) => {
                 error!("Failed writing sent message to message log: {}", e);
             }
@@ -840,7 +894,6 @@ pub enum TransferStatus {
     ServerCancelled,
 }
 
-
 impl From<&proto::EPPTransferStatus> for TransferStatus {
     fn from(from: &proto::EPPTransferStatus) -> Self {
         use proto::EPPTransferStatus;
@@ -864,11 +917,11 @@ pub fn handle_logout(
     _client: &EPPClientServerFeatures,
     _req: &LogoutRequest,
 ) -> router::HandleReqReturn<()> {
-    Ok((proto::EPPCommandType::Logout{}, None))
+    Ok((proto::EPPCommandType::Logout {}, None))
 }
 
 pub fn handle_logout_response(_response: proto::EPPResponse) -> Response<()> {
-   Response::Ok(())
+    Response::Ok(())
 }
 
 /// Ends an EPP session
@@ -885,5 +938,6 @@ pub async fn logout(
             return_path: sender,
         })),
         receiver,
-    ).await
+    )
+    .await
 }
