@@ -385,7 +385,7 @@ pub fn handle_update(
             .as_ref()
             .map(|n| proto::host::EPPHostUpdateChange { name: n.clone() }),
     });
-    Ok((proto::EPPCommandType::Update(command), None))
+    Ok((proto::EPPCommandType::Update(Box::new(command)), None))
 }
 
 pub fn handle_update_response(response: proto::EPPResponse) -> Response<UpdateResponse> {

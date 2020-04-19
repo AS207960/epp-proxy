@@ -82,7 +82,7 @@ pub enum EPPCommandType {
     #[serde(rename = "delete")]
     Delete(EPPDelete),
     #[serde(rename = "update")]
-    Update(EPPUpdate),
+    Update(Box<EPPUpdate>),
     #[serde(rename = "renew")]
     Renew(EPPRenew),
     #[serde(rename = "transfer")]
@@ -502,6 +502,7 @@ pub enum EPPInfo {
     #[serde(rename = "{http://www.nominet.org.uk/epp/xml/nom-tag-1.0}tag:list")]
     TagList{},
     #[serde(rename = "{https://www.nic.ch/epp/balance-1.0}balance:info")]
+    #[allow(dead_code)]
     SwitchBalace{},
 }
 
@@ -658,6 +659,7 @@ where
     d.deserialize_option(OptDateTimeVisitor)
 }
 
+#[allow(clippy::trivially_copy_pass_by_ref)]
 fn serialize_date<S>(d: &Date<Utc>, s: S) -> Result<S::Ok, S::Error>
     where
         S: serde::ser::Serializer,

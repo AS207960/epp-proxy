@@ -70,7 +70,7 @@ pub fn handle_restore(
             report: None
         }
     };
-    Ok((proto::EPPCommandType::Update(command), Some(proto::EPPCommandExtensionType::EPPRGPUpdate(ext))))
+    Ok((proto::EPPCommandType::Update(Box::new(command)), Some(proto::EPPCommandExtensionType::EPPRGPUpdate(ext))))
 }
 
 pub fn handle_restore_response(response: proto::EPPResponse) -> Response<RestoreResponse> {

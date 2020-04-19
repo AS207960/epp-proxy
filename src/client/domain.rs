@@ -595,21 +595,18 @@ pub fn handle_update(
     }
     let command = proto::EPPUpdate::Domain(proto::domain::EPPDomainUpdate {
         name: req.name.clone(),
-        add: match adds.is_empty() {
-            true => None,
-            false => Some(proto::domain::EPPDomainUpdateAdd {
+        add: if adds.is_empty() { None } else {
+            Some(proto::domain::EPPDomainUpdateAdd {
                 params: adds
             })
         },
-        remove: match rems.is_empty() {
-            true => None,
-            false => Some(proto::domain::EPPDomainUpdateRemove {
+        remove: if rems.is_empty() { None } else {
+            Some(proto::domain::EPPDomainUpdateRemove {
                 params: rems
             })
         },
-        change: match is_not_change {
-            true => None,
-            false => Some(proto::domain::EPPDomainUpdateChange {
+        change: if is_not_change { None } else {
+            Some(proto::domain::EPPDomainUpdateChange {
                 registrant: req.new_registrant.clone(),
                 auth_info: req.new_auth_info.as_ref().map(|a| proto::domain::EPPDomainAuthInfo {
                     password: a.clone()
@@ -617,7 +614,7 @@ pub fn handle_update(
             })
         }
     });
-    Ok((proto::EPPCommandType::Update(command), None))
+    Ok((proto::EPPCommandType::Update(Box::new(command)), None))
 }
 
 pub fn handle_update_response(response: proto::EPPResponse) -> Response<UpdateResponse> {

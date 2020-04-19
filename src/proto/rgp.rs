@@ -49,6 +49,7 @@ pub enum EPPRGPRestoreOperation {
     #[serde(rename = "request")]
     Request,
     #[serde(rename = "report")]
+    #[allow(dead_code)]
     Report
 }
 
