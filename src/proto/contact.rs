@@ -38,8 +38,8 @@ pub struct EPPContactInfoData {
     #[serde(rename = "postalInfo", default)]
     pub postal_info: Vec<EPPContactPostalInfo>,
     #[serde(rename = "voice")]
-    pub phone: Option<String>,
-    pub fax: Option<String>,
+    pub phone: Option<EPPContactPhone>,
+    pub fax: Option<EPPContactPhone>,
     pub email: String,
     #[serde(rename = "clID")]
     pub client_id: String,
@@ -66,6 +66,8 @@ pub struct EPPContactInfoData {
     )]
     pub last_transfer_date: Option<DateTime<Utc>>,
     pub disclose: Option<EPPContactDisclosure>,
+    #[serde(rename = "contact:authInfo")]
+    pub auth_info: Option<EPPContactAuthInfo>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -106,6 +108,14 @@ pub enum EPPContactStatusType {
     ServerTransferProhibited,
     #[serde(rename = "serverUpdateProhibited")]
     ServerUpdateProhibited,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct EPPContactPhone {
+    #[serde(rename = "x")]
+    pub extension: Option<String>,
+    #[serde(rename = "$value")]
+    pub number: String,
 }
 
 #[derive(Debug, Deserialize)]
@@ -206,6 +216,21 @@ pub enum EPPContactDisclosureItemSer {
     Email {},
 }
 
+#[derive(Debug, Deserialize)]
+pub struct EPPContactTransferData {
+    pub id: String,
+    #[serde(rename = "trStatus")]
+    pub transfer_status: super::EPPTransferStatus,
+    #[serde(rename = "reID")]
+    pub requested_client_id: String,
+    #[serde(rename = "reDate", deserialize_with = "super::deserialize_datetime")]
+    pub requested_date: DateTime<Utc>,
+    #[serde(rename = "acID")]
+    pub act_client_id: String,
+    #[serde(rename = "acDate", deserialize_with = "super::deserialize_datetime")]
+    pub act_date: DateTime<Utc>,
+}
+
 #[derive(Debug, Serialize)]
 pub struct EPPContactCreate {
     #[serde(rename = "contact:id")]
@@ -213,15 +238,23 @@ pub struct EPPContactCreate {
     #[serde(rename = "contact:postalInfo")]
     pub postal_info: Vec<EPPContactPostalInfoSer>,
     #[serde(rename = "contact:voice", skip_serializing_if = "Option::is_none")]
-    pub phone: Option<String>,
+    pub phone: Option<EPPContactPhoneSer>,
     #[serde(rename = "contact:fax", skip_serializing_if = "Option::is_none")]
-    pub fax: Option<String>,
+    pub fax: Option<EPPContactPhoneSer>,
     #[serde(rename = "contact:email")]
     pub email: String,
     #[serde(rename = "contact:authInfo")]
     pub auth_info: EPPContactAuthInfo,
     #[serde(rename = "contact:disclose", skip_serializing_if = "Option::is_none")]
     pub disclose: Option<EPPContactDisclosureSer>,
+}
+
+#[derive(Debug, Serialize)]
+pub struct EPPContactPhoneSer {
+    #[serde(rename = "$attr:x", skip_serializing_if = "Option::is_none")]
+    pub extension: Option<String>,
+    #[serde(rename = "$value")]
+    pub number: String,
 }
 
 #[derive(Debug, Serialize)]
@@ -250,7 +283,7 @@ pub struct EPPContactAddressSer {
     pub country_code: String,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct EPPContactAuthInfo {
     #[serde(rename = "contact:pw")]
     pub password: String,
@@ -296,9 +329,9 @@ pub struct EPPContactUpdateChange {
     #[serde(rename = "contact:postalInfo")]
     pub postal_info: Vec<EPPContactUpdatePostalInfo>,
     #[serde(rename = "contact:voice", skip_serializing_if = "Option::is_none")]
-    pub phone: Option<String>,
+    pub phone: Option<EPPContactPhoneSer>,
     #[serde(rename = "contact:fax", skip_serializing_if = "Option::is_none")]
-    pub fax: Option<String>,
+    pub fax: Option<EPPContactPhoneSer>,
     #[serde(rename = "contact:email", skip_serializing_if = "Option::is_none")]
     pub email: Option<String>,
     #[serde(rename = "contact:disclose", skip_serializing_if = "Option::is_none")]
@@ -315,4 +348,12 @@ pub struct EPPContactUpdatePostalInfo {
     pub organisation: Option<String>,
     #[serde(rename = "contact:addr", skip_serializing_if = "Option::is_none")]
     pub address: Option<EPPContactAddressSer>,
+}
+
+#[derive(Debug, Serialize)]
+pub struct EPPContactTransfer {
+    #[serde(rename = "contact:id")]
+    pub id: String,
+    #[serde(rename = "contact:authInfo")]
+    pub auth_info: EPPContactAuthInfo,
 }

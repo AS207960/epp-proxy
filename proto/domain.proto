@@ -75,6 +75,7 @@ message DomainInfoReply {
     google.protobuf.Timestamp last_transfer_date = 14;
     string registry_name = 15;
     rgp.RGPState rgp_state = 16;
+    google.protobuf.StringValue auth_info = 17;
 }
 
 message DomainCreateRequest {
@@ -137,12 +138,18 @@ message DomainRenewReply {
 
 message DomainTransferQueryRequest {
     string name = 1;
+    google.protobuf.StringValue auth_info = 2;
 }
 
 message DomainTransferRequestRequest {
     string name = 1;
     Period period = 2;
     string auth_info = 3;
+}
+
+message DomainTransferAcceptRejectRequest {
+    string name = 1;
+    string auth_info = 2;
 }
 
 message DomainTransferReply {

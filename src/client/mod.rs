@@ -175,6 +175,8 @@ pub struct EPPClientServerFeatures {
     change_poll_supported: bool,
     /// RFC 3915 support
     rgp_supported: bool,
+    /// RFC 5910 support
+    secdns_supported: bool,
     /// http://www.nominet.org.uk/epp/xml/std-notifications-1.2 support
     nominet_notifications: bool,
     /// http://www.nominet.org.uk/epp/xml/nom-tag-1.0 support
@@ -520,6 +522,9 @@ impl EPPClient {
         self.features.rgp_supported = greeting
             .service_menu
             .supports_ext("urn:ietf:params:xml:ns:rgp-1.0");
+        self.features.secdns_supported = greeting
+            .service_menu
+            .supports_ext("urn:ietf:params:xml:ns:secDNS-1.1");
         self.features.nominet_notifications = greeting
             .service_menu
             .supports_ext("http://www.nominet.org.uk/epp/xml/std-notifications-1.2");
@@ -567,6 +572,9 @@ impl EPPClient {
             }
             if self.features.rgp_supported {
                 ext_objects.push("urn:ietf:params:xml:ns:rgp-1.0".to_string())
+            }
+            if self.features.secdns_supported {
+                ext_objects.push("urn:ietf:params:xml:ns:secDNS-1.1".to_string())
             }
             if self.features.nominet_notifications {
                 ext_objects

@@ -3,6 +3,7 @@ package epp.contact;
 
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/wrappers.proto";
+import "common.proto";
 
 enum EntityType {
     NotSet = 0;
@@ -47,6 +48,11 @@ message PostalAddress {
     string country_code = 8;
 }
 
+message Phone {
+    string number = 1;
+    google.protobuf.StringValue extension = 2;
+}
+
 enum ContactStatus {
     ClientDeleteProhibited = 0;
     ClientTransferProhibited = 1;
@@ -82,14 +88,13 @@ message Disclosure {
 }
 
 message ContactInfoReply {
-
     string id = 1;
     string registry_id = 2;
     repeated ContactStatus statuses = 3;
     PostalAddress local_address = 4;
     PostalAddress internationalised_address = 5;
-    google.protobuf.StringValue phone = 6;
-    google.protobuf.StringValue fax = 7;
+    Phone phone = 6;
+    Phone fax = 7;
     string email = 8;
     string client_id = 9;
     google.protobuf.StringValue client_created_id = 10;
@@ -101,20 +106,22 @@ message ContactInfoReply {
     google.protobuf.StringValue trading_name = 16;
     google.protobuf.StringValue company_number = 17;
     repeated DisclosureType disclosure = 18;
+    google.protobuf.StringValue auth_info = 19;
 }
 
 message ContactCreateRequest {
     string id = 1;
     PostalAddress local_address = 2;
     PostalAddress internationalised_address = 3;
-    google.protobuf.StringValue phone = 4;
-    google.protobuf.StringValue fax = 5;
+    Phone phone = 4;
+    Phone fax = 5;
     string email = 6;
     EntityType entity_type = 7;
     google.protobuf.StringValue trading_name = 8;
     google.protobuf.StringValue company_number = 9;
     Disclosure disclosure = 10;
     string registry_name = 11;
+    string auth_info = 12;
 }
 
 message ContactCreateReply {
@@ -137,16 +144,38 @@ message ContactUpdateRequest {
     repeated ContactStatus remove_statuses = 3;
     PostalAddress new_local_address = 4;
     PostalAddress new_internationalised_address = 5;
-    google.protobuf.StringValue new_phone = 6;
-    google.protobuf.StringValue new_fax = 7;
+    Phone new_phone = 6;
+    Phone new_fax = 7;
     google.protobuf.StringValue new_email = 8;
     EntityType new_entity_type = 9;
     google.protobuf.StringValue new_trading_name = 10;
     google.protobuf.StringValue new_company_number = 11;
     Disclosure disclosure = 12;
     string registry_name = 13;
+    google.protobuf.StringValue new_auth_info = 14;
 }
 
 message ContactUpdateReply {
     bool pending = 1;
+}
+
+message ContactTransferQueryRequest {
+    string id = 1;
+    google.protobuf.StringValue auth_info = 2;
+    string registry_name = 3;
+}
+
+message ContactTransferRequestRequest {
+    string id = 1;
+    string auth_info = 2;
+    string registry_name = 3;
+}
+
+message ContactTransferReply {
+    bool pending = 1;
+    common.TransferStatus status = 2;
+    string requested_client_id = 3;
+    google.protobuf.Timestamp requested_date = 4;
+    string act_client_id = 5;
+    google.protobuf.Timestamp act_date = 6;
 }

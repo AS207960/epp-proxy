@@ -311,6 +311,24 @@ fn i32_from_restore_status(from: client::rgp::RGPState) -> i32 {
     }
 }
 
+impl From<epp_proto::contact::Phone> for client::contact::Phone {
+    fn from(from: epp_proto::contact::Phone) -> Self {
+        client::contact::Phone {
+            number: from.number,
+            extension: from.extension
+        }
+    }
+}
+
+impl From<client::contact::Phone> for epp_proto::contact::Phone {
+    fn from(from: client::contact::Phone) -> Self {
+        epp_proto::contact::Phone {
+            number: from.number,
+            extension: from.extension
+        }
+    }
+}
+
 fn client_by_domain(
     router: &super::Router,
     domain: &str,
@@ -460,6 +478,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
             last_transfer_date: chrono_to_proto(res.last_transfer_date),
             registry_name,
             rgp_state: i32_from_restore_status(res.rgp_state),
+            auth_info: res.auth_info
         };
 
         Ok(tonic::Response::new(reply))
@@ -697,6 +716,60 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                 unit: period_unit_from_i32(p.unit),
                 value: p.value,
             }),
+            &request.auth_info,
+            &mut sender,
+        )
+        .await?;
+
+        let reply = epp_proto::domain::DomainTransferReply {
+            pending: res.pending,
+            status: i32_from_transfer_status(res.status),
+            requested_client_id: res.requested_client_id,
+            requested_date: chrono_to_proto(Some(res.requested_date)),
+            act_client_id: res.act_client_id,
+            act_date: chrono_to_proto(Some(res.act_date)),
+            expiry_date: chrono_to_proto(res.expiry_date),
+            registry_name,
+        };
+
+        Ok(tonic::Response::new(reply))
+    }
+
+    async fn domain_transfer_accept(
+        &self,
+        request: tonic::Request<epp_proto::domain::DomainTransferAcceptRejectRequest>,
+    ) -> Result<tonic::Response<epp_proto::domain::DomainTransferReply>, tonic::Status> {
+        let request = request.into_inner();
+        let (mut sender, registry_name) = client_by_domain(&self.client_router, &request.name)?;
+        let res = client::domain::transfer_accept(
+            &request.name,
+            &request.auth_info,
+            &mut sender,
+        )
+        .await?;
+
+        let reply = epp_proto::domain::DomainTransferReply {
+            pending: res.pending,
+            status: i32_from_transfer_status(res.status),
+            requested_client_id: res.requested_client_id,
+            requested_date: chrono_to_proto(Some(res.requested_date)),
+            act_client_id: res.act_client_id,
+            act_date: chrono_to_proto(Some(res.act_date)),
+            expiry_date: chrono_to_proto(res.expiry_date),
+            registry_name,
+        };
+
+        Ok(tonic::Response::new(reply))
+    }
+
+    async fn domain_transfer_reject(
+        &self,
+        request: tonic::Request<epp_proto::domain::DomainTransferAcceptRejectRequest>,
+    ) -> Result<tonic::Response<epp_proto::domain::DomainTransferReply>, tonic::Status> {
+        let request = request.into_inner();
+        let (mut sender, registry_name) = client_by_domain(&self.client_router, &request.name)?;
+        let res = client::domain::transfer_reject(
+            &request.name,
             &request.auth_info,
             &mut sender,
         )
@@ -1022,8 +1095,8 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                 .collect(),
             local_address: res.local_address.map(map_addr),
             internationalised_address: res.internationalised_address.map(map_addr),
-            phone: res.phone,
-            fax: res.fax,
+            phone: res.phone.map(|p| p.into()),
+            fax: res.fax.map(|p| p.into()),
             email: res.email,
             client_id: res.client_id,
             client_created_id: res.client_created_id,
@@ -1119,6 +1192,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                     }
                 })
                 .collect(),
+            auth_info: res.auth_info
         };
 
         Ok(tonic::Response::new(reply))
@@ -1146,8 +1220,8 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
             client::contact::NewContactData {
                 local_address: request.local_address.map(addr_map),
                 internationalised_address: request.internationalised_address.map(addr_map),
-                phone: request.phone,
-                fax: request.fax,
+                phone: request.phone.map(|p| p.into()),
+                fax: request.fax.map(|p| p.into()),
                 email: request.email,
                 entity_type: entity_type_from_i32(request.entity_type),
                 trading_name: request.trading_name,
@@ -1208,8 +1282,8 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
             client::contact::UpdateContactData {
                 local_address: request.new_local_address.map(addr_map),
                 internationalised_address: request.new_internationalised_address.map(addr_map),
-                phone: request.new_phone,
-                fax: request.new_fax,
+                phone: request.new_phone.map(|p| p.into()),
+                fax: request.new_fax.map(|p| p.into()),
                 email: request.new_email,
                 entity_type: entity_type_from_i32(request.new_entity_type),
                 trading_name: request.new_trading_name,
@@ -1224,6 +1298,97 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
 
         let reply = epp_proto::contact::ContactUpdateReply {
             pending: res.pending,
+        };
+
+        Ok(tonic::Response::new(reply))
+    }
+
+    async fn contact_transfer_query(
+        &self,
+        request: tonic::Request<epp_proto::contact::ContactTransferQueryRequest>,
+    ) -> Result<tonic::Response<epp_proto::contact::ContactTransferReply>, tonic::Status> {
+        let request = request.into_inner();
+        let mut sender = client_by_id(&self.client_router, &request.registry_name)?;
+        let res = client::contact::transfer_query(&request.id, &mut sender).await?;
+
+        let reply = epp_proto::contact::ContactTransferReply {
+            pending: res.pending,
+            status: i32_from_transfer_status(res.status),
+            requested_client_id: res.requested_client_id,
+            requested_date: chrono_to_proto(Some(res.requested_date)),
+            act_client_id: res.act_client_id,
+            act_date: chrono_to_proto(Some(res.act_date)),
+        };
+
+        Ok(tonic::Response::new(reply))
+    }
+
+    async fn contact_transfer_request(
+        &self,
+        request: tonic::Request<epp_proto::contact::ContactTransferRequestRequest>,
+    ) -> Result<tonic::Response<epp_proto::contact::ContactTransferReply>, tonic::Status> {
+        let request = request.into_inner();
+        let mut sender = client_by_id(&self.client_router, &request.registry_name)?;
+
+        let res = client::contact::transfer_request(&request.id, &request.auth_info,&mut sender).await?;
+
+        let reply = epp_proto::contact::ContactTransferReply {
+            pending: res.pending,
+            status: i32_from_transfer_status(res.status),
+            requested_client_id: res.requested_client_id,
+            requested_date: chrono_to_proto(Some(res.requested_date)),
+            act_client_id: res.act_client_id,
+            act_date: chrono_to_proto(Some(res.act_date)),
+        };
+
+        Ok(tonic::Response::new(reply))
+    }
+
+    async fn contact_transfer_accept(
+        &self,
+        request: tonic::Request<epp_proto::contact::ContactTransferRequestRequest>,
+    ) -> Result<tonic::Response<epp_proto::contact::ContactTransferReply>, tonic::Status> {
+        let request = request.into_inner();
+        let mut sender = client_by_id(&self.client_router, &request.registry_name)?;
+        let res = client::contact::transfer_accept(
+            &request.id,
+            &request.auth_info,
+            &mut sender,
+        )
+            .await?;
+
+        let reply = epp_proto::contact::ContactTransferReply {
+            pending: res.pending,
+            status: i32_from_transfer_status(res.status),
+            requested_client_id: res.requested_client_id,
+            requested_date: chrono_to_proto(Some(res.requested_date)),
+            act_client_id: res.act_client_id,
+            act_date: chrono_to_proto(Some(res.act_date)),
+        };
+
+        Ok(tonic::Response::new(reply))
+    }
+
+    async fn contact_transfer_reject(
+        &self,
+        request: tonic::Request<epp_proto::contact::ContactTransferRequestRequest>,
+    ) -> Result<tonic::Response<epp_proto::contact::ContactTransferReply>, tonic::Status> {
+        let request = request.into_inner();
+        let mut sender = client_by_id(&self.client_router, &request.registry_name)?;
+        let res = client::contact::transfer_reject(
+            &request.id,
+            &request.auth_info,
+            &mut sender,
+        )
+            .await?;
+
+        let reply = epp_proto::contact::ContactTransferReply {
+            pending: res.pending,
+            status: i32_from_transfer_status(res.status),
+            requested_client_id: res.requested_client_id,
+            requested_date: chrono_to_proto(Some(res.requested_date)),
+            act_client_id: res.act_client_id,
+            act_date: chrono_to_proto(Some(res.act_date)),
         };
 
         Ok(tonic::Response::new(reply))

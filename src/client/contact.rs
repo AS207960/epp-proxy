@@ -40,9 +40,9 @@ pub struct InfoResponse {
     /// The internationalised address of the contact
     pub internationalised_address: Option<Address>,
     /// Voice phone number of the contact
-    pub phone: Option<String>,
+    pub phone: Option<Phone>,
     /// Fax number of the contact
-    pub fax: Option<String>,
+    pub fax: Option<Phone>,
     /// Email address of the contact
     pub email: String,
     /// Sponsoring client ID
@@ -61,6 +61,15 @@ pub struct InfoResponse {
     pub trading_name: Option<String>,
     pub company_number: Option<String>,
     pub disclosure: Vec<DisclosureType>,
+    pub auth_info: Option<String>,
+}
+
+#[derive(Debug)]
+pub struct Phone {
+    /// Initial dialable part of the number
+    pub number: String,
+    /// Optional internal extension
+    pub extension: Option<String>,
 }
 
 #[derive(Debug)]
@@ -289,13 +298,31 @@ impl From<&Status> for proto::contact::EPPContactStatusType {
     }
 }
 
+impl From<proto::contact::EPPContactPhone> for Phone {
+    fn from(from: proto::contact::EPPContactPhone) -> Self {
+        Phone {
+            number: from.number,
+            extension: from.extension
+        }
+    }
+}
+
+impl From<&Phone> for proto::contact::EPPContactPhoneSer {
+    fn from(from: &Phone) -> Self {
+        proto::contact::EPPContactPhoneSer {
+            number: from.number.clone(),
+            extension: from.extension.clone()
+        }
+    }
+}
+
 #[derive(Debug)]
 pub struct CreateRequest {
     id: String,
     local_address: Option<Address>,
     internationalised_address: Option<Address>,
-    phone: Option<String>,
-    fax: Option<String>,
+    phone: Option<Phone>,
+    fax: Option<Phone>,
     email: String,
     entity_type: Option<EntityType>,
     trading_name: Option<String>,
@@ -331,8 +358,8 @@ pub struct UpdateRequest {
     remove_statuses: Vec<Status>,
     new_local_address: Option<Address>,
     new_internationalised_address: Option<Address>,
-    new_phone: Option<String>,
-    new_fax: Option<String>,
+    new_phone: Option<Phone>,
+    new_fax: Option<Phone>,
     new_email: Option<String>,
     new_entity_type: Option<EntityType>,
     new_trading_name: Option<String>,
@@ -355,6 +382,34 @@ fn check_id<T>(id: &str) -> Result<(), Response<T>> {
             "contact id has a min length of 3 and a max length of 16".to_string(),
         ))
     }
+}
+
+#[derive(Debug)]
+pub struct TransferQueryRequest {
+    id: String,
+    pub return_path: Sender<TransferResponse>,
+}
+
+#[derive(Debug)]
+pub struct TransferRequestRequest {
+    id: String,
+    auth_info: String,
+    pub return_path: Sender<TransferResponse>,
+}
+
+#[derive(Debug)]
+pub struct TransferResponse {
+    /// Was the request completed instantly or not
+    pub pending: bool,
+    pub status: super::TransferStatus,
+    /// Which client requested the transfer
+    pub requested_client_id: String,
+    /// The date of the transfer request
+    pub requested_date: DateTime<Utc>,
+    /// Whcich client last acted / needs to act
+    pub act_client_id: String,
+    /// Date on which a client acted / must act by
+    pub act_date: DateTime<Utc>,
 }
 
 pub fn handle_check(
@@ -448,8 +503,8 @@ pub fn handle_info_response(response: proto::EPPResponse) -> Response<InfoRespon
                                 == proto::contact::EPPContactPostalInfoType::Internationalised
                         },
                     )),
-                    phone: contact_info.phone,
-                    fax: contact_info.fax,
+                    phone: contact_info.phone.map(|p| p.into()),
+                    fax: contact_info.fax.map(|p| p.into()),
                     email: contact_info.email,
                     client_id: contact_info.client_id,
                     client_created_id: contact_info.client_created_id,
@@ -483,6 +538,7 @@ pub fn handle_info_response(response: proto::EPPResponse) -> Response<InfoRespon
                         }
                         None => vec![],
                     },
+                    auth_info: contact_info.auth_info.map(|a| a.password)
                 })
             }
             _ => Response::InternalServerError,
@@ -504,12 +560,12 @@ pub fn handle_create(
     }
     let phone_re = Regex::new(r"^\+\d+\.\d+$").unwrap();
     if let Some(phone) = &req.phone {
-        if !phone_re.is_match(&phone) {
+        if !phone_re.is_match(&phone.number) {
             return Err(Response::Err("invalid phone number format".to_string()));
         }
     }
     if let Some(fax) = &req.fax {
-        if !phone_re.is_match(&fax) {
+        if !phone_re.is_match(&fax.number) {
             return Err(Response::Err("invalid fax number format".to_string()));
         }
     }
@@ -580,8 +636,8 @@ pub fn handle_create(
     let command = proto::EPPCreate::Contact(proto::contact::EPPContactCreate {
         id: req.id.clone(),
         postal_info,
-        phone: req.phone.clone(),
-        fax: req.fax.clone(),
+        phone: req.phone.as_ref().map(|p| p.into()),
+        fax: req.fax.as_ref().map(|p| p.into()),
         email: req.email.clone(),
         auth_info: proto::contact::EPPContactAuthInfo {
             password: String::new(),
@@ -619,11 +675,7 @@ pub fn handle_delete(
     if !client.contact_supported {
         return Err(Response::Unsupported);
     }
-    if req.id.is_empty() {
-        return Err(Response::Err(
-            "contact id has a min length of 1".to_string(),
-        ));
-    }
+    check_id(&req.id)?;
     let command = proto::EPPDelete::Contact(proto::contact::EPPContactCheck { id: req.id.clone() });
     Ok((proto::EPPCommandType::Delete(command), None))
 }
@@ -641,11 +693,7 @@ pub fn handle_update(
     if !client.contact_supported {
         return Err(Response::Unsupported);
     }
-    if req.id.is_empty() {
-        return Err(Response::Err(
-            "contact id has a min length of 1".to_string(),
-        ));
-    }
+    check_id(&req.id)?;
     let is_not_change = req.new_email.is_none()
         && req.new_phone.is_none()
         && req.new_fax.is_none()
@@ -662,6 +710,17 @@ pub fn handle_update(
             ));
         } else if !client.nominet_contact_ext {
             return Err(Response::Ok(UpdateResponse { pending: false }));
+        }
+    }
+    let phone_re = Regex::new(r"^\+\d+\.\d+$").unwrap();
+    if let Some(phone) = &req.new_phone {
+        if !phone_re.is_match(&phone.number) {
+            return Err(Response::Err("invalid phone number format".to_string()));
+        }
+    }
+    if let Some(fax) = &req.new_fax {
+        if !phone_re.is_match(&fax.number) {
+            return Err(Response::Err("invalid fax number format".to_string()));
         }
     }
     let mut postal_info = vec![];
@@ -734,8 +793,8 @@ pub fn handle_update(
         } else {
             Some(proto::contact::EPPContactUpdateChange {
                 email: req.new_email.clone(),
-                phone: req.new_phone.clone(),
-                fax: req.new_fax.clone(),
+                phone: req.new_phone.as_ref().map(|p| p.into()),
+                fax: req.new_fax.as_ref().map(|p| p.into()),
                 postal_info,
                 disclose: req.new_disclosure.clone().map(|mut d| {
                     d.sort_unstable_by(|a, b| (*a as i32).cmp(&(*b as i32)));
@@ -770,6 +829,102 @@ pub fn handle_update_response(response: proto::EPPResponse) -> Response<UpdateRe
     Response::Ok(UpdateResponse {
         pending: response.is_pending(),
     })
+}
+
+pub fn handle_transfer_query(
+    client: &EPPClientServerFeatures,
+    req: &TransferQueryRequest,
+) -> HandleReqReturn<TransferResponse> {
+    if !client.contact_supported {
+        return Err(Response::Unsupported);
+    }
+    check_id(&req.id)?;
+    let command = proto::EPPTransfer {
+        operation: proto::EPPTransferOperation::Query,
+        command: proto::EPPTransferCommand::ContactQuery(proto::contact::EPPContactCheck {
+            id: req.id.clone()
+        }),
+    };
+    Ok((proto::EPPCommandType::Transfer(command), None))
+}
+
+pub fn handle_transfer_request(
+    client: &EPPClientServerFeatures,
+    req: &TransferRequestRequest,
+) -> HandleReqReturn<TransferResponse> {
+    if !client.contact_supported {
+        return Err(Response::Unsupported);
+    }
+    check_id(&req.id)?;
+    let command = proto::EPPTransfer {
+        operation: proto::EPPTransferOperation::Query,
+        command: proto::EPPTransferCommand::ContactRequest(proto::contact::EPPContactTransfer {
+            id: req.id.clone(),
+            auth_info: proto::contact::EPPContactAuthInfo {
+                password: req.auth_info.clone(),
+            },
+        }),
+    };
+    Ok((proto::EPPCommandType::Transfer(command), None))
+}
+
+pub fn handle_transfer_accept(
+    client: &EPPClientServerFeatures,
+    req: &TransferRequestRequest,
+) -> HandleReqReturn<TransferResponse> {
+    if !client.contact_supported {
+        return Err(Response::Unsupported);
+    }
+    check_id(&req.id)?;
+    let command = proto::EPPTransfer {
+        operation: proto::EPPTransferOperation::Accept,
+        command: proto::EPPTransferCommand::ContactRequest(proto::contact::EPPContactTransfer {
+            id: req.id.clone(),
+            auth_info: proto::contact::EPPContactAuthInfo {
+                password: req.auth_info.clone(),
+            },
+        }),
+    };
+    Ok((proto::EPPCommandType::Transfer(command), None))
+}
+
+pub fn handle_transfer_reject(
+    client: &EPPClientServerFeatures,
+    req: &TransferRequestRequest,
+) -> HandleReqReturn<TransferResponse> {
+    if !client.contact_supported {
+        return Err(Response::Unsupported);
+    }
+    check_id(&req.id)?;
+    let command = proto::EPPTransfer {
+        operation: proto::EPPTransferOperation::Reject,
+        command: proto::EPPTransferCommand::ContactRequest(proto::contact::EPPContactTransfer {
+            id: req.id.clone(),
+            auth_info: proto::contact::EPPContactAuthInfo {
+                password: req.auth_info.clone(),
+            },
+        }),
+    };
+    Ok((proto::EPPCommandType::Transfer(command), None))
+}
+
+pub fn handle_transfer_response(response: proto::EPPResponse) -> Response<TransferResponse> {
+    match &response.data {
+        Some(value) => match &value.value {
+            proto::EPPResultDataValue::EPPContactTransferResult(contact_transfer) => {
+                Response::Ok(TransferResponse {
+                    pending: response.is_pending(),
+                    status: (&contact_transfer.transfer_status).into(),
+                    requested_client_id: contact_transfer.requested_client_id.clone(),
+                    requested_date: contact_transfer.requested_date,
+                    act_client_id: contact_transfer.act_client_id.clone(),
+                    act_date: contact_transfer.act_date,
+                })
+            }
+            _ => Response::InternalServerError,
+        },
+        None => Response::InternalServerError,
+    }
 }
 
 /// Checks if a contact ID exists
@@ -820,9 +975,9 @@ pub struct NewContactData {
     /// Internationalised address of the contact
     pub internationalised_address: Option<Address>,
     /// Voice phone number of the contact
-    pub phone: Option<String>,
+    pub phone: Option<Phone>,
     /// Fax number of the contact
-    pub fax: Option<String>,
+    pub fax: Option<Phone>,
     /// Email address of the contact
     pub email: String,
     /// New entity type of the contact
@@ -898,9 +1053,9 @@ pub struct UpdateContactData {
     /// New internationalised address of the contact
     pub internationalised_address: Option<Address>,
     /// New voice phone number of the contact
-    pub phone: Option<String>,
+    pub phone: Option<Phone>,
     /// New fax number of the contact
-    pub fax: Option<String>,
+    pub fax: Option<Phone>,
     /// New email address of the contact
     pub email: Option<String>,
     /// New entity type of the contact
@@ -951,4 +1106,98 @@ pub async fn update(
         receiver,
     )
     .await
+}
+
+/// Queries the current transfer status of a contact
+///
+/// # Arguments
+/// * `id` - The contact ID to be queried
+/// * `client_sender` - Reference to the tokio channel into the client
+pub async fn transfer_query(
+    id: &str,
+    client_sender: &mut futures::channel::mpsc::Sender<Request>,
+) -> Result<TransferResponse, super::Error> {
+    let (sender, receiver) = futures::channel::oneshot::channel();
+    super::send_epp_client_request(
+        client_sender,
+        Request::ContactTransferQuery(Box::new(TransferQueryRequest {
+            id: id.to_string(),
+            return_path: sender,
+        })),
+        receiver,
+    )
+        .await
+}
+
+/// Requests the transfer of a contact
+///
+/// # Arguments
+/// * `id` - The contact ID to be transferred
+/// * `auth_info` - Auth info for the contact
+/// * `client_sender` - Reference to the tokio channel into the client
+pub async fn transfer_request(
+    id: &str,
+    auth_info: &str,
+    client_sender: &mut futures::channel::mpsc::Sender<Request>,
+) -> Result<TransferResponse, super::Error> {
+    let (sender, receiver) = futures::channel::oneshot::channel();
+    super::send_epp_client_request(
+        client_sender,
+        Request::ContactTransferRequest(Box::new(TransferRequestRequest {
+            id: id.to_string(),
+            auth_info: auth_info.to_string(),
+            return_path: sender,
+        })),
+        receiver,
+    )
+        .await
+}
+
+/// Accepts the transfer of a contact
+///
+/// # Arguments
+/// * `id` - The contact ID to be approved
+/// * `auth_info` - Auth info for the contact
+/// * `client_sender` - Reference to the tokio channel into the client
+pub async fn transfer_accept(
+    id: &str,
+    auth_info: &str,
+    client_sender: &mut futures::channel::mpsc::Sender<Request>,
+) -> Result<TransferResponse, super::Error> {
+    let (sender, receiver) = futures::channel::oneshot::channel();
+    super::send_epp_client_request(
+        client_sender,
+        Request::ContactTransferAccept(Box::new(TransferRequestRequest {
+            id: id.to_string(),
+            auth_info: auth_info.to_string(),
+            return_path: sender,
+        })),
+        receiver,
+    )
+        .await
+}
+
+
+/// Rejects the transfer of a contact
+///
+/// # Arguments
+/// * `id` - The contact ID to be rejected
+/// * `auth_info` - Auth info for the contact
+/// * `client_sender` - Reference to the tokio channel into the client
+pub async fn transfer_reject(
+    id: &str,
+    auth_info: &str,
+    client_sender: &mut futures::channel::mpsc::Sender<Request>,
+) -> Result<TransferResponse, super::Error> {
+    let (sender, receiver) = futures::channel::oneshot::channel();
+    super::send_epp_client_request(
+        client_sender,
+        Request::ContactTransferReject(Box::new(TransferRequestRequest {
+            id: id.to_string(),
+            auth_info: auth_info.to_string(),
+            return_path: sender,
+        })),
+        receiver,
+    )
+        .await
 }

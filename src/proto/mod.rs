@@ -10,7 +10,10 @@ pub mod domain;
 pub mod host;
 pub mod nominet;
 pub mod rgp;
+pub mod secdns;
 pub mod switch;
+pub mod verisign;
+pub mod centralnic;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub enum EPPMessageType {
@@ -105,6 +108,10 @@ pub enum EPPCommandExtensionType {
     NominetContactExtUpdate(nominet::EPPContactInfoSet),
     #[serde(rename = "{urn:ietf:params:xml:ns:rgp-1.0}rgp:update")]
     EPPRGPUpdate(rgp::EPPRGPUpdate),
+    #[serde(rename = "{urn:ietf:params:xml:ns:secDNS-1.1}secDNS:create")]
+    EPPSecDNSCreate(secdns::EPPSecDNSCreate),
+    #[serde(rename = "{urn:ietf:params:xml:ns:secDNS-1.1}secDNS:update")]
+    EPPSecDNSUpdate(secdns::EPPSecDNSUpdate),
 }
 
 #[derive(Debug, Serialize)]
@@ -131,6 +138,10 @@ pub enum EPPResponseExtensionType {
     EPPRGPInfo(rgp::EPPRGPData),
     #[serde(rename = "rgp:upData")]
     EPPRGPUpdate(rgp::EPPRGPData),
+    #[serde(rename = "secDNS:infData")]
+    EPPSecDNSInfo(secdns::EPPSecDNSData),
+    #[serde(rename = "regtype:infData")]
+    EPPCentralnicRegTypeInfoResult(centralnic::EPPRegType),
 }
 
 #[derive(Debug, Deserialize)]
@@ -443,6 +454,8 @@ pub enum EPPResultDataValue {
     EPPContactCheckResult(contact::EPPContactCheckData),
     #[serde(rename = "contact:infData")]
     EPPContactInfoResult(Box<contact::EPPContactInfoData>),
+    #[serde(rename = "contact:trnData")]
+    EPPContactTransferResult(contact::EPPContactTransferData),
     #[serde(rename = "contact:creData")]
     EPPContactCreateResult(contact::EPPContactCreateData),
     #[serde(rename = "tag:listData")]
@@ -510,6 +523,9 @@ pub enum EPPInfo {
     #[serde(rename = "{https://www.nic.ch/epp/balance-1.0}balance:info")]
     #[allow(dead_code)]
     SwitchBalace {},
+    #[serde(rename = "{http://www.verisign.com/epp/balance-1.0}balance:info")]
+    #[allow(dead_code)]
+    VerisignBalace {},
 }
 
 #[derive(Debug, Serialize)]
@@ -562,6 +578,10 @@ pub enum EPPTransferOperation {
     Query,
     #[serde(rename = "request")]
     Request,
+    #[serde(rename = "accept")]
+    Accept,
+    #[serde(rename = "reject")]
+    Reject,
 }
 
 #[derive(Debug, Serialize)]
@@ -570,6 +590,10 @@ pub enum EPPTransferCommand {
     DomainQuery(domain::EPPDomainCheck),
     #[serde(rename = "{urn:ietf:params:xml:ns:domain-1.0}domain:transfer")]
     DomainRequest(domain::EPPDomainTransfer),
+    #[serde(rename = "{urn:ietf:params:xml:ns:contact-1.0}contact:transfer")]
+    ContactQuery(contact::EPPContactCheck),
+    #[serde(rename = "{urn:ietf:params:xml:ns:contact-1.0}contact:transfer")]
+    ContactRequest(contact::EPPContactTransfer),
 }
 
 #[derive(Debug, Serialize)]

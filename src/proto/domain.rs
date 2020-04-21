@@ -72,6 +72,8 @@ pub struct EPPDomainInfoData {
         default
     )]
     pub last_transfer_date: Option<DateTime<Utc>>,
+    #[serde(rename = "domain:authInfo")]
+    pub auth_info: Option<EPPDomainAuthInfo>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -249,7 +251,7 @@ pub struct EPPDomainInfoContactSer {
     pub contact_id: String,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct EPPDomainAuthInfo {
     #[serde(rename = "domain:pw")]
     pub password: String,

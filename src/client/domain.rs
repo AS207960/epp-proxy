@@ -58,6 +58,7 @@ pub struct InfoResponse {
     pub last_transfer_date: Option<DateTime<Utc>>,
     /// Redemption grace period state of the domain
     pub rgp_state: super::rgp::RGPState,
+    pub auth_info: Option<String>,
 }
 
 /// Additional contact associated with a domain
@@ -186,6 +187,13 @@ pub struct TransferRequestRequest {
     name: String,
     auth_info: String,
     add_period: Option<Period>,
+    pub return_path: Sender<TransferResponse>,
+}
+
+#[derive(Debug)]
+pub struct TransferAcceptRejectRequest {
+    name: String,
+    auth_info: String,
     pub return_path: Sender<TransferResponse>,
 }
 
@@ -451,6 +459,7 @@ pub fn handle_info_response(response: proto::EPPResponse) -> Response<InfoRespon
                     last_updated_date: domain_info.last_updated_date,
                     last_transfer_date: domain_info.last_transfer_date,
                     rgp_state,
+                    auth_info: domain_info.auth_info.map(|a| a.password)
                 })
             }
             _ => Response::InternalServerError,
@@ -731,6 +740,56 @@ pub fn handle_transfer_request(
     Ok((proto::EPPCommandType::Transfer(command), None))
 }
 
+pub fn handle_transfer_accept(
+    client: &EPPClientServerFeatures,
+    req: &TransferAcceptRejectRequest,
+) -> HandleReqReturn<TransferResponse> {
+    if !client.domain_supported {
+        return Err(Response::Unsupported);
+    }
+    if req.name.is_empty() {
+        return Err(Response::Err(
+            "domain name has a min length of 1".to_string(),
+        ));
+    }
+    let command = proto::EPPTransfer {
+        operation: proto::EPPTransferOperation::Accept,
+        command: proto::EPPTransferCommand::DomainRequest(proto::domain::EPPDomainTransfer {
+            name: req.name.clone(),
+            period: None,
+            auth_info: proto::domain::EPPDomainAuthInfo {
+                password: req.auth_info.clone(),
+            },
+        }),
+    };
+    Ok((proto::EPPCommandType::Transfer(command), None))
+}
+
+pub fn handle_transfer_reject(
+    client: &EPPClientServerFeatures,
+    req: &TransferAcceptRejectRequest,
+) -> HandleReqReturn<TransferResponse> {
+    if !client.domain_supported {
+        return Err(Response::Unsupported);
+    }
+    if req.name.is_empty() {
+        return Err(Response::Err(
+            "domain name has a min length of 1".to_string(),
+        ));
+    }
+    let command = proto::EPPTransfer {
+        operation: proto::EPPTransferOperation::Reject,
+        command: proto::EPPTransferCommand::DomainRequest(proto::domain::EPPDomainTransfer {
+            name: req.name.clone(),
+            period: None,
+            auth_info: proto::domain::EPPDomainAuthInfo {
+                password: req.auth_info.clone(),
+            },
+        }),
+    };
+    Ok((proto::EPPCommandType::Transfer(command), None))
+}
+
 pub fn handle_transfer_response(response: proto::EPPResponse) -> Response<TransferResponse> {
     match &response.data {
         Some(value) => match &value.value {
@@ -934,7 +993,8 @@ pub async fn transfer_query(
 /// Requests the transfer of a domain name
 ///
 /// # Arguments
-/// * `domain` - The domain to be queried
+/// * `domain` - The domain to be transferred
+/// * `add_period` - How much time to add to the domain's expiry on transfer
 /// * `auth_info` - Auth info for the domain
 /// * `client_sender` - Reference to the tokio channel into the client
 pub async fn transfer_request(
@@ -949,6 +1009,55 @@ pub async fn transfer_request(
         Request::DomainTransferRequest(Box::new(TransferRequestRequest {
             name: domain.to_string(),
             add_period,
+            auth_info: auth_info.to_string(),
+            return_path: sender,
+        })),
+        receiver,
+    )
+    .await
+}
+
+/// Accepts the transfer of a domain name
+///
+/// # Arguments
+/// * `domain` - The domain to be approved
+/// * `auth_info` - Auth info for the domain
+/// * `client_sender` - Reference to the tokio channel into the client
+pub async fn transfer_accept(
+    domain: &str,
+    auth_info: &str,
+    client_sender: &mut futures::channel::mpsc::Sender<Request>,
+) -> Result<TransferResponse, super::Error> {
+    let (sender, receiver) = futures::channel::oneshot::channel();
+    super::send_epp_client_request(
+        client_sender,
+        Request::DomainTransferAccept(Box::new(TransferAcceptRejectRequest {
+            name: domain.to_string(),
+            auth_info: auth_info.to_string(),
+            return_path: sender,
+        })),
+        receiver,
+    )
+    .await
+}
+
+
+/// Rejects the transfer of a domain name
+///
+/// # Arguments
+/// * `domain` - The domain to be rejected
+/// * `auth_info` - Auth info for the domain
+/// * `client_sender` - Reference to the tokio channel into the client
+pub async fn transfer_reject(
+    domain: &str,
+    auth_info: &str,
+    client_sender: &mut futures::channel::mpsc::Sender<Request>,
+) -> Result<TransferResponse, super::Error> {
+    let (sender, receiver) = futures::channel::oneshot::channel();
+    super::send_epp_client_request(
+        client_sender,
+        Request::DomainTransferReject(Box::new(TransferAcceptRejectRequest {
+            name: domain.to_string(),
             auth_info: auth_info.to_string(),
             return_path: sender,
         })),
