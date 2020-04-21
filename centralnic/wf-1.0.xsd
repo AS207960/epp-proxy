@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns:wf="urn:centralnic:params:xml:ns:wf-1.0" xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="urn:centralnic:params:xml:ns:wf-1.0" elementFormDefault="qualified">
+  <annotation>
+    <documentation>
+			Extensible Provisioning Protocol v1.0 domain name
+			extension schema that allows registrars to specify
+			a URL to which a registered domain name is forwarded
+			by a registry-managed web server
+		</documentation>
+  </annotation>
+  <!-- Child elements found in EPP command. -->
+  <element name="create" type="wf:urlString"/>
+  <element name="update" type="wf:urlString"/>
+  <element name="infData" type="wf:urlString"/>
+  <!--Child element of the commands above. -->
+  <complexType name="urlString">
+    <sequence>
+      <element name="url" type="token"/>
+    </sequence>
+  </complexType>
+  <!--
+End of schema.
+-->
+</schema>

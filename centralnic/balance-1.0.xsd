@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<schema targetNamespace="http://www.verisign.com/epp/balance-1.0" xmlns:balance="http://www.verisign.com/epp/balance-1.0" xmlns="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+  <annotation>
+    <documentation>Extensible Provisioning Protocol v1.0 Verisign mapping for getting account balance and other financial information.</documentation>
+  </annotation>
+  <!--
+Child elements found in EPP commands. -->
+  <!-- Empty balance:info command element -->
+  <element name="info" />
+  <!--
+Child response elements. -->
+  <element name="infData" type="balance:infDataType" />
+  <!--Child elements of the balance:infData element -->
+  <complexType name="infDataType">
+    <sequence>
+      <element name="creditLimit" type="balance:currencyValueType" />
+      <element name="balance" type="balance:currencyValueType" />
+      <element name="availableCredit" type="balance:currencyValueType" />
+      <element name="creditThreshold" type="balance:thresholdType" />
+    </sequence>
+  </complexType>
+  <complexType name="thresholdType">
+    <choice>
+      <element name="fixed" type="balance:currencyValueType" />
+      <element name="percent" type="integer" />
+    </choice>
+  </complexType>
+  <simpleType name="currencyValueType">
+    <restriction base="decimal">
+      <fractionDigits value="2" />
+    </restriction>
+  </simpleType>
+  <!-- End of schema.-->
+</schema>

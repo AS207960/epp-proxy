@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns:ttl="urn:centralnic:params:xml:ns:ttl-1.0" xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="urn:centralnic:params:xml:ns:ttl-1.0" elementFormDefault="qualified">
+  <annotation>
+    <documentation>
+			Extensible Provisioning Protocol v1.0 domain name
+			extension schema for Time-To-Live (TTL) modification
+			in all DNS responses for a domain name including
+			delegation (NS) records and any address (A) records.
+		</documentation>
+  </annotation>
+  <!-- Child elements found in EPP commands. -->
+  <element name="create" type="ttl:seconds"/>
+  <element name="update" type="ttl:seconds"/>
+  <element name="infData" type="ttl:seconds"/>
+  <!--Child elements of the <update> command. -->
+  <complexType name="seconds">
+    <sequence>
+      <element name="secs" type="ttl:nonNegativeInteger"/>
+    </sequence>
+  </complexType>
+  <!-- Restricted simpleType -->
+  <simpleType name="nonNegativeInteger">
+    <restriction base="nonNegativeInteger">
+      <minInclusive value="60"/>
+      <maxInclusive value="86400"/>
+    </restriction>
+  </simpleType>
+  <!--
+End of schema.
+-->
+</schema>

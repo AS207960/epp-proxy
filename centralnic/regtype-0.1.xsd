@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+  xmlns:regtype="urn:ietf:params:xml:ns:regtype-0.1"
+  xmlns:eppcom="urn:ietf:params:xml:ns:eppcom-1.0"
+  targetNamespace="urn:ietf:params:xml:ns:regtype-0.1"
+  elementFormDefault="qualified">
+
+  <import namespace="urn:ietf:params:xml:ns:eppcom-1.0" />
+
+  <annotation>
+    <documentation>Extensible Provisioning Protocol
+    v1.0 domain name extension schema for
+    registration type.</documentation>
+  </annotation>
+
+  <!--
+  Child elements found in EPP commands and responses
+  -->
+  <element name="infData" type="regtype:infDataType" />
+  <element name="create" type="regtype:createType" />
+  <element name="update" type="regtype:updateType" />
+
+  <!--
+    server <info> result
+  -->
+  <complexType name="infDataType">
+    <sequence>
+      <element name="type" type="eppcom:minTokenType" minOccurs="0" />
+    </sequence>
+  </complexType>
+
+  <!--
+    <create> command
+  -->
+  <complexType name="createType">
+    <sequence>
+      <element name="type" type="eppcom:minTokenType" minOccurs="0" />
+    </sequence>
+  </complexType>
+
+  <!--
+    <update> command
+  -->
+  <complexType name="updateType">
+    <sequence>
+      <element name="chg" type="regtype:chgType" />
+    </sequence>
+  </complexType>
+
+  <complexType name="chgType">
+    <sequence>
+      <element name="type" type="eppcom:minTokenType" minOccurs="0" />
+    </sequence>
+  </complexType>
+</schema>

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+  xmlns:auxcontact="urn:ietf:params:xml:ns:auxcontact-0.1"
+  xmlns:eppcom="urn:ietf:params:xml:ns:eppcom-1.0"
+  xmlns:domain="urn:ietf:params:xml:ns:domain-1.0"
+  targetNamespace="urn:ietf:params:xml:ns:auxcontact-0.1"
+  elementFormDefault="qualified">
+
+  <import namespace="urn:ietf:params:xml:ns:eppcom-1.0" />
+  <import namespace="urn:ietf:params:xml:ns:domain-1.0" />
+
+  <annotation>
+    <documentation>Extensible Provisioning Protocol
+    v1.0 domain name extension schema for
+    auxiliary contacts.</documentation>
+  </annotation>
+
+  <!--
+    just like the domain:contactType except the "type" attribute
+    can contain arbitrary tokens
+  -->
+  <complexType name="contactType">
+    <simpleContent>
+      <extension base="eppcom:clIDType">
+         <attribute name="type" type="eppcom:minTokenType" />
+      </extension>
+    </simpleContent>
+  </complexType>
+
+  <!--
+  Child elements found in EPP commands and responses
+  -->
+  <element name="infData" type="auxcontact:infDataType" />
+  <element name="create" type="auxcontact:createType" />
+  <element name="update" type="auxcontact:updateType" />
+
+  <!--
+    server <info> result
+  -->
+  <complexType name="infDataType">
+    <sequence>
+      <element name="contact" type="auxcontact:contactType"
+        minOccurs="0" maxOccurs="unbounded" />
+    </sequence>
+  </complexType>
+
+  <!--
+    <create> command
+  -->
+  <complexType name="createType">
+    <sequence>
+      <element name="contact" type="auxcontact:contactType"
+        minOccurs="0" maxOccurs="unbounded" />
+    </sequence>
+  </complexType>
+
+  <!--
+    <update> command
+  -->
+  <complexType name="updateType">
+    <sequence>
+      <element name="rem" type="auxcontact:addRemType"
+        minOccurs="0" maxOccurs="1" />
+      <element name="add" type="auxcontact:addRemType"
+        minOccurs="0" maxOccurs="1" />
+    </sequence>
+  </complexType>
+
+  <!--
+    <add> and <rem> elements in <update> commands
+  -->
+  <complexType name="addRemType">
+    <sequence>
+            <element name="contact"
+              type="auxcontact:contactType"
+              minOccurs="0"
+	      maxOccurs="unbounded" />
+    </sequence>
+  </complexType>
+
+</schema>

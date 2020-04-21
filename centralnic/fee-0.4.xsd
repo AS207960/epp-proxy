@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+  xmlns:fee="urn:ietf:params:xml:ns:fee-0.4"
+  xmlns:eppcom="urn:ietf:params:xml:ns:eppcom-1.0"
+  xmlns:domain="urn:ietf:params:xml:ns:domain-1.0"
+  targetNamespace="urn:ietf:params:xml:ns:fee-0.4"
+  elementFormDefault="qualified">
+
+  <import namespace="urn:ietf:params:xml:ns:eppcom-1.0" />
+  <import namespace="urn:ietf:params:xml:ns:domain-1.0" />
+
+  <annotation>
+    <documentation>Extensible Provisioning Protocol
+    v1.0 domain name extension schema for
+    fee information.</documentation>
+  </annotation>
+
+  <!--
+  Child elements found in EPP commands and responses
+  -->
+  <element name="check" type="fee:checkType" />
+  <element name="chkData" type="fee:chkDataType" />
+  <element name="info" type="fee:infoType" />
+  <element name="infData" type="fee:infDataType" />
+  <element name="create" type="fee:transformCommandType" />
+  <element name="creData" type="fee:transformResultType" />
+  <element name="renew" type="fee:transformCommandType" />
+  <element name="renData" type="fee:transformResultType" />
+  <element name="transfer" type="fee:transformCommandType" />
+  <element name="trnData" type="fee:transformResultType" />
+  <element name="update" type="fee:transformCommandType" />
+  <element name="updData" type="fee:transformResultType" />
+  <element name="delData" type="fee:deleteDataType" />
+
+  <!--
+  client <check> command
+  -->
+  <complexType name="checkType">
+    <sequence>
+    <element name="domain" type="eppcom:labelType" />
+    <element name="currency" type="fee:currencyType" />
+    <element name="action" type="fee:actionType" />
+    <element name="period" type="domain:periodType" />
+    </sequence>
+  </complexType>
+  
+  <!--
+  server <check> result
+  -->
+  <complexType name="chkDataType">
+    <sequence>
+      <element name="domain" type="eppcom:labelType" />
+      <element name="currency" type="fee:currencyType" />
+      <element name="action" type="fee:actionType" />
+      <element name="period" type="domain:periodType" />
+      <element name="fee" type="fee:feeType" />
+    </sequence>
+  </complexType>
+
+  <!--
+    client <info> command
+  -->
+  <complexType name="infoType">
+    <sequence>
+      <element name="currency" type="fee:currencyType" />
+      <element name="action" type="fee:actionType" />
+      <element name="period" type="domain:periodType" />
+    </sequence>
+  </complexType>
+
+  <!--
+    server <info> result
+  -->
+  <complexType name="infDataType">
+    <sequence>
+      <element name="currency" type="fee:currencyType" />
+      <element name="action" type="fee:actionType" />
+      <element name="period" type="domain:periodType" />
+      <element name="fee" type="fee:feeType" />
+    </sequence>
+  </complexType>
+
+  <!--
+    general transform (create, renew, update, transfer) command
+  -->
+  <complexType name="transformCommandType">
+    <sequence>
+      <element name="currency" type="fee:currencyType" />
+      <element name="fee" type="fee:feeType" />
+    </sequence>
+  </complexType>
+
+  <!--
+    general transform (create, renew, update, transfer) result
+  -->
+  <complexType name="transformResultType">
+    <sequence>
+      <element name="currency" type="fee:currencyType" />
+      <element name="fee" type="fee:feeType" />
+    </sequence>
+  </complexType>
+
+  <!--
+    delete result
+  -->
+  <complexType name="deleteDataType">
+    <sequence>
+      <element name="currency" type="fee:currencyType" />
+      <element name="credit" type="fee:feeType" />
+    </sequence>
+  </complexType>
+
+  <!--
+    common types
+  -->
+  <simpleType name="currencyType">
+    <restriction base="string">
+      <pattern value="[A-Z]{3}" />
+    </restriction>
+  </simpleType>
+
+  <complexType name="actionType">
+    <simpleContent>
+      <extension base="fee:actionTypeValue">
+        <attribute name="phase" type="token" />
+        <attribute name="subphase" type="token" />
+      </extension>
+    </simpleContent>
+  </complexType>
+
+  <simpleType name="actionTypeValue">
+    <restriction base="token">
+      <minLength value="3"/>
+      <maxLength value="16"/>
+    </restriction>
+  </simpleType>
+
+  <simpleType name="feeType">
+    <restriction base="decimal" />
+  </simpleType>
+</schema>

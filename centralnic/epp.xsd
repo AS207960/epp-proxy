@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <xsd:import namespace="urn:ietf:params:xml:ns:eppcom-1.0" schemaLocation="eppcom-1.0.xsd" />
+  <xsd:import namespace="urn:ietf:params:xml:ns:epp-1.0" schemaLocation="epp-1.0.xsd" />
+  <xsd:import namespace="urn:ietf:params:xml:ns:domain-1.0" schemaLocation="domain-1.0.xsd" />
+  <xsd:import namespace="urn:ietf:params:xml:ns:host-1.0" schemaLocation="host-1.0.xsd" />
+  <xsd:import namespace="urn:ietf:params:xml:ns:contact-1.0" schemaLocation="contact-1.0.xsd" />
+  <xsd:import namespace="urn:ietf:params:xml:ns:rgp-1.0" schemaLocation="rgp-1.0.xsd" />
+  <xsd:import namespace="urn:ietf:params:xml:ns:secDNS-1.1" schemaLocation="secDNS-1.1.xsd" />
+  <xsd:import namespace="http://www.verisign.com/epp/sync-1.0" schemaLocation="sync-1.0.xsd" />
+  <xsd:import namespace="urn:centralnic:params:xml:ns:ttl-1.0" schemaLocation="ttl-1.0.xsd" />
+  <xsd:import namespace="urn:centralnic:params:xml:ns:wf-1.0" schemaLocation="wf-1.0.xsd" />
+  <xsd:import namespace="urn:centralnic:params:xml:ns:pricing-1.0" schemaLocation="pricing-1.0.xsd" />
+  <xsd:import namespace="urn:ietf:params:xml:ns:idn-1.0" schemaLocation="idn-1.0.xsd" />
+  <xsd:import namespace="http://www.verisign.com/epp/balance-1.0" schemaLocation="balance-1.0.xsd" />
+  <xsd:import namespace="urn:ietf:params:xml:ns:launch-1.0" schemaLocation="launch-1.0.xsd" />
+  <xsd:import namespace="urn:ietf:params:xml:ns:mark-1.0" schemaLocation="mark-1.0.xsd" />
+  <xsd:import namespace="urn:ietf:params:xml:ns:signedMark-1.0" schemaLocation="signedMark-1.0.xsd" />
+  <xsd:import namespace="urn:ietf:params:xml:ns:fee-0.4" schemaLocation="fee-0.4.xsd" />
+  <xsd:import namespace="urn:ietf:params:xml:ns:fee-0.5" schemaLocation="fee-0.5.xsd" />
+  <xsd:import namespace="http://www.nic.coop/contactCoopExt-1.0" schemaLocation="contactCoopExt-1.0.xsd" />
+  <xsd:import namespace="urn:ietf:params:xml:ns:regtype-0.1" schemaLocation="regtype-0.1.xsd" />
+  <xsd:import namespace="urn:ietf:params:xml:ns:auxcontact-0.1" schemaLocation="auxcontact-0.1.xsd" />
+  <xsd:import namespace="urn:ietf:params:xml:ns:artRecord-0.2" schemaLocation="artRecord-0.2.xsd" />
+  <xsd:import namespace="http://www.sk-nic.sk/xml/epp/sk-contact-ident-0.2" schemaLocation="sk-contact-ident-0.2.xsd" />
+</xsd:schema>

@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema
+  targetNamespace="http://www.sk-nic.sk/xml/epp/sk-contact-ident-0.2"
+  xmlns:skContactIdent="http://www.sk-nic.sk/xml/epp/sk-contact-ident-0.2"
+  xmlns="http://www.w3.org/2001/XMLSchema"
+  elementFormDefault="qualified">
+
+  <annotation>
+    <documentation>
+      Extensible Provisioning Protocol v1.0
+      Extensions for .SK
+      Extension for object Contact: identifiaction
+    </documentation>
+  </annotation>
+
+  <!-- **************************************************************** -->
+  <!--                 extension to contact:create                      -->
+  <!--                                                                  -->
+  <element name="create" type="skContactIdent:createType"/>
+
+  <complexType name="createType">
+    <sequence>
+      <element name="legalForm" type="skContactIdent:legalFormEnumType"/>
+      <element name="identValue" type="skContactIdent:identValueChoiceType" minOccurs="0" />
+    </sequence>
+  </complexType>
+
+  <!-- **************************************************************** -->
+  <!--                 extension to contact:info                        -->
+  <!--                                                                  -->
+  <element name="infData" type="skContactIdent:infDataType"/>
+
+  <complexType name="infDataType">
+    <sequence>
+      <element name="legalForm" type="skContactIdent:legalFormEnumType"/>
+      <element name="identValue" type="skContactIdent:identValueChoiceType" minOccurs="0"/>
+    </sequence>
+  </complexType>
+
+
+  <!-- **************************************************************** -->
+  <!--               Define the extension element types                 -->
+  <!--                                                                  -->
+
+  <complexType name="identValueChoiceType">
+    <choice>
+      <element name="corpIdent" type="skContactIdent:identStringType"/>
+      <element name="persIdent" type="skContactIdent:identDateType"/>
+    </choice>
+  </complexType>
+
+  <simpleType name="identStringType">
+		<annotation>
+			<documentation>
+				Identification of the contactEnumeration of the contact identification
+				for CORP legalFormEnumType
+			</documentation>
+		</annotation>
+		<restriction base="normalizedString">
+			<maxLength value="32" />
+		</restriction>
+	</simpleType>
+
+  <simpleType name="identDateType">
+		<annotation>
+			<documentation>
+				Identification of the contactEnumeration of the contact identification
+        for PERS legalFormEnumType
+			</documentation>
+		</annotation>
+		<restriction base="date"/>
+	</simpleType>
+
+
+  <simpleType name="legalFormEnumType">
+		<annotation>
+			<documentation>
+				legal form the contact
+				- CORP: corporate
+				- PERS: person
+			</documentation>
+		</annotation>
+		<restriction base="token">
+			<enumeration value="CORP" />
+			<enumeration value="PERS" />
+		</restriction>
+	</simpleType>
+</schema>

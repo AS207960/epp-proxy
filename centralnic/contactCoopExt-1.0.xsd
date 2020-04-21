@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<schema targetNamespace="http://www.nic.coop/contactCoopExt-1.0" xmlns:contactCoopExt="http://www.nic.coop/contactCoopExt-1.0"
+	xmlns:eppcom="urn:ietf:params:xml:ns:eppcom-1.0" xmlns="http://www.w3.org/2001/XMLSchema"
+	elementFormDefault="qualified">
+	<!--
+  Import common element types.
+  -->
+	<import namespace="urn:ietf:params:xml:ns:eppcom-1.0" schemaLocation="eppcom-1.0.xsd" />
+	<annotation>
+		<documentation>
+        Extensible Provisioning Protocol v1.0
+        dotCoop extension to contact provisioning schema.
+      </documentation>
+	</annotation>
+	<!--
+  Child elements found in EPP command extensions.
+  -->
+	<element name="create" type="contactCoopExt:createType" />
+	<element name="update" type="contactCoopExt:updateType" />
+	<!--
+  Child elements of the <createType> command extension.
+
+  This extension is used with the <contact:create> command. It allows the
+  addition of sponsors to a contact so that the contact may enter the dotCoop
+  verification process and be used as a registrant. It also allows a language
+  preference to be specified for a contact which enables the dotCoop registry
+  to attempt to communicate in an appropriate language with the registrant 
+  during the verification process.
+  -->
+	<complexType name="createType">
+		<sequence>
+			<element name="langPref" type="language" minOccurs="0" />
+			<element name="mailingListPref" type="boolean" minOccurs="0" />
+			<element name="sponsor" type="eppcom:clIDType" minOccurs="0" maxOccurs="unbounded" />
+		</sequence>
+	</complexType>
+	<!--
+  Child elements of the <updateType> command extension.
+
+  This extension is used with the <contact:update> command to add and remove
+  sponsors, and change the language preference of a contact after it has been
+  created. Note that server policy may prevent sponsor modifications after a
+  contact has entered the verification process.
+  -->
+	<complexType name="updateType">
+		<sequence>
+			<element name="add" type="contactCoopExt:addRemType" minOccurs="0" />
+			<element name="rem" type="contactCoopExt:addRemType" minOccurs="0" />
+			<element name="chg" type="contactCoopExt:chgType" minOccurs="0" />
+		</sequence>
+	</complexType>
+	<!--
+  Data elements that can be added or removed.
+  -->
+	<complexType name="addRemType">
+		<sequence>
+			<element name="sponsor" type="eppcom:clIDType" maxOccurs="unbounded" />
+		</sequence>
+	</complexType>
+	<!--
+  Data elements that can be changed.
+  -->
+	<complexType name="chgType">
+		<sequence>
+			<element name="langPref" type="language" minOccurs="0" />
+			<element name="mailingListPref" type="boolean" minOccurs="0" />
+		</sequence>
+	</complexType>
+	<!--
+  Child response extension elements.
+  -->
+	<element name="infData" type="contactCoopExt:infDataType" />
+	<element name="stateChange" type="contactCoopExt:stateChangeType" />
+	<!--
+  Response utility types.
+  -->
+	<complexType name="stateType">
+		<simpleContent>
+			<extension base="string">
+				<attribute name="code" type="contactCoopExt:stateCodeType" use="required" />
+			</extension>
+		</simpleContent>
+	</complexType>
+	<simpleType name="stateCodeType">
+		<restriction base="token">
+			<enumeration value="ableToAppeal" />
+			<enumeration value="underInvestigation" />
+			<enumeration value="refused" />
+			<enumeration value="pendingVerification" />
+			<enumeration value="verified" />
+		</restriction>
+	</simpleType>
+	<!--
+  <contact:info> response extension elements.
+  -->
+	<complexType name="infDataType">
+		<sequence>
+			<element name="state" type="contactCoopExt:stateType" minOccurs="0" />
+			<element name="langPref" type="language" minOccurs="0" />
+			<element name="mailingListPref" type="boolean" minOccurs="0" />
+			<element name="sponsor" type="eppcom:clIDType" minOccurs="0" maxOccurs="unbounded" />
+		</sequence>
+	</complexType>
+	<!--
+  <poll>, <domain:create>, and <domain:update> response extension element.
+
+  This extension will only be present in a <poll> response if the service
+  message being retrieved is a "registrant verification state changed" message.
+
+  This extension will only be present in <domain:create> and <domain:update>
+  responses if the domain's registrant contact (identified by the id element)
+  has entered the dotCoop verification process as a result of the command. This
+  happens the first time a contact is used as a registrant.
+  -->
+	<complexType name="stateChangeType">
+		<sequence>
+			<element name="id" type="eppcom:clIDType" />
+			<element name="state" type="contactCoopExt:stateType" />
+		</sequence>
+	</complexType>
+	<!--
+  End of schema.
+  -->
+</schema>

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  Copyright 2016 CentralNic Group plc. All rights reserved.
+-->
+
+<schema
+  xmlns              = "http://www.w3.org/2001/XMLSchema"
+  xmlns:artRecord    = "urn:ietf:params:xml:ns:artRecord-0.1"
+  xmlns:eppcom       = "urn:ietf:params:xml:ns:eppcom-1.0"
+  xmlns:domain       = "urn:ietf:params:xml:ns:domain-1.0"
+  targetNamespace    = "urn:ietf:params:xml:ns:artRecord-0.1"
+  elementFormDefault = "qualified"
+>
+
+  <import namespace="urn:ietf:params:xml:ns:eppcom-1.0" />
+
+  <annotation>
+    <documentation>Extensible Provisioning Protocol
+    v1.0 domain name extension schema for Art
+    Records.</documentation>
+  </annotation>
+
+  <!--
+  Child elements found in EPP commands and responses
+  -->
+  <element name="infData" type="artRecord:artRecordType" />
+  <element name="create"  type="artRecord:artRecordType"  />
+  <element name="update"  type="artRecord:artRecordType"  />
+
+  <complexType name="artRecordType">
+    <sequence>
+      <element type="artRecord:artRecordToken" name="objectType" />
+      <element type="artRecord:artRecordToken" name="materialsAndTechniques" />
+      <element type="artRecord:artRecordToken" name="dimensions" />
+      <element type="artRecord:artRecordToken" name="title" />
+      <element type="artRecord:artRecordToken" name="dateOrPeriod" />
+      <element type="artRecord:artRecordToken" name="maker" />
+      <element type="artRecord:artRecordToken" name="reference" />
+    </sequence>
+  </complexType>
+
+  <simpleType name="artRecordToken">
+    <restriction base="token">
+      <minLength value="0" />
+      <maxLength value="255" />
+    </restriction>
+  </simpleType>
+</schema>

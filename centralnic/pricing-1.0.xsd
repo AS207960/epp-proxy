@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<schema
+  xmlns="http://www.w3.org/2001/XMLSchema"
+  xmlns:pricing="urn:centralnic:params:xml:ns:pricing-1.0"
+  xmlns:domain="urn:ietf:params:xml:ns:domain-1.0"
+  targetNamespace="urn:centralnic:params:xml:ns:pricing-1.0"
+  elementFormDefault="qualified"
+>
+
+  <import namespace="urn:ietf:params:xml:ns:domain-1.0" />
+
+  <annotation>
+    <documentation>
+      Extensible Provisioning Protocol v1.0 domain name extension schema for
+      pricing information.
+    </documentation>
+  </annotation>
+
+  <!--
+  Child elements found in EPP commands.
+  -->
+  <element name="check" type="pricing:checkType" />
+  <element name="chkData" type="pricing:chkDataType" />
+
+  <!--
+    client <check> command
+  -->
+  <complexType name="checkType">
+    <sequence>
+      <element name="currency" type="pricing:currencyType" />
+      <element name="action" type="pricing:actionType" />
+      <element name="period" type="domain:periodType" />
+    </sequence>
+  </complexType>
+
+  <!--
+    server <check> result
+  -->
+  <complexType name="chkDataType">
+    <sequence>
+      <element name="currency" type="pricing:currencyType" />
+      <element name="action" type="pricing:actionType" />
+      <element name="period" type="domain:periodType" />
+      <element name="price" type="pricing:priceType" />
+    </sequence>
+  </complexType>
+
+  <!--
+    common types
+  -->
+  <simpleType name="currencyType">
+    <restriction base="string">
+      <pattern value="[A-Z]{3}" />
+    </restriction>
+  </simpleType>
+
+  <simpleType name="actionType">
+    <restriction base="string">
+    	<enumeration value="create" />
+    	<enumeration value="renew" />
+    	<enumeration value="transfer" />
+    	<enumeration value="restore" />
+    </restriction>
+  </simpleType>
+
+  <simpleType name="priceType">
+    <restriction base="decimal" />
+  </simpleType>
+
+</schema>
