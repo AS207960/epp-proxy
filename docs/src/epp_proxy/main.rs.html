@@ -257,6 +257,8 @@
 <span id="257">257</span>
 <span id="258">258</span>
 <span id="259">259</span>
+<span id="260">260</span>
+<span id="261">261</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="attribute">#![<span class="ident">recursion_limit</span> <span class="op">=</span> <span class="string">&quot;1024&quot;</span>]</span>
 <span class="attribute">#![<span class="ident">warn</span>(<span class="ident">missing_docs</span>)]</span>
@@ -499,7 +501,9 @@
             <span class="kw">_</span> <span class="op">=</span> <span class="ident">int_fut</span> <span class="op">=</span><span class="op">&gt;</span> {}
         }
         <span class="kw">for</span> <span class="kw-2">mut</span> <span class="ident">c</span> <span class="kw">in</span> <span class="ident">handles</span> {
-            <span class="ident">client</span>::<span class="ident">logout</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">c</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span> <span class="ident">client</span>::<span class="ident">logout</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">c</span>).<span class="kw">await</span> {
+                <span class="macro">warn</span><span class="macro">!</span>(<span class="string">&quot;Failed to logout from server: {:?}&quot;</span>, <span class="ident">err</span>);
+            }
         }
         <span class="ident">std</span>::<span class="ident">process</span>::<span class="ident">exit</span>(<span class="number">0</span>);
     });
