@@ -239,7 +239,9 @@ async fn main() {
             _ = int_fut => {}
         }
         for mut c in handles {
-            client::logout(&mut c).await.unwrap();
+            if let Err(err) = client::logout(&mut c).await {
+                warn!("Failed to logout from server: {:?}", err);
+            }
         }
         std::process::exit(0);
     });

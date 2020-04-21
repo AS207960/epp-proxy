@@ -100,7 +100,8 @@ fn format_tag(key: &str, val: &_SerializerData) -> String {
                 output += &open_tag_str;
             } else {
                 let open_tag_str = open_tag("", false);
-                output += &format!("{}<![CDATA[{}]]>{}", open_tag_str, s, close_tag);
+                let so = s.replace("&", "&amp;").replace("<", "&lt;");
+                output += &format!("{}{}{}", open_tag_str, so, close_tag);
             }
         }
         _SerializerData::String(s) => {
