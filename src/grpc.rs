@@ -590,54 +590,56 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         }
 
         let res = client::domain::create(
-            &request.name,
-            request.period.map(|p| client::domain::Period {
-                unit: period_unit_from_i32(p.unit),
-                value: p.value,
-            }),
-            &request.registrant,
-            request
-                .contacts
-                .into_iter()
-                .map(|c| client::domain::InfoContact {
-                    contact_id: c.id,
-                    contact_type: c.r#type,
-                })
-                .collect(),
-            ns,
-            &request.auth_info,
-            match request.sec_dns {
-                Some(sec_dns) => match sec_dns.data {
-                    Some(sec_dns_data) => Some(client::domain::SecDNSData {
-                        max_sig_life: sec_dns.max_sig_life,
-                        data: match sec_dns_data {
-                            epp_proto::domain::sec_dns_data::Data::DsData(ds_data) => client::domain::SecDNSDataType::DSData(
-                                ds_data.data.into_iter().map(|d| client::domain::SecDNSDSData {
-                                    key_tag: d.key_tag as u16,
-                                    algorithm: d.algorithm as u8,
-                                    digest_type: d.digest_type as u8,
-                                    digest: d.digest,
-                                    key_data: d.key_data.map(|k| client::domain::SecDNSKeyData {
+            client::domain::CreateInfo {
+                domain: &request.name,
+                period: request.period.map(|p| client::domain::Period {
+                    unit: period_unit_from_i32(p.unit),
+                    value: p.value,
+                }),
+                registrant: &request.registrant,
+                contacts: request
+                    .contacts
+                    .into_iter()
+                    .map(|c| client::domain::InfoContact {
+                        contact_id: c.id,
+                        contact_type: c.r#type,
+                    })
+                    .collect(),
+                nameservers: ns,
+                auth_info: &request.auth_info,
+                sec_dns: match request.sec_dns {
+                    Some(sec_dns) => match sec_dns.data {
+                        Some(sec_dns_data) => Some(client::domain::SecDNSData {
+                            max_sig_life: sec_dns.max_sig_life,
+                            data: match sec_dns_data {
+                                epp_proto::domain::sec_dns_data::Data::DsData(ds_data) => client::domain::SecDNSDataType::DSData(
+                                    ds_data.data.into_iter().map(|d| client::domain::SecDNSDSData {
+                                        key_tag: d.key_tag as u16,
+                                        algorithm: d.algorithm as u8,
+                                        digest_type: d.digest_type as u8,
+                                        digest: d.digest,
+                                        key_data: d.key_data.map(|k| client::domain::SecDNSKeyData {
+                                            flags: k.flags as u16,
+                                            protocol: k.protocol as u8,
+                                            algorithm: k.algorithm as u8,
+                                            public_key: k.public_key
+                                        })
+                                    }).collect()
+                                ),
+                                epp_proto::domain::sec_dns_data::Data::KeyData(key_data) => client::domain::SecDNSDataType::KeyData(
+                                    key_data.data.into_iter().map(|k| client::domain::SecDNSKeyData {
                                         flags: k.flags as u16,
                                         protocol: k.protocol as u8,
                                         algorithm: k.algorithm as u8,
                                         public_key: k.public_key
-                                    })
-                                }).collect()
-                            ),
-                            epp_proto::domain::sec_dns_data::Data::KeyData(key_data) => client::domain::SecDNSDataType::KeyData(
-                                key_data.data.into_iter().map(|k| client::domain::SecDNSKeyData {
-                                    flags: k.flags as u16,
-                                    protocol: k.protocol as u8,
-                                    algorithm: k.algorithm as u8,
-                                    public_key: k.public_key
-                                }).collect()
-                            )
-                        }
-                    }),
+                                    }).collect()
+                                )
+                            }
+                        }),
+                        None => None
+                    }
                     None => None
                 }
-                None => None
             },
             &mut sender,
         )

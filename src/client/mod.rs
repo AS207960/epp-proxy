@@ -205,6 +205,17 @@ impl EPPClientServerFeatures {
     }
 }
 
+pub struct ClientConf<'a, C> {
+    pub host: &'a str,
+    pub tag: &'a str,
+    pub password: &'a str,
+    pub log_dir: std::path::PathBuf,
+    pub client_cert: C,
+    pub old_password: C,
+    pub pipelining: bool,
+    pub errata: Option<String>,
+}
+
 impl EPPClient {
     /// Creates a new EPP client ready to be started
     ///
@@ -212,26 +223,17 @@ impl EPPClient {
     /// * `host` - The server connection string, in the form `domain:port`
     /// * `tag` - The client ID/tag to login with
     /// * `password` - The password to login with
-    pub fn new<'a, C: Into<Option<&'a str>>>(
-        host: &str,
-        tag: &str,
-        password: &str,
-        log_dir: std::path::PathBuf,
-        client_cert: C,
-        old_password: C,
-        pipelining: bool,
-        errata: Option<String>,
-    ) -> Self {
+    pub fn new<'a, C: Into<Option<&'a str>>>(conf: ClientConf<'a, C>) -> Self {
         Self {
-            log_dir,
-            host: host.to_string(),
-            tag: tag.to_string(),
-            password: password.to_string(),
-            client_cert: client_cert.into().map(|c| c.to_string()),
-            old_password: old_password.into().map(|c| c.to_string()),
-            pipelining,
+            log_dir: conf.log_dir,
+            host: conf.host.to_string(),
+            tag: conf.tag.to_string(),
+            password: conf.password.to_string(),
+            client_cert: conf.client_cert.into().map(|c| c.to_string()),
+            old_password: conf.old_password.into().map(|c| c.to_string()),
+            pipelining: conf.pipelining,
             features: EPPClientServerFeatures {
-                errata,
+                errata: conf.errata,
                 ..Default::default()
             },
             ..Default::default()
@@ -313,7 +315,7 @@ impl EPPClient {
                 tokio::time::interval(tokio::time::Duration::new(120, 0)).fuse();
 
             loop {
-                if self.pipelining || (!self.pipelining && !self.is_awaiting_response) {
+                if self.pipelining || !self.is_awaiting_response {
                     futures::select! {
                         r = receiver.next() => {
                             match r {

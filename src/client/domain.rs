@@ -762,7 +762,7 @@ pub fn handle_update(
     rems.sort_unstable_by(|a, b| (update_as_i32(a)).cmp(&update_as_i32(b)));
 
     let is_not_change = req.new_registrant.is_none() && req.new_auth_info.is_none();
-    if req.add.is_empty() && req.remove.is_empty() && is_not_change && !(!req.sec_dns.is_none() && client.secdns_supported) {
+    if req.add.is_empty() && req.remove.is_empty() && is_not_change && (req.sec_dns.is_none() || !client.secdns_supported) {
         return Err(Response::Err(
             "at least one operation must be specified".to_string(),
         ));
@@ -1066,6 +1066,16 @@ pub async fn info(
     .await
 }
 
+pub struct CreateInfo<'a> {
+    pub domain: &'a str,
+    pub period: Option<Period>,
+    pub registrant: &'a str,
+    pub contacts: Vec<InfoContact>,
+    pub nameservers: Vec<InfoNameserver>,
+    pub auth_info: &'a str,
+    pub sec_dns: Option<SecDNSData>,
+}
+
 /// Registers a new domain
 ///
 /// # Arguments
@@ -1076,27 +1086,21 @@ pub async fn info(
 /// * `nameservers` - Domain nameservers
 /// * `auth_info` - Auth info password for future transfers
 /// * `client_sender` - Reference to the tokio channel into the client
-pub async fn create(
-    domain: &str,
-    period: Option<Period>,
-    registrant: &str,
-    contacts: Vec<InfoContact>,
-    nameservers: Vec<InfoNameserver>,
-    auth_info: &str,
-    sec_dns: Option<SecDNSData>,
+pub async fn create<'a>(
+    info: CreateInfo<'a>,
     client_sender: &mut futures::channel::mpsc::Sender<Request>,
 ) -> Result<CreateResponse, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
     super::send_epp_client_request(
         client_sender,
         Request::DomainCreate(Box::new(CreateRequest {
-            name: domain.to_string(),
-            period,
-            registrant: registrant.to_string(),
-            contacts,
-            nameservers,
-            auth_info: auth_info.to_string(),
-            sec_dns,
+            name: info.domain.to_string(),
+            period: info.period,
+            registrant: info.registrant.to_string(),
+            contacts: info.contacts,
+            nameservers: info.nameservers,
+            auth_info: info.auth_info.to_string(),
+            sec_dns: info.sec_dns,
             return_path: sender,
         })),
         receiver,

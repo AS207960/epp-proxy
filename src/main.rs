@@ -79,16 +79,16 @@ impl Router {
     }
 
     fn add_config(&mut self, config: &ConfigFile, log_dir: std::path::PathBuf) {
-        let epp_client = client::EPPClient::new(
-            &config.server,
-            &config.tag,
-            &config.password,
+        let epp_client = client::EPPClient::new(client::ClientConf {
+            host: &config.server,
+            tag: &config.tag,
+            password: &config.password,
             log_dir,
-            config.client_cert.as_deref(),
-            config.old_password.as_deref(),
-            config.pipelining,
-            config.errata.clone(),
-        );
+            client_cert: config.client_cert.as_deref(),
+            old_password: config.old_password.as_deref(),
+            pipelining: config.pipelining,
+            errata: config.errata.clone(),
+        });
         let epp_client_sender = epp_client.start();
 
         for zone in &config.zones {

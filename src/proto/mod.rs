@@ -545,7 +545,7 @@ pub enum EPPCreate {
     #[serde(rename = "{urn:ietf:params:xml:ns:host-1.0}host:create")]
     Host(host::EPPHostCreate),
     #[serde(rename = "{urn:ietf:params:xml:ns:contact-1.0}contact:create")]
-    Contact(contact::EPPContactCreate),
+    Contact(Box<contact::EPPContactCreate>),
     #[serde(rename = "{urn:ietf:params:xml:ns:domain-1.0}domain:create")]
     Domain(domain::EPPDomainCreate),
 }
@@ -700,7 +700,7 @@ where
 {
     let date = d.deserialize_option(OptDateTimeVisitor)?;
     Ok(match date {
-        Some(d) => if d == Utc.ymd(0001, 01, 01).and_hms(0, 0, 0) {
+        Some(d) => if d == Utc.ymd(1, 1, 1).and_hms(0, 0, 0) {
             None
         } else {
             Some(d)

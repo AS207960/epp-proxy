@@ -676,7 +676,7 @@ pub fn handle_create(
         if a.streets.is_empty() {
             return Err(Response::Err("contact streets cannot be empty".to_string()));
         }
-        let mut name_parts: Vec<&str> = a.name.rsplitn(2, " ").collect();
+        let mut name_parts: Vec<&str> = a.name.rsplitn(2, ' ').collect();
         Ok(proto::contact::EPPContactPostalInfo {
             addr_type: t,
             name: a.name.clone(),
@@ -765,7 +765,7 @@ pub fn handle_create(
         None
     };
 
-    let command = proto::EPPCreate::Contact(proto::contact::EPPContactCreate {
+    let command = proto::EPPCreate::Contact(Box::new(proto::contact::EPPContactCreate {
         id: req.id.clone(),
         postal_info,
         phone: req.phone.as_ref().map(|p| p.into()),
@@ -802,7 +802,7 @@ pub fn handle_create(
         } else {
             None
         }
-    });
+    }));
     Ok((proto::EPPCommandType::Create(command), extension))
 }
 
