@@ -57,6 +57,7 @@ pub struct CreateRequest {
 
 #[derive(Debug)]
 pub struct CreateResponse {
+    pub name: String,
     pub pending: bool,
     pub creation_date: Option<DateTime<Utc>>,
 }
@@ -146,7 +147,7 @@ pub fn handle_check(
     client: &EPPClientServerFeatures,
     req: &CheckRequest,
 ) -> HandleReqReturn<CheckResponse> {
-    if !client.host_supported {
+    if !(client.host_supported || client.nsset_supported) {
         return Err(Response::Unsupported);
     }
     if req.name.is_empty() {
@@ -181,7 +182,7 @@ pub fn handle_info(
     client: &EPPClientServerFeatures,
     req: &InfoRequest,
 ) -> HandleReqReturn<InfoResponse> {
-    if !client.host_supported {
+    if !(client.host_supported || client.nsset_supported) {
         return Err(Response::Unsupported);
     }
     if req.name.is_empty() {
@@ -198,7 +199,7 @@ pub fn handle_info_response(response: proto::EPPResponse) -> Response<InfoRespon
         Some(value) => match value.value {
             proto::EPPResultDataValue::EPPHostInfoResult(host_info) => Response::Ok(InfoResponse {
                 name: host_info.name,
-                registry_id: host_info.registry_id,
+                registry_id: host_info.registry_id.unwrap_or_default(),
                 statuses: host_info
                     .statuses
                     .into_iter()
@@ -232,7 +233,7 @@ pub fn handle_create(
     client: &EPPClientServerFeatures,
     req: &CreateRequest,
 ) -> HandleReqReturn<CreateResponse> {
-    if !client.host_supported {
+    if !(client.host_supported || client.nsset_supported) {
         return Err(Response::Unsupported);
     }
     if req.name.is_empty() {
@@ -244,7 +245,7 @@ pub fn handle_create(
             .addresses
             .iter()
             .map(|a| {
-                Ok(proto::host::EPPHostAddressSer {
+                Ok(proto::host::EPPHostAddress {
                     address: if let 3..=45 = a.address.len() {
                         a.address.clone()
                     } else {
@@ -272,6 +273,7 @@ pub fn handle_create_response(response: proto::EPPResponse) -> Response<CreateRe
         Some(ref value) => match &value.value {
             proto::EPPResultDataValue::EPPHostCreateResult(host_create) => {
                 Response::Ok(CreateResponse {
+                    name: host_create.name.clone(),
                     pending: response.is_pending(),
                     creation_date: host_create.creation_date,
                 })
@@ -286,7 +288,7 @@ pub fn handle_delete(
     client: &EPPClientServerFeatures,
     req: &DeleteRequest,
 ) -> HandleReqReturn<DeleteResponse> {
-    if !client.host_supported {
+    if !(client.host_supported || client.nsset_supported) {
         return Err(Response::Unsupported);
     }
     if req.name.is_empty() {
@@ -308,7 +310,7 @@ pub fn handle_update(
     client: &EPPClientServerFeatures,
     req: &UpdateRequest,
 ) -> HandleReqReturn<UpdateResponse> {
-    if !client.host_supported {
+    if !(client.host_supported || client.nsset_supported) {
         return Err(Response::Unsupported);
     }
     if req.name.is_empty() {
@@ -335,7 +337,7 @@ pub fn handle_update(
     let map_obj = |a: &UpdateObject| {
         Ok(match a {
             UpdateObject::Address(addr) => {
-                proto::host::EPPHostUpdateParam::Address(proto::host::EPPHostAddressSer {
+                proto::host::EPPHostUpdateParam::Address(proto::host::EPPHostAddress {
                     address: if let 3..=45 = addr.address.len() {
                         addr.address.clone()
                     } else {
@@ -350,7 +352,7 @@ pub fn handle_update(
                 })
             }
             UpdateObject::Status(s) => {
-                proto::host::EPPHostUpdateParam::Status(proto::host::EPPHostStatusSer {
+                proto::host::EPPHostUpdateParam::Status(proto::host::EPPHostStatus {
                     status: s.into(),
                 })
             }

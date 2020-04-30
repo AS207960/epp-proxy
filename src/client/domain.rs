@@ -59,6 +59,8 @@ pub struct InfoResponse {
     /// Redemption grace period state of the domain
     pub rgp_state: super::rgp::RGPState,
     pub auth_info: Option<String>,
+    /// DNSSEC data
+    pub sec_dns: Option<SecDNSData>
 }
 
 /// Additional contact associated with a domain
@@ -78,9 +80,38 @@ pub enum InfoNameserver {
     /// Host name with glue records
     HostAndAddress {
         host: String,
-        address: String,
-        ip_version: InfoNameserverAddressVersion,
+        addresses: Vec<super::host::Address>
     },
+}
+
+/// DNSSEC key data
+#[derive(Debug)]
+pub struct SecDNSData {
+    pub max_sig_life: Option<i64>,
+    pub data: SecDNSDataType
+}
+
+#[derive(Debug)]
+pub enum SecDNSDataType {
+    DSData(Vec<SecDNSDSData>),
+    KeyData(Vec<SecDNSKeyData>)
+}
+
+#[derive(Debug)]
+pub struct SecDNSDSData {
+    pub key_tag: u16,
+    pub algorithm: u8,
+    pub digest_type: u8,
+    pub digest: String,
+    pub key_data: Option<SecDNSKeyData>
+}
+
+#[derive(Debug)]
+pub struct SecDNSKeyData {
+    pub flags: u16,
+    pub protocol: u8,
+    pub algorithm: u8,
+    pub public_key: String
 }
 
 #[derive(Debug)]
@@ -91,6 +122,7 @@ pub struct CreateRequest {
     contacts: Vec<InfoContact>,
     nameservers: Vec<InfoNameserver>,
     auth_info: String,
+    sec_dns: Option<SecDNSData>,
     pub return_path: Sender<CreateResponse>,
 }
 
@@ -112,18 +144,14 @@ pub enum PeriodUnit {
 
 #[derive(Debug)]
 pub struct CreateResponse {
+    /// The actual domani name created
+    pub name: String,
     /// Was the request completed instantly or not
     pub pending: bool,
     /// What date did the server log as the date of creation
-    pub creation_date: DateTime<Utc>,
+    pub creation_date: Option<DateTime<Utc>>,
     /// When will the domain expire
     pub expiration_date: Option<DateTime<Utc>>,
-}
-
-#[derive(Debug)]
-pub enum InfoNameserverAddressVersion {
-    IPv4,
-    IPv6,
 }
 
 #[derive(Debug)]
@@ -145,6 +173,7 @@ pub struct UpdateRequest {
     remove: Vec<UpdateObject>,
     new_registrant: Option<String>,
     new_auth_info: Option<String>,
+    sec_dns: Option<UpdateSecDNS>,
     pub return_path: Sender<UpdateResponse>,
 }
 
@@ -153,6 +182,20 @@ pub enum UpdateObject {
     Status(Status),
     Contact(InfoContact),
     Nameserver(InfoNameserver),
+}
+
+#[derive(Debug)]
+pub struct UpdateSecDNS {
+    pub urgent: Option<bool>,
+    pub remove: Option<UpdateSecDNSRemove>,
+    pub add: Option<SecDNSDataType>,
+    pub new_max_sig_life: Option<i64>
+}
+
+#[derive(Debug)]
+pub enum UpdateSecDNSRemove {
+    All(bool),
+    Data(SecDNSDataType)
 }
 
 #[derive(Debug)]
@@ -246,8 +289,10 @@ impl From<proto::domain::EPPDomainStatusType> for Status {
             EPPDomainStatusType::ClientUpdateProhibited => Status::ClientUpdateProhibited,
             EPPDomainStatusType::Inactive => Status::Inactive,
             EPPDomainStatusType::Ok => Status::Ok,
+            EPPDomainStatusType::Granted => Status::Ok,
             EPPDomainStatusType::PendingCreate => Status::PendingCreate,
             EPPDomainStatusType::PendingDelete => Status::PendingDelete,
+            EPPDomainStatusType::Terminated => Status::PendingDelete,
             EPPDomainStatusType::PendingRenew => Status::PendingRenew,
             EPPDomainStatusType::PendingTransfer => Status::PendingTransfer,
             EPPDomainStatusType::PendingUpdate => Status::PendingUpdate,
@@ -285,29 +330,28 @@ impl From<&Status> for proto::domain::EPPDomainStatusType {
     }
 }
 
-impl From<&InfoNameserver> for proto::domain::EPPDomainInfoNameserverSer {
+impl From<&InfoNameserver> for proto::domain::EPPDomainInfoNameserver {
     fn from(from: &InfoNameserver) -> Self {
         match from {
             InfoNameserver::HostOnly(h) => {
-                proto::domain::EPPDomainInfoNameserverSer::HostOnly(h.to_string())
+                proto::domain::EPPDomainInfoNameserver::HostOnly(h.to_string())
             }
             InfoNameserver::HostAndAddress {
                 host,
-                address,
-                ip_version,
-            } => proto::domain::EPPDomainInfoNameserverSer::HostAndAddress {
+                addresses,
+            } => proto::domain::EPPDomainInfoNameserver::HostAndAddress {
                 host: host.to_string(),
-                address: proto::domain::EPPDomainInfoNameserverAddressSer {
-                    address: address.to_string(),
-                    ip_version: match ip_version {
-                        InfoNameserverAddressVersion::IPv4 => {
+                addresses: addresses.iter().map(|addr| proto::domain::EPPDomainInfoNameserverAddress {
+                    address: addr.address.to_string(),
+                    ip_version: match addr.ip_version {
+                        super::host::AddressVersion::IPv4 => {
                             proto::domain::EPPDomainInfoNameserverAddressVersion::IPv4
                         }
-                        InfoNameserverAddressVersion::IPv6 => {
+                        super::host::AddressVersion::IPv6 => {
                             proto::domain::EPPDomainInfoNameserverAddressVersion::IPv6
                         }
                     },
-                },
+                }).collect(),
             },
         }
     }
@@ -391,18 +435,54 @@ pub fn handle_info(
 }
 
 pub fn handle_info_response(response: proto::EPPResponse) -> Response<InfoResponse> {
-    let rgp_state = match response.extension {
-        Some(ext) => match ext.value.iter().find(|p| match p {
-            proto::EPPResponseExtensionType::EPPRGPInfo(_) => true,
-            _ => false,
+    let rgp_state = match &response.extension {
+        Some(ext) => match ext.value.iter().find_map(|p| match p {
+            proto::EPPResponseExtensionType::EPPRGPInfo(i) => Some(i),
+            _ => None,
         }) {
-            Some(e) => match e {
-                proto::EPPResponseExtensionType::EPPRGPInfo(info) => (&info.state.state).into(),
-                _ => unreachable!(),
-            },
+            Some(e) => (&e.state.state).into(),
             None => super::rgp::RGPState::Unknown,
         },
         None => super::rgp::RGPState::Unknown,
+    };
+
+    let sec_dns = match &response.extension {
+        Some(ext) => match ext.value.iter().find_map(|p| match p {
+            proto::EPPResponseExtensionType::EPPSecDNSInfo(i) => Some(i),
+            _ => None,
+        }).map(|i| Ok(SecDNSData {
+            max_sig_life: i.max_signature_life,
+            data: if !i.ds_data.is_empty() {
+                SecDNSDataType::DSData(i.ds_data.iter().map(|d| SecDNSDSData {
+                    key_tag: d.key_tag,
+                    algorithm: d.algorithm,
+                    digest_type: d.digest_type,
+                    digest: d.digest.clone(),
+                    key_data: d.key_data.as_ref().map(|k| SecDNSKeyData {
+                        flags: k.flags,
+                        protocol: k.protocol,
+                        algorithm: k.algorithm,
+                        public_key: k.public_key.clone()
+                    })
+                }).collect())
+            } else if !i.key_data.is_empty() {
+                SecDNSDataType::KeyData(i.key_data.iter().map(|k| SecDNSKeyData {
+                    flags: k.flags,
+                    protocol: k.protocol,
+                    algorithm: k.algorithm,
+                    public_key: k.public_key.clone()
+                }).collect())
+            } else {
+                return Err(Response::InternalServerError)
+            }
+        })) {
+            Some(i) => match i {
+                Ok(i) => Some(i),
+                Err(e) => return e
+            },
+            None => None
+        },
+        None => None
     };
 
     match response.data {
@@ -410,7 +490,7 @@ pub fn handle_info_response(response: proto::EPPResponse) -> Response<InfoRespon
             proto::EPPResultDataValue::EPPDomainInfoResult(domain_info) => {
                 Response::Ok(InfoResponse {
                     name: domain_info.name,
-                    registry_id: domain_info.registry_id,
+                    registry_id: domain_info.registry_id.unwrap_or_default(),
                     statuses: domain_info
                         .statuses
                         .into_iter()
@@ -425,31 +505,33 @@ pub fn handle_info_response(response: proto::EPPResponse) -> Response<InfoRespon
                             contact_type: c.contact_type,
                         })
                         .collect(),
-                    nameservers: domain_info
-                        .nameservers
-                        .servers
-                        .into_iter()
-                        .map(|s| match s {
-                            proto::domain::EPPDomainInfoNameserver::HostOnly(h) => {
-                                InfoNameserver::HostOnly(h)
-                            }
-                            proto::domain::EPPDomainInfoNameserver::HostAndAddress {
-                                host,
-                                address,
-                            } => InfoNameserver::HostAndAddress {
-                                host,
-                                address: address.address,
-                                ip_version: match address.ip_version {
-                                    proto::domain::EPPDomainInfoNameserverAddressVersion::IPv4 => {
-                                        InfoNameserverAddressVersion::IPv4
-                                    }
-                                    proto::domain::EPPDomainInfoNameserverAddressVersion::IPv6 => {
-                                        InfoNameserverAddressVersion::IPv6
-                                    }
+                    nameservers: match domain_info.nameservers {
+                        None => vec![],
+                        Some(n) => n.servers.into_iter()
+                            .map(|s| match s {
+                                proto::domain::EPPDomainInfoNameserver::HostOnly(h) => {
+                                    InfoNameserver::HostOnly(h)
+                                }
+                                proto::domain::EPPDomainInfoNameserver::HostAndAddress {
+                                    host,
+                                    addresses,
+                                } => InfoNameserver::HostAndAddress {
+                                    host,
+                                    addresses: addresses.into_iter().map(|addr| super::host::Address {
+                                        address: addr.address,
+                                        ip_version: match addr.ip_version {
+                                            proto::domain::EPPDomainInfoNameserverAddressVersion::IPv4 => {
+                                                super::host::AddressVersion::IPv4
+                                            }
+                                            proto::domain::EPPDomainInfoNameserverAddressVersion::IPv6 => {
+                                                super::host::AddressVersion::IPv6
+                                            }
+                                        },
+                                    }).collect()
                                 },
-                            },
-                        })
-                        .collect(),
+                            })
+                            .collect()
+                    },
                     hosts: domain_info.hosts,
                     client_id: domain_info.client_id,
                     client_created_id: domain_info.client_created_id,
@@ -459,7 +541,8 @@ pub fn handle_info_response(response: proto::EPPResponse) -> Response<InfoRespon
                     last_updated_date: domain_info.last_updated_date,
                     last_transfer_date: domain_info.last_transfer_date,
                     rgp_state,
-                    auth_info: domain_info.auth_info.map(|a| a.password)
+                    auth_info: domain_info.auth_info.map(|a| a.password),
+                    sec_dns,
                 })
             }
             _ => Response::InternalServerError,
@@ -481,11 +564,51 @@ pub fn handle_create(
         ));
     }
     check_id(&req.registrant)?;
+
+    let ext = if client.secdns_supported {
+        match &req.sec_dns {
+            Some(sec_dns) => Some(proto::EPPCommandExtensionType::EPPSecDNSCreate(match &sec_dns.data {
+                SecDNSDataType::DSData(ds_data) => proto::secdns::EPPSecDNSData {
+                    max_signature_life: sec_dns.max_sig_life,
+                    key_data: vec![],
+                    ds_data: ds_data.iter().map(|d| proto::secdns::EPPSecDNSDSData {
+                        key_tag: d.key_tag,
+                        algorithm: d.algorithm,
+                        digest_type: d.digest_type,
+                        digest: d.digest.clone(),
+                        key_data: d.key_data.as_ref().map(|k| proto::secdns::EPPSecDNSKeyData {
+                            flags: k.flags,
+                            protocol: k.protocol,
+                            algorithm: k.algorithm,
+                            public_key: k.public_key.clone()
+                        })
+                    }).collect()
+                },
+                SecDNSDataType::KeyData(key_data) => proto::secdns::EPPSecDNSData {
+                    max_signature_life: sec_dns.max_sig_life,
+                    ds_data: vec![],
+                    key_data: key_data.iter().map(|k| proto::secdns::EPPSecDNSKeyData {
+                        flags: k.flags,
+                        protocol: k.protocol,
+                        algorithm: k.algorithm,
+                        public_key: k.public_key.clone()
+                    }).collect()
+                }
+            })),
+            None => None
+        }
+    } else {
+        None
+    };
+
     let command = proto::EPPCreate::Domain(proto::domain::EPPDomainCreate {
         name: req.name.clone(),
         period: req.period.as_ref().map(|p| p.into()),
-        nameservers: proto::domain::EPPDomainInfoNameserversSer {
-            servers: req.nameservers.iter().map(|n| n.into()).collect(),
+        nameservers: match req.nameservers.len() {
+            0 => None,
+            _ => Some(proto::domain::EPPDomainInfoNameservers {
+                servers: req.nameservers.iter().map(|n| n.into()).collect(),
+            }),
         },
         registrant: req.registrant.to_string(),
         contacts: req
@@ -493,7 +616,7 @@ pub fn handle_create(
             .iter()
             .map(|c| {
                 check_id(&c.contact_id)?;
-                Ok(proto::domain::EPPDomainInfoContactSer {
+                Ok(proto::domain::EPPDomainInfoContact {
                     contact_type: c.contact_type.to_string(),
                     contact_id: c.contact_id.to_string(),
                 })
@@ -503,7 +626,7 @@ pub fn handle_create(
             password: req.auth_info.to_string(),
         },
     });
-    Ok((proto::EPPCommandType::Create(command), None))
+    Ok((proto::EPPCommandType::Create(command), ext))
 }
 
 pub fn handle_create_response(response: proto::EPPResponse) -> Response<CreateResponse> {
@@ -511,14 +634,24 @@ pub fn handle_create_response(response: proto::EPPResponse) -> Response<CreateRe
         Some(value) => match &value.value {
             proto::EPPResultDataValue::EPPDomainCreateResult(domain_create) => {
                 Response::Ok(CreateResponse {
+                    name: domain_create.name.clone(),
                     pending: response.is_pending(),
-                    creation_date: domain_create.creation_date,
+                    creation_date: Some(domain_create.creation_date),
                     expiration_date: domain_create.expiry_date,
                 })
             }
             _ => Response::InternalServerError,
         },
-        None => Response::InternalServerError,
+        None => if response.is_pending() {
+            Response::Ok(CreateResponse {
+                name: "".to_string(),
+                pending: response.is_pending(),
+                creation_date: None,
+                expiration_date: None
+            })
+        } else {
+            Response::InternalServerError
+        },
     }
 }
 
@@ -567,46 +700,56 @@ pub fn handle_update(
     let mut rem_ns = vec![];
     for add in &req.add {
         match add {
-            UpdateObject::Status(s) => adds.push(proto::domain::EPPDomainUpdateParam::Status(
-                proto::domain::EPPDomainStatusSer {
-                    status: s.into(),
-                    message: None,
-                },
-            )),
-            UpdateObject::Contact(c) => adds.push(proto::domain::EPPDomainUpdateParam::Contact(
-                proto::domain::EPPDomainInfoContactSer {
-                    contact_type: c.contact_type.clone(),
-                    contact_id: c.contact_id.clone(),
-                },
-            )),
+            UpdateObject::Status(s) => {
+                adds.push(proto::domain::EPPDomainUpdateParam::Status(
+                    proto::domain::EPPDomainStatus {
+                        status: s.into(),
+                        message: None,
+                    },
+                ))
+            },
+            UpdateObject::Contact(c) => {
+                check_id(&c.contact_id)?;
+                adds.push(proto::domain::EPPDomainUpdateParam::Contact(
+                    proto::domain::EPPDomainInfoContact {
+                        contact_type: c.contact_type.clone(),
+                        contact_id: c.contact_id.clone(),
+                    },
+                ))
+            },
             UpdateObject::Nameserver(n) => add_ns.push(n.into()),
         }
     }
     for rem in &req.remove {
         match rem {
-            UpdateObject::Status(s) => rems.push(proto::domain::EPPDomainUpdateParam::Status(
-                proto::domain::EPPDomainStatusSer {
-                    status: s.into(),
-                    message: None,
-                },
-            )),
-            UpdateObject::Contact(c) => rems.push(proto::domain::EPPDomainUpdateParam::Contact(
-                proto::domain::EPPDomainInfoContactSer {
-                    contact_type: c.contact_type.clone(),
-                    contact_id: c.contact_id.clone(),
-                },
-            )),
+            UpdateObject::Status(s) => {
+                rems.push(proto::domain::EPPDomainUpdateParam::Status(
+                    proto::domain::EPPDomainStatus {
+                        status: s.into(),
+                        message: None,
+                    },
+                ))
+            },
+            UpdateObject::Contact(c) => {
+                check_id(&c.contact_id)?;
+                rems.push(proto::domain::EPPDomainUpdateParam::Contact(
+                    proto::domain::EPPDomainInfoContact {
+                        contact_type: c.contact_type.clone(),
+                        contact_id: c.contact_id.clone(),
+                    },
+                ))
+            },
             UpdateObject::Nameserver(n) => rem_ns.push(n.into()),
         }
     }
     if !add_ns.is_empty() {
         adds.push(proto::domain::EPPDomainUpdateParam::Nameserver(
-            proto::domain::EPPDomainInfoNameserversSer { servers: add_ns },
+            proto::domain::EPPDomainInfoNameservers { servers: add_ns },
         ))
     }
     if !rem_ns.is_empty() {
         rems.push(proto::domain::EPPDomainUpdateParam::Nameserver(
-            proto::domain::EPPDomainInfoNameserversSer { servers: rem_ns },
+            proto::domain::EPPDomainInfoNameservers { servers: rem_ns },
         ))
     }
 
@@ -619,11 +762,82 @@ pub fn handle_update(
     rems.sort_unstable_by(|a, b| (update_as_i32(a)).cmp(&update_as_i32(b)));
 
     let is_not_change = req.new_registrant.is_none() && req.new_auth_info.is_none();
-    if req.add.is_empty() && req.remove.is_empty() && is_not_change {
+    if req.add.is_empty() && req.remove.is_empty() && is_not_change && !(!req.sec_dns.is_none() && client.secdns_supported) {
         return Err(Response::Err(
             "at least one operation must be specified".to_string(),
         ));
     }
+
+    let ext = if client.secdns_supported {
+        match &req.sec_dns {
+            Some(sec_dns) => Some(proto::EPPCommandExtensionType::EPPSecDNSUpdate(proto::secdns::EPPSecDNSUpdate {
+                urgent: sec_dns.urgent,
+                add: sec_dns.add.as_ref().map(|a| match a {
+                    SecDNSDataType::DSData(ds_data) => proto::secdns::EPPSecDNSUpdateAdd {
+                        key_data: vec![],
+                        ds_data: ds_data.iter().map(|d| proto::secdns::EPPSecDNSDSData {
+                            key_tag: d.key_tag,
+                            algorithm: d.algorithm,
+                            digest_type: d.digest_type,
+                            digest: d.digest.clone(),
+                            key_data: d.key_data.as_ref().map(|k| proto::secdns::EPPSecDNSKeyData {
+                                flags: k.flags,
+                                protocol: k.protocol,
+                                algorithm: k.algorithm,
+                                public_key: k.public_key.clone()
+                            })
+                        }).collect()
+                    },
+                    SecDNSDataType::KeyData(key_data) => proto::secdns::EPPSecDNSUpdateAdd {
+                        ds_data: vec![],
+                        key_data: key_data.iter().map(|k| proto::secdns::EPPSecDNSKeyData {
+                            flags: k.flags,
+                            protocol: k.protocol,
+                            algorithm: k.algorithm,
+                            public_key: k.public_key.clone()
+                        }).collect()
+                    },
+                }),
+                remove: sec_dns.remove.as_ref().map(|r| match r {
+                    UpdateSecDNSRemove::All(a) => proto::secdns::EPPSecDNSUpdateRemove {
+                        all: Some(*a),
+                        ds_data: vec![],
+                        key_data: vec![]
+                    },
+                    UpdateSecDNSRemove::Data(d) => match d {
+                        SecDNSDataType::DSData(ds_data) => proto::secdns::EPPSecDNSUpdateRemove {
+                            all: None,
+                            key_data: vec![],
+                            ds_data: ds_data.iter().map(|d| proto::secdns::EPPSecDNSDSData {
+                                key_tag: d.key_tag,
+                                algorithm: d.algorithm,
+                                digest_type: d.digest_type,
+                                digest: d.digest.clone(),
+                                key_data: None,
+                            }).collect()
+                        },
+                        SecDNSDataType::KeyData(key_data) => proto::secdns::EPPSecDNSUpdateRemove {
+                            all: None,
+                            ds_data: vec![],
+                            key_data: key_data.iter().map(|k| proto::secdns::EPPSecDNSKeyData {
+                                flags: k.flags,
+                                protocol: k.protocol,
+                                algorithm: k.algorithm,
+                                public_key: k.public_key.clone()
+                            }).collect()
+                        },
+                    }
+                }),
+                change: sec_dns.new_max_sig_life.map(|s| proto::secdns::EPPSecDNSUpdateChange {
+                    max_signature_life: Some(s)
+                })
+            })),
+            None => None
+        }
+    } else {
+        None
+    };
+
     let command = proto::EPPUpdate::Domain(proto::domain::EPPDomainUpdate {
         name: req.name.clone(),
         add: if adds.is_empty() {
@@ -650,7 +864,7 @@ pub fn handle_update(
             })
         },
     });
-    Ok((proto::EPPCommandType::Update(Box::new(command)), None))
+    Ok((proto::EPPCommandType::Update(Box::new(command)), ext))
 }
 
 pub fn handle_update_response(response: proto::EPPResponse) -> Response<UpdateResponse> {
@@ -869,6 +1083,7 @@ pub async fn create(
     contacts: Vec<InfoContact>,
     nameservers: Vec<InfoNameserver>,
     auth_info: &str,
+    sec_dns: Option<SecDNSData>,
     client_sender: &mut futures::channel::mpsc::Sender<Request>,
 ) -> Result<CreateResponse, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
@@ -881,6 +1096,7 @@ pub async fn create(
             contacts,
             nameservers,
             auth_info: auth_info.to_string(),
+            sec_dns,
             return_path: sender,
         })),
         receiver,
@@ -924,6 +1140,7 @@ pub async fn update(
     remove: Vec<UpdateObject>,
     new_registrant: Option<&str>,
     new_auth_info: Option<&str>,
+    sec_dns: Option<UpdateSecDNS>,
     client_sender: &mut futures::channel::mpsc::Sender<Request>,
 ) -> Result<UpdateResponse, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
@@ -935,6 +1152,7 @@ pub async fn update(
             remove,
             new_registrant: new_registrant.map(|s| s.into()),
             new_auth_info: new_auth_info.map(|s| s.into()),
+            sec_dns,
             return_path: sender,
         })),
         receiver,

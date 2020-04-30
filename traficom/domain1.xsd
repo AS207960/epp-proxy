@@ -1,0 +1,297 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:tns="urn:ietf:params:xml:ns:domain-1.0" attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="urn:ietf:params:xml:ns:domain-1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="check">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" name="name" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="create">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="name" type="xs:string" />
+        <xs:element name="period">
+          <xs:complexType>
+            <xs:simpleContent>
+              <xs:extension base="xs:unsignedByte">
+                <xs:attribute name="unit" type="xs:string" use="required" />
+              </xs:extension>
+            </xs:simpleContent>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="ns">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element maxOccurs="unbounded" name="hostObj" type="xs:string" />
+              <xs:element maxOccurs="unbounded" name="hostAttr">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="hostName" type="xs:string" />
+                    <xs:element minOccurs="0" maxOccurs="unbounded" name="hostAddr">
+                      <xs:complexType>
+                        <xs:simpleContent>
+                          <xs:extension base="xs:string">
+                            <xs:attribute name="ip" type="xs:string" use="required" />
+                          </xs:extension>
+                        </xs:simpleContent>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="registrant" type="xs:string" />
+        <xs:element maxOccurs="unbounded" name="contact">
+          <xs:complexType>
+            <xs:simpleContent>
+              <xs:extension base="xs:string">
+                <xs:attribute name="type" type="xs:string" use="required" />
+              </xs:extension>
+            </xs:simpleContent>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="authInfo">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="pw" type="xs:string" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="delete">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="name" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="info">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="name">
+          <xs:complexType>
+            <xs:simpleContent>
+              <xs:extension base="xs:string">
+                <xs:attribute name="hosts" type="xs:string" use="required" />
+              </xs:extension>
+            </xs:simpleContent>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="authInfo">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="pw" type="xs:string" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="renew">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="name" type="xs:string" />
+        <xs:element name="curExpDate" type="xs:date" />
+        <xs:element name="period">
+          <xs:complexType>
+            <xs:simpleContent>
+              <xs:extension base="xs:unsignedByte">
+                <xs:attribute name="unit" type="xs:string" use="required" />
+              </xs:extension>
+            </xs:simpleContent>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="autorenew">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="name" type="xs:string" />
+        <xs:element name="value" type="xs:unsignedByte" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="transfer">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="name" type="xs:string" />
+        <xs:element name="authInfo">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="pw" type="xs:string" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="ns">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element maxOccurs="unbounded" name="hostObj" type="xs:string" />
+              <xs:element maxOccurs="unbounded" name="hostAttr">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="hostName" type="xs:string" />
+                    <xs:element minOccurs="0" maxOccurs="unbounded" name="hostAddr">
+                      <xs:complexType>
+                        <xs:simpleContent>
+                          <xs:extension base="xs:string">
+                            <xs:attribute name="ip" type="xs:string" use="required" />
+                          </xs:extension>
+                        </xs:simpleContent>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="period">
+          <xs:complexType>
+            <xs:simpleContent>
+              <xs:extension base="xs:unsignedByte">
+                <xs:attribute name="unit" type="xs:string" use="required" />
+              </xs:extension>
+            </xs:simpleContent>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="update">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="name" type="xs:string" />
+        <xs:element name="add">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="ns">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element maxOccurs="unbounded" name="hostObj" type="xs:string" />
+                    <xs:element maxOccurs="unbounded" name="hostAttr">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="hostName" type="xs:string" />
+                          <xs:element minOccurs="0" maxOccurs="unbounded" name="hostAddr">
+                            <xs:complexType>
+                              <xs:simpleContent>
+                                <xs:extension base="xs:string">
+                                  <xs:attribute name="ip" type="xs:string" use="required" />
+                                </xs:extension>
+                              </xs:simpleContent>
+                            </xs:complexType>
+                          </xs:element>
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+              <xs:element maxOccurs="unbounded" name="contact">
+                <xs:complexType>
+                  <xs:simpleContent>
+                    <xs:extension base="xs:string">
+                      <xs:attribute name="type" type="xs:string" use="required" />
+                    </xs:extension>
+                  </xs:simpleContent>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="status">
+                <xs:complexType>
+                  <xs:simpleContent>
+                    <xs:extension base="xs:string">
+                      <xs:attribute name="s" type="xs:string" use="required" />
+                      <xs:attribute name="lang" type="xs:string" use="required" />
+                    </xs:extension>
+                  </xs:simpleContent>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="rem">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="ns">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element maxOccurs="unbounded" name="hostObj" type="xs:string" />
+                    <xs:element maxOccurs="unbounded" name="hostAttr">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="hostName" type="xs:string" />
+                          <xs:element minOccurs="0" maxOccurs="unbounded" name="hostAddr">
+                            <xs:complexType>
+                              <xs:simpleContent>
+                                <xs:extension base="xs:string">
+                                  <xs:attribute name="ip" type="xs:string" use="required" />
+                                </xs:extension>
+                              </xs:simpleContent>
+                            </xs:complexType>
+                          </xs:element>
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+              <xs:element maxOccurs="unbounded" name="contact">
+                <xs:complexType>
+                  <xs:simpleContent>
+                    <xs:extension base="xs:string">
+                      <xs:attribute name="type" type="xs:string" use="required" />
+                    </xs:extension>
+                  </xs:simpleContent>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="status">
+                <xs:complexType>
+                  <xs:attribute name="s" type="xs:string" use="required" />
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="authInfo">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="pw" type="xs:string" />
+                    <xs:element name="pwregistranttransfer" type="xs:string" />
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="chg">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="registrant" type="xs:string" />
+              <xs:element name="authInfo">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="pw" type="xs:string" />
+                    <xs:element name="pwregistranttransfer" type="xs:string" />
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="registrylock">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element maxOccurs="unbounded" name="smsnumber" type="xs:string" />
+                    <xs:element maxOccurs="unbounded" name="numbertosend" type="xs:unsignedShort" />
+                    <xs:element name="authkey" type="xs:string" />
+                  </xs:sequence>
+                  <xs:attribute name="type" type="xs:string" use="required" />
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

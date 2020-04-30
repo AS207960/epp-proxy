@@ -3,7 +3,7 @@
 //! Messages should be injected into the server using the helper functions in subordinate modules such as
 //! [`contact`], [`host`], and [`domain`].
 
-use crate::{proto, xml_ser};
+use crate::proto;
 use chrono::prelude::*;
 use futures::future::FutureExt;
 use futures::sink::SinkExt;
@@ -99,7 +99,7 @@ async fn recv_msg<R: std::marker::Unpin + tokio::io::AsyncRead>(
             error!("Failed writing received message to message log: {}", e);
         }
     }
-    let message: proto::EPPMessage = match quick_xml::de::from_str(&data) {
+    let message: proto::EPPMessage = match xml_serde::from_str(&data) {
         Ok(m) => m,
         Err(err) => {
             error!("Invalid XML from {}: {}", host, err);
@@ -152,6 +152,9 @@ pub struct EPPClient {
     old_password: Option<String>,
     client_cert: Option<String>,
     server_id: String,
+    pipelining: bool,
+    is_awaiting_response: bool,
+    is_closing: bool,
     /// Is the EPP server in a state to receive and process commands
     ready: bool,
     router: router::Router,
@@ -164,6 +167,8 @@ pub struct EPPClient {
 /// Features supported by the EPP server
 #[derive(Debug, Default)]
 pub struct EPPClientServerFeatures {
+    /// For naughty servers
+    errata: Option<String>,
     language: String,
     /// RFC 5731 support
     domain_supported: bool,
@@ -187,6 +192,17 @@ pub struct EPPClientServerFeatures {
     nominet_data_quality: bool,
     /// https://www.nic.ch/epp/balance-1.0 support
     switch_balance: bool,
+    /// urn:ietf:params:xml:ns:nsset-1.2 support (NOT AN ACTUAL IETF NAMESPACE)
+    nsset_supported: bool
+}
+
+impl EPPClientServerFeatures {
+    fn has_erratum(&self, name: &str) -> bool {
+        match &self.errata {
+            Some(s) => s == name,
+            None => false
+        }
+    }
 }
 
 impl EPPClient {
@@ -203,6 +219,8 @@ impl EPPClient {
         log_dir: std::path::PathBuf,
         client_cert: C,
         old_password: C,
+        pipelining: bool,
+        errata: Option<String>,
     ) -> Self {
         Self {
             log_dir,
@@ -211,6 +229,11 @@ impl EPPClient {
             password: password.to_string(),
             client_cert: client_cert.into().map(|c| c.to_string()),
             old_password: old_password.into().map(|c| c.to_string()),
+            pipelining,
+            features: EPPClientServerFeatures {
+                errata,
+                ..Default::default()
+            },
             ..Default::default()
         }
     }
@@ -290,45 +313,64 @@ impl EPPClient {
                 tokio::time::interval(tokio::time::Duration::new(120, 0)).fuse();
 
             loop {
-                futures::select! {
-                    r = receiver.next() => {
-                        match r {
-                            Some(r) => match self._handle_request(r, &mut sock_write).await {
+                if self.pipelining || (!self.pipelining && !self.is_awaiting_response) {
+                    futures::select! {
+                        r = receiver.next() => {
+                            match r {
+                                Some(r) => match self._handle_request(r, &mut sock_write).await {
+                                    Ok(_) => {},
+                                    Err(_) => {
+                                        tokio::time::delay_for(tokio::time::Duration::new(5, 0)).await;
+                                        break;
+                                    }
+                                },
+                                None => return
+                            };
+                        }
+                        m = message_channel.next() => {
+                            match m {
+                                Some(m) => match m {
+                                    Ok(m) => match self._handle_response(m).await {
+                                        Ok(c) => if c && self.is_closing {
+                                            return
+                                        },
+                                        Err(_) => break
+                                    },
+                                    Err(c) => if c && self.is_closing {
+                                        return
+                                    } else {
+                                        break
+                                    }
+                                },
+                                None => break
+                            }
+                        }
+                        _ = keepalive_interval.next() => {
+                            match self._send_keepalive(&mut sock_write).await {
                                 Ok(_) => {},
                                 Err(_) => {
                                     tokio::time::delay_for(tokio::time::Duration::new(5, 0)).await;
                                     break;
                                 }
-                            },
-                            None => return
-                        };
-                    }
-                    m = message_channel.next() => {
-                        match m {
-                            Some(m) => match m {
-                                Ok(m) => match self._handle_response(m).await {
-                                    Ok(c) => if c {
-                                        return
-                                    },
-                                    Err(_) => break
-                                },
-                                Err(c) => if c {
-                                    return
-                                } else {
-                                    break
-                                }
-                            },
-                            None => break
-                        }
-                    }
-                    _ = keepalive_interval.next() => {
-                        match self._send_keepalive(&mut sock_write).await {
-                            Ok(_) => {},
-                            Err(_) => {
-                                tokio::time::delay_for(tokio::time::Duration::new(5, 0)).await;
-                                break;
                             }
                         }
+                    }
+                } else {
+                    match message_channel.next().await {
+                        Some(m) => match m {
+                            Ok(m) => match self._handle_response(m).await {
+                                Ok(c) => if c && self.is_closing {
+                                    return
+                                },
+                                Err(_) => break
+                            },
+                            Err(c) => if c && self.is_closing {
+                                return
+                            } else {
+                                break
+                            }
+                        },
+                        None => break
                     }
                 }
             }
@@ -343,6 +385,7 @@ impl EPPClient {
         let message = proto::EPPMessage {
             message: proto::EPPMessageType::Hello {},
         };
+        self.is_awaiting_response = true;
         match self._send_msg(&message, sock_write).await {
             Ok(_) => Ok(()),
             Err(_) => {
@@ -370,14 +413,42 @@ impl EPPClient {
                         Err(())
                     }
                 }
+            },
+            (router::Request::Logout(t), _) => {
+                match &mut self.nominet_tag_list_subordinate_client {
+                    Some(client) => {
+                        let (sender, _) = futures::channel::oneshot::channel();
+                        match client.send(router::Request::Logout(Box::new(LogoutRequest {
+                            return_path: sender
+                        }))).await {
+                            Ok(_) => {},
+                            Err(e) => {
+                                warn!("Failed to send to subordinate server: {}", e);
+                                return Err(())
+                            }
+                        }
+                    },
+                    None => {}
+                };
+                self.is_closing = true;
+                match self.router.handle_request(&self.features, router::Request::Logout(t)).await {
+                    Some((command, extension, command_id)) => {
+                        self.is_awaiting_response = true;
+                        match self._send_command(command, extension, sock_write, command_id).await{
+                            Ok(_) => Ok(()),
+                            Err(_) => Err(()),
+                        }
+                    },
+                    None => Ok(()),
+                }
             }
             (req, _) => match self.router.handle_request(&self.features, req).await {
-                Some((command, extension, command_id)) => match self
-                    ._send_command(command, extension, sock_write, command_id)
-                    .await
-                {
-                    Ok(_) => Ok(()),
-                    Err(_) => Err(()),
+                Some((command, extension, command_id)) => {
+                    self.is_awaiting_response = true;
+                    match self._send_command(command, extension, sock_write, command_id).await {
+                        Ok(_) => Ok(()),
+                        Err(_) => Err(()),
+                    }
                 },
                 None => Ok(()),
             },
@@ -385,6 +456,7 @@ impl EPPClient {
     }
 
     async fn _handle_response(&mut self, res: proto::EPPMessage) -> Result<bool, ()> {
+        self.is_awaiting_response = false;
         match res.message {
             proto::EPPMessageType::Response(response) => {
                 if !response.is_success() {
@@ -540,6 +612,9 @@ impl EPPClient {
         self.features.switch_balance = greeting
             .service_menu
             .supports_ext("https://www.nic.ch/epp/balance-1.0");
+        self.features.nsset_supported = greeting
+            .service_menu
+            .supports("urn:ietf:params:xml:ns:nsset-1.2");
 
         if !(self.features.contact_supported
             | self.features.domain_supported
@@ -590,6 +665,9 @@ impl EPPClient {
             }
             if self.features.switch_balance {
                 ext_objects.push("https://www.nic.ch/epp/balance-1.0".to_string())
+            }
+            if self.features.nsset_supported {
+                objects.push("urn:ietf:params:xml:ns:nsset-1.2".to_string())
             }
             if self.features.nominet_tag_list {
                 let new_client = Self {
@@ -742,7 +820,7 @@ impl EPPClient {
         sock: &mut W,
     ) -> Result<(), ()> {
         let encoded_msg =
-            xml_ser::to_string(message, "epp", "urn:ietf:params:xml:ns:epp-1.0").unwrap();
+            xml_serde::to_string(message).unwrap();
         debug!("Sending EPP message with contents: {}", encoded_msg);
         let msg_bytes = encoded_msg.as_bytes();
         let msg_len = msg_bytes.len() + 4;
@@ -855,7 +933,10 @@ async fn send_epp_client_request<R>(
     req: Request,
     receiver: futures::channel::oneshot::Receiver<Response<R>>,
 ) -> Result<R, Error> {
-    client_sender.try_send(req).unwrap();
+    match client_sender.try_send(req) {
+        Ok(_) => {},
+        Err(_) => return Err(Error::InternalServerError)
+    }
     let mut receiver = receiver.fuse();
     let mut delay = tokio::time::delay_for(tokio::time::Duration::new(5, 0)).fuse();
     let resp = futures::select! {
@@ -937,11 +1018,11 @@ pub fn handle_logout_response(_response: proto::EPPResponse) -> Response<()> {
 /// # Arguments
 /// * `client_sender` - Reference to the tokio channel into the client
 pub async fn logout(
-    client_sender: &mut futures::channel::mpsc::Sender<Request>,
+    mut client_sender: futures::channel::mpsc::Sender<Request>,
 ) -> Result<(), Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
     send_epp_client_request(
-        client_sender,
+        &mut client_sender,
         Request::Logout(Box::new(LogoutRequest {
             return_path: sender,
         })),

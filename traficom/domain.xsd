@@ -1,0 +1,80 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:secDNS="urn:ietf:params:xml:ns:secDNS-1.1" xmlns:domain="urn:ietf:params:xml:ns:domain-1.0" xmlns:domain-ext="urn:ietf:params:xml:ns:domain-ext-1.0" attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="urn:ietf:params:xml:ns:epp-1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:import namespace="urn:ietf:params:xml:ns:domain-1.0" />
+  <xs:import namespace="urn:ietf:params:xml:ns:secDNS-1.1" />
+  <xs:import namespace="urn:ietf:params:xml:ns:domain-ext-1.0" />
+  <xs:element name="epp">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="command">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="check">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element ref="domain:check" />
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="create">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element ref="domain:create" />
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="delete">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element ref="domain:delete" />
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="info">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element ref="domain:info" />
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="renew">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element ref="domain:renew" />
+                    <xs:element ref="domain:autorenew" />
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="transfer">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element ref="domain:transfer" />
+                  </xs:sequence>
+                  <xs:attribute name="op" type="xs:string" use="required" />
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="update">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element ref="domain:update" />
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="extension">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element ref="secDNS:create" />
+                    <xs:element ref="secDNS:update" />
+                    <xs:element ref="domain-ext:delete" />
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="clTRID" type="xs:string" />
+              <xs:element name="svTRID" type="xs:string" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

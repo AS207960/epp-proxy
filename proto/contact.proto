@@ -20,10 +20,24 @@ enum EntityType {
     UkGovernmentBody = 11;
     UkCorporationByRoyalCharter = 12;
     UkStatutoryBody = 13;
-    NonUkIndividual = 14;
-    NonUkCompany = 15;
-    OtherUkEntity = 16;
-    OtherNonUkEntity = 17;
+    UkPoliticalParty = 31;
+    OtherUkEntity = 14;
+    FinnishIndividual = 15;
+    FinnishCompany = 16;
+    FinnishAssociation = 17;
+    FinnishInstitution = 18;
+    FinnishPoliticalParty = 19;
+    FinnishMunicipality = 20;
+    FinnishGovernment = 21;
+    FinnishPublicCommunity = 22;
+    OtherIndividual = 23;
+    OtherCompany = 24;
+    OtherAssociation = 25;
+    OtherInstitution = 26;
+    OtherPoliticalParty = 27;
+    OtherMunicipality = 28;
+    OtherGovernment = 29;
+    OtherPublicCommunity = 30;
 }
 
 enum DisclosureType {
@@ -46,6 +60,8 @@ message PostalAddress {
     google.protobuf.StringValue province = 6;
     google.protobuf.StringValue postal_code = 7;
     string country_code = 8;
+    google.protobuf.StringValue identity_number = 9;
+    google.protobuf.Timestamp birth_date = 10;
 }
 
 message Phone {
@@ -125,8 +141,9 @@ message ContactCreateRequest {
 }
 
 message ContactCreateReply {
-    bool pending = 1;
-    google.protobuf.Timestamp creation_date = 2;
+    string id = 1;
+    bool pending = 2;
+    google.protobuf.Timestamp creation_date = 3;
 }
 
 message ContactDeleteRequest {

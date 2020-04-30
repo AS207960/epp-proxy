@@ -1,0 +1,150 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:tns="urn:ietf:params:xml:ns:contact-1.0" attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="urn:ietf:params:xml:ns:contact-1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="check">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" name="name" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="create">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="id" type="xs:string" />
+        <xs:element name="role" type="xs:unsignedShort" />
+        <xs:element name="type" type="xs:unsignedShort" />
+        <xs:element name="postalInfo">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="isfinnish" type="xs:unsignedByte" />
+              <xs:element name="firstname" type="xs:string" />
+              <xs:element name="lastname" type="xs:string" />
+              <xs:element name="name" type="xs:string" />
+              <xs:element name="org" type="xs:string" />
+              <xs:element name="birthDate" type="xs:dateTime" />
+              <xs:element name="identity" type="xs:string" />
+              <xs:element name="registernumber" type="xs:string" />
+              <xs:element name="addr">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element maxOccurs="unbounded" name="street" type="xs:string" />
+                    <xs:element name="city" type="xs:string" />
+                    <xs:element name="sp" type="xs:string" />
+                    <xs:element name="pc" type="xs:string" />
+                    <xs:element name="cc" type="xs:string" />
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+            <xs:attribute name="type" type="xs:string" use="required" />
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="voice" type="xs:string" />
+        <xs:element name="fax" type="xs:string" />
+        <xs:element name="email" type="xs:string" />
+        <xs:element name="legalemail" type="xs:string" />
+        <xs:element name="authInfo">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="pw" type="xs:string" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="disclose">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="voice" />
+              <xs:element name="email" />
+              <xs:element name="addr" />
+            </xs:sequence>
+            <xs:attribute name="flag" type="xs:unsignedByte" use="required" />
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="delete">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="id" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="info">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="id" type="xs:string" />
+        <xs:element name="authInfo">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="pw" type="xs:string" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="update">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="id" type="xs:string" />
+        <xs:element name="add" type="xs:string" />
+        <xs:element name="rem" type="xs:string" />
+        <xs:element name="chg">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="type" type="xs:unsignedShort" />
+              <xs:element name="postalInfo">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="isfinnish" type="xs:unsignedByte" />
+                    <xs:element name="firstname" type="xs:string" />
+                    <xs:element name="lastname" type="xs:string" />
+                    <xs:element name="name" type="xs:string" />
+                    <xs:element name="org" type="xs:string" />
+                    <xs:element name="birthDate" type="xs:dateTime" />
+                    <xs:element name="identity" type="xs:string" />
+                    <xs:element name="registernumber" type="xs:string" />
+                    <xs:element name="addr">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element maxOccurs="unbounded" name="street" type="xs:string" />
+                          <xs:element name="city" type="xs:string" />
+                          <xs:element name="sp" type="xs:string" />
+                          <xs:element name="pc" type="xs:string" />
+                          <xs:element name="cc" type="xs:string" />
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                  <xs:attribute name="type" type="xs:string" use="required" />
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="voice" type="xs:string" />
+              <xs:element name="fax" type="xs:string" />
+              <xs:element name="email" type="xs:string" />
+              <xs:element name="legalemail" type="xs:string" />
+              <xs:element name="authInfo">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="pw" type="xs:string" />
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="disclose">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="voice" />
+                    <xs:element name="email" />
+                    <xs:element name="addr" />
+                  </xs:sequence>
+                  <xs:attribute name="flag" type="xs:unsignedByte" use="required" />
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

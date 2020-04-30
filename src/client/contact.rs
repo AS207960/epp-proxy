@@ -86,6 +86,10 @@ pub struct Address {
     pub postal_code: Option<String>,
     /// ISO 2 letter country code
     pub country_code: String,
+    /// National ID number for individuals
+    pub identity_number: Option<String>,
+    /// Individuals birth date
+    pub birth_date: Option<DateTime<Utc>>,
 }
 
 #[derive(Debug)]
@@ -102,10 +106,24 @@ pub enum EntityType {
     UkGovernmentBody,
     UkCorporationByRoyalCharter,
     UkStatutoryBody,
-    NonUkIndividual,
-    NonUkCompany,
+    UkPoliticalParty,
     OtherUkEntity,
-    OtherNonUkEntity,
+    FinnishIndividual,
+    FinnishCompany,
+    FinnishAssociation,
+    FinnishInstitution,
+    FinnishPoliticalParty,
+    FinnishMunicipality,
+    FinnishGovernment,
+    FinnishPublicCommunity,
+    OtherIndividual,
+    OtherCompany,
+    OtherAssociation,
+    OtherInstitution,
+    OtherPoliticalParty,
+    OtherMunicipality,
+    OtherGovernment,
+    OtherPublicCommunity,
     Unknown,
 }
 
@@ -129,10 +147,10 @@ impl From<&proto::nominet::EPPContactType> for EntityType {
             EPPContactType::UkGovernmentBody => EntityType::UkGovernmentBody,
             EPPContactType::UkCorporationByRoyalCharter => EntityType::UkCorporationByRoyalCharter,
             EPPContactType::UkStatutoryBody => EntityType::UkStatutoryBody,
-            EPPContactType::NonUkIndividual => EntityType::NonUkIndividual,
-            EPPContactType::NonUkCompany => EntityType::NonUkCompany,
+            EPPContactType::NonUkIndividual => EntityType::OtherIndividual,
+            EPPContactType::NonUkCompany => EntityType::OtherCompany,
             EPPContactType::OtherUkEntity => EntityType::OtherUkEntity,
-            EPPContactType::OtherNonUkEntity => EntityType::OtherNonUkEntity,
+            EPPContactType::OtherNonUkEntity => EntityType::OtherCompany,
             EPPContactType::Unknown => EntityType::Unknown,
         }
     }
@@ -158,12 +176,66 @@ impl From<&EntityType> for proto::nominet::EPPContactType {
             EntityType::UkGovernmentBody => EPPContactType::UkGovernmentBody,
             EntityType::UkCorporationByRoyalCharter => EPPContactType::UkCorporationByRoyalCharter,
             EntityType::UkStatutoryBody => EPPContactType::UkStatutoryBody,
-            EntityType::NonUkIndividual => EPPContactType::NonUkIndividual,
-            EntityType::NonUkCompany => EPPContactType::NonUkCompany,
             EntityType::OtherUkEntity => EPPContactType::OtherUkEntity,
-            EntityType::OtherNonUkEntity => EPPContactType::OtherNonUkEntity,
-            EntityType::Unknown => EPPContactType::Unknown,
+            EntityType::FinnishIndividual | EntityType::OtherIndividual => EPPContactType::NonUkIndividual,
+            EntityType::FinnishCompany | EntityType::OtherCompany => EPPContactType::NonUkCompany,
+            _ => EPPContactType::OtherNonUkEntity,
         }
+    }
+}
+
+impl From<&EntityType> for proto::traficom::EPPContactTraficomType {
+    fn from(from: &EntityType) -> Self {
+        use proto::traficom::EPPContactTraficomType;
+        match from {
+            EntityType::FinnishIndividual | EntityType::OtherIndividual | EntityType::UkIndividual
+            | EntityType::UkSoleTrader | EntityType::OtherUkEntity | EntityType::Unknown => EPPContactTraficomType::PrivatePerson,
+            EntityType::FinnishCompany | EntityType::OtherCompany | EntityType::UkLimitedCompany
+            | EntityType::UkPublicLimitedCompany | EntityType::UkCorporationByRoyalCharter |
+            EntityType::UkRegisteredCharity | EntityType::UkIndustrialProvidentRegisteredCompany => EPPContactTraficomType::Company,
+            EntityType::UkPartnership | EntityType::UkLimitedLiabilityPartnership | EntityType::FinnishAssociation
+            | EntityType::OtherAssociation => EPPContactTraficomType::Association,
+            EntityType::UkSchool | EntityType::UkStatutoryBody | EntityType::FinnishInstitution
+            | EntityType::OtherInstitution => EPPContactTraficomType::Institution,
+            EntityType::UkPoliticalParty | EntityType::FinnishPoliticalParty | EntityType::OtherPoliticalParty => EPPContactTraficomType::PoliticalParty,
+            EntityType::UkGovernmentBody | EntityType::FinnishGovernment | EntityType::OtherGovernment => EPPContactTraficomType::Government,
+            EntityType::FinnishMunicipality | EntityType::OtherMunicipality => EPPContactTraficomType::Municipality,
+            EntityType::FinnishPublicCommunity | EntityType::OtherPublicCommunity => EPPContactTraficomType::PublicCommunity,
+        }
+    }
+}
+
+fn traficom_type_to_entity_type(from: &proto::traficom::EPPContactTraficomType, is_finnish: bool) -> EntityType {
+    use proto::traficom::EPPContactTraficomType;
+    match (from, is_finnish) {
+        (EPPContactTraficomType::PrivatePerson, true) => EntityType::FinnishIndividual,
+        (EPPContactTraficomType::PrivatePerson, false) => EntityType::OtherIndividual,
+        (EPPContactTraficomType::Company, true) => EntityType::FinnishCompany,
+        (EPPContactTraficomType::Company, false) => EntityType::OtherCompany,
+        (EPPContactTraficomType::Association, true) => EntityType::FinnishAssociation,
+        (EPPContactTraficomType::Association, false) => EntityType::OtherAssociation,
+        (EPPContactTraficomType::Institution, true) => EntityType::FinnishInstitution,
+        (EPPContactTraficomType::Institution, false) => EntityType::OtherInstitution,
+        (EPPContactTraficomType::PoliticalParty, true) => EntityType::FinnishPoliticalParty,
+        (EPPContactTraficomType::PoliticalParty, false) => EntityType::OtherPoliticalParty,
+        (EPPContactTraficomType::Municipality, true) => EntityType::FinnishMunicipality,
+        (EPPContactTraficomType::Municipality, false) => EntityType::OtherMunicipality,
+        (EPPContactTraficomType::Government, true) => EntityType::FinnishGovernment,
+        (EPPContactTraficomType::Government, false) => EntityType::OtherGovernment,
+        (EPPContactTraficomType::PublicCommunity, true) => EntityType::FinnishPublicCommunity,
+        (EPPContactTraficomType::PublicCommunity, false) => EntityType::OtherPublicCommunity,
+    }
+}
+
+fn is_entity_finnish(entity: &Option<EntityType>) -> bool {
+    match entity {
+        Some(e) => match e {
+            EntityType::FinnishIndividual | EntityType::FinnishCompany | EntityType::FinnishAssociation
+            | EntityType::FinnishInstitution | EntityType::FinnishGovernment | EntityType::FinnishMunicipality
+            | EntityType::FinnishPoliticalParty | EntityType::FinnishPublicCommunity => true,
+            _ => false
+        },
+        None => false
     }
 }
 
@@ -180,64 +252,65 @@ pub enum DisclosureType {
     Email = 9,
 }
 
-impl From<&DisclosureType> for proto::contact::EPPContactDisclosureItemSer {
+impl From<&DisclosureType> for proto::contact::EPPContactDisclosureItem {
     fn from(from: &DisclosureType) -> Self {
-        use proto::contact::EPPContactDisclosureItemSer;
+        use proto::contact::EPPContactDisclosureItem;
         use proto::contact::EPPContactPostalInfoType;
         match from {
-            DisclosureType::LocalName => EPPContactDisclosureItemSer::Name {
+            DisclosureType::LocalName => EPPContactDisclosureItem::Name {
                 addr_type: EPPContactPostalInfoType::Local,
             },
-            DisclosureType::InternationalisedName => EPPContactDisclosureItemSer::Name {
+            DisclosureType::InternationalisedName => EPPContactDisclosureItem::Name {
                 addr_type: EPPContactPostalInfoType::Internationalised,
             },
-            DisclosureType::LocalOrganisation => EPPContactDisclosureItemSer::Organisation {
+            DisclosureType::LocalOrganisation => EPPContactDisclosureItem::Organisation {
                 addr_type: EPPContactPostalInfoType::Local,
             },
             DisclosureType::InternationalisedOrganisation => {
-                EPPContactDisclosureItemSer::Organisation {
+                EPPContactDisclosureItem::Organisation {
                     addr_type: EPPContactPostalInfoType::Internationalised,
                 }
             }
-            DisclosureType::LocalAddress => EPPContactDisclosureItemSer::Address {
+            DisclosureType::LocalAddress => EPPContactDisclosureItem::Address {
                 addr_type: EPPContactPostalInfoType::Local,
             },
-            DisclosureType::InternationalisedAddress => EPPContactDisclosureItemSer::Address {
+            DisclosureType::InternationalisedAddress => EPPContactDisclosureItem::Address {
                 addr_type: EPPContactPostalInfoType::Internationalised,
             },
-            DisclosureType::Voice => EPPContactDisclosureItemSer::Voice {},
-            DisclosureType::Fax => EPPContactDisclosureItemSer::Fax {},
-            DisclosureType::Email => EPPContactDisclosureItemSer::Email {},
+            DisclosureType::Voice => EPPContactDisclosureItem::Voice {},
+            DisclosureType::Fax => EPPContactDisclosureItem::Fax {},
+            DisclosureType::Email => EPPContactDisclosureItem::Email {},
         }
     }
 }
 
-impl From<&proto::contact::EPPContactDisclosureItem> for DisclosureType {
+impl From<&proto::contact::EPPContactDisclosureItem> for Option<DisclosureType> {
     fn from(from: &proto::contact::EPPContactDisclosureItem) -> Self {
         use proto::contact::EPPContactDisclosureItem;
         use proto::contact::EPPContactPostalInfoType;
         match from {
+            EPPContactDisclosureItem::DisclosureType { .. } => None,
             EPPContactDisclosureItem::Name {
                 addr_type: EPPContactPostalInfoType::Local,
-            } => DisclosureType::LocalName,
+            } => Some(DisclosureType::LocalName),
             EPPContactDisclosureItem::Name {
                 addr_type: EPPContactPostalInfoType::Internationalised,
-            } => DisclosureType::InternationalisedName,
+            } => Some(DisclosureType::InternationalisedName),
             EPPContactDisclosureItem::Organisation {
                 addr_type: EPPContactPostalInfoType::Local,
-            } => DisclosureType::LocalOrganisation,
+            } => Some(DisclosureType::LocalOrganisation),
             EPPContactDisclosureItem::Organisation {
                 addr_type: EPPContactPostalInfoType::Internationalised,
-            } => DisclosureType::InternationalisedOrganisation,
+            } => Some(DisclosureType::InternationalisedOrganisation),
             EPPContactDisclosureItem::Address {
                 addr_type: EPPContactPostalInfoType::Local,
-            } => DisclosureType::LocalAddress,
+            } => Some(DisclosureType::LocalAddress),
             EPPContactDisclosureItem::Address {
                 addr_type: EPPContactPostalInfoType::Internationalised,
-            } => DisclosureType::InternationalisedAddress,
-            EPPContactDisclosureItem::Voice => DisclosureType::Voice,
-            EPPContactDisclosureItem::Fax => DisclosureType::Fax,
-            EPPContactDisclosureItem::Email => DisclosureType::Email,
+            } => Some(DisclosureType::InternationalisedAddress),
+            EPPContactDisclosureItem::Voice => Some(DisclosureType::Voice),
+            EPPContactDisclosureItem::Fax => Some(DisclosureType::Fax),
+            EPPContactDisclosureItem::Email => Some(DisclosureType::Email),
         }
     }
 }
@@ -307,9 +380,9 @@ impl From<proto::contact::EPPContactPhone> for Phone {
     }
 }
 
-impl From<&Phone> for proto::contact::EPPContactPhoneSer {
+impl From<&Phone> for proto::contact::EPPContactPhone {
     fn from(from: &Phone) -> Self {
-        proto::contact::EPPContactPhoneSer {
+        proto::contact::EPPContactPhone {
             number: from.number.clone(),
             extension: from.extension.clone()
         }
@@ -328,11 +401,14 @@ pub struct CreateRequest {
     trading_name: Option<String>,
     company_number: Option<String>,
     disclosure: Option<Vec<DisclosureType>>,
+    auth_info: String,
     pub return_path: Sender<CreateResponse>,
 }
 
 #[derive(Debug)]
 pub struct CreateResponse {
+    /// The actual contact ID created
+    pub id: String,
     /// Was the request completed instantly or not
     pub pending: bool,
     /// What date did the server log as the date of creation
@@ -365,6 +441,7 @@ pub struct UpdateRequest {
     new_trading_name: Option<String>,
     new_company_number: Option<String>,
     new_disclosure: Option<Vec<DisclosureType>>,
+    new_auth_info: Option<String>,
     pub return_path: Sender<UpdateResponse>,
 }
 
@@ -468,6 +545,8 @@ pub fn handle_info_response(response: proto::EPPResponse) -> Response<InfoRespon
                         province: p.address.province.clone(),
                         postal_code: p.address.postal_code.clone(),
                         country_code: p.address.country_code.clone(),
+                        identity_number: p.traficom_identity.clone(),
+                        birth_date: p.traficom_birth_date
                     }),
                     None => None,
                 };
@@ -484,6 +563,9 @@ pub fn handle_info_response(response: proto::EPPResponse) -> Response<InfoRespon
                     },
                     None => None,
                 };
+                let local_address = contact_info.postal_info.iter().find(|p| {
+                    p.addr_type == proto::contact::EPPContactPostalInfoType::Local
+                });
                 Response::Ok(InfoResponse {
                     id: contact_info.id,
                     statuses: contact_info
@@ -492,11 +574,7 @@ pub fn handle_info_response(response: proto::EPPResponse) -> Response<InfoRespon
                         .map(|s| s.status.into())
                         .collect(),
                     registry_id: contact_info.registry_id,
-                    local_address: map_addr(
-                        contact_info.postal_info.iter().find(|p| {
-                            p.addr_type == proto::contact::EPPContactPostalInfoType::Local
-                        }),
-                    ),
+                    local_address: map_addr(local_address),
                     internationalised_address: map_addr(contact_info.postal_info.iter().find(
                         |p| {
                             p.addr_type
@@ -518,20 +596,28 @@ pub fn handle_info_response(response: proto::EPPResponse) -> Response<InfoRespon
                     },
                     company_number: match &ext_info {
                         Some(e) => e.company_number.clone(),
-                        None => None,
+                        None => match local_address {
+                            Some(a) => a.traficom_register_number.clone(),
+                            None => None
+                        },
                     },
                     entity_type: match &ext_info {
-                        Some(e) => e
-                            .contact_type
-                            .as_ref()
-                            .map(|e| (&e.value).into())
-                            .unwrap_or(EntityType::Unknown),
-                        None => EntityType::Unknown,
+                        Some(e) => match &e.contact_type {
+                            Some(i) => i.into(),
+                            None =>EntityType::Unknown
+                        },
+                        None => match contact_info.traficom_type {
+                            Some(t) => traficom_type_to_entity_type(&t, match local_address {
+                                Some(a) => a.traficom_is_finnish.unwrap_or(false),
+                                None => false
+                            }),
+                            None => EntityType::Unknown
+                        },
                     },
                     disclosure: match contact_info.disclose {
                         Some(d) => {
                             if d.flag {
-                                d.elements.iter().map(|e| e.into()).collect()
+                                d.elements.iter().filter_map(|e| e.into()).collect()
                             } else {
                                 vec![]
                             }
@@ -590,15 +676,58 @@ pub fn handle_create(
         if a.streets.is_empty() {
             return Err(Response::Err("contact streets cannot be empty".to_string()));
         }
-        Ok(proto::contact::EPPContactPostalInfoSer {
+        let mut name_parts: Vec<&str> = a.name.rsplitn(2, " ").collect();
+        Ok(proto::contact::EPPContactPostalInfo {
             addr_type: t,
             name: a.name.clone(),
             organisation: a.organisation.clone(),
-            address: proto::contact::EPPContactAddressSer {
+            traficom_last_name: if client.has_erratum("traficom") {
+                Some(format!("{:.<2}", name_parts.pop().unwrap_or_default()))
+            } else {
+                None
+            },
+            traficom_first_name: if client.has_erratum("traficom") {
+                Some(format!("{:.<2}", name_parts.pop().unwrap_or_default()))
+            } else {
+                None
+            },
+            traficom_register_number: if client.has_erratum("traficom") {
+                req.company_number.clone()
+            } else {
+                None
+            },
+            traficom_is_finnish: if client.has_erratum("traficom") {
+                Some(is_entity_finnish(&req.entity_type))
+            } else {
+                None
+            },
+            traficom_birth_date: if client.has_erratum("traficom") {
+                match &req.entity_type {
+                    Some(i) => match (proto::traficom::EPPContactTraficomType::from(i), is_entity_finnish(&req.entity_type)) {
+                        (proto::traficom::EPPContactTraficomType::PrivatePerson, false) => a.birth_date,
+                        _ => None
+                    },
+                    None => None
+                }
+            } else {
+                None
+            },
+            traficom_identity: if client.has_erratum("traficom") {
+                match &req.entity_type {
+                    Some(i) => match (proto::traficom::EPPContactTraficomType::from(i), is_entity_finnish(&req.entity_type)) {
+                        (proto::traficom::EPPContactTraficomType::PrivatePerson, true) => a.identity_number.clone(),
+                        _ => None
+                    },
+                    None => None
+                }
+            } else {
+                None
+            },
+            address: proto::contact::EPPContactAddress {
                 streets: a.streets.clone(),
                 city: a.city.clone(),
                 province: a.province.clone(),
-                postal_code: a.postal_code.clone(),
+                postal_code: a.postal_code.as_ref().map(|s| s.replace(" ", "")),
                 country_code: a.country_code.clone(),
             },
         })
@@ -620,11 +749,14 @@ pub fn handle_create(
 
     let extension = if client.nominet_contact_ext {
         Some(proto::EPPCommandExtensionType::NominetContactExtCreate(
-            proto::nominet::EPPContactInfoSet {
-                contact_type: req
-                    .entity_type
-                    .as_ref()
-                    .map(|t| proto::nominet::EPPContactTypeVal { value: t.into() }),
+            proto::nominet::EPPContactInfo {
+                contact_type: match &req.entity_type {
+                    Some(i) => match i {
+                        EntityType::Unknown => None,
+                        i => Some(i.into())
+                    },
+                    None => None
+                },
                 trading_name: req.trading_name.clone(),
                 company_number: req.company_number.clone(),
             },
@@ -640,15 +772,36 @@ pub fn handle_create(
         fax: req.fax.as_ref().map(|p| p.into()),
         email: req.email.clone(),
         auth_info: proto::contact::EPPContactAuthInfo {
-            password: String::new(),
+            password: req.auth_info.clone(),
         },
         disclose: req.disclosure.clone().map(|mut d| {
             d.sort_unstable_by(|a, b| (*a as i32).cmp(&(*b as i32)));
-            proto::contact::EPPContactDisclosureSer {
-                flag: "1".to_string(),
+            proto::contact::EPPContactDisclosure {
+                flag: true,
                 elements: d.iter().map(|e| e.into()).collect(),
             }
         }),
+        traficom_role: if client.has_erratum("traficom") {
+            Some(proto::traficom::EPPContactTraficomRole::Registrant)
+        } else {
+            None
+        },
+        traficom_type: if client.has_erratum("traficom") {
+            match &req.entity_type {
+                Some(i) => match i {
+                    EntityType::Unknown => None,
+                    i => Some(i.into())
+                },
+                None => None
+            }
+        } else {
+            None
+        },
+        traficom_legal_email: if client.has_erratum("traficom") {
+            Some(req.email.clone())
+        } else {
+            None
+        }
     });
     Ok((proto::EPPCommandType::Create(command), extension))
 }
@@ -658,6 +811,7 @@ pub fn handle_create_response(response: proto::EPPResponse) -> Response<CreateRe
         Some(ref value) => match &value.value {
             proto::EPPResultDataValue::EPPContactCreateResult(contact_create) => {
                 Response::Ok(CreateResponse {
+                    id: contact_create.id.clone(),
                     pending: response.is_pending(),
                     creation_date: contact_create.creation_date,
                 })
@@ -743,7 +897,7 @@ pub fn handle_update(
             addr_type: t,
             name: Some(a.name.clone()),
             organisation: a.organisation.clone(),
-            address: Some(proto::contact::EPPContactAddressSer {
+            address: Some(proto::contact::EPPContactAddress {
                 streets: a.streets.clone(),
                 city: a.city.clone(),
                 province: a.province.clone(),
@@ -773,7 +927,7 @@ pub fn handle_update(
                 statuses: req
                     .add_statuses
                     .iter()
-                    .map(|s| proto::contact::EPPContactStatusSer { status: s.into() })
+                    .map(|s| proto::contact::EPPContactStatus { status: s.into() })
                     .collect(),
             })
         },
@@ -784,7 +938,7 @@ pub fn handle_update(
                 statuses: req
                     .remove_statuses
                     .iter()
-                    .map(|s| proto::contact::EPPContactStatusSer { status: s.into() })
+                    .map(|s| proto::contact::EPPContactStatus { status: s.into() })
                     .collect(),
             })
         },
@@ -798,22 +952,28 @@ pub fn handle_update(
                 postal_info,
                 disclose: req.new_disclosure.clone().map(|mut d| {
                     d.sort_unstable_by(|a, b| (*a as i32).cmp(&(*b as i32)));
-                    proto::contact::EPPContactDisclosureSer {
-                        flag: "1".to_string(),
+                    proto::contact::EPPContactDisclosure {
+                        flag: true,
                         elements: d.iter().map(|e| e.into()).collect(),
                     }
                 }),
+                auth_info: req.new_auth_info.as_ref().map(|p| proto::contact::EPPContactAuthInfo {
+                    password: p.clone()
+                })
             })
         },
     });
 
     let extension = if client.nominet_contact_ext {
         Some(proto::EPPCommandExtensionType::NominetContactExtUpdate(
-            proto::nominet::EPPContactInfoSet {
-                contact_type: req
-                    .new_entity_type
-                    .as_ref()
-                    .map(|t| proto::nominet::EPPContactTypeVal { value: t.into() }),
+            proto::nominet::EPPContactInfo {
+                contact_type: match &req.new_entity_type {
+                    Some(i) => match i {
+                        EntityType::Unknown => None,
+                        i => Some(i.into())
+                    },
+                    None => None
+                },
                 trading_name: req.new_trading_name.clone(),
                 company_number: req.new_company_number.clone(),
             },
@@ -988,6 +1148,7 @@ pub struct NewContactData {
     pub company_number: Option<String>,
     /// Elements the contact has consented to disclosure of
     pub disclosure: Option<Vec<DisclosureType>>,
+    pub auth_info: String,
 }
 
 /// Creates a new contact
@@ -1019,6 +1180,7 @@ pub async fn create(
             trading_name: data.trading_name,
             company_number: data.company_number,
             disclosure: data.disclosure,
+            auth_info: data.auth_info,
             return_path: sender,
         })),
         receiver,
@@ -1066,6 +1228,7 @@ pub struct UpdateContactData {
     pub company_number: Option<String>,
     /// Elements the contact has consented to disclosure of
     pub disclosure: Option<Vec<DisclosureType>>,
+    pub auth_info: Option<String>,
 }
 /// Updates an existing contact
 ///
@@ -1101,6 +1264,7 @@ pub async fn update(
             new_trading_name: new_data.trading_name,
             new_company_number: new_data.company_number,
             new_disclosure: new_data.disclosure,
+            new_auth_info: new_data.auth_info,
             return_path: sender,
         })),
         receiver,

@@ -2,17 +2,19 @@ use chrono::prelude::*;
 
 #[derive(Debug, Deserialize)]
 pub struct EPPChangeData {
-    #[serde(default)]
+    #[serde(rename = "$attr:state", default)]
     pub state: EPPChangeState,
+    #[serde(rename = "{urn:ietf:params:xml:ns:changePoll-1.0}operation")]
     pub operation: EPPChangeOperation,
-    #[serde(deserialize_with = "super::deserialize_datetime")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:changePoll-1.0}date", deserialize_with = "super::deserialize_datetime")]
     pub date: DateTime<Utc>,
-    #[serde(rename = "svTRID")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:changePoll-1.0}svTRID")]
     pub server_transaction_id: String,
+    #[serde(rename = "{urn:ietf:params:xml:ns:changePoll-1.0}who")]
     pub who: String,
-    #[serde(rename = "caseId", default)]
+    #[serde(rename = "{urn:ietf:params:xml:ns:changePoll-1.0}caseId", default)]
     pub case_id: Option<EPPChangeCaseId>,
-    #[serde(rename = "reason", default)]
+    #[serde(rename = "{urn:ietf:params:xml:ns:changePoll-1.0}reason", default)]
     pub reason: Option<String>,
 }
 
@@ -32,7 +34,7 @@ impl Default for EPPChangeState {
 
 #[derive(Debug, Deserialize)]
 pub struct EPPChangeOperation {
-    #[serde(rename = "op")]
+    #[serde(rename = "$attr:op")]
     pub operation: String,
     #[serde(rename = "$value")]
     pub op_type: EPPChangeOperationType,

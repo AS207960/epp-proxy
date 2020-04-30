@@ -2,53 +2,30 @@ use chrono::prelude::*;
 
 #[derive(Debug, Deserialize)]
 pub struct EPPTagListData {
-    #[serde(rename = "infData")]
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/nom-tag-1.0}infData")]
     pub tags: Vec<EPPTagInfoData>,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct EPPTagInfoData {
-    #[serde(rename = "registrar-tag")]
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/nom-tag-1.0}registrar-tag")]
     pub tag: String,
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/nom-tag-1.0}name")]
     pub name: String,
-    #[serde(rename = "trad-name")]
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/nom-tag-1.0}trad-name")]
     pub trading_name: Option<String>,
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/nom-tag-1.0}handshake")]
     pub handshake: String,
 }
 
-#[derive(Debug, Serialize)]
-pub struct EPPContactInfoSet {
-    #[serde(
-        rename = "contact-nom-ext:trad-name",
-        skip_serializing_if = "Option::is_none"
-    )]
-    pub trading_name: Option<String>,
-    #[serde(
-        rename = "contact-nom-ext:type",
-        skip_serializing_if = "Option::is_none"
-    )]
-    pub contact_type: Option<EPPContactTypeVal>,
-    #[serde(
-        rename = "contact-nom-ext:co-no",
-        skip_serializing_if = "Option::is_none"
-    )]
-    pub company_number: Option<String>,
-}
-
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct EPPContactInfo {
-    #[serde(rename = "trad-name")]
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/contact-nom-ext-1.0}contact-nom-ext:trad-name", skip_serializing_if = "Option::is_none")]
     pub trading_name: Option<String>,
-    #[serde(rename = "type", default)]
-    pub contact_type: Option<EPPContactTypeVal>,
-    #[serde(rename = "oco-no")]
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/contact-nom-ext-1.0}contact-nom-ext:type", default, skip_serializing_if = "Option::is_none")]
+    pub contact_type: Option<EPPContactType>,
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/contact-nom-ext-1.0}contact-nom-ext:co-no", skip_serializing_if = "Option::is_none")]
     pub company_number: Option<String>,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct EPPContactTypeVal {
-    #[serde(rename = "$value")]
-    pub value: EPPContactType,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -91,7 +68,15 @@ pub enum EPPContactType {
 
 #[derive(Debug, Deserialize)]
 pub struct EPPIgnoredField {
-    #[serde(rename = "field-name")]
+    #[serde(rename = "$attr:field-name")]
+    pub field_name: String,
+    #[serde(rename = "$value")]
+    pub message: String,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct EPPTruncatedField {
+    #[serde(rename = "$attr:field-name")]
     pub field_name: String,
     #[serde(rename = "$value")]
     pub message: String,
@@ -99,30 +84,32 @@ pub struct EPPIgnoredField {
 
 #[derive(Debug, Deserialize)]
 pub struct EPPDataQualityInfo {
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/nom-data-quality-1.1}status")]
     pub status: String,
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/nom-data-quality-1.1}reason")]
     pub reason: Option<String>,
     #[serde(
-        rename = "dateCommenced",
+        rename = "{http://www.nominet.org.uk/epp/xml/nom-data-quality-1.1}dateCommenced",
         deserialize_with = "super::deserialize_datetime_opt",
         default
     )]
     pub date_commenced: Option<DateTime<Utc>>,
     #[serde(
-        rename = "dateToSuspend",
+        rename = "{http://www.nominet.org.uk/epp/xml/nom-data-quality-1.1}dateToSuspend",
         deserialize_with = "super::deserialize_datetime_opt",
         default
     )]
     pub date_to_suspend: Option<DateTime<Utc>>,
-    #[serde(rename = "lockApplied")]
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/nom-data-quality-1.1}lockApplied")]
     pub lock_applied: Option<String>,
-    #[serde(rename = "domainListData", default)]
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/nom-data-quality-1.1}domainListData", default)]
     pub domains: Option<EPPDataQualityDomainListInfo>,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct EPPDataQualityDomainListInfo {
-    #[serde(rename = "noDomains")]
+    #[serde(rename = "$attr:noDomains")]
     pub num_domains: u32,
-    #[serde(rename = "domainName")]
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/nom-data-quality-1.1}domainName")]
     pub domains: Vec<String>,
 }

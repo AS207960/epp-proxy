@@ -1,0 +1,53 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:host="urn:ietf:params:xml:ns:host-1.0" attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="urn:ietf:params:xml:ns:epp-1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:import namespace="urn:ietf:params:xml:ns:host-1.0" />
+  <xs:element name="epp">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="command">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="check">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element ref="host:check" />
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="create">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element ref="host:create" />
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="delete">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element ref="host:delete" />
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="info">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element ref="host:info" />
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="update">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element ref="host:update" />
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="clTRID" type="xs:string" />
+              <xs:element name="svTRID" type="xs:string" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

@@ -1,105 +1,71 @@
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct EPPSecDNSData {
-    #[serde(rename = "maxSigLife")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:secDNS-1.1}secDNS:maxSigLife", skip_serializing_if = "Option::is_none")]
     pub max_signature_life: Option<i64>,
-    #[serde(rename = "dsData")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:secDNS-1.1}secDNS:dsData", default)]
     pub ds_data: Vec<EPPSecDNSDSData>,
-    #[serde(rename = "keyData")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:secDNS-1.1}secDNS:keyData", default)]
     pub key_data: Vec<EPPSecDNSKeyData>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct EPPSecDNSDSData {
-    #[serde(rename = "keyTag")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:secDNS-1.1}secDNS:keyTag")]
     pub key_tag: u16,
-    #[serde(rename = "alg")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:secDNS-1.1}secDNS:alg")]
     pub algorithm: u8,
-    #[serde(rename = "digestType")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:secDNS-1.1}secDNS:digestType")]
     pub digest_type: u8,
-    #[serde(rename = "digest")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:secDNS-1.1}secDNS:digest")]
     pub digest: String,
-    #[serde(rename = "keyData")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:secDNS-1.1}secDNS:keyData", skip_serializing_if = "Option::is_none", default)]
     pub key_data: Option<EPPSecDNSKeyData>
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct EPPSecDNSKeyData {
+    #[serde(rename = "{urn:ietf:params:xml:ns:secDNS-1.1}secDNS:flags")]
     pub flags: u16,
+    #[serde(rename = "{urn:ietf:params:xml:ns:secDNS-1.1}secDNS:protocol")]
     pub protocol: u8,
-    #[serde(rename = "alg")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:secDNS-1.1}secDNS:alg")]
     pub algorithm: u8,
-    #[serde(rename = "pubKey")]
-    pub public_key: String
-}
-
-#[derive(Debug, Serialize)]
-pub struct EPPSecDNSCreate {
-    #[serde(rename = "secDNS:maxSigLife", skip_serializing_if = "Option::is_none")]
-    pub max_signature_life: Option<i64>,
-    #[serde(rename = "secDNS:dsData")]
-    pub ds_data: Vec<EPPSecDNSDSDataSer>,
-    #[serde(rename = "secDNS:keyData")]
-    pub key_data: Vec<EPPSecDNSKeyDataSer>,
-}
-
-#[derive(Debug, Serialize)]
-pub struct EPPSecDNSDSDataSer {
-    #[serde(rename = "secDNS:keyTag")]
-    pub key_tag: u16,
-    #[serde(rename = "secDNS:alg")]
-    pub algorithm: u8,
-    #[serde(rename = "secDNS:digestType")]
-    pub digest_type: u8,
-    #[serde(rename = "secDNS:digest")]
-    pub digest: String,
-    #[serde(rename = "secDNS:keyData")]
-    pub key_data: Option<EPPSecDNSKeyDataSer>
-}
-
-#[derive(Debug, Serialize)]
-pub struct EPPSecDNSKeyDataSer {
-    #[serde(rename = "secDNS:flags")]
-    pub flags: u16,
-    #[serde(rename = "secDNS:protocol")]
-    pub protocol: u8,
-    #[serde(rename = "secDNS:alg")]
-    pub algorithm: u8,
-    #[serde(rename = "secDNS:pubKey")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:secDNS-1.1}secDNS:pubKey")]
     pub public_key: String
 }
 
 #[derive(Debug, Serialize)]
 pub struct EPPSecDNSUpdate {
-    #[serde(rename = "$attr:urgent")]
-    pub urgent: bool,
-    #[serde(rename = "secDNS:add", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "$attr:urgent", skip_serializing_if = "Option::is_none", serialize_with = "super::serialize_opt_bool")]
+    pub urgent: Option<bool>,
+    #[serde(rename = "{urn:ietf:params:xml:ns:secDNS-1.1}secDNS:add", skip_serializing_if = "Option::is_none")]
     pub add: Option<EPPSecDNSUpdateAdd>,
-    #[serde(rename = "secDNS:rem", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:secDNS-1.1}secDNS:rem", skip_serializing_if = "Option::is_none")]
     pub remove: Option<EPPSecDNSUpdateRemove>,
-    #[serde(rename = "secDNS:chg", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:secDNS-1.1}secDNS:chg", skip_serializing_if = "Option::is_none")]
     pub change: Option<EPPSecDNSUpdateChange>,
 }
 
 #[derive(Debug, Serialize)]
 pub struct EPPSecDNSUpdateAdd {
-    #[serde(rename = "secDNS:all", skip_serializing_if = "Option::is_none")]
-    pub all: Option<bool>,
-    #[serde(rename = "secDNS:dsData")]
-    pub ds_data: Vec<EPPSecDNSDSDataSer>,
-    #[serde(rename = "secDNS:keyData")]
-    pub key_data: Vec<EPPSecDNSKeyDataSer>,
+    #[serde(rename = "{urn:ietf:params:xml:ns:secDNS-1.1}secDNS:dsData")]
+    pub ds_data: Vec<EPPSecDNSDSData>,
+    #[serde(rename = "{urn:ietf:params:xml:ns:secDNS-1.1}secDNS:keyData")]
+    pub key_data: Vec<EPPSecDNSKeyData>,
 }
 
 #[derive(Debug, Serialize)]
 pub struct EPPSecDNSUpdateRemove {
-    #[serde(rename = "secDNS:dsData")]
-    pub ds_data: Vec<EPPSecDNSDSDataSer>,
-    #[serde(rename = "secDNS:keyData")]
-    pub key_data: Vec<EPPSecDNSKeyDataSer>,
+    #[serde(rename = "{urn:ietf:params:xml:ns:secDNS-1.1}secDNS:all", skip_serializing_if = "Option::is_none", serialize_with = "super::serialize_opt_bool")]
+    pub all: Option<bool>,
+    #[serde(rename = "{urn:ietf:params:xml:ns:secDNS-1.1}secDNS:dsData")]
+    pub ds_data: Vec<EPPSecDNSDSData>,
+    #[serde(rename = "{urn:ietf:params:xml:ns:secDNS-1.1}secDNS:keyData")]
+    pub key_data: Vec<EPPSecDNSKeyData>,
 }
 
 #[derive(Debug, Serialize)]
 pub struct EPPSecDNSUpdateChange {
-    #[serde(rename = "secDNS:maxSigLife", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:secDNS-1.1}secDNS:maxSigLife", skip_serializing_if = "Option::is_none")]
     pub max_signature_life: Option<i64>,
 }

@@ -47,7 +47,7 @@ pub fn handle_restore(
     client: &EPPClientServerFeatures,
     req: &RestoreRequest,
 ) -> HandleReqReturn<RestoreResponse> {
-    if !client.rgp_supported {
+    if !(client.rgp_supported || client.has_erratum("traficom")) {
         return Err(Response::Unsupported);
     }
     if req.name.is_empty() {
@@ -55,25 +55,36 @@ pub fn handle_restore(
             "domain name has a min length of 1".to_string(),
         ));
     }
-    let command = proto::EPPUpdate::Domain(proto::domain::EPPDomainUpdate {
-        name: req.name.clone(),
-        add: None,
-        remove: None,
-        change: Some(proto::domain::EPPDomainUpdateChange {
-            registrant: None,
-            auth_info: None,
-        }),
-    });
-    let ext = proto::rgp::EPPRGPUpdate {
-        restore: proto::rgp::EPPRGPRestore {
-            operation: proto::rgp::EPPRGPRestoreOperation::Request,
-            report: None,
-        },
-    };
-    Ok((
-        proto::EPPCommandType::Update(Box::new(command)),
-        Some(proto::EPPCommandExtensionType::EPPRGPUpdate(ext)),
-    ))
+    if client.has_erratum("traficom") {
+        let command = proto::EPPDelete::Domain(proto::domain::EPPDomainCheck {
+            name: req.name.clone(),
+        });
+        let ext = proto::traficom::EPPDomainDelete::Cancel {};
+        Ok((
+            proto::EPPCommandType::Delete(command),
+            Some(proto::EPPCommandExtensionType::TraficomDelete(ext)),
+        ))
+    } else {
+        let command = proto::EPPUpdate::Domain(proto::domain::EPPDomainUpdate {
+            name: req.name.clone(),
+            add: None,
+            remove: None,
+            change: Some(proto::domain::EPPDomainUpdateChange {
+                registrant: None,
+                auth_info: None,
+            }),
+        });
+        let ext = proto::rgp::EPPRGPUpdate {
+            restore: proto::rgp::EPPRGPRestore {
+                operation: proto::rgp::EPPRGPRestoreOperation::Request,
+                report: None,
+            },
+        };
+        Ok((
+            proto::EPPCommandType::Update(Box::new(command)),
+            Some(proto::EPPCommandExtensionType::EPPRGPUpdate(ext)),
+        ))
+    }
 }
 
 pub fn handle_restore_response(response: proto::EPPResponse) -> Response<RestoreResponse> {

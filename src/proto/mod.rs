@@ -14,44 +14,45 @@ pub mod secdns;
 pub mod switch;
 pub mod verisign;
 pub mod centralnic;
+pub mod traficom;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub enum EPPMessageType {
-    #[serde(rename = "hello", skip_deserializing)]
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp-1.0}hello", skip_deserializing)]
     Hello {},
-    #[serde(rename = "greeting", skip_serializing)]
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp-1.0}greeting", skip_serializing)]
     Greeting(EPPGreeting),
-    #[serde(rename = "command", skip_deserializing)]
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp-1.0}command", skip_deserializing)]
     Command(Box<EPPCommand>),
-    #[serde(rename = "response", skip_serializing)]
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp-1.0}response", skip_serializing)]
     Response(Box<EPPResponse>),
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct EPPMessage {
-    #[serde(rename = "$value")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp-1.0}epp")]
     pub message: EPPMessageType,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct EPPGreeting {
-    #[serde(rename = "svID")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp-1.0}svID")]
     pub server_id: String,
-    #[serde(rename = "svDate")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp-1.0}svDate")]
     pub server_date: DateTime<Utc>,
-    #[serde(rename = "svcMenu")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp-1.0}svcMenu")]
     pub service_menu: EPPServiceMenu,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct EPPServiceMenu {
-    #[serde(rename = "version")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp-1.0}version")]
     pub versions: Vec<String>,
-    #[serde(rename = "lang")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp-1.0}lang")]
     pub languages: Vec<String>,
-    #[serde(rename = "objURI")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp-1.0}objURI")]
     pub objects: Vec<String>,
-    #[serde(rename = "svcExtension")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp-1.0}svcExtension")]
     pub extension: Option<EPPServiceExtension>,
 }
 
@@ -68,31 +69,31 @@ impl EPPServiceMenu {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct EPPServiceExtension {
-    #[serde(rename = "extURI")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp-1.0}extURI")]
     pub extensions: Vec<String>,
 }
 
 #[derive(Debug, Serialize)]
 pub enum EPPCommandType {
-    #[serde(rename = "login")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp-1.0}login")]
     Login(EPPLogin),
-    #[serde(rename = "logout")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp-1.0}logout")]
     Logout {},
-    #[serde(rename = "check")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp-1.0}check")]
     Check(EPPCheck),
-    #[serde(rename = "info")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp-1.0}info")]
     Info(EPPInfo),
-    #[serde(rename = "create")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp-1.0}create")]
     Create(EPPCreate),
-    #[serde(rename = "delete")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp-1.0}delete")]
     Delete(EPPDelete),
-    #[serde(rename = "update")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp-1.0}update")]
     Update(Box<EPPUpdate>),
-    #[serde(rename = "renew")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp-1.0}renew")]
     Renew(EPPRenew),
-    #[serde(rename = "transfer")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp-1.0}transfer")]
     Transfer(EPPTransfer),
-    #[serde(rename = "poll")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp-1.0}poll")]
     Poll(EPPPoll),
 }
 
@@ -101,67 +102,49 @@ pub enum EPPCommandExtensionType {
     #[serde(
         rename = "{http://www.nominet.org.uk/epp/xml/contact-nom-ext-1.0}contact-nom-ext:create"
     )]
-    NominetContactExtCreate(nominet::EPPContactInfoSet),
+    NominetContactExtCreate(nominet::EPPContactInfo),
     #[serde(
         rename = "{http://www.nominet.org.uk/epp/xml/contact-nom-ext-1.0}contact-nom-ext:update"
     )]
-    NominetContactExtUpdate(nominet::EPPContactInfoSet),
+    NominetContactExtUpdate(nominet::EPPContactInfo),
     #[serde(rename = "{urn:ietf:params:xml:ns:rgp-1.0}rgp:update")]
     EPPRGPUpdate(rgp::EPPRGPUpdate),
     #[serde(rename = "{urn:ietf:params:xml:ns:secDNS-1.1}secDNS:create")]
-    EPPSecDNSCreate(secdns::EPPSecDNSCreate),
+    EPPSecDNSCreate(secdns::EPPSecDNSData),
     #[serde(rename = "{urn:ietf:params:xml:ns:secDNS-1.1}secDNS:update")]
     EPPSecDNSUpdate(secdns::EPPSecDNSUpdate),
+    #[serde(rename = "{urn:ietf:params:xml:ns:domain-ext-1.0}domain-ext:delete")]
+    TraficomDelete(traficom::EPPDomainDelete)
 }
 
 #[derive(Debug, Serialize)]
 pub struct EPPCommand {
     #[serde(rename = "$value")]
     pub command: EPPCommandType,
-    #[serde(rename = "extension", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp-1.0}extension", skip_serializing_if = "Option::is_none")]
     pub extension: Option<EPPCommandExtensionType>,
-    #[serde(rename = "clTRID", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp-1.0}clTRID", skip_serializing_if = "Option::is_none")]
     pub client_transaction_id: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]
-pub enum EPPResponseExtensionType {
-    #[serde(rename = "contact-nom-ext:infData")]
-    NominetContactExtInfo(nominet::EPPContactInfo),
-    #[serde(rename = "warning:ignored-field")]
-    NominetIgnoredField(nominet::EPPIgnoredField),
-    #[serde(rename = "nom-data-quality:infData")]
-    NominetDataQuality(nominet::EPPDataQualityInfo),
-    #[serde(rename = "changePoll:changeData")]
-    EPPChangePoll(change_poll::EPPChangeData),
-    #[serde(rename = "rgp:infData")]
-    EPPRGPInfo(rgp::EPPRGPData),
-    #[serde(rename = "rgp:upData")]
-    EPPRGPUpdate(rgp::EPPRGPData),
-    #[serde(rename = "secDNS:infData")]
-    EPPSecDNSInfo(secdns::EPPSecDNSData),
-    #[serde(rename = "regtype:infData")]
-    EPPCentralnicRegTypeInfoResult(centralnic::EPPRegType),
+pub struct EPPResponse {
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp-1.0}result")]
+    pub results: Vec<EPPResult>,
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp-1.0}extension", default)]
+    pub extension: Option<EPPResponseExtension>,
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp-1.0}msgQ", default)]
+    pub message_queue: Option<EPPMessageQueue>,
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp-1.0}resData", default)]
+    pub data: Option<EPPResultData>,
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp-1.0}trID")]
+    pub transaction_id: EPPTransactionIdentifier,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct EPPResponseExtension {
-    #[serde(rename = "$value")]
-    pub value: Vec<EPPResponseExtensionType>,
-}
-
-#[derive(Debug, Deserialize)]
-pub struct EPPResponse {
-    #[serde(rename = "result")]
-    pub results: Vec<EPPResult>,
-    #[serde(rename = "extension", default)]
-    pub extension: Option<EPPResponseExtension>,
-    #[serde(rename = "msgQ")]
-    pub message_queue: Option<EPPMessageQueue>,
-    #[serde(rename = "resData")]
-    pub data: Option<EPPResultData>,
-    #[serde(rename = "trID")]
-    pub transaction_id: EPPTransactionIdentifier,
+    #[serde(rename = "$value", default)]
+    pub value: Vec<EPPResponseExtensionType>
 }
 
 impl EPPResponse {
@@ -200,7 +183,7 @@ impl EPPResponse {
                             .value
                             .iter()
                             .next()
-                            .map(|(k, v)| format!("{}: {}", k, v))
+                            .map(|(k, v)| format!("{}: {}", k, v.as_deref().unwrap_or("")))
                             .unwrap_or_default();
                         format!("({}) {}", val, e.reason)
                     })
@@ -225,12 +208,13 @@ impl EPPResponse {
 
 #[derive(Debug, Deserialize)]
 pub struct EPPResult {
+    #[serde(rename = "$attr:code")]
     pub code: EPPResultCode,
-    #[serde(rename = "msg")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp-1.0}msg")]
     pub message: String,
-    #[serde(rename = "value")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp-1.0}value")]
     pub values: Option<Vec<HashMap<String, String>>>,
-    #[serde(rename = "extValue")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp-1.0}extValue")]
     pub extra_values: Option<Vec<EPPResultExtraValue>>,
 }
 
@@ -410,17 +394,21 @@ impl<'de> serde::Deserialize<'de> for EPPResultCode {
 
 #[derive(Debug, Deserialize)]
 pub struct EPPResultExtraValue {
-    pub value: HashMap<String, String>,
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp-1.0}value")]
+    pub value: HashMap<String, Option<String>>,
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp-1.0}reason")]
     pub reason: String,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct EPPMessageQueue {
+    #[serde(rename = "$attr:count")]
     pub count: u64,
+    #[serde(rename = "$attr:id")]
     pub id: String,
-    #[serde(rename = "qDate")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp-1.0}qDate")]
     pub enqueue_date: Option<DateTime<Utc>>,
-    #[serde(rename = "msg")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp-1.0}msg")]
     pub message: Option<String>,
 }
 
@@ -432,72 +420,96 @@ pub struct EPPResultData {
 
 #[derive(Debug, Deserialize)]
 pub enum EPPResultDataValue {
-    #[serde(rename = "domain:chkData")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:domain-1.0}chkData")]
     EPPDomainCheckResult(domain::EPPDomainCheckData),
-    #[serde(rename = "domain:infData")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:domain-1.0}infData")]
     EPPDomainInfoResult(Box<domain::EPPDomainInfoData>),
-    #[serde(rename = "domain:trnData")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:domain-1.0}trnData")]
     EPPDomainTransferResult(domain::EPPDomainTransferData),
-    #[serde(rename = "domain:creData")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:domain-1.0}creData")]
     EPPDomainCreateResult(domain::EPPDomainCreateData),
-    #[serde(rename = "domain:renData")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:domain-1.0}renData")]
     EPPDomainRenewResult(domain::EPPDomainRenewData),
-    #[serde(rename = "domain:panData")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:domain-1.0}panData")]
     EPPDomainPendingActionNotification(domain::EPPDomainPanData),
-    #[serde(rename = "host:chkData")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:host-1.0}chkData")]
     EPPHostCheckResult(host::EPPHostCheckData),
-    #[serde(rename = "host:infData")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:host-1.0}infData")]
     EPPHostInfoResult(Box<host::EPPHostInfoData>),
-    #[serde(rename = "host:creData")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:host-1.0}creData")]
     EPPHostCreateResult(host::EPPHostCreateData),
-    #[serde(rename = "contact:chkData")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:contact-1.0}chkData")]
     EPPContactCheckResult(contact::EPPContactCheckData),
-    #[serde(rename = "contact:infData")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:contact-1.0}infData")]
     EPPContactInfoResult(Box<contact::EPPContactInfoData>),
-    #[serde(rename = "contact:trnData")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:contact-1.0}trnData")]
     EPPContactTransferResult(contact::EPPContactTransferData),
-    #[serde(rename = "contact:creData")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:contact-1.0}creData")]
     EPPContactCreateResult(contact::EPPContactCreateData),
-    #[serde(rename = "tag:listData")]
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/nom-tag-1.0}listData")]
     EPPNominetTagInfoResult(nominet::EPPTagListData),
-    #[serde(rename = "balance:infData")]
+    #[serde(rename = "{https://www.nic.ch/epp/balance-1.0}infData")]
     EPPSwitchBalanceInfoResult(switch::EPPBalance),
 }
 
 #[derive(Debug, Deserialize)]
 pub struct EPPTransactionIdentifier {
-    #[serde(rename = "clTRID")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp-1.0}clTRID")]
     pub client_transaction_id: Option<String>,
-    #[serde(rename = "svTRID")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp-1.0}svTRID")]
     pub server_transaction_id: Option<String>,
 }
 
 #[derive(Debug, Serialize)]
 pub struct EPPLogin {
-    #[serde(rename = "clID")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp-1.0}clID")]
     pub client_id: String,
-    #[serde(rename = "pw")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp-1.0}pw")]
     pub password: String,
-    #[serde(rename = "newPW", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp-1.0}newPW", skip_serializing_if = "Option::is_none")]
     pub new_password: Option<String>,
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp-1.0}options")]
     pub options: EPPLoginOptions,
-    #[serde(rename = "svcs")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp-1.0}svcs")]
     pub services: EPPLoginServices,
 }
 
 #[derive(Debug, Serialize)]
 pub struct EPPLoginOptions {
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp-1.0}version")]
     pub version: String,
-    #[serde(rename = "lang")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp-1.0}lang")]
     pub language: String,
 }
 
 #[derive(Debug, Serialize)]
 pub struct EPPLoginServices {
-    #[serde(rename = "objURI")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp-1.0}objURI")]
     pub objects: Vec<String>,
-    #[serde(rename = "svcExtension", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp-1.0}svcExtension", skip_serializing_if = "Option::is_none")]
     pub extension: Option<EPPServiceExtension>,
+}
+
+#[derive(Debug, Deserialize)]
+pub enum EPPResponseExtensionType {
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/contact-nom-ext-1.0}infData")]
+    NominetContactExtInfo(nominet::EPPContactInfo),
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/std-warning-1.1}ignored-field")]
+    NominetIgnoredField(nominet::EPPIgnoredField),
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/std-warning-1.1}truncated-field")]
+    NominetTruncatedField(nominet::EPPTruncatedField),
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/nom-data-quality-1.1}infData")]
+    NominetDataQuality(nominet::EPPDataQualityInfo),
+    #[serde(rename = "{urn:ietf:params:xml:ns:changePoll-1.0}changeData")]
+    EPPChangePoll(change_poll::EPPChangeData),
+    #[serde(rename = "{urn:ietf:params:xml:ns:rgp-1.0}infData")]
+    EPPRGPInfo(rgp::EPPRGPData),
+    #[serde(rename = "{urn:ietf:params:xml:ns:rgp-1.0}upData")]
+    EPPRGPUpdate(rgp::EPPRGPData),
+    #[serde(rename = "{urn:ietf:params:xml:ns:secDNS-1.1}infData")]
+    EPPSecDNSInfo(secdns::EPPSecDNSData),
+    #[serde(rename = "{urn:ietf:params:xml:ns:regtype-0.1}infData")]
+    EPPCentralnicRegTypeInfoResult(centralnic::EPPRegType),
 }
 
 #[derive(Debug, Serialize)]
@@ -643,9 +655,10 @@ impl<'de> serde::de::Visitor<'de> for DateTimeVisitor {
     {
         match value.parse::<DateTime<Utc>>() {
             Ok(v) => Ok(v.with_timezone(&Utc)),
-            Err(_) => Utc
-                .datetime_from_str("2019-04-04T20:00:09", "%FT%T")
-                .map_err(E::custom),
+            Err(_) => match Utc.datetime_from_str(value, "%FT%T%.f") {
+                Ok(t) => Ok(t),
+                Err(_) => Utc.datetime_from_str(value, "%FT%T").map_err(E::custom),
+            }
         }
     }
 }
@@ -685,7 +698,15 @@ fn deserialize_datetime_opt<'de, D>(d: D) -> Result<Option<DateTime<Utc>>, D::Er
 where
     D: serde::de::Deserializer<'de>,
 {
-    d.deserialize_option(OptDateTimeVisitor)
+    let date = d.deserialize_option(OptDateTimeVisitor)?;
+    Ok(match date {
+        Some(d) => if d == Utc.ymd(0001, 01, 01).and_hms(0, 0, 0) {
+            None
+        } else {
+            Some(d)
+        },
+        None => None
+    })
 }
 
 #[allow(clippy::trivially_copy_pass_by_ref)]
@@ -694,4 +715,20 @@ where
     S: serde::ser::Serializer,
 {
     s.serialize_str(&d.format("%Y-%m-%d").to_string())
+}
+
+
+#[allow(clippy::trivially_copy_pass_by_ref)]
+fn serialize_opt_bool<S>(d: &Option<bool>, s: S) -> Result<S::Ok, S::Error>
+where
+    S: serde::ser::Serializer,
+{
+    match d {
+        Some(d) => if *d {
+            s.serialize_str("true")
+        } else {
+            s.serialize_str("false")
+        },
+        None => s.serialize_none()
+    }
 }

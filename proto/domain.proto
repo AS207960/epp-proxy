@@ -11,8 +11,11 @@ message Contact {
     string type = 2;
 }
 message NameServer {
-    string host = 1;
-    common.IPAddress address = 2;
+    oneof server {
+        string host_obj = 1;
+        string host_name = 3;
+    }
+    repeated common.IPAddress addresses = 2;
 }
 message Period {
     enum Unit {
@@ -76,6 +79,7 @@ message DomainInfoReply {
     string registry_name = 15;
     rgp.RGPState rgp_state = 16;
     google.protobuf.StringValue auth_info = 17;
+    SecDNSData sec_dns = 18;
 }
 
 message DomainCreateRequest {
@@ -85,13 +89,15 @@ message DomainCreateRequest {
     repeated Contact contacts = 4;
     repeated NameServer nameservers = 5;
     string auth_info = 6;
+    SecDNSData sec_dns = 7;
 }
 
 message DomainCreateReply {
-    bool pending = 1;
-    google.protobuf.Timestamp creation_date = 2;
-    google.protobuf.Timestamp expiry_date = 3;
-    string registry_name = 4;
+    string name = 1;
+    bool pending = 2;
+    google.protobuf.Timestamp creation_date = 3;
+    google.protobuf.Timestamp expiry_date = 4;
+    string registry_name = 5;
 }
 
 message DomainDeleteRequest {
@@ -117,6 +123,7 @@ message DomainUpdateRequest {
     repeated Param remove = 3;
     google.protobuf.StringValue new_registrant = 4;
     google.protobuf.StringValue new_auth_info = 5;
+    UpdateSecDNSData sec_dns = 6;
 }
 
 message DomainUpdateReply {
@@ -161,4 +168,49 @@ message DomainTransferReply {
     google.protobuf.Timestamp act_date = 6;
     google.protobuf.Timestamp expiry_date = 7;
     string registry_name = 8;
+}
+
+message SecDNSData {
+    google.protobuf.Int64Value max_sig_life = 1;
+    oneof data {
+        SecDNSDSData ds_data = 2;
+        SecDNSKeyData key_data = 3;
+    }
+}
+
+message SecDNSDSData {
+    repeated SecDNSDSDatum data = 1;
+}
+
+message SecDNSDSDatum {
+    uint32 key_tag = 1;
+    uint32 algorithm = 2;
+    uint32 digest_type = 3;
+    string digest = 4;
+    SecDNSKeyDatum key_data = 5;
+}
+
+message SecDNSKeyData {
+    repeated SecDNSKeyDatum data = 1;
+}
+
+message SecDNSKeyDatum {
+    uint32 flags = 1;
+    uint32 protocol = 2;
+    uint32 algorithm = 3;
+    string public_key = 4;
+}
+
+message UpdateSecDNSData {
+    google.protobuf.BoolValue urgent = 1;
+    google.protobuf.Int64Value new_max_sig_life = 2;
+    oneof add {
+        SecDNSDSData add_ds_data = 3;
+        SecDNSKeyData add_key_data = 4;
+    }
+    oneof remove {
+        bool remove_all = 5;
+        SecDNSDSData remove_ds_data = 6;
+        SecDNSKeyData remove_key_data = 7;
+    }
 }

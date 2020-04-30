@@ -53,8 +53,9 @@ message HostCreateRequest {
 }
 
 message HostCreateReply {
-    bool pending = 1;
-    google.protobuf.Timestamp creation_date = 2;
+    string name = 1;
+    bool pending = 2;
+    google.protobuf.Timestamp creation_date = 3;
 }
 
 message HostDeleteRequest {

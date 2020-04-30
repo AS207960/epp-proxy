@@ -2,21 +2,21 @@ use chrono::prelude::*;
 
 #[derive(Debug, Serialize)]
 pub struct EPPHostCheck {
-    #[serde(rename = "host:name")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:host-1.0}host:name")]
     pub name: String,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct EPPHostCheckData {
-    #[serde(rename = "cd", default)]
+    #[serde(rename = "{urn:ietf:params:xml:ns:host-1.0}cd", default)]
     pub data: Vec<EPPHostCheckDatum>,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct EPPHostCheckDatum {
-    #[serde(rename = "name")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:host-1.0}name")]
     pub name: EPPHostCheckName,
-    #[serde(rename = "reason")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:host-1.0}reason")]
     pub reason: Option<String>,
 }
 
@@ -24,53 +24,48 @@ pub struct EPPHostCheckDatum {
 pub struct EPPHostCheckName {
     #[serde(rename = "$value")]
     pub name: String,
-    #[serde(rename = "avail")]
+    #[serde(rename = "$attr:avail")]
     pub available: bool,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct EPPHostInfoData {
+    #[serde(rename = "{urn:ietf:params:xml:ns:host-1.0}name")]
     pub name: String,
-    #[serde(rename = "roid")]
-    pub registry_id: String,
-    #[serde(rename = "status", default)]
+    #[serde(rename = "{urn:ietf:params:xml:ns:host-1.0}roid", default)]
+    pub registry_id: Option<String>,
+    #[serde(rename = "{urn:ietf:params:xml:ns:host-1.0}status", default)]
     pub statuses: Vec<EPPHostStatus>,
-    #[serde(rename = "addr", default)]
+    #[serde(rename = "{urn:ietf:params:xml:ns:host-1.0}addr", default)]
     pub addresses: Vec<EPPHostAddress>,
-    #[serde(rename = "clID")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:host-1.0}clID")]
     pub client_id: String,
-    #[serde(rename = "crID")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:host-1.0}crID")]
     pub client_created_id: Option<String>,
     #[serde(
-        rename = "crDate",
+        rename = "{urn:ietf:params:xml:ns:host-1.0}crDate",
         deserialize_with = "super::deserialize_datetime_opt",
         default
     )]
     pub creation_date: Option<DateTime<Utc>>,
-    #[serde(rename = "upID")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:host-1.0}upID")]
     pub last_updated_client: Option<String>,
     #[serde(
-        rename = "upDate",
+        rename = "{urn:ietf:params:xml:ns:host-1.0}upDate",
         deserialize_with = "super::deserialize_datetime_opt",
         default
     )]
     pub last_updated_date: Option<DateTime<Utc>>,
     #[serde(
-        rename = "trDate",
+        rename = "{urn:ietf:params:xml:ns:host-1.0}trDate",
         deserialize_with = "super::deserialize_datetime_opt",
         default
     )]
     pub last_transfer_date: Option<DateTime<Utc>>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct EPPHostStatus {
-    #[serde(rename = "s")]
-    pub status: EPPHostStatusType,
-}
-
-#[derive(Debug, Serialize)]
-pub struct EPPHostStatusSer {
     #[serde(rename = "$attr:s")]
     pub status: EPPHostStatusType,
 }
@@ -99,11 +94,11 @@ pub enum EPPHostStatusType {
     ServerUpdateProhibited,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct EPPHostAddress {
     #[serde(rename = "$value")]
     pub address: String,
-    #[serde(rename = "ip", default)]
+    #[serde(rename = "$attr:ip", default)]
     pub ip_version: EPPHostAddressVersion,
 }
 
@@ -123,25 +118,18 @@ impl std::default::Default for EPPHostAddressVersion {
 
 #[derive(Debug, Serialize)]
 pub struct EPPHostCreate {
-    #[serde(rename = "host:name")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:host-1.0}host:name")]
     pub name: String,
-    #[serde(rename = "host:addr")]
-    pub addresses: Vec<EPPHostAddressSer>,
-}
-
-#[derive(Debug, Serialize)]
-pub struct EPPHostAddressSer {
-    #[serde(rename = "$value")]
-    pub address: String,
-    #[serde(rename = "$attr:ip", default)]
-    pub ip_version: EPPHostAddressVersion,
+    #[serde(rename = "{urn:ietf:params:xml:ns:host-1.0}host:addr")]
+    pub addresses: Vec<EPPHostAddress>,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct EPPHostCreateData {
+    #[serde(rename = "{urn:ietf:params:xml:ns:host-1.0}name")]
     pub name: String,
     #[serde(
-        rename = "crDate",
+        rename = "{urn:ietf:params:xml:ns:host-1.0}crDate",
         deserialize_with = "super::deserialize_datetime_opt",
         default
     )]
@@ -150,13 +138,13 @@ pub struct EPPHostCreateData {
 
 #[derive(Debug, Serialize)]
 pub struct EPPHostUpdate {
-    #[serde(rename = "host:name")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:host-1.0}host:name")]
     pub name: String,
-    #[serde(rename = "host:add", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:host-1.0}host:add", skip_serializing_if = "Option::is_none")]
     pub add: Option<EPPHostUpdateAdd>,
-    #[serde(rename = "host:rem", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:host-1.0}host:rem", skip_serializing_if = "Option::is_none")]
     pub remove: Option<EPPHostUpdateRemove>,
-    #[serde(rename = "host:chg", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:host-1.0}host:chg", skip_serializing_if = "Option::is_none")]
     pub change: Option<EPPHostUpdateChange>,
 }
 
@@ -174,14 +162,14 @@ pub struct EPPHostUpdateRemove {
 
 #[derive(Debug, Serialize)]
 pub struct EPPHostUpdateChange {
-    #[serde(rename = "host:name")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:host-1.0}host:name")]
     pub name: String,
 }
 
 #[derive(Debug, Serialize)]
 pub enum EPPHostUpdateParam {
-    #[serde(rename = "host:addr")]
-    Address(EPPHostAddressSer),
-    #[serde(rename = "host:status")]
-    Status(EPPHostStatusSer),
+    #[serde(rename = "{urn:ietf:params:xml:ns:host-1.0}host:addr")]
+    Address(EPPHostAddress),
+    #[serde(rename = "{urn:ietf:params:xml:ns:host-1.0}host:status")]
+    Status(EPPHostStatus),
 }

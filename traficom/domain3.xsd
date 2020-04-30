@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:tns="urn:ietf:params:xml:ns:domain-ext-1.0" attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="urn:ietf:params:xml:ns:domain-ext-1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="delete">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="schedule">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="delDate" type="xs:dateTime" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="cancel" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

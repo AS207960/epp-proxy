@@ -41,7 +41,6 @@ use std::collections::HashMap;
 mod client;
 mod grpc;
 mod proto;
-mod xml_ser;
 
 #[derive(Debug, Deserialize)]
 struct ConfigFile {
@@ -59,6 +58,10 @@ struct ConfigFile {
     zones: Vec<String>,
     /// PKCS12 file for TLS client auth
     client_cert: Option<String>,
+    /// Does the server support pipelining?
+    pipelining: bool,
+    /// For naughty servers
+    errata: Option<String>,
 }
 
 /// Route requests to the correct EPP client for the authoritative registry
@@ -83,6 +86,8 @@ impl Router {
             log_dir,
             config.client_cert.as_deref(),
             config.old_password.as_deref(),
+            config.pipelining,
+            config.errata.clone(),
         );
         let epp_client_sender = epp_client.start();
 
@@ -238,8 +243,12 @@ async fn main() {
             _ = term_fut => {}
             _ = int_fut => {}
         }
-        for mut c in handles {
-            if let Err(err) = client::logout(&mut c).await {
+        let mut futs = vec![];
+        for c in handles {
+            futs.push(client::logout(c));
+        }
+        for res in futures::future::join_all(futs).await {
+            if let Err(err) = res {
                 warn!("Failed to logout from server: {:?}", err);
             }
         }

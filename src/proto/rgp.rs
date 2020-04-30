@@ -2,13 +2,13 @@ use chrono::prelude::*;
 
 #[derive(Debug, Deserialize)]
 pub struct EPPRGPData {
-    #[serde(rename = "rgpStatus")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:rgp-1.0}rgpStatus")]
     pub state: EPPRGPStatus,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct EPPRGPStatus {
-    #[serde(rename = "s")]
+    #[serde(rename = "$attr:s")]
     pub state: EPPRGPState,
 }
 
@@ -32,7 +32,7 @@ pub enum EPPRGPState {
 
 #[derive(Debug, Serialize)]
 pub struct EPPRGPUpdate {
-    #[serde(rename = "rgp:restore")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:rgp-1.0}rgp:restore")]
     pub restore: EPPRGPRestore,
 }
 
@@ -40,7 +40,7 @@ pub struct EPPRGPUpdate {
 pub struct EPPRGPRestore {
     #[serde(rename = "$attr:op")]
     pub operation: EPPRGPRestoreOperation,
-    #[serde(rename = "rgp:report", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:rgp-1.0}rgp:report", skip_serializing_if = "Option::is_none")]
     pub report: Option<EPPRGPReport>,
 }
 
@@ -55,18 +55,18 @@ pub enum EPPRGPRestoreOperation {
 
 #[derive(Debug, Serialize)]
 pub struct EPPRGPReport {
-    #[serde(rename = "rgp:preData")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:rgp-1.0}rgp:preData")]
     pub pre_data: String,
-    #[serde(rename = "rgp:postData")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:rgp-1.0}rgp:postData")]
     pub post_data: String,
-    #[serde(rename = "rgp:delTime")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:rgp-1.0}rgp:delTime")]
     pub delete_time: DateTime<Utc>,
-    #[serde(rename = "rgp:resTime")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:rgp-1.0}rgp:resTime")]
     pub restore_time: DateTime<Utc>,
-    #[serde(rename = "rgp:resReason")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:rgp-1.0}rgp:resReason")]
     pub restore_reason: String,
-    #[serde(rename = "rgp:statement")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:rgp-1.0}rgp:statement")]
     pub statement: Vec<String>,
-    #[serde(rename = "rgp:other", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:rgp-1.0}rgp:other", skip_serializing_if = "Option::is_none")]
     pub other: Option<String>,
 }

@@ -27,6 +27,7 @@ prost = "0.6"
 prost-types = "0.6"
 clap = "2.33"
 base64 = "0.12"
+xml_serde = { path = "../xml_serde" }
 
 [build-dependencies]
 tonic-build = "0.2"
