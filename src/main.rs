@@ -221,7 +221,11 @@ async fn main() {
         let conf_file = conf_file.unwrap();
         let conf_file_type = conf_file.file_type().unwrap();
         if !conf_file_type.is_dir() {
-            let file = match std::fs::File::open(conf_file.path()) {
+            let conf_file_path = conf_file.path();
+            if conf_file_path.extension().unwrap_or_default() != "json" {
+                continue;
+            }
+            let file = match std::fs::File::open(conf_file_path) {
                 Ok(f) => f,
                 Err(e) => {
                     error!(
