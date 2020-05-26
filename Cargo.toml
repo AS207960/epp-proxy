@@ -22,12 +22,17 @@ time = "0.1"
 uuid = { version = "0.8", features = ["v4"] }
 hex = "0.4"
 regex = "1"
-tonic = "0.2"
+tonic = { version = "0.2", features = ["transport", "tls"] }
 prost = "0.6"
 prost-types = "0.6"
 clap = "2.33"
 base64 = "0.12"
-xml_serde = { path = "../xml_serde" }
+xml_serde = { git = "https://github.com/as207960/xml-serde" }
+rust-keycloak = { git = "https://github.com/TheEnbyperor/rust-keycloak" }
+dotenv = "0.9.0"
+tower-service = "0.3"
+http = "0.2"
+sentry = "0.12.0"
 
 [build-dependencies]
 tonic-build = "0.2"

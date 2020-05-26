@@ -1,3 +1,5 @@
+use chrono::prelude::*;
+
 #[derive(Debug, Deserialize)]
 pub struct EPPBalance {
     #[serde(rename = "{http://www.verisign.com/epp/balance-1.0}balance")]
@@ -16,4 +18,22 @@ pub enum EPPCreditThreshold {
     Fixed(String),
     #[serde(rename = "{http://www.verisign.com/epp/balance-1.0}percent")]
     Percentage(u8)
+}
+
+#[derive(Debug, Serialize)]
+pub struct EPPNameStoreExt {
+    #[serde(rename = "{http://www.verisign-grs.com/epp/namestoreExt-1.1}namestoreExt:subProduct")]
+    pub sub_product: String
+}
+
+#[derive(Debug, Deserialize)]
+pub struct EPPRGPPollData {
+    #[serde(rename = "{http://www.verisign.com/epp/rgp-poll-1.0}name")]
+    pub name: String,
+    #[serde(rename = "{http://www.verisign.com/epp/rgp-poll-1.0}rgpStatus")]
+    pub status: super::rgp::EPPRGPStatus,
+    #[serde(rename = "{http://www.verisign.com/epp/rgp-poll-1.0}reqDate", serialize_with="super::serialize_datetime")]
+    pub request_date: DateTime<Utc>,
+    #[serde(rename = "{http://www.verisign.com/epp/rgp-poll-1.0}reportDueDate", serialize_with="super::serialize_datetime")]
+    pub report_due_date: DateTime<Utc>,
 }

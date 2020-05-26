@@ -217,8 +217,8 @@ pub struct EPPDomainCreate {
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct EPPDomainAuthInfo {
-    #[serde(rename = "{urn:ietf:params:xml:ns:domain-1.0}domain:pw")]
-    pub password: String,
+    #[serde(rename = "{urn:ietf:params:xml:ns:domain-1.0}domain:pw", default)]
+    pub password: Option<String>,
 }
 
 #[derive(Debug, Serialize)]

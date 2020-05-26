@@ -1,0 +1,24 @@
+apiVersion: cert-manager.io/v1alpha2
+kind: Certificate
+metadata:
+  name: epp-proxy-cert
+spec:
+  secretName: epp-proxy-tls
+  duration: 2160h
+  renewBefore: 360h
+  organization:
+    - jetstack
+  commonName: epp-proxy
+  isCA: false
+  keySize: 4096
+  keyAlgorithm: rsa
+  keyEncoding: pkcs1
+  usages:
+    - server auth
+  dnsNames:
+    - epp-proxy
+    - epp-proxy.default
+  issuerRef:
+    name: epp-ca-issuer
+    kind: Issuer
+    group: cert-manager.io

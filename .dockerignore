@@ -1,0 +1,17 @@
+.github
+.git
+centralnic
+conf
+conf-live
+conf2
+docs
+log
+nom-std
+priv
+traficom
+target
+.env
+.gitignore
+Dockerfile
+build.sh
+kube

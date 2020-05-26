@@ -1223,7 +1223,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
             postal_code: a.postal_code,
             country_code: a.country_code,
             identity_number: a.identity_number,
-            birth_date: chrono_to_proto(a.birth_date)
+            birth_date: chrono_to_proto(a.birth_date.map(|d| d.and_hms(0, 0, 0)))
         };
 
         let reply = epp_proto::contact::ContactInfoReply {
@@ -1432,7 +1432,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
             postal_code: a.postal_code,
             country_code: a.country_code,
             identity_number: a.identity_number,
-            birth_date: proto_to_chrono(a.birth_date)
+            birth_date: proto_to_chrono(a.birth_date).map(|d| d.date())
         };
 
         let res = client::contact::create(
@@ -1496,7 +1496,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
             postal_code: a.postal_code,
             country_code: a.country_code,
             identity_number: a.identity_number,
-            birth_date: proto_to_chrono(a.birth_date)
+            birth_date: proto_to_chrono(a.birth_date).map(|d| d.date())
         };
 
         let res = client::contact::update(
@@ -1630,14 +1630,14 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let mut sender = client_by_id(&self.client_router, &request.registry_name)?;
 
         tokio::spawn(async move {
-            let should_delay = true;
+            let mut should_delay = true;
             loop {
                 match client::poll::poll(&mut sender).await {
                     Ok(resp) => {
                         if let Some(message) = resp {
-                            //                            if message.count > 0 {
-                            //                                delay_time = 0;
-                            //                            }
+                            if message.count > 0 {
+                                should_delay = false;
+                            }
                             match tx
                                 .send(Ok(epp_proto::PollReply {
                                     msg_id: message.id.clone(),

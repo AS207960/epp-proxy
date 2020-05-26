@@ -38,10 +38,10 @@ pub struct EPPSecDNSKeyData {
 pub struct EPPSecDNSUpdate {
     #[serde(rename = "$attr:urgent", skip_serializing_if = "Option::is_none", serialize_with = "super::serialize_opt_bool")]
     pub urgent: Option<bool>,
-    #[serde(rename = "{urn:ietf:params:xml:ns:secDNS-1.1}secDNS:add", skip_serializing_if = "Option::is_none")]
-    pub add: Option<EPPSecDNSUpdateAdd>,
     #[serde(rename = "{urn:ietf:params:xml:ns:secDNS-1.1}secDNS:rem", skip_serializing_if = "Option::is_none")]
     pub remove: Option<EPPSecDNSUpdateRemove>,
+    #[serde(rename = "{urn:ietf:params:xml:ns:secDNS-1.1}secDNS:add", skip_serializing_if = "Option::is_none")]
+    pub add: Option<EPPSecDNSUpdateAdd>,
     #[serde(rename = "{urn:ietf:params:xml:ns:secDNS-1.1}secDNS:chg", skip_serializing_if = "Option::is_none")]
     pub change: Option<EPPSecDNSUpdateChange>,
 }

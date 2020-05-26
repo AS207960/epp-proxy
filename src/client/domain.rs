@@ -394,7 +394,18 @@ pub fn handle_check(
     let command = proto::EPPCheck::Domain(proto::domain::EPPDomainCheck {
         name: req.name.clone(),
     });
-    Ok((proto::EPPCommandType::Check(command), None))
+    let ext = if client.has_erratum("verisign-tv") {
+        Some(vec![proto::EPPCommandExtensionType::VerisignNameStoreExt(proto::verisign::EPPNameStoreExt {
+            sub_product: "dotTV".to_string()
+        })])
+    } else if client.has_erratum("verisign-cc") {
+        Some(vec![proto::EPPCommandExtensionType::VerisignNameStoreExt(proto::verisign::EPPNameStoreExt {
+            sub_product: "dotCC".to_string()
+        })])
+    } else {
+        None
+    };
+    Ok((proto::EPPCommandType::Check(command), ext))
 }
 
 pub fn handle_check_response(response: proto::EPPResponse) -> Response<CheckResponse> {
@@ -431,7 +442,18 @@ pub fn handle_info(
     let command = proto::EPPInfo::Domain(proto::domain::EPPDomainCheck {
         name: req.name.clone(),
     });
-    Ok((proto::EPPCommandType::Info(command), None))
+    let ext = if client.has_erratum("verisign-tv") {
+        Some(vec![proto::EPPCommandExtensionType::VerisignNameStoreExt(proto::verisign::EPPNameStoreExt {
+            sub_product: "dotTV".to_string()
+        })])
+    } else if client.has_erratum("verisign-cc") {
+        Some(vec![proto::EPPCommandExtensionType::VerisignNameStoreExt(proto::verisign::EPPNameStoreExt {
+            sub_product: "dotCC".to_string()
+        })])
+    } else {
+        None
+    };
+    Ok((proto::EPPCommandType::Info(command), ext))
 }
 
 pub fn handle_info_response(response: proto::EPPResponse) -> Response<InfoResponse> {
@@ -541,7 +563,10 @@ pub fn handle_info_response(response: proto::EPPResponse) -> Response<InfoRespon
                     last_updated_date: domain_info.last_updated_date,
                     last_transfer_date: domain_info.last_transfer_date,
                     rgp_state,
-                    auth_info: domain_info.auth_info.map(|a| a.password),
+                    auth_info: match domain_info.auth_info {
+                        Some(a) => a.password,
+                        None => None
+                    },
                     sec_dns,
                 })
             }
@@ -565,9 +590,10 @@ pub fn handle_create(
     }
     check_id(&req.registrant)?;
 
-    let ext = if client.secdns_supported {
+    let mut exts = vec![];
+    if client.secdns_supported {
         match &req.sec_dns {
-            Some(sec_dns) => Some(proto::EPPCommandExtensionType::EPPSecDNSCreate(match &sec_dns.data {
+            Some(sec_dns) => exts.push(proto::EPPCommandExtensionType::EPPSecDNSCreate(match &sec_dns.data {
                 SecDNSDataType::DSData(ds_data) => proto::secdns::EPPSecDNSData {
                     max_signature_life: sec_dns.max_sig_life,
                     key_data: vec![],
@@ -595,11 +621,18 @@ pub fn handle_create(
                     }).collect()
                 }
             })),
-            None => None
+            None => {}
         }
-    } else {
-        None
-    };
+    }
+    if client.has_erratum("verisign-tv") {
+        exts.push(proto::EPPCommandExtensionType::VerisignNameStoreExt(proto::verisign::EPPNameStoreExt {
+            sub_product: "dotTV".to_string()
+        }))
+    } else if client.has_erratum("verisign-cc") {
+        exts.push(proto::EPPCommandExtensionType::VerisignNameStoreExt(proto::verisign::EPPNameStoreExt {
+            sub_product: "dotCC".to_string()
+        }))
+    }
 
     let command = proto::EPPCreate::Domain(proto::domain::EPPDomainCreate {
         name: req.name.clone(),
@@ -623,10 +656,13 @@ pub fn handle_create(
             })
             .collect::<Result<Vec<_>, super::router::Response<CreateResponse>>>()?,
         auth_info: proto::domain::EPPDomainAuthInfo {
-            password: req.auth_info.to_string(),
+            password: Some(req.auth_info.to_string()),
         },
     });
-    Ok((proto::EPPCommandType::Create(command), ext))
+    Ok((proto::EPPCommandType::Create(command), match exts.len() {
+        0 => None,
+        _ => Some(exts)
+    }))
 }
 
 pub fn handle_create_response(response: proto::EPPResponse) -> Response<CreateResponse> {
@@ -670,7 +706,18 @@ pub fn handle_delete(
     let command = proto::EPPDelete::Domain(proto::domain::EPPDomainCheck {
         name: req.name.clone(),
     });
-    Ok((proto::EPPCommandType::Delete(command), None))
+    let ext = if client.has_erratum("verisign-tv") {
+        Some(vec![proto::EPPCommandExtensionType::VerisignNameStoreExt(proto::verisign::EPPNameStoreExt {
+            sub_product: "dotTV".to_string()
+        })])
+    } else if client.has_erratum("verisign-cc") {
+        Some(vec![proto::EPPCommandExtensionType::VerisignNameStoreExt(proto::verisign::EPPNameStoreExt {
+            sub_product: "dotCC".to_string()
+        })])
+    } else {
+        None
+    };
+    Ok((proto::EPPCommandType::Delete(command), ext))
 }
 
 pub fn handle_delete_response(response: proto::EPPResponse) -> Response<DeleteResponse> {
@@ -768,9 +815,10 @@ pub fn handle_update(
         ));
     }
 
-    let ext = if client.secdns_supported {
+    let mut exts = vec![];
+    if client.secdns_supported {
         match &req.sec_dns {
-            Some(sec_dns) => Some(proto::EPPCommandExtensionType::EPPSecDNSUpdate(proto::secdns::EPPSecDNSUpdate {
+            Some(sec_dns) => exts.push(proto::EPPCommandExtensionType::EPPSecDNSUpdate(proto::secdns::EPPSecDNSUpdate {
                 urgent: sec_dns.urgent,
                 add: sec_dns.add.as_ref().map(|a| match a {
                     SecDNSDataType::DSData(ds_data) => proto::secdns::EPPSecDNSUpdateAdd {
@@ -832,11 +880,18 @@ pub fn handle_update(
                     max_signature_life: Some(s)
                 })
             })),
-            None => None
+            None => {}
         }
-    } else {
-        None
-    };
+    }
+    if client.has_erratum("verisign-tv") {
+        exts.push(proto::EPPCommandExtensionType::VerisignNameStoreExt(proto::verisign::EPPNameStoreExt {
+            sub_product: "dotTV".to_string()
+        }))
+    } else if client.has_erratum("verisign-cc") {
+        exts.push(proto::EPPCommandExtensionType::VerisignNameStoreExt(proto::verisign::EPPNameStoreExt {
+            sub_product: "dotCC".to_string()
+        }))
+    }
 
     let command = proto::EPPUpdate::Domain(proto::domain::EPPDomainUpdate {
         name: req.name.clone(),
@@ -859,12 +914,15 @@ pub fn handle_update(
                     .new_auth_info
                     .as_ref()
                     .map(|a| proto::domain::EPPDomainAuthInfo {
-                        password: a.clone(),
+                        password: Some(a.clone()),
                     }),
             })
         },
     });
-    Ok((proto::EPPCommandType::Update(Box::new(command)), ext))
+    Ok((proto::EPPCommandType::Update(Box::new(command)), match exts.len() {
+        0 => None,
+        _ => Some(exts)
+    }))
 }
 
 pub fn handle_update_response(response: proto::EPPResponse) -> Response<UpdateResponse> {
@@ -890,7 +948,18 @@ pub fn handle_renew(
         period: req.add_period.as_ref().map(|p| p.into()),
         current_expiry_date: req.cur_expiry_date.date(),
     });
-    Ok((proto::EPPCommandType::Renew(command), None))
+    let ext = if client.has_erratum("verisign-tv") {
+        Some(vec![proto::EPPCommandExtensionType::VerisignNameStoreExt(proto::verisign::EPPNameStoreExt {
+            sub_product: "dotTV".to_string()
+        })])
+    } else if client.has_erratum("verisign-cc") {
+        Some(vec![proto::EPPCommandExtensionType::VerisignNameStoreExt(proto::verisign::EPPNameStoreExt {
+            sub_product: "dotCC".to_string()
+        })])
+    } else {
+        None
+    };
+    Ok((proto::EPPCommandType::Renew(command), ext))
 }
 
 pub fn handle_renew_response(response: proto::EPPResponse) -> Response<RenewResponse> {
@@ -926,7 +995,18 @@ pub fn handle_transfer_query(
             name: req.name.clone(),
         }),
     };
-    Ok((proto::EPPCommandType::Transfer(command), None))
+    let ext = if client.has_erratum("verisign-tv") {
+        Some(vec![proto::EPPCommandExtensionType::VerisignNameStoreExt(proto::verisign::EPPNameStoreExt {
+            sub_product: "dotTV".to_string()
+        })])
+    } else if client.has_erratum("verisign-cc") {
+        Some(vec![proto::EPPCommandExtensionType::VerisignNameStoreExt(proto::verisign::EPPNameStoreExt {
+            sub_product: "dotCC".to_string()
+        })])
+    } else {
+        None
+    };
+    Ok((proto::EPPCommandType::Transfer(command), ext))
 }
 
 pub fn handle_transfer_request(
@@ -947,11 +1027,22 @@ pub fn handle_transfer_request(
             name: req.name.clone(),
             period: req.add_period.as_ref().map(|p| p.into()),
             auth_info: proto::domain::EPPDomainAuthInfo {
-                password: req.auth_info.clone(),
+                password: Some(req.auth_info.clone()),
             },
         }),
     };
-    Ok((proto::EPPCommandType::Transfer(command), None))
+    let ext = if client.has_erratum("verisign-tv") {
+        Some(vec![proto::EPPCommandExtensionType::VerisignNameStoreExt(proto::verisign::EPPNameStoreExt {
+            sub_product: "dotTV".to_string()
+        })])
+    } else if client.has_erratum("verisign-cc") {
+        Some(vec![proto::EPPCommandExtensionType::VerisignNameStoreExt(proto::verisign::EPPNameStoreExt {
+            sub_product: "dotCC".to_string()
+        })])
+    } else {
+        None
+    };
+    Ok((proto::EPPCommandType::Transfer(command), ext))
 }
 
 pub fn handle_transfer_accept(
@@ -972,11 +1063,22 @@ pub fn handle_transfer_accept(
             name: req.name.clone(),
             period: None,
             auth_info: proto::domain::EPPDomainAuthInfo {
-                password: req.auth_info.clone(),
+                password: Some(req.auth_info.clone()),
             },
         }),
     };
-    Ok((proto::EPPCommandType::Transfer(command), None))
+    let ext = if client.has_erratum("verisign-tv") {
+        Some(vec![proto::EPPCommandExtensionType::VerisignNameStoreExt(proto::verisign::EPPNameStoreExt {
+            sub_product: "dotTV".to_string()
+        })])
+    } else if client.has_erratum("verisign-cc") {
+        Some(vec![proto::EPPCommandExtensionType::VerisignNameStoreExt(proto::verisign::EPPNameStoreExt {
+            sub_product: "dotCC".to_string()
+        })])
+    } else {
+        None
+    };
+    Ok((proto::EPPCommandType::Transfer(command), ext))
 }
 
 pub fn handle_transfer_reject(
@@ -997,11 +1099,22 @@ pub fn handle_transfer_reject(
             name: req.name.clone(),
             period: None,
             auth_info: proto::domain::EPPDomainAuthInfo {
-                password: req.auth_info.clone(),
+                password: Some(req.auth_info.clone()),
             },
         }),
     };
-    Ok((proto::EPPCommandType::Transfer(command), None))
+    let ext = if client.has_erratum("verisign-tv") {
+        Some(vec![proto::EPPCommandExtensionType::VerisignNameStoreExt(proto::verisign::EPPNameStoreExt {
+            sub_product: "dotTV".to_string()
+        })])
+    } else if client.has_erratum("verisign-cc") {
+        Some(vec![proto::EPPCommandExtensionType::VerisignNameStoreExt(proto::verisign::EPPNameStoreExt {
+            sub_product: "dotCC".to_string()
+        })])
+    } else {
+        None
+    };
+    Ok((proto::EPPCommandType::Transfer(command), ext))
 }
 
 pub fn handle_transfer_response(response: proto::EPPResponse) -> Response<TransferResponse> {

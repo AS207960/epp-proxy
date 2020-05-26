@@ -126,8 +126,8 @@ pub struct EPPContactPhone {
 pub struct EPPContactPostalInfo {
     #[serde(rename = "$attr:type")]
     pub addr_type: EPPContactPostalInfoType,
-    #[serde(rename = "{urn:ietf:params:xml:ns:contact-1.0}contact:name")]
-    pub name: String,
+    #[serde(rename = "{urn:ietf:params:xml:ns:contact-1.0}contact:name", default)]
+    pub name: Option<String>,
     #[serde(rename = "{urn:ietf:params:xml:ns:contact-1.0}contact:firstname", skip_serializing_if = "Option::is_none", default)]
     pub traficom_first_name: Option<String>,
     #[serde(rename = "{urn:ietf:params:xml:ns:contact-1.0}contact:lastname", skip_serializing_if = "Option::is_none", default)]
@@ -140,8 +140,9 @@ pub struct EPPContactPostalInfo {
     pub traficom_register_number: Option<String>,
     #[serde(rename = "{urn:ietf:params:xml:ns:contact-1.0}contact:identity", skip_serializing_if = "Option::is_none", default)]
     pub traficom_identity: Option<String>,
-    #[serde(rename = "{urn:ietf:params:xml:ns:contact-1.0}contact:birthDate", deserialize_with = "super::deserialize_datetime_opt", skip_serializing_if = "Option::is_none", default)]
-    pub traficom_birth_date: Option<DateTime<Utc>>,
+    #[serde(rename = "{urn:ietf:params:xml:ns:contact-1.0}contact:birthDate", deserialize_with = "super::deserialize_date_opt",
+    serialize_with="super::serialize_date_opt", skip_serializing_if = "Option::is_none", default)]
+    pub traficom_birth_date: Option<Date<Utc>>,
     #[serde(rename = "{urn:ietf:params:xml:ns:contact-1.0}contact:addr")]
     pub address: EPPContactAddress,
 }
@@ -250,8 +251,8 @@ pub struct EPPContactCreate {
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct EPPContactAuthInfo {
-    #[serde(rename = "{urn:ietf:params:xml:ns:contact-1.0}contact:pw")]
-    pub password: String,
+    #[serde(rename = "{urn:ietf:params:xml:ns:contact-1.0}contact:pw", default)]
+    pub password: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]

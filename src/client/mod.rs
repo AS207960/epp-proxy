@@ -149,7 +149,7 @@ pub struct EPPClient {
     host: String,
     tag: String,
     password: String,
-    old_password: Option<String>,
+    new_password: Option<String>,
     client_cert: Option<String>,
     server_id: String,
     pipelining: bool,
@@ -211,7 +211,7 @@ pub struct ClientConf<'a, C> {
     pub password: &'a str,
     pub log_dir: std::path::PathBuf,
     pub client_cert: C,
-    pub old_password: C,
+    pub new_password: C,
     pub pipelining: bool,
     pub errata: Option<String>,
 }
@@ -230,7 +230,7 @@ impl EPPClient {
             tag: conf.tag.to_string(),
             password: conf.password.to_string(),
             client_cert: conf.client_cert.into().map(|c| c.to_string()),
-            old_password: conf.old_password.into().map(|c| c.to_string()),
+            new_password: conf.new_password.into().map(|c| c.to_string()),
             pipelining: conf.pipelining,
             features: EPPClientServerFeatures {
                 errata: conf.errata,
@@ -245,7 +245,7 @@ impl EPPClient {
     pub fn start(mut self) -> futures::channel::mpsc::Sender<Request> {
         info!("EPP Client for {} starting...", &self.host);
         if self.nominet_tag_list_subordinate {
-            info!("This is a Nominet Tag list subordinate server");
+            info!("This is a Nominet Tag list subordinate client");
         }
         let (sender, receiver) = futures::channel::mpsc::channel::<Request>(16);
         tokio::spawn(async move {
@@ -257,6 +257,8 @@ impl EPPClient {
     async fn _main_loop(&mut self, receiver: futures::channel::mpsc::Receiver<Request>) {
         let mut receiver = receiver.fuse();
         loop {
+            self.is_closing = false;
+
             let mut sock = {
                 let connect_fut = self._connect().fuse();
                 futures::pin_mut!(connect_fut);
@@ -266,7 +268,10 @@ impl EPPClient {
                         x = receiver.next() => {
                             match x {
                                 Some(x) => router::Router::reject_request(x),
-                                None => return
+                                None => {
+                                    info!("All senders for {} dropped, exiting...", &self.host);
+                                    return
+                                }
                             };
                         }
                         s = connect_fut => {
@@ -284,7 +289,10 @@ impl EPPClient {
                         x = receiver.next() => {
                             match x {
                                 Some(x) => router::Router::reject_request(x),
-                                None => return
+                                None => {
+                                    info!("All senders for {} dropped, exiting...", &self.host);
+                                    return
+                                }
                             };
                         }
                         s = setup_fut => {
@@ -326,7 +334,10 @@ impl EPPClient {
                                         break;
                                     }
                                 },
-                                None => return
+                                None => {
+                                    info!("All senders for {} dropped, exiting...", &self.host);
+                                    return
+                                }
                             };
                         }
                         m = message_channel.next() => {
@@ -334,11 +345,13 @@ impl EPPClient {
                                 Some(m) => match m {
                                     Ok(m) => match self._handle_response(m).await {
                                         Ok(c) => if c && self.is_closing {
+                                            info!("Closing connection to {}...", &self.host);
                                             return
                                         },
                                         Err(_) => break
                                     },
                                     Err(c) => if c && self.is_closing {
+                                        info!("Closing connection to {}...", &self.host);
                                         return
                                     } else {
                                         break
@@ -362,11 +375,13 @@ impl EPPClient {
                         Some(m) => match m {
                             Ok(m) => match self._handle_response(m).await {
                                 Ok(c) => if c && self.is_closing {
+                                    info!("Closing connection to {}...", &self.host);
                                     return
                                 },
                                 Err(_) => break
                             },
                             Err(c) => if c && self.is_closing {
+                                info!("Closing connection to {}...", &self.host);
                                 return
                             } else {
                                 break
@@ -685,40 +700,38 @@ impl EPPClient {
             }
         }
 
-        match self
-            ._try_login(
-                self.password.clone(),
-                None,
-                objects.clone(),
-                ext_objects.clone(),
-                sock,
-            )
-            .await
-        {
-            Ok(_) => return Ok(()),
-            Err(e) => {
-                if e {
-                    return Err(());
-                }
-            }
-        }
-        if let Some(old_password) = &self.old_password {
-            let old_password = old_password.clone();
+        if let Some(new_password) = &self.new_password {
+            let new_password = new_password.clone();
             match self
                 ._try_login(
-                    old_password,
-                    Some(self.password.clone()),
-                    objects,
-                    ext_objects,
+                    self.password.clone(),
+                    Some(new_password),
+                    objects.clone(),
+                    ext_objects.clone(),
                     sock,
                 )
                 .await
             {
-                Ok(_) => Ok(()),
-                Err(_) => Err(()),
+                Ok(_) => return Ok(()),
+                Err(e) => {
+                    if e {
+                        return Err(());
+                    }
+                },
             }
-        } else {
-            Err(())
+        }
+        match self
+            ._try_login(
+                self.password.clone(),
+                None,
+                objects,
+                ext_objects,
+                sock,
+                )
+            .await
+        {
+            Ok(_) => Ok(()),
+            Err(_) => Err(())
         }
     }
 
@@ -790,7 +803,7 @@ impl EPPClient {
     async fn _send_command<
         W: std::marker::Unpin + tokio::io::AsyncWrite,
         M: Into<Option<uuid::Uuid>>,
-        E: Into<Option<proto::EPPCommandExtensionType>>,
+        E: Into<Option<Vec<proto::EPPCommandExtensionType>>>,
     >(
         &self,
         command: proto::EPPCommandType,
@@ -804,7 +817,9 @@ impl EPPClient {
         };
         let command = proto::EPPCommand {
             command,
-            extension: extension.into(),
+            extension: extension.into().map(|e| proto::EPPCommandExtension {
+                value: e
+            }),
             client_transaction_id: Some(message_id.to_hyphenated().to_string()),
         };
         let message = proto::EPPMessage {
@@ -940,7 +955,7 @@ async fn send_epp_client_request<R>(
         Err(_) => return Err(Error::InternalServerError)
     }
     let mut receiver = receiver.fuse();
-    let mut delay = tokio::time::delay_for(tokio::time::Duration::new(5, 0)).fuse();
+    let mut delay = tokio::time::delay_for(tokio::time::Duration::new(15, 0)).fuse();
     let resp = futures::select! {
         r = receiver => r,
         _ = delay => {

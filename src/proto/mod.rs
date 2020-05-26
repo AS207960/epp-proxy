@@ -114,7 +114,9 @@ pub enum EPPCommandExtensionType {
     #[serde(rename = "{urn:ietf:params:xml:ns:secDNS-1.1}secDNS:update")]
     EPPSecDNSUpdate(secdns::EPPSecDNSUpdate),
     #[serde(rename = "{urn:ietf:params:xml:ns:domain-ext-1.0}domain-ext:delete")]
-    TraficomDelete(traficom::EPPDomainDelete)
+    TraficomDelete(traficom::EPPDomainDelete),
+    #[serde(rename = "{http://www.verisign-grs.com/epp/namestoreExt-1.1}namestoreExt:namestoreExt")]
+    VerisignNameStoreExt(verisign::EPPNameStoreExt)
 }
 
 #[derive(Debug, Serialize)]
@@ -122,9 +124,15 @@ pub struct EPPCommand {
     #[serde(rename = "$value")]
     pub command: EPPCommandType,
     #[serde(rename = "{urn:ietf:params:xml:ns:epp-1.0}extension", skip_serializing_if = "Option::is_none")]
-    pub extension: Option<EPPCommandExtensionType>,
+    pub extension: Option<EPPCommandExtension>,
     #[serde(rename = "{urn:ietf:params:xml:ns:epp-1.0}clTRID", skip_serializing_if = "Option::is_none")]
     pub client_transaction_id: Option<String>,
+}
+
+#[derive(Debug, Serialize)]
+pub struct EPPCommandExtension {
+    #[serde(rename = "$value")]
+    pub value: Vec<EPPCommandExtensionType>
 }
 
 #[derive(Debug, Deserialize)]
@@ -198,7 +206,28 @@ impl EPPResponse {
                     ));
                 }
                 None => {
-                    output.push(format!("({:?}) {}", r.code, r.message));
+                    match r.values.as_ref().map(|v| {
+                        v.iter()
+                            .map(|e| e
+                                .iter()
+                                .next()
+                                .map(|(k, v)| format!("{}: {}", k, v))
+                                .unwrap_or_default()
+                            )
+                            .collect::<Vec<_>>()
+                    }) {
+                        Some(v) => {
+                            output.push(format!(
+                                "({:?}) {}: {}",
+                                r.code,
+                                r.message,
+                                v.join(", ")
+                            ));
+                        },
+                        None => {
+                            output.push(format!("({:?}) {}", r.code, r.message));
+                        }
+                    }
                 }
             }
         }
@@ -449,7 +478,11 @@ pub enum EPPResultDataValue {
     #[serde(rename = "{http://www.nominet.org.uk/epp/xml/nom-tag-1.0}listData")]
     EPPNominetTagInfoResult(nominet::EPPTagListData),
     #[serde(rename = "{https://www.nic.ch/epp/balance-1.0}infData")]
-    EPPSwitchBalanceInfoResult(switch::EPPBalance),
+    SwitchBalanceInfoResult(switch::EPPBalance),
+    #[serde(rename = "{http://www.verisign.com/epp/balance-1.0}infData")]
+    VerisignBalanceInfoResult(verisign::EPPBalance),
+    #[serde(rename = "{http://www.verisign.com/epp/rgp-poll-1.0}pollData")]
+    VerisignRGPPollData(verisign::EPPRGPPollData)
 }
 
 #[derive(Debug, Deserialize)]
@@ -590,7 +623,7 @@ pub enum EPPTransferOperation {
     Query,
     #[serde(rename = "request")]
     Request,
-    #[serde(rename = "accept")]
+    #[serde(rename = "approve")]
     Accept,
     #[serde(rename = "reject")]
     Reject,
@@ -663,6 +696,26 @@ impl<'de> serde::de::Visitor<'de> for DateTimeVisitor {
     }
 }
 
+struct DateVisitor;
+
+impl<'de> serde::de::Visitor<'de> for DateVisitor {
+    type Value = Date<Utc>;
+
+    fn expecting(&self, formatter: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(formatter, "a formatted date string")
+    }
+
+    fn visit_str<E>(self, value: &str) -> Result<Self::Value, E>
+    where
+        E: serde::de::Error,
+    {
+        match NaiveDate::parse_from_str(value, "%Y-%m-%d") {
+            Ok(v) => Ok(Date::from_utc(v, Utc)),
+            Err(e) => Err(E::custom(e)),
+        }
+    }
+}
+
 struct OptDateTimeVisitor;
 
 impl<'de> serde::de::Visitor<'de> for OptDateTimeVisitor {
@@ -684,6 +737,30 @@ impl<'de> serde::de::Visitor<'de> for OptDateTimeVisitor {
         D: serde::de::Deserializer<'de>,
     {
         d.deserialize_str(DateTimeVisitor).map(Some)
+    }
+}
+
+struct OptDateVisitor;
+
+impl<'de> serde::de::Visitor<'de> for OptDateVisitor {
+    type Value = Option<Date<Utc>>;
+
+    fn expecting(&self, formatter: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(formatter, "a formatted date string")
+    }
+
+    fn visit_none<E>(self) -> Result<Self::Value, E>
+    where
+        E: serde::de::Error,
+    {
+        Ok(None)
+    }
+
+    fn visit_some<D>(self, d: D) -> Result<Self::Value, D::Error>
+    where
+        D: serde::de::Deserializer<'de>,
+    {
+        d.deserialize_str(DateVisitor).map(Some)
     }
 }
 
@@ -709,12 +786,39 @@ where
     })
 }
 
+fn deserialize_date_opt<'de, D>(d: D) -> Result<Option<Date<Utc>>, D::Error>
+where
+    D: serde::de::Deserializer<'de>,
+{
+    let date = d.deserialize_option(OptDateVisitor)?;
+    Ok(match date {
+        Some(d) => if d == Utc.ymd(1, 1, 1) {
+            None
+        } else {
+            Some(d)
+        },
+        None => None
+    })
+}
+
 #[allow(clippy::trivially_copy_pass_by_ref)]
 fn serialize_date<S>(d: &Date<Utc>, s: S) -> Result<S::Ok, S::Error>
 where
     S: serde::ser::Serializer,
 {
     s.serialize_str(&d.format("%Y-%m-%d").to_string())
+}
+
+
+#[allow(clippy::trivially_copy_pass_by_ref)]
+fn serialize_date_opt<S>(d: &Option<Date<Utc>>, s: S) -> Result<S::Ok, S::Error>
+where
+    S: serde::ser::Serializer,
+{
+    match d {
+        Some(d) => s.serialize_str(&d.format("%Y-%m-%d").to_string()),
+        None => s.serialize_none()
+    }
 }
 
 

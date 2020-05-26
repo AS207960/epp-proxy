@@ -15,7 +15,7 @@ pub enum Response<T> {
 pub type HandleReqReturn<T> = Result<
     (
         super::proto::EPPCommandType,
-        Option<super::proto::EPPCommandExtensionType>,
+        Option<Vec<super::proto::EPPCommandExtensionType>>,
     ),
     Response<T>,
 >;
@@ -42,7 +42,7 @@ macro_rules! router {
             }
 
             pub async fn handle_request(&mut self, client: &super::EPPClientServerFeatures, req: Request) ->
-             Option<(super::proto::EPPCommandType, Option<super::proto::EPPCommandExtensionType>, uuid::Uuid)> {
+             Option<(super::proto::EPPCommandType, Option<Vec<super::proto::EPPCommandExtensionType>>, uuid::Uuid)> {
                 match req {
                     $(Request::$n(req) => {
                         let command_id = uuid::Uuid::new_v4();
@@ -63,7 +63,7 @@ macro_rules! router {
                 $(if let Some(return_path) = self.$n.remove(transaction_id) {
                     let _ = if !response.is_success() {
                         if response.is_server_error() {
-                            return_path.send(Response::InternalServerError)
+                            return_path.send(Response::Err(format!("Server error: {}", response.response_msg())))
                         } else {
                             return_path.send(Response::Err(response.response_msg()))
                         }

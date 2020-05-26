@@ -62,7 +62,7 @@ pub fn handle_restore(
         let ext = proto::traficom::EPPDomainDelete::Cancel {};
         Ok((
             proto::EPPCommandType::Delete(command),
-            Some(proto::EPPCommandExtensionType::TraficomDelete(ext)),
+            Some(vec![proto::EPPCommandExtensionType::TraficomDelete(ext)]),
         ))
     } else {
         let command = proto::EPPUpdate::Domain(proto::domain::EPPDomainUpdate {
@@ -74,15 +74,26 @@ pub fn handle_restore(
                 auth_info: None,
             }),
         });
-        let ext = proto::rgp::EPPRGPUpdate {
+        let mut exts = vec![proto::EPPCommandExtensionType::EPPRGPUpdate(
+            proto::rgp::EPPRGPUpdate {
             restore: proto::rgp::EPPRGPRestore {
                 operation: proto::rgp::EPPRGPRestoreOperation::Request,
                 report: None,
             },
+            }
+        )];
+        if client.has_erratum("verisign-tv") {
+            exts.push(proto::EPPCommandExtensionType::VerisignNameStoreExt(proto::verisign::EPPNameStoreExt {
+                sub_product: "dotTV".to_string()
+            }))
+        } else if client.has_erratum("verisign-cc") {
+            exts.push(proto::EPPCommandExtensionType::VerisignNameStoreExt(proto::verisign::EPPNameStoreExt {
+                sub_product: "dotCC".to_string()
+            }))
         };
         Ok((
             proto::EPPCommandType::Update(Box::new(command)),
-            Some(proto::EPPCommandExtensionType::EPPRGPUpdate(ext)),
+            Some(exts),
         ))
     }
 }

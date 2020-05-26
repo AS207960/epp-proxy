@@ -32,9 +32,9 @@ pub struct PollAckRequest {
 #[derive(Debug)]
 pub struct PollAckResponse {
     /// Messages in the queue
-    pub count: u64,
+    pub count: Option<u64>,
     /// ID of the message next in the queue
-    pub next_id: String,
+    pub next_id: Option<String>,
 }
 
 pub fn handle_poll(
@@ -84,10 +84,13 @@ pub fn handle_poll_ack(
 pub fn handle_poll_ack_response(response: proto::EPPResponse) -> Response<PollAckResponse> {
     match response.message_queue {
         Some(value) => Response::Ok(PollAckResponse {
-            count: value.count,
-            next_id: value.id,
+            count: Some(value.count),
+            next_id: Some(value.id),
         }),
-        None => Response::InternalServerError,
+        None => Response::Ok(PollAckResponse {
+            count: None,
+            next_id: None,
+        }),
     }
 }
 

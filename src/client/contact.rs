@@ -89,7 +89,7 @@ pub struct Address {
     /// National ID number for individuals
     pub identity_number: Option<String>,
     /// Individuals birth date
-    pub birth_date: Option<DateTime<Utc>>,
+    pub birth_date: Option<Date<Utc>>,
 }
 
 #[derive(Debug)]
@@ -538,7 +538,10 @@ pub fn handle_info_response(response: proto::EPPResponse) -> Response<InfoRespon
             proto::EPPResultDataValue::EPPContactInfoResult(contact_info) => {
                 let map_addr = |a: Option<&proto::contact::EPPContactPostalInfo>| match a {
                     Some(p) => Some(Address {
-                        name: p.name.clone(),
+                        name: match &p.name {
+                            Some(n) => n.clone(),
+                            None => format!("{} {}", p.traficom_first_name.as_deref().unwrap_or_default(), p.traficom_last_name.as_deref().unwrap_or_default())
+                        },
                         organisation: p.organisation.clone(),
                         streets: p.address.streets.clone(),
                         city: p.address.city.clone(),
@@ -624,7 +627,10 @@ pub fn handle_info_response(response: proto::EPPResponse) -> Response<InfoRespon
                         }
                         None => vec![],
                     },
-                    auth_info: contact_info.auth_info.map(|a| a.password)
+                    auth_info: match contact_info.auth_info {
+                        Some(a) => a.password,
+                        None => None
+                    }
                 })
             }
             _ => Response::InternalServerError,
@@ -679,7 +685,7 @@ pub fn handle_create(
         let mut name_parts: Vec<&str> = a.name.rsplitn(2, ' ').collect();
         Ok(proto::contact::EPPContactPostalInfo {
             addr_type: t,
-            name: a.name.clone(),
+            name: Some(a.name.clone()),
             organisation: a.organisation.clone(),
             traficom_last_name: if client.has_erratum("traficom") {
                 Some(format!("{:.<2}", name_parts.pop().unwrap_or_default()))
@@ -748,7 +754,7 @@ pub fn handle_create(
     }
 
     let extension = if client.nominet_contact_ext {
-        Some(proto::EPPCommandExtensionType::NominetContactExtCreate(
+        Some(vec![proto::EPPCommandExtensionType::NominetContactExtCreate(
             proto::nominet::EPPContactInfo {
                 contact_type: match &req.entity_type {
                     Some(i) => match i {
@@ -760,7 +766,7 @@ pub fn handle_create(
                 trading_name: req.trading_name.clone(),
                 company_number: req.company_number.clone(),
             },
-        ))
+        )])
     } else {
         None
     };
@@ -772,7 +778,7 @@ pub fn handle_create(
         fax: req.fax.as_ref().map(|p| p.into()),
         email: req.email.clone(),
         auth_info: proto::contact::EPPContactAuthInfo {
-            password: req.auth_info.clone(),
+            password: Some(req.auth_info.clone()),
         },
         disclose: req.disclosure.clone().map(|mut d| {
             d.sort_unstable_by(|a, b| (*a as i32).cmp(&(*b as i32)));
@@ -868,12 +874,12 @@ pub fn handle_update(
     }
     let phone_re = Regex::new(r"^\+\d+\.\d+$").unwrap();
     if let Some(phone) = &req.new_phone {
-        if !phone_re.is_match(&phone.number) {
+        if !phone_re.is_match(&phone.number) && &phone.number != "" {
             return Err(Response::Err("invalid phone number format".to_string()));
         }
     }
     if let Some(fax) = &req.new_fax {
-        if !phone_re.is_match(&fax.number) {
+        if !phone_re.is_match(&fax.number) && &fax.number != "" {
             return Err(Response::Err("invalid fax number format".to_string()));
         }
     }
@@ -958,14 +964,14 @@ pub fn handle_update(
                     }
                 }),
                 auth_info: req.new_auth_info.as_ref().map(|p| proto::contact::EPPContactAuthInfo {
-                    password: p.clone()
+                    password: Some(p.clone())
                 })
             })
         },
     });
 
     let extension = if client.nominet_contact_ext {
-        Some(proto::EPPCommandExtensionType::NominetContactExtUpdate(
+        Some(vec![proto::EPPCommandExtensionType::NominetContactExtUpdate(
             proto::nominet::EPPContactInfo {
                 contact_type: match &req.new_entity_type {
                     Some(i) => match i {
@@ -977,7 +983,7 @@ pub fn handle_update(
                 trading_name: req.new_trading_name.clone(),
                 company_number: req.new_company_number.clone(),
             },
-        ))
+        )])
     } else {
         None
     };
@@ -1017,11 +1023,11 @@ pub fn handle_transfer_request(
     }
     check_id(&req.id)?;
     let command = proto::EPPTransfer {
-        operation: proto::EPPTransferOperation::Query,
+        operation: proto::EPPTransferOperation::Request,
         command: proto::EPPTransferCommand::ContactRequest(proto::contact::EPPContactTransfer {
             id: req.id.clone(),
             auth_info: proto::contact::EPPContactAuthInfo {
-                password: req.auth_info.clone(),
+                password: Some(req.auth_info.clone()),
             },
         }),
     };
@@ -1041,7 +1047,7 @@ pub fn handle_transfer_accept(
         command: proto::EPPTransferCommand::ContactRequest(proto::contact::EPPContactTransfer {
             id: req.id.clone(),
             auth_info: proto::contact::EPPContactAuthInfo {
-                password: req.auth_info.clone(),
+                password: Some(req.auth_info.clone()),
             },
         }),
     };
@@ -1061,7 +1067,7 @@ pub fn handle_transfer_reject(
         command: proto::EPPTransferCommand::ContactRequest(proto::contact::EPPContactTransfer {
             id: req.id.clone(),
             auth_info: proto::contact::EPPContactAuthInfo {
-                password: req.auth_info.clone(),
+                password: Some(req.auth_info.clone()),
             },
         }),
     };
