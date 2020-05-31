@@ -12,22 +12,31 @@
 //! programs current working directory on startup. JSON file should follow the structure of the
 //! [`ConfigFile`] struct, where id is a unique ID for identifying the register in gRPC commands,
 //! server is the TLS server to connect to in the form `domain:port`,
-//! tag is the client login ID, password is the client login password, old_password is the optional
-//! current/old EPP password if it is to be changed on login, zones is a list of DNS
-//! zones said server is responsible for such as `ch`, `co.uk`, and `org.uk`, and client_cert
-//! is an optional TLS certificated bundle in PKCS12 format.
+//! tag is the client login ID, password is the client login password, new_password is the optional
+//! new EPP password if it is to be changed on login, zones is a list of DNS
+//! zones said server is responsible for such as `ch`, `co.uk`, and `org.uk`, client_cert
+//! is an optional TLS certificated bundle in PKCS12 format, pipelining defines support for multiple
+//! in flight commands, errata defines server errata.
+//!
+//! Supported errata are:
+//! * `traficom`
+//! * `verisign_tv`
+//! * `verisign_cc`
+//!
 //! Example config file:
 //! ```text
 //! {
 //!  "id": "nominet",
 //!  "server": "ote-epp.nominet.org.uk:700",
 //!  "tag": "AS207960",
-//!  "password": "supersecretpassword",
-//!  "old_password": "oldpassword",
+//!  "new_wpassword": "supersecretpassword",
+//!  "password": "oldpassword",
 //!  "zones": [
 //!    "uk"
 //!  ],
-//!  "client_cert": "priv/as207960-registrar.pfx"
+//!  "client_cert": "priv/as207960-registrar.pfx",
+//!  "pipelining": true,
+//!  "errata": "traficom"
 //! }
 //! ```
 
