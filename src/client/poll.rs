@@ -29,11 +29,11 @@ pub struct PollResponse {
 #[derive(Debug)]
 pub enum PollData {
     DomainInfoData {
-        data: super::domain::InfoResponse,
+        data: Box<super::domain::InfoResponse>,
         change_data: Option<ChangeData>,
     },
     ContactInfoData {
-        data: super::contact::InfoResponse,
+        data: Box<super::contact::InfoResponse>,
         change_data: Option<ChangeData>,
     },
     DomainTransferData(super::domain::TransferData),
@@ -182,16 +182,16 @@ pub fn handle_poll_response(response: proto::EPPResponse) -> Response<Option<Pol
                 Some(value) => Response::Ok(Some(PollResponse {
                     count: value.count,
                     id: value.id,
-                    enqueue_time: value.enqueue_date.unwrap_or(Utc::now()),
+                    enqueue_time: value.enqueue_date.unwrap_or_else(Utc::now),
                     message: value.message.unwrap_or_default(),
                     data: match response.data {
                         Some(value) => match value.value {
                             proto::EPPResultDataValue::EPPDomainInfoResult(domain_info) => PollData::DomainInfoData {
-                                data: (*domain_info, &response.extension).try_into()?,
+                                data: Box::new((*domain_info, &response.extension).try_into()?),
                                 change_data: change_data_from_response(&response.extension)?,
                             },
                             proto::EPPResultDataValue::EPPContactInfoResult(contact_info) => PollData::ContactInfoData {
-                                data: (*contact_info, &response.extension).try_into()?,
+                                data: Box::new((*contact_info, &response.extension).try_into()?),
                                 change_data: change_data_from_response(&response.extension)?,
                             },
                             proto::EPPResultDataValue::EPPDomainTransferResult(domain_transfer) => PollData::DomainTransferData((&domain_transfer).into()),

@@ -135,7 +135,7 @@ fn oauth_client() -> rust_keycloak::oauth::OAuthClient {
     let client_secret = std::env::var("CLIENT_SECRET")
         .expect("CLIENT_SECRET must be set");
     let well_known_url = std::env::var("OAUTH_WELL_KNOWN")
-        .unwrap_or("https://sso.as207960.net/auth/realms/dev/.well-known/openid-configuration".to_string());
+        .unwrap_or_else(|_| "https://sso.as207960.net/auth/realms/dev/.well-known/openid-configuration".to_string());
 
     let config = rust_keycloak::oauth::OAuthClientConfig::new(&client_id, &client_secret, &well_known_url).unwrap();
 
@@ -336,7 +336,7 @@ impl<T, B> tower_service::Service<http::Request<B>> for AuthService<T>
 {
     type Response = T::Response;
     type Error = T::Error;
-    type Future = std::pin::Pin<Box<dyn std::future::Future<Output = Result<Self::Response, Self::Error>> + Send>>;
+    type Future = futures::future::BoxFuture<'static, Result<Self::Response, Self::Error>>;
 
     fn poll_ready(&mut self, cx: &mut std::task::Context<'_>) -> std::task::Poll<Result<(), Self::Error>> {
         self.inner.poll_ready(cx).map_err(Into::into)
@@ -381,11 +381,8 @@ impl<T, B> tower_service::Service<http::Request<B>> for AuthService<T>
                     );
 
                     parts.headers.insert("grpc-status", http::HeaderValue::from_static("16"));
-                    match http::HeaderValue::from_str(status) {
-                        Ok(v) => {
-                            parts.headers.insert("grpc-message", v);
-                        },
-                        _ => {}
+                    if let Ok(v) = http::HeaderValue::from_str(status) {
+                        parts.headers.insert("grpc-message", v);
                     }
 
                     Ok(http::Response::from_parts(parts, tonic::body::BoxBody::empty()).into())
