@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["Request","Request into the EPP client, see sibling modules for explanation of requests"],["Response","Responses from EPP client, see [`super::Error`] for explanations of errors"]],"struct":[["Router",""]],"type":[["HandleReqReturn",""]]});
+initSidebarItems({"enum":[["Request","Request into the EPP client, see sibling modules for explanation of requests"]],"struct":[["Router",""]],"type":[["HandleReqReturn",""],["Response",""]]});
