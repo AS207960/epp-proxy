@@ -113,3 +113,149 @@ pub struct EPPDataQualityDomainListInfo {
     #[serde(rename = "{http://www.nominet.org.uk/epp/xml/nom-data-quality-1.1}domainName")]
     pub domains: Vec<String>,
 }
+
+#[derive(Debug, Deserialize)]
+pub struct EPPCancelData {
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/std-notifications-1.2}domainName")]
+    pub domain_name: String,
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/std-notifications-1.2}orig")]
+    pub originator: String
+}
+
+#[derive(Debug, Deserialize)]
+pub struct EPPReleaseData {
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/std-notifications-1.2}accountId")]
+    pub account: EPPReleaseAccountData,
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/std-notifications-1.2}from")]
+    pub from: String,
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/std-notifications-1.2}registrarTag")]
+    pub registrar_tag: String,
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/std-notifications-1.2}domainListData")]
+    pub domain_list: EPPDomainListData,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct EPPReleaseAccountData {
+    #[serde(rename = "$attr:moved")]
+    pub moved: bool,
+    #[serde(rename = "$value")]
+    pub id: String
+}
+
+#[derive(Debug, Deserialize)]
+pub struct EPPDomainListData {
+    #[serde(rename = "$attr:noDomains")]
+    pub count: u32,
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/std-notifications-1.2}domainName")]
+    pub domain_names: Vec<String>
+}
+
+#[derive(Debug, Deserialize)]
+pub struct EPPExpandedDomainListData {
+    #[serde(rename = "$attr:noDomains")]
+    pub count: u32,
+    #[serde(rename = "{urn:ietf:params:xml:ns:domain-1.0}infData")]
+    pub domains: Vec<super::domain::EPPDomainInfoData>
+}
+
+#[derive(Debug, Deserialize)]
+pub struct EPPHostListData {
+    #[serde(rename = "$attr:noHosts")]
+    pub count: u32,
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/std-notifications-1.2}hostObj")]
+    pub host_objects: Vec<String>
+}
+
+#[derive(Debug, Deserialize)]
+pub struct EPPRegistrarChangeData {
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/std-notifications-1.2}orig")]
+    pub originator: String,
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/std-notifications-1.2}registrarTag")]
+    pub registrar_tag: String,
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/std-notifications-1.2}caseId")]
+    pub case_id: String,
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/std-notifications-1.2}domainListData")]
+    pub domain_list: EPPExpandedDomainListData,
+    #[serde(rename = "{urn:ietf:params:xml:ns:contact-1.0}infData")]
+    pub contact: super::contact::EPPContactInfoData
+}
+
+#[derive(Debug, Deserialize)]
+pub struct EPPHostCancelData {
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/std-notifications-1.2}hostListData")]
+    pub host_list: EPPHostListData,
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/std-notifications-1.2}domainListData")]
+    pub domain_list: EPPDomainListData,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct EPPProcessData {
+    #[serde(rename = "$attr:stage")]
+    pub stage: EPPProcessStage,
+    #[serde(rename = "{urn:ietf:params:xml:ns:contact-1.0}infData")]
+    pub contact: super::contact::EPPContactInfoData,
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/std-notifications-1.2}processType")]
+    pub process_type: String,
+    #[serde(
+        rename = "{http://www.nominet.org.uk/epp/xml/std-notifications-1.2}suspendDate",
+        deserialize_with = "super::deserialize_datetime_opt",
+        default
+    )]
+    pub suspend_date: Option<DateTime<Utc>>,
+    #[serde(
+        rename = "{http://www.nominet.org.uk/epp/xml/std-notifications-1.2}cancelDate",
+        deserialize_with = "super::deserialize_datetime_opt",
+        default
+    )]
+    pub cancel_date: Option<DateTime<Utc>>,
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/std-notifications-1.2}domainListData")]
+    pub domain_list: EPPDomainListData,
+}
+
+#[derive(Debug, Deserialize)]
+pub enum EPPProcessStage {
+    #[serde(rename = "initial")]
+    Initial,
+    #[serde(rename = "updated")]
+    Updated
+}
+
+#[derive(Debug, Deserialize)]
+pub struct EPPSuspendData {
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/std-notifications-1.2}reason")]
+    pub reason: String,
+    #[serde(
+        rename = "{http://www.nominet.org.uk/epp/xml/std-notifications-1.2}cancelDate",
+        deserialize_with = "super::deserialize_datetime_opt",
+        default
+    )]
+    pub cancel_date: Option<DateTime<Utc>>,
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/std-notifications-1.2}domainListData")]
+    pub domain_list: EPPDomainListData,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct EPPDomainFailData {
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/std-notifications-1.2}reason")]
+    pub reason: String,
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/std-notifications-1.2}domainName")]
+    pub domain_name: String
+}
+
+
+
+#[derive(Debug, Deserialize)]
+pub struct EPPTransferData {
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/std-notifications-1.2}orig")]
+    pub originator: String,
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/std-notifications-1.2}accountId")]
+    pub account_id: String,
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/std-notifications-1.2}oldAccountId")]
+    pub old_account_id: String,
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/std-notifications-1.2}caseId", default)]
+    pub case_id: Option<String>,
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/std-notifications-1.2}domainListData")]
+    pub domain_list: EPPDomainListData,
+    #[serde(rename = "{urn:ietf:params:xml:ns:contact-1.0}infData")]
+    pub contact: super::contact::EPPContactInfoData,
+}

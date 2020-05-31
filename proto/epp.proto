@@ -36,6 +36,7 @@ service EPPProxy {
     rpc ContactTransferReject  (contact.ContactTransferRequestRequest)    returns (contact.ContactTransferReply);
     rpc Poll                   (RegistryInfo)                             returns (stream PollReply);
     rpc NominetTagList         (RegistryInfo)                             returns (NominetTagListReply);
+    rpc BalanceInfo            (RegistryInfo)                             returns (BalanceReply);
 }
 
 message RegistryInfo {
@@ -57,4 +58,15 @@ message NominetTagListReply {
     }
 
     repeated Tag tags = 1;
+}
+
+message BalanceReply {
+    string balance = 1;
+    string currency = 2;
+    google.protobuf.StringValue credit_limit = 3;
+    google.protobuf.StringValue available_credit = 4;
+    oneof credit_threshold {
+        google.protobuf.StringValue fixed_credit_threshold = 5;
+        google.protobuf.UInt32Value percentage_credit_threshold = 6;
+    }
 }

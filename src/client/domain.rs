@@ -1,7 +1,8 @@
 //! EPP commands relating to domain objects
 
+use std::convert::{TryFrom, TryInto};
 use super::router::HandleReqReturn;
-use super::{proto, EPPClientServerFeatures, Request, Response, Sender};
+use super::{proto, EPPClientServerFeatures, Request, Response, Error, Sender};
 use chrono::prelude::*;
 
 #[derive(Debug)]
@@ -144,10 +145,15 @@ pub enum PeriodUnit {
 
 #[derive(Debug)]
 pub struct CreateResponse {
-    /// The actual domani name created
-    pub name: String,
     /// Was the request completed instantly or not
     pub pending: bool,
+    pub data: CreateData
+}
+
+#[derive(Debug)]
+pub struct CreateData {
+    /// The actual domain name created
+    pub name: String,
     /// What date did the server log as the date of creation
     pub creation_date: Option<DateTime<Utc>>,
     /// When will the domain expire
@@ -244,6 +250,12 @@ pub struct TransferAcceptRejectRequest {
 pub struct TransferResponse {
     /// Was the request completed instantly or not
     pub pending: bool,
+    pub data: TransferData
+}
+
+#[derive(Debug)]
+pub struct TransferData {
+    pub name: String,
     pub status: super::TransferStatus,
     /// Which client requested the transfer
     pub requested_client_id: String,
@@ -276,6 +288,15 @@ pub enum Status {
     ServerRenewProhibited,
     ServerTransferProhibited,
     ServerUpdateProhibited,
+}
+
+#[derive(Debug)]
+pub struct PanData {
+    pub name: String,
+    pub result: bool,
+    pub server_transaction_id: Option<String>,
+    pub client_transaction_id: Option<String>,
+    pub date: DateTime<Utc>,
 }
 
 impl From<proto::domain::EPPDomainStatusType> for Status {
@@ -369,13 +390,166 @@ impl From<&Period> for proto::domain::EPPDomainPeriod {
     }
 }
 
-fn check_id<T>(id: &str) -> Result<(), Response<T>> {
-    if let 3..=16 = id.len() {
+impl TryFrom<(proto::domain::EPPDomainInfoData, &Option<proto::EPPResponseExtension>)> for InfoResponse {
+    type Error = Error;
+
+    fn try_from(from: (proto::domain::EPPDomainInfoData, &Option<proto::EPPResponseExtension>)) -> Result<Self, Self::Error> {
+        let (domain_info, extension) = from;
+        let rgp_state = match extension {
+            Some(ext) => match ext.value.iter().find_map(|p| match p {
+                proto::EPPResponseExtensionType::EPPRGPInfo(i) => Some(i),
+                _ => None,
+            }) {
+                Some(e) => (&e.state.state).into(),
+                None => super::rgp::RGPState::Unknown,
+            },
+            None => super::rgp::RGPState::Unknown,
+        };
+
+        let sec_dns = match extension {
+            Some(ext) => match ext.value.iter().find_map(|p| match p {
+                proto::EPPResponseExtensionType::EPPSecDNSInfo(i) => Some(i),
+                _ => None,
+            }).map(|i| Ok(SecDNSData {
+                max_sig_life: i.max_signature_life,
+                data: if !i.ds_data.is_empty() {
+                    SecDNSDataType::DSData(i.ds_data.iter().map(|d| SecDNSDSData {
+                        key_tag: d.key_tag,
+                        algorithm: d.algorithm,
+                        digest_type: d.digest_type,
+                        digest: d.digest.clone(),
+                        key_data: d.key_data.as_ref().map(|k| SecDNSKeyData {
+                            flags: k.flags,
+                            protocol: k.protocol,
+                            algorithm: k.algorithm,
+                            public_key: k.public_key.clone()
+                        })
+                    }).collect())
+                } else if !i.key_data.is_empty() {
+                    SecDNSDataType::KeyData(i.key_data.iter().map(|k| SecDNSKeyData {
+                        flags: k.flags,
+                        protocol: k.protocol,
+                        algorithm: k.algorithm,
+                        public_key: k.public_key.clone()
+                    }).collect())
+                } else {
+                    return Err(Error::InternalServerError)
+                }
+            })) {
+                Some(i) => match i {
+                    Ok(i) => Some(i),
+                    Err(e) => return Err(e)
+                },
+                None => None
+            },
+            None => None
+        };
+
+        Ok(InfoResponse {
+            name: domain_info.name,
+            registry_id: domain_info.registry_id.unwrap_or_default(),
+            statuses: domain_info
+                .statuses
+                .into_iter()
+                .map(|s| s.status.into())
+                .collect(),
+            registrant: domain_info.registrant,
+            contacts: domain_info
+                .contacts
+                .into_iter()
+                .map(|c| InfoContact {
+                    contact_id: c.contact_id,
+                    contact_type: c.contact_type,
+                })
+                .collect(),
+            nameservers: match domain_info.nameservers {
+                None => vec![],
+                Some(n) => n.servers.into_iter()
+                    .map(|s| match s {
+                        proto::domain::EPPDomainInfoNameserver::HostOnly(h) => {
+                            InfoNameserver::HostOnly(h)
+                        }
+                        proto::domain::EPPDomainInfoNameserver::HostAndAddress {
+                            host,
+                            addresses,
+                        } => InfoNameserver::HostAndAddress {
+                            host,
+                            addresses: addresses.into_iter().map(|addr| super::host::Address {
+                                address: addr.address,
+                                ip_version: match addr.ip_version {
+                                    proto::domain::EPPDomainInfoNameserverAddressVersion::IPv4 => {
+                                        super::host::AddressVersion::IPv4
+                                    }
+                                    proto::domain::EPPDomainInfoNameserverAddressVersion::IPv6 => {
+                                        super::host::AddressVersion::IPv6
+                                    }
+                                },
+                            }).collect()
+                        },
+                    })
+                    .collect()
+            },
+            hosts: domain_info.hosts,
+            client_id: domain_info.client_id,
+            client_created_id: domain_info.client_created_id,
+            creation_date: domain_info.creation_date,
+            expiry_date: domain_info.expiry_date,
+            last_updated_client: domain_info.last_updated_client,
+            last_updated_date: domain_info.last_updated_date,
+            last_transfer_date: domain_info.last_transfer_date,
+            rgp_state,
+            auth_info: match domain_info.auth_info {
+                Some(a) => a.password,
+                None => None
+            },
+            sec_dns,
+        })
+    }
+}
+
+impl From<&proto::domain::EPPDomainTransferData> for TransferData {
+    fn from(domain_transfer: &proto::domain::EPPDomainTransferData) -> Self {
+        TransferData {
+            name: domain_transfer.name.clone(),
+            status: (&domain_transfer.transfer_status).into(),
+            requested_client_id: domain_transfer.requested_client_id.clone(),
+            requested_date: domain_transfer.requested_date,
+            act_client_id: domain_transfer.act_client_id.clone(),
+            act_date: domain_transfer.act_date,
+            expiry_date: domain_transfer.expiry_date,
+        }
+    }
+}
+
+impl From<&proto::domain::EPPDomainCreateData> for CreateData {
+    fn from(domain_create: &proto::domain::EPPDomainCreateData) -> Self {
+        CreateData {
+            name: domain_create.name.clone(),
+            creation_date: Some(domain_create.creation_date),
+            expiration_date: domain_create.expiry_date,
+        }
+    }
+}
+
+impl From<&proto::domain::EPPDomainPanData> for PanData {
+    fn from(from: &proto::domain::EPPDomainPanData) -> Self {
+        PanData {
+            name: from.name.domain.clone(),
+            result: from.name.result,
+            server_transaction_id: from.transaction_id.server_transaction_id.clone(),
+            client_transaction_id: from.transaction_id.client_transaction_id.clone(),
+            date: from.action_date
+        }
+    }
+}
+
+pub(crate) fn check_domain<T>(id: &str) -> Result<(), Response<T>> {
+    if !id.is_empty() {
         Ok(())
     } else {
-        Err(Response::Err(
-            "contact id has a min length of 3 and a max length of 16".to_string(),
-        ))
+        Err(Err(Error::Err(
+            "domain name has a min length of 1".to_string(),
+        )))
     }
 }
 
@@ -384,13 +558,9 @@ pub fn handle_check(
     req: &CheckRequest,
 ) -> HandleReqReturn<CheckResponse> {
     if !client.domain_supported {
-        return Err(Response::Unsupported);
+        return Err(Err(Error::Unsupported));
     }
-    if req.name.is_empty() {
-        return Err(Response::Err(
-            "domain name has a min length of 1".to_string(),
-        ));
-    }
+    check_domain(&req.name)?;
     let command = proto::EPPCheck::Domain(proto::domain::EPPDomainCheck {
         name: req.name.clone(),
     });
@@ -418,12 +588,12 @@ pub fn handle_check_response(response: proto::EPPResponse) -> Response<CheckResp
                         reason: domain_check.reason.to_owned(),
                     })
                 } else {
-                    Response::InternalServerError
+                    Err(Error::InternalServerError)
                 }
             }
-            _ => Response::InternalServerError,
+            _ => Err(Error::InternalServerError),
         },
-        None => Response::InternalServerError,
+        None => Err(Error::InternalServerError),
     }
 }
 
@@ -432,13 +602,9 @@ pub fn handle_info(
     req: &InfoRequest,
 ) -> HandleReqReturn<InfoResponse> {
     if !client.domain_supported {
-        return Err(Response::Unsupported);
+        return Err(Err(Error::Unsupported));
     }
-    if req.name.is_empty() {
-        return Err(Response::Err(
-            "domain name has a min length of 1".to_string(),
-        ));
-    }
+    check_domain(&req.name)?;
     let command = proto::EPPInfo::Domain(proto::domain::EPPDomainCheck {
         name: req.name.clone(),
     });
@@ -457,122 +623,14 @@ pub fn handle_info(
 }
 
 pub fn handle_info_response(response: proto::EPPResponse) -> Response<InfoResponse> {
-    let rgp_state = match &response.extension {
-        Some(ext) => match ext.value.iter().find_map(|p| match p {
-            proto::EPPResponseExtensionType::EPPRGPInfo(i) => Some(i),
-            _ => None,
-        }) {
-            Some(e) => (&e.state.state).into(),
-            None => super::rgp::RGPState::Unknown,
-        },
-        None => super::rgp::RGPState::Unknown,
-    };
-
-    let sec_dns = match &response.extension {
-        Some(ext) => match ext.value.iter().find_map(|p| match p {
-            proto::EPPResponseExtensionType::EPPSecDNSInfo(i) => Some(i),
-            _ => None,
-        }).map(|i| Ok(SecDNSData {
-            max_sig_life: i.max_signature_life,
-            data: if !i.ds_data.is_empty() {
-                SecDNSDataType::DSData(i.ds_data.iter().map(|d| SecDNSDSData {
-                    key_tag: d.key_tag,
-                    algorithm: d.algorithm,
-                    digest_type: d.digest_type,
-                    digest: d.digest.clone(),
-                    key_data: d.key_data.as_ref().map(|k| SecDNSKeyData {
-                        flags: k.flags,
-                        protocol: k.protocol,
-                        algorithm: k.algorithm,
-                        public_key: k.public_key.clone()
-                    })
-                }).collect())
-            } else if !i.key_data.is_empty() {
-                SecDNSDataType::KeyData(i.key_data.iter().map(|k| SecDNSKeyData {
-                    flags: k.flags,
-                    protocol: k.protocol,
-                    algorithm: k.algorithm,
-                    public_key: k.public_key.clone()
-                }).collect())
-            } else {
-                return Err(Response::InternalServerError)
-            }
-        })) {
-            Some(i) => match i {
-                Ok(i) => Some(i),
-                Err(e) => return e
-            },
-            None => None
-        },
-        None => None
-    };
-
     match response.data {
         Some(value) => match value.value {
             proto::EPPResultDataValue::EPPDomainInfoResult(domain_info) => {
-                Response::Ok(InfoResponse {
-                    name: domain_info.name,
-                    registry_id: domain_info.registry_id.unwrap_or_default(),
-                    statuses: domain_info
-                        .statuses
-                        .into_iter()
-                        .map(|s| s.status.into())
-                        .collect(),
-                    registrant: domain_info.registrant,
-                    contacts: domain_info
-                        .contacts
-                        .into_iter()
-                        .map(|c| InfoContact {
-                            contact_id: c.contact_id,
-                            contact_type: c.contact_type,
-                        })
-                        .collect(),
-                    nameservers: match domain_info.nameservers {
-                        None => vec![],
-                        Some(n) => n.servers.into_iter()
-                            .map(|s| match s {
-                                proto::domain::EPPDomainInfoNameserver::HostOnly(h) => {
-                                    InfoNameserver::HostOnly(h)
-                                }
-                                proto::domain::EPPDomainInfoNameserver::HostAndAddress {
-                                    host,
-                                    addresses,
-                                } => InfoNameserver::HostAndAddress {
-                                    host,
-                                    addresses: addresses.into_iter().map(|addr| super::host::Address {
-                                        address: addr.address,
-                                        ip_version: match addr.ip_version {
-                                            proto::domain::EPPDomainInfoNameserverAddressVersion::IPv4 => {
-                                                super::host::AddressVersion::IPv4
-                                            }
-                                            proto::domain::EPPDomainInfoNameserverAddressVersion::IPv6 => {
-                                                super::host::AddressVersion::IPv6
-                                            }
-                                        },
-                                    }).collect()
-                                },
-                            })
-                            .collect()
-                    },
-                    hosts: domain_info.hosts,
-                    client_id: domain_info.client_id,
-                    client_created_id: domain_info.client_created_id,
-                    creation_date: domain_info.creation_date,
-                    expiry_date: domain_info.expiry_date,
-                    last_updated_client: domain_info.last_updated_client,
-                    last_updated_date: domain_info.last_updated_date,
-                    last_transfer_date: domain_info.last_transfer_date,
-                    rgp_state,
-                    auth_info: match domain_info.auth_info {
-                        Some(a) => a.password,
-                        None => None
-                    },
-                    sec_dns,
-                })
+                (*domain_info, &response.extension).try_into()
             }
-            _ => Response::InternalServerError,
+            _ => Err(Error::InternalServerError),
         },
-        None => Response::InternalServerError,
+        None => Err(Error::InternalServerError),
     }
 }
 
@@ -581,14 +639,10 @@ pub fn handle_create(
     req: &CreateRequest,
 ) -> HandleReqReturn<CreateResponse> {
     if !client.domain_supported {
-        return Err(Response::Unsupported);
+        return Err(Err(Error::Unsupported));
     }
-    if req.name.is_empty() {
-        return Err(Response::Err(
-            "domain name has a min length of 1".to_string(),
-        ));
-    }
-    check_id(&req.registrant)?;
+    check_domain(&req.name)?;
+    super::contact::check_id(&req.registrant)?;
 
     let mut exts = vec![];
     if client.secdns_supported {
@@ -648,7 +702,7 @@ pub fn handle_create(
             .contacts
             .iter()
             .map(|c| {
-                check_id(&c.contact_id)?;
+                super::contact::check_id(&c.contact_id)?;
                 Ok(proto::domain::EPPDomainInfoContact {
                     contact_type: c.contact_type.to_string(),
                     contact_id: c.contact_id.to_string(),
@@ -669,24 +723,24 @@ pub fn handle_create_response(response: proto::EPPResponse) -> Response<CreateRe
     match &response.data {
         Some(value) => match &value.value {
             proto::EPPResultDataValue::EPPDomainCreateResult(domain_create) => {
-                Response::Ok(CreateResponse {
-                    name: domain_create.name.clone(),
+                Ok(CreateResponse {
                     pending: response.is_pending(),
-                    creation_date: Some(domain_create.creation_date),
-                    expiration_date: domain_create.expiry_date,
+                    data: domain_create.into()
                 })
             }
-            _ => Response::InternalServerError,
+            _ =>  Err(Error::InternalServerError),
         },
         None => if response.is_pending() {
-            Response::Ok(CreateResponse {
-                name: "".to_string(),
+            Ok(CreateResponse {
                 pending: response.is_pending(),
-                creation_date: None,
-                expiration_date: None
+                data: CreateData {
+                    name: "".to_string(),
+                    creation_date: None,
+                    expiration_date: None
+                }
             })
         } else {
-            Response::InternalServerError
+            Err(Error::InternalServerError)
         },
     }
 }
@@ -696,13 +750,9 @@ pub fn handle_delete(
     req: &DeleteRequest,
 ) -> HandleReqReturn<DeleteResponse> {
     if !client.domain_supported {
-        return Err(Response::Unsupported);
+        return Err(Err(Error::Unsupported));
     }
-    if req.name.is_empty() {
-        return Err(Response::Err(
-            "domain name has a min length of 1".to_string(),
-        ));
-    }
+    check_domain(&req.name)?;
     let command = proto::EPPDelete::Domain(proto::domain::EPPDomainCheck {
         name: req.name.clone(),
     });
@@ -731,15 +781,11 @@ pub fn handle_update(
     req: &UpdateRequest,
 ) -> HandleReqReturn<UpdateResponse> {
     if !client.domain_supported {
-        return Err(Response::Unsupported);
+        return Err(Err(Error::Unsupported));
     }
-    if req.name.is_empty() {
-        return Err(Response::Err(
-            "domain name has a min length of 1".to_string(),
-        ));
-    }
+    check_domain(&req.name)?;
     if let Some(new_registrant) = &req.new_registrant {
-        check_id(&new_registrant)?;
+        super::contact::check_id(&new_registrant)?;
     }
     let mut adds = vec![];
     let mut rems = vec![];
@@ -756,7 +802,7 @@ pub fn handle_update(
                 ))
             },
             UpdateObject::Contact(c) => {
-                check_id(&c.contact_id)?;
+                super::contact::check_id(&c.contact_id)?;
                 adds.push(proto::domain::EPPDomainUpdateParam::Contact(
                     proto::domain::EPPDomainInfoContact {
                         contact_type: c.contact_type.clone(),
@@ -778,7 +824,7 @@ pub fn handle_update(
                 ))
             },
             UpdateObject::Contact(c) => {
-                check_id(&c.contact_id)?;
+                super::contact::check_id(&c.contact_id)?;
                 rems.push(proto::domain::EPPDomainUpdateParam::Contact(
                     proto::domain::EPPDomainInfoContact {
                         contact_type: c.contact_type.clone(),
@@ -810,9 +856,9 @@ pub fn handle_update(
 
     let is_not_change = req.new_registrant.is_none() && req.new_auth_info.is_none();
     if req.add.is_empty() && req.remove.is_empty() && is_not_change && (req.sec_dns.is_none() || !client.secdns_supported) {
-        return Err(Response::Err(
+        return Err(Err(Error::Err(
             "at least one operation must be specified".to_string(),
-        ));
+        )));
     }
 
     let mut exts = vec![];
@@ -936,13 +982,9 @@ pub fn handle_renew(
     req: &RenewRequest,
 ) -> HandleReqReturn<RenewResponse> {
     if !client.domain_supported {
-        return Err(Response::Unsupported);
+        return Err(Err(Error::Unsupported));
     }
-    if req.name.is_empty() {
-        return Err(Response::Err(
-            "domain name has a min length of 1".to_string(),
-        ));
-    }
+    check_domain(&req.name)?;
     let command = proto::EPPRenew::Domain(proto::domain::EPPDomainRenew {
         name: req.name.clone(),
         period: req.add_period.as_ref().map(|p| p.into()),
@@ -971,9 +1013,9 @@ pub fn handle_renew_response(response: proto::EPPResponse) -> Response<RenewResp
                     new_expiry_date: domain_renew.expiry_date,
                 })
             }
-            _ => Response::InternalServerError,
+            _ => Err(Error::InternalServerError),
         },
-        None => Response::InternalServerError,
+        None => Err(Error::InternalServerError),
     }
 }
 
@@ -982,13 +1024,9 @@ pub fn handle_transfer_query(
     req: &TransferQueryRequest,
 ) -> HandleReqReturn<TransferResponse> {
     if !client.domain_supported {
-        return Err(Response::Unsupported);
+        return Err(Err(Error::Unsupported));
     }
-    if req.name.is_empty() {
-        return Err(Response::Err(
-            "domain name has a min length of 1".to_string(),
-        ));
-    }
+    check_domain(&req.name)?;
     let command = proto::EPPTransfer {
         operation: proto::EPPTransferOperation::Query,
         command: proto::EPPTransferCommand::DomainQuery(proto::domain::EPPDomainCheck {
@@ -1014,13 +1052,9 @@ pub fn handle_transfer_request(
     req: &TransferRequestRequest,
 ) -> HandleReqReturn<TransferResponse> {
     if !client.domain_supported {
-        return Err(Response::Unsupported);
+        return Err(Err(Error::Unsupported));
     }
-    if req.name.is_empty() {
-        return Err(Response::Err(
-            "domain name has a min length of 1".to_string(),
-        ));
-    }
+    check_domain(&req.name)?;
     let command = proto::EPPTransfer {
         operation: proto::EPPTransferOperation::Request,
         command: proto::EPPTransferCommand::DomainRequest(proto::domain::EPPDomainTransfer {
@@ -1050,13 +1084,9 @@ pub fn handle_transfer_accept(
     req: &TransferAcceptRejectRequest,
 ) -> HandleReqReturn<TransferResponse> {
     if !client.domain_supported {
-        return Err(Response::Unsupported);
+        return Err(Err(Error::Unsupported));
     }
-    if req.name.is_empty() {
-        return Err(Response::Err(
-            "domain name has a min length of 1".to_string(),
-        ));
-    }
+    check_domain(&req.name)?;
     let command = proto::EPPTransfer {
         operation: proto::EPPTransferOperation::Accept,
         command: proto::EPPTransferCommand::DomainRequest(proto::domain::EPPDomainTransfer {
@@ -1086,13 +1116,9 @@ pub fn handle_transfer_reject(
     req: &TransferAcceptRejectRequest,
 ) -> HandleReqReturn<TransferResponse> {
     if !client.domain_supported {
-        return Err(Response::Unsupported);
+        return Err(Err(Error::Unsupported));
     }
-    if req.name.is_empty() {
-        return Err(Response::Err(
-            "domain name has a min length of 1".to_string(),
-        ));
-    }
+    check_domain(&req.name)?;
     let command = proto::EPPTransfer {
         operation: proto::EPPTransferOperation::Reject,
         command: proto::EPPTransferCommand::DomainRequest(proto::domain::EPPDomainTransfer {
@@ -1123,17 +1149,12 @@ pub fn handle_transfer_response(response: proto::EPPResponse) -> Response<Transf
             proto::EPPResultDataValue::EPPDomainTransferResult(domain_transfer) => {
                 Response::Ok(TransferResponse {
                     pending: response.is_pending(),
-                    status: (&domain_transfer.transfer_status).into(),
-                    requested_client_id: domain_transfer.requested_client_id.clone(),
-                    requested_date: domain_transfer.requested_date,
-                    act_client_id: domain_transfer.act_client_id.clone(),
-                    act_date: domain_transfer.act_date,
-                    expiry_date: domain_transfer.expiry_date,
+                    data: domain_transfer.into()
                 })
             }
-            _ => Response::InternalServerError,
+            _ => Err(Error::InternalServerError),
         },
-        None => Response::InternalServerError,
+        None => Err(Error::InternalServerError),
     }
 }
 

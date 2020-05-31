@@ -2,15 +2,9 @@
 
 use std::collections::HashMap;
 
-/// Responses from EPP client, see [`super::Error`] for explanations of errors
-#[derive(Debug)]
-pub enum Response<T> {
-    Ok(T),
-    Err(String),
-    NotReady,
-    Unsupported,
-    InternalServerError,
-}
+pub use super::Error;
+
+pub type Response<T> = Result<T, Error>;
 
 pub type HandleReqReturn<T> = Result<
     (
@@ -37,7 +31,7 @@ macro_rules! router {
         impl Router {
             pub fn reject_request(req: Request) {
                 match req {
-                    $(Request::$n(req) => {let _ = req.return_path.send(super::Response::NotReady);},)*
+                    $(Request::$n(req) => {let _ = req.return_path.send(Err(Error::NotReady));},)*
                 };
             }
 
@@ -63,9 +57,9 @@ macro_rules! router {
                 $(if let Some(return_path) = self.$n.remove(transaction_id) {
                     let _ = if !response.is_success() {
                         if response.is_server_error() {
-                            return_path.send(Response::Err(format!("Server error: {}", response.response_msg())))
+                            return_path.send(Err(Error::Err(format!("Server error: {}", response.response_msg()))))
                         } else {
-                            return_path.send(Response::Err(response.response_msg()))
+                            return_path.send(Err(Error::Err(response.response_msg())))
                         }
                     } else {
                         return_path.send($res_handle(*response))
@@ -76,7 +70,7 @@ macro_rules! router {
 
             pub fn drain(&mut self) {
                 $(for r in self.$n.drain() {
-                    let _ = r.1.send(super::Response::NotReady);
+                    let _ = r.1.send(Err(Error::NotReady));
                 })*
             }
         }
@@ -113,5 +107,6 @@ router!(
     ContactTransferAccept,  super::contact::TransferRequestRequest,     super::contact::TransferResponse,  super::contact::handle_transfer_accept,  super::contact::handle_transfer_response;
     ContactTransferReject,  super::contact::TransferRequestRequest,     super::contact::TransferResponse,  super::contact::handle_transfer_reject,  super::contact::handle_transfer_response;
 
-    NominetTagList,        super::nominet::TagListRequest,              super::nominet::TagListResponse,   super::nominet::handle_tag_list,         super::nominet::handle_tag_list_response
+    NominetTagList,        super::nominet::TagListRequest,              super::nominet::TagListResponse,   super::nominet::handle_tag_list,         super::nominet::handle_tag_list_response;
+    Balance,               super::balance::BalanceRequest,              super::balance::BalanceResponse,   super::balance::handle_balance,          super::balance::handle_balance_response
 );

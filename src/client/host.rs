@@ -1,7 +1,7 @@
 //! EPP commands relating to host (nameserver) objects
 
 use super::router::HandleReqReturn;
-use super::{proto, EPPClientServerFeatures, Request, Response, Sender};
+use super::{proto, EPPClientServerFeatures, Request, Response, Error, Sender};
 use chrono::prelude::*;
 
 #[derive(Debug)]
@@ -143,16 +143,24 @@ impl From<&Status> for proto::host::EPPHostStatusType {
     }
 }
 
+fn check_host<T>(id: &str) -> Result<(), Response<T>> {
+    if !id.is_empty() {
+        Ok(())
+    } else {
+        Err(Err(Error::Err(
+            "host name has a min length of 1".to_string(),
+        )))
+    }
+}
+
 pub fn handle_check(
     client: &EPPClientServerFeatures,
     req: &CheckRequest,
 ) -> HandleReqReturn<CheckResponse> {
     if !(client.host_supported || client.nsset_supported) {
-        return Err(Response::Unsupported);
+        return Err(Err(Error::Unsupported));
     }
-    if req.name.is_empty() {
-        return Err(Response::Err("host name has a min length of 1".to_string()));
-    }
+    check_host(&req.name)?;
     let command = proto::EPPCheck::Host(proto::host::EPPHostCheck {
         name: req.name.clone(),
     });
@@ -169,12 +177,12 @@ pub fn handle_check_response(response: proto::EPPResponse) -> Response<CheckResp
                         reason: host_check.reason.to_owned(),
                     })
                 } else {
-                    Response::InternalServerError
+                    Err(Error::InternalServerError)
                 }
             }
-            _ => Response::InternalServerError,
+            _ => Err(Error::InternalServerError),
         },
-        None => Response::InternalServerError,
+        None => Err(Error::InternalServerError),
     }
 }
 
@@ -183,11 +191,9 @@ pub fn handle_info(
     req: &InfoRequest,
 ) -> HandleReqReturn<InfoResponse> {
     if !(client.host_supported || client.nsset_supported) {
-        return Err(Response::Unsupported);
+        return Err(Err(Error::Unsupported));
     }
-    if req.name.is_empty() {
-        return Err(Response::Err("host name has a min length of 1".to_string()));
-    }
+    check_host(&req.name)?;
     let command = proto::EPPInfo::Host(proto::host::EPPHostCheck {
         name: req.name.clone(),
     });
@@ -223,9 +229,9 @@ pub fn handle_info_response(response: proto::EPPResponse) -> Response<InfoRespon
                 last_updated_date: host_info.last_updated_date,
                 last_transfer_date: host_info.last_transfer_date,
             }),
-            _ => Response::InternalServerError,
+            _ => Err(Error::InternalServerError),
         },
-        None => Response::InternalServerError,
+        None => Err(Error::InternalServerError),
     }
 }
 
@@ -234,11 +240,9 @@ pub fn handle_create(
     req: &CreateRequest,
 ) -> HandleReqReturn<CreateResponse> {
     if !(client.host_supported || client.nsset_supported) {
-        return Err(Response::Unsupported);
+        return Err(Err(Error::Unsupported));
     }
-    if req.name.is_empty() {
-        return Err(Response::Err("host name has a min length of 1".to_string()));
-    }
+    check_host(&req.name)?;
     let command = proto::EPPCreate::Host(proto::host::EPPHostCreate {
         name: req.name.clone(),
         addresses: match req
@@ -249,9 +253,9 @@ pub fn handle_create(
                     address: if let 3..=45 = a.address.len() {
                         a.address.clone()
                     } else {
-                        return Err(Response::Err(
+                        return Err(Err(Error::Err(
                             "address has a min length of 3 and a max length of 45".to_string(),
-                        ));
+                        )));
                     },
                     ip_version: match a.ip_version {
                         AddressVersion::IPv4 => proto::host::EPPHostAddressVersion::IPv4,
@@ -278,9 +282,9 @@ pub fn handle_create_response(response: proto::EPPResponse) -> Response<CreateRe
                     creation_date: host_create.creation_date,
                 })
             }
-            _ => Response::InternalServerError,
+            _ => Err(Error::InternalServerError),
         },
-        None => Response::InternalServerError,
+        None => Err(Error::InternalServerError),
     }
 }
 
@@ -289,11 +293,9 @@ pub fn handle_delete(
     req: &DeleteRequest,
 ) -> HandleReqReturn<DeleteResponse> {
     if !(client.host_supported || client.nsset_supported) {
-        return Err(Response::Unsupported);
+        return Err(Err(Error::Unsupported));
     }
-    if req.name.is_empty() {
-        return Err(Response::Err("host name has a min length of 1".to_string()));
-    }
+    check_host(&req.name)?;
     let command = proto::EPPDelete::Host(proto::host::EPPHostCheck {
         name: req.name.clone(),
     });
@@ -311,22 +313,20 @@ pub fn handle_update(
     req: &UpdateRequest,
 ) -> HandleReqReturn<UpdateResponse> {
     if !(client.host_supported || client.nsset_supported) {
-        return Err(Response::Unsupported);
+        return Err(Err(Error::Unsupported));
     }
-    if req.name.is_empty() {
-        return Err(Response::Err("host name has a min length of 1".to_string()));
-    }
+    check_host(&req.name)?;
     if req.add.is_empty() && req.remove.is_empty() && req.new_name.is_none() {
-        return Err(Response::Err(
+        return Err(Err(Error::Err(
             "at least one operation must be specified".to_string(),
-        ));
+        )));
     }
     match &req.new_name {
         Some(n) => {
             if n.is_empty() {
-                return Err(Response::Err(
+                return Err(Err(Error::Err(
                     "new host name has a min length of 1".to_string(),
-                ));
+                )));
             }
         }
         None => {}
@@ -341,9 +341,9 @@ pub fn handle_update(
                     address: if let 3..=45 = addr.address.len() {
                         addr.address.clone()
                     } else {
-                        return Err(Response::Err(
+                        return Err(Err(Error::Err(
                             "address has a min length of 3 and a max length of 45".to_string(),
-                        ));
+                        )));
                     },
                     ip_version: match addr.ip_version {
                         AddressVersion::IPv4 => proto::host::EPPHostAddressVersion::IPv4,

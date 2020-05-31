@@ -34,8 +34,8 @@ impl Default for EPPChangeState {
 
 #[derive(Debug, Deserialize)]
 pub struct EPPChangeOperation {
-    #[serde(rename = "$attr:op")]
-    pub operation: String,
+    #[serde(rename = "$attr:op", default)]
+    pub operation: Option<String>,
     #[serde(rename = "$value")]
     pub op_type: EPPChangeOperationType,
 }
@@ -66,8 +66,10 @@ pub enum EPPChangeOperationType {
 
 #[derive(Debug, Deserialize)]
 pub struct EPPChangeCaseId {
-    #[serde(rename = "type")]
+    #[serde(rename = "$attr:type")]
     pub case_type: EPPChangeCaseIdType,
+    #[serde(rename = "$attr:name")]
+    pub name: Option<String>,
     #[serde(rename = "$value")]
     pub case_id: String,
 }

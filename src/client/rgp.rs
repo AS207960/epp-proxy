@@ -1,7 +1,7 @@
 //! EPP commands relating to nominet specific features
 
 use super::router::HandleReqReturn;
-use super::{proto, EPPClientServerFeatures, Request, Response, Sender};
+use super::{proto, EPPClientServerFeatures, Request, Response, Error, Sender};
 
 #[derive(Debug)]
 pub struct RestoreRequest {
@@ -48,13 +48,9 @@ pub fn handle_restore(
     req: &RestoreRequest,
 ) -> HandleReqReturn<RestoreResponse> {
     if !(client.rgp_supported || client.has_erratum("traficom")) {
-        return Err(Response::Unsupported);
+        return Err(Err(Error::Unsupported));
     }
-    if req.name.is_empty() {
-        return Err(Response::Err(
-            "domain name has a min length of 1".to_string(),
-        ));
-    }
+    super::domain::check_domain(&req.name)?;
     if client.has_erratum("traficom") {
         let command = proto::EPPDelete::Domain(proto::domain::EPPDomainCheck {
             name: req.name.clone(),

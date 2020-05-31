@@ -646,10 +646,10 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         .await?;
 
         let reply = epp_proto::domain::DomainCreateReply {
-            name: res.name,
+            name: res.data.name,
             pending: res.pending,
-            creation_date: chrono_to_proto(res.creation_date),
-            expiry_date: chrono_to_proto(res.expiration_date),
+            creation_date: chrono_to_proto(res.data.creation_date),
+            expiry_date: chrono_to_proto(res.data.expiration_date),
             registry_name,
         };
 
@@ -865,12 +865,12 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
 
         let reply = epp_proto::domain::DomainTransferReply {
             pending: res.pending,
-            status: i32_from_transfer_status(res.status),
-            requested_client_id: res.requested_client_id,
-            requested_date: chrono_to_proto(Some(res.requested_date)),
-            act_client_id: res.act_client_id,
-            act_date: chrono_to_proto(Some(res.act_date)),
-            expiry_date: chrono_to_proto(res.expiry_date),
+            status: i32_from_transfer_status(res.data.status),
+            requested_client_id: res.data.requested_client_id,
+            requested_date: chrono_to_proto(Some(res.data.requested_date)),
+            act_client_id: res.data.act_client_id,
+            act_date: chrono_to_proto(Some(res.data.act_date)),
+            expiry_date: chrono_to_proto(res.data.expiry_date),
             registry_name,
         };
 
@@ -896,12 +896,12 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
 
         let reply = epp_proto::domain::DomainTransferReply {
             pending: res.pending,
-            status: i32_from_transfer_status(res.status),
-            requested_client_id: res.requested_client_id,
-            requested_date: chrono_to_proto(Some(res.requested_date)),
-            act_client_id: res.act_client_id,
-            act_date: chrono_to_proto(Some(res.act_date)),
-            expiry_date: chrono_to_proto(res.expiry_date),
+            status: i32_from_transfer_status(res.data.status),
+            requested_client_id: res.data.requested_client_id,
+            requested_date: chrono_to_proto(Some(res.data.requested_date)),
+            act_client_id: res.data.act_client_id,
+            act_date: chrono_to_proto(Some(res.data.act_date)),
+            expiry_date: chrono_to_proto(res.data.expiry_date),
             registry_name,
         };
 
@@ -923,12 +923,12 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
 
         let reply = epp_proto::domain::DomainTransferReply {
             pending: res.pending,
-            status: i32_from_transfer_status(res.status),
-            requested_client_id: res.requested_client_id,
-            requested_date: chrono_to_proto(Some(res.requested_date)),
-            act_client_id: res.act_client_id,
-            act_date: chrono_to_proto(Some(res.act_date)),
-            expiry_date: chrono_to_proto(res.expiry_date),
+            status: i32_from_transfer_status(res.data.status),
+            requested_client_id: res.data.requested_client_id,
+            requested_date: chrono_to_proto(Some(res.data.requested_date)),
+            act_client_id: res.data.act_client_id,
+            act_date: chrono_to_proto(Some(res.data.act_date)),
+            expiry_date: chrono_to_proto(res.data.expiry_date),
             registry_name,
         };
 
@@ -950,12 +950,12 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
 
         let reply = epp_proto::domain::DomainTransferReply {
             pending: res.pending,
-            status: i32_from_transfer_status(res.status),
-            requested_client_id: res.requested_client_id,
-            requested_date: chrono_to_proto(Some(res.requested_date)),
-            act_client_id: res.act_client_id,
-            act_date: chrono_to_proto(Some(res.act_date)),
-            expiry_date: chrono_to_proto(res.expiry_date),
+            status: i32_from_transfer_status(res.data.status),
+            requested_client_id: res.data.requested_client_id,
+            requested_date: chrono_to_proto(Some(res.data.requested_date)),
+            act_client_id: res.data.act_client_id,
+            act_date: chrono_to_proto(Some(res.data.act_date)),
+            expiry_date: chrono_to_proto(res.data.expiry_date),
             registry_name,
         };
 
@@ -1695,6 +1695,29 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                     handshake: t.handshake,
                 })
                 .collect(),
+        };
+
+        Ok(tonic::Response::new(reply))
+    }
+
+    async fn balance_info(
+        &self,
+        request: tonic::Request<epp_proto::RegistryInfo>,
+    ) -> Result<tonic::Response<epp_proto::BalanceReply>, tonic::Status> {
+        let request = request.into_inner();
+        let mut sender = client_by_id(&self.client_router, &request.registry_name)?;
+
+        let res = client::balance::balance_info(&mut sender).await?;
+
+        let reply = epp_proto::BalanceReply {
+            balance: res.balance,
+            currency: res.currency,
+            available_credit: res.available_credit,
+            credit_limit: res.credit_limit,
+            credit_threshold: res.credit_threshold.map(|t| match t {
+                client::balance::CreditThreshold::Fixed(f) => epp_proto::balance_reply::CreditThreshold::FixedCreditThreshold(f),
+                client::balance::CreditThreshold::Percentage(p) => epp_proto::balance_reply::CreditThreshold::PercentageCreditThreshold(p.into())
+            })
         };
 
         Ok(tonic::Response::new(reply))

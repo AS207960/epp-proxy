@@ -16,6 +16,8 @@ pub mod contact;
 pub mod domain;
 pub mod host;
 pub mod nominet;
+pub mod verisign;
+pub mod balance;
 pub mod poll;
 pub mod rgp;
 pub mod router;
@@ -192,6 +194,10 @@ pub struct EPPClientServerFeatures {
     nominet_data_quality: bool,
     /// https://www.nic.ch/epp/balance-1.0 support
     switch_balance: bool,
+    /// http://www.verisign.com/epp/balance-1.0 support
+    verisign_balance: bool,
+    /// http://www.verisign.com/epp/lowbalance-poll-1.0 support
+    verisign_low_balance: bool,
     /// urn:ietf:params:xml:ns:nsset-1.2 support (NOT AN ACTUAL IETF NAMESPACE)
     nsset_supported: bool
 }
@@ -269,7 +275,7 @@ impl EPPClient {
                             match x {
                                 Some(x) => router::Router::reject_request(x),
                                 None => {
-                                    info!("All senders for {} dropped, exiting...", &self.host);
+                                    info!("All senders for {} dropped, exiting...", self.host);
                                     return
                                 }
                             };
@@ -282,6 +288,7 @@ impl EPPClient {
             };
 
             {
+                let exit_str = format!("All senders for {} dropped, exiting...", self.host);
                 let setup_fut = self._setup_connection(&mut sock).fuse();
                 futures::pin_mut!(setup_fut);
                 match loop {
@@ -290,7 +297,7 @@ impl EPPClient {
                             match x {
                                 Some(x) => router::Router::reject_request(x),
                                 None => {
-                                    info!("All senders for {} dropped, exiting...", &self.host);
+                                    info!("{}", exit_str);
                                     return
                                 }
                             };
@@ -335,7 +342,7 @@ impl EPPClient {
                                     }
                                 },
                                 None => {
-                                    info!("All senders for {} dropped, exiting...", &self.host);
+                                    info!("All senders for {} dropped, exiting...", self.host);
                                     return
                                 }
                             };
@@ -345,13 +352,13 @@ impl EPPClient {
                                 Some(m) => match m {
                                     Ok(m) => match self._handle_response(m).await {
                                         Ok(c) => if c && self.is_closing {
-                                            info!("Closing connection to {}...", &self.host);
+                                            info!("Closing connection to {}...", self.host);
                                             return
                                         },
                                         Err(_) => break
                                     },
                                     Err(c) => if c && self.is_closing {
-                                        info!("Closing connection to {}...", &self.host);
+                                        info!("Closing connection to {}...", self.host);
                                         return
                                     } else {
                                         break
@@ -375,13 +382,13 @@ impl EPPClient {
                         Some(m) => match m {
                             Ok(m) => match self._handle_response(m).await {
                                 Ok(c) => if c && self.is_closing {
-                                    info!("Closing connection to {}...", &self.host);
+                                    info!("Closing connection to {}...", self.host);
                                     return
                                 },
                                 Err(_) => break
                             },
                             Err(c) => if c && self.is_closing {
-                                info!("Closing connection to {}...", &self.host);
+                                info!("Closing connection to {}...", self.host);
                                 return
                             } else {
                                 break
@@ -629,6 +636,12 @@ impl EPPClient {
         self.features.switch_balance = greeting
             .service_menu
             .supports_ext("https://www.nic.ch/epp/balance-1.0");
+        self.features.verisign_balance = greeting
+            .service_menu
+            .supports_ext("http://www.verisign.com/epp/balance-1.0");
+        self.features.verisign_low_balance = greeting
+            .service_menu
+            .supports_ext("http://www.verisign.com/epp/lowbalance-poll-1.0");
         self.features.nsset_supported = greeting
             .service_menu
             .supports("urn:ietf:params:xml:ns:nsset-1.2");
@@ -682,6 +695,12 @@ impl EPPClient {
             }
             if self.features.switch_balance {
                 ext_objects.push("https://www.nic.ch/epp/balance-1.0".to_string())
+            }
+            if self.features.verisign_balance {
+                ext_objects.push("http://www.verisign.com/epp/balance-1.0".to_string())
+            }
+            if self.features.verisign_low_balance {
+                ext_objects.push("http://www.verisign.com/epp/lowbalance-poll-1.0".to_string())
             }
             if self.features.nsset_supported {
                 objects.push("urn:ietf:params:xml:ns:nsset-1.2".to_string())
@@ -962,16 +981,9 @@ async fn send_epp_client_request<R>(
             return Err(Error::Timeout);
         }
     };
-    let resp = match resp {
-        Ok(r) => r,
-        Err(_) => return Err(Error::InternalServerError),
-    };
     match resp {
-        Response::Ok(r) => Ok(r),
-        Response::InternalServerError => Err(Error::InternalServerError),
-        Response::Unsupported => Err(Error::Unsupported),
-        Response::NotReady => Err(Error::NotReady),
-        Response::Err(s) => Err(Error::Err(s)),
+        Ok(r) => r,
+        Err(_) => Err(Error::InternalServerError),
     }
 }
 
@@ -990,7 +1002,7 @@ pub enum Error {
     Err(String),
 }
 
-#[derive(Debug)]
+#[derive(PartialEq, Debug)]
 pub enum TransferStatus {
     ClientApproved,
     ClientCancelled,

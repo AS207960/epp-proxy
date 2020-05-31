@@ -141,7 +141,7 @@ pub struct EPPResponse {
     pub results: Vec<EPPResult>,
     #[serde(rename = "{urn:ietf:params:xml:ns:epp-1.0}extension", default)]
     pub extension: Option<EPPResponseExtension>,
-    #[serde(rename = "{urn:ietf:params:xml:ns:epp-1.0}msgQ", default)]
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp-1.0}msgQ")]
     pub message_queue: Option<EPPMessageQueue>,
     #[serde(rename = "{urn:ietf:params:xml:ns:epp-1.0}resData", default)]
     pub data: Option<EPPResultData>,
@@ -435,7 +435,7 @@ pub struct EPPMessageQueue {
     pub count: u64,
     #[serde(rename = "$attr:id")]
     pub id: String,
-    #[serde(rename = "{urn:ietf:params:xml:ns:epp-1.0}qDate")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp-1.0}qDate", deserialize_with = "deserialize_datetime_opt", default)]
     pub enqueue_date: Option<DateTime<Utc>>,
     #[serde(rename = "{urn:ietf:params:xml:ns:epp-1.0}msg")]
     pub message: Option<String>,
@@ -482,7 +482,25 @@ pub enum EPPResultDataValue {
     #[serde(rename = "{http://www.verisign.com/epp/balance-1.0}infData")]
     VerisignBalanceInfoResult(verisign::EPPBalance),
     #[serde(rename = "{http://www.verisign.com/epp/rgp-poll-1.0}pollData")]
-    VerisignRGPPollData(verisign::EPPRGPPollData)
+    VerisignRGPPollData(verisign::EPPRGPPollData),
+    #[serde(rename = "{http://www.verisign.com/epp/lowbalance-poll-1.0}pollData")]
+    VerisignLowBalanceData(verisign::EPPLowBalanceData),
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/std-notifications-1.2}cancData")]
+    NominetCancelData(nominet::EPPCancelData),
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/std-notifications-1.2}relData")]
+    NominetReleaseData(nominet::EPPReleaseData),
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/std-notifications-1.2}rcData")]
+    NominetRegistrarChangeData(nominet::EPPRegistrarChangeData),
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/std-notifications-1.2}hostCancData")]
+    NominetHostCancelData(nominet::EPPHostCancelData),
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/std-notifications-1.2}processData")]
+    NominetProcessData(nominet::EPPProcessData),
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/std-notifications-1.2}suspData")]
+    NominetSuspendData(nominet::EPPSuspendData),
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/std-notifications-1.2}domainFailData")]
+    NominetDomainFailData(nominet::EPPDomainFailData),
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/std-notifications-1.2}trnData")]
+    NominetTransferData(nominet::EPPTransferData),
 }
 
 #[derive(Debug, Deserialize)]

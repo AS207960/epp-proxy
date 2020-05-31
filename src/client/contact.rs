@@ -1,7 +1,8 @@
 //! EPP commands relating to contact objects
 
+use std::convert::{TryFrom, TryInto};
 use super::router::HandleReqReturn;
-use super::{proto, EPPClientServerFeatures, Request, Response, Sender};
+use super::{proto, EPPClientServerFeatures, Request, Response, Error, Sender};
 use chrono::prelude::*;
 use regex::Regex;
 
@@ -451,13 +452,13 @@ pub struct UpdateResponse {
     pub pending: bool,
 }
 
-fn check_id<T>(id: &str) -> Result<(), Response<T>> {
+pub(crate) fn check_id<T>(id: &str) -> Result<(), Response<T>> {
     if let 3..=16 = id.len() {
         Ok(())
     } else {
-        Err(Response::Err(
+        Err(Err(Error::Err(
             "contact id has a min length of 3 and a max length of 16".to_string(),
-        ))
+        )))
     }
 }
 
@@ -489,12 +490,116 @@ pub struct TransferResponse {
     pub act_date: DateTime<Utc>,
 }
 
+impl TryFrom<(proto::contact::EPPContactInfoData, &Option<proto::EPPResponseExtension>)> for InfoResponse {
+    type Error = Error;
+
+    fn try_from(from: (proto::contact::EPPContactInfoData, &Option<proto::EPPResponseExtension>)) -> Result<Self, Self::Error> {
+        let (contact_info, extension) = from;
+        let map_addr = |a: Option<&proto::contact::EPPContactPostalInfo>| match a {
+            Some(p) => Some(Address {
+                name: match &p.name {
+                    Some(n) => n.clone(),
+                    None => format!("{} {}", p.traficom_first_name.as_deref().unwrap_or_default(), p.traficom_last_name.as_deref().unwrap_or_default())
+                },
+                organisation: p.organisation.clone(),
+                streets: p.address.streets.clone(),
+                city: p.address.city.clone(),
+                province: p.address.province.clone(),
+                postal_code: p.address.postal_code.clone(),
+                country_code: p.address.country_code.clone(),
+                identity_number: p.traficom_identity.clone(),
+                birth_date: p.traficom_birth_date
+            }),
+            None => None,
+        };
+        let ext_info = match extension {
+            Some(e) => match e.value.iter().find(|e| match e {
+                proto::EPPResponseExtensionType::NominetContactExtInfo(_) => true,
+                _ => false,
+            }) {
+                Some(e) => match e {
+                    proto::EPPResponseExtensionType::NominetContactExtInfo(e) => Some(e),
+                    _ => unreachable!(),
+                },
+                None => None,
+            },
+            None => None,
+        };
+        let local_address = contact_info.postal_info.iter().find(|p| {
+            p.addr_type == proto::contact::EPPContactPostalInfoType::Local
+        });
+        Ok(InfoResponse {
+            id: contact_info.id,
+            statuses: contact_info
+                .statuses
+                .into_iter()
+                .map(|s| s.status.into())
+                .collect(),
+            registry_id: contact_info.registry_id,
+            local_address: map_addr(local_address),
+            internationalised_address: map_addr(contact_info.postal_info.iter().find(
+                |p| {
+                    p.addr_type
+                        == proto::contact::EPPContactPostalInfoType::Internationalised
+                },
+            )),
+            phone: contact_info.phone.map(|p| p.into()),
+            fax: contact_info.fax.map(|p| p.into()),
+            email: contact_info.email,
+            client_id: contact_info.client_id,
+            client_created_id: contact_info.client_created_id,
+            creation_date: contact_info.creation_date,
+            last_updated_client: contact_info.last_updated_client,
+            last_updated_date: contact_info.last_updated_date,
+            last_transfer_date: contact_info.last_transfer_date,
+            trading_name: match &ext_info {
+                Some(e) => e.trading_name.clone(),
+                None => None,
+            },
+            company_number: match &ext_info {
+                Some(e) => e.company_number.clone(),
+                None => match local_address {
+                    Some(a) => a.traficom_register_number.clone(),
+                    None => None
+                },
+            },
+            entity_type: match &ext_info {
+                Some(e) => match &e.contact_type {
+                    Some(i) => i.into(),
+                    None => EntityType::Unknown
+                },
+                None => match contact_info.traficom_type {
+                    Some(t) => traficom_type_to_entity_type(&t, match local_address {
+                        Some(a) => a.traficom_is_finnish.unwrap_or(false),
+                        None => false
+                    }),
+                    None => EntityType::Unknown
+                },
+            },
+            disclosure: match contact_info.disclose {
+                Some(d) => {
+                    if d.flag {
+                        d.elements.iter().filter_map(|e| e.into()).collect()
+                    } else {
+                        vec![]
+                    }
+                }
+                None => vec![],
+            },
+            auth_info: match contact_info.auth_info {
+                Some(a) => a.password,
+                None => None
+            }
+        })
+    }
+}
+
 pub fn handle_check(
     client: &EPPClientServerFeatures,
     req: &CheckRequest,
 ) -> HandleReqReturn<CheckResponse> {
     if !client.contact_supported {
-        return Err(Response::Unsupported);
+        return Err(Err(Error::Unsupported));
     }
     check_id(&req.id)?;
     let command = proto::EPPCheck::Contact(proto::contact::EPPContactCheck { id: req.id.clone() });
@@ -506,17 +611,17 @@ pub fn handle_check_response(response: proto::EPPResponse) -> Response<CheckResp
         Some(value) => match value.value {
             proto::EPPResultDataValue::EPPContactCheckResult(contact_check) => {
                 if let Some(contact_check) = contact_check.data.first() {
-                    Response::Ok(CheckResponse {
+                    Ok(CheckResponse {
                         avail: contact_check.id.available,
                         reason: contact_check.reason.to_owned(),
                     })
                 } else {
-                    Response::InternalServerError
+                    Err(Error::InternalServerError)
                 }
             }
-            _ => Response::InternalServerError,
+            _ => Err(Error::InternalServerError),
         },
-        None => Response::InternalServerError,
+        None => Err(Error::InternalServerError),
     }
 }
 
@@ -525,7 +630,7 @@ pub fn handle_info(
     req: &InfoRequest,
 ) -> HandleReqReturn<InfoResponse> {
     if !client.contact_supported {
-        return Err(Response::Unsupported);
+        return Err(Err(Error::Unsupported));
     }
     check_id(&req.id)?;
     let command = proto::EPPInfo::Contact(proto::contact::EPPContactCheck { id: req.id.clone() });
@@ -536,106 +641,11 @@ pub fn handle_info_response(response: proto::EPPResponse) -> Response<InfoRespon
     match response.data {
         Some(value) => match value.value {
             proto::EPPResultDataValue::EPPContactInfoResult(contact_info) => {
-                let map_addr = |a: Option<&proto::contact::EPPContactPostalInfo>| match a {
-                    Some(p) => Some(Address {
-                        name: match &p.name {
-                            Some(n) => n.clone(),
-                            None => format!("{} {}", p.traficom_first_name.as_deref().unwrap_or_default(), p.traficom_last_name.as_deref().unwrap_or_default())
-                        },
-                        organisation: p.organisation.clone(),
-                        streets: p.address.streets.clone(),
-                        city: p.address.city.clone(),
-                        province: p.address.province.clone(),
-                        postal_code: p.address.postal_code.clone(),
-                        country_code: p.address.country_code.clone(),
-                        identity_number: p.traficom_identity.clone(),
-                        birth_date: p.traficom_birth_date
-                    }),
-                    None => None,
-                };
-                let ext_info = match response.extension {
-                    Some(e) => match e.value.into_iter().find(|e| match e {
-                        proto::EPPResponseExtensionType::NominetContactExtInfo(_) => true,
-                        _ => false,
-                    }) {
-                        Some(e) => match e {
-                            proto::EPPResponseExtensionType::NominetContactExtInfo(e) => Some(e),
-                            _ => unreachable!(),
-                        },
-                        None => None,
-                    },
-                    None => None,
-                };
-                let local_address = contact_info.postal_info.iter().find(|p| {
-                    p.addr_type == proto::contact::EPPContactPostalInfoType::Local
-                });
-                Response::Ok(InfoResponse {
-                    id: contact_info.id,
-                    statuses: contact_info
-                        .statuses
-                        .into_iter()
-                        .map(|s| s.status.into())
-                        .collect(),
-                    registry_id: contact_info.registry_id,
-                    local_address: map_addr(local_address),
-                    internationalised_address: map_addr(contact_info.postal_info.iter().find(
-                        |p| {
-                            p.addr_type
-                                == proto::contact::EPPContactPostalInfoType::Internationalised
-                        },
-                    )),
-                    phone: contact_info.phone.map(|p| p.into()),
-                    fax: contact_info.fax.map(|p| p.into()),
-                    email: contact_info.email,
-                    client_id: contact_info.client_id,
-                    client_created_id: contact_info.client_created_id,
-                    creation_date: contact_info.creation_date,
-                    last_updated_client: contact_info.last_updated_client,
-                    last_updated_date: contact_info.last_updated_date,
-                    last_transfer_date: contact_info.last_transfer_date,
-                    trading_name: match &ext_info {
-                        Some(e) => e.trading_name.clone(),
-                        None => None,
-                    },
-                    company_number: match &ext_info {
-                        Some(e) => e.company_number.clone(),
-                        None => match local_address {
-                            Some(a) => a.traficom_register_number.clone(),
-                            None => None
-                        },
-                    },
-                    entity_type: match &ext_info {
-                        Some(e) => match &e.contact_type {
-                            Some(i) => i.into(),
-                            None =>EntityType::Unknown
-                        },
-                        None => match contact_info.traficom_type {
-                            Some(t) => traficom_type_to_entity_type(&t, match local_address {
-                                Some(a) => a.traficom_is_finnish.unwrap_or(false),
-                                None => false
-                            }),
-                            None => EntityType::Unknown
-                        },
-                    },
-                    disclosure: match contact_info.disclose {
-                        Some(d) => {
-                            if d.flag {
-                                d.elements.iter().filter_map(|e| e.into()).collect()
-                            } else {
-                                vec![]
-                            }
-                        }
-                        None => vec![],
-                    },
-                    auth_info: match contact_info.auth_info {
-                        Some(a) => a.password,
-                        None => None
-                    }
-                })
+                (*contact_info, &response.extension).try_into()
             }
-            _ => Response::InternalServerError,
+            _ => Err(Error::InternalServerError),
         },
-        None => Response::InternalServerError,
+        None => Err(Error::InternalServerError),
     }
 }
 
@@ -644,43 +654,43 @@ pub fn handle_create(
     req: &CreateRequest,
 ) -> HandleReqReturn<CreateResponse> {
     if !client.contact_supported {
-        return Err(Response::Unsupported);
+        return Err(Err(Error::Unsupported));
     }
     check_id(&req.id)?;
     if req.email.is_empty() {
-        return Err(Response::Err("contact email cannot be empty".to_string()));
+        return Err(Err(Error::Err("contact email cannot be empty".to_string())));
     }
     let phone_re = Regex::new(r"^\+\d+\.\d+$").unwrap();
     if let Some(phone) = &req.phone {
         if !phone_re.is_match(&phone.number) {
-            return Err(Response::Err("invalid phone number format".to_string()));
+            return Err(Err(Error::Err("invalid phone number format".to_string())));
         }
     }
     if let Some(fax) = &req.fax {
         if !phone_re.is_match(&fax.number) {
-            return Err(Response::Err("invalid fax number format".to_string()));
+            return Err(Err(Error::Err("invalid fax number format".to_string())));
         }
     }
     if req.local_address.is_none() && req.internationalised_address.is_none() {
-        return Err(Response::Err(
+        return Err(Err(Error::Err(
             "either a local or internationalised address must be specified format".to_string(),
-        ));
+        )));
     }
 
     let map_addr = |a: &Address, t: proto::contact::EPPContactPostalInfoType| {
         if a.name.is_empty() {
-            return Err(Response::Err("contact name cannot be empty".to_string()));
+            return Err(Err(Error::Err("contact name cannot be empty".to_string())));
         }
         if a.city.is_empty() {
-            return Err(Response::Err("contact city cannot be empty".to_string()));
+            return Err(Err(Error::Err("contact city cannot be empty".to_string())));
         }
         if a.country_code.len() != 2 {
-            return Err(Response::Err(
+            return Err(Err(Error::Err(
                 "contact country code must be of length 2".to_string(),
-            ));
+            )));
         }
         if a.streets.is_empty() {
-            return Err(Response::Err("contact streets cannot be empty".to_string()));
+            return Err(Err(Error::Err("contact streets cannot be empty".to_string())));
         }
         let mut name_parts: Vec<&str> = a.name.rsplitn(2, ' ').collect();
         Ok(proto::contact::EPPContactPostalInfo {
@@ -816,15 +826,15 @@ pub fn handle_create_response(response: proto::EPPResponse) -> Response<CreateRe
     match response.data {
         Some(ref value) => match &value.value {
             proto::EPPResultDataValue::EPPContactCreateResult(contact_create) => {
-                Response::Ok(CreateResponse {
+                Ok(CreateResponse {
                     id: contact_create.id.clone(),
                     pending: response.is_pending(),
                     creation_date: contact_create.creation_date,
                 })
             }
-            _ => Response::InternalServerError,
+            _ => Err(Error::InternalServerError),
         },
-        None => Response::InternalServerError,
+        None => Err(Error::InternalServerError),
     }
 }
 
@@ -833,7 +843,7 @@ pub fn handle_delete(
     req: &DeleteRequest,
 ) -> HandleReqReturn<DeleteResponse> {
     if !client.contact_supported {
-        return Err(Response::Unsupported);
+        return Err(Err(Error::Unsupported));
     }
     check_id(&req.id)?;
     let command = proto::EPPDelete::Contact(proto::contact::EPPContactCheck { id: req.id.clone() });
@@ -851,7 +861,7 @@ pub fn handle_update(
     req: &UpdateRequest,
 ) -> HandleReqReturn<UpdateResponse> {
     if !client.contact_supported {
-        return Err(Response::Unsupported);
+        return Err(Err(Error::Unsupported));
     }
     check_id(&req.id)?;
     let is_not_change = req.new_email.is_none()
@@ -865,39 +875,39 @@ pub fn handle_update(
         && req.new_company_number.is_none();
     if req.add_statuses.is_empty() && req.remove_statuses.is_empty() && is_not_change {
         if is_not_nom_change {
-            return Err(Response::Err(
+            return Err(Err(Error::Err(
                 "at least one operation must be specified".to_string(),
-            ));
+            )));
         } else if !client.nominet_contact_ext {
-            return Err(Response::Ok(UpdateResponse { pending: false }));
+            return Err(Ok(UpdateResponse { pending: false }));
         }
     }
     let phone_re = Regex::new(r"^\+\d+\.\d+$").unwrap();
     if let Some(phone) = &req.new_phone {
         if !phone_re.is_match(&phone.number) && &phone.number != "" {
-            return Err(Response::Err("invalid phone number format".to_string()));
+            return Err(Err(Error::Err("invalid phone number format".to_string())));
         }
     }
     if let Some(fax) = &req.new_fax {
         if !phone_re.is_match(&fax.number) && &fax.number != "" {
-            return Err(Response::Err("invalid fax number format".to_string()));
+            return Err(Err(Error::Err("invalid fax number format".to_string())));
         }
     }
     let mut postal_info = vec![];
     let map_addr = |a: &Address, t: proto::contact::EPPContactPostalInfoType| {
         if a.name.is_empty() {
-            return Err(Response::Err("contact name cannot be empty".to_string()));
+            return Err(Err(Error::Err("contact name cannot be empty".to_string())));
         }
         if a.city.is_empty() {
-            return Err(Response::Err("contact city cannot be empty".to_string()));
+            return Err(Err(Error::Err("contact city cannot be empty".to_string())));
         }
         if a.country_code.len() != 2 {
-            return Err(Response::Err(
+            return Err(Err(Error::Err(
                 "contact country code must be of length 2".to_string(),
-            ));
+            )));
         }
         if a.streets.is_empty() {
-            return Err(Response::Err("contact streets cannot be empty".to_string()));
+            return Err(Err(Error::Err("contact streets cannot be empty".to_string())));
         }
         Ok(proto::contact::EPPContactUpdatePostalInfo {
             addr_type: t,
@@ -1002,7 +1012,7 @@ pub fn handle_transfer_query(
     req: &TransferQueryRequest,
 ) -> HandleReqReturn<TransferResponse> {
     if !client.contact_supported {
-        return Err(Response::Unsupported);
+        return Err(Err(Error::Unsupported));
     }
     check_id(&req.id)?;
     let command = proto::EPPTransfer {
@@ -1019,7 +1029,7 @@ pub fn handle_transfer_request(
     req: &TransferRequestRequest,
 ) -> HandleReqReturn<TransferResponse> {
     if !client.contact_supported {
-        return Err(Response::Unsupported);
+        return Err(Err(Error::Unsupported));
     }
     check_id(&req.id)?;
     let command = proto::EPPTransfer {
@@ -1039,7 +1049,7 @@ pub fn handle_transfer_accept(
     req: &TransferRequestRequest,
 ) -> HandleReqReturn<TransferResponse> {
     if !client.contact_supported {
-        return Err(Response::Unsupported);
+        return Err(Err(Error::Unsupported));
     }
     check_id(&req.id)?;
     let command = proto::EPPTransfer {
@@ -1059,7 +1069,7 @@ pub fn handle_transfer_reject(
     req: &TransferRequestRequest,
 ) -> HandleReqReturn<TransferResponse> {
     if !client.contact_supported {
-        return Err(Response::Unsupported);
+        return Err(Err(Error::Unsupported));
     }
     check_id(&req.id)?;
     let command = proto::EPPTransfer {
@@ -1078,7 +1088,7 @@ pub fn handle_transfer_response(response: proto::EPPResponse) -> Response<Transf
     match &response.data {
         Some(value) => match &value.value {
             proto::EPPResultDataValue::EPPContactTransferResult(contact_transfer) => {
-                Response::Ok(TransferResponse {
+                Ok(TransferResponse {
                     pending: response.is_pending(),
                     status: (&contact_transfer.transfer_status).into(),
                     requested_client_id: contact_transfer.requested_client_id.clone(),
@@ -1087,9 +1097,9 @@ pub fn handle_transfer_response(response: proto::EPPResponse) -> Response<Transf
                     act_date: contact_transfer.act_date,
                 })
             }
-            _ => Response::InternalServerError,
+            _ => Err(Error::InternalServerError),
         },
-        None => Response::InternalServerError,
+        None => Err(Error::InternalServerError),
     }
 }
 
