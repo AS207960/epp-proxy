@@ -4,8 +4,8 @@ use std::convert::TryInto;
 
 use chrono::prelude::*;
 
-use super::{EPPClientServerFeatures, Error, proto, Request, Response, Sender};
 use super::router::HandleReqReturn;
+use super::{proto, EPPClientServerFeatures, Error, Request, Response, Sender};
 
 #[derive(Debug)]
 pub struct PollRequest {
@@ -102,7 +102,9 @@ pub enum ChangeCaseIdType {
     Custom,
 }
 
-fn change_data_from_response(from: &Option<proto::EPPResponseExtension>) -> Result<Option<ChangeData>, Error> {
+fn change_data_from_response(
+    from: &Option<proto::EPPResponseExtension>,
+) -> Result<Option<ChangeData>, Error> {
     match from {
         Some(ext) => match ext.value.iter().find_map(|p| match p {
             proto::EPPResponseExtensionType::EPPChangePoll(i) => Some(i),
@@ -116,16 +118,36 @@ fn change_data_from_response(from: &Option<proto::EPPResponseExtension>) -> Resu
                 operation: ChangeOperation {
                     operation: e.operation.operation.clone(),
                     op_type: match e.operation.op_type {
-                        proto::change_poll::EPPChangeOperationType::Create => ChangeOperationType::Create,
-                        proto::change_poll::EPPChangeOperationType::Delete => ChangeOperationType::Delete,
-                        proto::change_poll::EPPChangeOperationType::Renew => ChangeOperationType::Renew,
-                        proto::change_poll::EPPChangeOperationType::Transfer => ChangeOperationType::Transfer,
-                        proto::change_poll::EPPChangeOperationType::Update => ChangeOperationType::Update,
-                        proto::change_poll::EPPChangeOperationType::Restore => ChangeOperationType::Restore,
-                        proto::change_poll::EPPChangeOperationType::AutoRenew => ChangeOperationType::AutoRenew,
-                        proto::change_poll::EPPChangeOperationType::AutoDelete => ChangeOperationType::AutoDelete,
-                        proto::change_poll::EPPChangeOperationType::AutoPurge => ChangeOperationType::AutoPurge,
-                        proto::change_poll::EPPChangeOperationType::Custom => ChangeOperationType::Custom
+                        proto::change_poll::EPPChangeOperationType::Create => {
+                            ChangeOperationType::Create
+                        }
+                        proto::change_poll::EPPChangeOperationType::Delete => {
+                            ChangeOperationType::Delete
+                        }
+                        proto::change_poll::EPPChangeOperationType::Renew => {
+                            ChangeOperationType::Renew
+                        }
+                        proto::change_poll::EPPChangeOperationType::Transfer => {
+                            ChangeOperationType::Transfer
+                        }
+                        proto::change_poll::EPPChangeOperationType::Update => {
+                            ChangeOperationType::Update
+                        }
+                        proto::change_poll::EPPChangeOperationType::Restore => {
+                            ChangeOperationType::Restore
+                        }
+                        proto::change_poll::EPPChangeOperationType::AutoRenew => {
+                            ChangeOperationType::AutoRenew
+                        }
+                        proto::change_poll::EPPChangeOperationType::AutoDelete => {
+                            ChangeOperationType::AutoDelete
+                        }
+                        proto::change_poll::EPPChangeOperationType::AutoPurge => {
+                            ChangeOperationType::AutoPurge
+                        }
+                        proto::change_poll::EPPChangeOperationType::Custom => {
+                            ChangeOperationType::Custom
+                        }
                     },
                 },
                 date: e.date,
@@ -137,14 +159,14 @@ fn change_data_from_response(from: &Option<proto::EPPResponseExtension>) -> Resu
                     case_type: match c.case_type {
                         proto::change_poll::EPPChangeCaseIdType::UDRP => ChangeCaseIdType::UDRP,
                         proto::change_poll::EPPChangeCaseIdType::URS => ChangeCaseIdType::URS,
-                        proto::change_poll::EPPChangeCaseIdType::Custom => ChangeCaseIdType::Custom
+                        proto::change_poll::EPPChangeCaseIdType::Custom => ChangeCaseIdType::Custom,
                     },
                 }),
                 reason: e.reason.clone(),
             })),
             None => Ok(None),
         },
-        None => Ok(None)
+        None => Ok(None),
     }
 }
 
@@ -186,29 +208,59 @@ pub fn handle_poll_response(response: proto::EPPResponse) -> Response<Option<Pol
                     message: value.message.unwrap_or_default(),
                     data: match response.data {
                         Some(value) => match value.value {
-                            proto::EPPResultDataValue::EPPDomainInfoResult(domain_info) => PollData::DomainInfoData {
-                                data: Box::new((*domain_info, &response.extension).try_into()?),
-                                change_data: change_data_from_response(&response.extension)?,
-                            },
-                            proto::EPPResultDataValue::EPPContactInfoResult(contact_info) => PollData::ContactInfoData {
-                                data: Box::new((*contact_info, &response.extension).try_into()?),
-                                change_data: change_data_from_response(&response.extension)?,
-                            },
-                            proto::EPPResultDataValue::EPPDomainTransferResult(domain_transfer) => PollData::DomainTransferData((&domain_transfer).into()),
-                            proto::EPPResultDataValue::EPPDomainCreateResult(domain_create) => PollData::DomainCreateData((&domain_create).into()),
-                            proto::EPPResultDataValue::EPPDomainPendingActionNotification(domain_data) => PollData::DomainPanData((&domain_data).into()),
-                            proto::EPPResultDataValue::NominetCancelData(canc_data) => PollData::NominetDomainCancelData(canc_data.into()),
-                            proto::EPPResultDataValue::NominetReleaseData(rel_data) => PollData::NominetDomainReleaseData(rel_data.into()),
-                            proto::EPPResultDataValue::NominetRegistrarChangeData(rc_data) => PollData::NominetDomainRegistrarChangeData(rc_data.try_into()?),
-                            proto::EPPResultDataValue::NominetHostCancelData(canc_data) => PollData::NominetHostCancelData(canc_data.into()),
-                            proto::EPPResultDataValue::NominetProcessData(p_data) => PollData::NominetProcessData(p_data.try_into()?),
-                            proto::EPPResultDataValue::NominetSuspendData(sus_data) => PollData::NominetSuspendData(sus_data.into()),
-                            proto::EPPResultDataValue::NominetDomainFailData(fail_data) => PollData::NominetDomainFailData(fail_data.into()),
-                            proto::EPPResultDataValue::NominetTransferData(trn_data) => PollData::NominetRegistrantTransferData(trn_data.try_into()?),
-                            proto::EPPResultDataValue::VerisignLowBalanceData(bal_data) => PollData::VerisignLowBalanceData(bal_data.try_into()?),
-                            _ => return Err(Error::InternalServerError)
-                        }
-                        None => PollData::None
+                            proto::EPPResultDataValue::EPPDomainInfoResult(domain_info) => {
+                                PollData::DomainInfoData {
+                                    data: Box::new((*domain_info, &response.extension).try_into()?),
+                                    change_data: change_data_from_response(&response.extension)?,
+                                }
+                            }
+                            proto::EPPResultDataValue::EPPContactInfoResult(contact_info) => {
+                                PollData::ContactInfoData {
+                                    data: Box::new(
+                                        (*contact_info, &response.extension).try_into()?,
+                                    ),
+                                    change_data: change_data_from_response(&response.extension)?,
+                                }
+                            }
+                            proto::EPPResultDataValue::EPPDomainTransferResult(domain_transfer) => {
+                                PollData::DomainTransferData((&domain_transfer).into())
+                            }
+                            proto::EPPResultDataValue::EPPDomainCreateResult(domain_create) => {
+                                PollData::DomainCreateData((&domain_create).into())
+                            }
+                            proto::EPPResultDataValue::EPPDomainPendingActionNotification(
+                                domain_data,
+                            ) => PollData::DomainPanData((&domain_data).into()),
+                            proto::EPPResultDataValue::NominetCancelData(canc_data) => {
+                                PollData::NominetDomainCancelData(canc_data.into())
+                            }
+                            proto::EPPResultDataValue::NominetReleaseData(rel_data) => {
+                                PollData::NominetDomainReleaseData(rel_data.into())
+                            }
+                            proto::EPPResultDataValue::NominetRegistrarChangeData(rc_data) => {
+                                PollData::NominetDomainRegistrarChangeData(rc_data.try_into()?)
+                            }
+                            proto::EPPResultDataValue::NominetHostCancelData(canc_data) => {
+                                PollData::NominetHostCancelData(canc_data.into())
+                            }
+                            proto::EPPResultDataValue::NominetProcessData(p_data) => {
+                                PollData::NominetProcessData(p_data.try_into()?)
+                            }
+                            proto::EPPResultDataValue::NominetSuspendData(sus_data) => {
+                                PollData::NominetSuspendData(sus_data.into())
+                            }
+                            proto::EPPResultDataValue::NominetDomainFailData(fail_data) => {
+                                PollData::NominetDomainFailData(fail_data.into())
+                            }
+                            proto::EPPResultDataValue::NominetTransferData(trn_data) => {
+                                PollData::NominetRegistrantTransferData(trn_data.try_into()?)
+                            }
+                            proto::EPPResultDataValue::VerisignLowBalanceData(bal_data) => {
+                                PollData::VerisignLowBalanceData(bal_data.try_into()?)
+                            }
+                            _ => return Err(Error::InternalServerError),
+                        },
+                        None => PollData::None,
                     },
                 })),
                 None => Err(Error::InternalServerError),
@@ -260,7 +312,7 @@ pub async fn poll(
         })),
         receiver,
     )
-        .await
+    .await
 }
 
 /// Acknowledges and dequeues a message previously retrieved via poll
@@ -281,7 +333,7 @@ pub async fn poll_ack(
         })),
         receiver,
     )
-        .await
+    .await
 }
 
 #[cfg(test)]
@@ -318,13 +370,13 @@ mod poll_tests {
         let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
         let res = match res.message {
             super::proto::EPPMessageType::Response(r) => r,
-            _ => unreachable!()
+            _ => unreachable!(),
         };
         let data = super::handle_poll_response(*res).unwrap().unwrap();
         assert_eq!(data.message, "Domain transfer completed successfully");
         match data.data {
             super::PollData::DomainTransferData(_) => {}
-            _ => unreachable!()
+            _ => unreachable!(),
         }
     }
 
@@ -371,22 +423,23 @@ mod poll_tests {
         let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
         let res = match res.message {
             super::proto::EPPMessageType::Response(r) => r,
-            _ => unreachable!()
+            _ => unreachable!(),
         };
         let data = super::handle_poll_response(*res).unwrap().unwrap();
         assert_eq!(data.message, "");
         match data.data {
-            super::PollData::DomainInfoData {
-                data, change_data
-            } => {
+            super::PollData::DomainInfoData { data, change_data } => {
                 let change_data = change_data.unwrap();
                 assert_eq!(change_data.state, super::ChangeState::After);
-                assert_eq!(change_data.operation.op_type, super::ChangeOperationType::Delete);
+                assert_eq!(
+                    change_data.operation.op_type,
+                    super::ChangeOperationType::Delete
+                );
                 assert_eq!(change_data.who, "SWITCH manual delete");
                 assert_eq!(change_data.reason.unwrap(), "domain name abuse");
                 assert_eq!(data.name, "delete-me11.ch");
             }
-            _ => unreachable!()
+            _ => unreachable!(),
         }
     }
 
@@ -444,22 +497,23 @@ mod poll_tests {
         let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
         let res = match res.message {
             super::proto::EPPMessageType::Response(r) => r,
-            _ => unreachable!()
+            _ => unreachable!(),
         };
         let data = super::handle_poll_response(*res).unwrap().unwrap();
         assert_eq!(data.message, "");
         match data.data {
-            super::PollData::DomainInfoData {
-                data, change_data
-            } => {
+            super::PollData::DomainInfoData { data, change_data } => {
                 let change_data = change_data.unwrap();
                 assert_eq!(change_data.state, super::ChangeState::After);
-                assert_eq!(change_data.operation.op_type, super::ChangeOperationType::Update);
+                assert_eq!(
+                    change_data.operation.op_type,
+                    super::ChangeOperationType::Update
+                );
                 assert_eq!(change_data.who, "SWITCH CDS: see https://www.nic.ch/cds/");
                 assert_eq!(change_data.reason.unwrap(), "DNSSEC initialized");
                 assert_eq!(data.sec_dns.is_some(), true);
             }
-            _ => unreachable!()
+            _ => unreachable!(),
         }
     }
 
@@ -503,22 +557,23 @@ mod poll_tests {
         let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
         let res = match res.message {
             super::proto::EPPMessageType::Response(r) => r,
-            _ => unreachable!()
+            _ => unreachable!(),
         };
         let data = super::handle_poll_response(*res).unwrap().unwrap();
         assert_eq!(data.message, "");
         match data.data {
-            super::PollData::DomainInfoData {
-                data, change_data
-            } => {
+            super::PollData::DomainInfoData { data, change_data } => {
                 let change_data = change_data.unwrap();
                 assert_eq!(change_data.state, super::ChangeState::After);
-                assert_eq!(change_data.operation.op_type, super::ChangeOperationType::Update);
+                assert_eq!(
+                    change_data.operation.op_type,
+                    super::ChangeOperationType::Update
+                );
                 assert_eq!(change_data.who, "SWITCH CDS: see https://www.nic.ch/cds/");
                 assert_eq!(change_data.reason.unwrap(), "DNSSEC deactivated");
                 assert_eq!(data.sec_dns.is_none(), true);
             }
-            _ => unreachable!()
+            _ => unreachable!(),
         }
     }
 
@@ -574,18 +629,16 @@ mod poll_tests {
         let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
         let res = match res.message {
             super::proto::EPPMessageType::Response(r) => r,
-            _ => unreachable!()
+            _ => unreachable!(),
         };
         let data = super::handle_poll_response(*res).unwrap().unwrap();
         assert_eq!(data.message, "Account Details Change Notification");
         match data.data {
-            super::PollData::ContactInfoData {
-                data, change_data
-            } => {
+            super::PollData::ContactInfoData { data, change_data } => {
                 assert_eq!(change_data.is_none(), true);
                 assert_eq!(data.id, "CMyContactID");
             }
-            _ => unreachable!()
+            _ => unreachable!(),
         }
     }
 
@@ -617,7 +670,7 @@ mod poll_tests {
         let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
         let res = match res.message {
             super::proto::EPPMessageType::Response(r) => r,
-            _ => unreachable!()
+            _ => unreachable!(),
         };
         let data = super::handle_poll_response(*res).unwrap().unwrap();
         assert_eq!(data.message, "Domain name Cancellation Notification");
@@ -626,7 +679,7 @@ mod poll_tests {
                 assert_eq!(canc_data.domain_name, "epp-example1.co.uk");
                 assert_eq!(canc_data.originator, "example@nominet");
             }
-            _ => unreachable!()
+            _ => unreachable!(),
         }
     }
 
@@ -667,7 +720,7 @@ mod poll_tests {
         let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
         let res = match res.message {
             super::proto::EPPMessageType::Response(r) => r,
-            _ => unreachable!()
+            _ => unreachable!(),
         };
         let data = super::handle_poll_response(*res).unwrap().unwrap();
         assert_eq!(data.message, "Domains Released Notification");
@@ -679,7 +732,7 @@ mod poll_tests {
                 assert_eq!(canc_data.registrar_tag, "EXAMPLE2-TAG");
                 assert_eq!(canc_data.domains.len(), 6);
             }
-            _ => unreachable!()
+            _ => unreachable!(),
         }
     }
 
@@ -754,7 +807,7 @@ mod poll_tests {
         let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
         let res = match res.message {
             super::proto::EPPMessageType::Response(r) => r,
-            _ => unreachable!()
+            _ => unreachable!(),
         };
         let data = super::handle_poll_response(*res).unwrap().unwrap();
         assert_eq!(data.message, "Registrar Change Authorisation Request");
@@ -765,7 +818,7 @@ mod poll_tests {
                 assert_eq!(rc_data.case_id, "3560");
                 assert_eq!(rc_data.contact.id, "CMyContactID");
             }
-            _ => unreachable!()
+            _ => unreachable!(),
         }
     }
 
@@ -806,7 +859,7 @@ mod poll_tests {
         let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
         let res = match res.message {
             super::proto::EPPMessageType::Response(r) => r,
-            _ => unreachable!()
+            _ => unreachable!(),
         };
         let data = super::handle_poll_response(*res).unwrap().unwrap();
         assert_eq!(data.message, "Host cancellation notification");
@@ -815,7 +868,7 @@ mod poll_tests {
                 assert_eq!(hc_data.host_objects.len(), 2);
                 assert_eq!(hc_data.domain_names.len(), 2);
             }
-            _ => unreachable!()
+            _ => unreachable!(),
         }
     }
 
@@ -874,17 +927,20 @@ mod poll_tests {
         let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
         let res = match res.message {
             super::proto::EPPMessageType::Response(r) => r,
-            _ => unreachable!()
+            _ => unreachable!(),
         };
         let data = super::handle_poll_response(*res).unwrap().unwrap();
-        assert_eq!(data.message, "Data Quality - {{Workflow type}} process commenced notification");
+        assert_eq!(
+            data.message,
+            "Data Quality - {{Workflow type}} process commenced notification"
+        );
         match data.data {
             super::PollData::NominetProcessData(p_data) => {
                 assert_eq!(p_data.contact.id, "E2CD4B4D83DB0857");
                 assert_eq!(p_data.process_type, "{{Workflow type}}");
                 assert_eq!(p_data.domain_names.len(), 2);
             }
-            _ => unreachable!()
+            _ => unreachable!(),
         }
     }
 
@@ -942,7 +998,7 @@ mod poll_tests {
         let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
         let res = match res.message {
             super::proto::EPPMessageType::Response(r) => r,
-            _ => unreachable!()
+            _ => unreachable!(),
         };
         let data = super::handle_poll_response(*res).unwrap().unwrap();
         assert_eq!(data.message, "DQ Workflow process lifted notification");
@@ -952,7 +1008,7 @@ mod poll_tests {
                 assert_eq!(p_data.process_type, "DQ Workflow");
                 assert_eq!(p_data.domain_names.len(), 2);
             }
-            _ => unreachable!()
+            _ => unreachable!(),
         }
     }
 
@@ -988,7 +1044,7 @@ mod poll_tests {
         let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
         let res = match res.message {
             super::proto::EPPMessageType::Response(r) => r,
-            _ => unreachable!()
+            _ => unreachable!(),
         };
         let data = super::handle_poll_response(*res).unwrap().unwrap();
         assert_eq!(data.message, "Domains Suspended Notification");
@@ -997,7 +1053,7 @@ mod poll_tests {
                 assert_eq!(sus_data.reason, "Data Quality");
                 assert_eq!(sus_data.domain_names.len(), 2);
             }
-            _ => unreachable!()
+            _ => unreachable!(),
         }
     }
 
@@ -1030,7 +1086,7 @@ mod poll_tests {
         let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
         let res = match res.message {
             super::proto::EPPMessageType::Response(r) => r,
-            _ => unreachable!()
+            _ => unreachable!(),
         };
         let data = super::handle_poll_response(*res).unwrap().unwrap();
         assert_eq!(data.message, "Referral Accepted Notification");
@@ -1038,7 +1094,7 @@ mod poll_tests {
             super::PollData::DomainCreateData(create_data) => {
                 assert_eq!(create_data.name, "epp-example1.ltd.uk");
             }
-            _ => unreachable!()
+            _ => unreachable!(),
         }
     }
 
@@ -1070,16 +1126,19 @@ mod poll_tests {
         let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
         let res = match res.message {
             super::proto::EPPMessageType::Response(r) => r,
-            _ => unreachable!()
+            _ => unreachable!(),
         };
         let data = super::handle_poll_response(*res).unwrap().unwrap();
         assert_eq!(data.message, "Referral Rejected Notification");
         match data.data {
             super::PollData::NominetDomainFailData(fail_data) => {
                 assert_eq!(fail_data.domain_name, "epp-example2.ltd.uk");
-                assert_eq!(fail_data.reason, "V205 Registrant does not match domain name");
+                assert_eq!(
+                    fail_data.reason,
+                    "V205 Registrant does not match domain name"
+                );
             }
-            _ => unreachable!()
+            _ => unreachable!(),
         }
     }
 
@@ -1137,7 +1196,7 @@ mod poll_tests {
         let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
         let res = match res.message {
             super::proto::EPPMessageType::Response(r) => r,
-            _ => unreachable!()
+            _ => unreachable!(),
         };
         let data = super::handle_poll_response(*res).unwrap().unwrap();
         assert_eq!(data.message, "Registrant Transfer Notification");
@@ -1149,7 +1208,7 @@ mod poll_tests {
                 assert_eq!(trn_data.domain_names.len(), 2);
                 assert_eq!(trn_data.contact.id, "ST68956589R4");
             }
-            _ => unreachable!()
+            _ => unreachable!(),
         }
     }
 
@@ -1182,18 +1241,21 @@ mod poll_tests {
         let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
         let res = match res.message {
             super::proto::EPPMessageType::Response(r) => r,
-            _ => unreachable!()
+            _ => unreachable!(),
         };
         let data = super::handle_poll_response(*res).unwrap().unwrap();
         assert_eq!(data.message, "");
         match data.data {
             super::PollData::DomainTransferData(trn_data) => {
                 assert_eq!(trn_data.name, "example.uk.com");
-                assert_eq!(trn_data.status, super::super::TransferStatus::ClientApproved);
+                assert_eq!(
+                    trn_data.status,
+                    super::super::TransferStatus::ClientApproved
+                );
                 assert_eq!(trn_data.requested_client_id, "H12345");
                 assert_eq!(trn_data.act_client_id, "H54321");
             }
-            _ => unreachable!()
+            _ => unreachable!(),
         }
     }
 
@@ -1226,7 +1288,7 @@ mod poll_tests {
         let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
         let res = match res.message {
             super::proto::EPPMessageType::Response(r) => r,
-            _ => unreachable!()
+            _ => unreachable!(),
         };
         let data = super::handle_poll_response(*res).unwrap().unwrap();
         assert_eq!(data.message, "");
@@ -1237,7 +1299,7 @@ mod poll_tests {
                 assert_eq!(trn_data.requested_client_id, "H12345");
                 assert_eq!(trn_data.act_client_id, "H54321");
             }
-            _ => unreachable!()
+            _ => unreachable!(),
         }
     }
 
@@ -1273,7 +1335,7 @@ mod poll_tests {
         let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
         let res = match res.message {
             super::proto::EPPMessageType::Response(r) => r,
-            _ => unreachable!()
+            _ => unreachable!(),
         };
         let data = super::handle_poll_response(*res).unwrap().unwrap();
         assert_eq!(data.message, "Low Account Balance");
@@ -1281,10 +1343,13 @@ mod poll_tests {
             super::PollData::VerisignLowBalanceData(bal_data) => {
                 assert_eq!(bal_data.registrar_name, "Test Registar");
                 assert_eq!(bal_data.credit_limit, "1000");
-                assert_eq!(bal_data.credit_threshold, super::super::verisign::CreditThreshold::Percentage(10));
+                assert_eq!(
+                    bal_data.credit_threshold,
+                    super::super::verisign::CreditThreshold::Percentage(10)
+                );
                 assert_eq!(bal_data.available_credit, "80");
             }
-            _ => unreachable!()
+            _ => unreachable!(),
         }
     }
 }

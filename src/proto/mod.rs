@@ -4,6 +4,7 @@
 use chrono::prelude::*;
 use std::collections::HashMap;
 
+pub mod centralnic;
 pub mod change_poll;
 pub mod contact;
 pub mod domain;
@@ -12,9 +13,8 @@ pub mod nominet;
 pub mod rgp;
 pub mod secdns;
 pub mod switch;
-pub mod verisign;
-pub mod centralnic;
 pub mod traficom;
+pub mod verisign;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub enum EPPMessageType {
@@ -115,24 +115,32 @@ pub enum EPPCommandExtensionType {
     EPPSecDNSUpdate(secdns::EPPSecDNSUpdate),
     #[serde(rename = "{urn:ietf:params:xml:ns:domain-ext-1.0}domain-ext:delete")]
     TraficomDelete(traficom::EPPDomainDelete),
-    #[serde(rename = "{http://www.verisign-grs.com/epp/namestoreExt-1.1}namestoreExt:namestoreExt")]
-    VerisignNameStoreExt(verisign::EPPNameStoreExt)
+    #[serde(
+        rename = "{http://www.verisign-grs.com/epp/namestoreExt-1.1}namestoreExt:namestoreExt"
+    )]
+    VerisignNameStoreExt(verisign::EPPNameStoreExt),
 }
 
 #[derive(Debug, Serialize)]
 pub struct EPPCommand {
     #[serde(rename = "$value")]
     pub command: EPPCommandType,
-    #[serde(rename = "{urn:ietf:params:xml:ns:epp-1.0}extension", skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "{urn:ietf:params:xml:ns:epp-1.0}extension",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extension: Option<EPPCommandExtension>,
-    #[serde(rename = "{urn:ietf:params:xml:ns:epp-1.0}clTRID", skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "{urn:ietf:params:xml:ns:epp-1.0}clTRID",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub client_transaction_id: Option<String>,
 }
 
 #[derive(Debug, Serialize)]
 pub struct EPPCommandExtension {
     #[serde(rename = "$value")]
-    pub value: Vec<EPPCommandExtensionType>
+    pub value: Vec<EPPCommandExtensionType>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -152,7 +160,7 @@ pub struct EPPResponse {
 #[derive(Debug, Deserialize)]
 pub struct EPPResponseExtension {
     #[serde(rename = "$value", default)]
-    pub value: Vec<EPPResponseExtensionType>
+    pub value: Vec<EPPResponseExtensionType>,
 }
 
 impl EPPResponse {
@@ -208,22 +216,17 @@ impl EPPResponse {
                 None => {
                     match r.values.as_ref().map(|v| {
                         v.iter()
-                            .map(|e| e
-                                .iter()
-                                .next()
-                                .map(|(k, v)| format!("{}: {}", k, v))
-                                .unwrap_or_default()
-                            )
+                            .map(|e| {
+                                e.iter()
+                                    .next()
+                                    .map(|(k, v)| format!("{}: {}", k, v))
+                                    .unwrap_or_default()
+                            })
                             .collect::<Vec<_>>()
                     }) {
                         Some(v) => {
-                            output.push(format!(
-                                "({:?}) {}: {}",
-                                r.code,
-                                r.message,
-                                v.join(", ")
-                            ));
-                        },
+                            output.push(format!("({:?}) {}: {}", r.code, r.message, v.join(", ")));
+                        }
                         None => {
                             output.push(format!("({:?}) {}", r.code, r.message));
                         }
@@ -435,7 +438,11 @@ pub struct EPPMessageQueue {
     pub count: u64,
     #[serde(rename = "$attr:id")]
     pub id: String,
-    #[serde(rename = "{urn:ietf:params:xml:ns:epp-1.0}qDate", deserialize_with = "deserialize_datetime_opt", default)]
+    #[serde(
+        rename = "{urn:ietf:params:xml:ns:epp-1.0}qDate",
+        deserialize_with = "deserialize_datetime_opt",
+        default
+    )]
     pub enqueue_date: Option<DateTime<Utc>>,
     #[serde(rename = "{urn:ietf:params:xml:ns:epp-1.0}msg")]
     pub message: Option<String>,
@@ -517,7 +524,10 @@ pub struct EPPLogin {
     pub client_id: String,
     #[serde(rename = "{urn:ietf:params:xml:ns:epp-1.0}pw")]
     pub password: String,
-    #[serde(rename = "{urn:ietf:params:xml:ns:epp-1.0}newPW", skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "{urn:ietf:params:xml:ns:epp-1.0}newPW",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub new_password: Option<String>,
     #[serde(rename = "{urn:ietf:params:xml:ns:epp-1.0}options")]
     pub options: EPPLoginOptions,
@@ -537,7 +547,10 @@ pub struct EPPLoginOptions {
 pub struct EPPLoginServices {
     #[serde(rename = "{urn:ietf:params:xml:ns:epp-1.0}objURI")]
     pub objects: Vec<String>,
-    #[serde(rename = "{urn:ietf:params:xml:ns:epp-1.0}svcExtension", skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "{urn:ietf:params:xml:ns:epp-1.0}svcExtension",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extension: Option<EPPServiceExtension>,
 }
 
@@ -709,7 +722,7 @@ impl<'de> serde::de::Visitor<'de> for DateTimeVisitor {
             Err(_) => match Utc.datetime_from_str(value, "%FT%T%.f") {
                 Ok(t) => Ok(t),
                 Err(_) => Utc.datetime_from_str(value, "%FT%T").map_err(E::custom),
-            }
+            },
         }
     }
 }
@@ -795,12 +808,14 @@ where
 {
     let date = d.deserialize_option(OptDateTimeVisitor)?;
     Ok(match date {
-        Some(d) => if d == Utc.ymd(1, 1, 1).and_hms(0, 0, 0) {
-            None
-        } else {
-            Some(d)
-        },
-        None => None
+        Some(d) => {
+            if d == Utc.ymd(1, 1, 1).and_hms(0, 0, 0) {
+                None
+            } else {
+                Some(d)
+            }
+        }
+        None => None,
     })
 }
 
@@ -810,12 +825,14 @@ where
 {
     let date = d.deserialize_option(OptDateVisitor)?;
     Ok(match date {
-        Some(d) => if d == Utc.ymd(1, 1, 1) {
-            None
-        } else {
-            Some(d)
-        },
-        None => None
+        Some(d) => {
+            if d == Utc.ymd(1, 1, 1) {
+                None
+            } else {
+                Some(d)
+            }
+        }
+        None => None,
     })
 }
 
@@ -827,7 +844,6 @@ where
     s.serialize_str(&d.format("%Y-%m-%d").to_string())
 }
 
-
 #[allow(clippy::trivially_copy_pass_by_ref)]
 fn serialize_date_opt<S>(d: &Option<Date<Utc>>, s: S) -> Result<S::Ok, S::Error>
 where
@@ -835,10 +851,9 @@ where
 {
     match d {
         Some(d) => s.serialize_str(&d.format("%Y-%m-%d").to_string()),
-        None => s.serialize_none()
+        None => s.serialize_none(),
     }
 }
-
 
 #[allow(clippy::trivially_copy_pass_by_ref)]
 fn serialize_opt_bool<S>(d: &Option<bool>, s: S) -> Result<S::Ok, S::Error>
@@ -846,11 +861,13 @@ where
     S: serde::ser::Serializer,
 {
     match d {
-        Some(d) => if *d {
-            s.serialize_str("true")
-        } else {
-            s.serialize_str("false")
-        },
-        None => s.serialize_none()
+        Some(d) => {
+            if *d {
+                s.serialize_str("true")
+            } else {
+                s.serialize_str("false")
+            }
+        }
+        None => s.serialize_none(),
     }
 }

@@ -38,6 +38,6 @@ pub enum EPPDomainDelete {
     #[allow(dead_code)]
     Schedule {
         #[serde(rename = "{urn:ietf:params:xml:ns:domain-ext-1.0}domain-ext:delDate")]
-        delete_date: DateTime<Utc>
-    }
+        delete_date: DateTime<Utc>,
+    },
 }

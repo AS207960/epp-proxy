@@ -140,11 +140,20 @@ pub struct EPPHostCreateData {
 pub struct EPPHostUpdate {
     #[serde(rename = "{urn:ietf:params:xml:ns:host-1.0}host:name")]
     pub name: String,
-    #[serde(rename = "{urn:ietf:params:xml:ns:host-1.0}host:add", skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "{urn:ietf:params:xml:ns:host-1.0}host:add",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub add: Option<EPPHostUpdateAdd>,
-    #[serde(rename = "{urn:ietf:params:xml:ns:host-1.0}host:rem", skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "{urn:ietf:params:xml:ns:host-1.0}host:rem",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub remove: Option<EPPHostUpdateRemove>,
-    #[serde(rename = "{urn:ietf:params:xml:ns:host-1.0}host:chg", skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "{urn:ietf:params:xml:ns:host-1.0}host:chg",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub change: Option<EPPHostUpdateChange>,
 }
 

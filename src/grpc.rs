@@ -154,7 +154,9 @@ fn entity_type_from_i32(from: i32) -> Option<client::contact::EntityType> {
             epp_proto::contact::EntityType::OtherPublicCommunity => {
                 Some(client::contact::EntityType::OtherPublicCommunity)
             }
-            epp_proto::contact::EntityType::UnknownEntity => Some(client::contact::EntityType::Unknown),
+            epp_proto::contact::EntityType::UnknownEntity => {
+                Some(client::contact::EntityType::Unknown)
+            }
             epp_proto::contact::EntityType::NotSet => None,
         },
         None => None,
@@ -355,7 +357,7 @@ impl From<epp_proto::contact::Phone> for client::contact::Phone {
     fn from(from: epp_proto::contact::Phone) -> Self {
         client::contact::Phone {
             number: from.number,
-            extension: from.extension
+            extension: from.extension,
         }
     }
 }
@@ -364,7 +366,7 @@ impl From<client::contact::Phone> for epp_proto::contact::Phone {
     fn from(from: client::contact::Phone) -> Self {
         epp_proto::contact::Phone {
             number: from.number,
-            extension: from.extension
+            extension: from.extension,
         }
     }
 }
@@ -486,25 +488,27 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                 .map(|n| match n {
                     client::domain::InfoNameserver::HostOnly(h) => epp_proto::domain::NameServer {
                         server: Some(epp_proto::domain::name_server::Server::HostObj(h)),
-                        addresses: vec![]
+                        addresses: vec![],
                     },
-                    client::domain::InfoNameserver::HostAndAddress {
-                        host,
-                        addresses
-                    } => epp_proto::domain::NameServer {
-                        server: Some(epp_proto::domain::name_server::Server::HostName(host)),
-                        addresses: addresses.iter().map(|addr| epp_proto::common::IpAddress {
-                            address: addr.address.clone(),
-                            r#type: match addr.ip_version {
-                                client::host::AddressVersion::IPv4 => {
-                                    epp_proto::common::ip_address::IpVersion::IPv4.into()
-                                }
-                                client::host::AddressVersion::IPv6 => {
-                                    epp_proto::common::ip_address::IpVersion::IPv6.into()
-                                }
-                            }
-                        }).collect(),
-                    },
+                    client::domain::InfoNameserver::HostAndAddress { host, addresses } => {
+                        epp_proto::domain::NameServer {
+                            server: Some(epp_proto::domain::name_server::Server::HostName(host)),
+                            addresses: addresses
+                                .iter()
+                                .map(|addr| epp_proto::common::IpAddress {
+                                    address: addr.address.clone(),
+                                    r#type: match addr.ip_version {
+                                        client::host::AddressVersion::IPv4 => {
+                                            epp_proto::common::ip_address::IpVersion::IPv4.into()
+                                        }
+                                        client::host::AddressVersion::IPv6 => {
+                                            epp_proto::common::ip_address::IpVersion::IPv6.into()
+                                        }
+                                    },
+                                })
+                                .collect(),
+                        }
+                    }
                 })
                 .collect(),
             hosts: res.hosts,
@@ -521,32 +525,46 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
             sec_dns: res.sec_dns.map(|sec_dns| epp_proto::domain::SecDnsData {
                 max_sig_life: sec_dns.max_sig_life,
                 data: Some(match sec_dns.data {
-                    client::domain::SecDNSDataType::DSData(ds_data) =>
-                        epp_proto::domain::sec_dns_data::Data::DsData(epp_proto::domain::SecDnsdsData {
-                        data: ds_data.into_iter().map(|d| epp_proto::domain::SecDnsdsDatum {
-                            key_tag: d.key_tag as u32,
-                            algorithm: d.algorithm as u32,
-                            digest_type: d.digest_type as u32,
-                            digest: d.digest,
-                            key_data: d.key_data.map(|k| epp_proto::domain::SecDnsKeyDatum {
-                                flags: k.flags as u32,
-                                protocol: k.protocol as u32,
-                                algorithm: k.algorithm as u32,
-                                public_key: k.public_key
-                            })
-                        }).collect()
-                    }),
-                    client::domain::SecDNSDataType::KeyData(key_data) =>
-                        epp_proto::domain::sec_dns_data::Data::KeyData(epp_proto::domain::SecDnsKeyData {
-                        data: key_data.into_iter().map(|k| epp_proto::domain::SecDnsKeyDatum {
-                            flags: k.flags as u32,
-                            protocol: k.protocol as u32,
-                            algorithm: k.algorithm as u32,
-                            public_key: k.public_key
-                        }).collect()
-                    })
-                })
-            })
+                    client::domain::SecDNSDataType::DSData(ds_data) => {
+                        epp_proto::domain::sec_dns_data::Data::DsData(
+                            epp_proto::domain::SecDnsdsData {
+                                data: ds_data
+                                    .into_iter()
+                                    .map(|d| epp_proto::domain::SecDnsdsDatum {
+                                        key_tag: d.key_tag as u32,
+                                        algorithm: d.algorithm as u32,
+                                        digest_type: d.digest_type as u32,
+                                        digest: d.digest,
+                                        key_data: d.key_data.map(|k| {
+                                            epp_proto::domain::SecDnsKeyDatum {
+                                                flags: k.flags as u32,
+                                                protocol: k.protocol as u32,
+                                                algorithm: k.algorithm as u32,
+                                                public_key: k.public_key,
+                                            }
+                                        }),
+                                    })
+                                    .collect(),
+                            },
+                        )
+                    }
+                    client::domain::SecDNSDataType::KeyData(key_data) => {
+                        epp_proto::domain::sec_dns_data::Data::KeyData(
+                            epp_proto::domain::SecDnsKeyData {
+                                data: key_data
+                                    .into_iter()
+                                    .map(|k| epp_proto::domain::SecDnsKeyDatum {
+                                        flags: k.flags as u32,
+                                        protocol: k.protocol as u32,
+                                        algorithm: k.algorithm as u32,
+                                        public_key: k.public_key,
+                                    })
+                                    .collect(),
+                            },
+                        )
+                    }
+                }),
+            }),
         };
 
         Ok(tonic::Response::new(reply))
@@ -563,28 +581,42 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
 
         for n in &request.nameservers {
             match &n.server {
-                Some(epp_proto::domain::name_server::Server::HostObj(h)) => ns.push(client::domain::InfoNameserver::HostOnly(h.clone())),
-                Some(epp_proto::domain::name_server::Server::HostName(h)) => ns.push(client::domain::InfoNameserver::HostAndAddress {
-                    host: h.clone(),
-                    addresses: n.addresses.iter().map(|addr| Ok(client::host::Address {
-                        address: addr.address.clone(),
-                        ip_version: match epp_proto::common::ip_address::IpVersion::from_i32(
-                            addr.r#type,
-                        ) {
-                            Some(epp_proto::common::ip_address::IpVersion::IPv4) => {
-                                client::host::AddressVersion::IPv4
-                            }
-                            Some(epp_proto::common::ip_address::IpVersion::IPv6) => {
-                                client::host::AddressVersion::IPv6
-                            }
-                            None | Some(epp_proto::common::ip_address::IpVersion::Unknown) => {
-                                return Err(tonic::Status::invalid_argument(
-                                    "unknown IP address version",
-                                ));
-                            }
-                        },
-                    })).collect::<Result<Vec<client::host::Address>, tonic::Status>>()?
-                }),
+                Some(epp_proto::domain::name_server::Server::HostObj(h)) => {
+                    ns.push(client::domain::InfoNameserver::HostOnly(h.clone()))
+                }
+                Some(epp_proto::domain::name_server::Server::HostName(h)) => {
+                    ns.push(client::domain::InfoNameserver::HostAndAddress {
+                        host: h.clone(),
+                        addresses: n
+                            .addresses
+                            .iter()
+                            .map(|addr| {
+                                Ok(client::host::Address {
+                                    address: addr.address.clone(),
+                                    ip_version:
+                                        match epp_proto::common::ip_address::IpVersion::from_i32(
+                                            addr.r#type,
+                                        ) {
+                                            Some(
+                                                epp_proto::common::ip_address::IpVersion::IPv4,
+                                            ) => client::host::AddressVersion::IPv4,
+                                            Some(
+                                                epp_proto::common::ip_address::IpVersion::IPv6,
+                                            ) => client::host::AddressVersion::IPv6,
+                                            None
+                                            | Some(
+                                                epp_proto::common::ip_address::IpVersion::Unknown,
+                                            ) => {
+                                                return Err(tonic::Status::invalid_argument(
+                                                    "unknown IP address version",
+                                                ));
+                                            }
+                                        },
+                                })
+                            })
+                            .collect::<Result<Vec<client::host::Address>, tonic::Status>>()?,
+                    })
+                }
                 None => {}
             }
         }
@@ -612,34 +644,48 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                         Some(sec_dns_data) => Some(client::domain::SecDNSData {
                             max_sig_life: sec_dns.max_sig_life,
                             data: match sec_dns_data {
-                                epp_proto::domain::sec_dns_data::Data::DsData(ds_data) => client::domain::SecDNSDataType::DSData(
-                                    ds_data.data.into_iter().map(|d| client::domain::SecDNSDSData {
-                                        key_tag: d.key_tag as u16,
-                                        algorithm: d.algorithm as u8,
-                                        digest_type: d.digest_type as u8,
-                                        digest: d.digest,
-                                        key_data: d.key_data.map(|k| client::domain::SecDNSKeyData {
-                                            flags: k.flags as u16,
-                                            protocol: k.protocol as u8,
-                                            algorithm: k.algorithm as u8,
-                                            public_key: k.public_key
-                                        })
-                                    }).collect()
-                                ),
-                                epp_proto::domain::sec_dns_data::Data::KeyData(key_data) => client::domain::SecDNSDataType::KeyData(
-                                    key_data.data.into_iter().map(|k| client::domain::SecDNSKeyData {
-                                        flags: k.flags as u16,
-                                        protocol: k.protocol as u8,
-                                        algorithm: k.algorithm as u8,
-                                        public_key: k.public_key
-                                    }).collect()
-                                )
-                            }
+                                epp_proto::domain::sec_dns_data::Data::DsData(ds_data) => {
+                                    client::domain::SecDNSDataType::DSData(
+                                        ds_data
+                                            .data
+                                            .into_iter()
+                                            .map(|d| client::domain::SecDNSDSData {
+                                                key_tag: d.key_tag as u16,
+                                                algorithm: d.algorithm as u8,
+                                                digest_type: d.digest_type as u8,
+                                                digest: d.digest,
+                                                key_data: d.key_data.map(|k| {
+                                                    client::domain::SecDNSKeyData {
+                                                        flags: k.flags as u16,
+                                                        protocol: k.protocol as u8,
+                                                        algorithm: k.algorithm as u8,
+                                                        public_key: k.public_key,
+                                                    }
+                                                }),
+                                            })
+                                            .collect(),
+                                    )
+                                }
+                                epp_proto::domain::sec_dns_data::Data::KeyData(key_data) => {
+                                    client::domain::SecDNSDataType::KeyData(
+                                        key_data
+                                            .data
+                                            .into_iter()
+                                            .map(|k| client::domain::SecDNSKeyData {
+                                                flags: k.flags as u16,
+                                                protocol: k.protocol as u8,
+                                                algorithm: k.algorithm as u8,
+                                                public_key: k.public_key,
+                                            })
+                                            .collect(),
+                                    )
+                                }
+                            },
                         }),
-                        None => None
-                    }
-                    None => None
-                }
+                        None => None,
+                    },
+                    None => None,
+                },
             },
             &mut sender,
         )
@@ -682,12 +728,20 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let mut add = vec![];
         let mut rem = vec![];
 
-        let map_ns = |n: epp_proto::domain::NameServer| {
-            Ok(match &n.server {
-                Some(epp_proto::domain::name_server::Server::HostObj(h)) => client::domain::InfoNameserver::HostOnly(h.clone()),
-                Some(epp_proto::domain::name_server::Server::HostName(h)) => client::domain::InfoNameserver::HostAndAddress {
-                    host: h.clone(),
-                    addresses: n.addresses.iter().map(|addr| Ok(client::host::Address {
+        let map_ns =
+            |n: epp_proto::domain::NameServer| {
+                Ok(match &n.server {
+                    Some(epp_proto::domain::name_server::Server::HostObj(h)) => {
+                        client::domain::InfoNameserver::HostOnly(h.clone())
+                    }
+                    Some(epp_proto::domain::name_server::Server::HostName(h)) => {
+                        client::domain::InfoNameserver::HostAndAddress {
+                            host: h.clone(),
+                            addresses: n
+                                .addresses
+                                .iter()
+                                .map(|addr| {
+                                    Ok(client::host::Address {
                         address: addr.address.clone(),
                         ip_version: match epp_proto::common::ip_address::IpVersion::from_i32(
                             addr.r#type,
@@ -704,13 +758,18 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                                 ));
                             }
                         },
-                    })).collect::<Result<Vec<client::host::Address>, tonic::Status>>()?
-                },
-                None => return Err(tonic::Status::invalid_argument(
-                    "one of host_obj or host_name must be specified",
-                ))
-            })
-        };
+                    })
+                                })
+                                .collect::<Result<Vec<client::host::Address>, tonic::Status>>()?,
+                        }
+                    }
+                    None => {
+                        return Err(tonic::Status::invalid_argument(
+                            "one of host_obj or host_name must be specified",
+                        ))
+                    }
+                })
+            };
         let map_param = |p: epp_proto::domain::domain_update_request::Param,
                          l: &mut Vec<client::domain::UpdateObject>|
          -> Result<(), tonic::Status> {
@@ -754,60 +813,90 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                     urgent: sec_dns.urgent,
                     new_max_sig_life: sec_dns.new_max_sig_life,
                     add: sec_dns.add.map(|a| match a {
-                        epp_proto::domain::update_sec_dns_data::Add::AddDsData(ds_data) => client::domain::SecDNSDataType::DSData(
-                            ds_data.data.into_iter().map(|d| client::domain::SecDNSDSData {
-                                key_tag: d.key_tag as u16,
-                                algorithm: d.algorithm as u8,
-                                digest_type: d.digest_type as u8,
-                                digest: d.digest,
-                                key_data: d.key_data.map(|k| client::domain::SecDNSKeyData {
-                                    flags: k.flags as u16,
-                                    protocol: k.protocol as u8,
-                                    algorithm: k.algorithm as u8,
-                                    public_key: k.public_key
-                                })
-                            }).collect()
-                        ),
-                        epp_proto::domain::update_sec_dns_data::Add::AddKeyData(key_data) => client::domain::SecDNSDataType::KeyData(
-                            key_data.data.into_iter().map(|k| client::domain::SecDNSKeyData {
-                                flags: k.flags as u16,
-                                protocol: k.protocol as u8,
-                                algorithm: k.algorithm as u8,
-                                public_key: k.public_key
-                            }).collect()
-                        )
-                    }),
-                    remove: sec_dns.remove.map(|r| match r {
-                        epp_proto::domain::update_sec_dns_data::Remove::RemoveAll(a) => client::domain::UpdateSecDNSRemove::All(a),
-                        epp_proto::domain::update_sec_dns_data::Remove::RemoveDsData(ds_data) => client::domain::UpdateSecDNSRemove::Data(
+                        epp_proto::domain::update_sec_dns_data::Add::AddDsData(ds_data) => {
                             client::domain::SecDNSDataType::DSData(
-                                ds_data.data.into_iter().map(|d| client::domain::SecDNSDSData {
-                                    key_tag: d.key_tag as u16,
-                                    algorithm: d.algorithm as u8,
-                                    digest_type: d.digest_type as u8,
-                                    digest: d.digest,
-                                    key_data: d.key_data.map(|k| client::domain::SecDNSKeyData {
+                                ds_data
+                                    .data
+                                    .into_iter()
+                                    .map(|d| client::domain::SecDNSDSData {
+                                        key_tag: d.key_tag as u16,
+                                        algorithm: d.algorithm as u8,
+                                        digest_type: d.digest_type as u8,
+                                        digest: d.digest,
+                                        key_data: d.key_data.map(|k| {
+                                            client::domain::SecDNSKeyData {
+                                                flags: k.flags as u16,
+                                                protocol: k.protocol as u8,
+                                                algorithm: k.algorithm as u8,
+                                                public_key: k.public_key,
+                                            }
+                                        }),
+                                    })
+                                    .collect(),
+                            )
+                        }
+                        epp_proto::domain::update_sec_dns_data::Add::AddKeyData(key_data) => {
+                            client::domain::SecDNSDataType::KeyData(
+                                key_data
+                                    .data
+                                    .into_iter()
+                                    .map(|k| client::domain::SecDNSKeyData {
                                         flags: k.flags as u16,
                                         protocol: k.protocol as u8,
                                         algorithm: k.algorithm as u8,
-                                        public_key: k.public_key
+                                        public_key: k.public_key,
                                     })
-                                }).collect()
+                                    .collect(),
                             )
-                        ),
-                        epp_proto::domain::update_sec_dns_data::Remove::RemoveKeyData(key_data) => client::domain::UpdateSecDNSRemove::Data(
-                            client::domain::SecDNSDataType::KeyData(
-                                key_data.data.into_iter().map(|k| client::domain::SecDNSKeyData {
-                                    flags: k.flags as u16,
-                                    protocol: k.protocol as u8,
-                                    algorithm: k.algorithm as u8,
-                                    public_key: k.public_key
-                                }).collect()
+                        }
+                    }),
+                    remove: sec_dns.remove.map(|r| match r {
+                        epp_proto::domain::update_sec_dns_data::Remove::RemoveAll(a) => {
+                            client::domain::UpdateSecDNSRemove::All(a)
+                        }
+                        epp_proto::domain::update_sec_dns_data::Remove::RemoveDsData(ds_data) => {
+                            client::domain::UpdateSecDNSRemove::Data(
+                                client::domain::SecDNSDataType::DSData(
+                                    ds_data
+                                        .data
+                                        .into_iter()
+                                        .map(|d| client::domain::SecDNSDSData {
+                                            key_tag: d.key_tag as u16,
+                                            algorithm: d.algorithm as u8,
+                                            digest_type: d.digest_type as u8,
+                                            digest: d.digest,
+                                            key_data: d.key_data.map(|k| {
+                                                client::domain::SecDNSKeyData {
+                                                    flags: k.flags as u16,
+                                                    protocol: k.protocol as u8,
+                                                    algorithm: k.algorithm as u8,
+                                                    public_key: k.public_key,
+                                                }
+                                            }),
+                                        })
+                                        .collect(),
+                                ),
                             )
-                        )
-                    })
+                        }
+                        epp_proto::domain::update_sec_dns_data::Remove::RemoveKeyData(key_data) => {
+                            client::domain::UpdateSecDNSRemove::Data(
+                                client::domain::SecDNSDataType::KeyData(
+                                    key_data
+                                        .data
+                                        .into_iter()
+                                        .map(|k| client::domain::SecDNSKeyData {
+                                            flags: k.flags as u16,
+                                            protocol: k.protocol as u8,
+                                            algorithm: k.algorithm as u8,
+                                            public_key: k.public_key,
+                                        })
+                                        .collect(),
+                                ),
+                            )
+                        }
+                    }),
                 }),
-                None => None
+                None => None,
             },
             &mut sender,
         )
@@ -914,12 +1003,8 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
     ) -> Result<tonic::Response<epp_proto::domain::DomainTransferReply>, tonic::Status> {
         let request = request.into_inner();
         let (mut sender, registry_name) = client_by_domain(&self.client_router, &request.name)?;
-        let res = client::domain::transfer_accept(
-            &request.name,
-            &request.auth_info,
-            &mut sender,
-        )
-        .await?;
+        let res =
+            client::domain::transfer_accept(&request.name, &request.auth_info, &mut sender).await?;
 
         let reply = epp_proto::domain::DomainTransferReply {
             pending: res.pending,
@@ -941,12 +1026,8 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
     ) -> Result<tonic::Response<epp_proto::domain::DomainTransferReply>, tonic::Status> {
         let request = request.into_inner();
         let (mut sender, registry_name) = client_by_domain(&self.client_router, &request.name)?;
-        let res = client::domain::transfer_reject(
-            &request.name,
-            &request.auth_info,
-            &mut sender,
-        )
-        .await?;
+        let res =
+            client::domain::transfer_reject(&request.name, &request.auth_info, &mut sender).await?;
 
         let reply = epp_proto::domain::DomainTransferReply {
             pending: res.pending,
@@ -1223,7 +1304,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
             postal_code: a.postal_code,
             country_code: a.country_code,
             identity_number: a.identity_number,
-            birth_date: chrono_to_proto(a.birth_date.map(|d| d.and_hms(0, 0, 0)))
+            birth_date: chrono_to_proto(a.birth_date.map(|d| d.and_hms(0, 0, 0))),
         };
 
         let reply = epp_proto::contact::ContactInfoReply {
@@ -1410,7 +1491,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                     }
                 })
                 .collect(),
-            auth_info: res.auth_info
+            auth_info: res.auth_info,
         };
 
         Ok(tonic::Response::new(reply))
@@ -1432,7 +1513,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
             postal_code: a.postal_code,
             country_code: a.country_code,
             identity_number: a.identity_number,
-            birth_date: proto_to_chrono(a.birth_date).map(|d| d.date())
+            birth_date: proto_to_chrono(a.birth_date).map(|d| d.date()),
         };
 
         let res = client::contact::create(
@@ -1496,7 +1577,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
             postal_code: a.postal_code,
             country_code: a.country_code,
             identity_number: a.identity_number,
-            birth_date: proto_to_chrono(a.birth_date).map(|d| d.date())
+            birth_date: proto_to_chrono(a.birth_date).map(|d| d.date()),
         };
 
         let res = client::contact::update(
@@ -1555,7 +1636,8 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let request = request.into_inner();
         let mut sender = client_by_id(&self.client_router, &request.registry_name)?;
 
-        let res = client::contact::transfer_request(&request.id, &request.auth_info,&mut sender).await?;
+        let res =
+            client::contact::transfer_request(&request.id, &request.auth_info, &mut sender).await?;
 
         let reply = epp_proto::contact::ContactTransferReply {
             pending: res.pending,
@@ -1575,12 +1657,8 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
     ) -> Result<tonic::Response<epp_proto::contact::ContactTransferReply>, tonic::Status> {
         let request = request.into_inner();
         let mut sender = client_by_id(&self.client_router, &request.registry_name)?;
-        let res = client::contact::transfer_accept(
-            &request.id,
-            &request.auth_info,
-            &mut sender,
-        )
-            .await?;
+        let res =
+            client::contact::transfer_accept(&request.id, &request.auth_info, &mut sender).await?;
 
         let reply = epp_proto::contact::ContactTransferReply {
             pending: res.pending,
@@ -1600,12 +1678,8 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
     ) -> Result<tonic::Response<epp_proto::contact::ContactTransferReply>, tonic::Status> {
         let request = request.into_inner();
         let mut sender = client_by_id(&self.client_router, &request.registry_name)?;
-        let res = client::contact::transfer_reject(
-            &request.id,
-            &request.auth_info,
-            &mut sender,
-        )
-            .await?;
+        let res =
+            client::contact::transfer_reject(&request.id, &request.auth_info, &mut sender).await?;
 
         let reply = epp_proto::contact::ContactTransferReply {
             pending: res.pending,
@@ -1715,9 +1789,13 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
             available_credit: res.available_credit,
             credit_limit: res.credit_limit,
             credit_threshold: res.credit_threshold.map(|t| match t {
-                client::balance::CreditThreshold::Fixed(f) => epp_proto::balance_reply::CreditThreshold::FixedCreditThreshold(f),
-                client::balance::CreditThreshold::Percentage(p) => epp_proto::balance_reply::CreditThreshold::PercentageCreditThreshold(p.into())
-            })
+                client::balance::CreditThreshold::Fixed(f) => {
+                    epp_proto::balance_reply::CreditThreshold::FixedCreditThreshold(f)
+                }
+                client::balance::CreditThreshold::Percentage(p) => {
+                    epp_proto::balance_reply::CreditThreshold::PercentageCreditThreshold(p.into())
+                }
+            }),
         };
 
         Ok(tonic::Response::new(reply))

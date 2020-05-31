@@ -40,7 +40,10 @@ pub struct EPPRGPUpdate {
 pub struct EPPRGPRestore {
     #[serde(rename = "$attr:op")]
     pub operation: EPPRGPRestoreOperation,
-    #[serde(rename = "{urn:ietf:params:xml:ns:rgp-1.0}rgp:report", skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "{urn:ietf:params:xml:ns:rgp-1.0}rgp:report",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub report: Option<EPPRGPReport>,
 }
 
@@ -67,6 +70,9 @@ pub struct EPPRGPReport {
     pub restore_reason: String,
     #[serde(rename = "{urn:ietf:params:xml:ns:rgp-1.0}rgp:statement")]
     pub statement: Vec<String>,
-    #[serde(rename = "{urn:ietf:params:xml:ns:rgp-1.0}rgp:other", skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "{urn:ietf:params:xml:ns:rgp-1.0}rgp:other",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub other: Option<String>,
 }

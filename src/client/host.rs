@@ -1,7 +1,7 @@
 //! EPP commands relating to host (nameserver) objects
 
 use super::router::HandleReqReturn;
-use super::{proto, EPPClientServerFeatures, Request, Response, Error, Sender};
+use super::{proto, EPPClientServerFeatures, Error, Request, Response, Sender};
 use chrono::prelude::*;
 
 #[derive(Debug)]

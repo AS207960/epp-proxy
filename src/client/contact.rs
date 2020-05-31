@@ -1,10 +1,10 @@
 //! EPP commands relating to contact objects
 
-use std::convert::{TryFrom, TryInto};
 use super::router::HandleReqReturn;
-use super::{proto, EPPClientServerFeatures, Request, Response, Error, Sender};
+use super::{proto, EPPClientServerFeatures, Error, Request, Response, Sender};
 use chrono::prelude::*;
 use regex::Regex;
+use std::convert::{TryFrom, TryInto};
 
 #[derive(Debug)]
 pub struct CheckRequest {
@@ -178,7 +178,9 @@ impl From<&EntityType> for proto::nominet::EPPContactType {
             EntityType::UkCorporationByRoyalCharter => EPPContactType::UkCorporationByRoyalCharter,
             EntityType::UkStatutoryBody => EPPContactType::UkStatutoryBody,
             EntityType::OtherUkEntity => EPPContactType::OtherUkEntity,
-            EntityType::FinnishIndividual | EntityType::OtherIndividual => EPPContactType::NonUkIndividual,
+            EntityType::FinnishIndividual | EntityType::OtherIndividual => {
+                EPPContactType::NonUkIndividual
+            }
             EntityType::FinnishCompany | EntityType::OtherCompany => EPPContactType::NonUkCompany,
             _ => EPPContactType::OtherNonUkEntity,
         }
@@ -189,24 +191,47 @@ impl From<&EntityType> for proto::traficom::EPPContactTraficomType {
     fn from(from: &EntityType) -> Self {
         use proto::traficom::EPPContactTraficomType;
         match from {
-            EntityType::FinnishIndividual | EntityType::OtherIndividual | EntityType::UkIndividual
-            | EntityType::UkSoleTrader | EntityType::OtherUkEntity | EntityType::Unknown => EPPContactTraficomType::PrivatePerson,
-            EntityType::FinnishCompany | EntityType::OtherCompany | EntityType::UkLimitedCompany
-            | EntityType::UkPublicLimitedCompany | EntityType::UkCorporationByRoyalCharter |
-            EntityType::UkRegisteredCharity | EntityType::UkIndustrialProvidentRegisteredCompany => EPPContactTraficomType::Company,
-            EntityType::UkPartnership | EntityType::UkLimitedLiabilityPartnership | EntityType::FinnishAssociation
+            EntityType::FinnishIndividual
+            | EntityType::OtherIndividual
+            | EntityType::UkIndividual
+            | EntityType::UkSoleTrader
+            | EntityType::OtherUkEntity
+            | EntityType::Unknown => EPPContactTraficomType::PrivatePerson,
+            EntityType::FinnishCompany
+            | EntityType::OtherCompany
+            | EntityType::UkLimitedCompany
+            | EntityType::UkPublicLimitedCompany
+            | EntityType::UkCorporationByRoyalCharter
+            | EntityType::UkRegisteredCharity
+            | EntityType::UkIndustrialProvidentRegisteredCompany => EPPContactTraficomType::Company,
+            EntityType::UkPartnership
+            | EntityType::UkLimitedLiabilityPartnership
+            | EntityType::FinnishAssociation
             | EntityType::OtherAssociation => EPPContactTraficomType::Association,
-            EntityType::UkSchool | EntityType::UkStatutoryBody | EntityType::FinnishInstitution
+            EntityType::UkSchool
+            | EntityType::UkStatutoryBody
+            | EntityType::FinnishInstitution
             | EntityType::OtherInstitution => EPPContactTraficomType::Institution,
-            EntityType::UkPoliticalParty | EntityType::FinnishPoliticalParty | EntityType::OtherPoliticalParty => EPPContactTraficomType::PoliticalParty,
-            EntityType::UkGovernmentBody | EntityType::FinnishGovernment | EntityType::OtherGovernment => EPPContactTraficomType::Government,
-            EntityType::FinnishMunicipality | EntityType::OtherMunicipality => EPPContactTraficomType::Municipality,
-            EntityType::FinnishPublicCommunity | EntityType::OtherPublicCommunity => EPPContactTraficomType::PublicCommunity,
+            EntityType::UkPoliticalParty
+            | EntityType::FinnishPoliticalParty
+            | EntityType::OtherPoliticalParty => EPPContactTraficomType::PoliticalParty,
+            EntityType::UkGovernmentBody
+            | EntityType::FinnishGovernment
+            | EntityType::OtherGovernment => EPPContactTraficomType::Government,
+            EntityType::FinnishMunicipality | EntityType::OtherMunicipality => {
+                EPPContactTraficomType::Municipality
+            }
+            EntityType::FinnishPublicCommunity | EntityType::OtherPublicCommunity => {
+                EPPContactTraficomType::PublicCommunity
+            }
         }
     }
 }
 
-fn traficom_type_to_entity_type(from: &proto::traficom::EPPContactTraficomType, is_finnish: bool) -> EntityType {
+fn traficom_type_to_entity_type(
+    from: &proto::traficom::EPPContactTraficomType,
+    is_finnish: bool,
+) -> EntityType {
     use proto::traficom::EPPContactTraficomType;
     match (from, is_finnish) {
         (EPPContactTraficomType::PrivatePerson, true) => EntityType::FinnishIndividual,
@@ -231,12 +256,17 @@ fn traficom_type_to_entity_type(from: &proto::traficom::EPPContactTraficomType, 
 fn is_entity_finnish(entity: &Option<EntityType>) -> bool {
     match entity {
         Some(e) => match e {
-            EntityType::FinnishIndividual | EntityType::FinnishCompany | EntityType::FinnishAssociation
-            | EntityType::FinnishInstitution | EntityType::FinnishGovernment | EntityType::FinnishMunicipality
-            | EntityType::FinnishPoliticalParty | EntityType::FinnishPublicCommunity => true,
-            _ => false
+            EntityType::FinnishIndividual
+            | EntityType::FinnishCompany
+            | EntityType::FinnishAssociation
+            | EntityType::FinnishInstitution
+            | EntityType::FinnishGovernment
+            | EntityType::FinnishMunicipality
+            | EntityType::FinnishPoliticalParty
+            | EntityType::FinnishPublicCommunity => true,
+            _ => false,
         },
-        None => false
+        None => false,
     }
 }
 
@@ -376,7 +406,7 @@ impl From<proto::contact::EPPContactPhone> for Phone {
     fn from(from: proto::contact::EPPContactPhone) -> Self {
         Phone {
             number: from.number,
-            extension: from.extension
+            extension: from.extension,
         }
     }
 }
@@ -385,7 +415,7 @@ impl From<&Phone> for proto::contact::EPPContactPhone {
     fn from(from: &Phone) -> Self {
         proto::contact::EPPContactPhone {
             number: from.number.clone(),
-            extension: from.extension.clone()
+            extension: from.extension.clone(),
         }
     }
 }
@@ -490,16 +520,30 @@ pub struct TransferResponse {
     pub act_date: DateTime<Utc>,
 }
 
-impl TryFrom<(proto::contact::EPPContactInfoData, &Option<proto::EPPResponseExtension>)> for InfoResponse {
+impl
+    TryFrom<(
+        proto::contact::EPPContactInfoData,
+        &Option<proto::EPPResponseExtension>,
+    )> for InfoResponse
+{
     type Error = Error;
 
-    fn try_from(from: (proto::contact::EPPContactInfoData, &Option<proto::EPPResponseExtension>)) -> Result<Self, Self::Error> {
+    fn try_from(
+        from: (
+            proto::contact::EPPContactInfoData,
+            &Option<proto::EPPResponseExtension>,
+        ),
+    ) -> Result<Self, Self::Error> {
         let (contact_info, extension) = from;
         let map_addr = |a: Option<&proto::contact::EPPContactPostalInfo>| match a {
             Some(p) => Some(Address {
                 name: match &p.name {
                     Some(n) => n.clone(),
-                    None => format!("{} {}", p.traficom_first_name.as_deref().unwrap_or_default(), p.traficom_last_name.as_deref().unwrap_or_default())
+                    None => format!(
+                        "{} {}",
+                        p.traficom_first_name.as_deref().unwrap_or_default(),
+                        p.traficom_last_name.as_deref().unwrap_or_default()
+                    ),
                 },
                 organisation: p.organisation.clone(),
                 streets: p.address.streets.clone(),
@@ -508,7 +552,7 @@ impl TryFrom<(proto::contact::EPPContactInfoData, &Option<proto::EPPResponseExte
                 postal_code: p.address.postal_code.clone(),
                 country_code: p.address.country_code.clone(),
                 identity_number: p.traficom_identity.clone(),
-                birth_date: p.traficom_birth_date
+                birth_date: p.traficom_birth_date,
             }),
             None => None,
         };
@@ -525,9 +569,10 @@ impl TryFrom<(proto::contact::EPPContactInfoData, &Option<proto::EPPResponseExte
             },
             None => None,
         };
-        let local_address = contact_info.postal_info.iter().find(|p| {
-            p.addr_type == proto::contact::EPPContactPostalInfoType::Local
-        });
+        let local_address = contact_info
+            .postal_info
+            .iter()
+            .find(|p| p.addr_type == proto::contact::EPPContactPostalInfoType::Local);
         Ok(InfoResponse {
             id: contact_info.id,
             statuses: contact_info
@@ -537,12 +582,9 @@ impl TryFrom<(proto::contact::EPPContactInfoData, &Option<proto::EPPResponseExte
                 .collect(),
             registry_id: contact_info.registry_id,
             local_address: map_addr(local_address),
-            internationalised_address: map_addr(contact_info.postal_info.iter().find(
-                |p| {
-                    p.addr_type
-                        == proto::contact::EPPContactPostalInfoType::Internationalised
-                },
-            )),
+            internationalised_address: map_addr(contact_info.postal_info.iter().find(|p| {
+                p.addr_type == proto::contact::EPPContactPostalInfoType::Internationalised
+            })),
             phone: contact_info.phone.map(|p| p.into()),
             fax: contact_info.fax.map(|p| p.into()),
             email: contact_info.email,
@@ -560,20 +602,23 @@ impl TryFrom<(proto::contact::EPPContactInfoData, &Option<proto::EPPResponseExte
                 Some(e) => e.company_number.clone(),
                 None => match local_address {
                     Some(a) => a.traficom_register_number.clone(),
-                    None => None
+                    None => None,
                 },
             },
             entity_type: match &ext_info {
                 Some(e) => match &e.contact_type {
                     Some(i) => i.into(),
-                    None => EntityType::Unknown
+                    None => EntityType::Unknown,
                 },
                 None => match contact_info.traficom_type {
-                    Some(t) => traficom_type_to_entity_type(&t, match local_address {
-                        Some(a) => a.traficom_is_finnish.unwrap_or(false),
-                        None => false
-                    }),
-                    None => EntityType::Unknown
+                    Some(t) => traficom_type_to_entity_type(
+                        &t,
+                        match local_address {
+                            Some(a) => a.traficom_is_finnish.unwrap_or(false),
+                            None => false,
+                        },
+                    ),
+                    None => EntityType::Unknown,
                 },
             },
             disclosure: match contact_info.disclose {
@@ -588,8 +633,8 @@ impl TryFrom<(proto::contact::EPPContactInfoData, &Option<proto::EPPResponseExte
             },
             auth_info: match contact_info.auth_info {
                 Some(a) => a.password,
-                None => None
-            }
+                None => None,
+            },
         })
     }
 }
@@ -690,7 +735,9 @@ pub fn handle_create(
             )));
         }
         if a.streets.is_empty() {
-            return Err(Err(Error::Err("contact streets cannot be empty".to_string())));
+            return Err(Err(Error::Err(
+                "contact streets cannot be empty".to_string(),
+            )));
         }
         let mut name_parts: Vec<&str> = a.name.rsplitn(2, ' ').collect();
         Ok(proto::contact::EPPContactPostalInfo {
@@ -719,22 +766,32 @@ pub fn handle_create(
             },
             traficom_birth_date: if client.has_erratum("traficom") {
                 match &req.entity_type {
-                    Some(i) => match (proto::traficom::EPPContactTraficomType::from(i), is_entity_finnish(&req.entity_type)) {
-                        (proto::traficom::EPPContactTraficomType::PrivatePerson, false) => a.birth_date,
-                        _ => None
+                    Some(i) => match (
+                        proto::traficom::EPPContactTraficomType::from(i),
+                        is_entity_finnish(&req.entity_type),
+                    ) {
+                        (proto::traficom::EPPContactTraficomType::PrivatePerson, false) => {
+                            a.birth_date
+                        }
+                        _ => None,
                     },
-                    None => None
+                    None => None,
                 }
             } else {
                 None
             },
             traficom_identity: if client.has_erratum("traficom") {
                 match &req.entity_type {
-                    Some(i) => match (proto::traficom::EPPContactTraficomType::from(i), is_entity_finnish(&req.entity_type)) {
-                        (proto::traficom::EPPContactTraficomType::PrivatePerson, true) => a.identity_number.clone(),
-                        _ => None
+                    Some(i) => match (
+                        proto::traficom::EPPContactTraficomType::from(i),
+                        is_entity_finnish(&req.entity_type),
+                    ) {
+                        (proto::traficom::EPPContactTraficomType::PrivatePerson, true) => {
+                            a.identity_number.clone()
+                        }
+                        _ => None,
                     },
-                    None => None
+                    None => None,
                 }
             } else {
                 None
@@ -764,19 +821,21 @@ pub fn handle_create(
     }
 
     let extension = if client.nominet_contact_ext {
-        Some(vec![proto::EPPCommandExtensionType::NominetContactExtCreate(
-            proto::nominet::EPPContactInfo {
-                contact_type: match &req.entity_type {
-                    Some(i) => match i {
-                        EntityType::Unknown => None,
-                        i => Some(i.into())
+        Some(vec![
+            proto::EPPCommandExtensionType::NominetContactExtCreate(
+                proto::nominet::EPPContactInfo {
+                    contact_type: match &req.entity_type {
+                        Some(i) => match i {
+                            EntityType::Unknown => None,
+                            i => Some(i.into()),
+                        },
+                        None => None,
                     },
-                    None => None
+                    trading_name: req.trading_name.clone(),
+                    company_number: req.company_number.clone(),
                 },
-                trading_name: req.trading_name.clone(),
-                company_number: req.company_number.clone(),
-            },
-        )])
+            ),
+        ])
     } else {
         None
     };
@@ -806,9 +865,9 @@ pub fn handle_create(
             match &req.entity_type {
                 Some(i) => match i {
                     EntityType::Unknown => None,
-                    i => Some(i.into())
+                    i => Some(i.into()),
                 },
-                None => None
+                None => None,
             }
         } else {
             None
@@ -817,7 +876,7 @@ pub fn handle_create(
             Some(req.email.clone())
         } else {
             None
-        }
+        },
     }));
     Ok((proto::EPPCommandType::Create(command), extension))
 }
@@ -907,7 +966,9 @@ pub fn handle_update(
             )));
         }
         if a.streets.is_empty() {
-            return Err(Err(Error::Err("contact streets cannot be empty".to_string())));
+            return Err(Err(Error::Err(
+                "contact streets cannot be empty".to_string(),
+            )));
         }
         Ok(proto::contact::EPPContactUpdatePostalInfo {
             addr_type: t,
@@ -973,27 +1034,32 @@ pub fn handle_update(
                         elements: d.iter().map(|e| e.into()).collect(),
                     }
                 }),
-                auth_info: req.new_auth_info.as_ref().map(|p| proto::contact::EPPContactAuthInfo {
-                    password: Some(p.clone())
-                })
+                auth_info: req
+                    .new_auth_info
+                    .as_ref()
+                    .map(|p| proto::contact::EPPContactAuthInfo {
+                        password: Some(p.clone()),
+                    }),
             })
         },
     });
 
     let extension = if client.nominet_contact_ext {
-        Some(vec![proto::EPPCommandExtensionType::NominetContactExtUpdate(
-            proto::nominet::EPPContactInfo {
-                contact_type: match &req.new_entity_type {
-                    Some(i) => match i {
-                        EntityType::Unknown => None,
-                        i => Some(i.into())
+        Some(vec![
+            proto::EPPCommandExtensionType::NominetContactExtUpdate(
+                proto::nominet::EPPContactInfo {
+                    contact_type: match &req.new_entity_type {
+                        Some(i) => match i {
+                            EntityType::Unknown => None,
+                            i => Some(i.into()),
+                        },
+                        None => None,
                     },
-                    None => None
+                    trading_name: req.new_trading_name.clone(),
+                    company_number: req.new_company_number.clone(),
                 },
-                trading_name: req.new_trading_name.clone(),
-                company_number: req.new_company_number.clone(),
-            },
-        )])
+            ),
+        ])
     } else {
         None
     };
@@ -1018,7 +1084,7 @@ pub fn handle_transfer_query(
     let command = proto::EPPTransfer {
         operation: proto::EPPTransferOperation::Query,
         command: proto::EPPTransferCommand::ContactQuery(proto::contact::EPPContactCheck {
-            id: req.id.clone()
+            id: req.id.clone(),
         }),
     };
     Ok((proto::EPPCommandType::Transfer(command), None))
@@ -1306,7 +1372,7 @@ pub async fn transfer_query(
         })),
         receiver,
     )
-        .await
+    .await
 }
 
 /// Requests the transfer of a contact
@@ -1330,7 +1396,7 @@ pub async fn transfer_request(
         })),
         receiver,
     )
-        .await
+    .await
 }
 
 /// Accepts the transfer of a contact
@@ -1354,9 +1420,8 @@ pub async fn transfer_accept(
         })),
         receiver,
     )
-        .await
+    .await
 }
-
 
 /// Rejects the transfer of a contact
 ///
@@ -1379,5 +1444,5 @@ pub async fn transfer_reject(
         })),
         receiver,
     )
-        .await
+    .await
 }

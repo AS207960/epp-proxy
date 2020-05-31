@@ -185,11 +185,17 @@ pub struct EPPDomainTransferData {
     pub transfer_status: super::EPPTransferStatus,
     #[serde(rename = "{urn:ietf:params:xml:ns:domain-1.0}reID")]
     pub requested_client_id: String,
-    #[serde(rename = "{urn:ietf:params:xml:ns:domain-1.0}reDate", deserialize_with = "super::deserialize_datetime")]
+    #[serde(
+        rename = "{urn:ietf:params:xml:ns:domain-1.0}reDate",
+        deserialize_with = "super::deserialize_datetime"
+    )]
     pub requested_date: DateTime<Utc>,
     #[serde(rename = "{urn:ietf:params:xml:ns:domain-1.0}acID")]
     pub act_client_id: String,
-    #[serde(rename = "{urn:ietf:params:xml:ns:domain-1.0}acDate", deserialize_with = "super::deserialize_datetime")]
+    #[serde(
+        rename = "{urn:ietf:params:xml:ns:domain-1.0}acDate",
+        deserialize_with = "super::deserialize_datetime"
+    )]
     pub act_date: DateTime<Utc>,
     #[serde(
         rename = "{urn:ietf:params:xml:ns:domain-1.0}exDate",
@@ -203,9 +209,15 @@ pub struct EPPDomainTransferData {
 pub struct EPPDomainCreate {
     #[serde(rename = "{urn:ietf:params:xml:ns:domain-1.0}domain:name")]
     pub name: String,
-    #[serde(rename = "{urn:ietf:params:xml:ns:domain-1.0}domain:period", skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "{urn:ietf:params:xml:ns:domain-1.0}domain:period",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub period: Option<EPPDomainPeriod>,
-    #[serde(rename = "{urn:ietf:params:xml:ns:domain-1.0}domain:ns", skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "{urn:ietf:params:xml:ns:domain-1.0}domain:ns",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub nameservers: Option<EPPDomainInfoNameservers>,
     #[serde(rename = "{urn:ietf:params:xml:ns:domain-1.0}domain:registrant")]
     pub registrant: String,
@@ -241,7 +253,10 @@ pub enum EPPDomainPeriodUnit {
 pub struct EPPDomainCreateData {
     #[serde(rename = "{urn:ietf:params:xml:ns:domain-1.0}name")]
     pub name: String,
-    #[serde(rename = "{urn:ietf:params:xml:ns:domain-1.0}crDate", deserialize_with = "super::deserialize_datetime")]
+    #[serde(
+        rename = "{urn:ietf:params:xml:ns:domain-1.0}crDate",
+        deserialize_with = "super::deserialize_datetime"
+    )]
     pub creation_date: DateTime<Utc>,
     #[serde(
         rename = "{urn:ietf:params:xml:ns:domain-1.0}exDate",
@@ -255,7 +270,10 @@ pub struct EPPDomainCreateData {
 pub struct EPPDomainRenew {
     #[serde(rename = "{urn:ietf:params:xml:ns:domain-1.0}domain:name")]
     pub name: String,
-    #[serde(rename = "{urn:ietf:params:xml:ns:domain-1.0}domain:curExpDate", serialize_with = "super::serialize_date")]
+    #[serde(
+        rename = "{urn:ietf:params:xml:ns:domain-1.0}domain:curExpDate",
+        serialize_with = "super::serialize_date"
+    )]
     pub current_expiry_date: Date<Utc>,
     #[serde(rename = "{urn:ietf:params:xml:ns:domain-1.0}domain:period")]
     pub period: Option<EPPDomainPeriod>,
@@ -277,7 +295,10 @@ pub struct EPPDomainRenewData {
 pub struct EPPDomainTransfer {
     #[serde(rename = "{urn:ietf:params:xml:ns:domain-1.0}domain:name")]
     pub name: String,
-    #[serde(rename = "{urn:ietf:params:xml:ns:domain-1.0}domain:period", skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "{urn:ietf:params:xml:ns:domain-1.0}domain:period",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub period: Option<EPPDomainPeriod>,
     #[serde(rename = "{urn:ietf:params:xml:ns:domain-1.0}domain:authInfo")]
     pub auth_info: EPPDomainAuthInfo,
@@ -287,11 +308,20 @@ pub struct EPPDomainTransfer {
 pub struct EPPDomainUpdate {
     #[serde(rename = "{urn:ietf:params:xml:ns:domain-1.0}domain:name")]
     pub name: String,
-    #[serde(rename = "{urn:ietf:params:xml:ns:domain-1.0}domain:add", skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "{urn:ietf:params:xml:ns:domain-1.0}domain:add",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub add: Option<EPPDomainUpdateAdd>,
-    #[serde(rename = "{urn:ietf:params:xml:ns:domain-1.0}domain:rem", skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "{urn:ietf:params:xml:ns:domain-1.0}domain:rem",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub remove: Option<EPPDomainUpdateRemove>,
-    #[serde(rename = "{urn:ietf:params:xml:ns:domain-1.0}domain:chg", skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "{urn:ietf:params:xml:ns:domain-1.0}domain:chg",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub change: Option<EPPDomainUpdateChange>,
 }
 
@@ -309,9 +339,15 @@ pub struct EPPDomainUpdateRemove {
 
 #[derive(Debug, Serialize)]
 pub struct EPPDomainUpdateChange {
-    #[serde(rename = "{urn:ietf:params:xml:ns:domain-1.0}domain:registrant", skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "{urn:ietf:params:xml:ns:domain-1.0}domain:registrant",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub registrant: Option<String>,
-    #[serde(rename = "{urn:ietf:params:xml:ns:domain-1.0}domain:authInfo", skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "{urn:ietf:params:xml:ns:domain-1.0}domain:authInfo",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub auth_info: Option<EPPDomainAuthInfo>,
 }
 
@@ -331,7 +367,10 @@ pub struct EPPDomainPanData {
     pub name: EPPDomainPanDomain,
     #[serde(rename = "{urn:ietf:params:xml:ns:domain-1.0}paTRID")]
     pub transaction_id: super::EPPTransactionIdentifier,
-    #[serde(rename = "{urn:ietf:params:xml:ns:domain-1.0}paDate", deserialize_with = "super::deserialize_datetime")]
+    #[serde(
+        rename = "{urn:ietf:params:xml:ns:domain-1.0}paDate",
+        deserialize_with = "super::deserialize_datetime"
+    )]
     pub action_date: DateTime<Utc>,
 }
 

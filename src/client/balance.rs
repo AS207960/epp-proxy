@@ -1,7 +1,7 @@
 //! EPP commands relating to balance enquiries
 
 use super::router::HandleReqReturn;
-use super::{proto, EPPClientServerFeatures, Request, Response, Error, Sender};
+use super::{proto, EPPClientServerFeatures, Error, Request, Response, Sender};
 
 #[derive(Debug)]
 pub struct BalanceRequest {
@@ -14,13 +14,13 @@ pub struct BalanceResponse {
     pub currency: String,
     pub credit_limit: Option<String>,
     pub available_credit: Option<String>,
-    pub credit_threshold: Option<CreditThreshold>
+    pub credit_threshold: Option<CreditThreshold>,
 }
 
 #[derive(Debug)]
 pub enum CreditThreshold {
     Fixed(String),
-    Percentage(u8)
+    Percentage(u8),
 }
 
 pub fn handle_balance(
@@ -28,9 +28,15 @@ pub fn handle_balance(
     _req: &BalanceRequest,
 ) -> HandleReqReturn<BalanceResponse> {
     if client.switch_balance {
-        Ok((proto::EPPCommandType::Info(proto::EPPInfo::SwitchBalace {}), None))
+        Ok((
+            proto::EPPCommandType::Info(proto::EPPInfo::SwitchBalace {}),
+            None,
+        ))
     } else if client.verisign_balance {
-        Ok((proto::EPPCommandType::Info(proto::EPPInfo::VerisignBalace {}), None))
+        Ok((
+            proto::EPPCommandType::Info(proto::EPPInfo::VerisignBalace {}),
+            None,
+        ))
     } else {
         Err(Err(Error::Unsupported))
     }
@@ -45,9 +51,9 @@ pub fn handle_balance_response(response: proto::EPPResponse) -> Response<Balance
                     currency: switch_balance.currency,
                     credit_limit: None,
                     available_credit: None,
-                    credit_threshold: None
+                    credit_threshold: None,
                 })
-            },
+            }
             proto::EPPResultDataValue::VerisignBalanceInfoResult(verisign_balance) => {
                 Response::Ok(BalanceResponse {
                     balance: verisign_balance.balance,
@@ -56,8 +62,10 @@ pub fn handle_balance_response(response: proto::EPPResponse) -> Response<Balance
                     available_credit: Some(verisign_balance.available_credit),
                     credit_threshold: Some(match verisign_balance.credit_threshold {
                         proto::verisign::EPPCreditThreshold::Fixed(f) => CreditThreshold::Fixed(f),
-                        proto::verisign::EPPCreditThreshold::Percentage(p) => CreditThreshold::Percentage(p)
-                    })
+                        proto::verisign::EPPCreditThreshold::Percentage(p) => {
+                            CreditThreshold::Percentage(p)
+                        }
+                    }),
                 })
             }
             _ => Err(Error::InternalServerError),

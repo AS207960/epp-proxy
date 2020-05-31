@@ -130,14 +130,15 @@ impl Router {
 fn oauth_client() -> rust_keycloak::oauth::OAuthClient {
     dotenv::dotenv().ok();
 
-    let client_id = std::env::var("CLIENT_ID")
-        .expect("CLIENT_ID must be set");
-    let client_secret = std::env::var("CLIENT_SECRET")
-        .expect("CLIENT_SECRET must be set");
-    let well_known_url = std::env::var("OAUTH_WELL_KNOWN")
-        .unwrap_or_else(|_| "https://sso.as207960.net/auth/realms/dev/.well-known/openid-configuration".to_string());
+    let client_id = std::env::var("CLIENT_ID").expect("CLIENT_ID must be set");
+    let client_secret = std::env::var("CLIENT_SECRET").expect("CLIENT_SECRET must be set");
+    let well_known_url = std::env::var("OAUTH_WELL_KNOWN").unwrap_or_else(|_| {
+        "https://sso.as207960.net/auth/realms/dev/.well-known/openid-configuration".to_string()
+    });
 
-    let config = rust_keycloak::oauth::OAuthClientConfig::new(&client_id, &client_secret, &well_known_url).unwrap();
+    let config =
+        rust_keycloak::oauth::OAuthClientConfig::new(&client_id, &client_secret, &well_known_url)
+            .unwrap();
 
     rust_keycloak::oauth::OAuthClient::new(config)
 }
@@ -145,20 +146,20 @@ fn oauth_client() -> rust_keycloak::oauth::OAuthClient {
 async fn server_identity() -> tonic::transport::Identity {
     dotenv::dotenv().ok();
 
-    let cert_file = std::env::var("TLS_CERT_FILE")
-        .expect("TLS_CERT_FILE must be set");
-    let key_file = std::env::var("TLS_KEY_FILE")
-        .expect("TLS_KEY_FILE must be set");
+    let cert_file = std::env::var("TLS_CERT_FILE").expect("TLS_CERT_FILE must be set");
+    let key_file = std::env::var("TLS_KEY_FILE").expect("TLS_KEY_FILE must be set");
 
-
-    let cert = tokio::fs::read(cert_file).await.expect("Can't read TLS cert");
+    let cert = tokio::fs::read(cert_file)
+        .await
+        .expect("Can't read TLS cert");
     let key = tokio::fs::read(key_file).await.expect("Can't read TLS key");
     tonic::transport::Identity::from_pem(cert, key)
 }
 
 #[tokio::main]
 async fn main() {
-    let _guard = sentry::init("https://786e367376234c2b9bee2bb1984c2e84@o222429.ingest.sentry.io/5247736");
+    let _guard =
+        sentry::init("https://786e367376234c2b9bee2bb1984c2e84@o222429.ingest.sentry.io/5247736");
     sentry::integrations::panic::register_panic_handler();
     let mut log_builder = pretty_env_logger::formatted_builder();
     log_builder.parse_filters(&std::env::var("RUST_LOG").unwrap_or_default());
@@ -323,22 +324,25 @@ async fn main() {
 #[derive(Clone)]
 struct AuthService<T> {
     inner: T,
-    oauth_client: rust_keycloak::oauth::OAuthClient
+    oauth_client: rust_keycloak::oauth::OAuthClient,
 }
 
 impl<T, B> tower_service::Service<http::Request<B>> for AuthService<T>
-    where
-        T: tower_service::Service<http::Request<B>> + Send + Clone + 'static,
-        T::Future: Send + 'static,
-        T::Error: 'static,
-        T::Response: From<http::response::Response<tonic::body::BoxBody>> + 'static,
-        B: tonic::codegen::HttpBody + Send + Sync + 'static,
+where
+    T: tower_service::Service<http::Request<B>> + Send + Clone + 'static,
+    T::Future: Send + 'static,
+    T::Error: 'static,
+    T::Response: From<http::response::Response<tonic::body::BoxBody>> + 'static,
+    B: tonic::codegen::HttpBody + Send + Sync + 'static,
 {
     type Response = T::Response;
     type Error = T::Error;
     type Future = futures::future::BoxFuture<'static, Result<Self::Response, Self::Error>>;
 
-    fn poll_ready(&mut self, cx: &mut std::task::Context<'_>) -> std::task::Poll<Result<(), Self::Error>> {
+    fn poll_ready(
+        &mut self,
+        cx: &mut std::task::Context<'_>,
+    ) -> std::task::Poll<Result<(), Self::Error>> {
         self.inner.poll_ready(cx).map_err(Into::into)
     }
 
@@ -353,14 +357,17 @@ impl<T, B> tower_service::Service<http::Request<B>> for AuthService<T>
                     Ok(t) => {
                         let auth_token_str = t.trim();
                         if auth_token_str.starts_with("Bearer ") {
-                            match client.verify_token(&auth_token_str[7..], "access-epp").await {
+                            match client
+                                .verify_token(&auth_token_str[7..], "access-epp")
+                                .await
+                            {
                                 Ok(_) => Ok(inner.call(req).await?),
                                 Err(_) => Err("Invalid auth token"),
                             }
                         } else {
                             Err("Invalid auth token")
                         }
-                    },
+                    }
                     Err(_) => Err("Invalid auth token"),
                 },
                 _ => Err("No valid auth token"),
@@ -380,7 +387,9 @@ impl<T, B> tower_service::Service<http::Request<B>> for AuthService<T>
                         http::header::HeaderValue::from_static("application/grpc"),
                     );
 
-                    parts.headers.insert("grpc-status", http::HeaderValue::from_static("16"));
+                    parts
+                        .headers
+                        .insert("grpc-status", http::HeaderValue::from_static("16"));
                     if let Ok(v) = http::HeaderValue::from_str(status) {
                         parts.headers.insert("grpc-message", v);
                     }
@@ -393,8 +402,8 @@ impl<T, B> tower_service::Service<http::Request<B>> for AuthService<T>
 }
 
 impl<T> tonic::transport::server::NamedService for AuthService<T>
-    where
-        T: tonic::transport::server::NamedService
+where
+    T: tonic::transport::server::NamedService,
 {
     const NAME: &'static str = T::NAME;
 }

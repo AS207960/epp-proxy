@@ -12,15 +12,15 @@ use native_tls::TlsConnector;
 use tokio::net::TcpStream;
 use tokio::prelude::*;
 
+pub mod balance;
 pub mod contact;
 pub mod domain;
 pub mod host;
 pub mod nominet;
-pub mod verisign;
-pub mod balance;
 pub mod poll;
 pub mod rgp;
 pub mod router;
+pub mod verisign;
 
 use crate::proto::EPPServiceExtension;
 pub use router::{Request, Response};
@@ -199,14 +199,14 @@ pub struct EPPClientServerFeatures {
     /// http://www.verisign.com/epp/lowbalance-poll-1.0 support
     verisign_low_balance: bool,
     /// urn:ietf:params:xml:ns:nsset-1.2 support (NOT AN ACTUAL IETF NAMESPACE)
-    nsset_supported: bool
+    nsset_supported: bool,
 }
 
 impl EPPClientServerFeatures {
     fn has_erratum(&self, name: &str) -> bool {
         match &self.errata {
             Some(s) => s == name,
-            None => false
+            None => false,
         }
     }
 }
@@ -381,20 +381,24 @@ impl EPPClient {
                     match message_channel.next().await {
                         Some(m) => match m {
                             Ok(m) => match self._handle_response(m).await {
-                                Ok(c) => if c && self.is_closing {
-                                    info!("Closing connection to {}...", self.host);
-                                    return
-                                },
-                                Err(_) => break
+                                Ok(c) => {
+                                    if c && self.is_closing {
+                                        info!("Closing connection to {}...", self.host);
+                                        return;
+                                    }
+                                }
+                                Err(_) => break,
                             },
-                            Err(c) => if c && self.is_closing {
-                                info!("Closing connection to {}...", self.host);
-                                return
-                            } else {
-                                break
+                            Err(c) => {
+                                if c && self.is_closing {
+                                    info!("Closing connection to {}...", self.host);
+                                    return;
+                                } else {
+                                    break;
+                                }
                             }
                         },
-                        None => break
+                        None => break,
                     }
                 }
             }
@@ -437,43 +441,56 @@ impl EPPClient {
                         Err(())
                     }
                 }
-            },
+            }
             (router::Request::Logout(t), _) => {
                 match &mut self.nominet_tag_list_subordinate_client {
                     Some(client) => {
                         let (sender, _) = futures::channel::oneshot::channel();
-                        match client.send(router::Request::Logout(Box::new(LogoutRequest {
-                            return_path: sender
-                        }))).await {
-                            Ok(_) => {},
+                        match client
+                            .send(router::Request::Logout(Box::new(LogoutRequest {
+                                return_path: sender,
+                            })))
+                            .await
+                        {
+                            Ok(_) => {}
                             Err(e) => {
                                 warn!("Failed to send to subordinate server: {}", e);
-                                return Err(())
+                                return Err(());
                             }
                         }
-                    },
+                    }
                     None => {}
                 };
                 self.is_closing = true;
-                match self.router.handle_request(&self.features, router::Request::Logout(t)).await {
+                match self
+                    .router
+                    .handle_request(&self.features, router::Request::Logout(t))
+                    .await
+                {
                     Some((command, extension, command_id)) => {
                         self.is_awaiting_response = true;
-                        match self._send_command(command, extension, sock_write, command_id).await{
+                        match self
+                            ._send_command(command, extension, sock_write, command_id)
+                            .await
+                        {
                             Ok(_) => Ok(()),
                             Err(_) => Err(()),
                         }
-                    },
+                    }
                     None => Ok(()),
                 }
             }
             (req, _) => match self.router.handle_request(&self.features, req).await {
                 Some((command, extension, command_id)) => {
                     self.is_awaiting_response = true;
-                    match self._send_command(command, extension, sock_write, command_id).await {
+                    match self
+                        ._send_command(command, extension, sock_write, command_id)
+                        .await
+                    {
                         Ok(_) => Ok(()),
                         Err(_) => Err(()),
                     }
-                },
+                }
                 None => Ok(()),
             },
         }
@@ -736,21 +753,15 @@ impl EPPClient {
                     if e {
                         return Err(());
                     }
-                },
+                }
             }
         }
         match self
-            ._try_login(
-                self.password.clone(),
-                None,
-                objects,
-                ext_objects,
-                sock,
-                )
+            ._try_login(self.password.clone(), None, objects, ext_objects, sock)
             .await
         {
             Ok(_) => Ok(()),
-            Err(_) => Err(())
+            Err(_) => Err(()),
         }
     }
 
@@ -836,9 +847,9 @@ impl EPPClient {
         };
         let command = proto::EPPCommand {
             command,
-            extension: extension.into().map(|e| proto::EPPCommandExtension {
-                value: e
-            }),
+            extension: extension
+                .into()
+                .map(|e| proto::EPPCommandExtension { value: e }),
             client_transaction_id: Some(message_id.to_hyphenated().to_string()),
         };
         let message = proto::EPPMessage {
@@ -855,8 +866,7 @@ impl EPPClient {
         message: &proto::EPPMessage,
         sock: &mut W,
     ) -> Result<(), ()> {
-        let encoded_msg =
-            xml_serde::to_string(message).unwrap();
+        let encoded_msg = xml_serde::to_string(message).unwrap();
         debug!("Sending EPP message with contents: {}", encoded_msg);
         let msg_bytes = encoded_msg.as_bytes();
         let msg_len = msg_bytes.len() + 4;
@@ -970,8 +980,8 @@ async fn send_epp_client_request<R>(
     receiver: futures::channel::oneshot::Receiver<Response<R>>,
 ) -> Result<R, Error> {
     match client_sender.try_send(req) {
-        Ok(_) => {},
-        Err(_) => return Err(Error::InternalServerError)
+        Ok(_) => {}
+        Err(_) => return Err(Error::InternalServerError),
     }
     let mut receiver = receiver.fuse();
     let mut delay = tokio::time::delay_for(tokio::time::Duration::new(15, 0)).fuse();

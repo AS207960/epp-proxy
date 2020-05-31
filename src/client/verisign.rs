@@ -11,7 +11,7 @@ pub struct LowBalanceData {
 #[derive(PartialEq, Debug)]
 pub enum CreditThreshold {
     Fixed(String),
-    Percentage(u8)
+    Percentage(u8),
 }
 
 impl TryFrom<super::proto::verisign::EPPLowBalanceData> for LowBalanceData {
@@ -23,12 +23,18 @@ impl TryFrom<super::proto::verisign::EPPLowBalanceData> for LowBalanceData {
             credit_limit: from.credit_limit,
             available_credit: from.available_credit,
             credit_threshold: match from.credit_threshold.credit_type {
-                super::proto::verisign::EPPLowCreditThresholdType::Percentage => CreditThreshold::Percentage(match from.credit_threshold.threshold.parse::<u8>() {
-                    Ok(v) => v,
-                    Err(_) => return Err(super::Error::InternalServerError)
-                }),
-                super::proto::verisign::EPPLowCreditThresholdType::Fixed => CreditThreshold::Fixed(from.credit_threshold.threshold)
-            }
+                super::proto::verisign::EPPLowCreditThresholdType::Percentage => {
+                    CreditThreshold::Percentage(
+                        match from.credit_threshold.threshold.parse::<u8>() {
+                            Ok(v) => v,
+                            Err(_) => return Err(super::Error::InternalServerError),
+                        },
+                    )
+                }
+                super::proto::verisign::EPPLowCreditThresholdType::Fixed => {
+                    CreditThreshold::Fixed(from.credit_threshold.threshold)
+                }
+            },
         })
     }
 }

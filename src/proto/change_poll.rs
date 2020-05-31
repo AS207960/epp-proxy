@@ -6,7 +6,10 @@ pub struct EPPChangeData {
     pub state: EPPChangeState,
     #[serde(rename = "{urn:ietf:params:xml:ns:changePoll-1.0}operation")]
     pub operation: EPPChangeOperation,
-    #[serde(rename = "{urn:ietf:params:xml:ns:changePoll-1.0}date", deserialize_with = "super::deserialize_datetime")]
+    #[serde(
+        rename = "{urn:ietf:params:xml:ns:changePoll-1.0}date",
+        deserialize_with = "super::deserialize_datetime"
+    )]
     pub date: DateTime<Utc>,
     #[serde(rename = "{urn:ietf:params:xml:ns:changePoll-1.0}svTRID")]
     pub server_transaction_id: String,

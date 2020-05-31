@@ -1,9 +1,9 @@
 //! EPP commands relating to domain objects
 
-use std::convert::{TryFrom, TryInto};
 use super::router::HandleReqReturn;
-use super::{proto, EPPClientServerFeatures, Request, Response, Error, Sender};
+use super::{proto, EPPClientServerFeatures, Error, Request, Response, Sender};
 use chrono::prelude::*;
+use std::convert::{TryFrom, TryInto};
 
 #[derive(Debug)]
 pub struct CheckRequest {
@@ -61,7 +61,7 @@ pub struct InfoResponse {
     pub rgp_state: super::rgp::RGPState,
     pub auth_info: Option<String>,
     /// DNSSEC data
-    pub sec_dns: Option<SecDNSData>
+    pub sec_dns: Option<SecDNSData>,
 }
 
 /// Additional contact associated with a domain
@@ -81,7 +81,7 @@ pub enum InfoNameserver {
     /// Host name with glue records
     HostAndAddress {
         host: String,
-        addresses: Vec<super::host::Address>
+        addresses: Vec<super::host::Address>,
     },
 }
 
@@ -89,13 +89,13 @@ pub enum InfoNameserver {
 #[derive(Debug)]
 pub struct SecDNSData {
     pub max_sig_life: Option<i64>,
-    pub data: SecDNSDataType
+    pub data: SecDNSDataType,
 }
 
 #[derive(Debug)]
 pub enum SecDNSDataType {
     DSData(Vec<SecDNSDSData>),
-    KeyData(Vec<SecDNSKeyData>)
+    KeyData(Vec<SecDNSKeyData>),
 }
 
 #[derive(Debug)]
@@ -104,7 +104,7 @@ pub struct SecDNSDSData {
     pub algorithm: u8,
     pub digest_type: u8,
     pub digest: String,
-    pub key_data: Option<SecDNSKeyData>
+    pub key_data: Option<SecDNSKeyData>,
 }
 
 #[derive(Debug)]
@@ -112,7 +112,7 @@ pub struct SecDNSKeyData {
     pub flags: u16,
     pub protocol: u8,
     pub algorithm: u8,
-    pub public_key: String
+    pub public_key: String,
 }
 
 #[derive(Debug)]
@@ -147,7 +147,7 @@ pub enum PeriodUnit {
 pub struct CreateResponse {
     /// Was the request completed instantly or not
     pub pending: bool,
-    pub data: CreateData
+    pub data: CreateData,
 }
 
 #[derive(Debug)]
@@ -195,13 +195,13 @@ pub struct UpdateSecDNS {
     pub urgent: Option<bool>,
     pub remove: Option<UpdateSecDNSRemove>,
     pub add: Option<SecDNSDataType>,
-    pub new_max_sig_life: Option<i64>
+    pub new_max_sig_life: Option<i64>,
 }
 
 #[derive(Debug)]
 pub enum UpdateSecDNSRemove {
     All(bool),
-    Data(SecDNSDataType)
+    Data(SecDNSDataType),
 }
 
 #[derive(Debug)]
@@ -250,7 +250,7 @@ pub struct TransferAcceptRejectRequest {
 pub struct TransferResponse {
     /// Was the request completed instantly or not
     pub pending: bool,
-    pub data: TransferData
+    pub data: TransferData,
 }
 
 #[derive(Debug)]
@@ -357,23 +357,25 @@ impl From<&InfoNameserver> for proto::domain::EPPDomainInfoNameserver {
             InfoNameserver::HostOnly(h) => {
                 proto::domain::EPPDomainInfoNameserver::HostOnly(h.to_string())
             }
-            InfoNameserver::HostAndAddress {
-                host,
-                addresses,
-            } => proto::domain::EPPDomainInfoNameserver::HostAndAddress {
-                host: host.to_string(),
-                addresses: addresses.iter().map(|addr| proto::domain::EPPDomainInfoNameserverAddress {
-                    address: addr.address.to_string(),
-                    ip_version: match addr.ip_version {
-                        super::host::AddressVersion::IPv4 => {
-                            proto::domain::EPPDomainInfoNameserverAddressVersion::IPv4
-                        }
-                        super::host::AddressVersion::IPv6 => {
-                            proto::domain::EPPDomainInfoNameserverAddressVersion::IPv6
-                        }
-                    },
-                }).collect(),
-            },
+            InfoNameserver::HostAndAddress { host, addresses } => {
+                proto::domain::EPPDomainInfoNameserver::HostAndAddress {
+                    host: host.to_string(),
+                    addresses: addresses
+                        .iter()
+                        .map(|addr| proto::domain::EPPDomainInfoNameserverAddress {
+                            address: addr.address.to_string(),
+                            ip_version: match addr.ip_version {
+                                super::host::AddressVersion::IPv4 => {
+                                    proto::domain::EPPDomainInfoNameserverAddressVersion::IPv4
+                                }
+                                super::host::AddressVersion::IPv6 => {
+                                    proto::domain::EPPDomainInfoNameserverAddressVersion::IPv6
+                                }
+                            },
+                        })
+                        .collect(),
+                }
+            }
         }
     }
 }
@@ -390,10 +392,20 @@ impl From<&Period> for proto::domain::EPPDomainPeriod {
     }
 }
 
-impl TryFrom<(proto::domain::EPPDomainInfoData, &Option<proto::EPPResponseExtension>)> for InfoResponse {
+impl
+    TryFrom<(
+        proto::domain::EPPDomainInfoData,
+        &Option<proto::EPPResponseExtension>,
+    )> for InfoResponse
+{
     type Error = Error;
 
-    fn try_from(from: (proto::domain::EPPDomainInfoData, &Option<proto::EPPResponseExtension>)) -> Result<Self, Self::Error> {
+    fn try_from(
+        from: (
+            proto::domain::EPPDomainInfoData,
+            &Option<proto::EPPResponseExtension>,
+        ),
+    ) -> Result<Self, Self::Error> {
         let (domain_info, extension) = from;
         let rgp_state = match extension {
             Some(ext) => match ext.value.iter().find_map(|p| match p {
@@ -407,42 +419,58 @@ impl TryFrom<(proto::domain::EPPDomainInfoData, &Option<proto::EPPResponseExtens
         };
 
         let sec_dns = match extension {
-            Some(ext) => match ext.value.iter().find_map(|p| match p {
-                proto::EPPResponseExtensionType::EPPSecDNSInfo(i) => Some(i),
-                _ => None,
-            }).map(|i| Ok(SecDNSData {
-                max_sig_life: i.max_signature_life,
-                data: if !i.ds_data.is_empty() {
-                    SecDNSDataType::DSData(i.ds_data.iter().map(|d| SecDNSDSData {
-                        key_tag: d.key_tag,
-                        algorithm: d.algorithm,
-                        digest_type: d.digest_type,
-                        digest: d.digest.clone(),
-                        key_data: d.key_data.as_ref().map(|k| SecDNSKeyData {
-                            flags: k.flags,
-                            protocol: k.protocol,
-                            algorithm: k.algorithm,
-                            public_key: k.public_key.clone()
-                        })
-                    }).collect())
-                } else if !i.key_data.is_empty() {
-                    SecDNSDataType::KeyData(i.key_data.iter().map(|k| SecDNSKeyData {
-                        flags: k.flags,
-                        protocol: k.protocol,
-                        algorithm: k.algorithm,
-                        public_key: k.public_key.clone()
-                    }).collect())
-                } else {
-                    return Err(Error::InternalServerError)
-                }
-            })) {
+            Some(ext) => match ext
+                .value
+                .iter()
+                .find_map(|p| match p {
+                    proto::EPPResponseExtensionType::EPPSecDNSInfo(i) => Some(i),
+                    _ => None,
+                })
+                .map(|i| {
+                    Ok(SecDNSData {
+                        max_sig_life: i.max_signature_life,
+                        data: if !i.ds_data.is_empty() {
+                            SecDNSDataType::DSData(
+                                i.ds_data
+                                    .iter()
+                                    .map(|d| SecDNSDSData {
+                                        key_tag: d.key_tag,
+                                        algorithm: d.algorithm,
+                                        digest_type: d.digest_type,
+                                        digest: d.digest.clone(),
+                                        key_data: d.key_data.as_ref().map(|k| SecDNSKeyData {
+                                            flags: k.flags,
+                                            protocol: k.protocol,
+                                            algorithm: k.algorithm,
+                                            public_key: k.public_key.clone(),
+                                        }),
+                                    })
+                                    .collect(),
+                            )
+                        } else if !i.key_data.is_empty() {
+                            SecDNSDataType::KeyData(
+                                i.key_data
+                                    .iter()
+                                    .map(|k| SecDNSKeyData {
+                                        flags: k.flags,
+                                        protocol: k.protocol,
+                                        algorithm: k.algorithm,
+                                        public_key: k.public_key.clone(),
+                                    })
+                                    .collect(),
+                            )
+                        } else {
+                            return Err(Error::InternalServerError);
+                        },
+                    })
+                }) {
                 Some(i) => match i {
                     Ok(i) => Some(i),
-                    Err(e) => return Err(e)
+                    Err(e) => return Err(e),
                 },
-                None => None
+                None => None,
             },
-            None => None
+            None => None,
         };
 
         Ok(InfoResponse {
@@ -464,7 +492,9 @@ impl TryFrom<(proto::domain::EPPDomainInfoData, &Option<proto::EPPResponseExtens
                 .collect(),
             nameservers: match domain_info.nameservers {
                 None => vec![],
-                Some(n) => n.servers.into_iter()
+                Some(n) => n
+                    .servers
+                    .into_iter()
                     .map(|s| match s {
                         proto::domain::EPPDomainInfoNameserver::HostOnly(h) => {
                             InfoNameserver::HostOnly(h)
@@ -474,7 +504,10 @@ impl TryFrom<(proto::domain::EPPDomainInfoData, &Option<proto::EPPResponseExtens
                             addresses,
                         } => InfoNameserver::HostAndAddress {
                             host,
-                            addresses: addresses.into_iter().map(|addr| super::host::Address {
+                            addresses: addresses
+                                .into_iter()
+                                .map(|addr| {
+                                    super::host::Address {
                                 address: addr.address,
                                 ip_version: match addr.ip_version {
                                     proto::domain::EPPDomainInfoNameserverAddressVersion::IPv4 => {
@@ -484,10 +517,12 @@ impl TryFrom<(proto::domain::EPPDomainInfoData, &Option<proto::EPPResponseExtens
                                         super::host::AddressVersion::IPv6
                                     }
                                 },
-                            }).collect()
+                            }
+                                })
+                                .collect(),
                         },
                     })
-                    .collect()
+                    .collect(),
             },
             hosts: domain_info.hosts,
             client_id: domain_info.client_id,
@@ -500,7 +535,7 @@ impl TryFrom<(proto::domain::EPPDomainInfoData, &Option<proto::EPPResponseExtens
             rgp_state,
             auth_info: match domain_info.auth_info {
                 Some(a) => a.password,
-                None => None
+                None => None,
             },
             sec_dns,
         })
@@ -538,7 +573,7 @@ impl From<&proto::domain::EPPDomainPanData> for PanData {
             result: from.name.result,
             server_transaction_id: from.transaction_id.server_transaction_id.clone(),
             client_transaction_id: from.transaction_id.client_transaction_id.clone(),
-            date: from.action_date
+            date: from.action_date,
         }
     }
 }
@@ -565,13 +600,17 @@ pub fn handle_check(
         name: req.name.clone(),
     });
     let ext = if client.has_erratum("verisign-tv") {
-        Some(vec![proto::EPPCommandExtensionType::VerisignNameStoreExt(proto::verisign::EPPNameStoreExt {
-            sub_product: "dotTV".to_string()
-        })])
+        Some(vec![proto::EPPCommandExtensionType::VerisignNameStoreExt(
+            proto::verisign::EPPNameStoreExt {
+                sub_product: "dotTV".to_string(),
+            },
+        )])
     } else if client.has_erratum("verisign-cc") {
-        Some(vec![proto::EPPCommandExtensionType::VerisignNameStoreExt(proto::verisign::EPPNameStoreExt {
-            sub_product: "dotCC".to_string()
-        })])
+        Some(vec![proto::EPPCommandExtensionType::VerisignNameStoreExt(
+            proto::verisign::EPPNameStoreExt {
+                sub_product: "dotCC".to_string(),
+            },
+        )])
     } else {
         None
     };
@@ -609,13 +648,17 @@ pub fn handle_info(
         name: req.name.clone(),
     });
     let ext = if client.has_erratum("verisign-tv") {
-        Some(vec![proto::EPPCommandExtensionType::VerisignNameStoreExt(proto::verisign::EPPNameStoreExt {
-            sub_product: "dotTV".to_string()
-        })])
+        Some(vec![proto::EPPCommandExtensionType::VerisignNameStoreExt(
+            proto::verisign::EPPNameStoreExt {
+                sub_product: "dotTV".to_string(),
+            },
+        )])
     } else if client.has_erratum("verisign-cc") {
-        Some(vec![proto::EPPCommandExtensionType::VerisignNameStoreExt(proto::verisign::EPPNameStoreExt {
-            sub_product: "dotCC".to_string()
-        })])
+        Some(vec![proto::EPPCommandExtensionType::VerisignNameStoreExt(
+            proto::verisign::EPPNameStoreExt {
+                sub_product: "dotCC".to_string(),
+            },
+        )])
     } else {
         None
     };
@@ -647,45 +690,59 @@ pub fn handle_create(
     let mut exts = vec![];
     if client.secdns_supported {
         match &req.sec_dns {
-            Some(sec_dns) => exts.push(proto::EPPCommandExtensionType::EPPSecDNSCreate(match &sec_dns.data {
-                SecDNSDataType::DSData(ds_data) => proto::secdns::EPPSecDNSData {
-                    max_signature_life: sec_dns.max_sig_life,
-                    key_data: vec![],
-                    ds_data: ds_data.iter().map(|d| proto::secdns::EPPSecDNSDSData {
-                        key_tag: d.key_tag,
-                        algorithm: d.algorithm,
-                        digest_type: d.digest_type,
-                        digest: d.digest.clone(),
-                        key_data: d.key_data.as_ref().map(|k| proto::secdns::EPPSecDNSKeyData {
-                            flags: k.flags,
-                            protocol: k.protocol,
-                            algorithm: k.algorithm,
-                            public_key: k.public_key.clone()
-                        })
-                    }).collect()
+            Some(sec_dns) => exts.push(proto::EPPCommandExtensionType::EPPSecDNSCreate(
+                match &sec_dns.data {
+                    SecDNSDataType::DSData(ds_data) => proto::secdns::EPPSecDNSData {
+                        max_signature_life: sec_dns.max_sig_life,
+                        key_data: vec![],
+                        ds_data: ds_data
+                            .iter()
+                            .map(|d| proto::secdns::EPPSecDNSDSData {
+                                key_tag: d.key_tag,
+                                algorithm: d.algorithm,
+                                digest_type: d.digest_type,
+                                digest: d.digest.clone(),
+                                key_data: d.key_data.as_ref().map(|k| {
+                                    proto::secdns::EPPSecDNSKeyData {
+                                        flags: k.flags,
+                                        protocol: k.protocol,
+                                        algorithm: k.algorithm,
+                                        public_key: k.public_key.clone(),
+                                    }
+                                }),
+                            })
+                            .collect(),
+                    },
+                    SecDNSDataType::KeyData(key_data) => proto::secdns::EPPSecDNSData {
+                        max_signature_life: sec_dns.max_sig_life,
+                        ds_data: vec![],
+                        key_data: key_data
+                            .iter()
+                            .map(|k| proto::secdns::EPPSecDNSKeyData {
+                                flags: k.flags,
+                                protocol: k.protocol,
+                                algorithm: k.algorithm,
+                                public_key: k.public_key.clone(),
+                            })
+                            .collect(),
+                    },
                 },
-                SecDNSDataType::KeyData(key_data) => proto::secdns::EPPSecDNSData {
-                    max_signature_life: sec_dns.max_sig_life,
-                    ds_data: vec![],
-                    key_data: key_data.iter().map(|k| proto::secdns::EPPSecDNSKeyData {
-                        flags: k.flags,
-                        protocol: k.protocol,
-                        algorithm: k.algorithm,
-                        public_key: k.public_key.clone()
-                    }).collect()
-                }
-            })),
+            )),
             None => {}
         }
     }
     if client.has_erratum("verisign-tv") {
-        exts.push(proto::EPPCommandExtensionType::VerisignNameStoreExt(proto::verisign::EPPNameStoreExt {
-            sub_product: "dotTV".to_string()
-        }))
+        exts.push(proto::EPPCommandExtensionType::VerisignNameStoreExt(
+            proto::verisign::EPPNameStoreExt {
+                sub_product: "dotTV".to_string(),
+            },
+        ))
     } else if client.has_erratum("verisign-cc") {
-        exts.push(proto::EPPCommandExtensionType::VerisignNameStoreExt(proto::verisign::EPPNameStoreExt {
-            sub_product: "dotCC".to_string()
-        }))
+        exts.push(proto::EPPCommandExtensionType::VerisignNameStoreExt(
+            proto::verisign::EPPNameStoreExt {
+                sub_product: "dotCC".to_string(),
+            },
+        ))
     }
 
     let command = proto::EPPCreate::Domain(proto::domain::EPPDomainCreate {
@@ -713,35 +770,38 @@ pub fn handle_create(
             password: Some(req.auth_info.to_string()),
         },
     });
-    Ok((proto::EPPCommandType::Create(command), match exts.len() {
-        0 => None,
-        _ => Some(exts)
-    }))
+    Ok((
+        proto::EPPCommandType::Create(command),
+        match exts.len() {
+            0 => None,
+            _ => Some(exts),
+        },
+    ))
 }
 
 pub fn handle_create_response(response: proto::EPPResponse) -> Response<CreateResponse> {
     match &response.data {
         Some(value) => match &value.value {
-            proto::EPPResultDataValue::EPPDomainCreateResult(domain_create) => {
+            proto::EPPResultDataValue::EPPDomainCreateResult(domain_create) => Ok(CreateResponse {
+                pending: response.is_pending(),
+                data: domain_create.into(),
+            }),
+            _ => Err(Error::InternalServerError),
+        },
+        None => {
+            if response.is_pending() {
                 Ok(CreateResponse {
                     pending: response.is_pending(),
-                    data: domain_create.into()
+                    data: CreateData {
+                        name: "".to_string(),
+                        creation_date: None,
+                        expiration_date: None,
+                    },
                 })
+            } else {
+                Err(Error::InternalServerError)
             }
-            _ =>  Err(Error::InternalServerError),
-        },
-        None => if response.is_pending() {
-            Ok(CreateResponse {
-                pending: response.is_pending(),
-                data: CreateData {
-                    name: "".to_string(),
-                    creation_date: None,
-                    expiration_date: None
-                }
-            })
-        } else {
-            Err(Error::InternalServerError)
-        },
+        }
     }
 }
 
@@ -757,13 +817,17 @@ pub fn handle_delete(
         name: req.name.clone(),
     });
     let ext = if client.has_erratum("verisign-tv") {
-        Some(vec![proto::EPPCommandExtensionType::VerisignNameStoreExt(proto::verisign::EPPNameStoreExt {
-            sub_product: "dotTV".to_string()
-        })])
+        Some(vec![proto::EPPCommandExtensionType::VerisignNameStoreExt(
+            proto::verisign::EPPNameStoreExt {
+                sub_product: "dotTV".to_string(),
+            },
+        )])
     } else if client.has_erratum("verisign-cc") {
-        Some(vec![proto::EPPCommandExtensionType::VerisignNameStoreExt(proto::verisign::EPPNameStoreExt {
-            sub_product: "dotCC".to_string()
-        })])
+        Some(vec![proto::EPPCommandExtensionType::VerisignNameStoreExt(
+            proto::verisign::EPPNameStoreExt {
+                sub_product: "dotCC".to_string(),
+            },
+        )])
     } else {
         None
     };
@@ -793,14 +857,12 @@ pub fn handle_update(
     let mut rem_ns = vec![];
     for add in &req.add {
         match add {
-            UpdateObject::Status(s) => {
-                adds.push(proto::domain::EPPDomainUpdateParam::Status(
-                    proto::domain::EPPDomainStatus {
-                        status: s.into(),
-                        message: None,
-                    },
-                ))
-            },
+            UpdateObject::Status(s) => adds.push(proto::domain::EPPDomainUpdateParam::Status(
+                proto::domain::EPPDomainStatus {
+                    status: s.into(),
+                    message: None,
+                },
+            )),
             UpdateObject::Contact(c) => {
                 super::contact::check_id(&c.contact_id)?;
                 adds.push(proto::domain::EPPDomainUpdateParam::Contact(
@@ -809,20 +871,18 @@ pub fn handle_update(
                         contact_id: c.contact_id.clone(),
                     },
                 ))
-            },
+            }
             UpdateObject::Nameserver(n) => add_ns.push(n.into()),
         }
     }
     for rem in &req.remove {
         match rem {
-            UpdateObject::Status(s) => {
-                rems.push(proto::domain::EPPDomainUpdateParam::Status(
-                    proto::domain::EPPDomainStatus {
-                        status: s.into(),
-                        message: None,
-                    },
-                ))
-            },
+            UpdateObject::Status(s) => rems.push(proto::domain::EPPDomainUpdateParam::Status(
+                proto::domain::EPPDomainStatus {
+                    status: s.into(),
+                    message: None,
+                },
+            )),
             UpdateObject::Contact(c) => {
                 super::contact::check_id(&c.contact_id)?;
                 rems.push(proto::domain::EPPDomainUpdateParam::Contact(
@@ -831,7 +891,7 @@ pub fn handle_update(
                         contact_id: c.contact_id.clone(),
                     },
                 ))
-            },
+            }
             UpdateObject::Nameserver(n) => rem_ns.push(n.into()),
         }
     }
@@ -855,7 +915,11 @@ pub fn handle_update(
     rems.sort_unstable_by(|a, b| (update_as_i32(a)).cmp(&update_as_i32(b)));
 
     let is_not_change = req.new_registrant.is_none() && req.new_auth_info.is_none();
-    if req.add.is_empty() && req.remove.is_empty() && is_not_change && (req.sec_dns.is_none() || !client.secdns_supported) {
+    if req.add.is_empty()
+        && req.remove.is_empty()
+        && is_not_change
+        && (req.sec_dns.is_none() || !client.secdns_supported)
+    {
         return Err(Err(Error::Err(
             "at least one operation must be specified".to_string(),
         )));
@@ -864,79 +928,105 @@ pub fn handle_update(
     let mut exts = vec![];
     if client.secdns_supported {
         match &req.sec_dns {
-            Some(sec_dns) => exts.push(proto::EPPCommandExtensionType::EPPSecDNSUpdate(proto::secdns::EPPSecDNSUpdate {
-                urgent: sec_dns.urgent,
-                add: sec_dns.add.as_ref().map(|a| match a {
-                    SecDNSDataType::DSData(ds_data) => proto::secdns::EPPSecDNSUpdateAdd {
-                        key_data: vec![],
-                        ds_data: ds_data.iter().map(|d| proto::secdns::EPPSecDNSDSData {
-                            key_tag: d.key_tag,
-                            algorithm: d.algorithm,
-                            digest_type: d.digest_type,
-                            digest: d.digest.clone(),
-                            key_data: d.key_data.as_ref().map(|k| proto::secdns::EPPSecDNSKeyData {
-                                flags: k.flags,
-                                protocol: k.protocol,
-                                algorithm: k.algorithm,
-                                public_key: k.public_key.clone()
-                            })
-                        }).collect()
-                    },
-                    SecDNSDataType::KeyData(key_data) => proto::secdns::EPPSecDNSUpdateAdd {
-                        ds_data: vec![],
-                        key_data: key_data.iter().map(|k| proto::secdns::EPPSecDNSKeyData {
-                            flags: k.flags,
-                            protocol: k.protocol,
-                            algorithm: k.algorithm,
-                            public_key: k.public_key.clone()
-                        }).collect()
-                    },
-                }),
-                remove: sec_dns.remove.as_ref().map(|r| match r {
-                    UpdateSecDNSRemove::All(a) => proto::secdns::EPPSecDNSUpdateRemove {
-                        all: Some(*a),
-                        ds_data: vec![],
-                        key_data: vec![]
-                    },
-                    UpdateSecDNSRemove::Data(d) => match d {
-                        SecDNSDataType::DSData(ds_data) => proto::secdns::EPPSecDNSUpdateRemove {
-                            all: None,
+            Some(sec_dns) => exts.push(proto::EPPCommandExtensionType::EPPSecDNSUpdate(
+                proto::secdns::EPPSecDNSUpdate {
+                    urgent: sec_dns.urgent,
+                    add: sec_dns.add.as_ref().map(|a| match a {
+                        SecDNSDataType::DSData(ds_data) => proto::secdns::EPPSecDNSUpdateAdd {
                             key_data: vec![],
-                            ds_data: ds_data.iter().map(|d| proto::secdns::EPPSecDNSDSData {
-                                key_tag: d.key_tag,
-                                algorithm: d.algorithm,
-                                digest_type: d.digest_type,
-                                digest: d.digest.clone(),
-                                key_data: None,
-                            }).collect()
+                            ds_data: ds_data
+                                .iter()
+                                .map(|d| proto::secdns::EPPSecDNSDSData {
+                                    key_tag: d.key_tag,
+                                    algorithm: d.algorithm,
+                                    digest_type: d.digest_type,
+                                    digest: d.digest.clone(),
+                                    key_data: d.key_data.as_ref().map(|k| {
+                                        proto::secdns::EPPSecDNSKeyData {
+                                            flags: k.flags,
+                                            protocol: k.protocol,
+                                            algorithm: k.algorithm,
+                                            public_key: k.public_key.clone(),
+                                        }
+                                    }),
+                                })
+                                .collect(),
                         },
-                        SecDNSDataType::KeyData(key_data) => proto::secdns::EPPSecDNSUpdateRemove {
-                            all: None,
+                        SecDNSDataType::KeyData(key_data) => proto::secdns::EPPSecDNSUpdateAdd {
                             ds_data: vec![],
-                            key_data: key_data.iter().map(|k| proto::secdns::EPPSecDNSKeyData {
-                                flags: k.flags,
-                                protocol: k.protocol,
-                                algorithm: k.algorithm,
-                                public_key: k.public_key.clone()
-                            }).collect()
+                            key_data: key_data
+                                .iter()
+                                .map(|k| proto::secdns::EPPSecDNSKeyData {
+                                    flags: k.flags,
+                                    protocol: k.protocol,
+                                    algorithm: k.algorithm,
+                                    public_key: k.public_key.clone(),
+                                })
+                                .collect(),
                         },
-                    }
-                }),
-                change: sec_dns.new_max_sig_life.map(|s| proto::secdns::EPPSecDNSUpdateChange {
-                    max_signature_life: Some(s)
-                })
-            })),
+                    }),
+                    remove: sec_dns.remove.as_ref().map(|r| match r {
+                        UpdateSecDNSRemove::All(a) => proto::secdns::EPPSecDNSUpdateRemove {
+                            all: Some(*a),
+                            ds_data: vec![],
+                            key_data: vec![],
+                        },
+                        UpdateSecDNSRemove::Data(d) => match d {
+                            SecDNSDataType::DSData(ds_data) => {
+                                proto::secdns::EPPSecDNSUpdateRemove {
+                                    all: None,
+                                    key_data: vec![],
+                                    ds_data: ds_data
+                                        .iter()
+                                        .map(|d| proto::secdns::EPPSecDNSDSData {
+                                            key_tag: d.key_tag,
+                                            algorithm: d.algorithm,
+                                            digest_type: d.digest_type,
+                                            digest: d.digest.clone(),
+                                            key_data: None,
+                                        })
+                                        .collect(),
+                                }
+                            }
+                            SecDNSDataType::KeyData(key_data) => {
+                                proto::secdns::EPPSecDNSUpdateRemove {
+                                    all: None,
+                                    ds_data: vec![],
+                                    key_data: key_data
+                                        .iter()
+                                        .map(|k| proto::secdns::EPPSecDNSKeyData {
+                                            flags: k.flags,
+                                            protocol: k.protocol,
+                                            algorithm: k.algorithm,
+                                            public_key: k.public_key.clone(),
+                                        })
+                                        .collect(),
+                                }
+                            }
+                        },
+                    }),
+                    change: sec_dns.new_max_sig_life.map(|s| {
+                        proto::secdns::EPPSecDNSUpdateChange {
+                            max_signature_life: Some(s),
+                        }
+                    }),
+                },
+            )),
             None => {}
         }
     }
     if client.has_erratum("verisign-tv") {
-        exts.push(proto::EPPCommandExtensionType::VerisignNameStoreExt(proto::verisign::EPPNameStoreExt {
-            sub_product: "dotTV".to_string()
-        }))
+        exts.push(proto::EPPCommandExtensionType::VerisignNameStoreExt(
+            proto::verisign::EPPNameStoreExt {
+                sub_product: "dotTV".to_string(),
+            },
+        ))
     } else if client.has_erratum("verisign-cc") {
-        exts.push(proto::EPPCommandExtensionType::VerisignNameStoreExt(proto::verisign::EPPNameStoreExt {
-            sub_product: "dotCC".to_string()
-        }))
+        exts.push(proto::EPPCommandExtensionType::VerisignNameStoreExt(
+            proto::verisign::EPPNameStoreExt {
+                sub_product: "dotCC".to_string(),
+            },
+        ))
     }
 
     let command = proto::EPPUpdate::Domain(proto::domain::EPPDomainUpdate {
@@ -965,10 +1055,13 @@ pub fn handle_update(
             })
         },
     });
-    Ok((proto::EPPCommandType::Update(Box::new(command)), match exts.len() {
-        0 => None,
-        _ => Some(exts)
-    }))
+    Ok((
+        proto::EPPCommandType::Update(Box::new(command)),
+        match exts.len() {
+            0 => None,
+            _ => Some(exts),
+        },
+    ))
 }
 
 pub fn handle_update_response(response: proto::EPPResponse) -> Response<UpdateResponse> {
@@ -991,13 +1084,17 @@ pub fn handle_renew(
         current_expiry_date: req.cur_expiry_date.date(),
     });
     let ext = if client.has_erratum("verisign-tv") {
-        Some(vec![proto::EPPCommandExtensionType::VerisignNameStoreExt(proto::verisign::EPPNameStoreExt {
-            sub_product: "dotTV".to_string()
-        })])
+        Some(vec![proto::EPPCommandExtensionType::VerisignNameStoreExt(
+            proto::verisign::EPPNameStoreExt {
+                sub_product: "dotTV".to_string(),
+            },
+        )])
     } else if client.has_erratum("verisign-cc") {
-        Some(vec![proto::EPPCommandExtensionType::VerisignNameStoreExt(proto::verisign::EPPNameStoreExt {
-            sub_product: "dotCC".to_string()
-        })])
+        Some(vec![proto::EPPCommandExtensionType::VerisignNameStoreExt(
+            proto::verisign::EPPNameStoreExt {
+                sub_product: "dotCC".to_string(),
+            },
+        )])
     } else {
         None
     };
@@ -1034,13 +1131,17 @@ pub fn handle_transfer_query(
         }),
     };
     let ext = if client.has_erratum("verisign-tv") {
-        Some(vec![proto::EPPCommandExtensionType::VerisignNameStoreExt(proto::verisign::EPPNameStoreExt {
-            sub_product: "dotTV".to_string()
-        })])
+        Some(vec![proto::EPPCommandExtensionType::VerisignNameStoreExt(
+            proto::verisign::EPPNameStoreExt {
+                sub_product: "dotTV".to_string(),
+            },
+        )])
     } else if client.has_erratum("verisign-cc") {
-        Some(vec![proto::EPPCommandExtensionType::VerisignNameStoreExt(proto::verisign::EPPNameStoreExt {
-            sub_product: "dotCC".to_string()
-        })])
+        Some(vec![proto::EPPCommandExtensionType::VerisignNameStoreExt(
+            proto::verisign::EPPNameStoreExt {
+                sub_product: "dotCC".to_string(),
+            },
+        )])
     } else {
         None
     };
@@ -1066,13 +1167,17 @@ pub fn handle_transfer_request(
         }),
     };
     let ext = if client.has_erratum("verisign-tv") {
-        Some(vec![proto::EPPCommandExtensionType::VerisignNameStoreExt(proto::verisign::EPPNameStoreExt {
-            sub_product: "dotTV".to_string()
-        })])
+        Some(vec![proto::EPPCommandExtensionType::VerisignNameStoreExt(
+            proto::verisign::EPPNameStoreExt {
+                sub_product: "dotTV".to_string(),
+            },
+        )])
     } else if client.has_erratum("verisign-cc") {
-        Some(vec![proto::EPPCommandExtensionType::VerisignNameStoreExt(proto::verisign::EPPNameStoreExt {
-            sub_product: "dotCC".to_string()
-        })])
+        Some(vec![proto::EPPCommandExtensionType::VerisignNameStoreExt(
+            proto::verisign::EPPNameStoreExt {
+                sub_product: "dotCC".to_string(),
+            },
+        )])
     } else {
         None
     };
@@ -1098,13 +1203,17 @@ pub fn handle_transfer_accept(
         }),
     };
     let ext = if client.has_erratum("verisign-tv") {
-        Some(vec![proto::EPPCommandExtensionType::VerisignNameStoreExt(proto::verisign::EPPNameStoreExt {
-            sub_product: "dotTV".to_string()
-        })])
+        Some(vec![proto::EPPCommandExtensionType::VerisignNameStoreExt(
+            proto::verisign::EPPNameStoreExt {
+                sub_product: "dotTV".to_string(),
+            },
+        )])
     } else if client.has_erratum("verisign-cc") {
-        Some(vec![proto::EPPCommandExtensionType::VerisignNameStoreExt(proto::verisign::EPPNameStoreExt {
-            sub_product: "dotCC".to_string()
-        })])
+        Some(vec![proto::EPPCommandExtensionType::VerisignNameStoreExt(
+            proto::verisign::EPPNameStoreExt {
+                sub_product: "dotCC".to_string(),
+            },
+        )])
     } else {
         None
     };
@@ -1130,13 +1239,17 @@ pub fn handle_transfer_reject(
         }),
     };
     let ext = if client.has_erratum("verisign-tv") {
-        Some(vec![proto::EPPCommandExtensionType::VerisignNameStoreExt(proto::verisign::EPPNameStoreExt {
-            sub_product: "dotTV".to_string()
-        })])
+        Some(vec![proto::EPPCommandExtensionType::VerisignNameStoreExt(
+            proto::verisign::EPPNameStoreExt {
+                sub_product: "dotTV".to_string(),
+            },
+        )])
     } else if client.has_erratum("verisign-cc") {
-        Some(vec![proto::EPPCommandExtensionType::VerisignNameStoreExt(proto::verisign::EPPNameStoreExt {
-            sub_product: "dotCC".to_string()
-        })])
+        Some(vec![proto::EPPCommandExtensionType::VerisignNameStoreExt(
+            proto::verisign::EPPNameStoreExt {
+                sub_product: "dotCC".to_string(),
+            },
+        )])
     } else {
         None
     };
@@ -1149,7 +1262,7 @@ pub fn handle_transfer_response(response: proto::EPPResponse) -> Response<Transf
             proto::EPPResultDataValue::EPPDomainTransferResult(domain_transfer) => {
                 Response::Ok(TransferResponse {
                     pending: response.is_pending(),
-                    data: domain_transfer.into()
+                    data: domain_transfer.into(),
                 })
             }
             _ => Err(Error::InternalServerError),
@@ -1396,7 +1509,6 @@ pub async fn transfer_accept(
     )
     .await
 }
-
 
 /// Rejects the transfer of a domain name
 ///

@@ -1,9 +1,9 @@
 //! EPP commands relating to nominet specific features
 
-use std::convert::TryFrom;
-use chrono::prelude::*;
 use super::router::HandleReqReturn;
-use super::{proto, EPPClientServerFeatures, Request, Response, Error, Sender};
+use super::{proto, EPPClientServerFeatures, Error, Request, Response, Sender};
+use chrono::prelude::*;
+use std::convert::TryFrom;
 
 #[derive(Debug)]
 pub struct TagListRequest {
@@ -32,14 +32,14 @@ pub struct Tag {
 #[derive(Debug)]
 pub struct CancelData {
     pub domain_name: String,
-    pub originator: String
+    pub originator: String,
 }
 
 impl From<proto::nominet::EPPCancelData> for CancelData {
     fn from(from: proto::nominet::EPPCancelData) -> Self {
         CancelData {
             domain_name: from.domain_name,
-            originator: from.originator
+            originator: from.originator,
         }
     }
 }
@@ -50,7 +50,7 @@ pub struct ReleaseData {
     pub account_moved: bool,
     pub from: String,
     pub registrar_tag: String,
-    pub domains: Vec<String>
+    pub domains: Vec<String>,
 }
 
 impl From<proto::nominet::EPPReleaseData> for ReleaseData {
@@ -60,7 +60,7 @@ impl From<proto::nominet::EPPReleaseData> for ReleaseData {
             account_moved: from.account.moved,
             from: from.from,
             registrar_tag: from.registrar_tag,
-            domains: from.domain_list.domain_names
+            domains: from.domain_list.domain_names,
         }
     }
 }
@@ -71,7 +71,7 @@ pub struct RegistrarChangeData {
     pub registrar_tag: String,
     pub case_id: String,
     pub domains: Vec<super::domain::InfoResponse>,
-    pub contact: super::contact::InfoResponse
+    pub contact: super::contact::InfoResponse,
 }
 
 impl TryFrom<proto::nominet::EPPRegistrarChangeData> for RegistrarChangeData {
@@ -82,8 +82,13 @@ impl TryFrom<proto::nominet::EPPRegistrarChangeData> for RegistrarChangeData {
             originator: from.originator,
             registrar_tag: from.registrar_tag,
             case_id: from.case_id,
-            domains: from.domain_list.domains.into_iter().map(|d| super::domain::InfoResponse::try_from((d, &None))).collect::<Result<Vec<_>, _>>()?,
-            contact: super::contact::InfoResponse::try_from((from.contact, &None))?
+            domains: from
+                .domain_list
+                .domains
+                .into_iter()
+                .map(|d| super::domain::InfoResponse::try_from((d, &None)))
+                .collect::<Result<Vec<_>, _>>()?,
+            contact: super::contact::InfoResponse::try_from((from.contact, &None))?,
         })
     }
 }
@@ -110,7 +115,7 @@ pub struct ProcessData {
     pub process_type: String,
     pub suspend_date: Option<DateTime<Utc>>,
     pub cancel_date: Option<DateTime<Utc>>,
-    pub domain_names: Vec<String>
+    pub domain_names: Vec<String>,
 }
 
 #[derive(Debug)]
@@ -141,7 +146,7 @@ impl TryFrom<proto::nominet::EPPProcessData> for ProcessData {
 pub struct SuspendData {
     pub reason: String,
     pub cancel_date: Option<DateTime<Utc>>,
-    pub domain_names: Vec<String>
+    pub domain_names: Vec<String>,
 }
 
 impl From<proto::nominet::EPPSuspendData> for SuspendData {
@@ -157,7 +162,7 @@ impl From<proto::nominet::EPPSuspendData> for SuspendData {
 #[derive(Debug)]
 pub struct DomainFailData {
     pub reason: String,
-    pub domain_name: String
+    pub domain_name: String,
 }
 
 impl From<proto::nominet::EPPDomainFailData> for DomainFailData {
