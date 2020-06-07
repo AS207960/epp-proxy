@@ -407,6 +407,15 @@
 <span id="407">407</span>
 <span id="408">408</span>
 <span id="409">409</span>
+<span id="410">410</span>
+<span id="411">411</span>
+<span id="412">412</span>
+<span id="413">413</span>
+<span id="414">414</span>
+<span id="415">415</span>
+<span id="416">416</span>
+<span id="417">417</span>
+<span id="418">418</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="attribute">#![<span class="ident">recursion_limit</span> <span class="op">=</span> <span class="string">&quot;1024&quot;</span>]</span>
 <span class="attribute">#![<span class="ident">warn</span>(<span class="ident">missing_docs</span>)]</span>
@@ -422,22 +431,31 @@
 <span class="doccomment">//! programs current working directory on startup. JSON file should follow the structure of the</span>
 <span class="doccomment">//! [`ConfigFile`] struct, where id is a unique ID for identifying the register in gRPC commands,</span>
 <span class="doccomment">//! server is the TLS server to connect to in the form `domain:port`,</span>
-<span class="doccomment">//! tag is the client login ID, password is the client login password, old_password is the optional</span>
-<span class="doccomment">//! current/old EPP password if it is to be changed on login, zones is a list of DNS</span>
-<span class="doccomment">//! zones said server is responsible for such as `ch`, `co.uk`, and `org.uk`, and client_cert</span>
-<span class="doccomment">//! is an optional TLS certificated bundle in PKCS12 format.</span>
+<span class="doccomment">//! tag is the client login ID, password is the client login password, new_password is the optional</span>
+<span class="doccomment">//! new EPP password if it is to be changed on login, zones is a list of DNS</span>
+<span class="doccomment">//! zones said server is responsible for such as `ch`, `co.uk`, and `org.uk`, client_cert</span>
+<span class="doccomment">//! is an optional TLS certificated bundle in PKCS12 format, pipelining defines support for multiple</span>
+<span class="doccomment">//! in flight commands, errata defines server errata.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Supported errata are:</span>
+<span class="doccomment">//! * `traficom`</span>
+<span class="doccomment">//! * `verisign_tv`</span>
+<span class="doccomment">//! * `verisign_cc`</span>
+<span class="doccomment">//!</span>
 <span class="doccomment">//! Example config file:</span>
 <span class="doccomment">//! ```text</span>
 <span class="doccomment">//! {</span>
 <span class="doccomment">//!  &quot;id&quot;: &quot;nominet&quot;,</span>
 <span class="doccomment">//!  &quot;server&quot;: &quot;ote-epp.nominet.org.uk:700&quot;,</span>
 <span class="doccomment">//!  &quot;tag&quot;: &quot;AS207960&quot;,</span>
-<span class="doccomment">//!  &quot;password&quot;: &quot;supersecretpassword&quot;,</span>
-<span class="doccomment">//!  &quot;old_password&quot;: &quot;oldpassword&quot;,</span>
+<span class="doccomment">//!  &quot;new_wpassword&quot;: &quot;supersecretpassword&quot;,</span>
+<span class="doccomment">//!  &quot;password&quot;: &quot;oldpassword&quot;,</span>
 <span class="doccomment">//!  &quot;zones&quot;: [</span>
 <span class="doccomment">//!    &quot;uk&quot;</span>
 <span class="doccomment">//!  ],</span>
-<span class="doccomment">//!  &quot;client_cert&quot;: &quot;priv/as207960-registrar.pfx&quot;</span>
+<span class="doccomment">//!  &quot;client_cert&quot;: &quot;priv/as207960-registrar.pfx&quot;,</span>
+<span class="doccomment">//!  &quot;pipelining&quot;: true,</span>
+<span class="doccomment">//!  &quot;errata&quot;: &quot;traficom&quot;</span>
 <span class="doccomment">//! }</span>
 <span class="doccomment">//! ```</span>
 
