@@ -264,6 +264,7 @@ impl EPPClient {
         let mut receiver = receiver.fuse();
         loop {
             self.is_closing = false;
+            self.is_awaiting_response = false;
 
             let mut sock = {
                 let connect_fut = self._connect().fuse();
@@ -371,14 +372,21 @@ impl EPPClient {
                             match self._send_keepalive(&mut sock_write).await {
                                 Ok(_) => {},
                                 Err(_) => {
-                                    tokio::time::delay_for(tokio::time::Duration::new(5, 0)).await;
                                     break;
                                 }
                             }
                         }
                     }
                 } else {
-                    match message_channel.next().await {
+                    let mut delay = tokio::time::delay_for(tokio::time::Duration::new(15, 0)).fuse();
+                    let resp = futures::select! {
+                        r = message_channel.next() => r,
+                        _ = delay => {
+                            warn!("Timeout awaiting response from {}", self.host);
+                            break;
+                        }
+                    };
+                    match resp {
                         Some(m) => match m {
                             Ok(m) => match self._handle_response(m).await {
                                 Ok(c) => {
@@ -414,7 +422,16 @@ impl EPPClient {
             message: proto::EPPMessageType::Hello {},
         };
         self.is_awaiting_response = true;
-        match self._send_msg(&message, sock_write).await {
+        let receiver = self._send_msg(&message, sock_write).fuse();
+        let mut delay = tokio::time::delay_for(tokio::time::Duration::new(15, 0)).fuse();
+        futures::pin_mut!(receiver);
+        let resp = futures::select! {
+            r = receiver => r,
+            _ = delay => {
+                return Err(());
+            }
+        };
+        match resp {
             Ok(_) => Ok(()),
             Err(_) => {
                 error!("Failed to send hello keepalive command");

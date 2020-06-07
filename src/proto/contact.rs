@@ -47,7 +47,7 @@ pub struct EPPContactInfoData {
     #[serde(rename = "{urn:ietf:params:xml:ns:contact-1.0}fax")]
     pub fax: Option<EPPContactPhone>,
     #[serde(rename = "{urn:ietf:params:xml:ns:contact-1.0}email")]
-    pub email: String,
+    pub email: Option<String>,
     #[serde(rename = "{urn:ietf:params:xml:ns:contact-1.0}legalemail")]
     pub traficom_legal_email: Option<String>,
     #[serde(rename = "{urn:ietf:params:xml:ns:contact-1.0}clID")]

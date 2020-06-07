@@ -587,7 +587,7 @@ impl
             })),
             phone: contact_info.phone.map(|p| p.into()),
             fax: contact_info.fax.map(|p| p.into()),
-            email: contact_info.email,
+            email: contact_info.email.unwrap_or(contact_info.traficom_legal_email.unwrap_or_default()),
             client_id: contact_info.client_id,
             client_created_id: contact_info.client_created_id,
             creation_date: contact_info.creation_date,
