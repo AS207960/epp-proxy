@@ -59,6 +59,7 @@ pub struct CreateRequest {
 pub struct CreateResponse {
     pub name: String,
     pub pending: bool,
+    pub transaction_id: String,
     pub creation_date: Option<DateTime<Utc>>,
 }
 
@@ -71,6 +72,7 @@ pub struct DeleteRequest {
 #[derive(Debug)]
 pub struct DeleteResponse {
     pub pending: bool,
+    pub transaction_id: String,
 }
 
 #[derive(Debug)]
@@ -91,6 +93,7 @@ pub enum UpdateObject {
 #[derive(Debug)]
 pub struct UpdateResponse {
     pub pending: bool,
+    pub transaction_id: String,
 }
 
 #[derive(Debug)]
@@ -279,6 +282,7 @@ pub fn handle_create_response(response: proto::EPPResponse) -> Response<CreateRe
                 Response::Ok(CreateResponse {
                     name: host_create.name.clone(),
                     pending: response.is_pending(),
+                    transaction_id: response.transaction_id.server_transaction_id.unwrap_or_default(),
                     creation_date: host_create.creation_date,
                 })
             }
@@ -305,6 +309,7 @@ pub fn handle_delete(
 pub fn handle_delete_response(response: proto::EPPResponse) -> Response<DeleteResponse> {
     Response::Ok(DeleteResponse {
         pending: response.is_pending(),
+        transaction_id: response.transaction_id.server_transaction_id.unwrap_or_default(),
     })
 }
 
@@ -393,6 +398,7 @@ pub fn handle_update(
 pub fn handle_update_response(response: proto::EPPResponse) -> Response<UpdateResponse> {
     Response::Ok(UpdateResponse {
         pending: response.is_pending(),
+        transaction_id: response.transaction_id.server_transaction_id.unwrap_or_default(),
     })
 }
 

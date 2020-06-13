@@ -442,6 +442,7 @@ pub struct CreateResponse {
     pub id: String,
     /// Was the request completed instantly or not
     pub pending: bool,
+    pub transaction_id: String,
     /// What date did the server log as the date of creation
     pub creation_date: Option<DateTime<Utc>>,
 }
@@ -456,6 +457,7 @@ pub struct DeleteRequest {
 pub struct DeleteResponse {
     /// Was the request completed instantly or not
     pub pending: bool,
+    pub transaction_id: String,
 }
 
 #[derive(Debug)]
@@ -480,6 +482,7 @@ pub struct UpdateRequest {
 pub struct UpdateResponse {
     /// Was the request completed instantly or not
     pub pending: bool,
+    pub transaction_id: String,
 }
 
 pub(crate) fn check_id<T>(id: &str) -> Result<(), Response<T>> {
@@ -509,6 +512,7 @@ pub struct TransferRequestRequest {
 pub struct TransferResponse {
     /// Was the request completed instantly or not
     pub pending: bool,
+    pub transaction_id: String,
     pub status: super::TransferStatus,
     /// Which client requested the transfer
     pub requested_client_id: String,
@@ -587,7 +591,10 @@ impl
             })),
             phone: contact_info.phone.map(|p| p.into()),
             fax: contact_info.fax.map(|p| p.into()),
-            email: contact_info.email.unwrap_or(contact_info.traficom_legal_email.unwrap_or_default()),
+            email: match contact_info.email {
+                Some(e) => e,
+                None => contact_info.traficom_legal_email.unwrap_or_default()
+            },
             client_id: contact_info.client_id,
             client_created_id: contact_info.client_created_id,
             creation_date: contact_info.creation_date,
@@ -888,6 +895,7 @@ pub fn handle_create_response(response: proto::EPPResponse) -> Response<CreateRe
                 Ok(CreateResponse {
                     id: contact_create.id.clone(),
                     pending: response.is_pending(),
+                    transaction_id: response.transaction_id.server_transaction_id.unwrap_or_default(),
                     creation_date: contact_create.creation_date,
                 })
             }
@@ -912,6 +920,7 @@ pub fn handle_delete(
 pub fn handle_delete_response(response: proto::EPPResponse) -> Response<DeleteResponse> {
     Response::Ok(DeleteResponse {
         pending: response.is_pending(),
+        transaction_id: response.transaction_id.server_transaction_id.unwrap_or_default(),
     })
 }
 
@@ -938,7 +947,7 @@ pub fn handle_update(
                 "at least one operation must be specified".to_string(),
             )));
         } else if !client.nominet_contact_ext {
-            return Err(Ok(UpdateResponse { pending: false }));
+            return Err(Ok(UpdateResponse { pending: false, transaction_id: "".to_string() }));
         }
     }
     let phone_re = Regex::new(r"^\+\d+\.\d+$").unwrap();
@@ -1070,6 +1079,7 @@ pub fn handle_update(
 pub fn handle_update_response(response: proto::EPPResponse) -> Response<UpdateResponse> {
     Response::Ok(UpdateResponse {
         pending: response.is_pending(),
+        transaction_id: response.transaction_id.server_transaction_id.unwrap_or_default(),
     })
 }
 
@@ -1156,6 +1166,7 @@ pub fn handle_transfer_response(response: proto::EPPResponse) -> Response<Transf
             proto::EPPResultDataValue::EPPContactTransferResult(contact_transfer) => {
                 Ok(TransferResponse {
                     pending: response.is_pending(),
+                    transaction_id: response.transaction_id.server_transaction_id.unwrap_or_default(),
                     status: (&contact_transfer.transfer_status).into(),
                     requested_client_id: contact_transfer.requested_client_id.clone(),
                     requested_date: contact_transfer.requested_date,

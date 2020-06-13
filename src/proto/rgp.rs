@@ -2,8 +2,8 @@ use chrono::prelude::*;
 
 #[derive(Debug, Deserialize)]
 pub struct EPPRGPData {
-    #[serde(rename = "{urn:ietf:params:xml:ns:rgp-1.0}rgpStatus")]
-    pub state: EPPRGPStatus,
+    #[serde(rename = "{urn:ietf:params:xml:ns:rgp-1.0}rgpStatus", default)]
+    pub state: Vec<EPPRGPStatus>,
 }
 
 #[derive(Debug, Deserialize)]

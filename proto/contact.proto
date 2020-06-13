@@ -143,6 +143,7 @@ message ContactCreateRequest {
 message ContactCreateReply {
     string id = 1;
     bool pending = 2;
+    string transaction_id = 4;
     google.protobuf.Timestamp creation_date = 3;
 }
 
@@ -153,6 +154,7 @@ message ContactDeleteRequest {
 
 message ContactDeleteReply {
     bool pending = 1;
+    string transaction_id = 2;
 }
 
 message ContactUpdateRequest {
@@ -174,6 +176,7 @@ message ContactUpdateRequest {
 
 message ContactUpdateReply {
     bool pending = 1;
+    string transaction_id = 2;
 }
 
 message ContactTransferQueryRequest {
@@ -190,6 +193,7 @@ message ContactTransferRequestRequest {
 
 message ContactTransferReply {
     bool pending = 1;
+    string transaction_id = 7;
     common.TransferStatus status = 2;
     string requested_client_id = 3;
     google.protobuf.Timestamp requested_date = 4;

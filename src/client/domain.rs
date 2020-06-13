@@ -1,13 +1,14 @@
 //! EPP commands relating to domain objects
 
 use super::router::HandleReqReturn;
-use super::{proto, EPPClientServerFeatures, Error, Request, Response, Sender};
+use super::{proto, fee, EPPClientServerFeatures, Error, Request, Response, Sender};
 use chrono::prelude::*;
 use std::convert::{TryFrom, TryInto};
 
 #[derive(Debug)]
 pub struct CheckRequest {
     name: String,
+    fee_check: Option<fee::FeeCheck>,
     pub return_path: Sender<CheckResponse>,
 }
 
@@ -18,6 +19,8 @@ pub struct CheckResponse {
     pub avail: bool,
     /// An optional reason for the domain's status
     pub reason: Option<String>,
+    /// Fee information (if supplied by the registry)
+    pub fee_check: Option<fee::FeeCheckData>,
 }
 
 #[derive(Debug)]
@@ -58,7 +61,7 @@ pub struct InfoResponse {
     /// Date of last transfer
     pub last_transfer_date: Option<DateTime<Utc>>,
     /// Redemption grace period state of the domain
-    pub rgp_state: super::rgp::RGPState,
+    pub rgp_state: Vec<super::rgp::RGPState>,
     pub auth_info: Option<String>,
     /// DNSSEC data
     pub sec_dns: Option<SecDNSData>,
@@ -147,7 +150,10 @@ pub enum PeriodUnit {
 pub struct CreateResponse {
     /// Was the request completed instantly or not
     pub pending: bool,
+    pub transaction_id: String,
     pub data: CreateData,
+    /// Fee information (if supplied by the registry)
+    pub fee_data: Option<fee::FeeData>,
 }
 
 #[derive(Debug)]
@@ -170,6 +176,9 @@ pub struct DeleteRequest {
 pub struct DeleteResponse {
     /// Was the request completed instantly or not
     pub pending: bool,
+    pub transaction_id: String,
+    /// Fee information (if supplied by the registry)
+    pub fee_data: Option<fee::FeeData>,
 }
 
 #[derive(Debug)]
@@ -208,6 +217,9 @@ pub enum UpdateSecDNSRemove {
 pub struct UpdateResponse {
     /// Was the request completed instantly or not
     pub pending: bool,
+    pub transaction_id: String,
+    /// Fee information (if supplied by the registry)
+    pub fee_data: Option<fee::FeeData>,
 }
 
 #[derive(Debug)]
@@ -222,6 +234,15 @@ pub struct RenewRequest {
 pub struct RenewResponse {
     /// Was the request completed instantly or not
     pub pending: bool,
+    pub transaction_id: String,
+    pub data: RenewData,
+    /// Fee information (if supplied by the registry)
+    pub fee_data: Option<fee::FeeData>,
+}
+
+#[derive(Debug)]
+pub struct RenewData {
+    pub name: String,
     pub new_expiry_date: Option<DateTime<Utc>>,
 }
 
@@ -250,7 +271,10 @@ pub struct TransferAcceptRejectRequest {
 pub struct TransferResponse {
     /// Was the request completed instantly or not
     pub pending: bool,
+    pub transaction_id: String,
     pub data: TransferData,
+    /// Fee information (if supplied by the registry)
+    pub fee_data: Option<fee::FeeData>,
 }
 
 #[derive(Debug)]
@@ -387,7 +411,19 @@ impl From<&Period> for proto::domain::EPPDomainPeriod {
                 PeriodUnit::Months => proto::domain::EPPDomainPeriodUnit::Months,
                 PeriodUnit::Years => proto::domain::EPPDomainPeriodUnit::Years,
             },
-            value: from.value.to_string(),
+            value: std::cmp::min(99, std::cmp::max(from.value, 1)),
+        }
+    }
+}
+
+impl From<&proto::domain::EPPDomainPeriod> for Period {
+    fn from(from: &proto::domain::EPPDomainPeriod) -> Self {
+        Period {
+            unit: match from.unit {
+                proto::domain::EPPDomainPeriodUnit::Years => PeriodUnit::Years,
+                proto::domain::EPPDomainPeriodUnit::Months => PeriodUnit::Months,
+            },
+            value: from.value
         }
     }
 }
@@ -412,10 +448,10 @@ impl
                 proto::EPPResponseExtensionType::EPPRGPInfo(i) => Some(i),
                 _ => None,
             }) {
-                Some(e) => (&e.state.state).into(),
-                None => super::rgp::RGPState::Unknown,
+                Some(e) => e.state.iter().map(|s| (&s.state).into()).collect(),
+                None => vec![],
             },
-            None => super::rgp::RGPState::Unknown,
+            None => vec![],
         };
 
         let sec_dns = match extension {
@@ -566,6 +602,15 @@ impl From<&proto::domain::EPPDomainCreateData> for CreateData {
     }
 }
 
+impl From<&proto::domain::EPPDomainRenewData> for RenewData {
+    fn from(domain_renew: &proto::domain::EPPDomainRenewData) -> Self {
+        RenewData {
+            name: domain_renew.name.to_owned(),
+            new_expiry_date: domain_renew.expiry_date,
+        }
+    }
+}
+
 impl From<&proto::domain::EPPDomainPanData> for PanData {
     fn from(from: &proto::domain::EPPDomainPanData) -> Self {
         PanData {
@@ -599,25 +644,189 @@ pub fn handle_check(
     let command = proto::EPPCheck::Domain(proto::domain::EPPDomainCheck {
         name: req.name.clone(),
     });
-    let ext = if client.has_erratum("verisign-tv") {
-        Some(vec![proto::EPPCommandExtensionType::VerisignNameStoreExt(
+    let mut ext = vec![];
+    if client.has_erratum("verisign-tv") {
+        ext.push(proto::EPPCommandExtensionType::VerisignNameStoreExt(
             proto::verisign::EPPNameStoreExt {
                 sub_product: "dotTV".to_string(),
             },
-        )])
+        ));
     } else if client.has_erratum("verisign-cc") {
-        Some(vec![proto::EPPCommandExtensionType::VerisignNameStoreExt(
+        ext.push(proto::EPPCommandExtensionType::VerisignNameStoreExt(
             proto::verisign::EPPNameStoreExt {
                 sub_product: "dotCC".to_string(),
             },
-        )])
-    } else {
-        None
-    };
-    Ok((proto::EPPCommandType::Check(command), ext))
+        ));
+    }
+    if let Some(fee_check) = &req.fee_check {
+        if client.fee_supported {
+            ext.push(proto::EPPCommandExtensionType::EPPFee10Check(proto::fee::EPPFee10Check {
+                currency: fee_check.currency.to_owned(),
+                commands: fee_check.commands.iter().map(|c| proto::fee::EPPFee10CheckCommand {
+                    name: (&c.command).into(),
+                    period: c.period.as_ref().map(Into::into),
+                }).collect()
+            }))
+        } else if client.fee_09_supported {
+            ext.push(proto::EPPCommandExtensionType::EPPFee09Check(proto::fee::EPPFee09Check {
+                objects: fee_check.commands.iter().map(|c| proto::fee::EPPFee09CheckObject {
+                    object_uri: Some("urn:ietf:params:xml:ns:domain-1.0".to_string()),
+                    object_id: proto::fee::EPPFee10ObjectID {
+                        element: "name".to_string(),
+                        id: req.name.to_owned()
+                    },
+                    currency: fee_check.currency.to_owned(),
+                    command: (&c.command).into(),
+                    period: c.period.as_ref().map(Into::into),
+                }).collect()
+            }))
+        } else if client.fee_08_supported {
+            ext.push(proto::EPPCommandExtensionType::EPPFee08Check(proto::fee::EPPFee08Check {
+                domains: fee_check.commands.iter().map(|c| proto::fee::EPPFee08CheckDomain {
+                    name: req.name.to_owned(),
+                    currency: fee_check.currency.to_owned(),
+                    command: (&c.command).into(),
+                    period: c.period.as_ref().map(Into::into),
+                }).collect()
+            }))
+        } else if client.fee_07_supported {
+            ext.push(proto::EPPCommandExtensionType::EPPFee07Check(proto::fee::EPPFee07Check {
+                domains: fee_check.commands.iter().map(|c| proto::fee::EPPFee07CheckDomain {
+                    name: req.name.to_owned(),
+                    currency: fee_check.currency.to_owned(),
+                    command: (&c.command).into(),
+                    period: c.period.as_ref().map(Into::into),
+                }).collect()
+            }))
+        } else if client.fee_05_supported {
+            ext.push(proto::EPPCommandExtensionType::EPPFee05Check(proto::fee::EPPFee05Check {
+                domains: fee_check.commands.iter().map(|c| proto::fee::EPPFee05CheckDomain {
+                    name: req.name.to_owned(),
+                    currency: fee_check.currency.to_owned(),
+                    command: (&c.command).into(),
+                    period: c.period.as_ref().map(Into::into),
+                }).collect()
+            }))
+        } else {
+            return Err(Err(Error::Unsupported))
+        }
+    }
+    Ok((proto::EPPCommandType::Check(command), match ext.is_empty() {
+        true => None,
+        false => Some(ext)
+    }))
 }
 
 pub fn handle_check_response(response: proto::EPPResponse) -> Response<CheckResponse> {
+    let fee_check = match response.extension {
+        Some(ext) => {
+            let fee10 = ext.value.iter().find_map(|p| match p {
+                proto::EPPResponseExtensionType::EPPFee10CheckData(i) => Some(i),
+                _ => None,
+            });
+            let fee09 = ext.value.iter().find_map(|p| match p {
+                proto::EPPResponseExtensionType::EPPFee09CheckData(i) => Some(i),
+                _ => None,
+            });
+            let fee08 = ext.value.iter().find_map(|p| match p {
+                proto::EPPResponseExtensionType::EPPFee08CheckData(i) => Some(i),
+                _ => None,
+            });
+            let fee07 = ext.value.iter().find_map(|p| match p {
+                proto::EPPResponseExtensionType::EPPFee07CheckData(i) => Some(i),
+                _ => None,
+            });
+            let fee05 = ext.value.iter().find_map(|p| match p {
+                proto::EPPResponseExtensionType::EPPFee05CheckData(i) => Some(i),
+                _ => None,
+            });
+
+            if let Some(f) = fee10 {
+                let d = match f.objects.iter().next() {
+                    Some(o) => o,
+                    None => return Err(Error::InternalServerError)
+                };
+                Some(fee::FeeCheckData {
+                    available: d.available,
+                    commands: d.commands.iter().map(|c| fee::FeeCommand {
+                        command: (&c.name).into(),
+                        period: c.period.as_ref().map(Into::into),
+                        standard: Some(c.standard),
+                        currency: f.currency.to_owned(),
+                        fees: c.fee.iter().map(Into::into).collect(),
+                        credits: c.credit.iter().map(Into::into).collect(),
+                        reason: c.reason.to_owned(),
+                        class: d.class.to_owned(),
+                    }).collect(),
+                    reason: d.reason.to_owned(),
+                })
+            } else if let Some(f) = fee09 {
+                Some(fee::FeeCheckData {
+                    available: true,
+                    commands: f.objects.iter().map(|d| fee::FeeCommand {
+                        command: (&d.command).into(),
+                        period: d.period.as_ref().map(Into::into),
+                        standard: None,
+                        currency: d.currency.to_owned(),
+                        fees: d.fee.iter().map(Into::into).collect(),
+                        credits: d.credit.iter().map(Into::into).collect(),
+                        class: d.class.to_owned(),
+                        reason: None
+                    }).collect(),
+                    reason: None,
+                })
+            } else if let Some(f) = fee08 {
+                Some(fee::FeeCheckData {
+                    available: true,
+                    commands: f.domains.iter().map(|d| fee::FeeCommand {
+                        command: (&d.command).into(),
+                        period: d.period.as_ref().map(Into::into),
+                        standard: None,
+                        currency: d.currency.to_owned(),
+                        fees: d.fee.iter().map(Into::into).collect(),
+                        credits: d.credit.iter().map(Into::into).collect(),
+                        class: d.class.to_owned(),
+                        reason: None
+                    }).collect(),
+                    reason: None,
+                })
+            } else if let Some(f) = fee07 {
+                Some(fee::FeeCheckData {
+                    available: true,
+                    commands: f.domains.iter().map(|d| fee::FeeCommand {
+                        command: (&d.command).into(),
+                        period: d.period.as_ref().map(Into::into),
+                        standard: None,
+                        currency: d.currency.to_owned(),
+                        fees: d.fee.iter().map(Into::into).collect(),
+                        credits: d.credit.iter().map(Into::into).collect(),
+                        class: d.class.to_owned(),
+                        reason: None
+                    }).collect(),
+                    reason: None,
+                })
+            } else if let Some(f) = fee05 {
+                Some(fee::FeeCheckData {
+                    available: true,
+                    commands: f.domains.iter().map(|d| fee::FeeCommand {
+                        command: (&d.command).into(),
+                        period: Some((&d.period).into()),
+                        standard: None,
+                        currency: d.currency.to_owned(),
+                        fees: d.fee.iter().map(Into::into).collect(),
+                        class: d.class.to_owned(),
+                        credits: vec![],
+                        reason: None
+                    }).collect(),
+                    reason: None,
+                })
+            } else {
+                None
+            }
+        },
+        None => None,
+    };
+
     match response.data {
         Some(value) => match value.value {
             proto::EPPResultDataValue::EPPDomainCheckResult(domain_check) => {
@@ -625,6 +834,7 @@ pub fn handle_check_response(response: proto::EPPResponse) -> Response<CheckResp
                     Response::Ok(CheckResponse {
                         avail: domain_check.name.available,
                         reason: domain_check.reason.to_owned(),
+                        fee_check
                     })
                 } else {
                     Err(Error::InternalServerError)
@@ -780,11 +990,53 @@ pub fn handle_create(
 }
 
 pub fn handle_create_response(response: proto::EPPResponse) -> Response<CreateResponse> {
+    let fee_data = match &response.extension {
+        Some(ext) => {
+            let fee10 = ext.value.iter().find_map(|p| match p {
+                proto::EPPResponseExtensionType::EPPFee10CreateData(i) => Some(i),
+                _ => None,
+            });
+            let fee09 = ext.value.iter().find_map(|p| match p {
+                proto::EPPResponseExtensionType::EPPFee09CreateData(i) => Some(i),
+                _ => None,
+            });
+            let fee08 = ext.value.iter().find_map(|p| match p {
+                proto::EPPResponseExtensionType::EPPFee08CreateData(i) => Some(i),
+                _ => None,
+            });
+            let fee07 = ext.value.iter().find_map(|p| match p {
+                proto::EPPResponseExtensionType::EPPFee07CreateData(i) => Some(i),
+                _ => None,
+            });
+            let fee05 = ext.value.iter().find_map(|p| match p {
+                proto::EPPResponseExtensionType::EPPFee05CreateData(i) => Some(i),
+                _ => None,
+            });
+
+            if let Some(f) = fee10 {
+                Some(f.into())
+            } else if let Some(f) = fee09 {
+                Some(f.into())
+            } else if let Some(f) = fee08 {
+                Some(f.into())
+            } else if let Some(f) = fee07 {
+                Some(f.into())
+            } else if let Some(f) = fee05 {
+                Some(f.into())
+            } else {
+                None
+            }
+        },
+        None => None,
+    };
+
     match &response.data {
         Some(value) => match &value.value {
             proto::EPPResultDataValue::EPPDomainCreateResult(domain_create) => Ok(CreateResponse {
                 pending: response.is_pending(),
+                transaction_id: response.transaction_id.server_transaction_id.unwrap_or_default(),
                 data: domain_create.into(),
+                fee_data
             }),
             _ => Err(Error::InternalServerError),
         },
@@ -792,11 +1044,13 @@ pub fn handle_create_response(response: proto::EPPResponse) -> Response<CreateRe
             if response.is_pending() {
                 Ok(CreateResponse {
                     pending: response.is_pending(),
+                    transaction_id: response.transaction_id.server_transaction_id.unwrap_or_default(),
                     data: CreateData {
                         name: "".to_string(),
                         creation_date: None,
                         expiration_date: None,
                     },
+                    fee_data,
                 })
             } else {
                 Err(Error::InternalServerError)
@@ -835,8 +1089,50 @@ pub fn handle_delete(
 }
 
 pub fn handle_delete_response(response: proto::EPPResponse) -> Response<DeleteResponse> {
+    let fee_data = match &response.extension {
+        Some(ext) => {
+            let fee10 = ext.value.iter().find_map(|p| match p {
+                proto::EPPResponseExtensionType::EPPFee10DeleteData(i) => Some(i),
+                _ => None,
+            });
+            let fee09 = ext.value.iter().find_map(|p| match p {
+                proto::EPPResponseExtensionType::EPPFee09DeleteData(i) => Some(i),
+                _ => None,
+            });
+            let fee08 = ext.value.iter().find_map(|p| match p {
+                proto::EPPResponseExtensionType::EPPFee08DeleteData(i) => Some(i),
+                _ => None,
+            });
+            let fee07 = ext.value.iter().find_map(|p| match p {
+                proto::EPPResponseExtensionType::EPPFee07DeleteData(i) => Some(i),
+                _ => None,
+            });
+            let fee05 = ext.value.iter().find_map(|p| match p {
+                proto::EPPResponseExtensionType::EPPFee05DeleteData(i) => Some(i),
+                _ => None,
+            });
+
+            if let Some(f) = fee10 {
+                Some(f.into())
+            } else if let Some(f) = fee09 {
+                Some(f.into())
+            } else if let Some(f) = fee08 {
+                Some(f.into())
+            } else if let Some(f) = fee07 {
+                Some(f.into())
+            } else if let Some(f) = fee05 {
+                Some(f.into())
+            } else {
+                None
+            }
+        },
+        None => None,
+    };
+
     Response::Ok(DeleteResponse {
         pending: response.is_pending(),
+        transaction_id: response.transaction_id.server_transaction_id.unwrap_or_default(),
+        fee_data,
     })
 }
 
@@ -1065,8 +1361,50 @@ pub fn handle_update(
 }
 
 pub fn handle_update_response(response: proto::EPPResponse) -> Response<UpdateResponse> {
+    let fee_data = match &response.extension {
+        Some(ext) => {
+            let fee10 = ext.value.iter().find_map(|p| match p {
+                proto::EPPResponseExtensionType::EPPFee10UpdateData(i) => Some(i),
+                _ => None,
+            });
+            let fee09 = ext.value.iter().find_map(|p| match p {
+                proto::EPPResponseExtensionType::EPPFee09UpdateData(i) => Some(i),
+                _ => None,
+            });
+            let fee08 = ext.value.iter().find_map(|p| match p {
+                proto::EPPResponseExtensionType::EPPFee08UpdateData(i) => Some(i),
+                _ => None,
+            });
+            let fee07 = ext.value.iter().find_map(|p| match p {
+                proto::EPPResponseExtensionType::EPPFee07UpdateData(i) => Some(i),
+                _ => None,
+            });
+            let fee05 = ext.value.iter().find_map(|p| match p {
+                proto::EPPResponseExtensionType::EPPFee05UpdateData(i) => Some(i),
+                _ => None,
+            });
+
+            if let Some(f) = fee10 {
+                Some(f.into())
+            } else if let Some(f) = fee09 {
+                Some(f.into())
+            } else if let Some(f) = fee08 {
+                Some(f.into())
+            } else if let Some(f) = fee07 {
+                Some(f.into())
+            } else if let Some(f) = fee05 {
+                Some(f.into())
+            } else {
+                None
+            }
+        },
+        None => None,
+    };
+
     Response::Ok(UpdateResponse {
         pending: response.is_pending(),
+        transaction_id: response.transaction_id.server_transaction_id.unwrap_or_default(),
+        fee_data
     })
 }
 
@@ -1102,12 +1440,54 @@ pub fn handle_renew(
 }
 
 pub fn handle_renew_response(response: proto::EPPResponse) -> Response<RenewResponse> {
+    let fee_data = match &response.extension {
+        Some(ext) => {
+            let fee10 = ext.value.iter().find_map(|p| match p {
+                proto::EPPResponseExtensionType::EPPFee10RenewData(i) => Some(i),
+                _ => None,
+            });
+            let fee09 = ext.value.iter().find_map(|p| match p {
+                proto::EPPResponseExtensionType::EPPFee09RenewData(i) => Some(i),
+                _ => None,
+            });
+            let fee08 = ext.value.iter().find_map(|p| match p {
+                proto::EPPResponseExtensionType::EPPFee08RenewData(i) => Some(i),
+                _ => None,
+            });
+            let fee07 = ext.value.iter().find_map(|p| match p {
+                proto::EPPResponseExtensionType::EPPFee07RenewData(i) => Some(i),
+                _ => None,
+            });
+            let fee05 = ext.value.iter().find_map(|p| match p {
+                proto::EPPResponseExtensionType::EPPFee05RenewData(i) => Some(i),
+                _ => None,
+            });
+
+            if let Some(f) = fee10 {
+                Some(f.into())
+            } else if let Some(f) = fee09 {
+                Some(f.into())
+            } else if let Some(f) = fee08 {
+                Some(f.into())
+            } else if let Some(f) = fee07 {
+                Some(f.into())
+            } else if let Some(f) = fee05 {
+                Some(f.into())
+            } else {
+                None
+            }
+        },
+        None => None,
+    };
+
     match &response.data {
         Some(value) => match &value.value {
             proto::EPPResultDataValue::EPPDomainRenewResult(domain_renew) => {
                 Response::Ok(RenewResponse {
                     pending: response.is_pending(),
-                    new_expiry_date: domain_renew.expiry_date,
+                    transaction_id: response.transaction_id.server_transaction_id.unwrap_or_default(),
+                    data: domain_renew.into(),
+                    fee_data,
                 })
             }
             _ => Err(Error::InternalServerError),
@@ -1257,12 +1637,54 @@ pub fn handle_transfer_reject(
 }
 
 pub fn handle_transfer_response(response: proto::EPPResponse) -> Response<TransferResponse> {
+    let fee_data = match &response.extension {
+        Some(ext) => {
+            let fee10 = ext.value.iter().find_map(|p| match p {
+                proto::EPPResponseExtensionType::EPPFee10TransferData(i) => Some(i),
+                _ => None,
+            });
+            let fee09 = ext.value.iter().find_map(|p| match p {
+                proto::EPPResponseExtensionType::EPPFee09TransferData(i) => Some(i),
+                _ => None,
+            });
+            let fee08 = ext.value.iter().find_map(|p| match p {
+                proto::EPPResponseExtensionType::EPPFee08TransferData(i) => Some(i),
+                _ => None,
+            });
+            let fee07 = ext.value.iter().find_map(|p| match p {
+                proto::EPPResponseExtensionType::EPPFee07TransferData(i) => Some(i),
+                _ => None,
+            });
+            let fee05 = ext.value.iter().find_map(|p| match p {
+                proto::EPPResponseExtensionType::EPPFee05TransferData(i) => Some(i),
+                _ => None,
+            });
+
+            if let Some(f) = fee10 {
+                Some(f.into())
+            } else if let Some(f) = fee09 {
+                Some(f.into())
+            } else if let Some(f) = fee08 {
+                Some(f.into())
+            } else if let Some(f) = fee07 {
+                Some(f.into())
+            } else if let Some(f) = fee05 {
+                Some(f.into())
+            } else {
+                None
+            }
+        },
+        None => None,
+    };
+
     match &response.data {
         Some(value) => match &value.value {
             proto::EPPResultDataValue::EPPDomainTransferResult(domain_transfer) => {
                 Response::Ok(TransferResponse {
                     pending: response.is_pending(),
+                    transaction_id: response.transaction_id.server_transaction_id.unwrap_or_default(),
                     data: domain_transfer.into(),
+                    fee_data,
                 })
             }
             _ => Err(Error::InternalServerError),
@@ -1271,13 +1693,14 @@ pub fn handle_transfer_response(response: proto::EPPResponse) -> Response<Transf
     }
 }
 
-/// Checks if a domain name
+/// Checks if a domain name is available
 ///
 /// # Arguments
 /// * `domain` - The domain in question
 /// * `client_sender` - Reference to the tokio channel into the client
 pub async fn check(
     domain: &str,
+    fee_check: Option<fee::FeeCheck>,
     client_sender: &mut futures::channel::mpsc::Sender<Request>,
 ) -> Result<CheckResponse, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
@@ -1285,6 +1708,7 @@ pub async fn check(
         client_sender,
         Request::DomainCheck(Box::new(CheckRequest {
             name: domain.to_string(),
+            fee_check,
             return_path: sender,
         })),
         receiver,
@@ -1333,8 +1757,8 @@ pub struct CreateInfo<'a> {
 /// * `nameservers` - Domain nameservers
 /// * `auth_info` - Auth info password for future transfers
 /// * `client_sender` - Reference to the tokio channel into the client
-pub async fn create<'a>(
-    info: CreateInfo<'a>,
+pub async fn create(
+    info: CreateInfo<'_>,
     client_sender: &mut futures::channel::mpsc::Sender<Request>,
 ) -> Result<CreateResponse, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();

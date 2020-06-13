@@ -5,26 +5,19 @@ import "google/protobuf/timestamp.proto";
 import "google/protobuf/wrappers.proto";
 import "common.proto";
 import "rgp.proto";
+import "fee.proto";
 
 message Contact {
     string id = 1;
     string type = 2;
 }
+
 message NameServer {
     oneof server {
         string host_obj = 1;
         string host_name = 3;
     }
     repeated common.IPAddress addresses = 2;
-}
-message Period {
-    enum Unit {
-        Years = 0;
-        Months = 1;
-    }
-
-    uint32 value = 1;
-    Unit unit = 2;
 }
 
 enum DomainStatus {
@@ -49,11 +42,13 @@ enum DomainStatus {
 
 message DomainCheckRequest {
     string name = 1;
+    fee.FeeCheck fee_check = 2;
 }
 
 message DomainCheckReply {
     bool available = 1;
     google.protobuf.StringValue reason = 2;
+    fee.FeeCheckData fee_check = 4;
     string registry_name = 3;
 }
 
@@ -77,14 +72,14 @@ message DomainInfoReply {
     google.protobuf.Timestamp last_updated_date = 13;
     google.protobuf.Timestamp last_transfer_date = 14;
     string registry_name = 15;
-    rgp.RGPState rgp_state = 16;
+    repeated rgp.RGPState rgp_state = 16;
     google.protobuf.StringValue auth_info = 17;
     SecDNSData sec_dns = 18;
 }
 
 message DomainCreateRequest {
     string name = 1;
-    Period period = 2;
+    common.Period period = 2;
     string registrant = 3;
     repeated Contact contacts = 4;
     repeated NameServer nameservers = 5;
@@ -95,8 +90,10 @@ message DomainCreateRequest {
 message DomainCreateReply {
     string name = 1;
     bool pending = 2;
+    string transaction_id = 7;
     google.protobuf.Timestamp creation_date = 3;
     google.protobuf.Timestamp expiry_date = 4;
+    fee.FeeData fee_data = 6;
     string registry_name = 5;
 }
 
@@ -106,6 +103,8 @@ message DomainDeleteRequest {
 
 message DomainDeleteReply {
     bool pending = 1;
+    string transaction_id = 4;
+    fee.FeeData fee_data = 3;
     string registry_name = 2;
 }
 
@@ -128,18 +127,22 @@ message DomainUpdateRequest {
 
 message DomainUpdateReply {
     bool pending = 1;
+    string transaction_id = 4;
+    fee.FeeData fee_data = 3;
     string registry_name = 2;
 }
 
 message DomainRenewRequest {
     string name = 1;
-    Period period = 2;
+    common.Period period = 2;
     google.protobuf.Timestamp current_expiry_date = 3;
 }
 
 message DomainRenewReply {
     bool pending = 1;
+    string transaction_id = 5;
     google.protobuf.Timestamp expiry_date = 2;
+    fee.FeeData fee_data = 4;
     string registry_name = 3;
 }
 
@@ -150,7 +153,7 @@ message DomainTransferQueryRequest {
 
 message DomainTransferRequestRequest {
     string name = 1;
-    Period period = 2;
+    common.Period period = 2;
     string auth_info = 3;
 }
 
@@ -161,12 +164,14 @@ message DomainTransferAcceptRejectRequest {
 
 message DomainTransferReply {
     bool pending = 1;
+    string transaction_id = 10;
     common.TransferStatus status = 2;
     string requested_client_id = 3;
     google.protobuf.Timestamp requested_date = 4;
     string act_client_id = 5;
     google.protobuf.Timestamp act_date = 6;
     google.protobuf.Timestamp expiry_date = 7;
+    fee.FeeData fee_data = 9;
     string registry_name = 8;
 }
 

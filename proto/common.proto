@@ -21,3 +21,13 @@ enum TransferStatus {
     ServerApproved = 5;
     ServerCancelled = 6;
 }
+
+message Period {
+    enum Unit {
+        Years = 0;
+        Months = 1;
+    }
+
+    uint32 value = 1;
+    Unit unit = 2;
+}

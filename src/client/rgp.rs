@@ -1,7 +1,7 @@
 //! EPP commands relating to nominet specific features
 
 use super::router::HandleReqReturn;
-use super::{proto, EPPClientServerFeatures, Error, Request, Response, Sender};
+use super::{proto, fee, EPPClientServerFeatures, Error, Request, Response, Sender};
 
 #[derive(Debug)]
 pub struct RestoreRequest {
@@ -13,7 +13,10 @@ pub struct RestoreRequest {
 #[derive(Debug)]
 pub struct RestoreResponse {
     pub pending: bool,
-    pub state: RGPState,
+    pub transaction_id: String,
+    pub state: Vec<RGPState>,
+    /// Fee information (if supplied by the registry)
+    pub fee_data: Option<fee::FeeData>,
 }
 
 #[derive(Debug)]
@@ -96,22 +99,68 @@ pub fn handle_restore(
 }
 
 pub fn handle_restore_response(response: proto::EPPResponse) -> Response<RestoreResponse> {
+    let fee_data = match &response.extension {
+        Some(ext) => {
+            let fee10 = ext.value.iter().find_map(|p| match p {
+                proto::EPPResponseExtensionType::EPPFee10UpdateData(i) => Some(i),
+                _ => None,
+            });
+            let fee09 = ext.value.iter().find_map(|p| match p {
+                proto::EPPResponseExtensionType::EPPFee09UpdateData(i) => Some(i),
+                _ => None,
+            });
+            let fee08 = ext.value.iter().find_map(|p| match p {
+                proto::EPPResponseExtensionType::EPPFee08UpdateData(i) => Some(i),
+                _ => None,
+            });
+            let fee07 = ext.value.iter().find_map(|p| match p {
+                proto::EPPResponseExtensionType::EPPFee07UpdateData(i) => Some(i),
+                _ => None,
+            });
+            let fee05 = ext.value.iter().find_map(|p| match p {
+                proto::EPPResponseExtensionType::EPPFee05UpdateData(i) => Some(i),
+                _ => None,
+            });
+
+            if let Some(f) = fee10 {
+                Some(f.into())
+            } else if let Some(f) = fee09 {
+                Some(f.into())
+            } else if let Some(f) = fee08 {
+                Some(f.into())
+            } else if let Some(f) = fee07 {
+                Some(f.into())
+            } else if let Some(f) = fee05 {
+                Some(f.into())
+            } else {
+                None
+            }
+        },
+        None => None,
+    };
+
     match &response.extension {
         Some(value) => match &value.value.first() {
             Some(proto::EPPResponseExtensionType::EPPRGPUpdate(rgp_info)) => {
                 Response::Ok(RestoreResponse {
                     pending: response.is_pending(),
-                    state: (&rgp_info.state.state).into(),
+                    transaction_id: response.transaction_id.server_transaction_id.unwrap_or_default(),
+                    state: rgp_info.state.iter().map(|s| (&s.state).into()).collect(),
+                    fee_data,
                 })
             }
             _ => Response::Ok(RestoreResponse {
                 pending: response.is_pending(),
-                state: RGPState::Unknown,
+                transaction_id: response.transaction_id.server_transaction_id.unwrap_or_default(),
+                state: vec![],
+                fee_data,
             }),
         },
         None => Response::Ok(RestoreResponse {
             pending: response.is_pending(),
-            state: RGPState::Unknown,
+            transaction_id: response.transaction_id.server_transaction_id.unwrap_or_default(),
+            state: vec![],
+            fee_data,
         }),
     }
 }

@@ -20,6 +20,9 @@ pub mod epp_proto {
     pub mod rgp {
         tonic::include_proto!("epp.rgp");
     }
+    pub mod fee {
+        tonic::include_proto!("epp.fee");
+    }
 }
 
 /// Helper function to convert chrono times to protobuf well-known type times
@@ -164,12 +167,19 @@ fn entity_type_from_i32(from: i32) -> Option<client::contact::EntityType> {
 }
 
 fn period_unit_from_i32(from: i32) -> client::domain::PeriodUnit {
-    match epp_proto::domain::period::Unit::from_i32(from) {
+    match epp_proto::common::period::Unit::from_i32(from) {
         Some(e) => match e {
-            epp_proto::domain::period::Unit::Months => client::domain::PeriodUnit::Months,
-            epp_proto::domain::period::Unit::Years => client::domain::PeriodUnit::Years,
+            epp_proto::common::period::Unit::Months => client::domain::PeriodUnit::Months,
+            epp_proto::common::period::Unit::Years => client::domain::PeriodUnit::Years,
         },
         None => client::domain::PeriodUnit::Years,
+    }
+}
+
+fn i32_from_period_unit(from: client::domain::PeriodUnit) -> i32 {
+    match from {
+        client::domain::PeriodUnit::Months => epp_proto::common::period::Unit::Months.into(),
+        client::domain::PeriodUnit::Years => epp_proto::common::period::Unit::Years.into()
     }
 }
 
@@ -371,6 +381,106 @@ impl From<client::contact::Phone> for epp_proto::contact::Phone {
     }
 }
 
+fn fee_command_from_i32(from: i32) -> client::fee::Command {
+    match epp_proto::fee::Command::from_i32(from) {
+        Some(e) => match e {
+            epp_proto::fee::Command::Create => client::fee::Command::Create,
+            epp_proto::fee::Command::Renew => client::fee::Command::Renew,
+            epp_proto::fee::Command::Transfer => client::fee::Command::Transfer,
+            epp_proto::fee::Command::Delete => client::fee::Command::Delete,
+            epp_proto::fee::Command::Restore => client::fee::Command::Restore,
+        },
+        None => client::fee::Command::Create,
+    }
+}
+
+fn i32_from_fee_command(from: client::fee::Command) -> i32 {
+    match from {
+        client::fee::Command::Create => epp_proto::fee::Command::Create.into(),
+        client::fee::Command::Renew => epp_proto::fee::Command::Renew.into(),
+        client::fee::Command::Transfer => epp_proto::fee::Command::Transfer.into(),
+        client::fee::Command::Delete => epp_proto::fee::Command::Delete.into(),
+        client::fee::Command::Restore => epp_proto::fee::Command::Restore.into(),
+    }
+}
+
+impl From<epp_proto::fee::FeeCheck> for client::fee::FeeCheck {
+    fn from(from: epp_proto::fee::FeeCheck) -> Self {
+        client::fee::FeeCheck {
+            currency: from.currency,
+            commands: from.commands.into_iter().map(|c| client::fee::FeeCheckCommand {
+                command: fee_command_from_i32(c.command),
+                period: c.period.map(|p| client::domain::Period {
+                    unit: period_unit_from_i32(p.unit),
+                    value: p.value,
+                })
+            }).collect()
+        }
+    }
+}
+
+impl From<client::fee::FeeCheckData> for epp_proto::fee::FeeCheckData {
+    fn from(from: client::fee::FeeCheckData) -> Self {
+        epp_proto::fee::FeeCheckData {
+            available: from.available,
+            commands: from.commands.into_iter().map(|c| epp_proto::fee::fee_check_data::FeeCommand {
+                command: i32_from_fee_command(c.command),
+                standard: c.standard,
+                period: c.period.map(|p| epp_proto::common::Period {
+                    unit: i32_from_period_unit(p.unit),
+                    value: p.value,
+                }),
+                currency: c.currency,
+                fees: c.fees.into_iter().map(Into::into).collect(),
+                credits: c.credits.into_iter().map(Into::into).collect(),
+                class: c.class,
+                reason: c.reason
+            }).collect(),
+            reason: from.reason,
+        }
+    }
+}
+
+impl From<client::fee::FeeData> for epp_proto::fee::FeeData {
+    fn from(from: client::fee::FeeData) -> Self {
+        epp_proto::fee::FeeData {
+            period: from.period.map(|p| epp_proto::common::Period {
+                unit: i32_from_period_unit(p.unit),
+                value: p.value,
+            }),
+            currency: from.currency,
+            fees: from.fees.into_iter().map(Into::into).collect(),
+            credits: from.credits.into_iter().map(Into::into).collect(),
+            balance: from.balance,
+            credit_limit: from.credit_limit,
+        }
+    }
+}
+
+impl From<client::fee::Fee> for epp_proto::fee::Fee {
+    fn from(from: client::fee::Fee) -> Self {
+        epp_proto::fee::Fee {
+            value: from.value,
+            description: from.description,
+            refundable: from.refundable,
+            grace_period: from.grace_period,
+            applied: match from.applied {
+                client::fee::Applied::Immediate => epp_proto::fee::Applied::Immediate.into(),
+                client::fee::Applied::Delayed => epp_proto::fee::Applied::Delayed.into(),
+            }
+        }
+    }
+}
+
+impl From<client::fee::Credit> for epp_proto::fee::Credit {
+    fn from(from: client::fee::Credit) -> Self {
+        epp_proto::fee::Credit {
+            value: from.value,
+            description: from.description
+        }
+    }
+}
+
 fn client_by_domain(
     router: &super::Router,
     domain: &str,
@@ -394,13 +504,18 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         &self,
         request: tonic::Request<epp_proto::domain::DomainCheckRequest>,
     ) -> Result<tonic::Response<epp_proto::domain::DomainCheckReply>, tonic::Status> {
-        let name: String = request.into_inner().name;
-        let (mut sender, registry_name) = client_by_domain(&self.client_router, &name)?;
-        let res = client::domain::check(&name, &mut sender).await?;
+        let res = request.into_inner();
+        let (mut sender, registry_name) = client_by_domain(&self.client_router, &res.name)?;
+        let res = client::domain::check(
+            &res.name,
+            res.fee_check.map(Into::into),
+            &mut sender
+        ).await?;
 
         let reply = epp_proto::domain::DomainCheckReply {
             available: res.avail,
             reason: res.reason,
+            fee_check: res.fee_check.map(Into::into),
             registry_name,
         };
 
@@ -520,7 +635,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
             last_updated_date: chrono_to_proto(res.last_updated_date),
             last_transfer_date: chrono_to_proto(res.last_transfer_date),
             registry_name,
-            rgp_state: i32_from_restore_status(res.rgp_state),
+            rgp_state: res.rgp_state.into_iter().map(i32_from_restore_status).collect(),
             auth_info: res.auth_info,
             sec_dns: res.sec_dns.map(|sec_dns| epp_proto::domain::SecDnsData {
                 max_sig_life: sec_dns.max_sig_life,
@@ -694,8 +809,10 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let reply = epp_proto::domain::DomainCreateReply {
             name: res.data.name,
             pending: res.pending,
+            transaction_id: res.transaction_id,
             creation_date: chrono_to_proto(res.data.creation_date),
             expiry_date: chrono_to_proto(res.data.expiration_date),
+            fee_data: res.fee_data.map(Into::into),
             registry_name,
         };
 
@@ -712,6 +829,8 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
 
         let reply = epp_proto::domain::DomainDeleteReply {
             pending: res.pending,
+            transaction_id: res.transaction_id,
+            fee_data: res.fee_data.map(Into::into),
             registry_name,
         };
 
@@ -904,6 +1023,8 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
 
         let reply = epp_proto::domain::DomainUpdateReply {
             pending: res.pending,
+            transaction_id: res.transaction_id,
+            fee_data: res.fee_data.map(Into::into),
             registry_name,
         };
 
@@ -937,7 +1058,9 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
 
         let reply = epp_proto::domain::DomainRenewReply {
             pending: res.pending,
-            expiry_date: chrono_to_proto(res.new_expiry_date),
+            transaction_id: res.transaction_id,
+            expiry_date: chrono_to_proto(res.data.new_expiry_date),
+            fee_data: res.fee_data.map(Into::into),
             registry_name,
         };
 
@@ -954,12 +1077,14 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
 
         let reply = epp_proto::domain::DomainTransferReply {
             pending: res.pending,
+            transaction_id: res.transaction_id,
             status: i32_from_transfer_status(res.data.status),
             requested_client_id: res.data.requested_client_id,
             requested_date: chrono_to_proto(Some(res.data.requested_date)),
             act_client_id: res.data.act_client_id,
             act_date: chrono_to_proto(Some(res.data.act_date)),
             expiry_date: chrono_to_proto(res.data.expiry_date),
+            fee_data: res.fee_data.map(Into::into),
             registry_name,
         };
 
@@ -985,12 +1110,14 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
 
         let reply = epp_proto::domain::DomainTransferReply {
             pending: res.pending,
+            transaction_id: res.transaction_id,
             status: i32_from_transfer_status(res.data.status),
             requested_client_id: res.data.requested_client_id,
             requested_date: chrono_to_proto(Some(res.data.requested_date)),
             act_client_id: res.data.act_client_id,
             act_date: chrono_to_proto(Some(res.data.act_date)),
             expiry_date: chrono_to_proto(res.data.expiry_date),
+            fee_data: res.fee_data.map(Into::into),
             registry_name,
         };
 
@@ -1008,12 +1135,14 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
 
         let reply = epp_proto::domain::DomainTransferReply {
             pending: res.pending,
+            transaction_id: res.transaction_id,
             status: i32_from_transfer_status(res.data.status),
             requested_client_id: res.data.requested_client_id,
             requested_date: chrono_to_proto(Some(res.data.requested_date)),
             act_client_id: res.data.act_client_id,
             act_date: chrono_to_proto(Some(res.data.act_date)),
             expiry_date: chrono_to_proto(res.data.expiry_date),
+            fee_data: res.fee_data.map(Into::into),
             registry_name,
         };
 
@@ -1031,12 +1160,14 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
 
         let reply = epp_proto::domain::DomainTransferReply {
             pending: res.pending,
+            transaction_id: res.transaction_id,
             status: i32_from_transfer_status(res.data.status),
             requested_client_id: res.data.requested_client_id,
             requested_date: chrono_to_proto(Some(res.data.requested_date)),
             act_client_id: res.data.act_client_id,
             act_date: chrono_to_proto(Some(res.data.act_date)),
             expiry_date: chrono_to_proto(res.data.expiry_date),
+            fee_data: res.fee_data.map(Into::into),
             registry_name,
         };
 
@@ -1053,7 +1184,9 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
 
         let reply = epp_proto::rgp::RestoreReply {
             pending: res.pending,
-            state: i32_from_restore_status(res.state),
+            transaction_id: res.transaction_id,
+            state: res.state.into_iter().map(i32_from_restore_status).collect(),
+            fee_data: res.fee_data.map(Into::into),
             registry_name,
         };
 
@@ -1181,6 +1314,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let reply = epp_proto::host::HostCreateReply {
             name: res.name,
             pending: res.pending,
+            transaction_id: res.transaction_id,
             creation_date: chrono_to_proto(res.creation_date),
         };
 
@@ -1198,6 +1332,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
 
         let reply = epp_proto::host::HostDeleteReply {
             pending: res.pending,
+            transaction_id: res.transaction_id,
         };
 
         Ok(tonic::Response::new(reply))
@@ -1264,6 +1399,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
 
         let reply = epp_proto::host::HostUpdateReply {
             pending: res.pending,
+            transaction_id: res.transaction_id,
         };
 
         Ok(tonic::Response::new(reply))
@@ -1539,6 +1675,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let reply = epp_proto::contact::ContactCreateReply {
             id: res.id,
             pending: res.pending,
+            transaction_id: res.transaction_id,
             creation_date: chrono_to_proto(res.creation_date),
         };
 
@@ -1556,6 +1693,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
 
         let reply = epp_proto::contact::ContactDeleteReply {
             pending: res.pending,
+            transaction_id: res.transaction_id,
         };
 
         Ok(tonic::Response::new(reply))
@@ -1604,6 +1742,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
 
         let reply = epp_proto::contact::ContactUpdateReply {
             pending: res.pending,
+            transaction_id: res.transaction_id,
         };
 
         Ok(tonic::Response::new(reply))
@@ -1619,6 +1758,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
 
         let reply = epp_proto::contact::ContactTransferReply {
             pending: res.pending,
+            transaction_id: res.transaction_id,
             status: i32_from_transfer_status(res.status),
             requested_client_id: res.requested_client_id,
             requested_date: chrono_to_proto(Some(res.requested_date)),
@@ -1641,6 +1781,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
 
         let reply = epp_proto::contact::ContactTransferReply {
             pending: res.pending,
+            transaction_id: res.transaction_id,
             status: i32_from_transfer_status(res.status),
             requested_client_id: res.requested_client_id,
             requested_date: chrono_to_proto(Some(res.requested_date)),
@@ -1662,6 +1803,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
 
         let reply = epp_proto::contact::ContactTransferReply {
             pending: res.pending,
+            transaction_id: res.transaction_id,
             status: i32_from_transfer_status(res.status),
             requested_client_id: res.requested_client_id,
             requested_date: chrono_to_proto(Some(res.requested_date)),
@@ -1683,6 +1825,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
 
         let reply = epp_proto::contact::ContactTransferReply {
             pending: res.pending,
+            transaction_id: res.transaction_id,
             status: i32_from_transfer_status(res.status),
             requested_client_id: res.requested_client_id,
             requested_date: chrono_to_proto(Some(res.requested_date)),

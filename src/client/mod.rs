@@ -21,6 +21,7 @@ pub mod poll;
 pub mod rgp;
 pub mod router;
 pub mod verisign;
+pub mod fee;
 
 use crate::proto::EPPServiceExtension;
 pub use router::{Request, Response};
@@ -200,6 +201,16 @@ pub struct EPPClientServerFeatures {
     verisign_low_balance: bool,
     /// urn:ietf:params:xml:ns:nsset-1.2 support (NOT AN ACTUAL IETF NAMESPACE)
     nsset_supported: bool,
+    /// RFC 8748 support
+    fee_supported: bool,
+    /// urn:ietf:params:xml:ns:fee-0.9 support
+    fee_09_supported: bool,
+    /// urn:ietf:params:xml:ns:fee-0.8 support
+    fee_08_supported: bool,
+    /// urn:ietf:params:xml:ns:fee-0.7 support
+    fee_07_supported: bool,
+    /// urn:ietf:params:xml:ns:fee-0.5 support
+    fee_05_supported: bool,
 }
 
 impl EPPClientServerFeatures {
@@ -378,7 +389,8 @@ impl EPPClient {
                         }
                     }
                 } else {
-                    let mut delay = tokio::time::delay_for(tokio::time::Duration::new(15, 0)).fuse();
+                    let mut delay =
+                        tokio::time::delay_for(tokio::time::Duration::new(15, 0)).fuse();
                     let resp = futures::select! {
                         r = message_channel.next() => r,
                         _ = delay => {
@@ -679,10 +691,27 @@ impl EPPClient {
         self.features.nsset_supported = greeting
             .service_menu
             .supports("urn:ietf:params:xml:ns:nsset-1.2");
+        self.features.fee_supported = greeting
+            .service_menu
+            .supports_ext("urn:ietf:params:xml:ns:epp:fee-1.0");
+        self.features.fee_09_supported = greeting
+            .service_menu
+            .supports_ext("urn:ietf:params:xml:ns:fee-0.9");
+        self.features.fee_08_supported = greeting
+            .service_menu
+            .supports_ext("urn:ietf:params:xml:ns:fee-0.8");
+        self.features.fee_07_supported = greeting
+            .service_menu
+            .supports_ext("urn:ietf:params:xml:ns:fee-0.7");
+        self.features.fee_05_supported = greeting
+            .service_menu
+            .supports_ext("urn:ietf:params:xml:ns:fee-0.5");
 
         if !(self.features.contact_supported
             | self.features.domain_supported
-            | self.features.host_supported)
+            | self.features.host_supported
+            | self.features.nominet_tag_list
+            | self.features.nsset_supported)
         {
             error!("No common supported objects with {}", greeting.server_id);
             return Err(());
@@ -738,6 +767,17 @@ impl EPPClient {
             }
             if self.features.nsset_supported {
                 objects.push("urn:ietf:params:xml:ns:nsset-1.2".to_string())
+            }
+            if self.features.fee_supported {
+                ext_objects.push("urn:ietf:params:xml:ns:epp:fee-1.0".to_string())
+            } else if self.features.fee_09_supported {
+                ext_objects.push("urn:ietf:params:xml:ns:fee-0.9".to_string())
+            } else if self.features.fee_08_supported {
+                ext_objects.push("urn:ietf:params:xml:ns:fee-0.8".to_string())
+            } else if self.features.fee_07_supported {
+                ext_objects.push("urn:ietf:params:xml:ns:fee-0.7".to_string())
+            } else if self.features.fee_05_supported {
+                ext_objects.push("urn:ietf:params:xml:ns:fee-0.5".to_string())
             }
             if self.features.nominet_tag_list {
                 let new_client = Self {

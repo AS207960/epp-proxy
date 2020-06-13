@@ -39,6 +39,7 @@ pub enum PollData {
     DomainTransferData(super::domain::TransferData),
     DomainCreateData(super::domain::CreateData),
     DomainPanData(super::domain::PanData),
+    DomainRenewData(super::domain::RenewData),
     NominetDomainCancelData(super::nominet::CancelData),
     NominetDomainReleaseData(super::nominet::ReleaseData),
     NominetDomainRegistrarChangeData(super::nominet::RegistrarChangeData),
@@ -227,6 +228,9 @@ pub fn handle_poll_response(response: proto::EPPResponse) -> Response<Option<Pol
                             }
                             proto::EPPResultDataValue::EPPDomainCreateResult(domain_create) => {
                                 PollData::DomainCreateData((&domain_create).into())
+                            }
+                            proto::EPPResultDataValue::EPPDomainRenewResult(domain_renew) => {
+                                PollData::DomainRenewData((&domain_renew).into())
                             }
                             proto::EPPResultDataValue::EPPDomainPendingActionNotification(
                                 domain_data,
@@ -1348,6 +1352,92 @@ mod poll_tests {
                     super::super::verisign::CreditThreshold::Percentage(10)
                 );
                 assert_eq!(bal_data.available_credit, "80");
+            }
+            _ => unreachable!(),
+        }
+    }
+
+    #[test]
+    fn rrpproxy_renew() {
+        const XML_DATA: &str = r#"
+<?xml version="1.0" encoding="UTF-8"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0">
+ <response>
+   <result code="1301">
+     <msg>Command completed successfully; ack to dequeue</msg>
+   </result>
+   <msgQ count="1" id="28">
+     <qDate>2009-04-14T13:23:50.0Z</qDate>
+     <msg>DOMAIN_RENEWAL_SUCCESSFUL</msg>
+   </msgQ>
+   <resData>
+     <domain:renData xmlns:domain="urn:ietf:params:xml:ns:domain-1.0">
+       <domain:name>siatki.eu</domain:name>
+     </domain:renData>
+   </resData>
+   <trID>
+     <clTRID>AE7F32C2-28F7-11DE-A163-8000000099E9</clTRID>
+     <svTRID>F8471712-28F7-11DE-900C-B7CCEEA560E0</svTRID>
+   </trID>
+ </response>
+</epp>"#;
+        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
+        let res = match res.message {
+            super::proto::EPPMessageType::Response(r) => r,
+            _ => unreachable!(),
+        };
+        let data = super::handle_poll_response(*res).unwrap().unwrap();
+        assert_eq!(data.message, "DOMAIN_RENEWAL_SUCCESSFUL");
+        match data.data {
+            super::PollData::DomainRenewData(ren_data) => {
+                assert_eq!(ren_data.name, "siatki.eu");
+            }
+            _ => unreachable!(),
+        }
+    }
+
+    #[test]
+    fn rrpproxy_domain_pan_failed() {
+        const XML_DATA: &str = r#"
+<?xml version="1.0" encoding="UTF-8"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0">
+  <response>
+    <result code="1301">
+      <msg>Command completed successfully; ack to dequeue</msg>
+    </result>
+    <msgQ count="1" id="2351">
+      <qDate>2015-02-25T14:07:18.0Z</qDate>
+      <msg>DOMAIN_RESTORE_FAILED</msg>
+    </msgQ>
+    <resData>
+      <domain:panData xmlns:domain="urn:ietf:params:xml:ns:domain-1.0">
+        <domain:name paResult="0">example.com</domain:name>
+        <domain:paTRID>
+          <clTRID>ECA21919-4B41-40BB-8A9F-ED6849950154</clTRID>
+          <svTRID>33a2eb76-4295-43f1-a1f6-c757e8d1be41</svTRID>
+        </domain:paTRID>
+        <domain:paDate>2015-02-25T14:07:18.0Z</domain:paDate>
+      </domain:panData>
+    </resData>
+    <trID>
+      <clTRID>8C8B693B-B5E5-47D9-B40A-0FDC10307DF7</clTRID>
+      <svTRID>434ec058-9640-4deb-85c6-8e7f497e4acf</svTRID>
+    </trID>
+  </response>
+</epp>"#;
+        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
+        let res = match res.message {
+            super::proto::EPPMessageType::Response(r) => r,
+            _ => unreachable!(),
+        };
+        let data = super::handle_poll_response(*res).unwrap().unwrap();
+        assert_eq!(data.message, "DOMAIN_RESTORE_FAILED");
+        match data.data {
+            super::PollData::DomainPanData(pan_data) => {
+                assert_eq!(pan_data.name, "example.com");
+                assert_eq!(pan_data.result, false);
+                assert_eq!(pan_data.server_transaction_id.unwrap(), "33a2eb76-4295-43f1-a1f6-c757e8d1be41");
+                assert_eq!(pan_data.client_transaction_id.unwrap(), "ECA21919-4B41-40BB-8A9F-ED6849950154");
             }
             _ => unreachable!(),
         }

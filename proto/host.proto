@@ -55,6 +55,7 @@ message HostCreateRequest {
 message HostCreateReply {
     string name = 1;
     bool pending = 2;
+    string transaction_id = 4;
     google.protobuf.Timestamp creation_date = 3;
 }
 
@@ -65,6 +66,7 @@ message HostDeleteRequest {
 
 message HostDeleteReply {
     bool pending = 1;
+    string transaction_id = 2;
 }
 
 message HostUpdateRequest {
@@ -84,4 +86,5 @@ message HostUpdateRequest {
 
 message HostUpdateReply {
     bool pending = 1;
+    string transaction_id = 2;
 }

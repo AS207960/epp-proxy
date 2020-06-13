@@ -233,15 +233,15 @@ pub struct EPPDomainAuthInfo {
     pub password: Option<String>,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct EPPDomainPeriod {
     #[serde(rename = "$attr:unit")]
     pub unit: EPPDomainPeriodUnit,
     #[serde(rename = "$value")]
-    pub value: String,
+    pub value: u32,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub enum EPPDomainPeriodUnit {
     #[serde(rename = "y")]
     Years,

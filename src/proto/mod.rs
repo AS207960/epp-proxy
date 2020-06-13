@@ -8,6 +8,7 @@ pub mod centralnic;
 pub mod change_poll;
 pub mod contact;
 pub mod domain;
+pub mod fee;
 pub mod host;
 pub mod nominet;
 pub mod rgp;
@@ -119,6 +120,22 @@ pub enum EPPCommandExtensionType {
         rename = "{http://www.verisign-grs.com/epp/namestoreExt-1.1}namestoreExt:namestoreExt"
     )]
     VerisignNameStoreExt(verisign::EPPNameStoreExt),
+    #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.5}fee:check")]
+    EPPFee05Check(fee::EPPFee05Check),
+    #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.7}fee:check")]
+    EPPFee07Check(fee::EPPFee07Check),
+    #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.8}fee:check")]
+    EPPFee08Check(fee::EPPFee08Check),
+    #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.9}fee:check")]
+    EPPFee09Check(fee::EPPFee09Check),
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp:fee-1.0}fee:check")]
+    EPPFee10Check(fee::EPPFee10Check),
+    #[allow(dead_code)]
+    #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.5}fee:info")]
+    EPPFee05Info(fee::EPPFee05Info),
+    #[allow(dead_code)]
+    #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.7}fee:info")]
+    EPPFee07Info(fee::EPPFee07Info),
 }
 
 #[derive(Debug, Serialize)]
@@ -560,6 +577,8 @@ pub enum EPPResponseExtensionType {
     NominetContactExtInfo(nominet::EPPContactInfo),
     #[serde(rename = "{http://www.nominet.org.uk/epp/xml/std-warning-1.1}ignored-field")]
     NominetIgnoredField(nominet::EPPIgnoredField),
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/std-warning-1.1}postalInfo-ignored")]
+    NominetPostalInfoIgnored(nominet::EPPPostalInfoIgnored),
     #[serde(rename = "{http://www.nominet.org.uk/epp/xml/std-warning-1.1}truncated-field")]
     NominetTruncatedField(nominet::EPPTruncatedField),
     #[serde(rename = "{http://www.nominet.org.uk/epp/xml/nom-data-quality-1.1}infData")]
@@ -574,6 +593,70 @@ pub enum EPPResponseExtensionType {
     EPPSecDNSInfo(secdns::EPPSecDNSData),
     #[serde(rename = "{urn:ietf:params:xml:ns:regtype-0.1}infData")]
     EPPCentralnicRegTypeInfoResult(centralnic::EPPRegType),
+    #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.5}chkData")]
+    EPPFee05CheckData(fee::EPPFee05CheckData),
+    #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.7}chkData")]
+    EPPFee07CheckData(fee::EPPFee07CheckData),
+    #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.8}chkData")]
+    EPPFee08CheckData(fee::EPPFee08CheckData),
+    #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.9}chkData")]
+    EPPFee09CheckData(fee::EPPFee09CheckData),
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp:fee-1.0}chkData")]
+    EPPFee10CheckData(fee::EPPFee10CheckData),
+    #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.5}infData")]
+    EPPFee05InfoData(fee::EPPFee05InfoData),
+    #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.7}infData")]
+    EPPFee07InfoData(fee::EPPFee07InfoData),
+    #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.5}creData")]
+    EPPFee05CreateData(fee::EPPFee05TransformData),
+    #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.7}creData")]
+    EPPFee07CreateData(fee::EPPFee07TransformData),
+    #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.8}creData")]
+    EPPFee08CreateData(fee::EPPFee08TransformData),
+    #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.9}creData")]
+    EPPFee09CreateData(fee::EPPFee09TransformData),
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp:fee-1.0}creData")]
+    EPPFee10CreateData(fee::EPPFee10TransformData),
+    #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.5}delData")]
+    EPPFee05DeleteData(fee::EPPFee05DeleteData),
+    #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.7}delData")]
+    EPPFee07DeleteData(fee::EPPFee07DeleteData),
+    #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.8}delData")]
+    EPPFee08DeleteData(fee::EPPFee08DeleteData),
+    #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.9}delData")]
+    EPPFee09DeleteData(fee::EPPFee09DeleteData),
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp:fee-1.0}delData")]
+    EPPFee10DeleteData(fee::EPPFee10TransformData),
+    #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.5}renData")]
+    EPPFee05RenewData(fee::EPPFee05TransformData),
+    #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.7}renData")]
+    EPPFee07RenewData(fee::EPPFee07TransformData),
+    #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.8}renData")]
+    EPPFee08RenewData(fee::EPPFee08TransformData),
+    #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.9}renData")]
+    EPPFee09RenewData(fee::EPPFee09TransformData),
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp:fee-1.0}renData")]
+    EPPFee10RenewData(fee::EPPFee10TransformData),
+    #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.5}trnData")]
+    EPPFee05TransferData(fee::EPPFee05TransformData),
+    #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.7}trnData")]
+    EPPFee07TransferData(fee::EPPFee07TransferData),
+    #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.8}trnData")]
+    EPPFee08TransferData(fee::EPPFee08TransferData),
+    #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.9}trnData")]
+    EPPFee09TransferData(fee::EPPFee09TransferData),
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp:fee-1.0}trnData")]
+    EPPFee10TransferData(fee::EPPFee10TransformData),
+    #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.5}updData")]
+    EPPFee05UpdateData(fee::EPPFee05TransformData),
+    #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.7}updData")]
+    EPPFee07UpdateData(fee::EPPFee07TransformData),
+    #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.8}updData")]
+    EPPFee08UpdateData(fee::EPPFee08TransformData),
+    #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.9}updData")]
+    EPPFee09UpdateData(fee::EPPFee09TransformData),
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp:fee-1.0}updData")]
+    EPPFee10UpdateData(fee::EPPFee10TransformData),
 }
 
 #[derive(Debug, Serialize)]

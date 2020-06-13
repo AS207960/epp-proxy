@@ -1,6 +1,8 @@
 syntax = "proto3";
 package epp.rgp;
 
+import "fee.proto";
+
 enum RGPState {
     Unknown = 0;
     AddPeriod = 1;
@@ -18,6 +20,8 @@ message RequestRequest {
 
 message RestoreReply {
     bool pending = 1;
-    RGPState state = 2;
+    string transaction_id = 5;
+    repeated RGPState state = 2;
+    fee.FeeData fee_data = 4;
     string registry_name = 3;
 }

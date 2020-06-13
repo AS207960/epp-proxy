@@ -93,6 +93,14 @@ pub struct EPPTruncatedField {
 }
 
 #[derive(Debug, Deserialize)]
+pub struct EPPPostalInfoIgnored {
+    #[serde(rename = "$attr:type")]
+    pub addr_type: super::contact::EPPContactPostalInfoType,
+    #[serde(rename = "$value")]
+    pub message: String,
+}
+
+#[derive(Debug, Deserialize)]
 pub struct EPPDataQualityInfo {
     #[serde(rename = "{http://www.nominet.org.uk/epp/xml/nom-data-quality-1.1}status")]
     pub status: String,
