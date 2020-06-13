@@ -486,11 +486,11 @@ pub struct UpdateResponse {
 }
 
 pub(crate) fn check_id<T>(id: &str) -> Result<(), Response<T>> {
-    if let 3..=16 = id.len() {
+    if let 3..=64 = id.len() {
         Ok(())
     } else {
         Err(Err(Error::Err(
-            "contact id has a min length of 3 and a max length of 16".to_string(),
+            "contact id has a min length of 3 and a max length of 64".to_string(),
         )))
     }
 }
