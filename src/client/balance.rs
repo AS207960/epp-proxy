@@ -17,7 +17,7 @@ pub struct BalanceResponse {
     pub credit_threshold: Option<CreditThreshold>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum CreditThreshold {
     Fixed(String),
     Percentage(u8),
@@ -123,5 +123,83 @@ mod balance_tests {
         let data = super::handle_balance_response(*res).unwrap();
         assert_eq!(data.balance, "27.05");
         assert_eq!(data.currency, "CHF");
+    }
+
+    #[test]
+    fn verisign_percent_balance() {
+        const XML_DATA: &str = r#"
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0">
+  <response>
+    <result code="1000">
+      <msg>Command completed successfully</msg>
+    </result>
+    <resData>
+      <balance:infData
+        xmlns:balance="http://www.verisign.com/epp/balance-1.0">
+        <balance:creditLimit>1000.00</balance:creditLimit>
+        <balance:balance>200.00</balance:balance>
+        <balance:availableCredit>800.00</balance:availableCredit>
+        <balance:creditThreshold>
+          <balance:percent>50</balance:percent>
+        </balance:creditThreshold>
+      </balance:infData>
+    </resData>
+    <trID>
+      <clTRID>ABC-12345</clTRID>
+      <svTRID>54322-XYZ</svTRID>
+    </trID>
+  </response>
+</epp>"#;
+        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
+        let res = match res.message {
+            super::proto::EPPMessageType::Response(r) => r,
+            _ => unreachable!(),
+        };
+        let data = super::handle_balance_response(*res).unwrap();
+        assert_eq!(data.balance, "200.00");
+        assert_eq!(data.currency, "USD");
+        assert_eq!(data.credit_limit.unwrap(), "1000.00");
+        assert_eq!(data.available_credit.unwrap(), "800.00");
+        assert_eq!(data.credit_threshold.unwrap(), super::CreditThreshold::Percentage(50));
+    }
+
+    #[test]
+    fn verisign_fixed_balance() {
+        const XML_DATA: &str = r#"
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0">
+  <response>
+    <result code="1000">
+      <msg>Command completed successfully</msg>
+    </result>
+    <resData>
+      <balance:infData
+        xmlns:balance="http://www.verisign.com/epp/balance-1.0">
+        <balance:creditLimit>1000.00</balance:creditLimit>
+        <balance:balance>200.00</balance:balance>
+        <balance:availableCredit>800.00</balance:availableCredit>
+        <balance:creditThreshold>
+          <balance:fixed>500.00</balance:fixed>
+        </balance:creditThreshold>
+      </balance:infData>
+    </resData>
+    <trID>
+      <clTRID>ABC-12345</clTRID>
+      <svTRID>54322-XYZ</svTRID>
+    </trID>
+  </response>
+</epp>"#;
+        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
+        let res = match res.message {
+            super::proto::EPPMessageType::Response(r) => r,
+            _ => unreachable!(),
+        };
+        let data = super::handle_balance_response(*res).unwrap();
+        assert_eq!(data.balance, "200.00");
+        assert_eq!(data.currency, "USD");
+        assert_eq!(data.credit_limit.unwrap(), "1000.00");
+        assert_eq!(data.available_credit.unwrap(), "800.00");
+        assert_eq!(data.credit_threshold.unwrap(), super::CreditThreshold::Fixed("500.00".to_string()));
     }
 }
