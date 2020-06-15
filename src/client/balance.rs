@@ -91,3 +91,37 @@ pub async fn balance_info(
     )
     .await
 }
+
+#[cfg(test)]
+mod balance_tests {
+    #[test]
+    fn switch_balance() {
+        const XML_DATA: &str = r#"
+<?xml version="1.0" encoding="UTF-8"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0">
+    <response>
+        <result code="1000">
+            <msg lang="en">Command completed successfully</msg>
+        </result>
+        <resData>
+            <infData xmlns="https://www.nic.ch/epp/balance-1.0">
+                <balance>27.05</balance>
+                <currency>CHF</currency>
+            </infData>
+        </resData>
+        <trID>
+            <clTRID>b4e118c9-b2ea-41f3-bfa7-d8238b5a224d</clTRID>
+            <svTRID>20200615.116639549.1185125979</svTRID>
+        </trID>
+    </response>
+</epp>"#;
+        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
+        let res = match res.message {
+            super::proto::EPPMessageType::Response(r) => r,
+            _ => unreachable!(),
+        };
+        let data = super::handle_balance_response(*res).unwrap();
+        assert_eq!(data.balance, "27.05");
+        assert_eq!(data.currency, "CHF");
+    }
+}

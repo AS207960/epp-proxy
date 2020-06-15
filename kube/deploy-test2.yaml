@@ -1,0 +1,90 @@
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: epp-proxy-test-secondary-log
+spec:
+  storageClassName: standard
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 5Gi
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: epp-proxy-test-conf
+data:
+  CLIENT_ID: "epp-proxy"
+  OAUTH_WELL_KNOWN: "https://sso.as207960.net/auth/realms/dev/.well-known/openid-configuration"
+  TLS_CERT_FILE: "/tls/tls.crt"
+  TLS_KEY_FILE: "/tls/tls.key"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: epp-proxy-test-secondary
+  labels:
+    app: epp-proxy-test-secondary
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: epp-proxy-test-secondary
+  template:
+    metadata:
+      annotations:
+        cni.projectcalico.org/ipv6pools: "[\"epp-ip6-ippool\"]"
+      labels:
+        app: epp-proxy-test-secondary
+    spec:
+      volumes:
+        - name: logs
+          persistentVolumeClaim:
+            claimName: epp-proxy-test-secondary-log
+        - name: conf
+          secret:
+            secretName: epp-proxy-test-secondary-conf
+        - name: tls-keys
+          secret:
+            secretName: epp-proxy-test-secondary-tls
+        - name: priv-keys
+          secret:
+            secretName: epp-proxy-priv
+      containers:
+        - name: epp-proxy
+          image: as207960/epp-proxy:(version)
+          imagePullPolicy: Always
+          args: ["--log",  "/log", "--conf", "/conf", "--listen", "[::]:50051"]
+          ports:
+            - containerPort: 50051
+          volumeMounts:
+            - mountPath: "/conf"
+              name: conf
+            - mountPath: "/log"
+              name: logs
+            - mountPath: "/tls"
+              name: tls-keys
+            - mountPath: "/priv"
+              name: priv-keys
+          env:
+            - name: RUST_LOG
+              value: info
+          envFrom:
+            - configMapRef:
+                name: epp-proxy-test-conf
+            - secretRef:
+                name: epp-proxy-test-secrets
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: epp-proxy-test-secondary
+  labels:
+    app: epp-proxy-test-secondary
+spec:
+  selector:
+    app: epp-proxy-test-secondary
+  ports:
+    - port: 50051
+      targetPort: 50051

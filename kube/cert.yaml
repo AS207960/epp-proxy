@@ -7,7 +7,7 @@ spec:
   duration: 2160h
   renewBefore: 360h
   organization:
-    - jetstack
+    - AS207960
   commonName: epp-proxy
   isCA: false
   keySize: 4096
@@ -18,6 +18,56 @@ spec:
   dnsNames:
     - epp-proxy
     - epp-proxy.default
+  issuerRef:
+    name: epp-ca-issuer
+    kind: Issuer
+    group: cert-manager.io
+---
+apiVersion: cert-manager.io/v1alpha2
+kind: Certificate
+metadata:
+  name: epp-proxy-test-primary-cert
+spec:
+  secretName: epp-proxy-test-primary-tls
+  duration: 2160h
+  renewBefore: 360h
+  organization:
+    - AS207960
+  commonName: epp-proxy-test-primary
+  isCA: false
+  keySize: 4096
+  keyAlgorithm: rsa
+  keyEncoding: pkcs1
+  usages:
+    - server auth
+  dnsNames:
+    - epp-proxy-test-primary
+    - epp-proxy-test-primary.default
+  issuerRef:
+    name: epp-ca-issuer
+    kind: Issuer
+    group: cert-manager.io
+---
+apiVersion: cert-manager.io/v1alpha2
+kind: Certificate
+metadata:
+  name: epp-proxy-test-secondary-cert
+spec:
+  secretName: epp-proxy-test-secondary-tls
+  duration: 2160h
+  renewBefore: 360h
+  organization:
+    - AS207960
+  commonName: epp-proxy-test-secondary
+  isCA: false
+  keySize: 4096
+  keyAlgorithm: rsa
+  keyEncoding: pkcs1
+  usages:
+    - server auth
+  dnsNames:
+    - epp-proxy-test-secondary
+    - epp-proxy-test-secondary.default
   issuerRef:
     name: epp-ca-issuer
     kind: Issuer
