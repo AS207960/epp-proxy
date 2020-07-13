@@ -216,7 +216,7 @@ impl EPPResponse {
                             .value
                             .iter()
                             .next()
-                            .map(|(k, v)| format!("{}: {}", k, v.as_deref().unwrap_or("")))
+                            .map(|v| v.to_string())
                             .unwrap_or_default();
                         format!("({}) {}", val, e.reason)
                     })
@@ -443,8 +443,8 @@ impl<'de> serde::Deserialize<'de> for EPPResultCode {
 
 #[derive(Debug, Deserialize)]
 pub struct EPPResultExtraValue {
-    #[serde(rename = "{urn:ietf:params:xml:ns:epp-1.0}value")]
-    pub value: HashMap<String, Option<String>>,
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp-1.0}value", default)]
+    pub value: Vec<String>,
     #[serde(rename = "{urn:ietf:params:xml:ns:epp-1.0}reason")]
     pub reason: String,
 }

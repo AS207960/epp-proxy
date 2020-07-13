@@ -27,7 +27,7 @@ prost = "0.6"
 prost-types = "0.6"
 clap = "2.33"
 base64 = "0.12"
-xml_serde = { git = "https://github.com/as207960/xml-serde", rev = "2f52a70b8ca60796ccbd19054864c8de7f4a5c02" }
+xml_serde = { git = "https://github.com/as207960/xml-serde", rev = "c848bbac02f57c84021cc210d3e0168792dd5e2a" }
 #xml_serde = { path = "../xml_serde" }
 rust-keycloak = { git = "https://github.com/TheEnbyperor/rust-keycloak" }
 dotenv = "0.9.0"

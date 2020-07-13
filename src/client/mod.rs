@@ -684,7 +684,7 @@ impl EPPClient {
             .supports_ext("https://www.nic.ch/epp/balance-1.0");
         self.features.verisign_balance = greeting
             .service_menu
-            .supports_ext("http://www.verisign.com/epp/balance-1.0");
+            .supports("http://www.verisign.com/epp/balance-1.0");
         self.features.verisign_low_balance = greeting
             .service_menu
             .supports_ext("http://www.verisign.com/epp/lowbalance-poll-1.0");
@@ -760,7 +760,7 @@ impl EPPClient {
                 ext_objects.push("https://www.nic.ch/epp/balance-1.0".to_string())
             }
             if self.features.verisign_balance {
-                ext_objects.push("http://www.verisign.com/epp/balance-1.0".to_string())
+                objects.push("http://www.verisign.com/epp/balance-1.0".to_string())
             }
             if self.features.verisign_low_balance {
                 ext_objects.push("http://www.verisign.com/epp/lowbalance-poll-1.0".to_string())
