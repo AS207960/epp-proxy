@@ -36,8 +36,8 @@ pub struct EPPDomainInfoData {
     pub registry_id: Option<String>,
     #[serde(rename = "{urn:ietf:params:xml:ns:domain-1.0}status", default)]
     pub statuses: Vec<EPPDomainStatus>,
-    #[serde(rename = "{urn:ietf:params:xml:ns:domain-1.0}registrant")]
-    pub registrant: String,
+    #[serde(rename = "{urn:ietf:params:xml:ns:domain-1.0}registrant", default)]
+    pub registrant: Option<String>,
     #[serde(rename = "{urn:ietf:params:xml:ns:domain-1.0}contact", default)]
     pub contacts: Vec<EPPDomainInfoContact>,
     #[serde(rename = "{urn:ietf:params:xml:ns:domain-1.0}ns", default)]

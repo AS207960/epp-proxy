@@ -16,7 +16,7 @@ metadata:
   name: epp-proxy-test-conf
 data:
   CLIENT_ID: "epp-proxy"
-  OAUTH_WELL_KNOWN: "https://sso.as207960.net/auth/realms/dev/.well-known/openid-configuration"
+  OAUTH_WELL_KNOWN: "https://sso.as207960.net/auth/realms/test/.well-known/openid-configuration"
   TLS_CERT_FILE: "/tls/tls.crt"
   TLS_KEY_FILE: "/tls/tls.key"
 ---

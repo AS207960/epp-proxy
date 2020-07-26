@@ -164,10 +164,27 @@ pub fn handle_check(
         return Err(Err(Error::Unsupported));
     }
     check_host(&req.name)?;
+    let mut ext = vec![];
+    if client.has_erratum("verisign-tv") {
+        ext.push(proto::EPPCommandExtensionType::VerisignNameStoreExt(
+            proto::verisign::EPPNameStoreExt {
+                sub_product: "dotTV".to_string(),
+            },
+        ));
+    } else if client.has_erratum("verisign-cc") {
+        ext.push(proto::EPPCommandExtensionType::VerisignNameStoreExt(
+            proto::verisign::EPPNameStoreExt {
+                sub_product: "dotCC".to_string(),
+            },
+        ));
+    }
     let command = proto::EPPCheck::Host(proto::host::EPPHostCheck {
         name: req.name.clone(),
     });
-    Ok((proto::EPPCommandType::Check(command), None))
+    Ok((proto::EPPCommandType::Check(command), match ext.is_empty() {
+        true => None,
+        false => Some(ext)
+    }))
 }
 
 pub fn handle_check_response(response: proto::EPPResponse) -> Response<CheckResponse> {
@@ -197,10 +214,27 @@ pub fn handle_info(
         return Err(Err(Error::Unsupported));
     }
     check_host(&req.name)?;
+    let mut ext = vec![];
+    if client.has_erratum("verisign-tv") {
+        ext.push(proto::EPPCommandExtensionType::VerisignNameStoreExt(
+            proto::verisign::EPPNameStoreExt {
+                sub_product: "dotTV".to_string(),
+            },
+        ));
+    } else if client.has_erratum("verisign-cc") {
+        ext.push(proto::EPPCommandExtensionType::VerisignNameStoreExt(
+            proto::verisign::EPPNameStoreExt {
+                sub_product: "dotCC".to_string(),
+            },
+        ));
+    }
     let command = proto::EPPInfo::Host(proto::host::EPPHostCheck {
         name: req.name.clone(),
     });
-    Ok((proto::EPPCommandType::Info(command), None))
+    Ok((proto::EPPCommandType::Info(command), match ext.is_empty() {
+        true => None,
+        false => Some(ext)
+    }))
 }
 
 pub fn handle_info_response(response: proto::EPPResponse) -> Response<InfoResponse> {
@@ -246,6 +280,20 @@ pub fn handle_create(
         return Err(Err(Error::Unsupported));
     }
     check_host(&req.name)?;
+    let mut ext = vec![];
+    if client.has_erratum("verisign-tv") {
+        ext.push(proto::EPPCommandExtensionType::VerisignNameStoreExt(
+            proto::verisign::EPPNameStoreExt {
+                sub_product: "dotTV".to_string(),
+            },
+        ));
+    } else if client.has_erratum("verisign-cc") {
+        ext.push(proto::EPPCommandExtensionType::VerisignNameStoreExt(
+            proto::verisign::EPPNameStoreExt {
+                sub_product: "dotCC".to_string(),
+            },
+        ));
+    }
     let command = proto::EPPCreate::Host(proto::host::EPPHostCreate {
         name: req.name.clone(),
         addresses: match req
@@ -272,7 +320,10 @@ pub fn handle_create(
             Err(e) => return Err(e),
         },
     });
-    Ok((proto::EPPCommandType::Create(command), None))
+    Ok((proto::EPPCommandType::Create(command), match ext.is_empty() {
+        true => None,
+        false => Some(ext)
+    }))
 }
 
 pub fn handle_create_response(response: proto::EPPResponse) -> Response<CreateResponse> {
@@ -300,10 +351,27 @@ pub fn handle_delete(
         return Err(Err(Error::Unsupported));
     }
     check_host(&req.name)?;
+    let mut ext = vec![];
+    if client.has_erratum("verisign-tv") {
+        ext.push(proto::EPPCommandExtensionType::VerisignNameStoreExt(
+            proto::verisign::EPPNameStoreExt {
+                sub_product: "dotTV".to_string(),
+            },
+        ));
+    } else if client.has_erratum("verisign-cc") {
+        ext.push(proto::EPPCommandExtensionType::VerisignNameStoreExt(
+            proto::verisign::EPPNameStoreExt {
+                sub_product: "dotCC".to_string(),
+            },
+        ));
+    }
     let command = proto::EPPDelete::Host(proto::host::EPPHostCheck {
         name: req.name.clone(),
     });
-    Ok((proto::EPPCommandType::Delete(command), None))
+    Ok((proto::EPPCommandType::Delete(command), match ext.is_empty() {
+        true => None,
+        false => Some(ext)
+    }))
 }
 
 pub fn handle_delete_response(response: proto::EPPResponse) -> Response<DeleteResponse> {
@@ -321,6 +389,20 @@ pub fn handle_update(
         return Err(Err(Error::Unsupported));
     }
     check_host(&req.name)?;
+    let mut ext = vec![];
+    if client.has_erratum("verisign-tv") {
+        ext.push(proto::EPPCommandExtensionType::VerisignNameStoreExt(
+            proto::verisign::EPPNameStoreExt {
+                sub_product: "dotTV".to_string(),
+            },
+        ));
+    } else if client.has_erratum("verisign-cc") {
+        ext.push(proto::EPPCommandExtensionType::VerisignNameStoreExt(
+            proto::verisign::EPPNameStoreExt {
+                sub_product: "dotCC".to_string(),
+            },
+        ));
+    }
     if req.add.is_empty() && req.remove.is_empty() && req.new_name.is_none() {
         return Err(Err(Error::Err(
             "at least one operation must be specified".to_string(),
@@ -392,7 +474,10 @@ pub fn handle_update(
             .as_ref()
             .map(|n| proto::host::EPPHostUpdateChange { name: n.clone() }),
     });
-    Ok((proto::EPPCommandType::Update(Box::new(command)), None))
+    Ok((proto::EPPCommandType::Update(Box::new(command)), match ext.is_empty() {
+        true => None,
+        false => Some(ext)
+    }))
 }
 
 pub fn handle_update_response(response: proto::EPPResponse) -> Response<UpdateResponse> {

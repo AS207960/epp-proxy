@@ -127,7 +127,8 @@ impl Router {
                     .into_iter()
                     .rev()
                     .collect::<Vec<_>>()
-                    .join("."),
+                    .join(".")
+                    .to_lowercase(),
             ) {
                 return Some(c.clone());
             }

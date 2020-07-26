@@ -517,7 +517,7 @@ impl
                 .into_iter()
                 .map(|s| s.status.into())
                 .collect(),
-            registrant: domain_info.registrant,
+            registrant: domain_info.registrant.unwrap_or_default(),
             contacts: domain_info
                 .contacts
                 .into_iter()

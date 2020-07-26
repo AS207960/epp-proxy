@@ -32,7 +32,7 @@ pub fn handle_balance(
             proto::EPPCommandType::Info(proto::EPPInfo::SwitchBalace {}),
             None,
         ))
-    } else if client.verisign_balance {
+    } else if client.verisign_balance || client.has_erratum("rrpproxy") {
         Ok((
             proto::EPPCommandType::Info(proto::EPPInfo::VerisignBalace {}),
             None,
