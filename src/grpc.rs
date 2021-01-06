@@ -192,7 +192,7 @@ fn disclosure_type_from_i32(from: Vec<i32>) -> Vec<client::contact::DisclosureTy
                     client::contact::DisclosureType::LocalName
                 }
                 epp_proto::contact::DisclosureType::InternationalisedName => {
-                    client::contact::DisclosureType::InternationalisedAddress
+                    client::contact::DisclosureType::InternationalisedName
                 }
                 epp_proto::contact::DisclosureType::LocalOrganisation => {
                     client::contact::DisclosureType::LocalOrganisation
