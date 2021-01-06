@@ -807,7 +807,11 @@ pub fn handle_create(
                 streets: a.streets.clone(),
                 city: a.city.clone(),
                 province: a.province.clone(),
-                postal_code: a.postal_code.as_ref().map(|s| s.replace(" ", "")),
+                postal_code: if client.has_erratum("traficom") {
+                    a.postal_code.as_ref().map(|s| s.replace(" ", ""))
+                } else {
+                    a.postal_code.clone()
+                },
                 country_code: a.country_code.clone(),
             },
         })
