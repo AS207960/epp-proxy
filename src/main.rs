@@ -20,8 +20,8 @@
 //!
 //! Supported errata are:
 //! * `traficom`
-//! * `verisign_tv`
-//! * `verisign_cc`
+//! * `verisign-tv`
+//! * `verisign-cc`
 //!
 //! Example config file:
 //! ```text
@@ -35,6 +35,7 @@
 //!    "uk"
 //!  ],
 //!  "client_cert": "priv/as207960-registrar.pfx",
+//!  "root_certs": ["root/uniregistry.pem"],
 //!  "pipelining": true,
 //!  "errata": "traficom"
 //! }
@@ -67,6 +68,8 @@ struct ConfigFile {
     zones: Vec<String>,
     /// PKCS12 file for TLS client auth
     client_cert: Option<String>,
+    /// Root certificates to trust on this connection
+    root_certs: Option<Vec<String>>,
     /// Does the server support pipelining?
     pipelining: bool,
     /// For naughty servers
@@ -94,6 +97,10 @@ impl Router {
             password: &config.password,
             log_dir,
             client_cert: config.client_cert.as_deref(),
+            root_certs: &match config.root_certs.as_ref() {
+                Some(r) => r.iter().map(|c| c.as_str()).collect::<Vec<_>>(),
+                None => vec![]
+            },
             new_password: config.new_password.as_deref(),
             pipelining: config.pipelining,
             errata: config.errata.clone(),
@@ -167,17 +174,13 @@ async fn server_identity() -> tonic::transport::Identity {
 
 #[tokio::main]
 async fn main() {
+let mut log_builder = pretty_env_logger::formatted_builder();
+    log_builder.parse_filters(&std::env::var("RUST_LOG").unwrap_or_default());
+    let logger = sentry::integrations::log::SentryLogger::with_dest(log_builder.build());
+    log::set_boxed_logger(Box::new(logger)).unwrap();
+    log::set_max_level(log::LevelFilter::Debug);
     let _guard =
         sentry::init("https://786e367376234c2b9bee2bb1984c2e84@o222429.ingest.sentry.io/5247736");
-    sentry::integrations::panic::register_panic_handler();
-    let mut log_builder = pretty_env_logger::formatted_builder();
-    log_builder.parse_filters(&std::env::var("RUST_LOG").unwrap_or_default());
-    let logger = log_builder.build();
-    let options = sentry::integrations::log::LoggerOptions {
-        global_filter: Some(logger.filter()),
-        ..Default::default()
-    };
-    sentry::integrations::log::init(Some(Box::new(logger)), options);
 
     let matches = clap::App::new("epp-proxy")
         .version("0.0.1")

@@ -33,7 +33,7 @@ rust-keycloak = { git = "https://github.com/TheEnbyperor/rust-keycloak" }
 dotenv = "0.9.0"
 tower-service = "0.3"
 http = "0.2"
-sentry = "0.12.0"
+sentry = "0.21.0"
 
 [build-dependencies]
 tonic-build = "0.2"

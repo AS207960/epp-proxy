@@ -4,6 +4,11 @@ use chrono::prelude::*;
 pub struct EPPDomainCheck {
     #[serde(rename = "{urn:ietf:params:xml:ns:domain-1.0}domain:name")]
     pub name: String,
+    #[serde(
+        rename = "{urn:ietf:params:xml:ns:domain-1.0}domain:authInfo",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub auth_info: Option<EPPDomainAuthInfo>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -300,8 +305,11 @@ pub struct EPPDomainTransfer {
         skip_serializing_if = "Option::is_none"
     )]
     pub period: Option<EPPDomainPeriod>,
-    #[serde(rename = "{urn:ietf:params:xml:ns:domain-1.0}domain:authInfo")]
-    pub auth_info: EPPDomainAuthInfo,
+    #[serde(
+        rename = "{urn:ietf:params:xml:ns:domain-1.0}domain:authInfo",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub auth_info: Option<EPPDomainAuthInfo>,
 }
 
 #[derive(Debug, Serialize)]

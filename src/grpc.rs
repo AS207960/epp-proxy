@@ -526,9 +526,10 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         &self,
         request: tonic::Request<epp_proto::domain::DomainInfoRequest>,
     ) -> Result<tonic::Response<epp_proto::domain::DomainInfoReply>, tonic::Status> {
-        let name: String = request.into_inner().name;
-        let (mut sender, registry_name) = client_by_domain(&self.client_router, &name)?;
-        let res = client::domain::info(&name, &mut sender).await?;
+        let req = request.into_inner();
+        let (mut sender, registry_name) = client_by_domain(&self.client_router, &req.name)?;
+        let res = client::domain::info(
+            &req.name, req.auth_info.as_deref(), &mut sender).await?;
 
         let reply = epp_proto::domain::DomainInfoReply {
             name: res.name,
@@ -1071,9 +1072,10 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         &self,
         request: tonic::Request<epp_proto::domain::DomainTransferQueryRequest>,
     ) -> Result<tonic::Response<epp_proto::domain::DomainTransferReply>, tonic::Status> {
-        let name: String = request.into_inner().name;
-        let (mut sender, registry_name) = client_by_domain(&self.client_router, &name)?;
-        let res = client::domain::transfer_query(&name, &mut sender).await?;
+        let req = request.into_inner();
+        let (mut sender, registry_name) = client_by_domain(&self.client_router, &req.name)?;
+        let res = client::domain::transfer_query(
+            &req.name, req.auth_info.as_deref(), &mut sender).await?;
 
         let reply = epp_proto::domain::DomainTransferReply {
             pending: res.pending,
@@ -1131,7 +1133,8 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let request = request.into_inner();
         let (mut sender, registry_name) = client_by_domain(&self.client_router, &request.name)?;
         let res =
-            client::domain::transfer_accept(&request.name, &request.auth_info, &mut sender).await?;
+            client::domain::transfer_accept(
+                &request.name, Some(&request.auth_info), &mut sender).await?;
 
         let reply = epp_proto::domain::DomainTransferReply {
             pending: res.pending,
@@ -1156,7 +1159,8 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let request = request.into_inner();
         let (mut sender, registry_name) = client_by_domain(&self.client_router, &request.name)?;
         let res =
-            client::domain::transfer_reject(&request.name, &request.auth_info, &mut sender).await?;
+            client::domain::transfer_reject(
+                &request.name, Some(&request.auth_info), &mut sender).await?;
 
         let reply = epp_proto::domain::DomainTransferReply {
             pending: res.pending,
