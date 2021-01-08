@@ -54,6 +54,7 @@ message DomainCheckReply {
 
 message DomainInfoRequest {
     string name = 1;
+    google.protobuf.StringValue auth_info = 2;
 }
 
 message DomainInfoReply {

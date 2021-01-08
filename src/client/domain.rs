@@ -1,9 +1,11 @@
 //! EPP commands relating to domain objects
 
-use super::router::HandleReqReturn;
-use super::{proto, fee, EPPClientServerFeatures, Error, Request, Response, Sender};
-use chrono::prelude::*;
 use std::convert::{TryFrom, TryInto};
+
+use chrono::prelude::*;
+
+use super::{EPPClientServerFeatures, Error, fee, proto, Request, Response, Sender};
+use super::router::HandleReqReturn;
 
 #[derive(Debug)]
 pub struct CheckRequest {
@@ -26,6 +28,7 @@ pub struct CheckResponse {
 #[derive(Debug)]
 pub struct InfoRequest {
     name: String,
+    auth_info: Option<String>,
     pub return_path: Sender<InfoResponse>,
 }
 
@@ -249,6 +252,7 @@ pub struct RenewData {
 #[derive(Debug)]
 pub struct TransferQueryRequest {
     name: String,
+    auth_info: Option<String>,
     pub return_path: Sender<TransferResponse>,
 }
 
@@ -263,7 +267,7 @@ pub struct TransferRequestRequest {
 #[derive(Debug)]
 pub struct TransferAcceptRejectRequest {
     name: String,
-    auth_info: String,
+    auth_info: Option<String>,
     pub return_path: Sender<TransferResponse>,
 }
 
@@ -423,16 +427,16 @@ impl From<&proto::domain::EPPDomainPeriod> for Period {
                 proto::domain::EPPDomainPeriodUnit::Years => PeriodUnit::Years,
                 proto::domain::EPPDomainPeriodUnit::Months => PeriodUnit::Months,
             },
-            value: from.value
+            value: from.value,
         }
     }
 }
 
 impl
-    TryFrom<(
-        proto::domain::EPPDomainInfoData,
-        &Option<proto::EPPResponseExtension>,
-    )> for InfoResponse
+TryFrom<(
+    proto::domain::EPPDomainInfoData,
+    &Option<proto::EPPResponseExtension>,
+)> for InfoResponse
 {
     type Error = Error;
 
@@ -544,16 +548,16 @@ impl
                                 .into_iter()
                                 .map(|addr| {
                                     super::host::Address {
-                                address: addr.address,
-                                ip_version: match addr.ip_version {
-                                    proto::domain::EPPDomainInfoNameserverAddressVersion::IPv4 => {
-                                        super::host::AddressVersion::IPv4
+                                        address: addr.address,
+                                        ip_version: match addr.ip_version {
+                                            proto::domain::EPPDomainInfoNameserverAddressVersion::IPv4 => {
+                                                super::host::AddressVersion::IPv4
+                                            }
+                                            proto::domain::EPPDomainInfoNameserverAddressVersion::IPv6 => {
+                                                super::host::AddressVersion::IPv6
+                                            }
+                                        },
                                     }
-                                    proto::domain::EPPDomainInfoNameserverAddressVersion::IPv6 => {
-                                        super::host::AddressVersion::IPv6
-                                    }
-                                },
-                            }
                                 })
                                 .collect(),
                         },
@@ -643,6 +647,7 @@ pub fn handle_check(
     check_domain(&req.name)?;
     let command = proto::EPPCheck::Domain(proto::domain::EPPDomainCheck {
         name: req.name.clone(),
+        auth_info: None,
     });
     let mut ext = vec![];
     if client.has_erratum("verisign-tv") {
@@ -665,7 +670,7 @@ pub fn handle_check(
                 commands: fee_check.commands.iter().map(|c| proto::fee::EPPFee10CheckCommand {
                     name: (&c.command).into(),
                     period: c.period.as_ref().map(Into::into),
-                }).collect()
+                }).collect(),
             }))
         } else if client.fee_09_supported {
             ext.push(proto::EPPCommandExtensionType::EPPFee09Check(proto::fee::EPPFee09Check {
@@ -673,7 +678,7 @@ pub fn handle_check(
                     object_uri: Some("urn:ietf:params:xml:ns:domain-1.0".to_string()),
                     object_id: proto::fee::EPPFee10ObjectID {
                         element: "name".to_string(),
-                        id: req.name.to_owned()
+                        id: req.name.to_owned(),
                     },
                     currency: fee_check.currency.to_owned(),
                     command: (&c.command).into(),
@@ -708,7 +713,7 @@ pub fn handle_check(
                 }).collect()
             }))
         } else {
-            return Err(Err(Error::Unsupported))
+            return Err(Err(Error::Unsupported));
         }
     }
     Ok((proto::EPPCommandType::Check(command), match ext.is_empty() {
@@ -771,7 +776,7 @@ pub fn handle_check_response(response: proto::EPPResponse) -> Response<CheckResp
                         fees: d.fee.iter().map(Into::into).collect(),
                         credits: d.credit.iter().map(Into::into).collect(),
                         class: d.class.to_owned(),
-                        reason: None
+                        reason: None,
                     }).collect(),
                     reason: None,
                 })
@@ -786,7 +791,7 @@ pub fn handle_check_response(response: proto::EPPResponse) -> Response<CheckResp
                         fees: d.fee.iter().map(Into::into).collect(),
                         credits: d.credit.iter().map(Into::into).collect(),
                         class: d.class.to_owned(),
-                        reason: None
+                        reason: None,
                     }).collect(),
                     reason: None,
                 })
@@ -801,7 +806,7 @@ pub fn handle_check_response(response: proto::EPPResponse) -> Response<CheckResp
                         fees: d.fee.iter().map(Into::into).collect(),
                         credits: d.credit.iter().map(Into::into).collect(),
                         class: d.class.to_owned(),
-                        reason: None
+                        reason: None,
                     }).collect(),
                     reason: None,
                 })
@@ -816,14 +821,14 @@ pub fn handle_check_response(response: proto::EPPResponse) -> Response<CheckResp
                         fees: d.fee.iter().map(Into::into).collect(),
                         class: d.class.to_owned(),
                         credits: vec![],
-                        reason: None
+                        reason: None,
                     }).collect(),
                     reason: None,
                 })
             } else {
                 None
             }
-        },
+        }
         None => None,
     };
 
@@ -834,7 +839,7 @@ pub fn handle_check_response(response: proto::EPPResponse) -> Response<CheckResp
                     Response::Ok(CheckResponse {
                         avail: domain_check.name.available,
                         reason: domain_check.reason.to_owned(),
-                        fee_check
+                        fee_check,
                     })
                 } else {
                     Err(Error::InternalServerError)
@@ -856,6 +861,9 @@ pub fn handle_info(
     check_domain(&req.name)?;
     let command = proto::EPPInfo::Domain(proto::domain::EPPDomainCheck {
         name: req.name.clone(),
+        auth_info: req.auth_info.as_ref().map(|a| proto::domain::EPPDomainAuthInfo {
+            password: Some(a.clone())
+        }),
     });
     let ext = if client.has_erratum("verisign-tv") {
         Some(vec![proto::EPPCommandExtensionType::VerisignNameStoreExt(
@@ -1026,7 +1034,7 @@ pub fn handle_create_response(response: proto::EPPResponse) -> Response<CreateRe
             } else {
                 None
             }
-        },
+        }
         None => None,
     };
 
@@ -1036,7 +1044,7 @@ pub fn handle_create_response(response: proto::EPPResponse) -> Response<CreateRe
                 pending: response.is_pending(),
                 transaction_id: response.transaction_id.server_transaction_id.unwrap_or_default(),
                 data: domain_create.into(),
-                fee_data
+                fee_data,
             }),
             _ => Err(Error::InternalServerError),
         },
@@ -1069,6 +1077,7 @@ pub fn handle_delete(
     check_domain(&req.name)?;
     let command = proto::EPPDelete::Domain(proto::domain::EPPDomainCheck {
         name: req.name.clone(),
+        auth_info: None,
     });
     let ext = if client.has_erratum("verisign-tv") {
         Some(vec![proto::EPPCommandExtensionType::VerisignNameStoreExt(
@@ -1125,7 +1134,7 @@ pub fn handle_delete_response(response: proto::EPPResponse) -> Response<DeleteRe
             } else {
                 None
             }
-        },
+        }
         None => None,
     };
 
@@ -1397,14 +1406,14 @@ pub fn handle_update_response(response: proto::EPPResponse) -> Response<UpdateRe
             } else {
                 None
             }
-        },
+        }
         None => None,
     };
 
     Response::Ok(UpdateResponse {
         pending: response.is_pending(),
         transaction_id: response.transaction_id.server_transaction_id.unwrap_or_default(),
-        fee_data
+        fee_data,
     })
 }
 
@@ -1476,7 +1485,7 @@ pub fn handle_renew_response(response: proto::EPPResponse) -> Response<RenewResp
             } else {
                 None
             }
-        },
+        }
         None => None,
     };
 
@@ -1508,6 +1517,9 @@ pub fn handle_transfer_query(
         operation: proto::EPPTransferOperation::Query,
         command: proto::EPPTransferCommand::DomainQuery(proto::domain::EPPDomainCheck {
             name: req.name.clone(),
+            auth_info: req.auth_info.as_ref().map(|a| proto::domain::EPPDomainAuthInfo {
+                password: Some(a.clone())
+            }),
         }),
     };
     let ext = if client.has_erratum("verisign-tv") {
@@ -1541,9 +1553,9 @@ pub fn handle_transfer_request(
         command: proto::EPPTransferCommand::DomainRequest(proto::domain::EPPDomainTransfer {
             name: req.name.clone(),
             period: req.add_period.as_ref().map(|p| p.into()),
-            auth_info: proto::domain::EPPDomainAuthInfo {
-                password: Some(req.auth_info.clone()),
-            },
+            auth_info: Some(proto::domain::EPPDomainAuthInfo {
+                password: Some(req.auth_info.clone())
+            }),
         }),
     };
     let ext = if client.has_erratum("verisign-tv") {
@@ -1577,9 +1589,9 @@ pub fn handle_transfer_accept(
         command: proto::EPPTransferCommand::DomainRequest(proto::domain::EPPDomainTransfer {
             name: req.name.clone(),
             period: None,
-            auth_info: proto::domain::EPPDomainAuthInfo {
-                password: Some(req.auth_info.clone()),
-            },
+            auth_info: req.auth_info.as_ref().map(|a| proto::domain::EPPDomainAuthInfo {
+                password: Some(a.clone())
+            }),
         }),
     };
     let ext = if client.has_erratum("verisign-tv") {
@@ -1613,9 +1625,9 @@ pub fn handle_transfer_reject(
         command: proto::EPPTransferCommand::DomainRequest(proto::domain::EPPDomainTransfer {
             name: req.name.clone(),
             period: None,
-            auth_info: proto::domain::EPPDomainAuthInfo {
-                password: Some(req.auth_info.clone()),
-            },
+            auth_info: req.auth_info.as_ref().map(|a| proto::domain::EPPDomainAuthInfo {
+                password: Some(a.clone())
+            }),
         }),
     };
     let ext = if client.has_erratum("verisign-tv") {
@@ -1673,7 +1685,7 @@ pub fn handle_transfer_response(response: proto::EPPResponse) -> Response<Transf
             } else {
                 None
             }
-        },
+        }
         None => None,
     };
 
@@ -1713,7 +1725,7 @@ pub async fn check(
         })),
         receiver,
     )
-    .await
+        .await
 }
 
 /// Fetches information about a domain name
@@ -1723,6 +1735,7 @@ pub async fn check(
 /// * `client_sender` - Reference to the tokio channel into the client
 pub async fn info(
     domain: &str,
+    auth_info: Option<&str>,
     client_sender: &mut futures::channel::mpsc::Sender<Request>,
 ) -> Result<InfoResponse, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
@@ -1730,11 +1743,12 @@ pub async fn info(
         client_sender,
         Request::DomainInfo(Box::new(InfoRequest {
             name: domain.to_string(),
+            auth_info: auth_info.map(|s| s.into()),
             return_path: sender,
         })),
         receiver,
     )
-    .await
+        .await
 }
 
 pub struct CreateInfo<'a> {
@@ -1776,7 +1790,7 @@ pub async fn create(
         })),
         receiver,
     )
-    .await
+        .await
 }
 
 /// Deletes a domain name
@@ -1797,7 +1811,7 @@ pub async fn delete(
         })),
         receiver,
     )
-    .await
+        .await
 }
 
 /// Updates properties of a domain name
@@ -1832,7 +1846,7 @@ pub async fn update(
         })),
         receiver,
     )
-    .await
+        .await
 }
 
 /// Renews a domain name
@@ -1859,16 +1873,18 @@ pub async fn renew(
         })),
         receiver,
     )
-    .await
+        .await
 }
 
 /// Queries the current transfer status of a domain name
 ///
 /// # Arguments
 /// * `domain` - The domain to be queried
+/// * `auth_info` - Auth info for the domain (not always required)
 /// * `client_sender` - Reference to the tokio channel into the client
 pub async fn transfer_query(
     domain: &str,
+    auth_info: Option<&str>,
     client_sender: &mut futures::channel::mpsc::Sender<Request>,
 ) -> Result<TransferResponse, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
@@ -1876,11 +1892,12 @@ pub async fn transfer_query(
         client_sender,
         Request::DomainTransferQuery(Box::new(TransferQueryRequest {
             name: domain.to_string(),
+            auth_info: auth_info.map(|s| s.into()),
             return_path: sender,
         })),
         receiver,
     )
-    .await
+        .await
 }
 
 /// Requests the transfer of a domain name
@@ -1907,7 +1924,7 @@ pub async fn transfer_request(
         })),
         receiver,
     )
-    .await
+        .await
 }
 
 /// Accepts the transfer of a domain name
@@ -1918,7 +1935,7 @@ pub async fn transfer_request(
 /// * `client_sender` - Reference to the tokio channel into the client
 pub async fn transfer_accept(
     domain: &str,
-    auth_info: &str,
+    auth_info: Option<&str>,
     client_sender: &mut futures::channel::mpsc::Sender<Request>,
 ) -> Result<TransferResponse, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
@@ -1926,12 +1943,12 @@ pub async fn transfer_accept(
         client_sender,
         Request::DomainTransferAccept(Box::new(TransferAcceptRejectRequest {
             name: domain.to_string(),
-            auth_info: auth_info.to_string(),
+            auth_info: auth_info.map(|s| s.into()),
             return_path: sender,
         })),
         receiver,
     )
-    .await
+        .await
 }
 
 /// Rejects the transfer of a domain name
@@ -1942,7 +1959,7 @@ pub async fn transfer_accept(
 /// * `client_sender` - Reference to the tokio channel into the client
 pub async fn transfer_reject(
     domain: &str,
-    auth_info: &str,
+    auth_info: Option<&str>,
     client_sender: &mut futures::channel::mpsc::Sender<Request>,
 ) -> Result<TransferResponse, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
@@ -1950,10 +1967,10 @@ pub async fn transfer_reject(
         client_sender,
         Request::DomainTransferReject(Box::new(TransferAcceptRejectRequest {
             name: domain.to_string(),
-            auth_info: auth_info.to_string(),
+            auth_info: auth_info.map(|s| s.into()),
             return_path: sender,
         })),
         receiver,
     )
-    .await
+        .await
 }

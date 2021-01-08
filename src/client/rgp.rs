@@ -57,6 +57,7 @@ pub fn handle_restore(
     if client.has_erratum("traficom") {
         let command = proto::EPPDelete::Domain(proto::domain::EPPDomainCheck {
             name: req.name.clone(),
+            auth_info: None
         });
         let ext = proto::traficom::EPPDomainDelete::Cancel {};
         Ok((

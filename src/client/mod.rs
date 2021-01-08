@@ -154,6 +154,7 @@ pub struct EPPClient {
     password: String,
     new_password: Option<String>,
     client_cert: Option<String>,
+    root_certs: Vec<String>,
     server_id: String,
     pipelining: bool,
     is_awaiting_response: bool,
@@ -223,13 +224,23 @@ impl EPPClientServerFeatures {
 }
 
 pub struct ClientConf<'a, C> {
+    /// The server connection string, in the form `domain:port`
     pub host: &'a str,
+    /// The client ID/tag to login with
     pub tag: &'a str,
+    /// The password to login with
     pub password: &'a str,
+    /// Directory path to log commands to
     pub log_dir: std::path::PathBuf,
+    /// PCKS#12 file path for client identity
     pub client_cert: C,
+    /// List of PEM file paths
+    pub root_certs: &'a[&'a str],
+    /// New password to set after login
     pub new_password: C,
+    /// Does the server support multiple commands in flight at once
     pub pipelining: bool,
+    /// Errata of this server
     pub errata: Option<String>,
 }
 
@@ -237,9 +248,7 @@ impl EPPClient {
     /// Creates a new EPP client ready to be started
     ///
     /// # Arguments
-    /// * `host` - The server connection string, in the form `domain:port`
-    /// * `tag` - The client ID/tag to login with
-    /// * `password` - The password to login with
+    /// * `conf` - Configuration to use for this client
     pub fn new<'a, C: Into<Option<&'a str>>>(conf: ClientConf<'a, C>) -> Self {
         Self {
             log_dir: conf.log_dir,
@@ -247,6 +256,7 @@ impl EPPClient {
             tag: conf.tag.to_string(),
             password: conf.password.to_string(),
             client_cert: conf.client_cert.into().map(|c| c.to_string()),
+            root_certs: conf.root_certs.into_iter().map(|c| c.to_string()).collect(),
             new_password: conf.new_password.into().map(|c| c.to_string()),
             pipelining: conf.pipelining,
             features: EPPClientServerFeatures {
@@ -1002,6 +1012,23 @@ impl EPPClient {
             }
         };
         let mut cx = TlsConnector::builder();
+        for root_cert_path in &self.root_certs {
+            let root_cert_bytes = match std::fs::read(root_cert_path) {
+                Ok(p) => p,
+                Err(err) => {
+                    error!("Unable read root cert {}: {}", root_cert_path, err);
+                    return Err(());
+                }
+            };
+            let root_cert = match native_tls::Certificate::from_pem(&root_cert_bytes) {
+                Ok(i) => i,
+                Err(err) => {
+                    error!("Unable read root cert {}: {}", root_cert_path, err);
+                    return Err(());
+                }
+            };
+            cx.add_root_certificate(root_cert);
+        }
         if let Some(client_cert) = &self.client_cert {
             let pkcs = match std::fs::read(client_cert) {
                 Ok(p) => p,

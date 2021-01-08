@@ -20,8 +20,8 @@
 //!
 //! Supported errata are:
 //! * `traficom`
-//! * `verisign_tv`
-//! * `verisign_cc`
+//! * `verisign-tv`
+//! * `verisign-cc`
 //!
 //! Example config file:
 //! ```text
@@ -35,6 +35,7 @@
 //!    "uk"
 //!  ],
 //!  "client_cert": "priv/as207960-registrar.pfx",
+//!  "root_certs": ["root/uniregistry.pem"],
 //!  "pipelining": true,
 //!  "errata": "traficom"
 //! }
@@ -67,6 +68,8 @@ struct ConfigFile {
     zones: Vec<String>,
     /// PKCS12 file for TLS client auth
     client_cert: Option<String>,
+    /// Root certificates to trust on this connection
+    root_certs: Option<Vec<String>>,
     /// Does the server support pipelining?
     pipelining: bool,
     /// For naughty servers
@@ -94,6 +97,10 @@ impl Router {
             password: &config.password,
             log_dir,
             client_cert: config.client_cert.as_deref(),
+            root_certs: &match config.root_certs.as_ref() {
+                Some(r) => r.iter().map(|c| c.as_str()).collect::<Vec<_>>(),
+                None => vec![]
+            },
             new_password: config.new_password.as_deref(),
             pipelining: config.pipelining,
             errata: config.errata.clone(),
