@@ -797,7 +797,7 @@ pub fn handle_check_response(response: proto::EPPResponse) -> Response<CheckResp
                         command: (&d.command).into(),
                         period: d.period.as_ref().map(Into::into),
                         standard: None,
-                        currency: d.currency.to_owned(),
+                        currency: d.currency.to_owned().unwrap_or_default(),
                         fees: d.fee.iter().map(Into::into).collect(),
                         credits: d.credit.iter().map(Into::into).collect(),
                         class: d.class.to_owned(),

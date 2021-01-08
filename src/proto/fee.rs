@@ -228,8 +228,8 @@ pub struct EPPFee05CheckDatum {
 pub struct EPPFee07CheckDatum {
     #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.7}name")]
     pub name: String,
-    #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.7}currency")]
-    pub currency: String,
+    #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.7}currency", default)]
+    pub currency: Option<String>,
     #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.7}command")]
     pub command: EPPFeeCommand,
     #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.7}period", default)]

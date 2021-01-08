@@ -29,11 +29,11 @@ clap = "2.33"
 base64 = "0.12"
 xml_serde = { git = "https://github.com/as207960/xml-serde", rev = "c848bbac02f57c84021cc210d3e0168792dd5e2a" }
 #xml_serde = { path = "../xml_serde" }
-rust-keycloak = { git = "https://github.com/TheEnbyperor/rust-keycloak" }
+rust-keycloak = { git = "https://github.com/TheEnbyperor/rust-keycloak", rev = "b4f76d59331d991909d199dca65e269e391dac82" }
 dotenv = "0.9.0"
 tower-service = "0.3"
 http = "0.2"
-sentry = "0.12.0"
+sentry = { version = "0.21.0", features = ["log"] }
 
 [build-dependencies]
 tonic-build = "0.2"

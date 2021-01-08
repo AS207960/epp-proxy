@@ -168,17 +168,14 @@ async fn server_identity() -> tonic::transport::Identity {
 
 #[tokio::main]
 async fn main() {
-    let _guard =
-        sentry::init("https://786e367376234c2b9bee2bb1984c2e84@o222429.ingest.sentry.io/5247736");
-    sentry::integrations::panic::register_panic_handler();
+    //sentry::integrations::panic::register_panic_handler();
     let mut log_builder = pretty_env_logger::formatted_builder();
     log_builder.parse_filters(&std::env::var("RUST_LOG").unwrap_or_default());
-    let logger = log_builder.build();
-    let options = sentry::integrations::log::LoggerOptions {
-        global_filter: Some(logger.filter()),
-        ..Default::default()
-    };
-    sentry::integrations::log::init(Some(Box::new(logger)), options);
+    let logger = sentry::integrations::log::SentryLogger::with_dest(log_builder.build());
+    log::set_boxed_logger(Box::new(logger)).unwrap();
+    log::set_max_level(log::LevelFilter::Debug);
+    let _guard =
+        sentry::init("https://786e367376234c2b9bee2bb1984c2e84@o222429.ingest.sentry.io/5247736");
 
     let matches = clap::App::new("epp-proxy")
         .version("0.0.1")
