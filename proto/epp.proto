@@ -7,6 +7,7 @@ import "contact.proto";
 import "domain.proto";
 import "host.proto";
 import "rgp.proto";
+import "nominet.proto";
 
 service EPPProxy {
     rpc DomainCheck            (domain.DomainCheckRequest)                returns (domain.DomainCheckReply);
@@ -35,7 +36,7 @@ service EPPProxy {
     rpc ContactTransferAccept  (contact.ContactTransferRequestRequest)    returns (contact.ContactTransferReply);
     rpc ContactTransferReject  (contact.ContactTransferRequestRequest)    returns (contact.ContactTransferReply);
     rpc Poll                   (RegistryInfo)                             returns (stream PollReply);
-    rpc NominetTagList         (RegistryInfo)                             returns (NominetTagListReply);
+    rpc NominetTagList         (RegistryInfo)                             returns (nominet.NominetTagListReply);
     rpc BalanceInfo            (RegistryInfo)                             returns (BalanceReply);
 }
 
@@ -47,17 +48,69 @@ message PollReply {
     string msg_id = 1;
     google.protobuf.Timestamp enqueue_date = 2;
     string message = 3;
+    oneof data {
+        domain.DomainInfoReply domain_info = 4;
+        domain.DomainTransferReply domain_transfer = 6;
+        domain.DomainCreateReply domain_create = 7;
+        domain.DomainRenewReply domain_renew = 8;
+        domain.DomainPANReply domain_pan = 9;
+        contact.ContactInfoReply contact_info = 5;
+        nominet.DomainCancelData nominet_domain_cancel_data = 11;
+        nominet.DomainReleaseData nominet_domain_release_data = 12;
+        nominet.DomainRegistrarChangeData nominet_domain_registrar_change_data = 13;
+        nominet.HostCancelData nominet_host_cancel_data = 14;
+        nominet.ProcessData nominet_process_data = 15;
+        nominet.SuspendData nominet_suspend_data = 16;
+        nominet.DomainFailData nominet_domain_fail_data = 17;
+        nominet.RegistrantTransferData nominet_registrant_transfer_data = 18;
+        BalanceReply verisign_low_balance_data = 19;
+    }
+    ChangeData change_data = 10;
 }
 
-message NominetTagListReply {
-    message Tag {
-        string tag = 1;
-        string name = 2;
-        google.protobuf.StringValue trading_name = 3;
-        bool handshake = 4;
+message ChangeData {
+    enum ChangeState {
+        AFTER = 0;
+        BEFORE = 1;
     }
 
-    repeated Tag tags = 1;
+    message ChangeOperation {
+        enum ChangeOperationType {
+            Custom = 0;
+            Create = 1;
+            Delete = 2;
+            Renew = 3;
+            Transfer = 4;
+            Update = 5;
+            Restore = 6;
+            AutoRenew = 7;
+            AutoDelete = 8;
+            AutoPurge = 9;
+        }
+
+        ChangeOperationType operation_type = 1;
+        google.protobuf.StringValue operation = 2;
+    }
+
+    message CaseID {
+        enum CaseIDType {
+            Custom = 0;
+            UDRP = 1;
+            URS = 2;
+        }
+
+        CaseIDType case_id_type = 1;
+        google.protobuf.StringValue name = 2;
+        string case_id = 3;
+    }
+
+    ChangeState change_state = 1;
+    ChangeOperation operation = 2;
+    google.protobuf.Timestamp date = 3;
+    string server_transaction_id = 4;
+    string who = 5;
+    CaseID case_id = 6;
+    google.protobuf.StringValue reason = 7;
 }
 
 message BalanceReply {

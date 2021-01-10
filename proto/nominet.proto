@@ -1,0 +1,78 @@
+syntax = "proto3";
+package epp.nominet;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+import "domain.proto";
+import "contact.proto";
+
+message NominetTagListReply {
+    message Tag {
+        string tag = 1;
+        string name = 2;
+        google.protobuf.StringValue trading_name = 3;
+        bool handshake = 4;
+    }
+
+    repeated Tag tags = 1;
+}
+
+message DomainCancelData {
+    string name = 1;
+    string originator = 2;
+}
+
+message DomainReleaseData {
+    string account_id = 1;
+    bool account_moved = 2;
+    string from = 3;
+    string registrar_tag = 4;
+    repeated string domains = 5;
+}
+
+message DomainRegistrarChangeData {
+    string originator = 1;
+    string registrar_tag = 2;
+    string case_id = 3;
+    repeated domain.DomainInfoReply domains = 4;
+    contact.ContactInfoReply contact = 5;
+}
+
+message HostCancelData {
+    repeated string host_objects = 1;
+    repeated string domain_names = 2;
+}
+
+message ProcessData {
+    enum ProcessStage {
+        Initial = 0;
+        Updated = 1;
+    }
+
+    ProcessStage stage = 1;
+    contact.ContactInfoReply contact = 2;
+    string process_type = 3;
+    google.protobuf.Timestamp suspend_date = 4;
+    google.protobuf.Timestamp cancel_date = 5;
+    repeated string domain_names = 6;
+}
+
+message SuspendData {
+    string reason = 1;
+    google.protobuf.Timestamp cancel_date = 2;
+    repeated string domain_names = 3;
+}
+
+message DomainFailData {
+    string domain = 1;
+    string reason = 2;
+}
+
+message RegistrantTransferData {
+    string originator = 1;
+    string account_id = 2;
+    string old_account_id = 3;
+    google.protobuf.StringValue case_id = 4;
+    repeated string domain_names = 5;
+    contact.ContactInfoReply contact = 6;
+}

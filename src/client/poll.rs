@@ -4,8 +4,8 @@ use std::convert::TryInto;
 
 use chrono::prelude::*;
 
+use super::{EPPClientServerFeatures, Error, proto, Request, Response, Sender};
 use super::router::HandleReqReturn;
-use super::{proto, EPPClientServerFeatures, Error, Request, Response, Sender};
 
 #[derive(Debug)]
 pub struct PollRequest {
@@ -36,18 +36,54 @@ pub enum PollData {
         data: Box<super::contact::InfoResponse>,
         change_data: Option<ChangeData>,
     },
-    DomainTransferData(super::domain::TransferData),
-    DomainCreateData(super::domain::CreateData),
-    DomainPanData(super::domain::PanData),
-    DomainRenewData(super::domain::RenewData),
-    NominetDomainCancelData(super::nominet::CancelData),
-    NominetDomainReleaseData(super::nominet::ReleaseData),
-    NominetDomainRegistrarChangeData(super::nominet::RegistrarChangeData),
-    NominetHostCancelData(super::nominet::HostCancelData),
-    NominetProcessData(super::nominet::ProcessData),
-    NominetSuspendData(super::nominet::SuspendData),
-    NominetDomainFailData(super::nominet::DomainFailData),
-    NominetRegistrantTransferData(super::nominet::RegistrantTransferData),
+    DomainTransferData {
+        data: super::domain::TransferData,
+        change_data: Option<ChangeData>,
+    },
+    DomainCreateData {
+        data: super::domain::CreateData,
+        change_data: Option<ChangeData>,
+    },
+    DomainPanData {
+        data: super::domain::PanData,
+        change_data: Option<ChangeData>,
+    },
+    DomainRenewData {
+        data: super::domain::RenewData,
+        change_data: Option<ChangeData>,
+    },
+    NominetDomainCancelData {
+        data: super::nominet::CancelData,
+        change_data: Option<ChangeData>,
+    },
+    NominetDomainReleaseData {
+        data: super::nominet::ReleaseData,
+        change_data: Option<ChangeData>,
+    },
+    NominetDomainRegistrarChangeData {
+        data: super::nominet::RegistrarChangeData,
+        change_data: Option<ChangeData>,
+    },
+    NominetHostCancelData {
+        data: super::nominet::HostCancelData,
+        change_data: Option<ChangeData>,
+    },
+    NominetProcessData {
+        data: super::nominet::ProcessData,
+        change_data: Option<ChangeData>,
+    },
+    NominetSuspendData {
+        data: super::nominet::SuspendData,
+        change_data: Option<ChangeData>,
+    },
+    NominetDomainFailData {
+        data: super::nominet::DomainFailData,
+        change_data: Option<ChangeData>,
+    },
+    NominetRegistrantTransferData {
+        data: super::nominet::RegistrantTransferData,
+        change_data: Option<ChangeData>,
+    },
     VerisignLowBalanceData(super::verisign::LowBalanceData),
     None,
 }
@@ -224,40 +260,76 @@ pub fn handle_poll_response(response: proto::EPPResponse) -> Response<Option<Pol
                                 }
                             }
                             proto::EPPResultDataValue::EPPDomainTransferResult(domain_transfer) => {
-                                PollData::DomainTransferData((&domain_transfer).into())
+                                PollData::DomainTransferData {
+                                    data: (&domain_transfer).into(),
+                                    change_data: change_data_from_response(&response.extension)?,
+                                }
                             }
                             proto::EPPResultDataValue::EPPDomainCreateResult(domain_create) => {
-                                PollData::DomainCreateData((&domain_create).into())
+                                PollData::DomainCreateData {
+                                    data: (&domain_create).into(),
+                                    change_data: change_data_from_response(&response.extension)?,
+                                }
                             }
                             proto::EPPResultDataValue::EPPDomainRenewResult(domain_renew) => {
-                                PollData::DomainRenewData((&domain_renew).into())
+                                PollData::DomainRenewData {
+                                    data: (&domain_renew).into(),
+                                    change_data: change_data_from_response(&response.extension)?,
+                                }
                             }
                             proto::EPPResultDataValue::EPPDomainPendingActionNotification(
                                 domain_data,
-                            ) => PollData::DomainPanData((&domain_data).into()),
+                            ) => PollData::DomainPanData {
+                                data: (&domain_data).into(),
+                                change_data: change_data_from_response(&response.extension)?,
+                            },
                             proto::EPPResultDataValue::NominetCancelData(canc_data) => {
-                                PollData::NominetDomainCancelData(canc_data.into())
+                                PollData::NominetDomainCancelData{
+                                    data: canc_data.into(),
+                                    change_data: change_data_from_response(&response.extension)?,
+                                }
                             }
                             proto::EPPResultDataValue::NominetReleaseData(rel_data) => {
-                                PollData::NominetDomainReleaseData(rel_data.into())
+                                PollData::NominetDomainReleaseData{
+                                    data: rel_data.into(),
+                                    change_data: change_data_from_response(&response.extension)?,
+                                }
                             }
                             proto::EPPResultDataValue::NominetRegistrarChangeData(rc_data) => {
-                                PollData::NominetDomainRegistrarChangeData(rc_data.try_into()?)
+                                PollData::NominetDomainRegistrarChangeData{
+                                    data: rc_data.try_into()?,
+                                    change_data: change_data_from_response(&response.extension)?,
+                                }
                             }
                             proto::EPPResultDataValue::NominetHostCancelData(canc_data) => {
-                                PollData::NominetHostCancelData(canc_data.into())
+                                PollData::NominetHostCancelData{
+                                    data: canc_data.into(),
+                                    change_data: change_data_from_response(&response.extension)?,
+                                }
                             }
                             proto::EPPResultDataValue::NominetProcessData(p_data) => {
-                                PollData::NominetProcessData(p_data.try_into()?)
+                                PollData::NominetProcessData{
+                                    data: p_data.try_into()?,
+                                    change_data: change_data_from_response(&response.extension)?,
+                                }
                             }
                             proto::EPPResultDataValue::NominetSuspendData(sus_data) => {
-                                PollData::NominetSuspendData(sus_data.into())
+                                PollData::NominetSuspendData{
+                                    data: sus_data.into(),
+                                    change_data: change_data_from_response(&response.extension)?,
+                                }
                             }
                             proto::EPPResultDataValue::NominetDomainFailData(fail_data) => {
-                                PollData::NominetDomainFailData(fail_data.into())
+                                PollData::NominetDomainFailData{
+                                    data: fail_data.into(),
+                                    change_data: change_data_from_response(&response.extension)?,
+                                }
                             }
                             proto::EPPResultDataValue::NominetTransferData(trn_data) => {
-                                PollData::NominetRegistrantTransferData(trn_data.try_into()?)
+                                PollData::NominetRegistrantTransferData{
+                                    data: trn_data.try_into()?,
+                                    change_data: change_data_from_response(&response.extension)?,
+                                }
                             }
                             proto::EPPResultDataValue::VerisignLowBalanceData(bal_data) => {
                                 PollData::VerisignLowBalanceData(bal_data.try_into()?)
@@ -316,7 +388,7 @@ pub async fn poll(
         })),
         receiver,
     )
-    .await
+        .await
 }
 
 /// Acknowledges and dequeues a message previously retrieved via poll
@@ -337,7 +409,7 @@ pub async fn poll_ack(
         })),
         receiver,
     )
-    .await
+        .await
 }
 
 #[cfg(test)]
@@ -379,7 +451,10 @@ mod poll_tests {
         let data = super::handle_poll_response(*res).unwrap().unwrap();
         assert_eq!(data.message, "Domain transfer completed successfully");
         match data.data {
-            super::PollData::DomainTransferData(_) => {}
+            super::PollData::DomainTransferData {
+                data: _,
+                change_data: None
+            } => {}
             _ => unreachable!(),
         }
     }
@@ -679,7 +754,10 @@ mod poll_tests {
         let data = super::handle_poll_response(*res).unwrap().unwrap();
         assert_eq!(data.message, "Domain name Cancellation Notification");
         match data.data {
-            super::PollData::NominetDomainCancelData(canc_data) => {
+            super::PollData::NominetDomainCancelData{
+                data: canc_data,
+                change_data: None
+            } => {
                 assert_eq!(canc_data.domain_name, "epp-example1.co.uk");
                 assert_eq!(canc_data.originator, "example@nominet");
             }
@@ -729,12 +807,15 @@ mod poll_tests {
         let data = super::handle_poll_response(*res).unwrap().unwrap();
         assert_eq!(data.message, "Domains Released Notification");
         match data.data {
-            super::PollData::NominetDomainReleaseData(canc_data) => {
-                assert_eq!(canc_data.account_id, "12345");
-                assert_eq!(canc_data.account_moved, true);
-                assert_eq!(canc_data.from, "EXAMPLE1-TAG");
-                assert_eq!(canc_data.registrar_tag, "EXAMPLE2-TAG");
-                assert_eq!(canc_data.domains.len(), 6);
+            super::PollData::NominetDomainReleaseData{
+                data: reslease_data,
+                change_data: None
+            } => {
+                assert_eq!(reslease_data.account_id, "12345");
+                assert_eq!(reslease_data.account_moved, true);
+                assert_eq!(reslease_data.from, "EXAMPLE1-TAG");
+                assert_eq!(reslease_data.registrar_tag, "EXAMPLE2-TAG");
+                assert_eq!(reslease_data.domains.len(), 6);
             }
             _ => unreachable!(),
         }
@@ -816,7 +897,10 @@ mod poll_tests {
         let data = super::handle_poll_response(*res).unwrap().unwrap();
         assert_eq!(data.message, "Registrar Change Authorisation Request");
         match data.data {
-            super::PollData::NominetDomainRegistrarChangeData(rc_data) => {
+            super::PollData::NominetDomainRegistrarChangeData{
+                data: rc_data,
+                change_data: None
+            } => {
                 assert_eq!(rc_data.originator, "p@epp-example.org.uk");
                 assert_eq!(rc_data.registrar_tag, "EXAMPLE");
                 assert_eq!(rc_data.case_id, "3560");
@@ -868,7 +952,10 @@ mod poll_tests {
         let data = super::handle_poll_response(*res).unwrap().unwrap();
         assert_eq!(data.message, "Host cancellation notification");
         match data.data {
-            super::PollData::NominetHostCancelData(hc_data) => {
+            super::PollData::NominetHostCancelData{
+                data: hc_data,
+                change_data: None
+            } => {
                 assert_eq!(hc_data.host_objects.len(), 2);
                 assert_eq!(hc_data.domain_names.len(), 2);
             }
@@ -939,7 +1026,10 @@ mod poll_tests {
             "Data Quality - {{Workflow type}} process commenced notification"
         );
         match data.data {
-            super::PollData::NominetProcessData(p_data) => {
+            super::PollData::NominetProcessData{
+                data: p_data,
+                change_data: None
+            } => {
                 assert_eq!(p_data.contact.id, "E2CD4B4D83DB0857");
                 assert_eq!(p_data.process_type, "{{Workflow type}}");
                 assert_eq!(p_data.domain_names.len(), 2);
@@ -1007,7 +1097,10 @@ mod poll_tests {
         let data = super::handle_poll_response(*res).unwrap().unwrap();
         assert_eq!(data.message, "DQ Workflow process lifted notification");
         match data.data {
-            super::PollData::NominetProcessData(p_data) => {
+            super::PollData::NominetProcessData{
+                data: p_data,
+                change_data: None
+            } => {
                 assert_eq!(p_data.contact.id, "E2CD4B4D83DB0857");
                 assert_eq!(p_data.process_type, "DQ Workflow");
                 assert_eq!(p_data.domain_names.len(), 2);
@@ -1053,7 +1146,10 @@ mod poll_tests {
         let data = super::handle_poll_response(*res).unwrap().unwrap();
         assert_eq!(data.message, "Domains Suspended Notification");
         match data.data {
-            super::PollData::NominetSuspendData(sus_data) => {
+            super::PollData::NominetSuspendData {
+                data: sus_data,
+                change_data: None
+            } => {
                 assert_eq!(sus_data.reason, "Data Quality");
                 assert_eq!(sus_data.domain_names.len(), 2);
             }
@@ -1095,7 +1191,10 @@ mod poll_tests {
         let data = super::handle_poll_response(*res).unwrap().unwrap();
         assert_eq!(data.message, "Referral Accepted Notification");
         match data.data {
-            super::PollData::DomainCreateData(create_data) => {
+            super::PollData::DomainCreateData {
+                data: create_data,
+                change_data: None
+            } => {
                 assert_eq!(create_data.name, "epp-example1.ltd.uk");
             }
             _ => unreachable!(),
@@ -1135,7 +1234,10 @@ mod poll_tests {
         let data = super::handle_poll_response(*res).unwrap().unwrap();
         assert_eq!(data.message, "Referral Rejected Notification");
         match data.data {
-            super::PollData::NominetDomainFailData(fail_data) => {
+            super::PollData::NominetDomainFailData {
+                data: fail_data,
+                change_data: None
+            } => {
                 assert_eq!(fail_data.domain_name, "epp-example2.ltd.uk");
                 assert_eq!(
                     fail_data.reason,
@@ -1205,7 +1307,10 @@ mod poll_tests {
         let data = super::handle_poll_response(*res).unwrap().unwrap();
         assert_eq!(data.message, "Registrant Transfer Notification");
         match data.data {
-            super::PollData::NominetRegistrantTransferData(trn_data) => {
+            super::PollData::NominetRegistrantTransferData {
+                data: trn_data,
+                change_data: None
+            } => {
                 assert_eq!(trn_data.originator, "p@automaton-example.org.uk");
                 assert_eq!(trn_data.account_id, "58658458");
                 assert_eq!(trn_data.old_account_id, "596859");
@@ -1250,7 +1355,10 @@ mod poll_tests {
         let data = super::handle_poll_response(*res).unwrap().unwrap();
         assert_eq!(data.message, "");
         match data.data {
-            super::PollData::DomainTransferData(trn_data) => {
+            super::PollData::DomainTransferData {
+                data: trn_data,
+                change_data: None
+            } => {
                 assert_eq!(trn_data.name, "example.uk.com");
                 assert_eq!(
                     trn_data.status,
@@ -1297,7 +1405,10 @@ mod poll_tests {
         let data = super::handle_poll_response(*res).unwrap().unwrap();
         assert_eq!(data.message, "");
         match data.data {
-            super::PollData::DomainTransferData(trn_data) => {
+            super::PollData::DomainTransferData {
+                data: trn_data,
+                change_data: None
+            } => {
                 assert_eq!(trn_data.name, "example.uk.com");
                 assert_eq!(trn_data.status, super::super::TransferStatus::Pending);
                 assert_eq!(trn_data.requested_client_id, "H12345");
@@ -1389,7 +1500,10 @@ mod poll_tests {
         let data = super::handle_poll_response(*res).unwrap().unwrap();
         assert_eq!(data.message, "DOMAIN_RENEWAL_SUCCESSFUL");
         match data.data {
-            super::PollData::DomainRenewData(ren_data) => {
+            super::PollData::DomainRenewData {
+                data: ren_data,
+                change_data: None
+            } => {
                 assert_eq!(ren_data.name, "siatki.eu");
             }
             _ => unreachable!(),
@@ -1433,7 +1547,10 @@ mod poll_tests {
         let data = super::handle_poll_response(*res).unwrap().unwrap();
         assert_eq!(data.message, "DOMAIN_RESTORE_FAILED");
         match data.data {
-            super::PollData::DomainPanData(pan_data) => {
+            super::PollData::DomainPanData {
+                data: pan_data,
+                change_data: None
+            } => {
                 assert_eq!(pan_data.name, "example.com");
                 assert_eq!(pan_data.result, false);
                 assert_eq!(pan_data.server_transaction_id.unwrap(), "33a2eb76-4295-43f1-a1f6-c757e8d1be41");

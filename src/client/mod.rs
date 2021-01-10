@@ -155,6 +155,8 @@ pub struct EPPClient {
     new_password: Option<String>,
     client_cert: Option<String>,
     root_certs: Vec<String>,
+    danger_accept_invalid_certs: bool,
+    danger_accept_invalid_hostname: bool,
     server_id: String,
     pipelining: bool,
     is_awaiting_response: bool,
@@ -199,6 +201,8 @@ pub struct EPPClientServerFeatures {
     /// http://www.verisign.com/epp/balance-1.0 support
     verisign_balance: bool,
     /// http://www.verisign.com/epp/lowbalance-poll-1.0 support
+    unitedtld_balance: bool,
+    /// http://www.verisign.com/epp/lowbalance-poll-1.0 support
     verisign_low_balance: bool,
     /// urn:ietf:params:xml:ns:nsset-1.2 support (NOT AN ACTUAL IETF NAMESPACE)
     nsset_supported: bool,
@@ -236,6 +240,10 @@ pub struct ClientConf<'a, C> {
     pub client_cert: C,
     /// List of PEM file paths
     pub root_certs: &'a[&'a str],
+    /// Accept invalid TLS certs
+    pub danger_accept_invalid_certs: bool,
+    /// Accept TLS certs with a hostname that doesn't match the DNS label
+    pub danger_accept_invalid_hostname: bool,
     /// New password to set after login
     pub new_password: C,
     /// Does the server support multiple commands in flight at once
@@ -257,6 +265,8 @@ impl EPPClient {
             password: conf.password.to_string(),
             client_cert: conf.client_cert.into().map(|c| c.to_string()),
             root_certs: conf.root_certs.into_iter().map(|c| c.to_string()).collect(),
+            danger_accept_invalid_certs: conf.danger_accept_invalid_certs,
+            danger_accept_invalid_hostname: conf.danger_accept_invalid_hostname,
             new_password: conf.new_password.into().map(|c| c.to_string()),
             pipelining: conf.pipelining,
             features: EPPClientServerFeatures {
@@ -695,6 +705,9 @@ impl EPPClient {
         self.features.verisign_balance = greeting
             .service_menu
             .supports("http://www.verisign.com/epp/balance-1.0");
+        self.features.unitedtld_balance = greeting
+            .service_menu
+            .supports("http://www.verisign.com/epp/lowbalance-poll-1.0");
         self.features.verisign_low_balance = greeting
             .service_menu
             .supports_ext("http://www.verisign.com/epp/lowbalance-poll-1.0");
@@ -771,6 +784,9 @@ impl EPPClient {
             }
             if self.features.verisign_balance {
                 objects.push("http://www.verisign.com/epp/balance-1.0".to_string())
+            }
+            if self.features.unitedtld_balance {
+                objects.push("http://www.verisign.com/epp/lowbalance-poll-1.0".to_string())
             }
             if self.features.verisign_low_balance {
                 ext_objects.push("http://www.verisign.com/epp/lowbalance-poll-1.0".to_string())
@@ -1012,6 +1028,8 @@ impl EPPClient {
             }
         };
         let mut cx = TlsConnector::builder();
+        cx.danger_accept_invalid_certs(self.danger_accept_invalid_certs);
+        cx.danger_accept_invalid_hostnames(self.danger_accept_invalid_hostname);
         for root_cert_path in &self.root_certs {
             let root_cert_bytes = match std::fs::read(root_cert_path) {
                 Ok(p) => p,
@@ -1027,6 +1045,7 @@ impl EPPClient {
                     return Err(());
                 }
             };
+            cx.disable_built_in_roots(true);
             cx.add_root_certificate(root_cert);
         }
         if let Some(client_cert) = &self.client_cert {

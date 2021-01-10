@@ -22,6 +22,7 @@
 //! * `traficom`
 //! * `verisign-tv`
 //! * `verisign-cc`
+//! * `rrpproxy`
 //!
 //! Example config file:
 //! ```text
@@ -70,6 +71,10 @@ struct ConfigFile {
     client_cert: Option<String>,
     /// Root certificates to trust on this connection
     root_certs: Option<Vec<String>>,
+    /// Accept invalid TLS certs
+    danger_accept_invalid_certs: Option<bool>,
+    /// Accept TLS certs with a hostname that doesn't match the DNS label
+    danger_accept_invalid_hostnames: Option<bool>,
     /// Does the server support pipelining?
     pipelining: bool,
     /// For naughty servers
@@ -101,6 +106,8 @@ impl Router {
                 Some(r) => r.iter().map(|c| c.as_str()).collect::<Vec<_>>(),
                 None => vec![]
             },
+            danger_accept_invalid_certs: config.danger_accept_invalid_certs.unwrap_or(false),
+            danger_accept_invalid_hostname: config.danger_accept_invalid_hostnames.unwrap_or(false),
             new_password: config.new_password.as_deref(),
             pipelining: config.pipelining,
             errata: config.errata.clone(),

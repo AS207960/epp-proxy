@@ -140,6 +140,7 @@ message DomainRenewRequest {
 }
 
 message DomainRenewReply {
+    string name = 6;
     bool pending = 1;
     string transaction_id = 5;
     google.protobuf.Timestamp expiry_date = 2;
@@ -219,4 +220,12 @@ message UpdateSecDNSData {
         SecDNSDSData remove_ds_data = 6;
         SecDNSKeyData remove_key_data = 7;
     }
+}
+
+message DomainPANReply {
+    string name = 1;
+    bool result = 2;
+    google.protobuf.StringValue server_transaction_id = 3;
+    google.protobuf.StringValue client_transaction_id = 4;
+    google.protobuf.Timestamp date = 5;
 }

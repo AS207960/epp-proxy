@@ -20,6 +20,9 @@ pub mod epp_proto {
     pub mod rgp {
         tonic::include_proto!("epp.rgp");
     }
+    pub mod nominet {
+        tonic::include_proto!("epp.nominet");
+    }
     pub mod fee {
         tonic::include_proto!("epp.fee");
     }
@@ -481,57 +484,9 @@ impl From<client::fee::Credit> for epp_proto::fee::Credit {
     }
 }
 
-fn client_by_domain(
-    router: &super::Router,
-    domain: &str,
-) -> Result<(client::RequestSender, String), tonic::Status> {
-    match router.client_by_domain(domain) {
-        Some(c) => Ok(c),
-        None => Err(tonic::Status::invalid_argument("unsupported domain")),
-    }
-}
-
-fn client_by_id(router: &super::Router, id: &str) -> Result<client::RequestSender, tonic::Status> {
-    match router.client_by_id(id) {
-        Some(c) => Ok(c),
-        None => Err(tonic::Status::not_found("unknown registry")),
-    }
-}
-
-#[tonic::async_trait]
-impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
-    async fn domain_check(
-        &self,
-        request: tonic::Request<epp_proto::domain::DomainCheckRequest>,
-    ) -> Result<tonic::Response<epp_proto::domain::DomainCheckReply>, tonic::Status> {
-        let res = request.into_inner();
-        let (mut sender, registry_name) = client_by_domain(&self.client_router, &res.name)?;
-        let res = client::domain::check(
-            &res.name,
-            res.fee_check.map(Into::into),
-            &mut sender
-        ).await?;
-
-        let reply = epp_proto::domain::DomainCheckReply {
-            available: res.avail,
-            reason: res.reason,
-            fee_check: res.fee_check.map(Into::into),
-            registry_name,
-        };
-
-        Ok(tonic::Response::new(reply))
-    }
-
-    async fn domain_info(
-        &self,
-        request: tonic::Request<epp_proto::domain::DomainInfoRequest>,
-    ) -> Result<tonic::Response<epp_proto::domain::DomainInfoReply>, tonic::Status> {
-        let req = request.into_inner();
-        let (mut sender, registry_name) = client_by_domain(&self.client_router, &req.name)?;
-        let res = client::domain::info(
-            &req.name, req.auth_info.as_deref(), &mut sender).await?;
-
-        let reply = epp_proto::domain::DomainInfoReply {
+impl From<client::domain::InfoResponse> for epp_proto::domain::DomainInfoReply {
+    fn from(res: client::domain::InfoResponse) -> Self {
+        epp_proto::domain::DomainInfoReply {
             name: res.name,
             registry_id: res.registry_id,
             statuses: res
@@ -635,7 +590,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
             last_updated_client: res.last_updated_client,
             last_updated_date: chrono_to_proto(res.last_updated_date),
             last_transfer_date: chrono_to_proto(res.last_transfer_date),
-            registry_name,
+            registry_name: String::new(),
             rgp_state: res.rgp_state.into_iter().map(i32_from_restore_status).collect(),
             auth_info: res.auth_info,
             sec_dns: res.sec_dns.map(|sec_dns| epp_proto::domain::SecDnsData {
@@ -681,7 +636,492 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                     }
                 }),
             }),
+        }
+    }
+}
+
+impl From<client::domain::CreateResponse> for epp_proto::domain::DomainCreateReply {
+    fn from(res: client::domain::CreateResponse) -> Self {
+        epp_proto::domain::DomainCreateReply {
+            name: res.data.name,
+            pending: res.pending,
+            transaction_id: res.transaction_id,
+            creation_date: chrono_to_proto(res.data.creation_date),
+            expiry_date: chrono_to_proto(res.data.expiration_date),
+            fee_data: res.fee_data.map(Into::into),
+            registry_name: String::new(),
+        }
+    }
+}
+impl From<client::domain::CreateData> for epp_proto::domain::DomainCreateReply {
+    fn from(res: client::domain::CreateData) -> Self {
+        epp_proto::domain::DomainCreateReply {
+            name: res.name,
+            pending: false,
+            transaction_id: String::new(),
+            creation_date: chrono_to_proto(res.creation_date),
+            expiry_date: chrono_to_proto(res.expiration_date),
+            fee_data: None,
+            registry_name: String::new(),
+        }
+    }
+}
+
+impl From<client::domain::RenewResponse> for epp_proto::domain::DomainRenewReply {
+    fn from(res: client::domain::RenewResponse) -> Self {
+        epp_proto::domain::DomainRenewReply {
+            name: res.data.name,
+            pending: res.pending,
+            transaction_id: res.transaction_id,
+            expiry_date: chrono_to_proto(res.data.new_expiry_date),
+            fee_data: res.fee_data.map(Into::into),
+            registry_name: String::new(),
+        }
+    }
+}
+
+impl From<client::domain::RenewData> for epp_proto::domain::DomainRenewReply {
+    fn from(res: client::domain::RenewData) -> Self {
+        epp_proto::domain::DomainRenewReply {
+            name: res.name,
+            pending: false,
+            transaction_id: String::new(),
+            expiry_date: chrono_to_proto(res.new_expiry_date),
+            fee_data: None,
+            registry_name: String::new(),
+        }
+    }
+}
+
+impl From<client::domain::TransferResponse> for epp_proto::domain::DomainTransferReply {
+    fn from(res: client::domain::TransferResponse) -> Self {
+        epp_proto::domain::DomainTransferReply {
+            pending: res.pending,
+            transaction_id: res.transaction_id,
+            status: i32_from_transfer_status(res.data.status),
+            requested_client_id: res.data.requested_client_id,
+            requested_date: chrono_to_proto(Some(res.data.requested_date)),
+            act_client_id: res.data.act_client_id,
+            act_date: chrono_to_proto(Some(res.data.act_date)),
+            expiry_date: chrono_to_proto(res.data.expiry_date),
+            fee_data: res.fee_data.map(Into::into),
+            registry_name: String::new(),
+        }
+    }
+}
+
+impl From<client::domain::TransferData> for epp_proto::domain::DomainTransferReply {
+    fn from(res: client::domain::TransferData) -> Self {
+        epp_proto::domain::DomainTransferReply {
+            pending: false,
+            transaction_id: String::new(),
+            status: i32_from_transfer_status(res.status),
+            requested_client_id: res.requested_client_id,
+            requested_date: chrono_to_proto(Some(res.requested_date)),
+            act_client_id: res.act_client_id,
+            act_date: chrono_to_proto(Some(res.act_date)),
+            expiry_date: chrono_to_proto(res.expiry_date),
+            fee_data: None,
+            registry_name: String::new(),
+        }
+    }
+}
+
+impl From<client::domain::PanData> for epp_proto::domain::DomainPanReply {
+    fn from(res: client::domain::PanData) -> Self {
+        epp_proto::domain::DomainPanReply {
+            name: res.name,
+            result: res.result,
+            server_transaction_id: res.server_transaction_id,
+            client_transaction_id: res.client_transaction_id,
+            date: chrono_to_proto(Some(res.date))
+        }
+    }
+}
+
+impl From<client::contact::InfoResponse> for epp_proto::contact::ContactInfoReply {
+    fn from(res: client::contact::InfoResponse) -> Self {
+        let map_addr = |a: client::contact::Address| epp_proto::contact::PostalAddress {
+            name: a.name,
+            organisation: a.organisation,
+            streets: a.streets,
+            city: a.city,
+            province: a.province,
+            postal_code: a.postal_code,
+            country_code: a.country_code,
+            identity_number: a.identity_number,
+            birth_date: chrono_to_proto(a.birth_date.map(|d| d.and_hms(0, 0, 0))),
         };
+
+        epp_proto::contact::ContactInfoReply {
+            id: res.id,
+            registry_id: res.registry_id,
+            statuses: res
+                .statuses
+                .into_iter()
+                .map(|s| match s {
+                    client::contact::Status::ClientDeleteProhibited => {
+                        epp_proto::contact::ContactStatus::ClientDeleteProhibited.into()
+                    }
+                    client::contact::Status::ClientTransferProhibited => {
+                        epp_proto::contact::ContactStatus::ClientTransferProhibited.into()
+                    }
+                    client::contact::Status::ClientUpdateProhibited => {
+                        epp_proto::contact::ContactStatus::ClientUpdateProhibited.into()
+                    }
+                    client::contact::Status::Linked => {
+                        epp_proto::contact::ContactStatus::Linked.into()
+                    }
+                    client::contact::Status::Ok => epp_proto::contact::ContactStatus::Ok.into(),
+                    client::contact::Status::PendingCreate => {
+                        epp_proto::contact::ContactStatus::PendingCreate.into()
+                    }
+                    client::contact::Status::PendingDelete => {
+                        epp_proto::contact::ContactStatus::PendingDelete.into()
+                    }
+                    client::contact::Status::PendingTransfer => {
+                        epp_proto::contact::ContactStatus::PendingTransfer.into()
+                    }
+                    client::contact::Status::PendingUpdate => {
+                        epp_proto::contact::ContactStatus::PendingUpdate.into()
+                    }
+                    client::contact::Status::ServerDeleteProhibited => {
+                        epp_proto::contact::ContactStatus::ServerDeleteProhibited.into()
+                    }
+                    client::contact::Status::ServerTransferProhibited => {
+                        epp_proto::contact::ContactStatus::ServerTransferProhibited.into()
+                    }
+                    client::contact::Status::ServerUpdateProhibited => {
+                        epp_proto::contact::ContactStatus::ServerUpdateProhibited.into()
+                    }
+                })
+                .collect(),
+            local_address: res.local_address.map(map_addr),
+            internationalised_address: res.internationalised_address.map(map_addr),
+            phone: res.phone.map(|p| p.into()),
+            fax: res.fax.map(|p| p.into()),
+            email: res.email,
+            client_id: res.client_id,
+            client_created_id: res.client_created_id,
+            creation_date: chrono_to_proto(res.creation_date),
+            last_updated_client: res.last_updated_client,
+            last_updated_date: chrono_to_proto(res.last_updated_date),
+            last_transfer_date: chrono_to_proto(res.last_transfer_date),
+            entity_type: match res.entity_type {
+                client::contact::EntityType::UkLimitedCompany => {
+                    epp_proto::contact::EntityType::UkLimitedCompany.into()
+                }
+                client::contact::EntityType::UkPublicLimitedCompany => {
+                    epp_proto::contact::EntityType::UkLimitedCompany.into()
+                }
+                client::contact::EntityType::UkPartnership => {
+                    epp_proto::contact::EntityType::UkPartnership.into()
+                }
+                client::contact::EntityType::UkSoleTrader => {
+                    epp_proto::contact::EntityType::UkSoleTrader.into()
+                }
+                client::contact::EntityType::UkLimitedLiabilityPartnership => {
+                    epp_proto::contact::EntityType::UkLimitedLiabilityPartnership.into()
+                }
+                client::contact::EntityType::UkIndustrialProvidentRegisteredCompany => {
+                    epp_proto::contact::EntityType::UkIndustrialProvidentRegisteredCompany.into()
+                }
+                client::contact::EntityType::UkIndividual => {
+                    epp_proto::contact::EntityType::UkIndividual.into()
+                }
+                client::contact::EntityType::UkSchool => {
+                    epp_proto::contact::EntityType::UkSchool.into()
+                }
+                client::contact::EntityType::UkRegisteredCharity => {
+                    epp_proto::contact::EntityType::UkRegisteredCharity.into()
+                }
+                client::contact::EntityType::UkGovernmentBody => {
+                    epp_proto::contact::EntityType::UkGovernmentBody.into()
+                }
+                client::contact::EntityType::UkCorporationByRoyalCharter => {
+                    epp_proto::contact::EntityType::UkCorporationByRoyalCharter.into()
+                }
+                client::contact::EntityType::UkStatutoryBody => {
+                    epp_proto::contact::EntityType::UkStatutoryBody.into()
+                }
+                client::contact::EntityType::UkPoliticalParty => {
+                    epp_proto::contact::EntityType::UkPoliticalParty.into()
+                }
+                client::contact::EntityType::OtherUkEntity => {
+                    epp_proto::contact::EntityType::OtherUkEntity.into()
+                }
+                client::contact::EntityType::FinnishIndividual => {
+                    epp_proto::contact::EntityType::FinnishIndividual.into()
+                }
+                client::contact::EntityType::FinnishCompany => {
+                    epp_proto::contact::EntityType::FinnishCompany.into()
+                }
+                client::contact::EntityType::FinnishAssociation => {
+                    epp_proto::contact::EntityType::FinnishAssociation.into()
+                }
+                client::contact::EntityType::FinnishInstitution => {
+                    epp_proto::contact::EntityType::FinnishInstitution.into()
+                }
+                client::contact::EntityType::FinnishPoliticalParty => {
+                    epp_proto::contact::EntityType::FinnishPoliticalParty.into()
+                }
+                client::contact::EntityType::FinnishMunicipality => {
+                    epp_proto::contact::EntityType::FinnishMunicipality.into()
+                }
+                client::contact::EntityType::FinnishGovernment => {
+                    epp_proto::contact::EntityType::FinnishGovernment.into()
+                }
+                client::contact::EntityType::FinnishPublicCommunity => {
+                    epp_proto::contact::EntityType::FinnishPublicCommunity.into()
+                }
+                client::contact::EntityType::OtherIndividual => {
+                    epp_proto::contact::EntityType::OtherIndividual.into()
+                }
+                client::contact::EntityType::OtherCompany => {
+                    epp_proto::contact::EntityType::OtherCompany.into()
+                }
+                client::contact::EntityType::OtherAssociation => {
+                    epp_proto::contact::EntityType::OtherAssociation.into()
+                }
+                client::contact::EntityType::OtherInstitution => {
+                    epp_proto::contact::EntityType::OtherInstitution.into()
+                }
+                client::contact::EntityType::OtherPoliticalParty => {
+                    epp_proto::contact::EntityType::OtherPoliticalParty.into()
+                }
+                client::contact::EntityType::OtherMunicipality => {
+                    epp_proto::contact::EntityType::OtherMunicipality.into()
+                }
+                client::contact::EntityType::OtherGovernment => {
+                    epp_proto::contact::EntityType::OtherGovernment.into()
+                }
+                client::contact::EntityType::OtherPublicCommunity => {
+                    epp_proto::contact::EntityType::OtherPublicCommunity.into()
+                }
+                client::contact::EntityType::Unknown => {
+                    epp_proto::contact::EntityType::UnknownEntity.into()
+                }
+            },
+            trading_name: res.trading_name,
+            company_number: res.company_number,
+            disclosure: res
+                .disclosure
+                .into_iter()
+                .map(|d| match d {
+                    client::contact::DisclosureType::LocalName => {
+                        epp_proto::contact::DisclosureType::LocalName.into()
+                    }
+                    client::contact::DisclosureType::InternationalisedName => {
+                        epp_proto::contact::DisclosureType::InternationalisedName.into()
+                    }
+                    client::contact::DisclosureType::LocalOrganisation => {
+                        epp_proto::contact::DisclosureType::LocalOrganisation.into()
+                    }
+                    client::contact::DisclosureType::InternationalisedOrganisation => {
+                        epp_proto::contact::DisclosureType::InternationalisedOrganisation.into()
+                    }
+                    client::contact::DisclosureType::LocalAddress => {
+                        epp_proto::contact::DisclosureType::LocalAddress.into()
+                    }
+                    client::contact::DisclosureType::InternationalisedAddress => {
+                        epp_proto::contact::DisclosureType::InternationalisedAddress.into()
+                    }
+                    client::contact::DisclosureType::Voice => {
+                        epp_proto::contact::DisclosureType::Voice.into()
+                    }
+                    client::contact::DisclosureType::Fax => {
+                        epp_proto::contact::DisclosureType::Fax.into()
+                    }
+                    client::contact::DisclosureType::Email => {
+                        epp_proto::contact::DisclosureType::Email.into()
+                    }
+                })
+                .collect(),
+            auth_info: res.auth_info,
+        }
+    }
+}
+
+impl From<client::balance::BalanceResponse> for epp_proto::BalanceReply {
+    fn from(res: client::balance::BalanceResponse) -> Self {
+        epp_proto::BalanceReply {
+            balance: res.balance,
+            currency: res.currency,
+            available_credit: res.available_credit,
+            credit_limit: res.credit_limit,
+            credit_threshold: res.credit_threshold.map(|t| match t {
+                client::balance::CreditThreshold::Fixed(f) => {
+                    epp_proto::balance_reply::CreditThreshold::FixedCreditThreshold(f)
+                }
+                client::balance::CreditThreshold::Percentage(p) => {
+                    epp_proto::balance_reply::CreditThreshold::PercentageCreditThreshold(p.into())
+                }
+            }),
+        }
+    }
+}
+
+impl From<client::verisign::LowBalanceData> for epp_proto::BalanceReply {
+    fn from(res: client::verisign::LowBalanceData) -> Self {
+        epp_proto::BalanceReply {
+            balance: String::new(),
+            currency: String::new(),
+            available_credit: Some(res.available_credit),
+            credit_limit: Some(res.credit_limit),
+            credit_threshold: Some(match res.credit_threshold {
+                client::verisign::CreditThreshold::Fixed(f) => {
+                    epp_proto::balance_reply::CreditThreshold::FixedCreditThreshold(f)
+                }
+                client::verisign::CreditThreshold::Percentage(p) => {
+                    epp_proto::balance_reply::CreditThreshold::PercentageCreditThreshold(p.into())
+                }
+            }),
+        }
+    }
+}
+
+impl From<client::nominet::CancelData> for epp_proto::nominet::DomainCancelData {
+    fn from(res: client::nominet::CancelData) -> Self {
+        epp_proto::nominet::DomainCancelData {
+            name: res.domain_name,
+            originator: res.originator,
+        }
+    }
+}
+
+impl From<client::nominet::ReleaseData> for epp_proto::nominet::DomainReleaseData {
+    fn from(res: client::nominet::ReleaseData) -> Self {
+        epp_proto::nominet::DomainReleaseData {
+            account_id: res.account_id,
+            account_moved: res.account_moved,
+            from: res.from,
+            registrar_tag: res.registrar_tag,
+            domains: res.domains
+        }
+    }
+}
+
+impl From<client::nominet::RegistrarChangeData> for epp_proto::nominet::DomainRegistrarChangeData {
+    fn from(res: client::nominet::RegistrarChangeData) -> Self {
+        epp_proto::nominet::DomainRegistrarChangeData {
+            originator: res.originator,
+            registrar_tag: res.registrar_tag,
+            case_id: res.case_id,
+            domains: res.domains.into_iter().map(Into::into).collect(),
+            contact: Some(res.contact.into()),
+        }
+    }
+}
+
+impl From<client::nominet::HostCancelData> for epp_proto::nominet::HostCancelData {
+    fn from(res: client::nominet::HostCancelData) -> Self {
+        epp_proto::nominet::HostCancelData {
+            host_objects: res.host_objects,
+            domain_names: res.domain_names
+        }
+    }
+}
+
+impl From<client::nominet::ProcessData> for epp_proto::nominet::ProcessData {
+    fn from(res: client::nominet::ProcessData) -> Self {
+        epp_proto::nominet::ProcessData {
+            stage: match res.stage {
+                client::nominet::ProcessStage::Initial => epp_proto::nominet::process_data::ProcessStage::Initial.into(),
+                client::nominet::ProcessStage::Updated => epp_proto::nominet::process_data::ProcessStage::Updated.into(),
+            },
+            contact: Some(res.contact.into()),
+            process_type: res.process_type,
+            suspend_date: chrono_to_proto(res.suspend_date),
+            cancel_date: chrono_to_proto(res.cancel_date),
+            domain_names: res.domain_names
+        }
+    }
+}
+
+impl From<client::nominet::SuspendData> for epp_proto::nominet::SuspendData {
+    fn from(res: client::nominet::SuspendData) -> Self {
+        epp_proto::nominet::SuspendData {
+            reason: res.reason,
+            cancel_date: chrono_to_proto(res.cancel_date),
+            domain_names: res.domain_names
+        }
+    }
+}
+
+impl From<client::nominet::DomainFailData> for epp_proto::nominet::DomainFailData {
+    fn from(res: client::nominet::DomainFailData) -> Self {
+        epp_proto::nominet::DomainFailData {
+            domain: res.domain_name,
+            reason: res.reason,
+        }
+    }
+}
+
+impl From<client::nominet::RegistrantTransferData> for epp_proto::nominet::RegistrantTransferData {
+    fn from(res: client::nominet::RegistrantTransferData) -> Self {
+        epp_proto::nominet::RegistrantTransferData {
+            originator: res.originator,
+            account_id: res.account_id,
+            old_account_id: res.old_account_id,
+            case_id: res.case_id,
+            domain_names: res.domain_names.into_iter().map(Into::into).collect(),
+            contact: Some(res.contact.into()),
+        }
+    }
+}
+
+fn client_by_domain(
+    router: &super::Router,
+    domain: &str,
+) -> Result<(client::RequestSender, String), tonic::Status> {
+    match router.client_by_domain(domain) {
+        Some(c) => Ok(c),
+        None => Err(tonic::Status::invalid_argument("unsupported domain")),
+    }
+}
+
+fn client_by_id(router: &super::Router, id: &str) -> Result<client::RequestSender, tonic::Status> {
+    match router.client_by_id(id) {
+        Some(c) => Ok(c),
+        None => Err(tonic::Status::not_found("unknown registry")),
+    }
+}
+
+#[tonic::async_trait]
+impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
+    async fn domain_check(
+        &self,
+        request: tonic::Request<epp_proto::domain::DomainCheckRequest>,
+    ) -> Result<tonic::Response<epp_proto::domain::DomainCheckReply>, tonic::Status> {
+        let res = request.into_inner();
+        let (mut sender, registry_name) = client_by_domain(&self.client_router, &res.name)?;
+        let res = client::domain::check(
+            &res.name,
+            res.fee_check.map(Into::into),
+            &mut sender
+        ).await?;
+
+        let reply = epp_proto::domain::DomainCheckReply {
+            available: res.avail,
+            reason: res.reason,
+            fee_check: res.fee_check.map(Into::into),
+            registry_name,
+        };
+
+        Ok(tonic::Response::new(reply))
+    }
+
+    async fn domain_info(
+        &self,
+        request: tonic::Request<epp_proto::domain::DomainInfoRequest>,
+    ) -> Result<tonic::Response<epp_proto::domain::DomainInfoReply>, tonic::Status> {
+        let req = request.into_inner();
+        let (mut sender, registry_name) = client_by_domain(&self.client_router, &req.name)?;
+        let res = client::domain::info(
+            &req.name, req.auth_info.as_deref(), &mut sender).await?;
+
+        let mut reply: epp_proto::domain::DomainInfoReply = res.into();
+        reply.registry_name = registry_name;
 
         Ok(tonic::Response::new(reply))
     }
@@ -807,15 +1247,8 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         )
         .await?;
 
-        let reply = epp_proto::domain::DomainCreateReply {
-            name: res.data.name,
-            pending: res.pending,
-            transaction_id: res.transaction_id,
-            creation_date: chrono_to_proto(res.data.creation_date),
-            expiry_date: chrono_to_proto(res.data.expiration_date),
-            fee_data: res.fee_data.map(Into::into),
-            registry_name,
-        };
+        let mut reply: epp_proto::domain::DomainCreateReply = res.into();
+        reply.registry_name = registry_name;
 
         Ok(tonic::Response::new(reply))
     }
@@ -1057,13 +1490,8 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         )
         .await?;
 
-        let reply = epp_proto::domain::DomainRenewReply {
-            pending: res.pending,
-            transaction_id: res.transaction_id,
-            expiry_date: chrono_to_proto(res.data.new_expiry_date),
-            fee_data: res.fee_data.map(Into::into),
-            registry_name,
-        };
+        let mut reply: epp_proto::domain::DomainRenewReply = res.into();
+        reply.registry_name = registry_name;
 
         Ok(tonic::Response::new(reply))
     }
@@ -1077,18 +1505,8 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let res = client::domain::transfer_query(
             &req.name, req.auth_info.as_deref(), &mut sender).await?;
 
-        let reply = epp_proto::domain::DomainTransferReply {
-            pending: res.pending,
-            transaction_id: res.transaction_id,
-            status: i32_from_transfer_status(res.data.status),
-            requested_client_id: res.data.requested_client_id,
-            requested_date: chrono_to_proto(Some(res.data.requested_date)),
-            act_client_id: res.data.act_client_id,
-            act_date: chrono_to_proto(Some(res.data.act_date)),
-            expiry_date: chrono_to_proto(res.data.expiry_date),
-            fee_data: res.fee_data.map(Into::into),
-            registry_name,
-        };
+        let mut reply: epp_proto::domain::DomainTransferReply = res.into();
+        reply.registry_name = registry_name;
 
         Ok(tonic::Response::new(reply))
     }
@@ -1110,18 +1528,8 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         )
         .await?;
 
-        let reply = epp_proto::domain::DomainTransferReply {
-            pending: res.pending,
-            transaction_id: res.transaction_id,
-            status: i32_from_transfer_status(res.data.status),
-            requested_client_id: res.data.requested_client_id,
-            requested_date: chrono_to_proto(Some(res.data.requested_date)),
-            act_client_id: res.data.act_client_id,
-            act_date: chrono_to_proto(Some(res.data.act_date)),
-            expiry_date: chrono_to_proto(res.data.expiry_date),
-            fee_data: res.fee_data.map(Into::into),
-            registry_name,
-        };
+        let mut reply: epp_proto::domain::DomainTransferReply = res.into();
+        reply.registry_name = registry_name;
 
         Ok(tonic::Response::new(reply))
     }
@@ -1136,18 +1544,8 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
             client::domain::transfer_accept(
                 &request.name, Some(&request.auth_info), &mut sender).await?;
 
-        let reply = epp_proto::domain::DomainTransferReply {
-            pending: res.pending,
-            transaction_id: res.transaction_id,
-            status: i32_from_transfer_status(res.data.status),
-            requested_client_id: res.data.requested_client_id,
-            requested_date: chrono_to_proto(Some(res.data.requested_date)),
-            act_client_id: res.data.act_client_id,
-            act_date: chrono_to_proto(Some(res.data.act_date)),
-            expiry_date: chrono_to_proto(res.data.expiry_date),
-            fee_data: res.fee_data.map(Into::into),
-            registry_name,
-        };
+        let mut reply: epp_proto::domain::DomainTransferReply = res.into();
+        reply.registry_name = registry_name;
 
         Ok(tonic::Response::new(reply))
     }
@@ -1162,18 +1560,8 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
             client::domain::transfer_reject(
                 &request.name, Some(&request.auth_info), &mut sender).await?;
 
-        let reply = epp_proto::domain::DomainTransferReply {
-            pending: res.pending,
-            transaction_id: res.transaction_id,
-            status: i32_from_transfer_status(res.data.status),
-            requested_client_id: res.data.requested_client_id,
-            requested_date: chrono_to_proto(Some(res.data.requested_date)),
-            act_client_id: res.data.act_client_id,
-            act_date: chrono_to_proto(Some(res.data.act_date)),
-            expiry_date: chrono_to_proto(res.data.expiry_date),
-            fee_data: res.fee_data.map(Into::into),
-            registry_name,
-        };
+        let mut reply: epp_proto::domain::DomainTransferReply = res.into();
+        reply.registry_name = registry_name;
 
         Ok(tonic::Response::new(reply))
     }
@@ -1435,206 +1823,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let mut sender = client_by_id(&self.client_router, &request.registry_name)?;
         let res = client::contact::info(&id, &mut sender).await?;
 
-        let map_addr = |a: client::contact::Address| epp_proto::contact::PostalAddress {
-            name: a.name,
-            organisation: a.organisation,
-            streets: a.streets,
-            city: a.city,
-            province: a.province,
-            postal_code: a.postal_code,
-            country_code: a.country_code,
-            identity_number: a.identity_number,
-            birth_date: chrono_to_proto(a.birth_date.map(|d| d.and_hms(0, 0, 0))),
-        };
-
-        let reply = epp_proto::contact::ContactInfoReply {
-            id: res.id,
-            registry_id: res.registry_id,
-            statuses: res
-                .statuses
-                .into_iter()
-                .map(|s| match s {
-                    client::contact::Status::ClientDeleteProhibited => {
-                        epp_proto::contact::ContactStatus::ClientDeleteProhibited.into()
-                    }
-                    client::contact::Status::ClientTransferProhibited => {
-                        epp_proto::contact::ContactStatus::ClientTransferProhibited.into()
-                    }
-                    client::contact::Status::ClientUpdateProhibited => {
-                        epp_proto::contact::ContactStatus::ClientUpdateProhibited.into()
-                    }
-                    client::contact::Status::Linked => {
-                        epp_proto::contact::ContactStatus::Linked.into()
-                    }
-                    client::contact::Status::Ok => epp_proto::contact::ContactStatus::Ok.into(),
-                    client::contact::Status::PendingCreate => {
-                        epp_proto::contact::ContactStatus::PendingCreate.into()
-                    }
-                    client::contact::Status::PendingDelete => {
-                        epp_proto::contact::ContactStatus::PendingDelete.into()
-                    }
-                    client::contact::Status::PendingTransfer => {
-                        epp_proto::contact::ContactStatus::PendingTransfer.into()
-                    }
-                    client::contact::Status::PendingUpdate => {
-                        epp_proto::contact::ContactStatus::PendingUpdate.into()
-                    }
-                    client::contact::Status::ServerDeleteProhibited => {
-                        epp_proto::contact::ContactStatus::ServerDeleteProhibited.into()
-                    }
-                    client::contact::Status::ServerTransferProhibited => {
-                        epp_proto::contact::ContactStatus::ServerTransferProhibited.into()
-                    }
-                    client::contact::Status::ServerUpdateProhibited => {
-                        epp_proto::contact::ContactStatus::ServerUpdateProhibited.into()
-                    }
-                })
-                .collect(),
-            local_address: res.local_address.map(map_addr),
-            internationalised_address: res.internationalised_address.map(map_addr),
-            phone: res.phone.map(|p| p.into()),
-            fax: res.fax.map(|p| p.into()),
-            email: res.email,
-            client_id: res.client_id,
-            client_created_id: res.client_created_id,
-            creation_date: chrono_to_proto(res.creation_date),
-            last_updated_client: res.last_updated_client,
-            last_updated_date: chrono_to_proto(res.last_updated_date),
-            last_transfer_date: chrono_to_proto(res.last_transfer_date),
-            entity_type: match res.entity_type {
-                client::contact::EntityType::UkLimitedCompany => {
-                    epp_proto::contact::EntityType::UkLimitedCompany.into()
-                }
-                client::contact::EntityType::UkPublicLimitedCompany => {
-                    epp_proto::contact::EntityType::UkLimitedCompany.into()
-                }
-                client::contact::EntityType::UkPartnership => {
-                    epp_proto::contact::EntityType::UkPartnership.into()
-                }
-                client::contact::EntityType::UkSoleTrader => {
-                    epp_proto::contact::EntityType::UkSoleTrader.into()
-                }
-                client::contact::EntityType::UkLimitedLiabilityPartnership => {
-                    epp_proto::contact::EntityType::UkLimitedLiabilityPartnership.into()
-                }
-                client::contact::EntityType::UkIndustrialProvidentRegisteredCompany => {
-                    epp_proto::contact::EntityType::UkIndustrialProvidentRegisteredCompany.into()
-                }
-                client::contact::EntityType::UkIndividual => {
-                    epp_proto::contact::EntityType::UkIndividual.into()
-                }
-                client::contact::EntityType::UkSchool => {
-                    epp_proto::contact::EntityType::UkSchool.into()
-                }
-                client::contact::EntityType::UkRegisteredCharity => {
-                    epp_proto::contact::EntityType::UkRegisteredCharity.into()
-                }
-                client::contact::EntityType::UkGovernmentBody => {
-                    epp_proto::contact::EntityType::UkGovernmentBody.into()
-                }
-                client::contact::EntityType::UkCorporationByRoyalCharter => {
-                    epp_proto::contact::EntityType::UkCorporationByRoyalCharter.into()
-                }
-                client::contact::EntityType::UkStatutoryBody => {
-                    epp_proto::contact::EntityType::UkStatutoryBody.into()
-                }
-                client::contact::EntityType::UkPoliticalParty => {
-                    epp_proto::contact::EntityType::UkPoliticalParty.into()
-                }
-                client::contact::EntityType::OtherUkEntity => {
-                    epp_proto::contact::EntityType::OtherUkEntity.into()
-                }
-                client::contact::EntityType::FinnishIndividual => {
-                    epp_proto::contact::EntityType::FinnishIndividual.into()
-                }
-                client::contact::EntityType::FinnishCompany => {
-                    epp_proto::contact::EntityType::FinnishCompany.into()
-                }
-                client::contact::EntityType::FinnishAssociation => {
-                    epp_proto::contact::EntityType::FinnishAssociation.into()
-                }
-                client::contact::EntityType::FinnishInstitution => {
-                    epp_proto::contact::EntityType::FinnishInstitution.into()
-                }
-                client::contact::EntityType::FinnishPoliticalParty => {
-                    epp_proto::contact::EntityType::FinnishPoliticalParty.into()
-                }
-                client::contact::EntityType::FinnishMunicipality => {
-                    epp_proto::contact::EntityType::FinnishMunicipality.into()
-                }
-                client::contact::EntityType::FinnishGovernment => {
-                    epp_proto::contact::EntityType::FinnishGovernment.into()
-                }
-                client::contact::EntityType::FinnishPublicCommunity => {
-                    epp_proto::contact::EntityType::FinnishPublicCommunity.into()
-                }
-                client::contact::EntityType::OtherIndividual => {
-                    epp_proto::contact::EntityType::OtherIndividual.into()
-                }
-                client::contact::EntityType::OtherCompany => {
-                    epp_proto::contact::EntityType::OtherCompany.into()
-                }
-                client::contact::EntityType::OtherAssociation => {
-                    epp_proto::contact::EntityType::OtherAssociation.into()
-                }
-                client::contact::EntityType::OtherInstitution => {
-                    epp_proto::contact::EntityType::OtherInstitution.into()
-                }
-                client::contact::EntityType::OtherPoliticalParty => {
-                    epp_proto::contact::EntityType::OtherPoliticalParty.into()
-                }
-                client::contact::EntityType::OtherMunicipality => {
-                    epp_proto::contact::EntityType::OtherMunicipality.into()
-                }
-                client::contact::EntityType::OtherGovernment => {
-                    epp_proto::contact::EntityType::OtherGovernment.into()
-                }
-                client::contact::EntityType::OtherPublicCommunity => {
-                    epp_proto::contact::EntityType::OtherPublicCommunity.into()
-                }
-                client::contact::EntityType::Unknown => {
-                    epp_proto::contact::EntityType::UnknownEntity.into()
-                }
-            },
-            trading_name: res.trading_name,
-            company_number: res.company_number,
-            disclosure: res
-                .disclosure
-                .into_iter()
-                .map(|d| match d {
-                    client::contact::DisclosureType::LocalName => {
-                        epp_proto::contact::DisclosureType::LocalName.into()
-                    }
-                    client::contact::DisclosureType::InternationalisedName => {
-                        epp_proto::contact::DisclosureType::InternationalisedName.into()
-                    }
-                    client::contact::DisclosureType::LocalOrganisation => {
-                        epp_proto::contact::DisclosureType::LocalOrganisation.into()
-                    }
-                    client::contact::DisclosureType::InternationalisedOrganisation => {
-                        epp_proto::contact::DisclosureType::InternationalisedOrganisation.into()
-                    }
-                    client::contact::DisclosureType::LocalAddress => {
-                        epp_proto::contact::DisclosureType::LocalAddress.into()
-                    }
-                    client::contact::DisclosureType::InternationalisedAddress => {
-                        epp_proto::contact::DisclosureType::InternationalisedAddress.into()
-                    }
-                    client::contact::DisclosureType::Voice => {
-                        epp_proto::contact::DisclosureType::Voice.into()
-                    }
-                    client::contact::DisclosureType::Fax => {
-                        epp_proto::contact::DisclosureType::Fax.into()
-                    }
-                    client::contact::DisclosureType::Email => {
-                        epp_proto::contact::DisclosureType::Email.into()
-                    }
-                })
-                .collect(),
-            auth_info: res.auth_info,
-        };
-
-        Ok(tonic::Response::new(reply))
+        Ok(tonic::Response::new(res.into()))
     }
 
     async fn contact_create(
@@ -1859,11 +2048,161 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                             if message.count > 0 {
                                 should_delay = false;
                             }
+                            let change_data = match message.data {
+                                client::poll::PollData::DomainInfoData {
+                                    change_data: ref c,
+                                    data: _
+                                } => c,
+                                client::poll::PollData::ContactInfoData {
+                                    change_data: ref c,
+                                    data: _
+                                } => c,
+                                client::poll::PollData::DomainTransferData  {
+                                    change_data: ref c,
+                                    data: _
+                                } => c,
+                                client::poll::PollData::DomainCreateData {
+                                    change_data: ref c,
+                                    data: _
+                                } => c,
+                                client::poll::PollData::DomainPanData {
+                                    change_data: ref c,
+                                    data: _
+                                } => c,
+                                client::poll::PollData::DomainRenewData {
+                                    change_data: ref c,
+                                    data: _
+                                } => c,
+                                client::poll::PollData::NominetDomainCancelData {
+                                    change_data: ref c,
+                                    data: _
+                                } => c,
+                                client::poll::PollData::NominetDomainReleaseData {
+                                    change_data: ref c,
+                                    data: _
+                                } => c,
+                                client::poll::PollData::NominetDomainRegistrarChangeData {
+                                    change_data: ref c,
+                                    data: _
+                                } => c,
+                                client::poll::PollData::NominetHostCancelData {
+                                    change_data: ref c,
+                                    data: _
+                                } => c,
+                                client::poll::PollData::NominetProcessData {
+                                    change_data: ref c,
+                                    data: _
+                                } => c,
+                                client::poll::PollData::NominetSuspendData {
+                                    change_data: ref c,
+                                    data: _
+                                } => c,
+                                client::poll::PollData::NominetDomainFailData {
+                                    change_data: ref c,
+                                    data: _
+                                } => c,
+                                client::poll::PollData::NominetRegistrantTransferData {
+                                    change_data: ref c,
+                                    data: _
+                                } => c,
+                                _ => &None
+                            };
                             match tx
                                 .send(Ok(epp_proto::PollReply {
                                     msg_id: message.id.clone(),
                                     enqueue_date: chrono_to_proto(Some(message.enqueue_time)),
                                     message: message.message,
+                                    change_data: change_data.as_ref().map(|c| epp_proto::ChangeData {
+                                        change_state: match c.state {
+                                            client::poll::ChangeState::After => epp_proto::change_data::ChangeState::After.into(),
+                                            client::poll::ChangeState::Before => epp_proto::change_data::ChangeState::Before.into(),
+                                        },
+                                        operation: Some(epp_proto::change_data::ChangeOperation {
+                                            operation_type: match c.operation.op_type {
+                                                client::poll::ChangeOperationType::Create => epp_proto::change_data::change_operation::ChangeOperationType::Create.into(),
+                                                client::poll::ChangeOperationType::Delete => epp_proto::change_data::change_operation::ChangeOperationType::Delete.into(),
+                                                client::poll::ChangeOperationType::Renew => epp_proto::change_data::change_operation::ChangeOperationType::Renew.into(),
+                                                client::poll::ChangeOperationType::Transfer => epp_proto::change_data::change_operation::ChangeOperationType::Transfer.into(),
+                                                client::poll::ChangeOperationType::Update => epp_proto::change_data::change_operation::ChangeOperationType::Update.into(),
+                                                client::poll::ChangeOperationType::Restore => epp_proto::change_data::change_operation::ChangeOperationType::Restore.into(),
+                                                client::poll::ChangeOperationType::AutoRenew => epp_proto::change_data::change_operation::ChangeOperationType::AutoRenew.into(),
+                                                client::poll::ChangeOperationType::AutoDelete => epp_proto::change_data::change_operation::ChangeOperationType::AutoDelete.into(),
+                                                client::poll::ChangeOperationType::AutoPurge => epp_proto::change_data::change_operation::ChangeOperationType::AutoPurge.into(),
+                                                client::poll::ChangeOperationType::Custom => epp_proto::change_data::change_operation::ChangeOperationType::Custom.into(),
+                                            },
+                                            operation: c.operation.operation.clone()
+                                        }),
+                                        date: chrono_to_proto(Some(c.date)),
+                                        server_transaction_id: c.server_transaction_id.clone(),
+                                        who: c.who.clone(),
+                                        case_id: c.case_id.as_ref().map(|i| epp_proto::change_data::CaseId {
+                                            case_id_type: match i.case_type {
+                                                client::poll::ChangeCaseIdType::UDRP => epp_proto::change_data::case_id::CaseIdType::Udrp.into(),
+                                                client::poll::ChangeCaseIdType::URS => epp_proto::change_data::case_id::CaseIdType::Urs.into(),
+                                                client::poll::ChangeCaseIdType::Custom => epp_proto::change_data::case_id::CaseIdType::Custom.into(),
+                                            },
+                                            name: i.name.clone(),
+                                            case_id: i.case_id.clone()
+                                        }),
+                                        reason: c.reason.clone()
+                                    }),
+                                    data: match message.data {
+                                        client::poll::PollData::DomainInfoData {
+                                            change_data: _,
+                                            data: i
+                                        } => Some(epp_proto::poll_reply::Data::DomainInfo((*i).into())),
+                                        client::poll::PollData::ContactInfoData {
+                                            change_data: _,
+                                            data: i
+                                        } => Some(epp_proto::poll_reply::Data::ContactInfo((*i).into())),
+                                        client::poll::PollData::DomainTransferData {
+                                            change_data: _,
+                                            data: i
+                                        } => Some(epp_proto::poll_reply::Data::DomainTransfer(i.into())),
+                                        client::poll::PollData::DomainCreateData {
+                                            change_data: _,
+                                            data: i
+                                        } => Some(epp_proto::poll_reply::Data::DomainCreate(i.into())),
+                                        client::poll::PollData::DomainPanData {
+                                            change_data: _,
+                                            data: i
+                                        } => Some(epp_proto::poll_reply::Data::DomainPan(i.into())),
+                                        client::poll::PollData::NominetDomainCancelData {
+                                            change_data: _,
+                                            data: i
+                                        } => Some(epp_proto::poll_reply::Data::NominetDomainCancelData(i.into())),
+                                        client::poll::PollData::NominetDomainReleaseData {
+                                            change_data: _,
+                                            data: i
+                                        } => Some(epp_proto::poll_reply::Data::NominetDomainReleaseData(i.into())),
+                                        client::poll::PollData::NominetDomainRegistrarChangeData {
+                                            change_data: _,
+                                            data: i
+                                        } => Some(epp_proto::poll_reply::Data::NominetDomainRegistrarChangeData(i.into())),
+                                        client::poll::PollData::NominetHostCancelData {
+                                            change_data: _,
+                                            data: i
+                                        } => Some(epp_proto::poll_reply::Data::NominetHostCancelData(i.into())),
+                                        client::poll::PollData::NominetProcessData {
+                                            change_data: _,
+                                            data: i
+                                        } => Some(epp_proto::poll_reply::Data::NominetProcessData(i.into())),
+                                        client::poll::PollData::NominetSuspendData {
+                                            change_data: _,
+                                            data: i
+                                        } => Some(epp_proto::poll_reply::Data::NominetSuspendData(i.into())),
+                                        client::poll::PollData::NominetDomainFailData {
+                                            change_data: _,
+                                            data: i
+                                        } => Some(epp_proto::poll_reply::Data::NominetDomainFailData(i.into())),
+                                        client::poll::PollData::NominetRegistrantTransferData {
+                                            change_data: _,
+                                            data: i
+                                        } => Some(epp_proto::poll_reply::Data::NominetRegistrantTransferData(i.into())),
+                                        client::poll::PollData::VerisignLowBalanceData(i) =>
+                                            Some(epp_proto::poll_reply::Data::VerisignLowBalanceData(i.into())),
+                                        _ => None
+                                    }
                                 }))
                                 .await
                             {
@@ -1899,17 +2238,17 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
     async fn nominet_tag_list(
         &self,
         request: tonic::Request<epp_proto::RegistryInfo>,
-    ) -> Result<tonic::Response<epp_proto::NominetTagListReply>, tonic::Status> {
+    ) -> Result<tonic::Response<epp_proto::nominet::NominetTagListReply>, tonic::Status> {
         let request = request.into_inner();
         let mut sender = client_by_id(&self.client_router, &request.registry_name)?;
 
         let res = client::nominet::tag_list(&mut sender).await?;
 
-        let reply = epp_proto::NominetTagListReply {
+        let reply = epp_proto::nominet::NominetTagListReply {
             tags: res
                 .tags
                 .into_iter()
-                .map(|t| epp_proto::nominet_tag_list_reply::Tag {
+                .map(|t| epp_proto::nominet::nominet_tag_list_reply::Tag {
                     tag: t.tag,
                     name: t.name,
                     trading_name: t.trading_name,
@@ -1930,21 +2269,6 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
 
         let res = client::balance::balance_info(&mut sender).await?;
 
-        let reply = epp_proto::BalanceReply {
-            balance: res.balance,
-            currency: res.currency,
-            available_credit: res.available_credit,
-            credit_limit: res.credit_limit,
-            credit_threshold: res.credit_threshold.map(|t| match t {
-                client::balance::CreditThreshold::Fixed(f) => {
-                    epp_proto::balance_reply::CreditThreshold::FixedCreditThreshold(f)
-                }
-                client::balance::CreditThreshold::Percentage(p) => {
-                    epp_proto::balance_reply::CreditThreshold::PercentageCreditThreshold(p.into())
-                }
-            }),
-        };
-
-        Ok(tonic::Response::new(reply))
+        Ok(tonic::Response::new(res.into()))
     }
 }
