@@ -37,6 +37,11 @@ pub fn handle_balance(
             proto::EPPCommandType::Info(proto::EPPInfo::VerisignBalace {}),
             None,
         ))
+    } else if client.unitedtld_balance {
+        Ok((
+            proto::EPPCommandType::Info(proto::EPPInfo::UnitedTLDBalace {}),
+            None,
+        ))
     } else {
         Err(Err(Error::Unsupported))
     }
@@ -66,6 +71,15 @@ pub fn handle_balance_response(response: proto::EPPResponse) -> Response<Balance
                             CreditThreshold::Percentage(p)
                         }
                     }),
+                })
+            }
+            proto::EPPResultDataValue::UnitedTLDBalaceInfoResult(unitedtld_balance) => {
+                Response::Ok(BalanceResponse {
+                    balance: unitedtld_balance.balance,
+                    currency: "USD".to_string(),
+                    credit_limit: None,
+                    available_credit: None,
+                    credit_threshold: None,
                 })
             }
             _ => Err(Error::InternalServerError),
@@ -123,6 +137,36 @@ mod balance_tests {
         let data = super::handle_balance_response(*res).unwrap();
         assert_eq!(data.balance, "27.05");
         assert_eq!(data.currency, "CHF");
+    }
+
+    #[test]
+    fn unitedtld_balance() {
+        const XML_DATA: &str = r#"
+<?xml version="1.0" encoding="utf-8"?>
+<epp xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:ietf:params:xml:ns:epp-1.0 epp-1.0.xsd" xmlns="urn:ietf:params:xml:ns:epp-1.0">
+  <response>
+    <result code="1000">
+      <msg>Command completed successfully</msg>
+    </result>
+    <resData>
+      <finance:infData xmlns:finance="http://www.unitedtld.com/epp/finance-1.0">
+        <finance:balance>99939047.94</finance:balance>
+      </finance:infData>
+    </resData>
+    <trID>
+      <clTRID>Test</clTRID>
+      <svTRID>2e438303-259a-4bdc-b0de-e7d62c4b1477:2</svTRID>
+    </trID>
+  </response>
+</epp>"#;
+        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
+        let res = match res.message {
+            super::proto::EPPMessageType::Response(r) => r,
+            _ => unreachable!(),
+        };
+        let data = super::handle_balance_response(*res).unwrap();
+        assert_eq!(data.balance, "99939047.94");
+        assert_eq!(data.currency, "USD");
     }
 
     #[test]

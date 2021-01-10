@@ -16,6 +16,7 @@ pub mod secdns;
 pub mod switch;
 pub mod traficom;
 pub mod verisign;
+pub mod united_tld;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub enum EPPMessageType {
@@ -505,6 +506,8 @@ pub enum EPPResultDataValue {
     SwitchBalanceInfoResult(switch::EPPBalance),
     #[serde(rename = "{http://www.verisign.com/epp/balance-1.0}infData")]
     VerisignBalanceInfoResult(verisign::EPPBalance),
+    #[serde(rename = "{http://www.unitedtld.com/epp/finance-1.0}infData")]
+    UnitedTLDBalaceInfoResult(united_tld::EPPBalance),
     #[serde(rename = "{http://www.verisign.com/epp/rgp-poll-1.0}pollData")]
     VerisignRGPPollData(verisign::EPPRGPPollData),
     #[serde(rename = "{http://www.verisign.com/epp/lowbalance-poll-1.0}pollData")]
@@ -680,11 +683,11 @@ pub enum EPPInfo {
     #[serde(rename = "{http://www.nominet.org.uk/epp/xml/nom-tag-1.0}tag:list")]
     TagList {},
     #[serde(rename = "{https://www.nic.ch/epp/balance-1.0}balance:info")]
-    #[allow(dead_code)]
     SwitchBalace {},
     #[serde(rename = "{http://www.verisign.com/epp/balance-1.0}balance:info")]
-    #[allow(dead_code)]
     VerisignBalace {},
+    #[serde(rename = "{http://www.unitedtld.com/epp/finance-1.0}finance:info")]
+    UnitedTLDBalace {},
 }
 
 #[derive(Debug, Serialize)]
