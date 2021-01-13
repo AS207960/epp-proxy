@@ -17,6 +17,7 @@ pub mod switch;
 pub mod traficom;
 pub mod verisign;
 pub mod united_tld;
+pub mod launch;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub enum EPPMessageType {
@@ -137,6 +138,16 @@ pub enum EPPCommandExtensionType {
     #[allow(dead_code)]
     #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.7}fee:info")]
     EPPFee07Info(fee::EPPFee07Info),
+    #[serde(rename = "{urn:ietf:params:xml:ns:launch-1.0}launch:check")]
+    EPPLaunchCheck(launch::EPPLaunchCheck),
+    #[serde(rename = "{urn:ietf:params:xml:ns:launch-1.0}launch:info")]
+    EPPLaunchInfo(launch::EPPLaunchInfo),
+    #[serde(rename = "{urn:ietf:params:xml:ns:launch-1.0}launch:create")]
+    EPPLaunchCreate(launch::EPPLaunchCreate),
+    #[serde(rename = "{urn:ietf:params:xml:ns:launch-1.0}launch:update")]
+    EPPLaunchUpdate(launch::EPPLaunchInfo),
+    #[serde(rename = "{urn:ietf:params:xml:ns:launch-1.0}launch:delete")]
+    EPPLaunchDelete(launch::EPPLaunchInfo),
 }
 
 #[derive(Debug, Serialize)]
@@ -660,6 +671,12 @@ pub enum EPPResponseExtensionType {
     EPPFee09UpdateData(fee::EPPFee09TransformData),
     #[serde(rename = "{urn:ietf:params:xml:ns:epp:fee-1.0}updData")]
     EPPFee10UpdateData(fee::EPPFee10TransformData),
+    #[serde(rename = "{urn:ietf:params:xml:ns:launch-1.0}chkData")]
+    EPPLaunchCheckData(launch::EPPLaunchCheckData),
+    #[serde(rename = "{urn:ietf:params:xml:ns:launch-1.0}infData")]
+    EPPLaunchInfoData(launch::EPPLaunchInfoData),
+    #[serde(rename = "{urn:ietf:params:xml:ns:launch-1.0}creData")]
+    EPPLaunchCreateData(launch::EPPLaunchCreateData),
 }
 
 #[derive(Debug, Serialize)]

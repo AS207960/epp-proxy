@@ -1098,6 +1098,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let res = client::domain::check(
             &res.name,
             res.fee_check.map(Into::into),
+            None,
             &mut sender
         ).await?;
 
@@ -1118,7 +1119,11 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let req = request.into_inner();
         let (mut sender, registry_name) = client_by_domain(&self.client_router, &req.name)?;
         let res = client::domain::info(
-            &req.name, req.auth_info.as_deref(), &mut sender).await?;
+            &req.name,
+            req.auth_info.as_deref(),
+            None,
+            &mut sender
+        ).await?;
 
         let mut reply: epp_proto::domain::DomainInfoReply = res.into();
         reply.registry_name = registry_name;
@@ -1242,6 +1247,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                     },
                     None => None,
                 },
+                launch_create: None
             },
             &mut sender,
         )
@@ -1259,7 +1265,11 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
     ) -> Result<tonic::Response<epp_proto::domain::DomainDeleteReply>, tonic::Status> {
         let request = request.into_inner();
         let (mut sender, registry_name) = client_by_domain(&self.client_router, &request.name)?;
-        let res = client::domain::delete(&request.name, &mut sender).await?;
+        let res = client::domain::delete(
+            &request.name,
+            None,
+            &mut sender
+        ).await?;
 
         let reply = epp_proto::domain::DomainDeleteReply {
             pending: res.pending,
@@ -1451,6 +1461,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                 }),
                 None => None,
             },
+            None,
             &mut sender,
         )
         .await?;

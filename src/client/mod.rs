@@ -22,6 +22,7 @@ pub mod rgp;
 pub mod router;
 pub mod verisign;
 pub mod fee;
+pub mod launch;
 
 use crate::proto::EPPServiceExtension;
 pub use router::{Request, Response};
@@ -208,6 +209,8 @@ pub struct EPPClientServerFeatures {
     nsset_supported: bool,
     /// RFC 8748 support
     fee_supported: bool,
+    /// RFC 8334 support
+    launch_supported: bool,
     /// urn:ietf:params:xml:ns:fee-0.9 support
     fee_09_supported: bool,
     /// urn:ietf:params:xml:ns:fee-0.8 support
@@ -717,6 +720,9 @@ impl EPPClient {
         self.features.fee_supported = greeting
             .service_menu
             .supports_ext("urn:ietf:params:xml:ns:epp:fee-1.0");
+        self.features.launch_supported = greeting
+            .service_menu
+            .supports_ext("urn:ietf:params:xml:ns:launch-1.0");
         self.features.fee_09_supported = greeting
             .service_menu
             .supports_ext("urn:ietf:params:xml:ns:fee-0.9");
@@ -793,6 +799,9 @@ impl EPPClient {
             }
             if self.features.nsset_supported {
                 objects.push("urn:ietf:params:xml:ns:nsset-1.2".to_string())
+            }
+            if self.features.launch_supported {
+                ext_objects.push("urn:ietf:params:xml:ns:launch-1.0".to_string())
             }
             if self.features.fee_supported {
                 ext_objects.push("urn:ietf:params:xml:ns:epp:fee-1.0".to_string())

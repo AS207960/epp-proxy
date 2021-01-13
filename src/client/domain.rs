@@ -4,14 +4,28 @@ use std::convert::{TryFrom, TryInto};
 
 use chrono::prelude::*;
 
-use super::{EPPClientServerFeatures, Error, fee, proto, Request, Response, Sender};
+use super::{EPPClientServerFeatures, Error, fee, launch, proto, Request, Response, Sender};
 use super::router::HandleReqReturn;
 
 #[derive(Debug)]
 pub struct CheckRequest {
     name: String,
     fee_check: Option<fee::FeeCheck>,
+    launch_check: Option<launch::LaunchAvailabilityCheck>,
     pub return_path: Sender<CheckResponse>,
+}
+
+#[derive(Debug)]
+pub struct ClaimsCheckRequest {
+    name: String,
+    launch_check: launch::LaunchClaimsCheck,
+    pub return_path: Sender<ClaimsCheckResponse>,
+}
+
+#[derive(Debug)]
+pub struct TrademarkCheckRequest {
+    name: String,
+    pub return_path: Sender<ClaimsCheckResponse>,
 }
 
 /// Response to a domain check query
@@ -25,10 +39,20 @@ pub struct CheckResponse {
     pub fee_check: Option<fee::FeeCheckData>,
 }
 
+/// Response to a domain claims check query
+#[derive(Debug)]
+pub struct ClaimsCheckResponse {
+    /// Does a trademark claim exist
+    pub exists: bool,
+    /// Claims key for this domain
+    pub claims_key: Vec<launch::LaunchClaimKey>,
+}
+
 #[derive(Debug)]
 pub struct InfoRequest {
     name: String,
     auth_info: Option<String>,
+    launch_info: Option<launch::LaunchInfo>,
     pub return_path: Sender<InfoResponse>,
 }
 
@@ -68,6 +92,7 @@ pub struct InfoResponse {
     pub auth_info: Option<String>,
     /// DNSSEC data
     pub sec_dns: Option<SecDNSData>,
+    pub launch_info: Option<launch::LaunchInfoData>,
 }
 
 /// Additional contact associated with a domain
@@ -130,6 +155,7 @@ pub struct CreateRequest {
     nameservers: Vec<InfoNameserver>,
     auth_info: String,
     sec_dns: Option<SecDNSData>,
+    launch_create: Option<launch::LaunchCreate>,
     pub return_path: Sender<CreateResponse>,
 }
 
@@ -157,6 +183,7 @@ pub struct CreateResponse {
     pub data: CreateData,
     /// Fee information (if supplied by the registry)
     pub fee_data: Option<fee::FeeData>,
+    pub launch_create: Option<launch::LaunchCreateData>,
 }
 
 #[derive(Debug)]
@@ -172,6 +199,7 @@ pub struct CreateData {
 #[derive(Debug)]
 pub struct DeleteRequest {
     name: String,
+    launch_info: Option<launch::LaunchUpdate>,
     pub return_path: Sender<DeleteResponse>,
 }
 
@@ -192,6 +220,7 @@ pub struct UpdateRequest {
     new_registrant: Option<String>,
     new_auth_info: Option<String>,
     sec_dns: Option<UpdateSecDNS>,
+    launch_info: Option<launch::LaunchUpdate>,
     pub return_path: Sender<UpdateResponse>,
 }
 
@@ -513,6 +542,20 @@ TryFrom<(
             None => None,
         };
 
+        let launch_info = match extension {
+            Some(ext) => (ext
+                .value
+                .iter()
+                .find_map(|p| match p {
+                    proto::EPPResponseExtensionType::EPPLaunchInfoData(i) => Some(i),
+                    _ => None,
+                })
+                .map(|i| {
+                    launch::LaunchInfoData::from(i)
+                })),
+            None => None,
+        };
+
         Ok(InfoResponse {
             name: domain_info.name,
             registry_id: domain_info.registry_id.unwrap_or_default(),
@@ -578,6 +621,7 @@ TryFrom<(
                 None => None,
             },
             sec_dns,
+            launch_info,
         })
     }
 }
@@ -716,6 +760,15 @@ pub fn handle_check(
             return Err(Err(Error::Unsupported));
         }
     }
+    if let Some(launch_check) = &req.launch_check {
+        if client.launch_supported {
+            ext.push(proto::EPPCommandExtensionType::EPPLaunchCheck(
+                launch_check.into()
+            ))
+        } else {
+            return Err(Err(Error::Unsupported));
+        }
+    }
     Ok((proto::EPPCommandType::Check(command), match ext.is_empty() {
         true => None,
         false => Some(ext)
@@ -840,6 +893,7 @@ pub fn handle_check_response(response: proto::EPPResponse) -> Response<CheckResp
                         avail: domain_check.name.available,
                         reason: domain_check.reason.to_owned(),
                         fee_check,
+
                     })
                 } else {
                     Err(Error::InternalServerError)
@@ -848,6 +902,107 @@ pub fn handle_check_response(response: proto::EPPResponse) -> Response<CheckResp
             _ => Err(Error::InternalServerError),
         },
         None => Err(Error::InternalServerError),
+    }
+}
+
+pub fn handle_claims_check(
+    client: &EPPClientServerFeatures,
+    req: &ClaimsCheckRequest,
+) -> HandleReqReturn<ClaimsCheckResponse> {
+    if !client.launch_supported {
+        return Err(Err(Error::Unsupported));
+    }
+    check_domain(&req.name)?;
+    let command = proto::EPPCheck::Domain(proto::domain::EPPDomainCheck {
+        name: req.name.clone(),
+        auth_info: None,
+    });
+    let mut ext = vec![proto::EPPCommandExtensionType::EPPLaunchCheck(
+        (&req.launch_check).into()
+    )];
+    if client.has_erratum("verisign-tv") {
+        ext.push(proto::EPPCommandExtensionType::VerisignNameStoreExt(
+            proto::verisign::EPPNameStoreExt {
+                sub_product: "dotTV".to_string(),
+            },
+        ));
+    } else if client.has_erratum("verisign-cc") {
+        ext.push(proto::EPPCommandExtensionType::VerisignNameStoreExt(
+            proto::verisign::EPPNameStoreExt {
+                sub_product: "dotCC".to_string(),
+            },
+        ));
+    }
+    Ok((proto::EPPCommandType::Check(command), match ext.is_empty() {
+        true => None,
+        false => Some(ext)
+    }))
+}
+
+pub fn handle_trademark_check(
+    client: &EPPClientServerFeatures,
+    req: &TrademarkCheckRequest,
+) -> HandleReqReturn<ClaimsCheckResponse> {
+    if !client.launch_supported {
+        return Err(Err(Error::Unsupported));
+    }
+    check_domain(&req.name)?;
+    let command = proto::EPPCheck::Domain(proto::domain::EPPDomainCheck {
+        name: req.name.clone(),
+        auth_info: None,
+    });
+    let mut ext = vec![proto::EPPCommandExtensionType::EPPLaunchCheck(
+        (&launch::LaunchTrademarkCheck {}).into()
+    )];
+    if client.has_erratum("verisign-tv") {
+        ext.push(proto::EPPCommandExtensionType::VerisignNameStoreExt(
+            proto::verisign::EPPNameStoreExt {
+                sub_product: "dotTV".to_string(),
+            },
+        ));
+    } else if client.has_erratum("verisign-cc") {
+        ext.push(proto::EPPCommandExtensionType::VerisignNameStoreExt(
+            proto::verisign::EPPNameStoreExt {
+                sub_product: "dotCC".to_string(),
+            },
+        ));
+    }
+    Ok((proto::EPPCommandType::Check(command), match ext.is_empty() {
+        true => None,
+        false => Some(ext)
+    }))
+}
+
+pub fn handle_claims_check_response(response: proto::EPPResponse) -> Response<ClaimsCheckResponse> {
+    let claims_check = match response.extension {
+        Some(ext) => {
+            let claims = ext.value.iter().find_map(|p| match p {
+                proto::EPPResponseExtensionType::EPPLaunchCheckData(i) => Some(i),
+                _ => None,
+            });
+
+            if let Some(c) = claims {
+                if let Some(domain_check) = c.data.first() {
+                    Some(ClaimsCheckResponse {
+                        exists: domain_check.name.exists,
+                        claims_key: domain_check.claim_key.iter().map(Into::into).collect(),
+                    })
+                } else {
+                    None
+                }
+            } else {
+                None
+            }
+        }
+        None => None,
+    };
+
+    match response.data {
+        Some(_) => Err(Error::InternalServerError),
+        None => match claims_check {
+            Some(c) => Response::Ok(c),
+            None => Err(Error::InternalServerError),
+        }
     }
 }
 
@@ -865,22 +1020,31 @@ pub fn handle_info(
             password: Some(a.clone())
         }),
     });
-    let ext = if client.has_erratum("verisign-tv") {
-        Some(vec![proto::EPPCommandExtensionType::VerisignNameStoreExt(
+    let mut exts = vec![];
+    if let Some(launch_info) = &req.launch_info {
+        if client.launch_supported {
+            exts.push(proto::EPPCommandExtensionType::EPPLaunchInfo(launch_info.into()))
+        } else {
+            return Err(Err(Error::Unsupported));
+        }
+    }
+    if client.has_erratum("verisign-tv") {
+        exts.push(proto::EPPCommandExtensionType::VerisignNameStoreExt(
             proto::verisign::EPPNameStoreExt {
                 sub_product: "dotTV".to_string(),
             },
-        )])
+        ));
     } else if client.has_erratum("verisign-cc") {
-        Some(vec![proto::EPPCommandExtensionType::VerisignNameStoreExt(
+        exts.push(proto::EPPCommandExtensionType::VerisignNameStoreExt(
             proto::verisign::EPPNameStoreExt {
                 sub_product: "dotCC".to_string(),
             },
-        )])
-    } else {
-        None
+        ));
     };
-    Ok((proto::EPPCommandType::Info(command), ext))
+    Ok((proto::EPPCommandType::Info(command), match exts.is_empty() {
+        true => None,
+        false => Some(exts)
+    }))
 }
 
 pub fn handle_info_response(response: proto::EPPResponse) -> Response<InfoResponse> {
@@ -947,6 +1111,13 @@ pub fn handle_create(
                 },
             )),
             None => {}
+        }
+    }
+    if let Some(launch_create) = &req.launch_create {
+        if client.launch_supported {
+            exts.push(proto::EPPCommandExtensionType::EPPLaunchCreate(launch_create.into()))
+        } else {
+            return Err(Err(Error::Unsupported));
         }
     }
     if client.has_erratum("verisign-tv") {
@@ -1038,6 +1209,21 @@ pub fn handle_create_response(response: proto::EPPResponse) -> Response<CreateRe
         None => None,
     };
 
+
+    let launch_create = match &response.extension {
+        Some(ext) => (ext
+            .value
+            .iter()
+            .find_map(|p| match p {
+                proto::EPPResponseExtensionType::EPPLaunchCreateData(i) => Some(i),
+                _ => None,
+            })
+            .map(|i| {
+                launch::LaunchCreateData::from(i)
+            })),
+        None => None,
+    };
+
     match &response.data {
         Some(value) => match &value.value {
             proto::EPPResultDataValue::EPPDomainCreateResult(domain_create) => Ok(CreateResponse {
@@ -1045,6 +1231,7 @@ pub fn handle_create_response(response: proto::EPPResponse) -> Response<CreateRe
                 transaction_id: response.transaction_id.server_transaction_id.unwrap_or_default(),
                 data: domain_create.into(),
                 fee_data,
+                launch_create,
             }),
             _ => Err(Error::InternalServerError),
         },
@@ -1059,6 +1246,7 @@ pub fn handle_create_response(response: proto::EPPResponse) -> Response<CreateRe
                         expiration_date: None,
                     },
                     fee_data,
+                    launch_create,
                 })
             } else {
                 Err(Error::InternalServerError)
@@ -1079,22 +1267,31 @@ pub fn handle_delete(
         name: req.name.clone(),
         auth_info: None,
     });
-    let ext = if client.has_erratum("verisign-tv") {
-        Some(vec![proto::EPPCommandExtensionType::VerisignNameStoreExt(
+    let mut ext = vec![];
+    if client.has_erratum("verisign-tv") {
+        ext.push(proto::EPPCommandExtensionType::VerisignNameStoreExt(
             proto::verisign::EPPNameStoreExt {
                 sub_product: "dotTV".to_string(),
             },
-        )])
+        ))
     } else if client.has_erratum("verisign-cc") {
-        Some(vec![proto::EPPCommandExtensionType::VerisignNameStoreExt(
+        ext.push(proto::EPPCommandExtensionType::VerisignNameStoreExt(
             proto::verisign::EPPNameStoreExt {
                 sub_product: "dotCC".to_string(),
             },
-        )])
-    } else {
-        None
-    };
-    Ok((proto::EPPCommandType::Delete(command), ext))
+        ))
+    }
+    if let Some(launch_info) = &req.launch_info {
+        if client.launch_supported {
+            ext.push(proto::EPPCommandExtensionType::EPPLaunchDelete(launch_info.into()))
+        } else {
+            return Err(Err(Error::Unsupported));
+        }
+    }
+    Ok((proto::EPPCommandType::Delete(command), match ext.len() {
+        0 => None,
+        _ => Some(ext),
+    }))
 }
 
 pub fn handle_delete_response(response: proto::EPPResponse) -> Response<DeleteResponse> {
@@ -1332,6 +1529,13 @@ pub fn handle_update(
                 sub_product: "dotCC".to_string(),
             },
         ))
+    }
+    if let Some(launch_info) = &req.launch_info {
+        if client.launch_supported {
+            exts.push(proto::EPPCommandExtensionType::EPPLaunchUpdate(launch_info.into()))
+        } else {
+            return Err(Err(Error::Unsupported));
+        }
     }
 
     let command = proto::EPPUpdate::Domain(proto::domain::EPPDomainUpdate {
@@ -1713,6 +1917,7 @@ pub fn handle_transfer_response(response: proto::EPPResponse) -> Response<Transf
 pub async fn check(
     domain: &str,
     fee_check: Option<fee::FeeCheck>,
+    launch_check: Option<launch::LaunchAvailabilityCheck>,
     client_sender: &mut futures::channel::mpsc::Sender<Request>,
 ) -> Result<CheckResponse, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
@@ -1721,6 +1926,7 @@ pub async fn check(
         Request::DomainCheck(Box::new(CheckRequest {
             name: domain.to_string(),
             fee_check,
+            launch_check,
             return_path: sender,
         })),
         receiver,
@@ -1736,6 +1942,7 @@ pub async fn check(
 pub async fn info(
     domain: &str,
     auth_info: Option<&str>,
+    launch_info: Option<launch::LaunchInfo>,
     client_sender: &mut futures::channel::mpsc::Sender<Request>,
 ) -> Result<InfoResponse, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
@@ -1744,6 +1951,7 @@ pub async fn info(
         Request::DomainInfo(Box::new(InfoRequest {
             name: domain.to_string(),
             auth_info: auth_info.map(|s| s.into()),
+            launch_info,
             return_path: sender,
         })),
         receiver,
@@ -1759,6 +1967,7 @@ pub struct CreateInfo<'a> {
     pub nameservers: Vec<InfoNameserver>,
     pub auth_info: &'a str,
     pub sec_dns: Option<SecDNSData>,
+    pub launch_create: Option<launch::LaunchCreate>,
 }
 
 /// Registers a new domain
@@ -1786,6 +1995,7 @@ pub async fn create(
             nameservers: info.nameservers,
             auth_info: info.auth_info.to_string(),
             sec_dns: info.sec_dns,
+            launch_create: info.launch_create,
             return_path: sender,
         })),
         receiver,
@@ -1800,6 +2010,7 @@ pub async fn create(
 /// * `client_sender` - Reference to the tokio channel into the client
 pub async fn delete(
     domain: &str,
+    launch_info: Option<launch::LaunchUpdate>,
     client_sender: &mut futures::channel::mpsc::Sender<Request>,
 ) -> Result<DeleteResponse, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
@@ -1807,6 +2018,7 @@ pub async fn delete(
         client_sender,
         Request::DomainDelete(Box::new(DeleteRequest {
             name: domain.to_string(),
+            launch_info,
             return_path: sender,
         })),
         receiver,
@@ -1830,6 +2042,7 @@ pub async fn update(
     new_registrant: Option<&str>,
     new_auth_info: Option<&str>,
     sec_dns: Option<UpdateSecDNS>,
+    launch_info: Option<launch::LaunchUpdate>,
     client_sender: &mut futures::channel::mpsc::Sender<Request>,
 ) -> Result<UpdateResponse, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
@@ -1842,6 +2055,7 @@ pub async fn update(
             new_registrant: new_registrant.map(|s| s.into()),
             new_auth_info: new_auth_info.map(|s| s.into()),
             sec_dns,
+            launch_info,
             return_path: sender,
         })),
         receiver,
@@ -1973,4 +2187,153 @@ pub async fn transfer_reject(
         receiver,
     )
         .await
+}
+
+#[cfg(test)]
+mod domain_tests {
+    #[test]
+    fn claims_check() {
+        const XML_DATA: &str = r#"
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0">
+  <response>
+    <result code="1000">
+     <msg>Command completed successfully</msg>
+    </result>
+    <extension>
+     <launch:chkData
+      xmlns:launch="urn:ietf:params:xml:ns:launch-1.0">
+      <launch:phase>claims</launch:phase>
+      <launch:cd>
+        <launch:name exists="1">domain3.example</launch:name>
+        <launch:claimKey validatorID="tmch">
+        2013041500/2/6/9/rJ1NrDO92vDsAzf7EQzgjX4R0000000001
+        </launch:claimKey>
+        <launch:claimKey validatorID="custom-tmch">
+        20140423200/1/2/3/rJ1Nr2vDsAzasdff7EasdfgjX4R000000002
+        </launch:claimKey>
+      </launch:cd>
+     </launch:chkData>
+    </extension>
+    <trID>
+     <clTRID>ABC-12345</clTRID>
+     <svTRID>54321-XYZ</svTRID>
+    </trID>
+  </response>
+</epp>"#;
+        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
+        let res = match res.message {
+            super::proto::EPPMessageType::Response(r) => r,
+            _ => unreachable!(),
+        };
+        let data = super::handle_claims_check_response(*res).unwrap();
+        assert_eq!(data.exists, true);
+        assert_eq!(data.claims_key.len(), 2);
+        let claims_key_1 = data.claims_key.get(0).unwrap();
+        let claims_key_2 = data.claims_key.get(1).unwrap();
+        assert_eq!(claims_key_1.validator_id.as_ref().unwrap(), "tmch");
+        assert_eq!(claims_key_1.key, "2013041500/2/6/9/rJ1NrDO92vDsAzf7EQzgjX4R0000000001");
+        assert_eq!(claims_key_2.validator_id.as_ref().unwrap(), "custom-tmch");
+        assert_eq!(claims_key_2.key, "20140423200/1/2/3/rJ1Nr2vDsAzasdff7EasdfgjX4R000000002");
+    }
+
+    #[test]
+    fn launch_info() {
+        const XML_DATA: &str = r#"
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0">
+  <response>
+    <result code="1000">
+      <msg>Command completed successfully</msg>
+    </result>
+    <resData>
+      <domain:infData
+       xmlns:domain="urn:ietf:params:xml:ns:domain-1.0">
+        <domain:name>domain.example</domain:name>
+        <domain:roid>EXAMPLE1-REP</domain:roid>
+        <domain:status s="pendingCreate"/>
+        <domain:registrant>jd1234</domain:registrant>
+        <domain:contact type="admin">sh8013</domain:contact>
+        <domain:contact type="tech">sh8013</domain:contact>
+        <domain:clID>ClientX</domain:clID>
+        <domain:crID>ClientY</domain:crID>
+        <domain:crDate>2012-04-03T22:00:00.0Z</domain:crDate>
+        <domain:authInfo>
+          <domain:pw>2fooBAR</domain:pw>
+        </domain:authInfo>
+      </domain:infData>
+    </resData>
+    <extension>
+      <launch:infData
+       xmlns:launch="urn:ietf:params:xml:ns:launch-1.0">
+        <launch:phase>sunrise</launch:phase>
+          <launch:applicationID>abc123</launch:applicationID>
+          <launch:status s="pendingValidation"/>
+          <mark:mark
+            xmlns:mark="urn:ietf:params:xml:ns:mark-1.0">
+             Test
+         </mark:mark>
+      </launch:infData>
+    </extension>
+    <trID>
+      <clTRID>ABC-12345</clTRID>
+      <svTRID>54321-XYZ</svTRID>
+    </trID>
+  </response>
+</epp>"#;
+        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
+        let res = match res.message {
+            super::proto::EPPMessageType::Response(r) => r,
+            _ => unreachable!(),
+        };
+        let data = super::handle_info_response(*res).unwrap();
+        assert_eq!(data.name, "domain.example");
+        let launch_info = data.launch_info.unwrap();
+        assert_eq!(launch_info.phase.phase_type, super::launch::PhaseType::Sunrise);
+        assert_eq!(launch_info.application_id.unwrap(), "abc123");
+        assert_eq!(launch_info.status.unwrap().status_type, super::launch::LaunchStatusType::PendingValidation);
+        assert_eq!(launch_info.mark.unwrap(), r#"<mark:mark xmlns="urn:ietf:params:xml:ns:epp-1.0" xmlns:launch="urn:ietf:params:xml:ns:launch-1.0" xmlns:mark="urn:ietf:params:xml:ns:mark-1.0">Test</mark:mark>"#);
+    }
+
+    #[test]
+    fn create_info() {
+        const XML_DATA: &str = r#"
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0">
+  <response>
+    <result code="1001">
+      <msg>Command completed successfully; action pending</msg>
+    </result>
+    <resData>
+      <domain:creData
+         xmlns:domain="urn:ietf:params:xml:ns:domain-1.0">
+       <domain:name>domain.example</domain:name>
+       <domain:crDate>2010-08-10T15:38:26.623854Z</domain:crDate>
+      </domain:creData>
+    </resData>
+    <extension>
+      <launch:creData
+        xmlns:launch="urn:ietf:params:xml:ns:launch-1.0">
+        <launch:phase>sunrise</launch:phase>
+        <launch:applicationID>2393-9323-E08C-03B1
+        </launch:applicationID>
+      </launch:creData>
+    </extension>
+    <trID>
+      <clTRID>ABC-12345</clTRID>
+      <svTRID>54321-XYZ</svTRID>
+    </trID>
+  </response>
+</epp>"#;
+        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
+        let res = match res.message {
+            super::proto::EPPMessageType::Response(r) => r,
+            _ => unreachable!(),
+        };
+        let data = super::handle_create_response(*res).unwrap();
+        assert_eq!(data.pending, true);
+        let launch_create = data.launch_create.unwrap();
+        assert_eq!(launch_create.phase.phase_type, super::launch::PhaseType::Sunrise);
+        assert_eq!(launch_create.application_id.unwrap(), "2393-9323-E08C-03B1");
+    }
 }
