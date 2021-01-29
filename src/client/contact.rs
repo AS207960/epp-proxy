@@ -513,6 +513,12 @@ pub struct TransferResponse {
     /// Was the request completed instantly or not
     pub pending: bool,
     pub transaction_id: String,
+    pub data: TransferData,
+
+}
+
+#[derive(Debug)]
+pub struct TransferData {
     pub status: super::TransferStatus,
     /// Which client requested the transfer
     pub requested_client_id: String,
@@ -646,6 +652,19 @@ impl
     }
 }
 
+impl From<&proto::contact::EPPContactTransferData> for TransferData {
+    fn from(contact_transfer: &proto::contact::EPPContactTransferData) -> Self {
+        TransferData {
+            status: (&contact_transfer.transfer_status).into(),
+            requested_client_id: contact_transfer.requested_client_id.clone(),
+            requested_date: contact_transfer.requested_date,
+            act_client_id: contact_transfer.act_client_id.clone(),
+            act_date: contact_transfer.act_date,
+        }
+    }
+}
+
+
 pub fn handle_check(
     client: &EPPClientServerFeatures,
     req: &CheckRequest,
@@ -655,7 +674,12 @@ pub fn handle_check(
     }
     check_id(&req.id)?;
     let command = proto::EPPCheck::Contact(proto::contact::EPPContactCheck { id: req.id.clone() });
-    Ok((proto::EPPCommandType::Check(command), None))
+    let mut ext = vec![];
+    super::verisign::handle_verisign_namestore_erratum(client, &mut ext);
+    Ok((proto::EPPCommandType::Check(command), match ext.is_empty() {
+        true => None,
+        false => Some(ext)
+    }))
 }
 
 pub fn handle_check_response(response: proto::EPPResponse) -> Response<CheckResponse> {
@@ -686,7 +710,12 @@ pub fn handle_info(
     }
     check_id(&req.id)?;
     let command = proto::EPPInfo::Contact(proto::contact::EPPContactCheck { id: req.id.clone() });
-    Ok((proto::EPPCommandType::Info(command), None))
+    let mut ext = vec![];
+    super::verisign::handle_verisign_namestore_erratum(client, &mut ext);
+    Ok((proto::EPPCommandType::Info(command), match ext.is_empty() {
+        true => None,
+        false => Some(ext)
+    }))
 }
 
 pub fn handle_info_response(response: proto::EPPResponse) -> Response<InfoResponse> {
@@ -831,9 +860,9 @@ pub fn handle_create(
         )?)
     }
 
-    let extension = if client.nominet_contact_ext {
-        Some(vec![
-            proto::EPPCommandExtensionType::NominetContactExtCreate(
+    let mut ext = vec![];
+    if client.nominet_contact_ext {
+        ext.push(proto::EPPCommandExtensionType::NominetContactExtCreate(
                 proto::nominet::EPPContactInfo {
                     contact_type: match &req.entity_type {
                         Some(i) => match i {
@@ -845,11 +874,9 @@ pub fn handle_create(
                     trading_name: req.trading_name.clone(),
                     company_number: req.company_number.clone(),
                 },
-            ),
-        ])
-    } else {
-        None
-    };
+            ));
+    }
+    super::verisign::handle_verisign_namestore_erratum(client, &mut ext);
 
     let command = proto::EPPCreate::Contact(Box::new(proto::contact::EPPContactCreate {
         id: req.id.clone(),
@@ -889,7 +916,10 @@ pub fn handle_create(
             None
         },
     }));
-    Ok((proto::EPPCommandType::Create(command), extension))
+    Ok((proto::EPPCommandType::Create(command), match ext.is_empty() {
+        true => None,
+        false => Some(ext)
+    }))
 }
 
 pub fn handle_create_response(response: proto::EPPResponse) -> Response<CreateResponse> {
@@ -918,7 +948,12 @@ pub fn handle_delete(
     }
     check_id(&req.id)?;
     let command = proto::EPPDelete::Contact(proto::contact::EPPContactCheck { id: req.id.clone() });
-    Ok((proto::EPPCommandType::Delete(command), None))
+    let mut ext = vec![];
+    super::verisign::handle_verisign_namestore_erratum(client, &mut ext);
+    Ok((proto::EPPCommandType::Delete(command), match ext.is_empty() {
+        true => None,
+        false => Some(ext)
+    }))
 }
 
 pub fn handle_delete_response(response: proto::EPPResponse) -> Response<DeleteResponse> {
@@ -1057,9 +1092,9 @@ pub fn handle_update(
         },
     });
 
-    let extension = if client.nominet_contact_ext {
-        Some(vec![
-            proto::EPPCommandExtensionType::NominetContactExtUpdate(
+    let mut ext = vec![];
+    if client.nominet_contact_ext {
+        ext.push(proto::EPPCommandExtensionType::NominetContactExtUpdate(
                 proto::nominet::EPPContactInfo {
                     contact_type: match &req.new_entity_type {
                         Some(i) => match i {
@@ -1071,13 +1106,14 @@ pub fn handle_update(
                     trading_name: req.new_trading_name.clone(),
                     company_number: req.new_company_number.clone(),
                 },
-            ),
-        ])
-    } else {
-        None
-    };
+        ));
+    }
+    super::verisign::handle_verisign_namestore_erratum(client, &mut ext);
 
-    Ok((proto::EPPCommandType::Update(Box::new(command)), extension))
+    Ok((proto::EPPCommandType::Update(Box::new(command)), match ext.is_empty() {
+        true => None,
+        false => Some(ext)
+    }))
 }
 
 pub fn handle_update_response(response: proto::EPPResponse) -> Response<UpdateResponse> {
@@ -1101,7 +1137,12 @@ pub fn handle_transfer_query(
             id: req.id.clone(),
         }),
     };
-    Ok((proto::EPPCommandType::Transfer(command), None))
+    let mut ext = vec![];
+    super::verisign::handle_verisign_namestore_erratum(client, &mut ext);
+    Ok((proto::EPPCommandType::Transfer(command), match ext.is_empty() {
+        true => None,
+        false => Some(ext)
+    }))
 }
 
 pub fn handle_transfer_request(
@@ -1121,7 +1162,12 @@ pub fn handle_transfer_request(
             },
         }),
     };
-    Ok((proto::EPPCommandType::Transfer(command), None))
+    let mut ext = vec![];
+    super::verisign::handle_verisign_namestore_erratum(client, &mut ext);
+    Ok((proto::EPPCommandType::Transfer(command), match ext.is_empty() {
+        true => None,
+        false => Some(ext)
+    }))
 }
 
 pub fn handle_transfer_accept(
@@ -1141,7 +1187,12 @@ pub fn handle_transfer_accept(
             },
         }),
     };
-    Ok((proto::EPPCommandType::Transfer(command), None))
+    let mut ext = vec![];
+    super::verisign::handle_verisign_namestore_erratum(client, &mut ext);
+    Ok((proto::EPPCommandType::Transfer(command), match ext.is_empty() {
+        true => None,
+        false => Some(ext)
+    }))
 }
 
 pub fn handle_transfer_reject(
@@ -1161,7 +1212,12 @@ pub fn handle_transfer_reject(
             },
         }),
     };
-    Ok((proto::EPPCommandType::Transfer(command), None))
+    let mut ext = vec![];
+    super::verisign::handle_verisign_namestore_erratum(client, &mut ext);
+    Ok((proto::EPPCommandType::Transfer(command), match ext.is_empty() {
+        true => None,
+        false => Some(ext)
+    }))
 }
 
 pub fn handle_transfer_response(response: proto::EPPResponse) -> Response<TransferResponse> {
@@ -1171,11 +1227,7 @@ pub fn handle_transfer_response(response: proto::EPPResponse) -> Response<Transf
                 Ok(TransferResponse {
                     pending: response.is_pending(),
                     transaction_id: response.transaction_id.server_transaction_id.unwrap_or_default(),
-                    status: (&contact_transfer.transfer_status).into(),
-                    requested_client_id: contact_transfer.requested_client_id.clone(),
-                    requested_date: contact_transfer.requested_date,
-                    act_client_id: contact_transfer.act_client_id.clone(),
-                    act_date: contact_transfer.act_date,
+                    data: contact_transfer.into()
                 })
             }
             _ => Err(Error::InternalServerError),

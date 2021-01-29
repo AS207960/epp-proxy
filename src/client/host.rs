@@ -165,19 +165,7 @@ pub fn handle_check(
     }
     check_host(&req.name)?;
     let mut ext = vec![];
-    if client.has_erratum("verisign-tv") {
-        ext.push(proto::EPPCommandExtensionType::VerisignNameStoreExt(
-            proto::verisign::EPPNameStoreExt {
-                sub_product: "dotTV".to_string(),
-            },
-        ));
-    } else if client.has_erratum("verisign-cc") {
-        ext.push(proto::EPPCommandExtensionType::VerisignNameStoreExt(
-            proto::verisign::EPPNameStoreExt {
-                sub_product: "dotCC".to_string(),
-            },
-        ));
-    }
+    super::verisign::handle_verisign_namestore_erratum(client, &mut ext);
     let command = proto::EPPCheck::Host(proto::host::EPPHostCheck {
         name: req.name.clone(),
     });
@@ -214,23 +202,11 @@ pub fn handle_info(
         return Err(Err(Error::Unsupported));
     }
     check_host(&req.name)?;
-    let mut ext = vec![];
-    if client.has_erratum("verisign-tv") {
-        ext.push(proto::EPPCommandExtensionType::VerisignNameStoreExt(
-            proto::verisign::EPPNameStoreExt {
-                sub_product: "dotTV".to_string(),
-            },
-        ));
-    } else if client.has_erratum("verisign-cc") {
-        ext.push(proto::EPPCommandExtensionType::VerisignNameStoreExt(
-            proto::verisign::EPPNameStoreExt {
-                sub_product: "dotCC".to_string(),
-            },
-        ));
-    }
     let command = proto::EPPInfo::Host(proto::host::EPPHostCheck {
         name: req.name.clone(),
     });
+    let mut ext = vec![];
+    super::verisign::handle_verisign_namestore_erratum(client, &mut ext);
     Ok((proto::EPPCommandType::Info(command), match ext.is_empty() {
         true => None,
         false => Some(ext)
@@ -281,19 +257,7 @@ pub fn handle_create(
     }
     check_host(&req.name)?;
     let mut ext = vec![];
-    if client.has_erratum("verisign-tv") {
-        ext.push(proto::EPPCommandExtensionType::VerisignNameStoreExt(
-            proto::verisign::EPPNameStoreExt {
-                sub_product: "dotTV".to_string(),
-            },
-        ));
-    } else if client.has_erratum("verisign-cc") {
-        ext.push(proto::EPPCommandExtensionType::VerisignNameStoreExt(
-            proto::verisign::EPPNameStoreExt {
-                sub_product: "dotCC".to_string(),
-            },
-        ));
-    }
+    super::verisign::handle_verisign_namestore_erratum(client, &mut ext);
     let command = proto::EPPCreate::Host(proto::host::EPPHostCreate {
         name: req.name.clone(),
         addresses: match req
@@ -352,19 +316,7 @@ pub fn handle_delete(
     }
     check_host(&req.name)?;
     let mut ext = vec![];
-    if client.has_erratum("verisign-tv") {
-        ext.push(proto::EPPCommandExtensionType::VerisignNameStoreExt(
-            proto::verisign::EPPNameStoreExt {
-                sub_product: "dotTV".to_string(),
-            },
-        ));
-    } else if client.has_erratum("verisign-cc") {
-        ext.push(proto::EPPCommandExtensionType::VerisignNameStoreExt(
-            proto::verisign::EPPNameStoreExt {
-                sub_product: "dotCC".to_string(),
-            },
-        ));
-    }
+    super::verisign::handle_verisign_namestore_erratum(client, &mut ext);
     let command = proto::EPPDelete::Host(proto::host::EPPHostCheck {
         name: req.name.clone(),
     });
@@ -390,19 +342,7 @@ pub fn handle_update(
     }
     check_host(&req.name)?;
     let mut ext = vec![];
-    if client.has_erratum("verisign-tv") {
-        ext.push(proto::EPPCommandExtensionType::VerisignNameStoreExt(
-            proto::verisign::EPPNameStoreExt {
-                sub_product: "dotTV".to_string(),
-            },
-        ));
-    } else if client.has_erratum("verisign-cc") {
-        ext.push(proto::EPPCommandExtensionType::VerisignNameStoreExt(
-            proto::verisign::EPPNameStoreExt {
-                sub_product: "dotCC".to_string(),
-            },
-        ));
-    }
+    super::verisign::handle_verisign_namestore_erratum(client, &mut ext);
     if req.add.is_empty() && req.remove.is_empty() && req.new_name.is_none() {
         return Err(Err(Error::Err(
             "at least one operation must be specified".to_string(),

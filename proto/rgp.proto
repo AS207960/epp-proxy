@@ -2,6 +2,7 @@ syntax = "proto3";
 package epp.rgp;
 
 import "fee.proto";
+import "google/protobuf/wrappers.proto";
 
 enum RGPState {
     Unknown = 0;
@@ -16,6 +17,8 @@ enum RGPState {
 
 message RequestRequest {
     string name = 1;
+    google.protobuf.StringValue registry_name = 2;
+    fee.DonutsFeeData donuts_fee_agreement = 3;
 }
 
 message RestoreReply {

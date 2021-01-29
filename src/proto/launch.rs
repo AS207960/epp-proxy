@@ -8,7 +8,7 @@ pub struct EPPLaunchCheck {
     )]
     pub phase: Option<EPPLaunchPhase>,
     #[serde(
-        rename = "$attr:exists",
+        rename = "$attr:type",
         skip_serializing_if = "Option::is_none"
     )]
     pub check_type: Option<EPPLaunchCheckType>
@@ -100,7 +100,7 @@ pub struct EPPLaunchCreate {
     #[serde(rename = "{urn:ietf:params:xml:ns:launch-1.0}launch:notice")]
     pub notices: Vec<EPPLaunchNotice>,
     #[serde(
-        rename = "$value",
+        rename = "$valueRaw",
         skip_serializing_if = "Option::is_none"
     )]
     pub signed_mark: Option<String>,
@@ -130,7 +130,11 @@ pub enum EPPLaunchCreateType {
 pub struct EPPLaunchPhase {
     #[serde(rename = "$value")]
     pub phase: EPPLaunchPhaseType,
-    #[serde(rename = "$attr:name", default)]
+    #[serde(
+        rename = "$attr:name",
+        skip_serializing_if = "Option::is_none",
+        default
+    )]
     pub name: Option<String>,
 }
 
@@ -184,7 +188,7 @@ pub struct EPPLaunchCodeMark {
     )]
     pub code: Option<EPPLaunchCode>,
     #[serde(
-        rename = "$value",
+        rename = "$valueRaw",
         skip_serializing_if = "Option::is_none"
     )]
     pub mark: Option<String>,

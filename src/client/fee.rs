@@ -3,7 +3,7 @@ use super::proto;
 #[derive(Debug)]
 pub struct FeeCheck {
     pub currency: Option<String>,
-    pub commands: Vec<FeeCheckCommand>
+    pub commands: Vec<FeeCheckCommand>,
 }
 
 #[derive(Debug)]
@@ -13,6 +13,10 @@ pub enum Command {
     Transfer,
     Delete,
     Restore,
+    Update,
+    Check,
+    Info,
+    Custom,
 }
 
 #[derive(Debug)]
@@ -24,7 +28,7 @@ pub enum Applied {
 #[derive(Debug)]
 pub struct FeeCheckCommand {
     pub command: Command,
-    pub period: Option<super::domain::Period>
+    pub period: Option<super::domain::Period>,
 }
 
 #[derive(Debug)]
@@ -52,13 +56,13 @@ pub struct Fee {
     pub description: Option<String>,
     pub refundable: Option<bool>,
     pub grace_period: Option<String>,
-    pub applied: Applied
+    pub applied: Applied,
 }
 
 #[derive(Debug)]
 pub struct Credit {
     pub value: String,
-    pub description: Option<String>
+    pub description: Option<String>,
 }
 
 #[derive(Debug)]
@@ -71,6 +75,43 @@ pub struct FeeData {
     pub credit_limit: Option<String>,
 }
 
+#[derive(Debug)]
+pub struct DonutsFeeData {
+    pub sets: Vec<DonutsFeeSet>,
+}
+
+#[derive(Debug)]
+pub struct DonutsFeeSet {
+    pub fees: Vec<DonutsAmount>,
+    pub fee_type: DonutsFeeType,
+    pub category: DonutsCategory,
+}
+
+#[derive(Debug)]
+pub struct DonutsCategory {
+    pub category: String,
+    pub name: Option<String>,
+}
+
+#[derive(Debug)]
+pub struct DonutsFeeType {
+    pub fee_type: DonutsFeeTypes,
+    pub name: Option<String>,
+}
+
+#[derive(Debug)]
+pub enum DonutsFeeTypes {
+    Fee,
+    Price,
+    Custom,
+}
+
+#[derive(Debug)]
+pub struct DonutsAmount {
+    pub value: String,
+    pub command: Command,
+    pub command_name: Option<String>,
+}
 
 impl From<&proto::fee::EPPFeeCommand> for Command {
     fn from(from: &proto::fee::EPPFeeCommand) -> Self {
@@ -84,14 +125,46 @@ impl From<&proto::fee::EPPFeeCommand> for Command {
     }
 }
 
-impl From<&Command> for proto::fee::EPPFeeCommand {
+impl From<&proto::united_tld::EPPChargeCommand> for Command {
+    fn from(from: &proto::united_tld::EPPChargeCommand) -> Self {
+        match from {
+            proto::united_tld::EPPChargeCommand::Check => Command::Check,
+            proto::united_tld::EPPChargeCommand::Create => Command::Create,
+            proto::united_tld::EPPChargeCommand::Delete => Command::Delete,
+            proto::united_tld::EPPChargeCommand::Info => Command::Info,
+            proto::united_tld::EPPChargeCommand::Renew => Command::Renew,
+            proto::united_tld::EPPChargeCommand::Transfer => Command::Transfer,
+            proto::united_tld::EPPChargeCommand::Update => Command::Update,
+            proto::united_tld::EPPChargeCommand::Custom => Command::Custom,
+        }
+    }
+}
+
+impl From<&Command> for Option<proto::fee::EPPFeeCommand> {
     fn from(from: &Command) -> Self {
         match from {
-            Command::Create => proto::fee::EPPFeeCommand::Create,
-            Command::Renew => proto::fee::EPPFeeCommand::Renew,
-            Command::Transfer => proto::fee::EPPFeeCommand::Transfer,
-            Command::Delete => proto::fee::EPPFeeCommand::Delete,
-            Command::Restore => proto::fee::EPPFeeCommand::Restore,
+            Command::Create => Some(proto::fee::EPPFeeCommand::Create),
+            Command::Renew => Some(proto::fee::EPPFeeCommand::Renew),
+            Command::Transfer => Some(proto::fee::EPPFeeCommand::Transfer),
+            Command::Delete => Some(proto::fee::EPPFeeCommand::Delete),
+            Command::Restore => Some(proto::fee::EPPFeeCommand::Restore),
+            _ => None
+        }
+    }
+}
+
+impl From<&Command> for proto::united_tld::EPPChargeCommand {
+    fn from(from: &Command) -> Self {
+        match from {
+            Command::Create => proto::united_tld::EPPChargeCommand::Create,
+            Command::Renew => proto::united_tld::EPPChargeCommand::Renew,
+            Command::Transfer => proto::united_tld::EPPChargeCommand::Transfer,
+            Command::Delete => proto::united_tld::EPPChargeCommand::Delete,
+            Command::Restore => proto::united_tld::EPPChargeCommand::Update,
+            Command::Check => proto::united_tld::EPPChargeCommand::Check,
+            Command::Info => proto::united_tld::EPPChargeCommand::Info,
+            Command::Update => proto::united_tld::EPPChargeCommand::Update,
+            Command::Custom => proto::united_tld::EPPChargeCommand::Custom,
         }
     }
 }
@@ -145,7 +218,7 @@ impl From<&proto::fee::EPPFee10Credit> for Credit {
     fn from(from: &proto::fee::EPPFee10Credit) -> Self {
         Credit {
             value: from.value.to_owned(),
-            description: from.description.to_owned()
+            description: from.description.to_owned(),
         }
     }
 }
@@ -158,7 +231,7 @@ impl From<&proto::fee::EPPFee05TransformData> for FeeData {
             fees: f.fee.iter().map(Into::into).collect(),
             credits: vec![],
             balance: f.balance.to_owned(),
-            credit_limit: f.credit_limit.to_owned()
+            credit_limit: f.credit_limit.to_owned(),
         }
     }
 }
@@ -171,7 +244,7 @@ impl From<&proto::fee::EPPFee07TransformData> for FeeData {
             fees: f.fee.iter().map(Into::into).collect(),
             credits: f.credit.iter().map(Into::into).collect(),
             balance: f.balance.to_owned(),
-            credit_limit: f.credit_limit.to_owned()
+            credit_limit: f.credit_limit.to_owned(),
         }
     }
 }
@@ -184,7 +257,7 @@ impl From<&proto::fee::EPPFee08TransformData> for FeeData {
             fees: f.fee.iter().map(Into::into).collect(),
             credits: f.credit.iter().map(Into::into).collect(),
             balance: f.balance.to_owned(),
-            credit_limit: f.credit_limit.to_owned()
+            credit_limit: f.credit_limit.to_owned(),
         }
     }
 }
@@ -197,7 +270,7 @@ impl From<&proto::fee::EPPFee09TransformData> for FeeData {
             fees: f.fee.iter().map(Into::into).collect(),
             credits: f.credit.iter().map(Into::into).collect(),
             balance: f.balance.to_owned(),
-            credit_limit: f.credit_limit.to_owned()
+            credit_limit: f.credit_limit.to_owned(),
         }
     }
 }
@@ -210,7 +283,7 @@ impl From<&proto::fee::EPPFee10TransformData> for FeeData {
             fees: f.fee.iter().map(Into::into).collect(),
             credits: f.credit.iter().map(Into::into).collect(),
             balance: f.balance.to_owned(),
-            credit_limit: f.credit_limit.to_owned()
+            credit_limit: f.credit_limit.to_owned(),
         }
     }
 }
@@ -236,7 +309,7 @@ impl From<&proto::fee::EPPFee08TransferData> for FeeData {
             fees: f.fee.iter().map(Into::into).collect(),
             credits: f.credit.iter().map(Into::into).collect(),
             balance: None,
-            credit_limit: None
+            credit_limit: None,
         }
     }
 }
@@ -262,7 +335,7 @@ impl From<&proto::fee::EPPFee05DeleteData> for FeeData {
             fees: vec![],
             credits: f.credit.iter().map(Into::into).collect(),
             balance: f.balance.to_owned(),
-            credit_limit: f.credit_limit.to_owned()
+            credit_limit: f.credit_limit.to_owned(),
         }
     }
 }
@@ -275,7 +348,7 @@ impl From<&proto::fee::EPPFee07DeleteData> for FeeData {
             fees: vec![],
             credits: f.credit.iter().map(Into::into).collect(),
             balance: f.balance.to_owned(),
-            credit_limit: f.credit_limit.to_owned()
+            credit_limit: f.credit_limit.to_owned(),
         }
     }
 }
@@ -288,7 +361,7 @@ impl From<&proto::fee::EPPFee08DeleteData> for FeeData {
             fees: vec![],
             credits: f.credit.iter().map(Into::into).collect(),
             balance: f.balance.to_owned(),
-            credit_limit: f.credit_limit.to_owned()
+            credit_limit: f.credit_limit.to_owned(),
         }
     }
 }
@@ -301,7 +374,90 @@ impl From<&proto::fee::EPPFee09DeleteData> for FeeData {
             fees: vec![],
             credits: f.credit.iter().map(Into::into).collect(),
             balance: f.balance.to_owned(),
-            credit_limit: f.credit_limit.to_owned()
+            credit_limit: f.credit_limit.to_owned(),
         }
+    }
+}
+
+impl From<&proto::united_tld::EPPChargeData> for DonutsFeeData {
+    fn from(f: &proto::united_tld::EPPChargeData) -> Self {
+        DonutsFeeData {
+            sets: f.sets.iter().map(Into::into).collect()
+        }
+    }
+}
+
+impl From<&proto::united_tld::EPPChargeSet> for DonutsFeeSet {
+    fn from(f: &proto::united_tld::EPPChargeSet) -> Self {
+        DonutsFeeSet {
+            fees: f.amount.iter().map(|f| DonutsAmount {
+                value: f.value.to_string(),
+                command: (&f.command).into(),
+                command_name: f.name.as_ref().map(Into::into),
+            }).collect(),
+            fee_type: DonutsFeeType {
+                fee_type: match f.set_type.value {
+                    proto::united_tld::EPPChargeTypes::Fee => DonutsFeeTypes::Fee,
+                    proto::united_tld::EPPChargeTypes::Price => DonutsFeeTypes::Price,
+                    proto::united_tld::EPPChargeTypes::Custom => DonutsFeeTypes::Custom,
+                },
+                name: f.set_type.name.as_ref().map(Into::into),
+            },
+            category: DonutsCategory {
+                category: f.category.value.to_string(),
+                name: f.category.name.as_ref().map(Into::into),
+            },
+        }
+    }
+}
+
+impl From<&proto::united_tld::EPPChargeCheckDatum> for DonutsFeeData {
+    fn from(f: &proto::united_tld::EPPChargeCheckDatum) -> Self {
+        DonutsFeeData {
+            sets: f.sets.iter().map(Into::into).collect()
+        }
+    }
+}
+
+impl From<&DonutsFeeData> for proto::united_tld::EPPChargeData {
+    fn from(f: &DonutsFeeData) -> Self {
+        proto::united_tld::EPPChargeData {
+            sets: f.sets.iter().map(|s| proto::united_tld::EPPChargeSet {
+                category: proto::united_tld::EPPChargeCategory {
+                    value: s.category.category.to_string(),
+                    name: s.category.name.as_ref().map(Into::into),
+                },
+                set_type: proto::united_tld::EPPChargeType {
+                    value: match s.fee_type.fee_type {
+                         DonutsFeeTypes::Fee => proto::united_tld::EPPChargeTypes::Fee,
+                         DonutsFeeTypes::Price => proto::united_tld::EPPChargeTypes::Price,
+                         DonutsFeeTypes::Custom => proto::united_tld::EPPChargeTypes::Custom,
+                    },
+                    name: s.fee_type.name.as_ref().map(Into::into),
+                },
+                amount: s.fees.iter().map(|f| proto::united_tld::EPPChargeAmount {
+                    value: f.value.to_string(),
+                    name: f.command_name.as_ref().map(Into::into),
+                    command: (&f.command).into(),
+                }).collect(),
+            }).collect()
+        }
+    }
+}
+
+pub fn handle_donuts_fee_agreement<T>(
+    client: &super::EPPClientServerFeatures, agreement: &Option<DonutsFeeData>,
+    exts: &mut Vec<super::proto::EPPCommandExtensionType>) -> Result<(), super::router::Response<T>> {
+    if let Some(agreement) = agreement {
+        if client.unitedtld_charge {
+            exts.push(super::proto::EPPCommandExtensionType::EPPDonutsChargeAgreement(
+                agreement.into()
+            ));
+            Ok(())
+        } else {
+            Err(Err(super::Error::Unsupported))
+        }
+    } else {
+        Ok(())
     }
 }

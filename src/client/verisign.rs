@@ -38,3 +38,37 @@ impl TryFrom<super::proto::verisign::EPPLowBalanceData> for LowBalanceData {
         })
     }
 }
+
+pub fn handle_verisign_namestore_erratum(client: &super::EPPClientServerFeatures, exts: &mut Vec<super::proto::EPPCommandExtensionType>) {
+    if client.has_erratum("verisign-tv") {
+        exts.push(super::proto::EPPCommandExtensionType::VerisignNameStoreExt(
+            super::proto::verisign::EPPNameStoreExt {
+                sub_product: "dotTV".to_string(),
+            },
+        ));
+    } else if client.has_erratum("verisign-cc") {
+        exts.push(super::proto::EPPCommandExtensionType::VerisignNameStoreExt(
+            super::proto::verisign::EPPNameStoreExt {
+                sub_product: "dotCC".to_string(),
+            },
+        ));
+    } else if client.has_erratum("verisign-com") {
+        exts.push(super::proto::EPPCommandExtensionType::VerisignNameStoreExt(
+            super::proto::verisign::EPPNameStoreExt {
+                sub_product: "dotCOM".to_string(),
+            },
+        ));
+    } else if client.has_erratum("verisign-net") {
+        exts.push(super::proto::EPPCommandExtensionType::VerisignNameStoreExt(
+            super::proto::verisign::EPPNameStoreExt {
+                sub_product: "dotNET".to_string(),
+            },
+        ));
+    } else if client.has_erratum("verisign-name") {
+        exts.push(super::proto::EPPCommandExtensionType::VerisignNameStoreExt(
+            super::proto::verisign::EPPNameStoreExt {
+                sub_product: "dotNAME".to_string(),
+            },
+        ));
+    }
+}

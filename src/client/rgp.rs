@@ -6,6 +6,7 @@ use super::{proto, fee, EPPClientServerFeatures, Error, Request, Response, Sende
 #[derive(Debug)]
 pub struct RestoreRequest {
     name: String,
+    donuts_fee_agreement: Option<fee::DonutsFeeData>,
     pub return_path: Sender<RestoreResponse>,
 }
 
@@ -82,19 +83,9 @@ pub fn handle_restore(
                 },
             },
         )];
-        if client.has_erratum("verisign-tv") {
-            exts.push(proto::EPPCommandExtensionType::VerisignNameStoreExt(
-                proto::verisign::EPPNameStoreExt {
-                    sub_product: "dotTV".to_string(),
-                },
-            ))
-        } else if client.has_erratum("verisign-cc") {
-            exts.push(proto::EPPCommandExtensionType::VerisignNameStoreExt(
-                proto::verisign::EPPNameStoreExt {
-                    sub_product: "dotCC".to_string(),
-                },
-            ))
-        };
+        super::verisign::handle_verisign_namestore_erratum(client, &mut exts);
+        super::fee::handle_donuts_fee_agreement(client, &req.donuts_fee_agreement, &mut exts)?;
+
         Ok((proto::EPPCommandType::Update(Box::new(command)), Some(exts)))
     }
 }
@@ -172,6 +163,7 @@ pub fn handle_restore_response(response: proto::EPPResponse) -> Response<Restore
 /// * `client_sender` - Reference to the tokio channel into the client
 pub async fn request(
     domain: &str,
+    donuts_fee_agreement: Option<fee::DonutsFeeData>,
     client_sender: &mut futures::channel::mpsc::Sender<Request>,
 ) -> Result<RestoreResponse, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
@@ -179,6 +171,7 @@ pub async fn request(
         client_sender,
         Request::RestoreRequest(Box::new(RestoreRequest {
             name: domain.to_string(),
+            donuts_fee_agreement,
             return_path: sender,
         })),
         receiver,

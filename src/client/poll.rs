@@ -37,11 +37,15 @@ pub enum PollData {
         change_data: Option<ChangeData>,
     },
     DomainTransferData {
-        data: super::domain::TransferData,
+        data: super::domain::TransferResponse,
+        change_data: Option<ChangeData>,
+    },
+    ContactTransferData {
+        data: super::contact::TransferData,
         change_data: Option<ChangeData>,
     },
     DomainCreateData {
-        data: super::domain::CreateData,
+        data: super::domain::CreateResponse,
         change_data: Option<ChangeData>,
     },
     DomainPanData {
@@ -49,7 +53,7 @@ pub enum PollData {
         change_data: Option<ChangeData>,
     },
     DomainRenewData {
-        data: super::domain::RenewData,
+        data: super::domain::RenewResponse,
         change_data: Option<ChangeData>,
     },
     NominetDomainCancelData {
@@ -240,7 +244,7 @@ pub fn handle_poll_response(response: proto::EPPResponse) -> Response<Option<Pol
             proto::EPPResultCode::SuccessAckToDequeue => match response.message_queue {
                 Some(value) => Response::Ok(Some(PollResponse {
                     count: value.count,
-                    id: value.id,
+                    id: value.id.unwrap_or_default(),
                     enqueue_time: value.enqueue_date.unwrap_or_else(Utc::now),
                     message: value.message.unwrap_or_default(),
                     data: match response.data {
@@ -261,19 +265,25 @@ pub fn handle_poll_response(response: proto::EPPResponse) -> Response<Option<Pol
                             }
                             proto::EPPResultDataValue::EPPDomainTransferResult(domain_transfer) => {
                                 PollData::DomainTransferData {
-                                    data: (&domain_transfer).into(),
+                                    data: (domain_transfer, &response.extension).try_into()?,
+                                    change_data: change_data_from_response(&response.extension)?,
+                                }
+                            }
+                            proto::EPPResultDataValue::EPPContactTransferResult(contact_transfer) => {
+                                PollData::ContactTransferData {
+                                    data: (&contact_transfer).into(),
                                     change_data: change_data_from_response(&response.extension)?,
                                 }
                             }
                             proto::EPPResultDataValue::EPPDomainCreateResult(domain_create) => {
                                 PollData::DomainCreateData {
-                                    data: (&domain_create).into(),
+                                    data: (Some(domain_create), &response.extension).try_into()?,
                                     change_data: change_data_from_response(&response.extension)?,
                                 }
                             }
                             proto::EPPResultDataValue::EPPDomainRenewResult(domain_renew) => {
                                 PollData::DomainRenewData {
-                                    data: (&domain_renew).into(),
+                                    data: (domain_renew, &response.extension).try_into()?,
                                     change_data: change_data_from_response(&response.extension)?,
                                 }
                             }
@@ -362,7 +372,7 @@ pub fn handle_poll_ack_response(response: proto::EPPResponse) -> Response<PollAc
     match response.message_queue {
         Some(value) => Response::Ok(PollAckResponse {
             count: Some(value.count),
-            next_id: Some(value.id),
+            next_id: value.id,
         }),
         None => Response::Ok(PollAckResponse {
             count: None,

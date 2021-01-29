@@ -110,6 +110,7 @@ pub struct LaunchCreate {
     pub code_mark: Vec<CodeMark>,
     pub signed_mark: Option<String>,
     pub create_type: LaunchCreateType,
+    pub notices: Vec<Notice>,
 }
 
 impl From<&LaunchCreate> for proto::launch::EPPLaunchCreate {
@@ -122,7 +123,7 @@ impl From<&LaunchCreate> for proto::launch::EPPLaunchCreate {
             phase: (&from.phase).into(),
             signed_mark: from.signed_mark.as_ref().map(Into::into),
             code_marks: from.code_mark.iter().map(Into::into).collect(),
-            notices: vec![]
+            notices: from.notices.iter().map(Into::into).collect()
         }
     }
 }

@@ -11,6 +11,8 @@ import "nominet.proto";
 
 service EPPProxy {
     rpc DomainCheck            (domain.DomainCheckRequest)                returns (domain.DomainCheckReply);
+    rpc DomainClaimsCheck      (domain.DomainClaimsCheckRequest)          returns (domain.DomainClaimsCheckReply);
+    rpc DomainTrademarkCheck   (domain.DomainTrademarkCheckRequest)       returns (domain.DomainClaimsCheckReply);
     rpc DomainInfo             (domain.DomainInfoRequest)                 returns (domain.DomainInfoReply);
     rpc DomainCreate           (domain.DomainCreateRequest)               returns (domain.DomainCreateReply);
     rpc DomainDelete           (domain.DomainDeleteRequest)               returns (domain.DomainDeleteReply);

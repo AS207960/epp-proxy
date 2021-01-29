@@ -1,0 +1,83 @@
+syntax = "proto3";
+package epp.launch;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+
+enum StatusType {
+  Custom = 0;
+  PendingValidation = 1;
+  Validated = 2;
+  Invalid = 3;
+  PendingAllocation = 4;
+  Allocated = 5;
+  Rejected = 6;
+}
+
+message Status {
+  StatusType status_type = 1;
+  google.protobuf.StringValue status_name = 2;
+  google.protobuf.StringValue message = 3;
+}
+
+message Phase {
+  enum PhaseType {
+    Open = 0;
+    Sunrise = 1;
+    Landrush = 2;
+    Claims = 3;
+    Custom = 4;
+  }
+
+  PhaseType phase_type = 1;
+  google.protobuf.StringValue phase_name = 2;
+}
+
+message ClaimsKey {
+  string key = 1;
+  google.protobuf.StringValue validator_id = 2;
+}
+
+message LaunchInfo {
+  bool include_mark = 1;
+  Phase phase = 2;
+  google.protobuf.StringValue application_id = 3;
+}
+
+message LaunchInfoData {
+  Phase phase = 1;
+  google.protobuf.StringValue application_id = 2;
+  Status status = 3;
+  google.protobuf.StringValue mark = 4;
+}
+
+message CodeMark {
+  google.protobuf.StringValue code = 1;
+  google.protobuf.StringValue validator = 2;
+  google.protobuf.StringValue mark = 3;
+}
+
+message Notice {
+  string notice_id = 1;
+  google.protobuf.StringValue validator = 2;
+  google.protobuf.Timestamp not_after = 3;
+  google.protobuf.Timestamp accepted_after = 4;
+}
+
+message LaunchCreate {
+  enum CreateType {
+    Registration = 0;
+    Application = 1;
+  }
+
+  Phase phase = 1;
+  repeated CodeMark code_mark = 2;
+  repeated Notice notices = 5;
+  google.protobuf.StringValue signed_mark = 3;
+  CreateType create_type = 4;
+}
+
+message LaunchData {
+  Phase phase = 1;
+  google.protobuf.StringValue application_Id = 2;
+}

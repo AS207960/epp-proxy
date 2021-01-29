@@ -148,6 +148,8 @@ pub enum EPPCommandExtensionType {
     EPPLaunchUpdate(launch::EPPLaunchInfo),
     #[serde(rename = "{urn:ietf:params:xml:ns:launch-1.0}launch:delete")]
     EPPLaunchDelete(launch::EPPLaunchInfo),
+    #[serde(rename = "{http://www.unitedtld.com/epp/charge-1.0}charge:agreement")]
+    EPPDonutsChargeAgreement(united_tld::EPPChargeData),
 }
 
 #[derive(Debug, Serialize)]
@@ -465,8 +467,8 @@ pub struct EPPResultExtraValue {
 pub struct EPPMessageQueue {
     #[serde(rename = "$attr:count")]
     pub count: u64,
-    #[serde(rename = "$attr:id")]
-    pub id: String,
+    #[serde(rename = "$attr:id", default)]
+    pub id: Option<String>,
     #[serde(
         rename = "{urn:ietf:params:xml:ns:epp-1.0}qDate",
         deserialize_with = "deserialize_datetime_opt",
@@ -677,6 +679,18 @@ pub enum EPPResponseExtensionType {
     EPPLaunchInfoData(launch::EPPLaunchInfoData),
     #[serde(rename = "{urn:ietf:params:xml:ns:launch-1.0}creData")]
     EPPLaunchCreateData(launch::EPPLaunchCreateData),
+    #[serde(rename = "{http://www.unitedtld.com/epp/charge-1.0}chkData")]
+    EPPDonutsChargeCheckData(united_tld::EPPChargeCheckData),
+    #[serde(rename = "{http://www.unitedtld.com/epp/charge-1.0}infData")]
+    EPPDonutsChargeInfoData(united_tld::EPPChargeData),
+    #[serde(rename = "{http://www.unitedtld.com/epp/charge-1.0}creData")]
+    EPPDonutsChargeCreateData(united_tld::EPPChargeData),
+    #[serde(rename = "{http://www.unitedtld.com/epp/charge-1.0}trnData")]
+    EPPDonutsChargeTransferData(united_tld::EPPChargeData),
+    #[serde(rename = "{http://www.unitedtld.com/epp/charge-1.0}renData")]
+    EPPDonutsChargeRenewData(united_tld::EPPChargeData),
+    #[serde(rename = "{http://www.unitedtld.com/epp/charge-1.0}upData")]
+    EPPDonutsChargeUpdateData(united_tld::EPPChargeData),
 }
 
 #[derive(Debug, Serialize)]

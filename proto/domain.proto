@@ -6,6 +6,7 @@ import "google/protobuf/wrappers.proto";
 import "common.proto";
 import "rgp.proto";
 import "fee.proto";
+import "launch.proto";
 
 message Contact {
     string id = 1;
@@ -43,18 +44,41 @@ enum DomainStatus {
 message DomainCheckRequest {
     string name = 1;
     fee.FeeCheck fee_check = 2;
+    launch.Phase launch_check = 3;
+    google.protobuf.StringValue registry_name = 4;
+}
+
+message DomainClaimsCheckRequest {
+    string name = 1;
+    launch.Phase launch_check = 2;
+    google.protobuf.StringValue registry_name = 3;
+}
+
+message DomainTrademarkCheckRequest {
+    string name = 1;
+    google.protobuf.StringValue registry_name = 2;
 }
 
 message DomainCheckReply {
     bool available = 1;
     google.protobuf.StringValue reason = 2;
     fee.FeeCheckData fee_check = 4;
+    fee.DonutsFeeData donuts_fee_check = 5;
+    string registry_name = 3;
+}
+
+message DomainClaimsCheckReply {
+    bool exists = 1;
+    repeated launch.ClaimsKey claims_keys = 2;
     string registry_name = 3;
 }
 
 message DomainInfoRequest {
     string name = 1;
     google.protobuf.StringValue auth_info = 2;
+    launch.LaunchInfo launch_info = 3;
+    google.protobuf.StringValue registry_name = 4;
+    fee.DonutsFeeData donuts_fee_agreement = 5;
 }
 
 message DomainInfoReply {
@@ -76,6 +100,8 @@ message DomainInfoReply {
     repeated rgp.RGPState rgp_state = 16;
     google.protobuf.StringValue auth_info = 17;
     SecDNSData sec_dns = 18;
+    launch.LaunchInfoData launch_info = 19;
+    fee.DonutsFeeData donuts_fee_data = 20;
 }
 
 message DomainCreateRequest {
@@ -86,6 +112,9 @@ message DomainCreateRequest {
     repeated NameServer nameservers = 5;
     string auth_info = 6;
     SecDNSData sec_dns = 7;
+    launch.LaunchCreate launch_data = 8;
+    google.protobuf.StringValue registry_name = 9;
+    fee.DonutsFeeData donuts_fee_agreement = 10;
 }
 
 message DomainCreateReply {
@@ -95,11 +124,16 @@ message DomainCreateReply {
     google.protobuf.Timestamp creation_date = 3;
     google.protobuf.Timestamp expiry_date = 4;
     fee.FeeData fee_data = 6;
+    fee.DonutsFeeData donuts_fee_data = 9;
+    launch.LaunchData launch_data = 8;
     string registry_name = 5;
 }
 
 message DomainDeleteRequest {
     string name = 1;
+    launch.LaunchData launch_data = 2;
+    google.protobuf.StringValue registry_name = 3;
+    fee.DonutsFeeData donuts_fee_agreement = 4;
 }
 
 message DomainDeleteReply {
@@ -124,12 +158,16 @@ message DomainUpdateRequest {
     google.protobuf.StringValue new_registrant = 4;
     google.protobuf.StringValue new_auth_info = 5;
     UpdateSecDNSData sec_dns = 6;
+    launch.LaunchData launch_data = 7;
+    google.protobuf.StringValue registry_name = 8;
+    fee.DonutsFeeData donuts_fee_agreement = 9;
 }
 
 message DomainUpdateReply {
     bool pending = 1;
     string transaction_id = 4;
     fee.FeeData fee_data = 3;
+    fee.DonutsFeeData donuts_fee_data = 5;
     string registry_name = 2;
 }
 
@@ -137,6 +175,8 @@ message DomainRenewRequest {
     string name = 1;
     common.Period period = 2;
     google.protobuf.Timestamp current_expiry_date = 3;
+    google.protobuf.StringValue registry_name = 4;
+    fee.DonutsFeeData donuts_fee_agreement = 5;
 }
 
 message DomainRenewReply {
@@ -145,23 +185,28 @@ message DomainRenewReply {
     string transaction_id = 5;
     google.protobuf.Timestamp expiry_date = 2;
     fee.FeeData fee_data = 4;
+    fee.DonutsFeeData donuts_fee_data = 7;
     string registry_name = 3;
 }
 
 message DomainTransferQueryRequest {
     string name = 1;
     google.protobuf.StringValue auth_info = 2;
+    google.protobuf.StringValue registry_name = 3;
 }
 
 message DomainTransferRequestRequest {
     string name = 1;
     common.Period period = 2;
     string auth_info = 3;
+    google.protobuf.StringValue registry_name = 4;
+    fee.DonutsFeeData donuts_fee_agreement = 5;
 }
 
 message DomainTransferAcceptRejectRequest {
     string name = 1;
     string auth_info = 2;
+    google.protobuf.StringValue registry_name = 3;
 }
 
 message DomainTransferReply {
@@ -174,6 +219,7 @@ message DomainTransferReply {
     google.protobuf.Timestamp act_date = 6;
     google.protobuf.Timestamp expiry_date = 7;
     fee.FeeData fee_data = 9;
+    fee.DonutsFeeData donuts_fee_data = 11;
     string registry_name = 8;
 }
 

@@ -37,6 +37,7 @@ pub struct CheckResponse {
     pub reason: Option<String>,
     /// Fee information (if supplied by the registry)
     pub fee_check: Option<fee::FeeCheckData>,
+    pub donuts_fee_check: Option<fee::DonutsFeeData>,
 }
 
 /// Response to a domain claims check query
@@ -93,6 +94,7 @@ pub struct InfoResponse {
     /// DNSSEC data
     pub sec_dns: Option<SecDNSData>,
     pub launch_info: Option<launch::LaunchInfoData>,
+    pub donuts_fee_data: Option<fee::DonutsFeeData>,
 }
 
 /// Additional contact associated with a domain
@@ -156,6 +158,7 @@ pub struct CreateRequest {
     auth_info: String,
     sec_dns: Option<SecDNSData>,
     launch_create: Option<launch::LaunchCreate>,
+    donuts_fee_agreement: Option<fee::DonutsFeeData>,
     pub return_path: Sender<CreateResponse>,
 }
 
@@ -183,6 +186,7 @@ pub struct CreateResponse {
     pub data: CreateData,
     /// Fee information (if supplied by the registry)
     pub fee_data: Option<fee::FeeData>,
+    pub donuts_fee_data: Option<fee::DonutsFeeData>,
     pub launch_create: Option<launch::LaunchCreateData>,
 }
 
@@ -200,6 +204,7 @@ pub struct CreateData {
 pub struct DeleteRequest {
     name: String,
     launch_info: Option<launch::LaunchUpdate>,
+    donuts_fee_agreement: Option<fee::DonutsFeeData>,
     pub return_path: Sender<DeleteResponse>,
 }
 
@@ -221,6 +226,7 @@ pub struct UpdateRequest {
     new_auth_info: Option<String>,
     sec_dns: Option<UpdateSecDNS>,
     launch_info: Option<launch::LaunchUpdate>,
+    donuts_fee_agreement: Option<fee::DonutsFeeData>,
     pub return_path: Sender<UpdateResponse>,
 }
 
@@ -252,6 +258,7 @@ pub struct UpdateResponse {
     pub transaction_id: String,
     /// Fee information (if supplied by the registry)
     pub fee_data: Option<fee::FeeData>,
+    pub donuts_fee_data: Option<fee::DonutsFeeData>,
 }
 
 #[derive(Debug)]
@@ -259,6 +266,7 @@ pub struct RenewRequest {
     name: String,
     add_period: Option<Period>,
     cur_expiry_date: DateTime<Utc>,
+    donuts_fee_agreement: Option<fee::DonutsFeeData>,
     pub return_path: Sender<RenewResponse>,
 }
 
@@ -270,6 +278,7 @@ pub struct RenewResponse {
     pub data: RenewData,
     /// Fee information (if supplied by the registry)
     pub fee_data: Option<fee::FeeData>,
+    pub donuts_fee_data: Option<fee::DonutsFeeData>,
 }
 
 #[derive(Debug)]
@@ -290,6 +299,7 @@ pub struct TransferRequestRequest {
     name: String,
     auth_info: String,
     add_period: Option<Period>,
+    donuts_fee_agreement: Option<fee::DonutsFeeData>,
     pub return_path: Sender<TransferResponse>,
 }
 
@@ -308,6 +318,7 @@ pub struct TransferResponse {
     pub data: TransferData,
     /// Fee information (if supplied by the registry)
     pub fee_data: Option<fee::FeeData>,
+    pub donuts_fee_data: Option<fee::DonutsFeeData>,
 }
 
 #[derive(Debug)]
@@ -556,6 +567,18 @@ TryFrom<(
             None => None,
         };
 
+        let donuts_fee_data = match extension {
+            Some(ext) => {
+                let charge = ext.value.iter().find_map(|p| match p {
+                    proto::EPPResponseExtensionType::EPPDonutsChargeInfoData(i) => Some(i),
+                    _ => None,
+                });
+
+                charge.map(Into::into)
+            }
+            None => None,
+        };
+
         Ok(InfoResponse {
             name: domain_info.name,
             registry_id: domain_info.registry_id.unwrap_or_default(),
@@ -622,40 +645,291 @@ TryFrom<(
             },
             sec_dns,
             launch_info,
+            donuts_fee_data,
         })
     }
 }
 
-impl From<&proto::domain::EPPDomainTransferData> for TransferData {
-    fn from(domain_transfer: &proto::domain::EPPDomainTransferData) -> Self {
-        TransferData {
-            name: domain_transfer.name.clone(),
-            status: (&domain_transfer.transfer_status).into(),
-            requested_client_id: domain_transfer.requested_client_id.clone(),
-            requested_date: domain_transfer.requested_date,
-            act_client_id: domain_transfer.act_client_id.clone(),
-            act_date: domain_transfer.act_date,
-            expiry_date: domain_transfer.expiry_date,
+impl
+TryFrom<(
+    proto::domain::EPPDomainTransferData,
+    &Option<proto::EPPResponseExtension>,
+)> for TransferResponse
+{
+    type Error = Error;
+
+    fn try_from(
+        from: (
+            proto::domain::EPPDomainTransferData,
+            &Option<proto::EPPResponseExtension>,
+        ),
+    ) -> Result<Self, Self::Error> {
+        let (domain_transfer, extension) = from;
+
+        let fee_data = match extension {
+            Some(ext) => {
+                let fee10 = ext.value.iter().find_map(|p| match p {
+                    proto::EPPResponseExtensionType::EPPFee10TransferData(i) => Some(i),
+                    _ => None,
+                });
+                let fee09 = ext.value.iter().find_map(|p| match p {
+                    proto::EPPResponseExtensionType::EPPFee09TransferData(i) => Some(i),
+                    _ => None,
+                });
+                let fee08 = ext.value.iter().find_map(|p| match p {
+                    proto::EPPResponseExtensionType::EPPFee08TransferData(i) => Some(i),
+                    _ => None,
+                });
+                let fee07 = ext.value.iter().find_map(|p| match p {
+                    proto::EPPResponseExtensionType::EPPFee07TransferData(i) => Some(i),
+                    _ => None,
+                });
+                let fee05 = ext.value.iter().find_map(|p| match p {
+                    proto::EPPResponseExtensionType::EPPFee05TransferData(i) => Some(i),
+                    _ => None,
+                });
+
+                if let Some(f) = fee10 {
+                    Some(f.into())
+                } else if let Some(f) = fee09 {
+                    Some(f.into())
+                } else if let Some(f) = fee08 {
+                    Some(f.into())
+                } else if let Some(f) = fee07 {
+                    Some(f.into())
+                } else if let Some(f) = fee05 {
+                    Some(f.into())
+                } else {
+                    None
+                }
+            }
+            None => None,
+        };
+
+        let donuts_fee_data = match extension {
+            Some(ext) => {
+                let charge = ext.value.iter().find_map(|p| match p {
+                    proto::EPPResponseExtensionType::EPPDonutsChargeTransferData(i) => Some(i),
+                    _ => None,
+                });
+
+                charge.map(Into::into)
+            }
+            None => None,
+        };
+
+        Ok(TransferResponse {
+            pending: false,
+            transaction_id: String::new(),
+            data: TransferData {
+                name: domain_transfer.name.clone(),
+                status: (&domain_transfer.transfer_status).into(),
+                requested_client_id: domain_transfer.requested_client_id.clone(),
+                requested_date: domain_transfer.requested_date,
+                act_client_id: domain_transfer.act_client_id.clone(),
+                act_date: domain_transfer.act_date,
+                expiry_date: domain_transfer.expiry_date,
+            },
+            fee_data,
+            donuts_fee_data,
+        })
+    }
+}
+
+impl
+TryFrom<(
+    Option<proto::domain::EPPDomainCreateData>,
+    &Option<proto::EPPResponseExtension>,
+)> for CreateResponse
+{
+    type Error = Error;
+
+    fn try_from(
+        from: (
+            Option<proto::domain::EPPDomainCreateData>,
+            &Option<proto::EPPResponseExtension>,
+        ),
+    ) -> Result<Self, Self::Error> {
+        let (domain_create, extension) = from;
+
+        let fee_data = match extension {
+            Some(ext) => {
+                let fee10 = ext.value.iter().find_map(|p| match p {
+                    proto::EPPResponseExtensionType::EPPFee10CreateData(i) => Some(i),
+                    _ => None,
+                });
+                let fee09 = ext.value.iter().find_map(|p| match p {
+                    proto::EPPResponseExtensionType::EPPFee09CreateData(i) => Some(i),
+                    _ => None,
+                });
+                let fee08 = ext.value.iter().find_map(|p| match p {
+                    proto::EPPResponseExtensionType::EPPFee08CreateData(i) => Some(i),
+                    _ => None,
+                });
+                let fee07 = ext.value.iter().find_map(|p| match p {
+                    proto::EPPResponseExtensionType::EPPFee07CreateData(i) => Some(i),
+                    _ => None,
+                });
+                let fee05 = ext.value.iter().find_map(|p| match p {
+                    proto::EPPResponseExtensionType::EPPFee05CreateData(i) => Some(i),
+                    _ => None,
+                });
+
+                if let Some(f) = fee10 {
+                    Some(f.into())
+                } else if let Some(f) = fee09 {
+                    Some(f.into())
+                } else if let Some(f) = fee08 {
+                    Some(f.into())
+                } else if let Some(f) = fee07 {
+                    Some(f.into())
+                } else if let Some(f) = fee05 {
+                    Some(f.into())
+                } else {
+                    None
+                }
+            }
+            None => None,
+        };
+
+
+        let launch_create = match extension {
+            Some(ext) => (ext
+                .value
+                .iter()
+                .find_map(|p| match p {
+                    proto::EPPResponseExtensionType::EPPLaunchCreateData(i) => Some(i),
+                    _ => None,
+                })
+                .map(|i| {
+                    launch::LaunchCreateData::from(i)
+                })),
+            None => None,
+        };
+
+        let donuts_fee_data = match extension {
+            Some(ext) => {
+                let charge = ext.value.iter().find_map(|p| match p {
+                    proto::EPPResponseExtensionType::EPPDonutsChargeCreateData(i) => Some(i),
+                    _ => None,
+                });
+
+                charge.map(Into::into)
+            }
+            None => None,
+        };
+
+        match domain_create {
+            Some(domain_create) => {
+                Ok(CreateResponse {
+                    pending: false,
+                    transaction_id: String::new(),
+                    data: CreateData {
+                        name: domain_create.name.clone(),
+                        creation_date: Some(domain_create.creation_date),
+                        expiration_date: domain_create.expiry_date,
+                    },
+                    fee_data,
+                    donuts_fee_data,
+                    launch_create,
+                })
+            }
+            None => {
+                Ok(CreateResponse {
+                    pending: false,
+                    transaction_id: String::new(),
+                    data: CreateData {
+                        name: "".to_string(),
+                        creation_date: None,
+                        expiration_date: None,
+                    },
+                    fee_data,
+                    donuts_fee_data,
+                    launch_create,
+                })
+            }
         }
     }
 }
 
-impl From<&proto::domain::EPPDomainCreateData> for CreateData {
-    fn from(domain_create: &proto::domain::EPPDomainCreateData) -> Self {
-        CreateData {
-            name: domain_create.name.clone(),
-            creation_date: Some(domain_create.creation_date),
-            expiration_date: domain_create.expiry_date,
-        }
-    }
-}
+impl
+TryFrom<(
+    proto::domain::EPPDomainRenewData,
+    &Option<proto::EPPResponseExtension>,
+)> for RenewResponse
+{
+    type Error = Error;
 
-impl From<&proto::domain::EPPDomainRenewData> for RenewData {
-    fn from(domain_renew: &proto::domain::EPPDomainRenewData) -> Self {
-        RenewData {
-            name: domain_renew.name.to_owned(),
-            new_expiry_date: domain_renew.expiry_date,
-        }
+    fn try_from(
+        from: (
+            proto::domain::EPPDomainRenewData,
+            &Option<proto::EPPResponseExtension>,
+        ),
+    ) -> Result<Self, Self::Error> {
+        let (domain_renew, extension) = from;
+
+        let fee_data = match extension {
+            Some(ext) => {
+                let fee10 = ext.value.iter().find_map(|p| match p {
+                    proto::EPPResponseExtensionType::EPPFee10RenewData(i) => Some(i),
+                    _ => None,
+                });
+                let fee09 = ext.value.iter().find_map(|p| match p {
+                    proto::EPPResponseExtensionType::EPPFee09RenewData(i) => Some(i),
+                    _ => None,
+                });
+                let fee08 = ext.value.iter().find_map(|p| match p {
+                    proto::EPPResponseExtensionType::EPPFee08RenewData(i) => Some(i),
+                    _ => None,
+                });
+                let fee07 = ext.value.iter().find_map(|p| match p {
+                    proto::EPPResponseExtensionType::EPPFee07RenewData(i) => Some(i),
+                    _ => None,
+                });
+                let fee05 = ext.value.iter().find_map(|p| match p {
+                    proto::EPPResponseExtensionType::EPPFee05RenewData(i) => Some(i),
+                    _ => None,
+                });
+
+                if let Some(f) = fee10 {
+                    Some(f.into())
+                } else if let Some(f) = fee09 {
+                    Some(f.into())
+                } else if let Some(f) = fee08 {
+                    Some(f.into())
+                } else if let Some(f) = fee07 {
+                    Some(f.into())
+                } else if let Some(f) = fee05 {
+                    Some(f.into())
+                } else {
+                    None
+                }
+            }
+            None => None,
+        };
+
+        let donuts_fee_data = match extension {
+            Some(ext) => {
+                let charge = ext.value.iter().find_map(|p| match p {
+                    proto::EPPResponseExtensionType::EPPDonutsChargeRenewData(i) => Some(i),
+                    _ => None,
+                });
+
+                charge.map(Into::into)
+            }
+            None => None,
+        };
+
+        Ok(RenewResponse {
+            pending: false,
+            transaction_id: String::new(),
+            data: RenewData {
+                name: domain_renew.name.to_owned(),
+                new_expiry_date: domain_renew.expiry_date,
+            },
+            fee_data,
+            donuts_fee_data,
+        })
     }
 }
 
@@ -694,67 +968,70 @@ pub fn handle_check(
         auth_info: None,
     });
     let mut ext = vec![];
-    if client.has_erratum("verisign-tv") {
-        ext.push(proto::EPPCommandExtensionType::VerisignNameStoreExt(
-            proto::verisign::EPPNameStoreExt {
-                sub_product: "dotTV".to_string(),
-            },
-        ));
-    } else if client.has_erratum("verisign-cc") {
-        ext.push(proto::EPPCommandExtensionType::VerisignNameStoreExt(
-            proto::verisign::EPPNameStoreExt {
-                sub_product: "dotCC".to_string(),
-            },
-        ));
-    }
+    super::verisign::handle_verisign_namestore_erratum(client, &mut ext);
     if let Some(fee_check) = &req.fee_check {
         if client.fee_supported {
             ext.push(proto::EPPCommandExtensionType::EPPFee10Check(proto::fee::EPPFee10Check {
                 currency: fee_check.currency.to_owned(),
-                commands: fee_check.commands.iter().map(|c| proto::fee::EPPFee10CheckCommand {
-                    name: (&c.command).into(),
+                commands: fee_check.commands.iter().map(|c| Ok(proto::fee::EPPFee10CheckCommand {
+                    name: match (&c.command).into() {
+                        Some(n) => n,
+                        None => return Err(Err(Error::Unsupported))
+                    },
                     period: c.period.as_ref().map(Into::into),
-                }).collect(),
+                })).collect::<Result<Vec<_>, _>>()?,
             }))
         } else if client.fee_09_supported {
             ext.push(proto::EPPCommandExtensionType::EPPFee09Check(proto::fee::EPPFee09Check {
-                objects: fee_check.commands.iter().map(|c| proto::fee::EPPFee09CheckObject {
+                objects: fee_check.commands.iter().map(|c| Ok(proto::fee::EPPFee09CheckObject {
                     object_uri: Some("urn:ietf:params:xml:ns:domain-1.0".to_string()),
                     object_id: proto::fee::EPPFee10ObjectID {
                         element: "name".to_string(),
                         id: req.name.to_owned(),
                     },
                     currency: fee_check.currency.to_owned(),
-                    command: (&c.command).into(),
+                    command: match (&c.command).into() {
+                        Some(n) => n,
+                        None => return Err(Err(Error::Unsupported))
+                    },
                     period: c.period.as_ref().map(Into::into),
-                }).collect()
+                })).collect::<Result<Vec<_>, _>>()?,
             }))
         } else if client.fee_08_supported {
             ext.push(proto::EPPCommandExtensionType::EPPFee08Check(proto::fee::EPPFee08Check {
-                domains: fee_check.commands.iter().map(|c| proto::fee::EPPFee08CheckDomain {
+                domains: fee_check.commands.iter().map(|c| Ok(proto::fee::EPPFee08CheckDomain {
                     name: req.name.to_owned(),
                     currency: fee_check.currency.to_owned(),
-                    command: (&c.command).into(),
+                    command: match (&c.command).into() {
+                        Some(n) => n,
+                        None => return Err(Err(Error::Unsupported))
+                    },
                     period: c.period.as_ref().map(Into::into),
-                }).collect()
+                })).collect::<Result<Vec<_>, _>>()?,
             }))
         } else if client.fee_07_supported {
             ext.push(proto::EPPCommandExtensionType::EPPFee07Check(proto::fee::EPPFee07Check {
-                domains: fee_check.commands.iter().map(|c| proto::fee::EPPFee07CheckDomain {
+                domains: fee_check.commands.iter().map(|c| Ok(proto::fee::EPPFee07CheckDomain {
                     name: req.name.to_owned(),
                     currency: fee_check.currency.to_owned(),
-                    command: (&c.command).into(),
+                    command: match (&c.command).into() {
+                        Some(n) => n,
+                        None => return Err(Err(Error::Unsupported))
+                    },
                     period: c.period.as_ref().map(Into::into),
-                }).collect()
+                })).collect::<Result<Vec<_>, _>>()?,
             }))
         } else if client.fee_05_supported {
             ext.push(proto::EPPCommandExtensionType::EPPFee05Check(proto::fee::EPPFee05Check {
-                domains: fee_check.commands.iter().map(|c| proto::fee::EPPFee05CheckDomain {
+                domains: fee_check.commands.iter().map(|c| Ok(proto::fee::EPPFee05CheckDomain {
                     name: req.name.to_owned(),
                     currency: fee_check.currency.to_owned(),
-                    command: (&c.command).into(),
+                    command: match (&c.command).into() {
+                        Some(n) => n,
+                        None => return Err(Err(Error::Unsupported))
+                    },
                     period: c.period.as_ref().map(Into::into),
-                }).collect()
+                })).collect::<Result<Vec<_>, _>>()?,
             }))
         } else {
             return Err(Err(Error::Unsupported));
@@ -776,7 +1053,7 @@ pub fn handle_check(
 }
 
 pub fn handle_check_response(response: proto::EPPResponse) -> Response<CheckResponse> {
-    let fee_check = match response.extension {
+    let fee_check = match &response.extension {
         Some(ext) => {
             let fee10 = ext.value.iter().find_map(|p| match p {
                 proto::EPPResponseExtensionType::EPPFee10CheckData(i) => Some(i),
@@ -885,6 +1162,26 @@ pub fn handle_check_response(response: proto::EPPResponse) -> Response<CheckResp
         None => None,
     };
 
+    let donuts_fee_check = match &response.extension {
+        Some(ext) => {
+            let charge = ext.value.iter().find_map(|p| match p {
+                proto::EPPResponseExtensionType::EPPDonutsChargeCheckData(i) => Some(i),
+                _ => None,
+            });
+
+            if let Some(c) = charge {
+                let d = match c.domains.iter().next() {
+                    Some(o) => o,
+                    None => return Err(Error::InternalServerError)
+                };
+                Some(d.into())
+            } else {
+                None
+            }
+        }
+        None => None,
+    };
+
     match response.data {
         Some(value) => match value.value {
             proto::EPPResultDataValue::EPPDomainCheckResult(domain_check) => {
@@ -893,7 +1190,7 @@ pub fn handle_check_response(response: proto::EPPResponse) -> Response<CheckResp
                         avail: domain_check.name.available,
                         reason: domain_check.reason.to_owned(),
                         fee_check,
-
+                        donuts_fee_check,
                     })
                 } else {
                     Err(Error::InternalServerError)
@@ -920,19 +1217,8 @@ pub fn handle_claims_check(
     let mut ext = vec![proto::EPPCommandExtensionType::EPPLaunchCheck(
         (&req.launch_check).into()
     )];
-    if client.has_erratum("verisign-tv") {
-        ext.push(proto::EPPCommandExtensionType::VerisignNameStoreExt(
-            proto::verisign::EPPNameStoreExt {
-                sub_product: "dotTV".to_string(),
-            },
-        ));
-    } else if client.has_erratum("verisign-cc") {
-        ext.push(proto::EPPCommandExtensionType::VerisignNameStoreExt(
-            proto::verisign::EPPNameStoreExt {
-                sub_product: "dotCC".to_string(),
-            },
-        ));
-    }
+
+    super::verisign::handle_verisign_namestore_erratum(client, &mut ext);
     Ok((proto::EPPCommandType::Check(command), match ext.is_empty() {
         true => None,
         false => Some(ext)
@@ -954,19 +1240,8 @@ pub fn handle_trademark_check(
     let mut ext = vec![proto::EPPCommandExtensionType::EPPLaunchCheck(
         (&launch::LaunchTrademarkCheck {}).into()
     )];
-    if client.has_erratum("verisign-tv") {
-        ext.push(proto::EPPCommandExtensionType::VerisignNameStoreExt(
-            proto::verisign::EPPNameStoreExt {
-                sub_product: "dotTV".to_string(),
-            },
-        ));
-    } else if client.has_erratum("verisign-cc") {
-        ext.push(proto::EPPCommandExtensionType::VerisignNameStoreExt(
-            proto::verisign::EPPNameStoreExt {
-                sub_product: "dotCC".to_string(),
-            },
-        ));
-    }
+
+    super::verisign::handle_verisign_namestore_erratum(client, &mut ext);
     Ok((proto::EPPCommandType::Check(command), match ext.is_empty() {
         true => None,
         false => Some(ext)
@@ -1028,19 +1303,8 @@ pub fn handle_info(
             return Err(Err(Error::Unsupported));
         }
     }
-    if client.has_erratum("verisign-tv") {
-        exts.push(proto::EPPCommandExtensionType::VerisignNameStoreExt(
-            proto::verisign::EPPNameStoreExt {
-                sub_product: "dotTV".to_string(),
-            },
-        ));
-    } else if client.has_erratum("verisign-cc") {
-        exts.push(proto::EPPCommandExtensionType::VerisignNameStoreExt(
-            proto::verisign::EPPNameStoreExt {
-                sub_product: "dotCC".to_string(),
-            },
-        ));
-    };
+
+    super::verisign::handle_verisign_namestore_erratum(client, &mut exts);
     Ok((proto::EPPCommandType::Info(command), match exts.is_empty() {
         true => None,
         false => Some(exts)
@@ -1120,19 +1384,9 @@ pub fn handle_create(
             return Err(Err(Error::Unsupported));
         }
     }
-    if client.has_erratum("verisign-tv") {
-        exts.push(proto::EPPCommandExtensionType::VerisignNameStoreExt(
-            proto::verisign::EPPNameStoreExt {
-                sub_product: "dotTV".to_string(),
-            },
-        ))
-    } else if client.has_erratum("verisign-cc") {
-        exts.push(proto::EPPCommandExtensionType::VerisignNameStoreExt(
-            proto::verisign::EPPNameStoreExt {
-                sub_product: "dotCC".to_string(),
-            },
-        ))
-    }
+
+    super::verisign::handle_verisign_namestore_erratum(client, &mut exts);
+    super::fee::handle_donuts_fee_agreement(client, &req.donuts_fee_agreement, &mut exts)?;
 
     let command = proto::EPPCreate::Domain(proto::domain::EPPDomainCreate {
         name: req.name.clone(),
@@ -1169,85 +1423,23 @@ pub fn handle_create(
 }
 
 pub fn handle_create_response(response: proto::EPPResponse) -> Response<CreateResponse> {
-    let fee_data = match &response.extension {
-        Some(ext) => {
-            let fee10 = ext.value.iter().find_map(|p| match p {
-                proto::EPPResponseExtensionType::EPPFee10CreateData(i) => Some(i),
-                _ => None,
-            });
-            let fee09 = ext.value.iter().find_map(|p| match p {
-                proto::EPPResponseExtensionType::EPPFee09CreateData(i) => Some(i),
-                _ => None,
-            });
-            let fee08 = ext.value.iter().find_map(|p| match p {
-                proto::EPPResponseExtensionType::EPPFee08CreateData(i) => Some(i),
-                _ => None,
-            });
-            let fee07 = ext.value.iter().find_map(|p| match p {
-                proto::EPPResponseExtensionType::EPPFee07CreateData(i) => Some(i),
-                _ => None,
-            });
-            let fee05 = ext.value.iter().find_map(|p| match p {
-                proto::EPPResponseExtensionType::EPPFee05CreateData(i) => Some(i),
-                _ => None,
-            });
-
-            if let Some(f) = fee10 {
-                Some(f.into())
-            } else if let Some(f) = fee09 {
-                Some(f.into())
-            } else if let Some(f) = fee08 {
-                Some(f.into())
-            } else if let Some(f) = fee07 {
-                Some(f.into())
-            } else if let Some(f) = fee05 {
-                Some(f.into())
-            } else {
-                None
+    let pending = response.is_pending();
+    match response.data {
+        Some(value) => match value.value {
+            proto::EPPResultDataValue::EPPDomainCreateResult(domain_create) => {
+                let mut res: CreateResponse = (Some(domain_create), &response.extension).try_into()?;
+                res.pending = pending;
+                res.transaction_id = response.transaction_id.server_transaction_id.unwrap_or_default();
+                Ok(res)
             }
-        }
-        None => None,
-    };
-
-
-    let launch_create = match &response.extension {
-        Some(ext) => (ext
-            .value
-            .iter()
-            .find_map(|p| match p {
-                proto::EPPResponseExtensionType::EPPLaunchCreateData(i) => Some(i),
-                _ => None,
-            })
-            .map(|i| {
-                launch::LaunchCreateData::from(i)
-            })),
-        None => None,
-    };
-
-    match &response.data {
-        Some(value) => match &value.value {
-            proto::EPPResultDataValue::EPPDomainCreateResult(domain_create) => Ok(CreateResponse {
-                pending: response.is_pending(),
-                transaction_id: response.transaction_id.server_transaction_id.unwrap_or_default(),
-                data: domain_create.into(),
-                fee_data,
-                launch_create,
-            }),
             _ => Err(Error::InternalServerError),
         },
         None => {
             if response.is_pending() {
-                Ok(CreateResponse {
-                    pending: response.is_pending(),
-                    transaction_id: response.transaction_id.server_transaction_id.unwrap_or_default(),
-                    data: CreateData {
-                        name: "".to_string(),
-                        creation_date: None,
-                        expiration_date: None,
-                    },
-                    fee_data,
-                    launch_create,
-                })
+                let mut res: CreateResponse = (None, &response.extension).try_into()?;
+                res.pending = response.is_pending();
+                res.transaction_id = response.transaction_id.server_transaction_id.unwrap_or_default();
+                Ok(res)
             } else {
                 Err(Error::InternalServerError)
             }
@@ -1268,19 +1460,10 @@ pub fn handle_delete(
         auth_info: None,
     });
     let mut ext = vec![];
-    if client.has_erratum("verisign-tv") {
-        ext.push(proto::EPPCommandExtensionType::VerisignNameStoreExt(
-            proto::verisign::EPPNameStoreExt {
-                sub_product: "dotTV".to_string(),
-            },
-        ))
-    } else if client.has_erratum("verisign-cc") {
-        ext.push(proto::EPPCommandExtensionType::VerisignNameStoreExt(
-            proto::verisign::EPPNameStoreExt {
-                sub_product: "dotCC".to_string(),
-            },
-        ))
-    }
+
+    super::verisign::handle_verisign_namestore_erratum(client, &mut ext);
+    super::fee::handle_donuts_fee_agreement(client, &req.donuts_fee_agreement, &mut ext)?;
+
     if let Some(launch_info) = &req.launch_info {
         if client.launch_supported {
             ext.push(proto::EPPCommandExtensionType::EPPLaunchDelete(launch_info.into()))
@@ -1517,19 +1700,10 @@ pub fn handle_update(
             None => {}
         }
     }
-    if client.has_erratum("verisign-tv") {
-        exts.push(proto::EPPCommandExtensionType::VerisignNameStoreExt(
-            proto::verisign::EPPNameStoreExt {
-                sub_product: "dotTV".to_string(),
-            },
-        ))
-    } else if client.has_erratum("verisign-cc") {
-        exts.push(proto::EPPCommandExtensionType::VerisignNameStoreExt(
-            proto::verisign::EPPNameStoreExt {
-                sub_product: "dotCC".to_string(),
-            },
-        ))
-    }
+
+    super::verisign::handle_verisign_namestore_erratum(client, &mut exts);
+    super::fee::handle_donuts_fee_agreement(client, &req.donuts_fee_agreement, &mut exts)?;
+
     if let Some(launch_info) = &req.launch_info {
         if client.launch_supported {
             exts.push(proto::EPPCommandExtensionType::EPPLaunchUpdate(launch_info.into()))
@@ -1614,10 +1788,23 @@ pub fn handle_update_response(response: proto::EPPResponse) -> Response<UpdateRe
         None => None,
     };
 
+    let donuts_fee_data = match &response.extension {
+        Some(ext) => {
+            let charge = ext.value.iter().find_map(|p| match p {
+                proto::EPPResponseExtensionType::EPPDonutsChargeUpdateData(i) => Some(i),
+                _ => None,
+            });
+
+            charge.map(Into::into)
+        }
+        None => None,
+    };
+
     Response::Ok(UpdateResponse {
         pending: response.is_pending(),
         transaction_id: response.transaction_id.server_transaction_id.unwrap_or_default(),
         fee_data,
+        donuts_fee_data,
     })
 }
 
@@ -1634,74 +1821,25 @@ pub fn handle_renew(
         period: req.add_period.as_ref().map(|p| p.into()),
         current_expiry_date: req.cur_expiry_date.date(),
     });
-    let ext = if client.has_erratum("verisign-tv") {
-        Some(vec![proto::EPPCommandExtensionType::VerisignNameStoreExt(
-            proto::verisign::EPPNameStoreExt {
-                sub_product: "dotTV".to_string(),
-            },
-        )])
-    } else if client.has_erratum("verisign-cc") {
-        Some(vec![proto::EPPCommandExtensionType::VerisignNameStoreExt(
-            proto::verisign::EPPNameStoreExt {
-                sub_product: "dotCC".to_string(),
-            },
-        )])
-    } else {
-        None
-    };
-    Ok((proto::EPPCommandType::Renew(command), ext))
+    let mut ext = vec![];
+    super::verisign::handle_verisign_namestore_erratum(client, &mut ext);
+    super::fee::handle_donuts_fee_agreement(client, &req.donuts_fee_agreement, &mut ext)?;
+
+    Ok((proto::EPPCommandType::Renew(command), match ext.is_empty() {
+        true => None,
+        false => Some(ext)
+    }))
 }
 
 pub fn handle_renew_response(response: proto::EPPResponse) -> Response<RenewResponse> {
-    let fee_data = match &response.extension {
-        Some(ext) => {
-            let fee10 = ext.value.iter().find_map(|p| match p {
-                proto::EPPResponseExtensionType::EPPFee10RenewData(i) => Some(i),
-                _ => None,
-            });
-            let fee09 = ext.value.iter().find_map(|p| match p {
-                proto::EPPResponseExtensionType::EPPFee09RenewData(i) => Some(i),
-                _ => None,
-            });
-            let fee08 = ext.value.iter().find_map(|p| match p {
-                proto::EPPResponseExtensionType::EPPFee08RenewData(i) => Some(i),
-                _ => None,
-            });
-            let fee07 = ext.value.iter().find_map(|p| match p {
-                proto::EPPResponseExtensionType::EPPFee07RenewData(i) => Some(i),
-                _ => None,
-            });
-            let fee05 = ext.value.iter().find_map(|p| match p {
-                proto::EPPResponseExtensionType::EPPFee05RenewData(i) => Some(i),
-                _ => None,
-            });
-
-            if let Some(f) = fee10 {
-                Some(f.into())
-            } else if let Some(f) = fee09 {
-                Some(f.into())
-            } else if let Some(f) = fee08 {
-                Some(f.into())
-            } else if let Some(f) = fee07 {
-                Some(f.into())
-            } else if let Some(f) = fee05 {
-                Some(f.into())
-            } else {
-                None
-            }
-        }
-        None => None,
-    };
-
-    match &response.data {
-        Some(value) => match &value.value {
+    let pending = response.is_pending();
+    match response.data {
+        Some(value) => match value.value {
             proto::EPPResultDataValue::EPPDomainRenewResult(domain_renew) => {
-                Response::Ok(RenewResponse {
-                    pending: response.is_pending(),
-                    transaction_id: response.transaction_id.server_transaction_id.unwrap_or_default(),
-                    data: domain_renew.into(),
-                    fee_data,
-                })
+                let mut res: RenewResponse = (domain_renew, &response.extension).try_into()?;
+                res.pending = pending;
+                res.transaction_id = response.transaction_id.server_transaction_id.unwrap_or_default();
+                Ok(res)
             }
             _ => Err(Error::InternalServerError),
         },
@@ -1726,22 +1864,12 @@ pub fn handle_transfer_query(
             }),
         }),
     };
-    let ext = if client.has_erratum("verisign-tv") {
-        Some(vec![proto::EPPCommandExtensionType::VerisignNameStoreExt(
-            proto::verisign::EPPNameStoreExt {
-                sub_product: "dotTV".to_string(),
-            },
-        )])
-    } else if client.has_erratum("verisign-cc") {
-        Some(vec![proto::EPPCommandExtensionType::VerisignNameStoreExt(
-            proto::verisign::EPPNameStoreExt {
-                sub_product: "dotCC".to_string(),
-            },
-        )])
-    } else {
-        None
-    };
-    Ok((proto::EPPCommandType::Transfer(command), ext))
+    let mut ext = vec![];
+    super::verisign::handle_verisign_namestore_erratum(client, &mut ext);
+    Ok((proto::EPPCommandType::Transfer(command), match ext.is_empty() {
+        true => None,
+        false => Some(ext)
+    }))
 }
 
 pub fn handle_transfer_request(
@@ -1762,22 +1890,14 @@ pub fn handle_transfer_request(
             }),
         }),
     };
-    let ext = if client.has_erratum("verisign-tv") {
-        Some(vec![proto::EPPCommandExtensionType::VerisignNameStoreExt(
-            proto::verisign::EPPNameStoreExt {
-                sub_product: "dotTV".to_string(),
-            },
-        )])
-    } else if client.has_erratum("verisign-cc") {
-        Some(vec![proto::EPPCommandExtensionType::VerisignNameStoreExt(
-            proto::verisign::EPPNameStoreExt {
-                sub_product: "dotCC".to_string(),
-            },
-        )])
-    } else {
-        None
-    };
-    Ok((proto::EPPCommandType::Transfer(command), ext))
+    let mut ext = vec![];
+    super::verisign::handle_verisign_namestore_erratum(client, &mut ext);
+    super::fee::handle_donuts_fee_agreement(client, &req.donuts_fee_agreement, &mut ext)?;
+
+    Ok((proto::EPPCommandType::Transfer(command), match ext.is_empty() {
+        true => None,
+        false => Some(ext)
+    }))
 }
 
 pub fn handle_transfer_accept(
@@ -1798,22 +1918,12 @@ pub fn handle_transfer_accept(
             }),
         }),
     };
-    let ext = if client.has_erratum("verisign-tv") {
-        Some(vec![proto::EPPCommandExtensionType::VerisignNameStoreExt(
-            proto::verisign::EPPNameStoreExt {
-                sub_product: "dotTV".to_string(),
-            },
-        )])
-    } else if client.has_erratum("verisign-cc") {
-        Some(vec![proto::EPPCommandExtensionType::VerisignNameStoreExt(
-            proto::verisign::EPPNameStoreExt {
-                sub_product: "dotCC".to_string(),
-            },
-        )])
-    } else {
-        None
-    };
-    Ok((proto::EPPCommandType::Transfer(command), ext))
+    let mut ext = vec![];
+    super::verisign::handle_verisign_namestore_erratum(client, &mut ext);
+    Ok((proto::EPPCommandType::Transfer(command), match ext.is_empty() {
+        true => None,
+        false => Some(ext)
+    }))
 }
 
 pub fn handle_transfer_reject(
@@ -1834,74 +1944,24 @@ pub fn handle_transfer_reject(
             }),
         }),
     };
-    let ext = if client.has_erratum("verisign-tv") {
-        Some(vec![proto::EPPCommandExtensionType::VerisignNameStoreExt(
-            proto::verisign::EPPNameStoreExt {
-                sub_product: "dotTV".to_string(),
-            },
-        )])
-    } else if client.has_erratum("verisign-cc") {
-        Some(vec![proto::EPPCommandExtensionType::VerisignNameStoreExt(
-            proto::verisign::EPPNameStoreExt {
-                sub_product: "dotCC".to_string(),
-            },
-        )])
-    } else {
-        None
-    };
-    Ok((proto::EPPCommandType::Transfer(command), ext))
+    let mut ext = vec![];
+    super::verisign::handle_verisign_namestore_erratum(client, &mut ext);
+
+    Ok((proto::EPPCommandType::Transfer(command), match ext.is_empty() {
+        true => None,
+        false => Some(ext)
+    }))
 }
 
 pub fn handle_transfer_response(response: proto::EPPResponse) -> Response<TransferResponse> {
-    let fee_data = match &response.extension {
-        Some(ext) => {
-            let fee10 = ext.value.iter().find_map(|p| match p {
-                proto::EPPResponseExtensionType::EPPFee10TransferData(i) => Some(i),
-                _ => None,
-            });
-            let fee09 = ext.value.iter().find_map(|p| match p {
-                proto::EPPResponseExtensionType::EPPFee09TransferData(i) => Some(i),
-                _ => None,
-            });
-            let fee08 = ext.value.iter().find_map(|p| match p {
-                proto::EPPResponseExtensionType::EPPFee08TransferData(i) => Some(i),
-                _ => None,
-            });
-            let fee07 = ext.value.iter().find_map(|p| match p {
-                proto::EPPResponseExtensionType::EPPFee07TransferData(i) => Some(i),
-                _ => None,
-            });
-            let fee05 = ext.value.iter().find_map(|p| match p {
-                proto::EPPResponseExtensionType::EPPFee05TransferData(i) => Some(i),
-                _ => None,
-            });
-
-            if let Some(f) = fee10 {
-                Some(f.into())
-            } else if let Some(f) = fee09 {
-                Some(f.into())
-            } else if let Some(f) = fee08 {
-                Some(f.into())
-            } else if let Some(f) = fee07 {
-                Some(f.into())
-            } else if let Some(f) = fee05 {
-                Some(f.into())
-            } else {
-                None
-            }
-        }
-        None => None,
-    };
-
-    match &response.data {
-        Some(value) => match &value.value {
+    let pending = response.is_pending();
+    match response.data {
+        Some(value) => match value.value {
             proto::EPPResultDataValue::EPPDomainTransferResult(domain_transfer) => {
-                Response::Ok(TransferResponse {
-                    pending: response.is_pending(),
-                    transaction_id: response.transaction_id.server_transaction_id.unwrap_or_default(),
-                    data: domain_transfer.into(),
-                    fee_data,
-                })
+                let mut res: TransferResponse = (domain_transfer, &response.extension).try_into()?;
+                res.pending = pending;
+                res.transaction_id = response.transaction_id.server_transaction_id.unwrap_or_default();
+                Ok(res)
             }
             _ => Err(Error::InternalServerError),
         },
@@ -1913,6 +1973,7 @@ pub fn handle_transfer_response(response: proto::EPPResponse) -> Response<Transf
 ///
 /// # Arguments
 /// * `domain` - The domain in question
+/// * `launch_check` - Launch availability info
 /// * `client_sender` - Reference to the tokio channel into the client
 pub async fn check(
     domain: &str,
@@ -1927,6 +1988,52 @@ pub async fn check(
             name: domain.to_string(),
             fee_check,
             launch_check,
+            return_path: sender,
+        })),
+        receiver,
+    )
+        .await
+}
+
+/// Checks if a domain name has claims registered for a launch phase
+///
+/// # Arguments
+/// * `domain` - The domain in question
+/// * `launch_check` - Launch claims info
+/// * `client_sender` - Reference to the tokio channel into the client
+pub async fn launch_claims_check(
+    domain: &str,
+    launch_check: launch::LaunchClaimsCheck,
+    client_sender: &mut futures::channel::mpsc::Sender<Request>,
+) -> Result<ClaimsCheckResponse, super::Error> {
+    let (sender, receiver) = futures::channel::oneshot::channel();
+    super::send_epp_client_request(
+        client_sender,
+        Request::DomainClaimsCheck(Box::new(ClaimsCheckRequest {
+            name: domain.to_string(),
+            launch_check,
+            return_path: sender,
+        })),
+        receiver,
+    )
+        .await
+}
+
+
+/// Checks if a domain name has trademarks registered for it
+///
+/// # Arguments
+/// * `domain` - The domain in question
+/// * `client_sender` - Reference to the tokio channel into the client
+pub async fn launch_trademark_check(
+    domain: &str,
+    client_sender: &mut futures::channel::mpsc::Sender<Request>,
+) -> Result<ClaimsCheckResponse, super::Error> {
+    let (sender, receiver) = futures::channel::oneshot::channel();
+    super::send_epp_client_request(
+        client_sender,
+        Request::DomainTrademarkCheck(Box::new(TrademarkCheckRequest {
+            name: domain.to_string(),
             return_path: sender,
         })),
         receiver,
@@ -1968,6 +2075,7 @@ pub struct CreateInfo<'a> {
     pub auth_info: &'a str,
     pub sec_dns: Option<SecDNSData>,
     pub launch_create: Option<launch::LaunchCreate>,
+    pub donuts_fee_agreement: Option<fee::DonutsFeeData>,
 }
 
 /// Registers a new domain
@@ -1996,6 +2104,7 @@ pub async fn create(
             auth_info: info.auth_info.to_string(),
             sec_dns: info.sec_dns,
             launch_create: info.launch_create,
+            donuts_fee_agreement: info.donuts_fee_agreement,
             return_path: sender,
         })),
         receiver,
@@ -2011,6 +2120,7 @@ pub async fn create(
 pub async fn delete(
     domain: &str,
     launch_info: Option<launch::LaunchUpdate>,
+    donuts_fee_agreement: Option<fee::DonutsFeeData>,
     client_sender: &mut futures::channel::mpsc::Sender<Request>,
 ) -> Result<DeleteResponse, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
@@ -2019,6 +2129,7 @@ pub async fn delete(
         Request::DomainDelete(Box::new(DeleteRequest {
             name: domain.to_string(),
             launch_info,
+            donuts_fee_agreement,
             return_path: sender,
         })),
         receiver,
@@ -2043,6 +2154,7 @@ pub async fn update(
     new_auth_info: Option<&str>,
     sec_dns: Option<UpdateSecDNS>,
     launch_info: Option<launch::LaunchUpdate>,
+    donuts_fee_agreement: Option<fee::DonutsFeeData>,
     client_sender: &mut futures::channel::mpsc::Sender<Request>,
 ) -> Result<UpdateResponse, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
@@ -2056,6 +2168,7 @@ pub async fn update(
             new_auth_info: new_auth_info.map(|s| s.into()),
             sec_dns,
             launch_info,
+            donuts_fee_agreement,
             return_path: sender,
         })),
         receiver,
@@ -2074,6 +2187,7 @@ pub async fn renew(
     domain: &str,
     add_period: Option<Period>,
     cur_expiry_date: DateTime<Utc>,
+    donuts_fee_agreement: Option<fee::DonutsFeeData>,
     client_sender: &mut futures::channel::mpsc::Sender<Request>,
 ) -> Result<RenewResponse, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
@@ -2083,6 +2197,7 @@ pub async fn renew(
             name: domain.to_string(),
             add_period,
             cur_expiry_date,
+            donuts_fee_agreement,
             return_path: sender,
         })),
         receiver,
@@ -2125,6 +2240,7 @@ pub async fn transfer_request(
     domain: &str,
     add_period: Option<Period>,
     auth_info: &str,
+    donuts_fee_agreement: Option<fee::DonutsFeeData>,
     client_sender: &mut futures::channel::mpsc::Sender<Request>,
 ) -> Result<TransferResponse, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
@@ -2134,6 +2250,7 @@ pub async fn transfer_request(
             name: domain.to_string(),
             add_period,
             auth_info: auth_info.to_string(),
+            donuts_fee_agreement,
             return_path: sender,
         })),
         receiver,

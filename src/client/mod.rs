@@ -201,8 +201,10 @@ pub struct EPPClientServerFeatures {
     switch_balance: bool,
     /// http://www.verisign.com/epp/balance-1.0 support
     verisign_balance: bool,
-    /// http://www.verisign.com/epp/lowbalance-poll-1.0 support
+    /// http://www.unitedtld.com/epp/finance-1.0 support
     unitedtld_balance: bool,
+    /// http://www.unitedtld.com/epp/charge-1.0 support
+    unitedtld_charge: bool,
     /// http://www.verisign.com/epp/lowbalance-poll-1.0 support
     verisign_low_balance: bool,
     /// urn:ietf:params:xml:ns:nsset-1.2 support (NOT AN ACTUAL IETF NAMESPACE)
@@ -710,7 +712,10 @@ impl EPPClient {
             .supports("http://www.verisign.com/epp/balance-1.0");
         self.features.unitedtld_balance = greeting
             .service_menu
-            .supports("http://www.verisign.com/epp/lowbalance-poll-1.0");
+            .supports("http://www.unitedtld.com/epp/finance-1.0");
+        self.features.unitedtld_charge = greeting
+            .service_menu
+            .supports_ext("http://www.unitedtld.com/epp/charge-1.0");
         self.features.verisign_low_balance = greeting
             .service_menu
             .supports_ext("http://www.verisign.com/epp/lowbalance-poll-1.0");
@@ -792,7 +797,10 @@ impl EPPClient {
                 objects.push("http://www.verisign.com/epp/balance-1.0".to_string())
             }
             if self.features.unitedtld_balance {
-                objects.push("http://www.verisign.com/epp/lowbalance-poll-1.0".to_string())
+                objects.push("http://www.unitedtld.com/epp/finance-1.0".to_string())
+            }
+            if self.features.unitedtld_charge {
+                ext_objects.push("http://www.unitedtld.com/epp/charge-1.0".to_string())
             }
             if self.features.verisign_low_balance {
                 ext_objects.push("http://www.verisign.com/epp/lowbalance-poll-1.0".to_string())

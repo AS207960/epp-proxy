@@ -1,30 +1,43 @@
 //! Implements the gRPC interface for the EPP client
 
-use super::client;
+use std::convert::{TryFrom, TryInto};
+
 use futures::sink::SinkExt;
+
+use super::client;
 
 pub mod epp_proto {
     tonic::include_proto!("epp");
     pub mod common {
         tonic::include_proto!("epp.common");
     }
+
     pub mod domain {
         tonic::include_proto!("epp.domain");
     }
+
     pub mod host {
         tonic::include_proto!("epp.host");
     }
+
     pub mod contact {
         tonic::include_proto!("epp.contact");
     }
+
     pub mod rgp {
         tonic::include_proto!("epp.rgp");
     }
+
     pub mod nominet {
         tonic::include_proto!("epp.nominet");
     }
+
     pub mod fee {
         tonic::include_proto!("epp.fee");
+    }
+
+    pub mod launch {
+        tonic::include_proto!("epp.launch");
     }
 }
 
@@ -392,6 +405,10 @@ fn fee_command_from_i32(from: i32) -> client::fee::Command {
             epp_proto::fee::Command::Transfer => client::fee::Command::Transfer,
             epp_proto::fee::Command::Delete => client::fee::Command::Delete,
             epp_proto::fee::Command::Restore => client::fee::Command::Restore,
+            epp_proto::fee::Command::Update => client::fee::Command::Update,
+            epp_proto::fee::Command::Check => client::fee::Command::Check,
+            epp_proto::fee::Command::Info => client::fee::Command::Info,
+            epp_proto::fee::Command::Custom => client::fee::Command::Custom,
         },
         None => client::fee::Command::Create,
     }
@@ -404,6 +421,10 @@ fn i32_from_fee_command(from: client::fee::Command) -> i32 {
         client::fee::Command::Transfer => epp_proto::fee::Command::Transfer.into(),
         client::fee::Command::Delete => epp_proto::fee::Command::Delete.into(),
         client::fee::Command::Restore => epp_proto::fee::Command::Restore.into(),
+        client::fee::Command::Update => epp_proto::fee::Command::Update.into(),
+        client::fee::Command::Check => epp_proto::fee::Command::Check.into(),
+        client::fee::Command::Info => epp_proto::fee::Command::Info.into(),
+        client::fee::Command::Custom => epp_proto::fee::Command::Custom.into(),
     }
 }
 
@@ -416,8 +437,8 @@ impl From<epp_proto::fee::FeeCheck> for client::fee::FeeCheck {
                 period: c.period.map(|p| client::domain::Period {
                     unit: period_unit_from_i32(p.unit),
                     value: p.value,
-                })
-            }).collect()
+                }),
+            }).collect(),
         }
     }
 }
@@ -437,7 +458,7 @@ impl From<client::fee::FeeCheckData> for epp_proto::fee::FeeCheckData {
                 fees: c.fees.into_iter().map(Into::into).collect(),
                 credits: c.credits.into_iter().map(Into::into).collect(),
                 class: c.class,
-                reason: c.reason
+                reason: c.reason,
             }).collect(),
             reason: from.reason,
         }
@@ -470,7 +491,7 @@ impl From<client::fee::Fee> for epp_proto::fee::Fee {
             applied: match from.applied {
                 client::fee::Applied::Immediate => epp_proto::fee::Applied::Immediate.into(),
                 client::fee::Applied::Delayed => epp_proto::fee::Applied::Delayed.into(),
-            }
+            },
         }
     }
 }
@@ -479,8 +500,75 @@ impl From<client::fee::Credit> for epp_proto::fee::Credit {
     fn from(from: client::fee::Credit) -> Self {
         epp_proto::fee::Credit {
             value: from.value,
-            description: from.description
+            description: from.description,
         }
+    }
+}
+
+impl From<client::fee::DonutsFeeData> for epp_proto::fee::DonutsFeeData {
+    fn from(from: client::fee::DonutsFeeData) -> Self {
+        epp_proto::fee::DonutsFeeData {
+            fees: from.sets.into_iter().map(|f| epp_proto::fee::DonutsFeeSet {
+                category: Some(epp_proto::fee::DonutsCategory {
+                    name: f.category.name,
+                    value: f.category.category,
+                }),
+                fee_type: Some(epp_proto::fee::DonutsFeeType {
+                    fee_type: match f.fee_type.fee_type {
+                        client::fee::DonutsFeeTypes::Fee => epp_proto::fee::donuts_fee_type::FeeTypes::Fee.into(),
+                        client::fee::DonutsFeeTypes::Price => epp_proto::fee::donuts_fee_type::FeeTypes::Price.into(),
+                        client::fee::DonutsFeeTypes::Custom => epp_proto::fee::donuts_fee_type::FeeTypes::Custom.into(),
+                    },
+                    name: f.fee_type.name,
+                }),
+                fees: f.fees.into_iter().map(|a| epp_proto::fee::DonutsAmount {
+                    command: i32_from_fee_command(a.command),
+                    name: a.command_name,
+                    value: a.value,
+                }).collect(),
+            }).collect()
+        }
+    }
+}
+
+impl TryFrom<epp_proto::fee::DonutsFeeData> for client::fee::DonutsFeeData {
+    type Error = tonic::Status;
+
+    fn try_from(from: epp_proto::fee::DonutsFeeData) -> Result<Self, Self::Error> {
+        Ok(client::fee::DonutsFeeData {
+            sets: from.fees.into_iter().map(|f| Ok(client::fee::DonutsFeeSet {
+                category: match f.category {
+                    Some(c) => client::fee::DonutsCategory {
+                        name: c.name,
+                        category: c.value,
+                    },
+                    None => return Err(tonic::Status::invalid_argument(
+                        "Category must be specified",
+                    ))
+                },
+                fee_type: match f.fee_type {
+                    Some(f) => client::fee::DonutsFeeType {
+                        fee_type: match epp_proto::fee::donuts_fee_type::FeeTypes::from_i32(f.fee_type) {
+                            Some(epp_proto::fee::donuts_fee_type::FeeTypes::Fee) => client::fee::DonutsFeeTypes::Fee,
+                            Some(epp_proto::fee::donuts_fee_type::FeeTypes::Price) => client::fee::DonutsFeeTypes::Price,
+                            Some(epp_proto::fee::donuts_fee_type::FeeTypes::Custom) => client::fee::DonutsFeeTypes::Custom,
+                            None => return Err(tonic::Status::invalid_argument(
+                                "Unknown fee type",
+                            ))
+                        },
+                        name: f.name,
+                    },
+                    None => return Err(tonic::Status::invalid_argument(
+                        "Fee type must be specified",
+                    ))
+                },
+                fees: f.fees.into_iter().map(|a| client::fee::DonutsAmount {
+                    command: fee_command_from_i32(a.command),
+                    command_name: a.name,
+                    value: a.value,
+                }).collect(),
+            })).collect::<Result<Vec<_>, _>>()?
+        })
     }
 }
 
@@ -636,6 +724,8 @@ impl From<client::domain::InfoResponse> for epp_proto::domain::DomainInfoReply {
                     }
                 }),
             }),
+            launch_info: res.launch_info.map(Into::into),
+            donuts_fee_data: res.donuts_fee_data.map(Into::into),
         }
     }
 }
@@ -649,20 +739,9 @@ impl From<client::domain::CreateResponse> for epp_proto::domain::DomainCreateRep
             creation_date: chrono_to_proto(res.data.creation_date),
             expiry_date: chrono_to_proto(res.data.expiration_date),
             fee_data: res.fee_data.map(Into::into),
+            donuts_fee_data: res.donuts_fee_data.map(Into::into),
             registry_name: String::new(),
-        }
-    }
-}
-impl From<client::domain::CreateData> for epp_proto::domain::DomainCreateReply {
-    fn from(res: client::domain::CreateData) -> Self {
-        epp_proto::domain::DomainCreateReply {
-            name: res.name,
-            pending: false,
-            transaction_id: String::new(),
-            creation_date: chrono_to_proto(res.creation_date),
-            expiry_date: chrono_to_proto(res.expiration_date),
-            fee_data: None,
-            registry_name: String::new(),
+            launch_data: res.launch_create.map(Into::into),
         }
     }
 }
@@ -675,19 +754,7 @@ impl From<client::domain::RenewResponse> for epp_proto::domain::DomainRenewReply
             transaction_id: res.transaction_id,
             expiry_date: chrono_to_proto(res.data.new_expiry_date),
             fee_data: res.fee_data.map(Into::into),
-            registry_name: String::new(),
-        }
-    }
-}
-
-impl From<client::domain::RenewData> for epp_proto::domain::DomainRenewReply {
-    fn from(res: client::domain::RenewData) -> Self {
-        epp_proto::domain::DomainRenewReply {
-            name: res.name,
-            pending: false,
-            transaction_id: String::new(),
-            expiry_date: chrono_to_proto(res.new_expiry_date),
-            fee_data: None,
+            donuts_fee_data: res.donuts_fee_data.map(Into::into),
             registry_name: String::new(),
         }
     }
@@ -705,23 +772,7 @@ impl From<client::domain::TransferResponse> for epp_proto::domain::DomainTransfe
             act_date: chrono_to_proto(Some(res.data.act_date)),
             expiry_date: chrono_to_proto(res.data.expiry_date),
             fee_data: res.fee_data.map(Into::into),
-            registry_name: String::new(),
-        }
-    }
-}
-
-impl From<client::domain::TransferData> for epp_proto::domain::DomainTransferReply {
-    fn from(res: client::domain::TransferData) -> Self {
-        epp_proto::domain::DomainTransferReply {
-            pending: false,
-            transaction_id: String::new(),
-            status: i32_from_transfer_status(res.status),
-            requested_client_id: res.requested_client_id,
-            requested_date: chrono_to_proto(Some(res.requested_date)),
-            act_client_id: res.act_client_id,
-            act_date: chrono_to_proto(Some(res.act_date)),
-            expiry_date: chrono_to_proto(res.expiry_date),
-            fee_data: None,
+            donuts_fee_data: res.donuts_fee_data.map(Into::into),
             registry_name: String::new(),
         }
     }
@@ -734,7 +785,7 @@ impl From<client::domain::PanData> for epp_proto::domain::DomainPanReply {
             result: res.result,
             server_transaction_id: res.server_transaction_id,
             client_transaction_id: res.client_transaction_id,
-            date: chrono_to_proto(Some(res.date))
+            date: chrono_to_proto(Some(res.date)),
         }
     }
 }
@@ -996,7 +1047,7 @@ impl From<client::nominet::ReleaseData> for epp_proto::nominet::DomainReleaseDat
             account_moved: res.account_moved,
             from: res.from,
             registrar_tag: res.registrar_tag,
-            domains: res.domains
+            domains: res.domains,
         }
     }
 }
@@ -1017,7 +1068,7 @@ impl From<client::nominet::HostCancelData> for epp_proto::nominet::HostCancelDat
     fn from(res: client::nominet::HostCancelData) -> Self {
         epp_proto::nominet::HostCancelData {
             host_objects: res.host_objects,
-            domain_names: res.domain_names
+            domain_names: res.domain_names,
         }
     }
 }
@@ -1033,7 +1084,7 @@ impl From<client::nominet::ProcessData> for epp_proto::nominet::ProcessData {
             process_type: res.process_type,
             suspend_date: chrono_to_proto(res.suspend_date),
             cancel_date: chrono_to_proto(res.cancel_date),
-            domain_names: res.domain_names
+            domain_names: res.domain_names,
         }
     }
 }
@@ -1043,7 +1094,7 @@ impl From<client::nominet::SuspendData> for epp_proto::nominet::SuspendData {
         epp_proto::nominet::SuspendData {
             reason: res.reason,
             cancel_date: chrono_to_proto(res.cancel_date),
-            domain_names: res.domain_names
+            domain_names: res.domain_names,
         }
     }
 }
@@ -1070,10 +1121,185 @@ impl From<client::nominet::RegistrantTransferData> for epp_proto::nominet::Regis
     }
 }
 
-fn client_by_domain(
+impl From<epp_proto::launch::Phase> for client::launch::LaunchPhase {
+    fn from(from: epp_proto::launch::Phase) -> Self {
+        client::launch::LaunchPhase {
+            phase_type: match epp_proto::launch::phase::PhaseType::from_i32(from.phase_type) {
+                Some(p) => match p {
+                    epp_proto::launch::phase::PhaseType::Open => client::launch::PhaseType::Open,
+                    epp_proto::launch::phase::PhaseType::Sunrise => client::launch::PhaseType::Sunrise,
+                    epp_proto::launch::phase::PhaseType::Landrush => client::launch::PhaseType::Landrush,
+                    epp_proto::launch::phase::PhaseType::Claims => client::launch::PhaseType::Claims,
+                    epp_proto::launch::phase::PhaseType::Custom => client::launch::PhaseType::Custom,
+                },
+                None => client::launch::PhaseType::Custom,
+            },
+            phase_name: from.phase_name,
+        }
+    }
+}
+
+impl From<client::launch::LaunchPhase> for epp_proto::launch::Phase {
+    fn from(from: client::launch::LaunchPhase) -> Self {
+        epp_proto::launch::Phase {
+            phase_type: match from.phase_type {
+                client::launch::PhaseType::Open => epp_proto::launch::phase::PhaseType::Open.into(),
+                client::launch::PhaseType::Sunrise => epp_proto::launch::phase::PhaseType::Sunrise.into(),
+                client::launch::PhaseType::Landrush => epp_proto::launch::phase::PhaseType::Landrush.into(),
+                client::launch::PhaseType::Claims => epp_proto::launch::phase::PhaseType::Claims.into(),
+                client::launch::PhaseType::Custom => epp_proto::launch::phase::PhaseType::Custom.into(),
+            },
+            phase_name: from.phase_name,
+        }
+    }
+}
+
+impl From<epp_proto::launch::Phase> for client::launch::LaunchClaimsCheck {
+    fn from(from: epp_proto::launch::Phase) -> Self {
+        client::launch::LaunchClaimsCheck {
+            phase: from.into()
+        }
+    }
+}
+
+impl From<client::launch::LaunchClaimKey> for epp_proto::launch::ClaimsKey {
+    fn from(from: client::launch::LaunchClaimKey) -> Self {
+        epp_proto::launch::ClaimsKey {
+            key: from.key,
+            validator_id: from.validator_id,
+        }
+    }
+}
+
+impl TryFrom<epp_proto::launch::LaunchInfo> for client::launch::LaunchInfo {
+    type Error = tonic::Status;
+
+    fn try_from(from: epp_proto::launch::LaunchInfo) -> Result<Self, Self::Error> {
+        Ok(client::launch::LaunchInfo {
+            include_mark: from.include_mark,
+            phase: match from.phase {
+                Some(p) => p.into(),
+                None => return Err(tonic::Status::invalid_argument(
+                    "Launch phase must be specified",
+                ))
+            },
+            application_id: from.application_id,
+        })
+    }
+}
+
+impl TryFrom<epp_proto::launch::LaunchCreate> for client::launch::LaunchCreate {
+    type Error = tonic::Status;
+
+    fn try_from(from: epp_proto::launch::LaunchCreate) -> Result<Self, Self::Error> {
+        Ok(client::launch::LaunchCreate {
+            create_type: match epp_proto::launch::launch_create::CreateType::from_i32(from.create_type) {
+                Some(epp_proto::launch::launch_create::CreateType::Registration) => client::launch::LaunchCreateType::Registration,
+                Some(epp_proto::launch::launch_create::CreateType::Application) => client::launch::LaunchCreateType::Application,
+                None => client::launch::LaunchCreateType::Registration,
+            },
+            phase: match from.phase {
+                Some(p) => p.into(),
+                None => return Err(tonic::Status::invalid_argument(
+                    "Launch phase must be specified",
+                ))
+            },
+            code_mark: from.code_mark.into_iter().map(|m| client::launch::CodeMark {
+                code: m.code,
+                validator: m.validator,
+                mark: m.mark,
+            }).collect(),
+            signed_mark: from.signed_mark,
+            notices: from.notices.into_iter().map(|n| Ok(client::launch::Notice {
+                notice_id: n.notice_id,
+                validator: n.validator,
+                not_after: match proto_to_chrono(n.not_after) {
+                    Some(d) => d,
+                    None => return Err(tonic::Status::invalid_argument(
+                        "Date must be specified",
+                    ))
+                },
+                accepted_date: match proto_to_chrono(n.accepted_after) {
+                    Some(d) => d,
+                    None => return Err(tonic::Status::invalid_argument(
+                        "Date must be specified",
+                    ))
+                },
+            })).collect::<Result<Vec<_>, _>>()?,
+        })
+    }
+}
+
+impl TryFrom<epp_proto::launch::LaunchData> for client::launch::LaunchUpdate {
+    type Error = tonic::Status;
+
+    fn try_from(from: epp_proto::launch::LaunchData) -> Result<Self, Self::Error> {
+        Ok(client::launch::LaunchUpdate {
+            phase: match from.phase {
+                Some(p) => p.into(),
+                None => return Err(tonic::Status::invalid_argument(
+                    "Launch phase must be specified",
+                ))
+            },
+            application_id: from.application_id,
+        })
+    }
+}
+
+impl From<client::launch::LaunchInfoData> for epp_proto::launch::LaunchInfoData {
+    fn from(from: client::launch::LaunchInfoData) -> Self {
+        epp_proto::launch::LaunchInfoData {
+            phase: Some(from.phase.into()),
+            application_id: from.application_id,
+            status: from.status.map(|s| epp_proto::launch::Status {
+                status_type: match s.status_type {
+                    client::launch::LaunchStatusType::PendingValidation => epp_proto::launch::StatusType::PendingValidation.into(),
+                    client::launch::LaunchStatusType::Validated => epp_proto::launch::StatusType::Validated.into(),
+                    client::launch::LaunchStatusType::Invalid => epp_proto::launch::StatusType::Invalid.into(),
+                    client::launch::LaunchStatusType::PendingAllocation => epp_proto::launch::StatusType::PendingAllocation.into(),
+                    client::launch::LaunchStatusType::Allocated => epp_proto::launch::StatusType::Allocated.into(),
+                    client::launch::LaunchStatusType::Rejected => epp_proto::launch::StatusType::Rejected.into(),
+                    client::launch::LaunchStatusType::Custom => epp_proto::launch::StatusType::Custom.into(),
+                },
+                status_name: s.status_name,
+                message: s.message,
+            }),
+            mark: from.mark,
+        }
+    }
+}
+
+impl From<client::launch::LaunchCreateData> for epp_proto::launch::LaunchData {
+    fn from(from: client::launch::LaunchCreateData) -> Self {
+        epp_proto::launch::LaunchData {
+            phase: Some(from.phase.into()),
+            application_id: from.application_id,
+        }
+    }
+}
+
+// fn client_by_domain(
+//     router: &super::Router,
+//     domain: &str,
+// ) -> Result<(client::RequestSender, String), tonic::Status> {
+//     match router.client_by_domain(domain) {
+//         Some(c) => Ok(c),
+//         None => Err(tonic::Status::invalid_argument("unsupported domain")),
+//     }
+// }
+
+
+fn client_by_domain_or_id(
     router: &super::Router,
     domain: &str,
+    registry_id: Option<String>,
 ) -> Result<(client::RequestSender, String), tonic::Status> {
+    if let Some(r) = registry_id {
+        match router.client_by_id(&r) {
+            Some(c) => return Ok((c, r)),
+            None => {}
+        }
+    }
     match router.client_by_domain(domain) {
         Some(c) => Ok(c),
         None => Err(tonic::Status::invalid_argument("unsupported domain")),
@@ -1094,18 +1320,69 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         request: tonic::Request<epp_proto::domain::DomainCheckRequest>,
     ) -> Result<tonic::Response<epp_proto::domain::DomainCheckReply>, tonic::Status> {
         let res = request.into_inner();
-        let (mut sender, registry_name) = client_by_domain(&self.client_router, &res.name)?;
+        let (mut sender, registry_name) =
+            client_by_domain_or_id(&self.client_router, &res.name, res.registry_name)?;
         let res = client::domain::check(
             &res.name,
             res.fee_check.map(Into::into),
             None,
-            &mut sender
+            &mut sender,
         ).await?;
 
         let reply = epp_proto::domain::DomainCheckReply {
             available: res.avail,
             reason: res.reason,
             fee_check: res.fee_check.map(Into::into),
+            donuts_fee_check: res.donuts_fee_check.map(Into::into),
+            registry_name,
+        };
+
+        Ok(tonic::Response::new(reply))
+    }
+
+    async fn domain_claims_check(
+        &self,
+        request: tonic::Request<epp_proto::domain::DomainClaimsCheckRequest>,
+    ) -> Result<tonic::Response<epp_proto::domain::DomainClaimsCheckReply>, tonic::Status> {
+        let res = request.into_inner();
+        let (mut sender, registry_name) =
+            client_by_domain_or_id(&self.client_router, &res.name, res.registry_name)?;
+        let launch_check = match res.launch_check {
+            Some(l) => l,
+            None => return Err(tonic::Status::invalid_argument(
+                "Launch check must be specified",
+            ))
+        };
+        let res = client::domain::launch_claims_check(
+            &res.name,
+            launch_check.into(),
+            &mut sender,
+        ).await?;
+
+        let reply = epp_proto::domain::DomainClaimsCheckReply {
+            exists: res.exists,
+            claims_keys: res.claims_key.into_iter().map(Into::into).collect(),
+            registry_name,
+        };
+
+        Ok(tonic::Response::new(reply))
+    }
+
+    async fn domain_trademark_check(
+        &self,
+        request: tonic::Request<epp_proto::domain::DomainTrademarkCheckRequest>,
+    ) -> Result<tonic::Response<epp_proto::domain::DomainClaimsCheckReply>, tonic::Status> {
+        let res = request.into_inner();
+        let (mut sender, registry_name) =
+            client_by_domain_or_id(&self.client_router, &res.name, res.registry_name)?;
+        let res = client::domain::launch_trademark_check(
+            &res.name,
+            &mut sender,
+        ).await?;
+
+        let reply = epp_proto::domain::DomainClaimsCheckReply {
+            exists: res.exists,
+            claims_keys: res.claims_key.into_iter().map(Into::into).collect(),
             registry_name,
         };
 
@@ -1117,12 +1394,16 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         request: tonic::Request<epp_proto::domain::DomainInfoRequest>,
     ) -> Result<tonic::Response<epp_proto::domain::DomainInfoReply>, tonic::Status> {
         let req = request.into_inner();
-        let (mut sender, registry_name) = client_by_domain(&self.client_router, &req.name)?;
+        let (mut sender, registry_name) =
+            client_by_domain_or_id(&self.client_router, &req.name, req.registry_name)?;
         let res = client::domain::info(
             &req.name,
             req.auth_info.as_deref(),
-            None,
-            &mut sender
+            match req.launch_info {
+                Some(i) => Some(TryInto::try_into(i)?),
+                None => None
+            },
+            &mut sender,
         ).await?;
 
         let mut reply: epp_proto::domain::DomainInfoReply = res.into();
@@ -1136,7 +1417,8 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         request: tonic::Request<epp_proto::domain::DomainCreateRequest>,
     ) -> Result<tonic::Response<epp_proto::domain::DomainCreateReply>, tonic::Status> {
         let request = request.into_inner();
-        let (mut sender, registry_name) = client_by_domain(&self.client_router, &request.name)?;
+        let (mut sender, registry_name) =
+            client_by_domain_or_id(&self.client_router, &request.name, request.registry_name)?;
 
         let mut ns = vec![];
 
@@ -1155,24 +1437,24 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                                 Ok(client::host::Address {
                                     address: addr.address.clone(),
                                     ip_version:
-                                        match epp_proto::common::ip_address::IpVersion::from_i32(
-                                            addr.r#type,
-                                        ) {
-                                            Some(
-                                                epp_proto::common::ip_address::IpVersion::IPv4,
-                                            ) => client::host::AddressVersion::IPv4,
-                                            Some(
-                                                epp_proto::common::ip_address::IpVersion::IPv6,
-                                            ) => client::host::AddressVersion::IPv6,
-                                            None
-                                            | Some(
-                                                epp_proto::common::ip_address::IpVersion::Unknown,
-                                            ) => {
-                                                return Err(tonic::Status::invalid_argument(
-                                                    "unknown IP address version",
-                                                ));
-                                            }
-                                        },
+                                    match epp_proto::common::ip_address::IpVersion::from_i32(
+                                        addr.r#type,
+                                    ) {
+                                        Some(
+                                            epp_proto::common::ip_address::IpVersion::IPv4,
+                                        ) => client::host::AddressVersion::IPv4,
+                                        Some(
+                                            epp_proto::common::ip_address::IpVersion::IPv6,
+                                        ) => client::host::AddressVersion::IPv6,
+                                        None
+                                        | Some(
+                                            epp_proto::common::ip_address::IpVersion::Unknown,
+                                        ) => {
+                                            return Err(tonic::Status::invalid_argument(
+                                                "unknown IP address version",
+                                            ));
+                                        }
+                                    },
                                 })
                             })
                             .collect::<Result<Vec<client::host::Address>, tonic::Status>>()?,
@@ -1247,11 +1529,15 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                     },
                     None => None,
                 },
-                launch_create: None
+                launch_create: match request.launch_data {
+                    Some(i) => Some(TryInto::try_into(i)?),
+                    None => None
+                },
+                donuts_fee_agreement: request.donuts_fee_agreement.map(TryInto::try_into).map_or(Ok(None), |v| v.map(Some))?,
             },
             &mut sender,
         )
-        .await?;
+            .await?;
 
         let mut reply: epp_proto::domain::DomainCreateReply = res.into();
         reply.registry_name = registry_name;
@@ -1264,11 +1550,16 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         request: tonic::Request<epp_proto::domain::DomainDeleteRequest>,
     ) -> Result<tonic::Response<epp_proto::domain::DomainDeleteReply>, tonic::Status> {
         let request = request.into_inner();
-        let (mut sender, registry_name) = client_by_domain(&self.client_router, &request.name)?;
+        let (mut sender, registry_name) =
+            client_by_domain_or_id(&self.client_router, &request.name, request.registry_name)?;
         let res = client::domain::delete(
             &request.name,
-            None,
-            &mut sender
+            match request.launch_data {
+                Some(i) => Some(TryInto::try_into(i)?),
+                None => None
+            },
+            request.donuts_fee_agreement.map(TryInto::try_into).map_or(Ok(None), |v| v.map(Some))?,
+            &mut sender,
         ).await?;
 
         let reply = epp_proto::domain::DomainDeleteReply {
@@ -1286,7 +1577,8 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         request: tonic::Request<epp_proto::domain::DomainUpdateRequest>,
     ) -> Result<tonic::Response<epp_proto::domain::DomainUpdateReply>, tonic::Status> {
         let request = request.into_inner();
-        let (mut sender, registry_name) = client_by_domain(&self.client_router, &request.name)?;
+        let (mut sender, registry_name) =
+            client_by_domain_or_id(&self.client_router, &request.name, request.registry_name)?;
 
         let mut add = vec![];
         let mut rem = vec![];
@@ -1305,23 +1597,23 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                                 .iter()
                                 .map(|addr| {
                                     Ok(client::host::Address {
-                        address: addr.address.clone(),
-                        ip_version: match epp_proto::common::ip_address::IpVersion::from_i32(
-                            addr.r#type,
-                        ) {
-                            Some(epp_proto::common::ip_address::IpVersion::IPv4) => {
-                                client::host::AddressVersion::IPv4
-                            }
-                            Some(epp_proto::common::ip_address::IpVersion::IPv6) => {
-                                client::host::AddressVersion::IPv6
-                            }
-                            None | Some(epp_proto::common::ip_address::IpVersion::Unknown) => {
-                                return Err(tonic::Status::invalid_argument(
-                                    "unknown IP address version",
-                                ));
-                            }
-                        },
-                    })
+                                        address: addr.address.clone(),
+                                        ip_version: match epp_proto::common::ip_address::IpVersion::from_i32(
+                                            addr.r#type,
+                                        ) {
+                                            Some(epp_proto::common::ip_address::IpVersion::IPv4) => {
+                                                client::host::AddressVersion::IPv4
+                                            }
+                                            Some(epp_proto::common::ip_address::IpVersion::IPv6) => {
+                                                client::host::AddressVersion::IPv6
+                                            }
+                                            None | Some(epp_proto::common::ip_address::IpVersion::Unknown) => {
+                                                return Err(tonic::Status::invalid_argument(
+                                                    "unknown IP address version",
+                                                ));
+                                            }
+                                        },
+                                    })
                                 })
                                 .collect::<Result<Vec<client::host::Address>, tonic::Status>>()?,
                         }
@@ -1329,13 +1621,13 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                     None => {
                         return Err(tonic::Status::invalid_argument(
                             "one of host_obj or host_name must be specified",
-                        ))
+                        ));
                     }
                 })
             };
         let map_param = |p: epp_proto::domain::domain_update_request::Param,
                          l: &mut Vec<client::domain::UpdateObject>|
-         -> Result<(), tonic::Status> {
+                         -> Result<(), tonic::Status> {
             match p.param {
                 Some(epp_proto::domain::domain_update_request::param::Param::Contact(c)) => {
                     l.push(client::domain::UpdateObject::Contact(
@@ -1461,15 +1753,20 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                 }),
                 None => None,
             },
-            None,
+            match request.launch_data {
+                Some(i) => Some(TryInto::try_into(i)?),
+                None => None
+            },
+            request.donuts_fee_agreement.map(TryInto::try_into).map_or(Ok(None), |v| v.map(Some))?,
             &mut sender,
         )
-        .await?;
+            .await?;
 
         let reply = epp_proto::domain::DomainUpdateReply {
             pending: res.pending,
             transaction_id: res.transaction_id,
             fee_data: res.fee_data.map(Into::into),
+            donuts_fee_data: res.donuts_fee_data.map(Into::into),
             registry_name,
         };
 
@@ -1481,7 +1778,8 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         request: tonic::Request<epp_proto::domain::DomainRenewRequest>,
     ) -> Result<tonic::Response<epp_proto::domain::DomainRenewReply>, tonic::Status> {
         let request = request.into_inner();
-        let (mut sender, registry_name) = client_by_domain(&self.client_router, &request.name)?;
+        let (mut sender, registry_name) =
+            client_by_domain_or_id(&self.client_router, &request.name, request.registry_name)?;
 
         let cur_expiry_date = proto_to_chrono(request.current_expiry_date);
         if cur_expiry_date.is_none() {
@@ -1497,9 +1795,10 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                 value: p.value,
             }),
             cur_expiry_date.unwrap(),
+            request.donuts_fee_agreement.map(TryInto::try_into).map_or(Ok(None), |v| v.map(Some))?,
             &mut sender,
         )
-        .await?;
+            .await?;
 
         let mut reply: epp_proto::domain::DomainRenewReply = res.into();
         reply.registry_name = registry_name;
@@ -1512,7 +1811,8 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         request: tonic::Request<epp_proto::domain::DomainTransferQueryRequest>,
     ) -> Result<tonic::Response<epp_proto::domain::DomainTransferReply>, tonic::Status> {
         let req = request.into_inner();
-        let (mut sender, registry_name) = client_by_domain(&self.client_router, &req.name)?;
+        let (mut sender, registry_name) =
+            client_by_domain_or_id(&self.client_router, &req.name, req.registry_name)?;
         let res = client::domain::transfer_query(
             &req.name, req.auth_info.as_deref(), &mut sender).await?;
 
@@ -1527,7 +1827,8 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         request: tonic::Request<epp_proto::domain::DomainTransferRequestRequest>,
     ) -> Result<tonic::Response<epp_proto::domain::DomainTransferReply>, tonic::Status> {
         let request = request.into_inner();
-        let (mut sender, registry_name) = client_by_domain(&self.client_router, &request.name)?;
+        let (mut sender, registry_name) =
+            client_by_domain_or_id(&self.client_router, &request.name, request.registry_name)?;
         let res = client::domain::transfer_request(
             &request.name,
             request.period.map(|p| client::domain::Period {
@@ -1535,9 +1836,10 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                 value: p.value,
             }),
             &request.auth_info,
+            request.donuts_fee_agreement.map(TryInto::try_into).map_or(Ok(None), |v| v.map(Some))?,
             &mut sender,
         )
-        .await?;
+            .await?;
 
         let mut reply: epp_proto::domain::DomainTransferReply = res.into();
         reply.registry_name = registry_name;
@@ -1550,7 +1852,8 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         request: tonic::Request<epp_proto::domain::DomainTransferAcceptRejectRequest>,
     ) -> Result<tonic::Response<epp_proto::domain::DomainTransferReply>, tonic::Status> {
         let request = request.into_inner();
-        let (mut sender, registry_name) = client_by_domain(&self.client_router, &request.name)?;
+        let (mut sender, registry_name) =
+            client_by_domain_or_id(&self.client_router, &request.name, request.registry_name)?;
         let res =
             client::domain::transfer_accept(
                 &request.name, Some(&request.auth_info), &mut sender).await?;
@@ -1566,7 +1869,8 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         request: tonic::Request<epp_proto::domain::DomainTransferAcceptRejectRequest>,
     ) -> Result<tonic::Response<epp_proto::domain::DomainTransferReply>, tonic::Status> {
         let request = request.into_inner();
-        let (mut sender, registry_name) = client_by_domain(&self.client_router, &request.name)?;
+        let (mut sender, registry_name) =
+            client_by_domain_or_id(&self.client_router, &request.name, request.registry_name)?;
         let res =
             client::domain::transfer_reject(
                 &request.name, Some(&request.auth_info), &mut sender).await?;
@@ -1581,9 +1885,14 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         &self,
         request: tonic::Request<epp_proto::rgp::RequestRequest>,
     ) -> Result<tonic::Response<epp_proto::rgp::RestoreReply>, tonic::Status> {
-        let name: String = request.into_inner().name;
-        let (mut sender, registry_name) = client_by_domain(&self.client_router, &name)?;
-        let res = client::rgp::request(&name, &mut sender).await?;
+        let res = request.into_inner();
+        let (mut sender, registry_name) =
+            client_by_domain_or_id(&self.client_router, &res.name, res.registry_name)?;
+        let res = client::rgp::request(
+            &res.name,
+            res.donuts_fee_agreement.map(TryInto::try_into).map_or(Ok(None), |v| v.map(Some))?,
+            &mut sender,
+        ).await?;
 
         let reply = epp_proto::rgp::RestoreReply {
             pending: res.pending,
@@ -1874,7 +2183,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
             },
             &mut sender,
         )
-        .await?;
+            .await?;
 
         let reply = epp_proto::contact::ContactCreateReply {
             id: res.id,
@@ -1942,7 +2251,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
             },
             &mut sender,
         )
-        .await?;
+            .await?;
 
         let reply = epp_proto::contact::ContactUpdateReply {
             pending: res.pending,
@@ -1963,11 +2272,11 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let reply = epp_proto::contact::ContactTransferReply {
             pending: res.pending,
             transaction_id: res.transaction_id,
-            status: i32_from_transfer_status(res.status),
-            requested_client_id: res.requested_client_id,
-            requested_date: chrono_to_proto(Some(res.requested_date)),
-            act_client_id: res.act_client_id,
-            act_date: chrono_to_proto(Some(res.act_date)),
+            status: i32_from_transfer_status(res.data.status),
+            requested_client_id: res.data.requested_client_id,
+            requested_date: chrono_to_proto(Some(res.data.requested_date)),
+            act_client_id: res.data.act_client_id,
+            act_date: chrono_to_proto(Some(res.data.act_date)),
         };
 
         Ok(tonic::Response::new(reply))
@@ -1986,11 +2295,11 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let reply = epp_proto::contact::ContactTransferReply {
             pending: res.pending,
             transaction_id: res.transaction_id,
-            status: i32_from_transfer_status(res.status),
-            requested_client_id: res.requested_client_id,
-            requested_date: chrono_to_proto(Some(res.requested_date)),
-            act_client_id: res.act_client_id,
-            act_date: chrono_to_proto(Some(res.act_date)),
+            status: i32_from_transfer_status(res.data.status),
+            requested_client_id: res.data.requested_client_id,
+            requested_date: chrono_to_proto(Some(res.data.requested_date)),
+            act_client_id: res.data.act_client_id,
+            act_date: chrono_to_proto(Some(res.data.act_date)),
         };
 
         Ok(tonic::Response::new(reply))
@@ -2008,11 +2317,11 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let reply = epp_proto::contact::ContactTransferReply {
             pending: res.pending,
             transaction_id: res.transaction_id,
-            status: i32_from_transfer_status(res.status),
-            requested_client_id: res.requested_client_id,
-            requested_date: chrono_to_proto(Some(res.requested_date)),
-            act_client_id: res.act_client_id,
-            act_date: chrono_to_proto(Some(res.act_date)),
+            status: i32_from_transfer_status(res.data.status),
+            requested_client_id: res.data.requested_client_id,
+            requested_date: chrono_to_proto(Some(res.data.requested_date)),
+            act_client_id: res.data.act_client_id,
+            act_date: chrono_to_proto(Some(res.data.act_date)),
         };
 
         Ok(tonic::Response::new(reply))
@@ -2030,11 +2339,11 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let reply = epp_proto::contact::ContactTransferReply {
             pending: res.pending,
             transaction_id: res.transaction_id,
-            status: i32_from_transfer_status(res.status),
-            requested_client_id: res.requested_client_id,
-            requested_date: chrono_to_proto(Some(res.requested_date)),
-            act_client_id: res.act_client_id,
-            act_date: chrono_to_proto(Some(res.act_date)),
+            status: i32_from_transfer_status(res.data.status),
+            requested_client_id: res.data.requested_client_id,
+            requested_date: chrono_to_proto(Some(res.data.requested_date)),
+            act_client_id: res.data.act_client_id,
+            act_date: chrono_to_proto(Some(res.data.act_date)),
         };
 
         Ok(tonic::Response::new(reply))
@@ -2068,7 +2377,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                                     change_data: ref c,
                                     data: _
                                 } => c,
-                                client::poll::PollData::DomainTransferData  {
+                                client::poll::PollData::DomainTransferData {
                                     change_data: ref c,
                                     data: _
                                 } => c,
@@ -2141,7 +2450,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                                                 client::poll::ChangeOperationType::AutoPurge => epp_proto::change_data::change_operation::ChangeOperationType::AutoPurge.into(),
                                                 client::poll::ChangeOperationType::Custom => epp_proto::change_data::change_operation::ChangeOperationType::Custom.into(),
                                             },
-                                            operation: c.operation.operation.clone()
+                                            operation: c.operation.operation.clone(),
                                         }),
                                         date: chrono_to_proto(Some(c.date)),
                                         server_transaction_id: c.server_transaction_id.clone(),
@@ -2153,9 +2462,9 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                                                 client::poll::ChangeCaseIdType::Custom => epp_proto::change_data::case_id::CaseIdType::Custom.into(),
                                             },
                                             name: i.name.clone(),
-                                            case_id: i.case_id.clone()
+                                            case_id: i.case_id.clone(),
                                         }),
-                                        reason: c.reason.clone()
+                                        reason: c.reason.clone(),
                                     }),
                                     data: match message.data {
                                         client::poll::PollData::DomainInfoData {
@@ -2213,7 +2522,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                                         client::poll::PollData::VerisignLowBalanceData(i) =>
                                             Some(epp_proto::poll_reply::Data::VerisignLowBalanceData(i.into())),
                                         _ => None
-                                    }
+                                    },
                                 }))
                                 .await
                             {

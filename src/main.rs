@@ -30,7 +30,7 @@
 //!  "id": "nominet",
 //!  "server": "ote-epp.nominet.org.uk:700",
 //!  "tag": "AS207960",
-//!  "new_wpassword": "supersecretpassword",
+//!  "new_password": "supersecretpassword",
 //!  "password": "oldpassword",
 //!  "zones": [
 //!    "uk"
