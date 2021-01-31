@@ -116,7 +116,7 @@ pub enum EPPContactStatusType {
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct EPPContactPhone {
-    #[serde(rename = "$attr:x", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "$attr:x", skip_serializing_if = "Option::is_none", default)]
     pub extension: Option<String>,
     #[serde(rename = "$value")]
     pub number: String,
@@ -237,11 +237,11 @@ pub enum EPPContactDisclosureItem {
         addr_type: EPPContactPostalInfoType,
     },
     #[serde(rename = "{urn:ietf:params:xml:ns:contact-1.0}contact:voice")]
-    Voice,
+    Voice {},
     #[serde(rename = "{urn:ietf:params:xml:ns:contact-1.0}contact:fax")]
-    Fax,
+    Fax {},
     #[serde(rename = "{urn:ietf:params:xml:ns:contact-1.0}contact:email")]
-    Email,
+    Email {},
 }
 
 #[derive(Debug, Deserialize)]
@@ -330,6 +330,11 @@ pub struct EPPContactCreateData {
 pub struct EPPContactUpdate {
     #[serde(rename = "{urn:ietf:params:xml:ns:contact-1.0}contact:id")]
     pub id: String,
+    #[serde(
+        rename = "{urn:ietf:params:xml:ns:contact-1.0}contact:role",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub traficom_role: Option<super::traficom::EPPContactTraficomRole>,
     #[serde(
         rename = "{urn:ietf:params:xml:ns:contact-1.0}contact:add",
         skip_serializing_if = "Option::is_none"

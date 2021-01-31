@@ -1,10 +1,12 @@
 //! EPP commands relating to contact objects
 
-use super::router::HandleReqReturn;
-use super::{proto, EPPClientServerFeatures, Error, Request, Response, Sender};
+use std::convert::{TryFrom, TryInto};
+
 use chrono::prelude::*;
 use regex::Regex;
-use std::convert::{TryFrom, TryInto};
+
+use super::{EPPClientServerFeatures, Error, proto, Request, Response, Sender};
+use super::router::HandleReqReturn;
 
 #[derive(Debug)]
 pub struct CheckRequest {
@@ -339,9 +341,9 @@ impl From<&proto::contact::EPPContactDisclosureItem> for Option<DisclosureType> 
             EPPContactDisclosureItem::Address {
                 addr_type: EPPContactPostalInfoType::Internationalised,
             } => Some(DisclosureType::InternationalisedAddress),
-            EPPContactDisclosureItem::Voice => Some(DisclosureType::Voice),
-            EPPContactDisclosureItem::Fax => Some(DisclosureType::Fax),
-            EPPContactDisclosureItem::Email => Some(DisclosureType::Email),
+            EPPContactDisclosureItem::Voice {} => Some(DisclosureType::Voice),
+            EPPContactDisclosureItem::Fax {} => Some(DisclosureType::Fax),
+            EPPContactDisclosureItem::Email {} => Some(DisclosureType::Email),
         }
     }
 }
@@ -531,10 +533,10 @@ pub struct TransferData {
 }
 
 impl
-    TryFrom<(
-        proto::contact::EPPContactInfoData,
-        &Option<proto::EPPResponseExtension>,
-    )> for InfoResponse
+TryFrom<(
+    proto::contact::EPPContactInfoData,
+    &Option<proto::EPPResponseExtension>,
+)> for InfoResponse
 {
     type Error = Error;
 
@@ -863,18 +865,18 @@ pub fn handle_create(
     let mut ext = vec![];
     if client.nominet_contact_ext {
         ext.push(proto::EPPCommandExtensionType::NominetContactExtCreate(
-                proto::nominet::EPPContactInfo {
-                    contact_type: match &req.entity_type {
-                        Some(i) => match i {
-                            EntityType::Unknown => None,
-                            i => Some(i.into()),
-                        },
-                        None => None,
+            proto::nominet::EPPContactInfo {
+                contact_type: match &req.entity_type {
+                    Some(i) => match i {
+                        EntityType::Unknown => None,
+                        i => Some(i.into()),
                     },
-                    trading_name: req.trading_name.clone(),
-                    company_number: req.company_number.clone(),
+                    None => None,
                 },
-            ));
+                trading_name: req.trading_name.clone(),
+                company_number: req.company_number.clone(),
+            },
+        ));
     }
     super::verisign::handle_verisign_namestore_erratum(client, &mut ext);
 
@@ -887,13 +889,16 @@ pub fn handle_create(
         auth_info: proto::contact::EPPContactAuthInfo {
             password: Some(req.auth_info.clone()),
         },
-        disclose: req.disclosure.clone().map(|mut d| {
-            d.sort_unstable_by(|a, b| (*a as i32).cmp(&(*b as i32)));
-            proto::contact::EPPContactDisclosure {
-                flag: true,
-                elements: d.iter().map(|e| e.into()).collect(),
-            }
-        }),
+        disclose: match client.switch_balance {
+            true => None,
+            false => req.disclosure.clone().map(|mut d| {
+                d.sort_unstable_by(|a, b| (*a as i32).cmp(&(*b as i32)));
+                proto::contact::EPPContactDisclosure {
+                    flag: true,
+                    elements: d.iter().map(|e| e.into()).collect(),
+                }
+            })
+        },
         traficom_role: if client.has_erratum("traficom") {
             Some(proto::traficom::EPPContactTraficomRole::Registrant)
         } else {
@@ -1045,6 +1050,11 @@ pub fn handle_update(
     }
     let command = proto::EPPUpdate::Contact(proto::contact::EPPContactUpdate {
         id: req.id.clone(),
+        traficom_role: if client.has_erratum("traficom") {
+            Some(proto::traficom::EPPContactTraficomRole::Registrant)
+        } else {
+            None
+        },
         add: if req.add_statuses.is_empty() {
             None
         } else {
@@ -1075,13 +1085,16 @@ pub fn handle_update(
                 phone: req.new_phone.as_ref().map(|p| p.into()),
                 fax: req.new_fax.as_ref().map(|p| p.into()),
                 postal_info,
-                disclose: req.new_disclosure.clone().map(|mut d| {
-                    d.sort_unstable_by(|a, b| (*a as i32).cmp(&(*b as i32)));
-                    proto::contact::EPPContactDisclosure {
-                        flag: true,
-                        elements: d.iter().map(|e| e.into()).collect(),
-                    }
-                }),
+                disclose: match client.switch_balance {
+                    true => None,
+                    false => req.new_disclosure.clone().map(|mut d| {
+                        d.sort_unstable_by(|a, b| (*a as i32).cmp(&(*b as i32)));
+                        proto::contact::EPPContactDisclosure {
+                            flag: true,
+                            elements: d.iter().map(|e| e.into()).collect(),
+                        }
+                    })
+                },
                 auth_info: req
                     .new_auth_info
                     .as_ref()
@@ -1095,17 +1108,17 @@ pub fn handle_update(
     let mut ext = vec![];
     if client.nominet_contact_ext {
         ext.push(proto::EPPCommandExtensionType::NominetContactExtUpdate(
-                proto::nominet::EPPContactInfo {
-                    contact_type: match &req.new_entity_type {
-                        Some(i) => match i {
-                            EntityType::Unknown => None,
-                            i => Some(i.into()),
-                        },
-                        None => None,
+            proto::nominet::EPPContactInfo {
+                contact_type: match &req.new_entity_type {
+                    Some(i) => match i {
+                        EntityType::Unknown => None,
+                        i => Some(i.into()),
                     },
-                    trading_name: req.new_trading_name.clone(),
-                    company_number: req.new_company_number.clone(),
+                    None => None,
                 },
+                trading_name: req.new_trading_name.clone(),
+                company_number: req.new_company_number.clone(),
+            },
         ));
     }
     super::verisign::handle_verisign_namestore_erratum(client, &mut ext);
@@ -1227,7 +1240,7 @@ pub fn handle_transfer_response(response: proto::EPPResponse) -> Response<Transf
                 Ok(TransferResponse {
                     pending: response.is_pending(),
                     transaction_id: response.transaction_id.server_transaction_id.unwrap_or_default(),
-                    data: contact_transfer.into()
+                    data: contact_transfer.into(),
                 })
             }
             _ => Err(Error::InternalServerError),
@@ -1254,7 +1267,7 @@ pub async fn check(
         })),
         receiver,
     )
-    .await
+        .await
 }
 
 /// Fetches information about a specific contact
@@ -1275,7 +1288,7 @@ pub async fn info(
         })),
         receiver,
     )
-    .await
+        .await
 }
 
 pub struct NewContactData {
@@ -1334,7 +1347,7 @@ pub async fn create(
         })),
         receiver,
     )
-    .await
+        .await
 }
 
 /// Deletes a contact contact
@@ -1355,7 +1368,7 @@ pub async fn delete(
         })),
         receiver,
     )
-    .await
+        .await
 }
 
 pub struct UpdateContactData {
@@ -1379,6 +1392,7 @@ pub struct UpdateContactData {
     pub disclosure: Option<Vec<DisclosureType>>,
     pub auth_info: Option<String>,
 }
+
 /// Updates an existing contact
 ///
 /// Contact numbers must be in `+cc.xxxxxxxxxx` format where `c` is the country dialing code and
@@ -1418,7 +1432,7 @@ pub async fn update(
         })),
         receiver,
     )
-    .await
+        .await
 }
 
 /// Queries the current transfer status of a contact
@@ -1439,7 +1453,7 @@ pub async fn transfer_query(
         })),
         receiver,
     )
-    .await
+        .await
 }
 
 /// Requests the transfer of a contact
@@ -1463,7 +1477,7 @@ pub async fn transfer_request(
         })),
         receiver,
     )
-    .await
+        .await
 }
 
 /// Accepts the transfer of a contact
@@ -1487,7 +1501,7 @@ pub async fn transfer_accept(
         })),
         receiver,
     )
-    .await
+        .await
 }
 
 /// Rejects the transfer of a contact
@@ -1511,5 +1525,5 @@ pub async fn transfer_reject(
         })),
         receiver,
     )
-    .await
+        .await
 }
