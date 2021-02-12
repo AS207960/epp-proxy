@@ -224,8 +224,11 @@ pub struct EPPDomainCreate {
         skip_serializing_if = "Option::is_none"
     )]
     pub nameservers: Option<EPPDomainInfoNameservers>,
-    #[serde(rename = "{urn:ietf:params:xml:ns:domain-1.0}domain:registrant")]
-    pub registrant: String,
+    #[serde(
+        rename = "{urn:ietf:params:xml:ns:domain-1.0}domain:registrant",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub registrant: Option<String>,
     #[serde(rename = "{urn:ietf:params:xml:ns:domain-1.0}domain:contact")]
     pub contacts: Vec<EPPDomainInfoContact>,
     #[serde(rename = "{urn:ietf:params:xml:ns:domain-1.0}domain:authInfo")]

@@ -213,6 +213,8 @@ pub struct EPPClientServerFeatures {
     fee_supported: bool,
     /// RFC 8334 support
     launch_supported: bool,
+    /// urn:ietf:params:xml:ns:fee-0.11 support
+    fee_011_supported: bool,
     /// urn:ietf:params:xml:ns:fee-0.9 support
     fee_09_supported: bool,
     /// urn:ietf:params:xml:ns:fee-0.8 support
@@ -486,7 +488,7 @@ impl EPPClient {
             (router::Request::NominetTagList(t), false) => {
                 let client = match &mut self.nominet_tag_list_subordinate_client {
                     Some(c) => c,
-                    None => unreachable!(),
+                    None => return Err(()),
                 };
                 match client.send(router::Request::NominetTagList(t)).await {
                     Ok(_) => Ok(()),
@@ -728,6 +730,9 @@ impl EPPClient {
         self.features.launch_supported = greeting
             .service_menu
             .supports_ext("urn:ietf:params:xml:ns:launch-1.0");
+        self.features.fee_011_supported = greeting
+            .service_menu
+            .supports_ext("urn:ietf:params:xml:ns:fee-0.11");
         self.features.fee_09_supported = greeting
             .service_menu
             .supports_ext("urn:ietf:params:xml:ns:fee-0.9");
@@ -813,6 +818,8 @@ impl EPPClient {
             }
             if self.features.fee_supported {
                 ext_objects.push("urn:ietf:params:xml:ns:epp:fee-1.0".to_string())
+            } else if self.features.fee_011_supported {
+                ext_objects.push("urn:ietf:params:xml:ns:fee-0.11".to_string())
             } else if self.features.fee_09_supported {
                 ext_objects.push("urn:ietf:params:xml:ns:fee-0.9".to_string())
             } else if self.features.fee_08_supported {

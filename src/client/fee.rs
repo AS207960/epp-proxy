@@ -7,6 +7,12 @@ pub struct FeeCheck {
 }
 
 #[derive(Debug)]
+pub struct FeeAgreement {
+    pub currency: Option<String>,
+    pub fees: Vec<Fee>,
+}
+
+#[derive(Debug)]
 pub enum Command {
     Create,
     Renew,
@@ -23,6 +29,7 @@ pub enum Command {
 pub enum Applied {
     Immediate,
     Delayed,
+    Unspecified,
 }
 
 #[derive(Debug)]
@@ -169,11 +176,22 @@ impl From<&Command> for proto::united_tld::EPPChargeCommand {
     }
 }
 
-impl From<&proto::fee::EPPFee10Applied> for Applied {
-    fn from(from: &proto::fee::EPPFee10Applied) -> Self {
+impl From<Option<&proto::fee::EPPFee10Applied>> for Applied {
+    fn from(from: Option<&proto::fee::EPPFee10Applied>) -> Self {
         match from {
-            proto::fee::EPPFee10Applied::Immediate => Applied::Immediate,
-            proto::fee::EPPFee10Applied::Delayed => Applied::Delayed,
+            None => Applied::Immediate,
+            Some(proto::fee::EPPFee10Applied::Immediate) => Applied::Immediate,
+            Some(proto::fee::EPPFee10Applied::Delayed) => Applied::Delayed,
+        }
+    }
+}
+
+impl From<&Applied> for Option<proto::fee::EPPFee10Applied> {
+    fn from(from: &Applied) -> Self {
+        match from {
+            Applied::Immediate => Some(proto::fee::EPPFee10Applied::Immediate),
+            Applied::Delayed => Some(proto::fee::EPPFee10Applied::Delayed),
+            Applied::Unspecified => None
         }
     }
 }
@@ -197,6 +215,30 @@ impl From<&proto::fee::EPPFee08Fee> for Fee {
             description: from.description.to_owned(),
             refundable: Some(from.refundable),
             grace_period: from.grace_period.to_owned(),
+            applied: (Some(&from.applied)).into(),
+        }
+    }
+}
+
+impl From<&proto::fee::EPPFee011Fee> for Fee {
+    fn from(from: &proto::fee::EPPFee011Fee) -> Self {
+        Fee {
+            value: from.value.to_owned(),
+            description: from.description.to_owned(),
+            refundable: from.refundable,
+            grace_period: from.grace_period.to_owned(),
+            applied: from.applied.as_ref().into(),
+        }
+    }
+}
+
+impl From<&Fee> for proto::fee::EPPFee011Fee {
+    fn from(from: &Fee) -> Self {
+        proto::fee::EPPFee011Fee {
+            value: from.value.to_owned(),
+            description: from.description.to_owned(),
+            refundable: from.refundable,
+            grace_period: from.grace_period.to_owned(),
             applied: (&from.applied).into(),
         }
     }
@@ -209,7 +251,28 @@ impl From<&proto::fee::EPPFee10Fee> for Fee {
             description: from.description.to_owned(),
             refundable: from.refundable,
             grace_period: from.grace_period.to_owned(),
+            applied: from.applied.as_ref().into(),
+        }
+    }
+}
+
+impl From<&Fee> for proto::fee::EPPFee10Fee {
+    fn from(from: &Fee) -> Self {
+        proto::fee::EPPFee10Fee {
+            value: from.value.to_owned(),
+            description: from.description.to_owned(),
+            refundable: from.refundable,
+            grace_period: from.grace_period.to_owned(),
             applied: (&from.applied).into(),
+        }
+    }
+}
+
+impl From<&proto::fee::EPPFee011Credit> for Credit {
+    fn from(from: &proto::fee::EPPFee011Credit) -> Self {
+        Credit {
+            value: from.value.to_owned(),
+            description: from.description.to_owned(),
         }
     }
 }
@@ -274,6 +337,20 @@ impl From<&proto::fee::EPPFee09TransformData> for FeeData {
         }
     }
 }
+
+impl From<&proto::fee::EPPFee011TransformData> for FeeData {
+    fn from(f: &proto::fee::EPPFee011TransformData) -> Self {
+        FeeData {
+            period: None,
+            currency: f.currency.to_owned(),
+            fees: f.fee.iter().map(Into::into).collect(),
+            credits: f.credit.iter().map(Into::into).collect(),
+            balance: f.balance.to_owned(),
+            credit_limit: f.credit_limit.to_owned(),
+        }
+    }
+}
+
 
 impl From<&proto::fee::EPPFee10TransformData> for FeeData {
     fn from(f: &proto::fee::EPPFee10TransformData) -> Self {
@@ -441,6 +518,24 @@ impl From<&DonutsFeeData> for proto::united_tld::EPPChargeData {
                     command: (&f.command).into(),
                 }).collect(),
             }).collect()
+        }
+    }
+}
+
+impl From<&FeeAgreement> for proto::fee::EPPFee011Agreement {
+    fn from(f: &FeeAgreement) -> Self {
+        proto::fee::EPPFee011Agreement {
+            currency: f.currency.as_ref().map(Into::into),
+            fee: f.fees.iter().map(Into::into).collect()
+        }
+    }
+}
+
+impl From<&FeeAgreement> for proto::fee::EPPFee10Agreement {
+    fn from(f: &FeeAgreement) -> Self {
+        proto::fee::EPPFee10Agreement {
+            currency: f.currency.as_ref().map(Into::into),
+            fee: f.fees.iter().map(Into::into).collect()
         }
     }
 }

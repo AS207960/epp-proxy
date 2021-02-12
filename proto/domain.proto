@@ -115,6 +115,7 @@ message DomainCreateRequest {
     launch.LaunchCreate launch_data = 8;
     google.protobuf.StringValue registry_name = 9;
     fee.DonutsFeeData donuts_fee_agreement = 10;
+    fee.FeeAgreement fee_agreement = 11;
 }
 
 message DomainCreateReply {
@@ -161,6 +162,7 @@ message DomainUpdateRequest {
     launch.LaunchData launch_data = 7;
     google.protobuf.StringValue registry_name = 8;
     fee.DonutsFeeData donuts_fee_agreement = 9;
+    fee.FeeAgreement fee_agreement = 10;
 }
 
 message DomainUpdateReply {
@@ -177,6 +179,7 @@ message DomainRenewRequest {
     google.protobuf.Timestamp current_expiry_date = 3;
     google.protobuf.StringValue registry_name = 4;
     fee.DonutsFeeData donuts_fee_agreement = 5;
+    fee.FeeAgreement fee_agreement = 6;
 }
 
 message DomainRenewReply {
@@ -201,6 +204,7 @@ message DomainTransferRequestRequest {
     string auth_info = 3;
     google.protobuf.StringValue registry_name = 4;
     fee.DonutsFeeData donuts_fee_agreement = 5;
+    fee.FeeAgreement fee_agreement = 6;
 }
 
 message DomainTransferAcceptRejectRequest {

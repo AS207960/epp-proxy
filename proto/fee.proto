@@ -19,6 +19,7 @@ enum Command {
 enum Applied {
     Immediate = 0;
     Delayed = 1;
+    Unspecified = 2;
 }
 
 message Fee {
@@ -37,6 +38,11 @@ message Credit {
 message FeeCheck {
     google.protobuf.StringValue currency = 1;
     repeated FeeCommand commands = 2;
+}
+
+message FeeAgreement {
+    google.protobuf.StringValue currency = 1;
+    repeated Fee fees = 2;
 }
 
 message FeeCommand {

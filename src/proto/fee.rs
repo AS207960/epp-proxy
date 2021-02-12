@@ -23,6 +23,22 @@ pub struct EPPFee09Check {
 }
 
 #[derive(Debug, Serialize)]
+pub struct EPPFee011Check {
+    #[serde(
+        rename = "{urn:ietf:params:xml:ns:epp:fee-0.11}fee:currency",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub currency: Option<String>,
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp:fee-0.11}fee:command")]
+    pub command: EPPFeeCommand,
+    #[serde(
+        rename = "{urn:ietf:params:xml:ns:epp:fee-0.11}fee:period",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub period: Option<super::domain::EPPDomainPeriod>,
+}
+
+#[derive(Debug, Serialize)]
 pub struct EPPFee10Check {
     #[serde(
         rename = "{urn:ietf:params:xml:ns:epp:fee-1.0}fee:currency",
@@ -162,6 +178,28 @@ pub struct EPPFee07Info {
     pub period: Option<super::domain::EPPDomainPeriod>,
 }
 
+#[derive(Debug, Serialize)]
+pub struct EPPFee011Agreement {
+    #[serde(
+        rename = "{urn:ietf:params:xml:ns:fee-0.11}currency",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub currency: Option<String>,
+    #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.11}fee")]
+    pub fee: Vec<EPPFee011Fee>,
+}
+
+#[derive(Debug, Serialize)]
+pub struct EPPFee10Agreement {
+    #[serde(
+        rename = "{urn:ietf:params:xml:ns:fee-1.0}currency",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub currency: Option<String>,
+    #[serde(rename = "{urn:ietf:params:xml:ns:fee-1.0}fee")]
+    pub fee: Vec<EPPFee10Fee>,
+}
+
 #[derive(Debug, Deserialize, Serialize)]
 pub enum EPPFeeCommand {
     #[serde(rename = "create")]
@@ -198,6 +236,12 @@ pub struct EPPFee08CheckData {
 pub struct EPPFee09CheckData {
     #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.9}cd")]
     pub objects: Vec<EPPFee09CheckDatum>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct EPPFee011CheckData {
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp:fee-0.11}cd")]
+    pub objects: Vec<EPPFee011CheckDatum>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -281,6 +325,28 @@ pub struct EPPFee09CheckDatum {
 }
 
 #[derive(Debug, Deserialize)]
+pub struct EPPFee011CheckDatum {
+    #[serde(rename = "$attr:avail", default = "default_as_true")]
+    pub available: bool,
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp:fee-0.11}currency")]
+    pub currency: String,
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp:fee-0.11}object")]
+    pub object: String,
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp:fee-0.11}command")]
+    pub command: EPPFee011Command,
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp:fee-0.11}period", default)]
+    pub period: Option<super::domain::EPPDomainPeriod>,
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp:fee-0p11}reason", default)]
+    pub reason: Option<String>,
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp:fee-0.11}fee", default)]
+    pub fee: Vec<EPPFee011Fee>,
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp:fee-0.11}credit", default)]
+    pub credit: Vec<EPPFee011Credit>,
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp:fee-0.11}class", default)]
+    pub class: Option<String>,
+}
+
+#[derive(Debug, Deserialize)]
 pub struct EPPFee10CheckDatum {
     #[serde(rename = "$attr:avail", default = "default_as_true")]
     pub available: bool,
@@ -293,6 +359,15 @@ pub struct EPPFee10CheckDatum {
     #[serde(rename = "{urn:ietf:params:xml:ns:epp:fee-1.0}class", default)]
     pub class: Option<String>,
 }
+
+#[derive(Debug, Deserialize)]
+pub struct EPPFee011Command {
+    #[serde(rename = "$value")]
+    pub name: EPPFeeCommand,
+    #[serde(rename = "$attr:standard", default = "default_as_false")]
+    pub standard: bool,
+}
+
 
 #[derive(Debug, Deserialize)]
 pub struct EPPFee10Command {
@@ -391,6 +466,20 @@ pub struct EPPFee09TransformData {
     #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.9}balance", default)]
     pub balance: Option<String>,
     #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.9}creditLimit", default)]
+    pub credit_limit: Option<String>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct EPPFee011TransformData {
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp:fee-0.11}currency")]
+    pub currency: String,
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp:fee-0.11}fee", default)]
+    pub fee: Vec<EPPFee011Fee>,
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp:fee-0.11}credit", default)]
+    pub credit: Vec<EPPFee011Credit>,
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp:fee-0.11}balance", default)]
+    pub balance: Option<String>,
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp:fee-0.11}creditLimit", default)]
     pub credit_limit: Option<String>,
 }
 
@@ -530,21 +619,67 @@ pub struct EPPFee08Fee {
     pub value: String,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct EPPFee10Fee {
-    #[serde(rename = "$attr:description", default)]
+    #[serde(
+    rename = "$attr:description",
+        skip_serializing_if = "Option::is_none",
+        default
+    )]
     pub description: Option<String>,
-    #[serde(rename = "$attr:refundable", default)]
+    #[serde(
+    rename = "$attr:refundable",
+        skip_serializing_if = "Option::is_none",
+        default
+    )]
     pub refundable: Option<bool>,
-    #[serde(rename = "$attr:grace-period", default)]
+    #[serde(
+    rename = "$attr:grace-period",
+        skip_serializing_if = "Option::is_none",
+        default
+    )]
     pub grace_period: Option<String>,
-    #[serde(rename = "$attr:applied", default)]
-    pub applied: EPPFee10Applied,
+    #[serde(
+    rename = "$attr:applied",
+        skip_serializing_if = "Option::is_none",
+        default
+    )]
+    pub applied: Option<EPPFee10Applied>,
     #[serde(rename = "$value")]
     pub value: String,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
+pub struct EPPFee011Fee {
+    #[serde(
+        rename = "$attr:description",
+        skip_serializing_if = "Option::is_none",
+        default
+    )]
+    pub description: Option<String>,
+    #[serde(
+        rename = "$attr:refundable",
+        skip_serializing_if = "Option::is_none",
+        default
+    )]
+    pub refundable: Option<bool>,
+    #[serde(
+        rename = "$attr:grace-period",
+        skip_serializing_if = "Option::is_none",
+        default
+    )]
+    pub grace_period: Option<String>,
+    #[serde(
+        rename = "$attr:applied",
+        skip_serializing_if = "Option::is_none",
+        default
+    )]
+    pub applied: Option<EPPFee10Applied>,
+    #[serde(rename = "$value")]
+    pub value: String,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
 pub enum EPPFee10Applied {
     #[serde(rename = "immediate")]
     Immediate,
@@ -560,6 +695,15 @@ impl Default for EPPFee10Applied {
 
 #[derive(Debug, Deserialize)]
 pub struct EPPFee10Credit {
+    #[serde(rename = "$attr:description", default)]
+    pub description: Option<String>,
+    #[serde(rename = "$value")]
+    pub value: String,
+}
+
+
+#[derive(Debug, Deserialize)]
+pub struct EPPFee011Credit {
     #[serde(rename = "$attr:description", default)]
     pub description: Option<String>,
     #[serde(rename = "$value")]

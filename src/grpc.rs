@@ -491,6 +491,7 @@ impl From<client::fee::Fee> for epp_proto::fee::Fee {
             applied: match from.applied {
                 client::fee::Applied::Immediate => epp_proto::fee::Applied::Immediate.into(),
                 client::fee::Applied::Delayed => epp_proto::fee::Applied::Delayed.into(),
+                client::fee::Applied::Unspecified => epp_proto::fee::Applied::Unspecified.into(),
             },
         }
     }
