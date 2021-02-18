@@ -2368,6 +2368,8 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                         if let Some(message) = resp {
                             if message.count > 0 {
                                 should_delay = false;
+                            } else {
+                                should_delay = true;
                             }
                             let change_data = match message.data {
                                 client::poll::PollData::DomainInfoData {

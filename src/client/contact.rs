@@ -488,11 +488,11 @@ pub struct UpdateResponse {
 }
 
 pub(crate) fn check_id<T>(id: &str) -> Result<(), Response<T>> {
-    if let 3..=16 = id.len() {
+    if let 3..=64 = id.len() {
         Ok(())
     } else {
         Err(Err(Error::Err(
-            "contact id has a min length of 3 and a max length of 16".to_string(),
+            "contact id has a min length of 3 and a max length of 64".to_string(),
         )))
     }
 }
@@ -771,6 +771,13 @@ pub fn handle_create(
             return Err(Err(Error::Err(
                 "contact country code must be of length 2".to_string(),
             )));
+        }
+        if let Some(pc) = &a.postal_code {
+            if pc.len() > 16 {
+                return Err(Err(Error::Err(
+                    "contact postal code has a max length of 16".to_string(),
+                )));
+            }
         }
         if a.streets.is_empty() {
             return Err(Err(Error::Err(
