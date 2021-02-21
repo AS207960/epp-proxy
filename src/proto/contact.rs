@@ -423,3 +423,24 @@ pub struct EPPContactTransfer {
     #[serde(rename = "{urn:ietf:params:xml:ns:contact-1.0}contact:authInfo")]
     pub auth_info: EPPContactAuthInfo,
 }
+
+#[derive(Debug, Deserialize)]
+pub struct EPPContactPanData {
+    #[serde(rename = "{urn:ietf:params:xml:ns:contact-1.0}id")]
+    pub contact: EPPContactPanContact,
+    #[serde(rename = "{urn:ietf:params:xml:ns:contact-1.0}paTRID")]
+    pub transaction_id: super::EPPTransactionIdentifier,
+    #[serde(
+        rename = "{urn:ietf:params:xml:ns:contact-1.0}paDate",
+        deserialize_with = "super::deserialize_datetime"
+    )]
+    pub action_date: DateTime<Utc>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct EPPContactPanContact {
+    #[serde(rename = "$attr:paResult")]
+    pub result: bool,
+    #[serde(rename = "$value")]
+    pub contact: String,
+}

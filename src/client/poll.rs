@@ -52,6 +52,10 @@ pub enum PollData {
         data: super::domain::PanData,
         change_data: Option<ChangeData>,
     },
+    ContactPanData {
+        data: super::contact::PanData,
+        change_data: Option<ChangeData>,
+    },
     DomainRenewData {
         data: super::domain::RenewResponse,
         change_data: Option<ChangeData>,
@@ -291,6 +295,12 @@ pub fn handle_poll_response(response: proto::EPPResponse) -> Response<Option<Pol
                                 domain_data,
                             ) => PollData::DomainPanData {
                                 data: (&domain_data).into(),
+                                change_data: change_data_from_response(&response.extension)?,
+                            },
+                            proto::EPPResultDataValue::EPPContactPendingActionNotification(
+                                contact_data,
+                            ) => PollData::ContactPanData {
+                                data: (&contact_data).into(),
                                 change_data: change_data_from_response(&response.extension)?,
                             },
                             proto::EPPResultDataValue::NominetCancelData(canc_data) => {

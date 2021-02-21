@@ -215,6 +215,7 @@ message DomainTransferAcceptRejectRequest {
 
 message DomainTransferReply {
     bool pending = 1;
+    string name = 12;
     string transaction_id = 10;
     common.TransferStatus status = 2;
     string requested_client_id = 3;

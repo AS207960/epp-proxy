@@ -766,6 +766,7 @@ impl From<client::domain::TransferResponse> for epp_proto::domain::DomainTransfe
         epp_proto::domain::DomainTransferReply {
             pending: res.pending,
             transaction_id: res.transaction_id,
+            name: res.data.name,
             status: i32_from_transfer_status(res.data.status),
             requested_client_id: res.data.requested_client_id,
             requested_date: chrono_to_proto(Some(res.data.requested_date)),

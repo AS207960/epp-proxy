@@ -532,6 +532,15 @@ pub struct TransferData {
     pub act_date: DateTime<Utc>,
 }
 
+#[derive(Debug)]
+pub struct PanData {
+    pub id: String,
+    pub result: bool,
+    pub server_transaction_id: Option<String>,
+    pub client_transaction_id: Option<String>,
+    pub date: DateTime<Utc>,
+}
+
 impl
 TryFrom<(
     proto::contact::EPPContactInfoData,
@@ -666,6 +675,17 @@ impl From<&proto::contact::EPPContactTransferData> for TransferData {
     }
 }
 
+impl From<&proto::contact::EPPContactPanData> for PanData {
+    fn from(from: &proto::contact::EPPContactPanData) -> Self {
+        PanData {
+            id: from.contact.contact.clone(),
+            result: from.contact.result,
+            server_transaction_id: from.transaction_id.server_transaction_id.clone(),
+            client_transaction_id: from.transaction_id.client_transaction_id.clone(),
+            date: from.action_date,
+        }
+    }
+}
 
 pub fn handle_check(
     client: &EPPClientServerFeatures,
