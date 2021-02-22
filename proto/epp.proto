@@ -37,13 +37,17 @@ service EPPProxy {
     rpc ContactTransferRequest (contact.ContactTransferRequestRequest)    returns (contact.ContactTransferReply);
     rpc ContactTransferAccept  (contact.ContactTransferRequestRequest)    returns (contact.ContactTransferReply);
     rpc ContactTransferReject  (contact.ContactTransferRequestRequest)    returns (contact.ContactTransferReply);
-    rpc Poll                   (RegistryInfo)                             returns (stream PollReply);
+    rpc Poll                   (stream PollAck)                           returns (stream PollReply);
     rpc NominetTagList         (RegistryInfo)                             returns (nominet.NominetTagListReply);
     rpc BalanceInfo            (RegistryInfo)                             returns (BalanceReply);
 }
 
 message RegistryInfo {
     string registry_name = 1;
+}
+
+message PollAck {
+    string msg_id = 1;
 }
 
 message PollReply {

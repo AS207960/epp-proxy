@@ -2355,11 +2355,20 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
 
     async fn poll(
         &self,
-        request: tonic::Request<epp_proto::RegistryInfo>,
+        request: tonic::Request<tonic::Streaming<epp_proto::PollAck>>,
     ) -> Result<tonic::Response<Self::PollStream>, tonic::Status> {
-        let request = request.into_inner();
+        let metadata = request.metadata();
+        let registry_name = match match metadata.get("registry_name") {
+            Some(r) => r.to_str(),
+            None => return Err(tonic::Status::invalid_argument("registry name not given"))
+        } {
+            Ok(r) => r.to_string(),
+            Err(_) => return Err(tonic::Status::invalid_argument("invalid registry name"))
+        };
+
+        let mut request = request.into_inner();
         let (mut tx, rx) = futures::channel::mpsc::channel(4);
-        let mut sender = client_by_id(&self.client_router, &request.registry_name)?;
+        let mut sender = client_by_id(&self.client_router, &registry_name)?;
 
         tokio::spawn(async move {
             let mut should_delay = true;
@@ -2531,12 +2540,22 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                                 .await
                             {
                                 Ok(_) => {
-                                    match client::poll::poll_ack(&message.id, &mut sender).await {
-                                        Ok(_) => {}
+                                    if let Some(msg) = match request.message().await {
+                                        Ok(m) => m,
                                         Err(err) => match tx.send(Err(err.into())).await {
-                                            Ok(_) => {}
+                                            Ok(_) => continue,
                                             Err(_) => break,
                                         },
+                                    } {
+                                        match client::poll::poll_ack(&msg.msg_id, &mut sender).await {
+                                            Ok(_) => {}
+                                            Err(err) => match tx.send(Err(err.into())).await {
+                                                Ok(_) => {}
+                                                Err(_) => break,
+                                            },
+                                        }
+                                    } else {
+                                        break;
                                     }
                                 }
                                 Err(_) => break,
