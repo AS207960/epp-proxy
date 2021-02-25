@@ -2190,6 +2190,7 @@ pub struct CreateInfo<'a> {
     pub auth_info: &'a str,
     pub sec_dns: Option<SecDNSData>,
     pub launch_create: Option<launch::LaunchCreate>,
+    pub fee_agreement: Option<fee::FeeAgreement>,
     pub donuts_fee_agreement: Option<fee::DonutsFeeData>,
 }
 
@@ -2219,7 +2220,7 @@ pub async fn create(
             auth_info: info.auth_info.to_string(),
             sec_dns: info.sec_dns,
             launch_create: info.launch_create,
-            fee_agreement: None,
+            fee_agreement: info.fee_agreement,
             donuts_fee_agreement: info.donuts_fee_agreement,
             return_path: sender,
         })),
@@ -2270,6 +2271,7 @@ pub async fn update(
     new_auth_info: Option<&str>,
     sec_dns: Option<UpdateSecDNS>,
     launch_info: Option<launch::LaunchUpdate>,
+    fee_agreement: Option<fee::FeeAgreement>,
     donuts_fee_agreement: Option<fee::DonutsFeeData>,
     client_sender: &mut futures::channel::mpsc::Sender<Request>,
 ) -> Result<UpdateResponse, super::Error> {
@@ -2284,7 +2286,7 @@ pub async fn update(
             new_auth_info: new_auth_info.map(|s| s.into()),
             sec_dns,
             launch_info,
-            fee_agreement: None,
+            fee_agreement,
             donuts_fee_agreement,
             return_path: sender,
         })),
@@ -2304,6 +2306,7 @@ pub async fn renew(
     domain: &str,
     add_period: Option<Period>,
     cur_expiry_date: DateTime<Utc>,
+    fee_agreement: Option<fee::FeeAgreement>,
     donuts_fee_agreement: Option<fee::DonutsFeeData>,
     client_sender: &mut futures::channel::mpsc::Sender<Request>,
 ) -> Result<RenewResponse, super::Error> {
@@ -2314,7 +2317,7 @@ pub async fn renew(
             name: domain.to_string(),
             add_period,
             cur_expiry_date,
-            fee_agreement: None,
+            fee_agreement,
             donuts_fee_agreement,
             return_path: sender,
         })),
@@ -2358,6 +2361,7 @@ pub async fn transfer_request(
     domain: &str,
     add_period: Option<Period>,
     auth_info: &str,
+    fee_agreement: Option<fee::FeeAgreement>,
     donuts_fee_agreement: Option<fee::DonutsFeeData>,
     client_sender: &mut futures::channel::mpsc::Sender<Request>,
 ) -> Result<TransferResponse, super::Error> {
@@ -2368,7 +2372,7 @@ pub async fn transfer_request(
             name: domain.to_string(),
             add_period,
             auth_info: auth_info.to_string(),
-            fee_agreement: None,
+            fee_agreement,
             donuts_fee_agreement,
             return_path: sender,
         })),

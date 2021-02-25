@@ -573,6 +573,29 @@ impl TryFrom<epp_proto::fee::DonutsFeeData> for client::fee::DonutsFeeData {
     }
 }
 
+
+impl From<epp_proto::fee::FeeAgreement> for client::fee::FeeAgreement {
+    fn from(from: epp_proto::fee::FeeAgreement) -> Self {
+        client::fee::FeeAgreement {
+            currency: from.currency,
+            fees: from.fees.into_iter().map(|f| client::fee::Fee {
+                value: f.value,
+                description: f.description,
+                refundable: f.refundable,
+                grace_period: f.grace_period,
+                applied:  match epp_proto::fee::Applied::from_i32(f.applied) {
+                    Some(e) => match e {
+                        epp_proto::fee::Applied::Immediate => client::fee::Applied::Immediate,
+                        epp_proto::fee::Applied::Delayed => client::fee::Applied::Delayed,
+                        epp_proto::fee::Applied::Unspecified => client::fee::Applied::Unspecified,
+                    },
+                    None => client::fee::Applied::Unspecified,
+                }
+            }).collect()
+        }
+    }
+}
+
 impl From<client::domain::InfoResponse> for epp_proto::domain::DomainInfoReply {
     fn from(res: client::domain::InfoResponse) -> Self {
         epp_proto::domain::DomainInfoReply {
@@ -1535,6 +1558,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                     Some(i) => Some(TryInto::try_into(i)?),
                     None => None
                 },
+                fee_agreement: request.fee_agreement.map(Into::into),
                 donuts_fee_agreement: request.donuts_fee_agreement.map(TryInto::try_into).map_or(Ok(None), |v| v.map(Some))?,
             },
             &mut sender,
@@ -1759,6 +1783,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                 Some(i) => Some(TryInto::try_into(i)?),
                 None => None
             },
+               request.fee_agreement.map(Into::into),
             request.donuts_fee_agreement.map(TryInto::try_into).map_or(Ok(None), |v| v.map(Some))?,
             &mut sender,
         )
@@ -1797,6 +1822,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                 value: p.value,
             }),
             cur_expiry_date.unwrap(),
+            request.fee_agreement.map(Into::into),
             request.donuts_fee_agreement.map(TryInto::try_into).map_or(Ok(None), |v| v.map(Some))?,
             &mut sender,
         )
@@ -1838,6 +1864,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                 value: p.value,
             }),
             &request.auth_info,
+            request.fee_agreement.map(Into::into),
             request.donuts_fee_agreement.map(TryInto::try_into).map_or(Ok(None), |v| v.map(Some))?,
             &mut sender,
         )

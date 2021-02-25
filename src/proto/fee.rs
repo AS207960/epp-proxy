@@ -181,22 +181,22 @@ pub struct EPPFee07Info {
 #[derive(Debug, Serialize)]
 pub struct EPPFee011Agreement {
     #[serde(
-        rename = "{urn:ietf:params:xml:ns:fee-0.11}currency",
+        rename = "{urn:ietf:params:xml:ns:fee-0.11}fee:currency",
         skip_serializing_if = "Option::is_none"
     )]
     pub currency: Option<String>,
-    #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.11}fee")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.11}fee:fee")]
     pub fee: Vec<EPPFee011Fee>,
 }
 
 #[derive(Debug, Serialize)]
 pub struct EPPFee10Agreement {
     #[serde(
-        rename = "{urn:ietf:params:xml:ns:fee-1.0}currency",
+        rename = "{urn:ietf:params:xml:ns:fee-1.0}fee:currency",
         skip_serializing_if = "Option::is_none"
     )]
     pub currency: Option<String>,
-    #[serde(rename = "{urn:ietf:params:xml:ns:fee-1.0}fee")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:fee-1.0}fee:fee")]
     pub fee: Vec<EPPFee10Fee>,
 }
 
