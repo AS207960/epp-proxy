@@ -41,7 +41,7 @@ pub enum PollData {
         change_data: Option<ChangeData>,
     },
     ContactTransferData {
-        data: super::contact::TransferData,
+        data: super::contact::TransferResponse,
         change_data: Option<ChangeData>,
     },
     DomainCreateData {
@@ -93,6 +93,7 @@ pub enum PollData {
         change_data: Option<ChangeData>,
     },
     VerisignLowBalanceData(super::verisign::LowBalanceData),
+    TraficomTrnData(super::traficom::TrnData),
     None,
 }
 
@@ -353,6 +354,9 @@ pub fn handle_poll_response(response: proto::EPPResponse) -> Response<Option<Pol
                             }
                             proto::EPPResultDataValue::VerisignLowBalanceData(bal_data) => {
                                 PollData::VerisignLowBalanceData(bal_data.try_into()?)
+                            }
+                            proto::EPPResultDataValue::TraficomTrnData(trn_data) => {
+                                PollData::TraficomTrnData(trn_data.into())
                             }
                             _ => return Err(Error::InternalServerError),
                         },

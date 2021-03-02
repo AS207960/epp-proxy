@@ -1,0 +1,6 @@
+syntax = "proto3";
+package epp.traficom;
+
+message TrnData {
+    string name = 1;
+}

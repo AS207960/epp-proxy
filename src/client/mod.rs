@@ -21,6 +21,7 @@ pub mod poll;
 pub mod rgp;
 pub mod router;
 pub mod verisign;
+pub mod traficom;
 pub mod fee;
 pub mod launch;
 

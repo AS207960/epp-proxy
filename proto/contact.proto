@@ -200,3 +200,11 @@ message ContactTransferReply {
     string act_client_id = 5;
     google.protobuf.Timestamp act_date = 6;
 }
+
+message ContactPANReply {
+    string id = 1;
+    bool result = 2;
+    google.protobuf.StringValue server_transaction_id = 3;
+    google.protobuf.StringValue client_transaction_id = 4;
+    google.protobuf.Timestamp date = 5;
+}

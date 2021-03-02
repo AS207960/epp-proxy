@@ -32,6 +32,10 @@ pub mod epp_proto {
         tonic::include_proto!("epp.nominet");
     }
 
+    pub mod traficom {
+        tonic::include_proto!("epp.traficom");
+    }
+
     pub mod fee {
         tonic::include_proto!("epp.fee");
     }
@@ -803,10 +807,37 @@ impl From<client::domain::TransferResponse> for epp_proto::domain::DomainTransfe
     }
 }
 
+impl From<client::contact::TransferResponse> for epp_proto::contact::ContactTransferReply {
+    fn from(res: client::contact::TransferResponse) -> Self {
+        epp_proto::contact::ContactTransferReply {
+            pending: res.pending,
+            transaction_id: res.transaction_id,
+            status: i32_from_transfer_status(res.data.status),
+            requested_client_id: res.data.requested_client_id,
+            requested_date: chrono_to_proto(Some(res.data.requested_date)),
+            act_client_id: res.data.act_client_id,
+            act_date: chrono_to_proto(Some(res.data.act_date)),
+        }
+    }
+}
+
 impl From<client::domain::PanData> for epp_proto::domain::DomainPanReply {
     fn from(res: client::domain::PanData) -> Self {
         epp_proto::domain::DomainPanReply {
             name: res.name,
+            result: res.result,
+            server_transaction_id: res.server_transaction_id,
+            client_transaction_id: res.client_transaction_id,
+            date: chrono_to_proto(Some(res.date)),
+        }
+    }
+}
+
+
+impl From<client::contact::PanData> for epp_proto::contact::ContactPanReply {
+    fn from(res: client::contact::PanData) -> Self {
+        epp_proto::contact::ContactPanReply {
+            id: res.id,
             result: res.result,
             server_transaction_id: res.server_transaction_id,
             client_transaction_id: res.client_transaction_id,
@@ -1299,6 +1330,15 @@ impl From<client::launch::LaunchCreateData> for epp_proto::launch::LaunchData {
         epp_proto::launch::LaunchData {
             phase: Some(from.phase.into()),
             application_id: from.application_id,
+        }
+    }
+}
+
+
+impl From<client::traficom::TrnData> for epp_proto::traficom::TrnData {
+    fn from(from: client::traficom::TrnData) -> Self {
+        epp_proto::traficom::TrnData {
+            name: from.name
         }
     }
 }
@@ -2536,6 +2576,10 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                                             change_data: _,
                                             data: i
                                         } => Some(epp_proto::poll_reply::Data::DomainTransfer(i.into())),
+                                        client::poll::PollData::ContactTransferData {
+                                            change_data: _,
+                                            data: i
+                                        } => Some(epp_proto::poll_reply::Data::ContactTransfer(i.into())),
                                         client::poll::PollData::DomainCreateData {
                                             change_data: _,
                                             data: i
@@ -2544,6 +2588,10 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                                             change_data: _,
                                             data: i
                                         } => Some(epp_proto::poll_reply::Data::DomainPan(i.into())),
+                                        client::poll::PollData::ContactPanData {
+                                            change_data: _,
+                                            data: i
+                                        } => Some(epp_proto::poll_reply::Data::ContactPan(i.into())),
                                         client::poll::PollData::NominetDomainCancelData {
                                             change_data: _,
                                             data: i
@@ -2578,6 +2626,8 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                                         } => Some(epp_proto::poll_reply::Data::NominetRegistrantTransferData(i.into())),
                                         client::poll::PollData::VerisignLowBalanceData(i) =>
                                             Some(epp_proto::poll_reply::Data::VerisignLowBalanceData(i.into())),
+                                        client::poll::PollData::TraficomTrnData(i) =>
+                                            Some(epp_proto::poll_reply::Data::TraficomTrnData(i.into())),
                                         _ => None
                                     },
                                 }))

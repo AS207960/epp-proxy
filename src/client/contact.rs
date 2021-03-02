@@ -663,14 +663,18 @@ TryFrom<(
     }
 }
 
-impl From<&proto::contact::EPPContactTransferData> for TransferData {
+impl From<&proto::contact::EPPContactTransferData> for TransferResponse {
     fn from(contact_transfer: &proto::contact::EPPContactTransferData) -> Self {
-        TransferData {
-            status: (&contact_transfer.transfer_status).into(),
-            requested_client_id: contact_transfer.requested_client_id.clone(),
-            requested_date: contact_transfer.requested_date,
-            act_client_id: contact_transfer.act_client_id.clone(),
-            act_date: contact_transfer.act_date,
+        TransferResponse {
+            pending: false,
+            transaction_id: String::new(),
+            data: TransferData {
+                status: (&contact_transfer.transfer_status).into(),
+                requested_client_id: contact_transfer.requested_client_id.clone(),
+                requested_date: contact_transfer.requested_date,
+                act_client_id: contact_transfer.act_client_id.clone(),
+                act_date: contact_transfer.act_date,
+            }
         }
     }
 }
@@ -1261,14 +1265,14 @@ pub fn handle_transfer_reject(
 }
 
 pub fn handle_transfer_response(response: proto::EPPResponse) -> Response<TransferResponse> {
+    let pending = response.is_pending();
     match &response.data {
         Some(value) => match &value.value {
             proto::EPPResultDataValue::EPPContactTransferResult(contact_transfer) => {
-                Ok(TransferResponse {
-                    pending: response.is_pending(),
-                    transaction_id: response.transaction_id.server_transaction_id.unwrap_or_default(),
-                    data: contact_transfer.into(),
-                })
+                let mut res: TransferResponse = contact_transfer.into();
+                res.pending = pending;
+                res.transaction_id = response.transaction_id.server_transaction_id.unwrap_or_default();
+                Ok(res)
             }
             _ => Err(Error::InternalServerError),
         },

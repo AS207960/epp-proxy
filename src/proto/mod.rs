@@ -533,6 +533,8 @@ pub enum EPPResultDataValue {
     EPPContactCreateResult(contact::EPPContactCreateData),
     #[serde(rename = "{urn:ietf:params:xml:ns:contact-1.0}panData")]
     EPPContactPendingActionNotification(contact::EPPContactPanData),
+    #[serde(rename = "{urn:ietf:params:xml:ns:obj-1.0}trnData")]
+    TraficomTrnData(traficom::EPPObjTrnData),
     #[serde(rename = "{http://www.nominet.org.uk/epp/xml/nom-tag-1.0}listData")]
     EPPNominetTagInfoResult(nominet::EPPTagListData),
     #[serde(rename = "{https://www.nic.ch/epp/balance-1.0}infData")]
