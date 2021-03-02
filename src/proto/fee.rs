@@ -24,15 +24,15 @@ pub struct EPPFee09Check {
 
 #[derive(Debug, Serialize)]
 pub struct EPPFee011Check {
+    #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.11}fee:command")]
+    pub command: EPPFeeCommand,
     #[serde(
-        rename = "{urn:ietf:params:xml:ns:epp:fee-0.11}fee:currency",
+        rename = "{urn:ietf:params:xml:ns:fee-0.11}fee:currency",
         skip_serializing_if = "Option::is_none"
     )]
     pub currency: Option<String>,
-    #[serde(rename = "{urn:ietf:params:xml:ns:epp:fee-0.11}fee:command")]
-    pub command: EPPFeeCommand,
     #[serde(
-        rename = "{urn:ietf:params:xml:ns:epp:fee-0.11}fee:period",
+        rename = "{urn:ietf:params:xml:ns:fee-0.11}fee:period",
         skip_serializing_if = "Option::is_none"
     )]
     pub period: Option<super::domain::EPPDomainPeriod>,
@@ -240,7 +240,7 @@ pub struct EPPFee09CheckData {
 
 #[derive(Debug, Deserialize)]
 pub struct EPPFee011CheckData {
-    #[serde(rename = "{urn:ietf:params:xml:ns:epp:fee-0.11}cd")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.11}cd")]
     pub objects: Vec<EPPFee011CheckDatum>,
 }
 
@@ -328,21 +328,21 @@ pub struct EPPFee09CheckDatum {
 pub struct EPPFee011CheckDatum {
     #[serde(rename = "$attr:avail", default = "default_as_true")]
     pub available: bool,
-    #[serde(rename = "{urn:ietf:params:xml:ns:epp:fee-0.11}currency")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.11}currency")]
     pub currency: String,
-    #[serde(rename = "{urn:ietf:params:xml:ns:epp:fee-0.11}object")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.11}object")]
     pub object: String,
-    #[serde(rename = "{urn:ietf:params:xml:ns:epp:fee-0.11}command")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.11}command")]
     pub command: EPPFee011Command,
-    #[serde(rename = "{urn:ietf:params:xml:ns:epp:fee-0.11}period", default)]
+    #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.11}period", default)]
     pub period: Option<super::domain::EPPDomainPeriod>,
     #[serde(rename = "{urn:ietf:params:xml:ns:epp:fee-0p11}reason", default)]
     pub reason: Option<String>,
-    #[serde(rename = "{urn:ietf:params:xml:ns:epp:fee-0.11}fee", default)]
+    #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.11}fee", default)]
     pub fee: Vec<EPPFee011Fee>,
-    #[serde(rename = "{urn:ietf:params:xml:ns:epp:fee-0.11}credit", default)]
+    #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.11}credit", default)]
     pub credit: Vec<EPPFee011Credit>,
-    #[serde(rename = "{urn:ietf:params:xml:ns:epp:fee-0.11}class", default)]
+    #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.11}class", default)]
     pub class: Option<String>,
 }
 
@@ -471,15 +471,15 @@ pub struct EPPFee09TransformData {
 
 #[derive(Debug, Deserialize)]
 pub struct EPPFee011TransformData {
-    #[serde(rename = "{urn:ietf:params:xml:ns:epp:fee-0.11}currency")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.11}currency")]
     pub currency: String,
-    #[serde(rename = "{urn:ietf:params:xml:ns:epp:fee-0.11}fee", default)]
+    #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.11}fee", default)]
     pub fee: Vec<EPPFee011Fee>,
-    #[serde(rename = "{urn:ietf:params:xml:ns:epp:fee-0.11}credit", default)]
+    #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.11}credit", default)]
     pub credit: Vec<EPPFee011Credit>,
-    #[serde(rename = "{urn:ietf:params:xml:ns:epp:fee-0.11}balance", default)]
+    #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.11}balance", default)]
     pub balance: Option<String>,
-    #[serde(rename = "{urn:ietf:params:xml:ns:epp:fee-0.11}creditLimit", default)]
+    #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.11}creditLimit", default)]
     pub credit_limit: Option<String>,
 }
 

@@ -2015,6 +2015,32 @@ pub fn handle_transfer_request(
     }))
 }
 
+pub fn handle_transfer_cancel(
+    client: &EPPClientServerFeatures,
+    req: &TransferAcceptRejectRequest,
+) -> HandleReqReturn<TransferResponse> {
+    if !client.domain_supported {
+        return Err(Err(Error::Unsupported));
+    }
+    check_domain(&req.name)?;
+    let command = proto::EPPTransfer {
+        operation: proto::EPPTransferOperation::Cancel,
+        command: proto::EPPTransferCommand::DomainRequest(proto::domain::EPPDomainTransfer {
+            name: req.name.clone(),
+            period: None,
+            auth_info: req.auth_info.as_ref().map(|a| proto::domain::EPPDomainAuthInfo {
+                password: Some(a.clone())
+            }),
+        }),
+    };
+    let mut ext = vec![];
+    super::verisign::handle_verisign_namestore_erratum(client, &mut ext);
+    Ok((proto::EPPCommandType::Transfer(command), match ext.is_empty() {
+        true => None,
+        false => Some(ext)
+    }))
+}
+
 pub fn handle_transfer_accept(
     client: &EPPClientServerFeatures,
     req: &TransferAcceptRejectRequest,
@@ -2374,6 +2400,30 @@ pub async fn transfer_request(
             auth_info: auth_info.to_string(),
             fee_agreement,
             donuts_fee_agreement,
+            return_path: sender,
+        })),
+        receiver,
+    )
+        .await
+}
+
+/// Cancels the pending transfer of a domain name
+///
+/// # Arguments
+/// * `domain` - The domain to be cancelled
+/// * `auth_info` - Auth info for the domain
+/// * `client_sender` - Reference to the tokio channel into the client
+pub async fn transfer_cancel(
+    domain: &str,
+    auth_info: Option<&str>,
+    client_sender: &mut futures::channel::mpsc::Sender<Request>,
+) -> Result<TransferResponse, super::Error> {
+    let (sender, receiver) = futures::channel::oneshot::channel();
+    super::send_epp_client_request(
+        client_sender,
+        Request::DomainTransferCancel(Box::new(TransferAcceptRejectRequest {
+            name: domain.to_string(),
+            auth_info: auth_info.map(|s| s.into()),
             return_path: sender,
         })),
         receiver,

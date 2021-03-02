@@ -91,6 +91,7 @@ router!(
     DomainRenew,            super::domain::RenewRequest,                super::domain::RenewResponse,       super::domain::handle_renew,             super::domain::handle_renew_response;
     DomainTransferQuery,    super::domain::TransferQueryRequest,        super::domain::TransferResponse,    super::domain::handle_transfer_query,    super::domain::handle_transfer_response;
     DomainTransferRequest,  super::domain::TransferRequestRequest,      super::domain::TransferResponse,    super::domain::handle_transfer_request,  super::domain::handle_transfer_response;
+    DomainTransferCancel,   super::domain::TransferAcceptRejectRequest, super::domain::TransferResponse,    super::domain::handle_transfer_cancel,   super::domain::handle_transfer_response;
     DomainTransferAccept,   super::domain::TransferAcceptRejectRequest, super::domain::TransferResponse,    super::domain::handle_transfer_accept,   super::domain::handle_transfer_response;
     DomainTransferReject,   super::domain::TransferAcceptRejectRequest, super::domain::TransferResponse,    super::domain::handle_transfer_reject,   super::domain::handle_transfer_response;
     RestoreRequest,         super::rgp::RestoreRequest,                 super::rgp::RestoreResponse,        super::rgp::handle_restore,              super::rgp::handle_restore_response;
