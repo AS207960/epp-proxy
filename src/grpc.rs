@@ -583,15 +583,15 @@ impl From<epp_proto::fee::FeeAgreement> for client::fee::FeeAgreement {
                 description: f.description,
                 refundable: f.refundable,
                 grace_period: f.grace_period,
-                applied:  match epp_proto::fee::Applied::from_i32(f.applied) {
+                applied: match epp_proto::fee::Applied::from_i32(f.applied) {
                     Some(e) => match e {
                         epp_proto::fee::Applied::Immediate => client::fee::Applied::Immediate,
                         epp_proto::fee::Applied::Delayed => client::fee::Applied::Delayed,
                         epp_proto::fee::Applied::Unspecified => client::fee::Applied::Unspecified,
                     },
                     None => client::fee::Applied::Unspecified,
-                }
-            }).collect()
+                },
+            }).collect(),
         }
     }
 }
@@ -1783,7 +1783,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                 Some(i) => Some(TryInto::try_into(i)?),
                 None => None
             },
-               request.fee_agreement.map(Into::into),
+            request.fee_agreement.map(Into::into),
             request.donuts_fee_agreement.map(TryInto::try_into).map_or(Ok(None), |v| v.map(Some))?,
             &mut sender,
         )
@@ -1869,6 +1869,23 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
             &mut sender,
         )
             .await?;
+
+        let mut reply: epp_proto::domain::DomainTransferReply = res.into();
+        reply.registry_name = registry_name;
+
+        Ok(tonic::Response::new(reply))
+    }
+
+    async fn domain_transfer_cancel(
+        &self,
+        request: tonic::Request<epp_proto::domain::DomainTransferAcceptRejectRequest>,
+    ) -> Result<tonic::Response<epp_proto::domain::DomainTransferReply>, tonic::Status> {
+        let request = request.into_inner();
+        let (mut sender, registry_name) =
+            client_by_domain_or_id(&self.client_router, &request.name, request.registry_name)?;
+        let res = client::domain::transfer_cancel(
+            &request.name, Some(&request.auth_info), &mut sender,
+        ).await?;
 
         let mut reply: epp_proto::domain::DomainTransferReply = res.into();
         reply.registry_name = registry_name;
@@ -2575,7 +2592,17 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                                         },
                                     } {
                                         match client::poll::poll_ack(&msg.msg_id, &mut sender).await {
-                                            Ok(_) => {}
+                                            Ok(resp) => {
+                                                if let Some(count) = resp.count {
+                                                    if count > 0 {
+                                                        should_delay = false;
+                                                    } else {
+                                                        should_delay = true;
+                                                    }
+                                                } else {
+                                                    should_delay = true;
+                                                }
+                                            }
                                             Err(err) => match tx.send(Err(err.into())).await {
                                                 Ok(_) => {}
                                                 Err(_) => break,
@@ -2589,6 +2616,8 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                             }
                         } else if tx.is_closed() {
                             break;
+                        } else {
+                            should_delay = true;
                         }
                     }
                     Err(err) => match tx.send(Err(err.into())).await {
