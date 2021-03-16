@@ -318,7 +318,7 @@ pub fn handle_poll_response(response: proto::EPPResponse) -> Response<Option<Pol
                             }
                             proto::EPPResultDataValue::NominetRegistrarChangeData(rc_data) => {
                                 PollData::NominetDomainRegistrarChangeData{
-                                    data: rc_data.try_into()?,
+                                    data: (rc_data, &response.extension).try_into()?,
                                     change_data: change_data_from_response(&response.extension)?,
                                 }
                             }
@@ -330,7 +330,7 @@ pub fn handle_poll_response(response: proto::EPPResponse) -> Response<Option<Pol
                             }
                             proto::EPPResultDataValue::NominetProcessData(p_data) => {
                                 PollData::NominetProcessData{
-                                    data: p_data.try_into()?,
+                                    data: (p_data, &response.extension).try_into()?,
                                     change_data: change_data_from_response(&response.extension)?,
                                 }
                             }
@@ -348,7 +348,7 @@ pub fn handle_poll_response(response: proto::EPPResponse) -> Response<Option<Pol
                             }
                             proto::EPPResultDataValue::NominetTransferData(trn_data) => {
                                 PollData::NominetRegistrantTransferData{
-                                    data: trn_data.try_into()?,
+                                    data: (trn_data, &response.extension).try_into()?,
                                     change_data: change_data_from_response(&response.extension)?,
                                 }
                             }

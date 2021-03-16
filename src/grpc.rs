@@ -32,6 +32,10 @@ pub mod epp_proto {
         tonic::include_proto!("epp.nominet");
     }
 
+    pub mod nominet_ext {
+        tonic::include_proto!("epp.nominet_ext");
+    }
+
     pub mod traficom {
         tonic::include_proto!("epp.traficom");
     }
@@ -754,6 +758,12 @@ impl From<client::domain::InfoResponse> for epp_proto::domain::DomainInfoReply {
             }),
             launch_info: res.launch_info.map(Into::into),
             donuts_fee_data: res.donuts_fee_data.map(Into::into),
+            verisign_whois_info: res.whois_info.map(|i| epp_proto::domain::VerisignWhoisInfo {
+                registrar: i.registrar,
+                whois_server: i.whois_server,
+                url: i.url,
+                iris_server: i.iris_server,
+            })
         }
     }
 }
@@ -1045,6 +1055,17 @@ impl From<client::contact::InfoResponse> for epp_proto::contact::ContactInfoRepl
                 })
                 .collect(),
             auth_info: res.auth_info,
+            nominet_data_quality: res.nominet_data_quality.map(|q| epp_proto::nominet_ext::DataQuality {
+                status: match q.status {
+                    client::nominet::DataQualityStatus::Invalid => epp_proto::nominet_ext::DataQualityStatus::Invalid.into(),
+                    client::nominet::DataQualityStatus::Valid => epp_proto::nominet_ext::DataQualityStatus::Valid.into(),
+                },
+                reason: q.reason,
+                date_commenced: chrono_to_proto(q.date_commenced),
+                date_to_suspend: chrono_to_proto(q.date_to_suspend),
+                lock_applied: q.lock_applied,
+                domains: q.domains.unwrap_or_default(),
+            })
         }
     }
 }
@@ -1464,6 +1485,13 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let res = client::domain::info(
             &req.name,
             req.auth_info.as_deref(),
+            req.hosts.map(|h| match epp_proto::domain::DomainHostsType::from_i32(h.hosts) {
+                Some(epp_proto::domain::DomainHostsType::All) => client::domain::InfoHost::All,
+                Some(epp_proto::domain::DomainHostsType::Delegated) => client::domain::InfoHost::Delegated,
+                Some(epp_proto::domain::DomainHostsType::Subordinate) => client::domain::InfoHost::Subordinate,
+                Some(epp_proto::domain::DomainHostsType::None) => client::domain::InfoHost::None,
+                None => client::domain::InfoHost::All,
+            }),
             match req.launch_info {
                 Some(i) => Some(TryInto::try_into(i)?),
                 None => None

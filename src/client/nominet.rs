@@ -69,26 +69,34 @@ impl From<proto::nominet::EPPReleaseData> for ReleaseData {
 pub struct RegistrarChangeData {
     pub originator: String,
     pub registrar_tag: String,
-    pub case_id: String,
+    pub case_id: Option<String>,
     pub domains: Vec<super::domain::InfoResponse>,
     pub contact: super::contact::InfoResponse,
 }
 
-impl TryFrom<proto::nominet::EPPRegistrarChangeData> for RegistrarChangeData {
+impl TryFrom<(
+    proto::nominet::EPPRegistrarChangeData,
+    &Option<proto::EPPResponseExtension>
+)> for RegistrarChangeData {
     type Error = Error;
 
-    fn try_from(from: proto::nominet::EPPRegistrarChangeData) -> Result<Self, Self::Error> {
+    fn try_from(from: (
+        proto::nominet::EPPRegistrarChangeData,
+        &Option<proto::EPPResponseExtension>
+    )) -> Result<Self, Self::Error> {
+        let (rc_data, extension) = from;
         Ok(RegistrarChangeData {
-            originator: from.originator,
-            registrar_tag: from.registrar_tag,
-            case_id: from.case_id,
-            domains: from
-                .domain_list
-                .domains
-                .into_iter()
-                .map(|d| super::domain::InfoResponse::try_from((d, &None)))
-                .collect::<Result<Vec<_>, _>>()?,
-            contact: super::contact::InfoResponse::try_from((from.contact, &None))?,
+            originator: rc_data.originator,
+            registrar_tag: rc_data.registrar_tag,
+            case_id: rc_data.case_id,
+            domains: match rc_data.domain_list {
+                Some(d) => d.domains
+                    .into_iter()
+                    .map(|d| super::domain::InfoResponse::try_from((d, extension)))
+                    .collect::<Result<Vec<_>, _>>()?,
+                None => vec![]
+            },
+            contact: super::contact::InfoResponse::try_from((rc_data.contact, extension))?,
         })
     }
 }
@@ -124,20 +132,27 @@ pub enum ProcessStage {
     Updated,
 }
 
-impl TryFrom<proto::nominet::EPPProcessData> for ProcessData {
+impl TryFrom<(
+    proto::nominet::EPPProcessData,
+    &Option<proto::EPPResponseExtension>
+)> for ProcessData {
     type Error = Error;
 
-    fn try_from(from: proto::nominet::EPPProcessData) -> Result<Self, Self::Error> {
+    fn try_from(from: (
+        proto::nominet::EPPProcessData,
+        &Option<proto::EPPResponseExtension>
+    )) -> Result<Self, Self::Error> {
+        let (process_data, extensions) = from;
         Ok(ProcessData {
-            stage: match from.stage {
+            stage: match process_data.stage {
                 proto::nominet::EPPProcessStage::Initial => ProcessStage::Initial,
                 proto::nominet::EPPProcessStage::Updated => ProcessStage::Updated,
             },
-            contact: super::contact::InfoResponse::try_from((from.contact, &None))?,
-            process_type: from.process_type,
-            suspend_date: from.suspend_date,
-            cancel_date: from.cancel_date,
-            domain_names: from.domain_list.domain_names,
+            contact: super::contact::InfoResponse::try_from((process_data.contact, extensions))?,
+            process_type: process_data.process_type,
+            suspend_date: process_data.suspend_date,
+            cancel_date: process_data.cancel_date,
+            domain_names: process_data.domain_list.domain_names,
         })
     }
 }
@@ -184,18 +199,58 @@ pub struct RegistrantTransferData {
     pub contact: super::contact::InfoResponse,
 }
 
-impl TryFrom<proto::nominet::EPPTransferData> for RegistrantTransferData {
+impl TryFrom<(
+    proto::nominet::EPPTransferData,
+    &Option<proto::EPPResponseExtension>
+)> for RegistrantTransferData {
     type Error = Error;
 
-    fn try_from(from: proto::nominet::EPPTransferData) -> Result<Self, Self::Error> {
+    fn try_from(from: (
+        proto::nominet::EPPTransferData,
+        &Option<proto::EPPResponseExtension>
+    )) -> Result<Self, Self::Error> {
+        let (transfer_data, extensions) = from;
         Ok(RegistrantTransferData {
-            originator: from.originator,
-            account_id: from.account_id,
-            old_account_id: from.old_account_id,
-            case_id: from.case_id,
-            domain_names: from.domain_list.domain_names,
-            contact: super::contact::InfoResponse::try_from((from.contact, &None))?,
+            originator: transfer_data.originator,
+            account_id: transfer_data.account_id,
+            old_account_id: transfer_data.old_account_id,
+            case_id: transfer_data.case_id,
+            domain_names: transfer_data.domain_list.domain_names,
+            contact: super::contact::InfoResponse::try_from((transfer_data.contact, extensions))?,
         })
+    }
+}
+
+#[derive(Debug)]
+pub enum DataQualityStatus {
+    Valid,
+    Invalid,
+}
+
+#[derive(Debug)]
+pub struct DataQualityData {
+    pub status: DataQualityStatus,
+    pub reason: Option<String>,
+    pub date_commenced: Option<DateTime<Utc>>,
+    pub date_to_suspend: Option<DateTime<Utc>>,
+    pub lock_applied: Option<bool>,
+    pub domains: Option<Vec<String>>,
+}
+
+impl From<&proto::nominet::EPPDataQualityInfo> for DataQualityData {
+
+    fn from(from: &proto::nominet::EPPDataQualityInfo) -> Self {
+        DataQualityData {
+            status: match from.status {
+                proto::nominet::EPPDataQualityStatus::Valid => DataQualityStatus::Valid,
+                proto::nominet::EPPDataQualityStatus::Invalid => DataQualityStatus::Invalid,
+            },
+            reason: from.reason.as_ref().map(Into::into),
+            date_commenced: from.date_commenced.map(Into::into),
+            date_to_suspend: from.date_to_suspend.map(Into::into),
+            lock_applied: from.lock_applied,
+            domains: from.domains.as_ref().map(|d| d.domains.iter().map(|s| s.into()).collect()),
+        }
     }
 }
 
@@ -254,5 +309,5 @@ pub async fn tag_list(
         })),
         receiver,
     )
-    .await
+        .await
 }

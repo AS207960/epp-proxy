@@ -71,3 +71,21 @@ pub enum EPPLowCreditThresholdType {
     #[serde(rename = "PERCENT")]
     Percentage,
 }
+
+#[derive(Debug, Serialize)]
+pub struct EPPWhoisInfoExt {
+    #[serde(rename = "{http://www.verisign.com/epp/whoisInf-1.0}whoisInf:flag")]
+    pub flag: bool,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct EPPWhoisInfoExtData {
+    #[serde(rename = "{http://www.verisign.com/epp/whoisInf-1.0}registrar")]
+    pub registrar: String,
+    #[serde(rename = "{http://www.verisign.com/epp/whoisInf-1.0}whoisServer", default)]
+    pub whois_server: Option<String>,
+    #[serde(rename = "{http://www.verisign.com/epp/whoisInf-1.0}url", default)]
+    pub url: Option<String>,
+    #[serde(rename = "{http://www.verisign.com/epp/whoisInf-1.0}irisServer", default)]
+    pub iris_server: Option<String>,
+}

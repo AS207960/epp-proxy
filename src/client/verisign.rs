@@ -14,6 +14,14 @@ pub enum CreditThreshold {
     Percentage(u8),
 }
 
+#[derive(Debug)]
+pub struct InfoWhois {
+    pub registrar: String,
+    pub whois_server: Option<String>,
+    pub url: Option<String>,
+    pub iris_server: Option<String>,
+}
+
 impl TryFrom<super::proto::verisign::EPPLowBalanceData> for LowBalanceData {
     type Error = super::Error;
 
@@ -36,6 +44,17 @@ impl TryFrom<super::proto::verisign::EPPLowBalanceData> for LowBalanceData {
                 }
             },
         })
+    }
+}
+
+impl From<&super::proto::verisign::EPPWhoisInfoExtData> for InfoWhois {
+    fn from(from: &super::proto::verisign::EPPWhoisInfoExtData) -> Self {
+        InfoWhois {
+            registrar: from.registrar.to_string(),
+            whois_server: from.whois_server.as_ref().map(Into::into),
+            url: from.url.as_ref().map(Into::into),
+            iris_server: from.iris_server.as_ref().map(Into::into),
+        }
     }
 }
 

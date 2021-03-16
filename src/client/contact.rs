@@ -65,6 +65,7 @@ pub struct InfoResponse {
     pub company_number: Option<String>,
     pub disclosure: Vec<DisclosureType>,
     pub auth_info: Option<String>,
+    pub nominet_data_quality: Option<super::nominet::DataQualityData>,
 }
 
 #[derive(Debug)]
@@ -577,7 +578,7 @@ TryFrom<(
             }),
             None => None,
         };
-        let ext_info = match extension {
+        let contact_ext_info = match extension {
             Some(e) => match e.value.iter().find(|e| match e {
                 proto::EPPResponseExtensionType::NominetContactExtInfo(_) => true,
                 _ => false,
@@ -590,6 +591,20 @@ TryFrom<(
             },
             None => None,
         };
+        let data_quality_ext_info = match extension {
+            Some(e) => match e.value.iter().find(|e| match e {
+                proto::EPPResponseExtensionType::NominetDataQuality(_) => true,
+                _ => false,
+            }) {
+                Some(e) => match e {
+                    proto::EPPResponseExtensionType::NominetDataQuality(e) => Some(e),
+                    _ => unreachable!(),
+                },
+                None => None,
+            },
+            None => None,
+        };
+
         let local_address = contact_info
             .postal_info
             .iter()
@@ -618,18 +633,18 @@ TryFrom<(
             last_updated_client: contact_info.last_updated_client,
             last_updated_date: contact_info.last_updated_date,
             last_transfer_date: contact_info.last_transfer_date,
-            trading_name: match &ext_info {
+            trading_name: match &contact_ext_info {
                 Some(e) => e.trading_name.clone(),
                 None => None,
             },
-            company_number: match &ext_info {
+            company_number: match &contact_ext_info {
                 Some(e) => e.company_number.clone(),
                 None => match local_address {
                     Some(a) => a.traficom_register_number.clone(),
                     None => None,
                 },
             },
-            entity_type: match &ext_info {
+            entity_type: match &contact_ext_info {
                 Some(e) => match &e.contact_type {
                     Some(i) => i.into(),
                     None => EntityType::Unknown,
@@ -659,6 +674,7 @@ TryFrom<(
                 Some(a) => a.password,
                 None => None,
             },
+            nominet_data_quality: data_quality_ext_info.map(Into::into)
         })
     }
 }

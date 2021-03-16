@@ -50,10 +50,19 @@ pub struct ClaimsCheckResponse {
 }
 
 #[derive(Debug)]
+pub enum InfoHost {
+    All,
+    Delegated,
+    Subordinate,
+    None
+}
+
+#[derive(Debug)]
 pub struct InfoRequest {
     name: String,
     auth_info: Option<String>,
     launch_info: Option<launch::LaunchInfo>,
+    hosts: Option<InfoHost>,
     pub return_path: Sender<InfoResponse>,
 }
 
@@ -95,6 +104,7 @@ pub struct InfoResponse {
     pub sec_dns: Option<SecDNSData>,
     pub launch_info: Option<launch::LaunchInfoData>,
     pub donuts_fee_data: Option<fee::DonutsFeeData>,
+    pub whois_info: Option<super::verisign::InfoWhois>,
 }
 
 /// Additional contact associated with a domain
@@ -583,6 +593,17 @@ TryFrom<(
             None => None,
         };
 
+        let whois_info = match extension {
+            Some(ext) => {
+                let charge = ext.value.iter().find_map(|p| match p {
+                    proto::EPPResponseExtensionType::VerisignWhoisInfo(i) => Some(i),
+                    _ => None,
+                });
+                charge.map(Into::into)
+            }
+            None => None,
+        };
+
         Ok(InfoResponse {
             name: domain_info.name,
             registry_id: domain_info.registry_id.unwrap_or_default(),
@@ -650,6 +671,7 @@ TryFrom<(
             sec_dns,
             launch_info,
             donuts_fee_data,
+            whois_info,
         })
     }
 }
@@ -1346,8 +1368,16 @@ pub fn handle_info(
         return Err(Err(Error::Unsupported));
     }
     check_domain(&req.name)?;
-    let command = proto::EPPInfo::Domain(proto::domain::EPPDomainCheck {
-        name: req.name.clone(),
+    let command = proto::EPPInfo::Domain(proto::domain::EPPDomainInfo {
+        name: proto::domain::EPPDomainInfoName {
+            name: req.name.clone(),
+            hosts: req.hosts.as_ref().map(|h| match h {
+                InfoHost::All => proto::domain::EPPDomainInfoHosts::All,
+                InfoHost::Delegated => proto::domain::EPPDomainInfoHosts::Delegated,
+                InfoHost::Subordinate => proto::domain::EPPDomainInfoHosts::Subordinate,
+                InfoHost::None => proto::domain::EPPDomainInfoHosts::None,
+            })
+        },
         auth_info: req.auth_info.as_ref().map(|a| proto::domain::EPPDomainAuthInfo {
             password: Some(a.clone())
         }),
@@ -1359,6 +1389,11 @@ pub fn handle_info(
         } else {
             return Err(Err(Error::Unsupported));
         }
+    }
+    if client.verisign_whois_info {
+        exts.push(proto::EPPCommandExtensionType::VerisignWhoisInfExt(proto::verisign::EPPWhoisInfoExt {
+            flag: true
+        }))
     }
 
     super::verisign::handle_verisign_namestore_erratum(client, &mut exts);
@@ -2190,6 +2225,7 @@ pub async fn launch_trademark_check(
 pub async fn info(
     domain: &str,
     auth_info: Option<&str>,
+    hosts: Option<InfoHost>,
     launch_info: Option<launch::LaunchInfo>,
     client_sender: &mut futures::channel::mpsc::Sender<Request>,
 ) -> Result<InfoResponse, super::Error> {
@@ -2199,6 +2235,7 @@ pub async fn info(
         Request::DomainInfo(Box::new(InfoRequest {
             name: domain.to_string(),
             auth_info: auth_info.map(|s| s.into()),
+            hosts,
             launch_info,
             return_path: sender,
         })),

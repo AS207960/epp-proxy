@@ -41,6 +41,17 @@ enum DomainStatus {
     ServerUpdateProhibited = 16;
 }
 
+enum DomainHostsType {
+    All = 0;
+    Delegated = 1;
+    Subordinate = 2;
+    None = 3;
+}
+
+message DomainHosts {
+    DomainHostsType hosts = 1;
+}
+
 message DomainCheckRequest {
     string name = 1;
     fee.FeeCheck fee_check = 2;
@@ -76,6 +87,7 @@ message DomainClaimsCheckReply {
 message DomainInfoRequest {
     string name = 1;
     google.protobuf.StringValue auth_info = 2;
+    DomainHosts hosts = 6;
     launch.LaunchInfo launch_info = 3;
     google.protobuf.StringValue registry_name = 4;
     fee.DonutsFeeData donuts_fee_agreement = 5;
@@ -102,6 +114,7 @@ message DomainInfoReply {
     SecDNSData sec_dns = 18;
     launch.LaunchInfoData launch_info = 19;
     fee.DonutsFeeData donuts_fee_data = 20;
+    VerisignWhoisInfo verisign_whois_info = 21;
 }
 
 message DomainCreateRequest {
@@ -271,6 +284,13 @@ message UpdateSecDNSData {
         SecDNSDSData remove_ds_data = 6;
         SecDNSKeyData remove_key_data = 7;
     }
+}
+
+message VerisignWhoisInfo {
+    string registrar = 1;
+    google.protobuf.StringValue whois_server = 2;
+    google.protobuf.StringValue url = 3;
+    google.protobuf.StringValue iris_server = 4;
 }
 
 message DomainPANReply {

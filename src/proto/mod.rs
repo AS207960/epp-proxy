@@ -122,6 +122,10 @@ pub enum EPPCommandExtensionType {
         rename = "{http://www.verisign-grs.com/epp/namestoreExt-1.1}namestoreExt:namestoreExt"
     )]
     VerisignNameStoreExt(verisign::EPPNameStoreExt),
+    #[serde(
+        rename = "{http://www.verisign.com/epp/whoisInf-1.0}whoisInf:whoisInf"
+    )]
+    VerisignWhoisInfExt(verisign::EPPWhoisInfoExt),
     #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.5}fee:check")]
     EPPFee05Check(fee::EPPFee05Check),
     #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.7}fee:check")]
@@ -621,6 +625,8 @@ pub enum EPPResponseExtensionType {
     NominetTruncatedField(nominet::EPPTruncatedField),
     #[serde(rename = "{http://www.nominet.org.uk/epp/xml/nom-data-quality-1.1}infData")]
     NominetDataQuality(nominet::EPPDataQualityInfo),
+    #[serde(rename = "{http://www.verisign.com/epp/whoisInf-1.0}whoisInfData")]
+    VerisignWhoisInfo(verisign::EPPWhoisInfoExtData),
     #[serde(rename = "{urn:ietf:params:xml:ns:changePoll-1.0}changeData")]
     EPPChangePoll(change_poll::EPPChangeData),
     #[serde(rename = "{urn:ietf:params:xml:ns:rgp-1.0}infData")]
@@ -740,7 +746,7 @@ pub enum EPPCheck {
 #[derive(Debug, Serialize)]
 pub enum EPPInfo {
     #[serde(rename = "{urn:ietf:params:xml:ns:domain-1.0}domain:info")]
-    Domain(domain::EPPDomainCheck),
+    Domain(domain::EPPDomainInfo),
     #[serde(rename = "{urn:ietf:params:xml:ns:host-1.0}host:info")]
     Host(host::EPPHostCheck),
     #[serde(rename = "{urn:ietf:params:xml:ns:contact-1.0}contact:info")]

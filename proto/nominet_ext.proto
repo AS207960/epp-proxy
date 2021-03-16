@@ -1,0 +1,19 @@
+syntax = "proto3";
+package epp.nominet_ext;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+
+enum DataQualityStatus {
+    Invalid = 0;
+    Valid = 1;
+}
+
+message DataQuality {
+    DataQualityStatus status = 1;
+    google.protobuf.StringValue reason = 2;
+    google.protobuf.Timestamp date_commenced = 3;
+    google.protobuf.Timestamp date_to_suspend = 4;
+    google.protobuf.BoolValue lock_applied = 5;
+    repeated string domains = 6;
+}

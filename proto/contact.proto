@@ -4,6 +4,7 @@ package epp.contact;
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/wrappers.proto";
 import "common.proto";
+import "nominet_ext.proto";
 
 enum EntityType {
     NotSet = 0;
@@ -123,6 +124,7 @@ message ContactInfoReply {
     google.protobuf.StringValue company_number = 17;
     repeated DisclosureType disclosure = 18;
     google.protobuf.StringValue auth_info = 19;
+    nominet_ext.DataQuality nominet_data_quality = 20;
 }
 
 message ContactCreateRequest {

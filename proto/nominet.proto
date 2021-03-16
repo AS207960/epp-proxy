@@ -33,7 +33,7 @@ message DomainReleaseData {
 message DomainRegistrarChangeData {
     string originator = 1;
     string registrar_tag = 2;
-    string case_id = 3;
+    google.protobuf.StringValue case_id = 3;
     repeated domain.DomainInfoReply domains = 4;
     contact.ContactInfoReply contact = 5;
 }

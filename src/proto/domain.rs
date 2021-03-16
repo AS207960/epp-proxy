@@ -33,6 +33,41 @@ pub struct EPPDomainCheckName {
     pub available: bool,
 }
 
+#[derive(Debug, Serialize)]
+pub struct EPPDomainInfo {
+    #[serde(rename = "{urn:ietf:params:xml:ns:domain-1.0}domain:name")]
+    pub name: EPPDomainInfoName,
+    #[serde(
+        rename = "{urn:ietf:params:xml:ns:domain-1.0}domain:authInfo",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub auth_info: Option<EPPDomainAuthInfo>,
+}
+
+#[derive(Debug, Serialize)]
+pub enum EPPDomainInfoHosts {
+    #[serde(rename = "all")]
+    All,
+    #[serde(rename = "del")]
+    Delegated,
+    #[serde(rename = "sub")]
+    Subordinate,
+    #[serde(rename = "none")]
+    None
+}
+
+#[derive(Debug, Serialize)]
+pub struct EPPDomainInfoName {
+    #[serde(
+        rename = "$attr:hosts",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub hosts: Option<EPPDomainInfoHosts>,
+    #[serde(rename = "$value")]
+    pub name: String
+}
+
+
 #[derive(Debug, Deserialize)]
 pub struct EPPDomainInfoData {
     #[serde(rename = "{urn:ietf:params:xml:ns:domain-1.0}name")]
