@@ -2484,6 +2484,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
 
         tokio::spawn(async move {
             let mut should_delay = true;
+            let mut pending_acks: Vec<_> = vec![];
             loop {
                 match client::poll::poll(&mut sender).await {
                     Ok(resp) => {
@@ -2662,32 +2663,39 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                                 .await
                             {
                                 Ok(_) => {
-                                    if let Some(msg) = match request.message().await {
-                                        Ok(m) => m,
-                                        Err(err) => match tx.send(Err(err.into())).await {
-                                            Ok(_) => continue,
-                                            Err(_) => break,
-                                        },
-                                    } {
-                                        match client::poll::poll_ack(&msg.msg_id, &mut sender).await {
-                                            Ok(resp) => {
-                                                if let Some(count) = resp.count {
-                                                    if count > 0 {
-                                                        should_delay = false;
-                                                    } else {
-                                                        should_delay = true;
-                                                    }
+                                    let msg = if !pending_acks.is_empty() {
+                                        pending_acks.pop().unwrap()
+                                    } else {
+                                        if let Some(m) = match request.message().await {
+                                            Ok(m) => m,
+                                            Err(err) => match tx.send(Err(err.into())).await {
+                                                Ok(_) => continue,
+                                                Err(_) => break,
+                                            },
+                                        } {
+                                            m
+                                        } else {
+                                            break;
+                                        }
+                                    };
+                                    match client::poll::poll_ack(&msg.msg_id, &mut sender).await {
+                                        Ok(resp) => {
+                                            if let Some(count) = resp.count {
+                                                if count > 0 {
+                                                    should_delay = false;
                                                 } else {
                                                     should_delay = true;
                                                 }
+                                            } else {
+                                                should_delay = true;
                                             }
-                                            Err(err) => match tx.send(Err(err.into())).await {
-                                                Ok(_) => {}
-                                                Err(_) => break,
-                                            },
                                         }
-                                    } else {
-                                        break;
+                                        Err(err) => match tx.send(Err(err.into())).await {
+                                            Ok(_) => {
+                                                pending_acks.push(msg)
+                                            }
+                                            Err(_) => break,
+                                        },
                                     }
                                 }
                                 Err(_) => break,
