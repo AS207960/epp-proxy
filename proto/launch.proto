@@ -75,9 +75,15 @@ message LaunchCreate {
   repeated Notice notices = 5;
   google.protobuf.StringValue signed_mark = 3;
   CreateType create_type = 4;
+  repeated CoreNICApplicationInfo core_nic_augmented_mark = 6;
 }
 
 message LaunchData {
   Phase phase = 1;
   google.protobuf.StringValue application_Id = 2;
+}
+
+message CoreNICApplicationInfo {
+  string info = 1;
+  google.protobuf.StringValue info_type = 2;
 }

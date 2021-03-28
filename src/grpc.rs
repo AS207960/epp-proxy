@@ -1303,6 +1303,10 @@ impl TryFrom<epp_proto::launch::LaunchCreate> for client::launch::LaunchCreate {
                     ))
                 },
             })).collect::<Result<Vec<_>, _>>()?,
+            core_nic: from.core_nic_augmented_mark.into_iter().map(|m| client::launch::CoreNICApplicationInfo {
+                info_type: m.info_type,
+                info: m.info
+            }).collect(),
         })
     }
 }

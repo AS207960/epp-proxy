@@ -104,6 +104,11 @@ pub struct EPPLaunchCreate {
         skip_serializing_if = "Option::is_none"
     )]
     pub signed_mark: Option<String>,
+    #[serde(
+        rename = "{http://xmlns.corenic.net/epp/mark-ext-1.0}ext:augmentedMark",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub augmented_mark: Option<super::corenic::EPPAugmentedMark>,
     // #[serde(rename = "{urn:ietf:params:xml:ns:signedMark-1.0}signedMark")]
     // pub signed_mark: Vec<String>,
     // #[serde(rename = "{urn:ietf:params:xml:ns:signedMark-1.0}encodedSignedMark")]

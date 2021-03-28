@@ -54,7 +54,7 @@ pub enum InfoHost {
     All,
     Delegated,
     Subordinate,
-    None
+    None,
 }
 
 #[derive(Debug)]
@@ -937,7 +937,7 @@ TryFrom<(
                     Some(f.into())
                 } else if let Some(f) = fee011 {
                     Some(f.into())
-                }  else if let Some(f) = fee09 {
+                } else if let Some(f) = fee09 {
                     Some(f.into())
                 } else if let Some(f) = fee08 {
                     Some(f.into())
@@ -1174,7 +1174,7 @@ pub fn handle_check_response(response: proto::EPPResponse) -> Response<CheckResp
                     }).collect(),
                     reason: d.reason.to_owned(),
                 })
-            }  else if let Some(f) = fee09 {
+            } else if let Some(f) = fee09 {
                 Some(fee::FeeCheckData {
                     available: true,
                     commands: f.objects.iter().map(|d| fee::FeeCommand {
@@ -1376,7 +1376,7 @@ pub fn handle_info(
                 InfoHost::Delegated => proto::domain::EPPDomainInfoHosts::Delegated,
                 InfoHost::Subordinate => proto::domain::EPPDomainInfoHosts::Subordinate,
                 InfoHost::None => proto::domain::EPPDomainInfoHosts::None,
-            })
+            }),
         },
         auth_info: req.auth_info.as_ref().map(|a| proto::domain::EPPDomainAuthInfo {
             password: Some(a.clone())
@@ -1475,6 +1475,27 @@ pub fn handle_create(
     }
     if let Some(launch_create) = &req.launch_create {
         if client.launch_supported {
+            if !launch_create.core_nic.is_empty() {
+                if !(client.corenic_mark || client.has_erratum("corenic")) {
+                    return Err(Err(Error::Unsupported));
+                }
+
+                for info in launch_create.core_nic.iter() {
+                    if let Some(info_type) = &info.info_type {
+                        if info_type.len() < 1 || info_type.len() > 64 {
+                            return Err(Err(Error::Err(
+                                "application info type has a min length of 1 and a max length of 64".to_string(),
+                            )));
+                        }
+                    }
+                    if info.info.len() < 1 || info.info.len() > 2048 {
+                        return Err(Err(Error::Err(
+                            "application info has a min length of 1 and a max length of 2048".to_string(),
+                        )));
+                    }
+                }
+            }
+
             exts.push(proto::EPPCommandExtensionType::EPPLaunchCreate(launch_create.into()))
         } else {
             return Err(Err(Error::Unsupported));

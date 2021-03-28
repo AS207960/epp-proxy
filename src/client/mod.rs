@@ -210,6 +210,8 @@ pub struct EPPClientServerFeatures {
     verisign_low_balance: bool,
     /// http://www.verisign.com/epp/whoisInf-1.0 support
     verisign_whois_info: bool,
+    /// http://xmlns.corenic.net/epp/mark-ext-1.0 support
+    corenic_mark: bool,
     /// urn:ietf:params:xml:ns:nsset-1.2 support (NOT AN ACTUAL IETF NAMESPACE)
     nsset_supported: bool,
     /// RFC 8748 support
@@ -727,6 +729,9 @@ impl EPPClient {
         self.features.verisign_whois_info = greeting
             .service_menu
             .supports_ext("http://www.verisign.com/epp/whoisInf-1.0");
+        self.features.corenic_mark = greeting
+            .service_menu
+            .supports_ext("http://xmlns.corenic.net/epp/mark-ext-1.0");
         self.features.nsset_supported = greeting
             .service_menu
             .supports("urn:ietf:params:xml:ns:nsset-1.2");
@@ -818,6 +823,9 @@ impl EPPClient {
             }
             if self.features.verisign_whois_info {
                 ext_objects.push("http://www.verisign.com/epp/whoisInf-1.0".to_string())
+            }
+            if self.features.corenic_mark {
+                ext_objects.push("http://xmlns.corenic.net/epp/mark-ext-1.0".to_string())
             }
             if self.features.nsset_supported {
                 objects.push("urn:ietf:params:xml:ns:nsset-1.2".to_string())

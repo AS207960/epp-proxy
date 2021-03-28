@@ -18,6 +18,7 @@ pub mod traficom;
 pub mod verisign;
 pub mod united_tld;
 pub mod launch;
+pub mod corenic;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub enum EPPMessageType {

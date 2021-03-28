@@ -105,25 +105,53 @@ impl From<&proto::launch::EPPLaunchInfoData> for LaunchInfoData {
 }
 
 #[derive(Debug)]
+pub struct CoreNICApplicationInfo {
+    pub info_type: Option<String>,
+    pub info: String
+}
+
+#[derive(Debug)]
 pub struct LaunchCreate {
     pub phase: LaunchPhase,
     pub code_mark: Vec<CodeMark>,
     pub signed_mark: Option<String>,
     pub create_type: LaunchCreateType,
     pub notices: Vec<Notice>,
+    pub core_nic: Vec<CoreNICApplicationInfo>
 }
 
 impl From<&LaunchCreate> for proto::launch::EPPLaunchCreate {
     fn from(from: &LaunchCreate) -> Self {
-        proto::launch::EPPLaunchCreate {
-            create_type: Some(match from.create_type {
-                LaunchCreateType::Application => proto::launch::EPPLaunchCreateType::Application,
-                LaunchCreateType::Registration => proto::launch::EPPLaunchCreateType::Registration,
-            }),
-            phase: (&from.phase).into(),
-            signed_mark: from.signed_mark.as_ref().map(Into::into),
-            code_marks: from.code_mark.iter().map(Into::into).collect(),
-            notices: from.notices.iter().map(Into::into).collect()
+        if from.core_nic.is_empty() {
+            proto::launch::EPPLaunchCreate {
+                create_type: Some(match from.create_type {
+                    LaunchCreateType::Application => proto::launch::EPPLaunchCreateType::Application,
+                    LaunchCreateType::Registration => proto::launch::EPPLaunchCreateType::Registration,
+                }),
+                phase: (&from.phase).into(),
+                signed_mark: from.signed_mark.as_ref().map(Into::into),
+                code_marks: from.code_mark.iter().map(Into::into).collect(),
+                notices: from.notices.iter().map(Into::into).collect(),
+                augmented_mark: None,
+            }
+        } else {
+            proto::launch::EPPLaunchCreate {
+                create_type: Some(match from.create_type {
+                    LaunchCreateType::Application => proto::launch::EPPLaunchCreateType::Application,
+                    LaunchCreateType::Registration => proto::launch::EPPLaunchCreateType::Registration,
+                }),
+                phase: (&from.phase).into(),
+                signed_mark: None,
+                code_marks: from.code_mark.iter().map(Into::into).collect(),
+                notices: from.notices.iter().map(Into::into).collect(),
+                augmented_mark: Some(proto::corenic::EPPAugmentedMark {
+                    signed_mark: from.signed_mark.as_ref().map(Into::into),
+                    application_info: from.core_nic.iter().map(|i| proto::corenic::EPPApplicationInfo {
+                        info_type: i.info_type.as_ref().map(Into::into),
+                        info: i.info.to_string(),
+                    }).collect()
+                }),
+            }
         }
     }
 }
