@@ -1840,9 +1840,9 @@ pub fn handle_update(
                 ))
             } else {
                 return Err(Err(Error::Unsupported));
-            },
-            None => {}
-        }
+            }
+        },
+        None => {}
     }
 
     if let Some(fee_agreement) = &req.fee_agreement {
