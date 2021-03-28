@@ -1430,49 +1430,54 @@ pub fn handle_create(
     }
 
     let mut exts = vec![];
-    if client.secdns_supported {
-        match &req.sec_dns {
-            Some(sec_dns) => exts.push(proto::EPPCommandExtensionType::EPPSecDNSCreate(
-                match &sec_dns.data {
-                    SecDNSDataType::DSData(ds_data) => proto::secdns::EPPSecDNSData {
-                        max_signature_life: sec_dns.max_sig_life,
-                        key_data: vec![],
-                        ds_data: ds_data
-                            .iter()
-                            .map(|d| proto::secdns::EPPSecDNSDSData {
-                                key_tag: d.key_tag,
-                                algorithm: d.algorithm,
-                                digest_type: d.digest_type,
-                                digest: d.digest.clone(),
-                                key_data: d.key_data.as_ref().map(|k| {
-                                    proto::secdns::EPPSecDNSKeyData {
-                                        flags: k.flags,
-                                        protocol: k.protocol,
-                                        algorithm: k.algorithm,
-                                        public_key: k.public_key.clone(),
-                                    }
-                                }),
-                            })
-                            .collect(),
+    match &req.sec_dns {
+        Some(sec_dns) => {
+            if client.secdns_supported || client.has_erratum("pir") {
+                exts.push(proto::EPPCommandExtensionType::EPPSecDNSCreate(
+                    match &sec_dns.data {
+                        SecDNSDataType::DSData(ds_data) => proto::secdns::EPPSecDNSData {
+                            max_signature_life: sec_dns.max_sig_life,
+                            key_data: vec![],
+                            ds_data: ds_data
+                                .iter()
+                                .map(|d| proto::secdns::EPPSecDNSDSData {
+                                    key_tag: d.key_tag,
+                                    algorithm: d.algorithm,
+                                    digest_type: d.digest_type,
+                                    digest: d.digest.clone(),
+                                    key_data: d.key_data.as_ref().map(|k| {
+                                        proto::secdns::EPPSecDNSKeyData {
+                                            flags: k.flags,
+                                            protocol: k.protocol,
+                                            algorithm: k.algorithm,
+                                            public_key: k.public_key.clone(),
+                                        }
+                                    }),
+                                })
+                                .collect(),
+                        },
+                        SecDNSDataType::KeyData(key_data) => proto::secdns::EPPSecDNSData {
+                            max_signature_life: sec_dns.max_sig_life,
+                            ds_data: vec![],
+                            key_data: key_data
+                                .iter()
+                                .map(|k| proto::secdns::EPPSecDNSKeyData {
+                                    flags: k.flags,
+                                    protocol: k.protocol,
+                                    algorithm: k.algorithm,
+                                    public_key: k.public_key.clone(),
+                                })
+                                .collect(),
+                        },
                     },
-                    SecDNSDataType::KeyData(key_data) => proto::secdns::EPPSecDNSData {
-                        max_signature_life: sec_dns.max_sig_life,
-                        ds_data: vec![],
-                        key_data: key_data
-                            .iter()
-                            .map(|k| proto::secdns::EPPSecDNSKeyData {
-                                flags: k.flags,
-                                protocol: k.protocol,
-                                algorithm: k.algorithm,
-                                public_key: k.public_key.clone(),
-                            })
-                            .collect(),
-                    },
-                },
-            )),
-            None => {}
+                ))
+            } else {
+                return Err(Err(Error::Unsupported));
+            }
         }
+        None => {}
     }
+
     if let Some(launch_create) = &req.launch_create {
         if client.launch_supported {
             if !launch_create.core_nic.is_empty() {
@@ -1746,92 +1751,96 @@ pub fn handle_update(
     }
 
     let mut exts = vec![];
-    if client.secdns_supported {
-        match &req.sec_dns {
-            Some(sec_dns) => exts.push(proto::EPPCommandExtensionType::EPPSecDNSUpdate(
-                proto::secdns::EPPSecDNSUpdate {
-                    urgent: sec_dns.urgent,
-                    add: sec_dns.add.as_ref().map(|a| match a {
-                        SecDNSDataType::DSData(ds_data) => proto::secdns::EPPSecDNSUpdateAdd {
-                            key_data: vec![],
-                            ds_data: ds_data
-                                .iter()
-                                .map(|d| proto::secdns::EPPSecDNSDSData {
-                                    key_tag: d.key_tag,
-                                    algorithm: d.algorithm,
-                                    digest_type: d.digest_type,
-                                    digest: d.digest.clone(),
-                                    key_data: d.key_data.as_ref().map(|k| {
-                                        proto::secdns::EPPSecDNSKeyData {
-                                            flags: k.flags,
-                                            protocol: k.protocol,
-                                            algorithm: k.algorithm,
-                                            public_key: k.public_key.clone(),
-                                        }
-                                    }),
-                                })
-                                .collect(),
-                        },
-                        SecDNSDataType::KeyData(key_data) => proto::secdns::EPPSecDNSUpdateAdd {
-                            ds_data: vec![],
-                            key_data: key_data
-                                .iter()
-                                .map(|k| proto::secdns::EPPSecDNSKeyData {
-                                    flags: k.flags,
-                                    protocol: k.protocol,
-                                    algorithm: k.algorithm,
-                                    public_key: k.public_key.clone(),
-                                })
-                                .collect(),
-                        },
-                    }),
-                    remove: sec_dns.remove.as_ref().map(|r| match r {
-                        UpdateSecDNSRemove::All(a) => proto::secdns::EPPSecDNSUpdateRemove {
-                            all: Some(*a),
-                            ds_data: vec![],
-                            key_data: vec![],
-                        },
-                        UpdateSecDNSRemove::Data(d) => match d {
-                            SecDNSDataType::DSData(ds_data) => {
-                                proto::secdns::EPPSecDNSUpdateRemove {
-                                    all: None,
-                                    key_data: vec![],
-                                    ds_data: ds_data
-                                        .iter()
-                                        .map(|d| proto::secdns::EPPSecDNSDSData {
-                                            key_tag: d.key_tag,
-                                            algorithm: d.algorithm,
-                                            digest_type: d.digest_type,
-                                            digest: d.digest.clone(),
-                                            key_data: None,
-                                        })
-                                        .collect(),
+    match &req.sec_dns {
+        Some(sec_dns) => {
+            if client.secdns_supported || client.has_erratum("pir") {
+                exts.push(proto::EPPCommandExtensionType::EPPSecDNSUpdate(
+                    proto::secdns::EPPSecDNSUpdate {
+                        urgent: sec_dns.urgent,
+                        add: sec_dns.add.as_ref().map(|a| match a {
+                            SecDNSDataType::DSData(ds_data) => proto::secdns::EPPSecDNSUpdateAdd {
+                                key_data: vec![],
+                                ds_data: ds_data
+                                    .iter()
+                                    .map(|d| proto::secdns::EPPSecDNSDSData {
+                                        key_tag: d.key_tag,
+                                        algorithm: d.algorithm,
+                                        digest_type: d.digest_type,
+                                        digest: d.digest.clone(),
+                                        key_data: d.key_data.as_ref().map(|k| {
+                                            proto::secdns::EPPSecDNSKeyData {
+                                                flags: k.flags,
+                                                protocol: k.protocol,
+                                                algorithm: k.algorithm,
+                                                public_key: k.public_key.clone(),
+                                            }
+                                        }),
+                                    })
+                                    .collect(),
+                            },
+                            SecDNSDataType::KeyData(key_data) => proto::secdns::EPPSecDNSUpdateAdd {
+                                ds_data: vec![],
+                                key_data: key_data
+                                    .iter()
+                                    .map(|k| proto::secdns::EPPSecDNSKeyData {
+                                        flags: k.flags,
+                                        protocol: k.protocol,
+                                        algorithm: k.algorithm,
+                                        public_key: k.public_key.clone(),
+                                    })
+                                    .collect(),
+                            },
+                        }),
+                        remove: sec_dns.remove.as_ref().map(|r| match r {
+                            UpdateSecDNSRemove::All(a) => proto::secdns::EPPSecDNSUpdateRemove {
+                                all: Some(*a),
+                                ds_data: vec![],
+                                key_data: vec![],
+                            },
+                            UpdateSecDNSRemove::Data(d) => match d {
+                                SecDNSDataType::DSData(ds_data) => {
+                                    proto::secdns::EPPSecDNSUpdateRemove {
+                                        all: None,
+                                        key_data: vec![],
+                                        ds_data: ds_data
+                                            .iter()
+                                            .map(|d| proto::secdns::EPPSecDNSDSData {
+                                                key_tag: d.key_tag,
+                                                algorithm: d.algorithm,
+                                                digest_type: d.digest_type,
+                                                digest: d.digest.clone(),
+                                                key_data: None,
+                                            })
+                                            .collect(),
+                                    }
                                 }
-                            }
-                            SecDNSDataType::KeyData(key_data) => {
-                                proto::secdns::EPPSecDNSUpdateRemove {
-                                    all: None,
-                                    ds_data: vec![],
-                                    key_data: key_data
-                                        .iter()
-                                        .map(|k| proto::secdns::EPPSecDNSKeyData {
-                                            flags: k.flags,
-                                            protocol: k.protocol,
-                                            algorithm: k.algorithm,
-                                            public_key: k.public_key.clone(),
-                                        })
-                                        .collect(),
+                                SecDNSDataType::KeyData(key_data) => {
+                                    proto::secdns::EPPSecDNSUpdateRemove {
+                                        all: None,
+                                        ds_data: vec![],
+                                        key_data: key_data
+                                            .iter()
+                                            .map(|k| proto::secdns::EPPSecDNSKeyData {
+                                                flags: k.flags,
+                                                protocol: k.protocol,
+                                                algorithm: k.algorithm,
+                                                public_key: k.public_key.clone(),
+                                            })
+                                            .collect(),
+                                    }
                                 }
+                            },
+                        }),
+                        change: sec_dns.new_max_sig_life.map(|s| {
+                            proto::secdns::EPPSecDNSUpdateChange {
+                                max_signature_life: Some(s),
                             }
-                        },
-                    }),
-                    change: sec_dns.new_max_sig_life.map(|s| {
-                        proto::secdns::EPPSecDNSUpdateChange {
-                            max_signature_life: Some(s),
-                        }
-                    }),
-                },
-            )),
+                        }),
+                    },
+                ))
+            } else {
+                return Err(Err(Error::Unsupported));
+            },
             None => {}
         }
     }
