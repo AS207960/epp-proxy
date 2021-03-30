@@ -178,7 +178,7 @@ pub struct EPPContactPostalInfo {
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct EPPContactAddress {
-    #[serde(rename = "{urn:ietf:params:xml:ns:contact-1.0}contact:street")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:contact-1.0}contact:street", default)]
     pub streets: Vec<String>,
     #[serde(rename = "{urn:ietf:params:xml:ns:contact-1.0}contact:city")]
     pub city: String,
