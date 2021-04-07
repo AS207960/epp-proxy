@@ -188,8 +188,8 @@ async fn main() {
     let logger = sentry::integrations::log::SentryLogger::with_dest(log_builder.build());
     log::set_boxed_logger(Box::new(logger)).unwrap();
     log::set_max_level(log::LevelFilter::Debug);
-    let _guard =
-        sentry::init("https://786e367376234c2b9bee2bb1984c2e84@o222429.ingest.sentry.io/5247736");
+    //let _guard =
+    //    sentry::init("https://786e367376234c2b9bee2bb1984c2e84@o222429.ingest.sentry.io/5247736");
 
     let matches = clap::App::new("epp-proxy")
         .version("0.0.1")
