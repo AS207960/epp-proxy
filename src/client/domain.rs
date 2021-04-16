@@ -4,7 +4,7 @@ use std::convert::{TryFrom, TryInto};
 
 use chrono::prelude::*;
 
-use super::{EPPClientServerFeatures, Error, fee, launch, proto, Request, Response, Sender};
+use super::{EPPClientServerFeatures, Error, fee, launch, proto, Request, Response, CommandResponse, Sender};
 use super::router::HandleReqReturn;
 
 #[derive(Debug)]
@@ -193,7 +193,6 @@ pub enum PeriodUnit {
 pub struct CreateResponse {
     /// Was the request completed instantly or not
     pub pending: bool,
-    pub transaction_id: String,
     pub data: CreateData,
     /// Fee information (if supplied by the registry)
     pub fee_data: Option<fee::FeeData>,
@@ -223,7 +222,6 @@ pub struct DeleteRequest {
 pub struct DeleteResponse {
     /// Was the request completed instantly or not
     pub pending: bool,
-    pub transaction_id: String,
     /// Fee information (if supplied by the registry)
     pub fee_data: Option<fee::FeeData>,
 }
@@ -267,7 +265,6 @@ pub enum UpdateSecDNSRemove {
 pub struct UpdateResponse {
     /// Was the request completed instantly or not
     pub pending: bool,
-    pub transaction_id: String,
     /// Fee information (if supplied by the registry)
     pub fee_data: Option<fee::FeeData>,
     pub donuts_fee_data: Option<fee::DonutsFeeData>,
@@ -287,7 +284,6 @@ pub struct RenewRequest {
 pub struct RenewResponse {
     /// Was the request completed instantly or not
     pub pending: bool,
-    pub transaction_id: String,
     pub data: RenewData,
     /// Fee information (if supplied by the registry)
     pub fee_data: Option<fee::FeeData>,
@@ -328,7 +324,6 @@ pub struct TransferAcceptRejectRequest {
 pub struct TransferResponse {
     /// Was the request completed instantly or not
     pub pending: bool,
-    pub transaction_id: String,
     pub data: TransferData,
     /// Fee information (if supplied by the registry)
     pub fee_data: Option<fee::FeeData>,
@@ -752,7 +747,6 @@ TryFrom<(
 
         Ok(TransferResponse {
             pending: false,
-            transaction_id: String::new(),
             data: TransferData {
                 name: domain_transfer.name.clone(),
                 status: (&domain_transfer.transfer_status).into(),
@@ -861,7 +855,6 @@ TryFrom<(
             Some(domain_create) => {
                 Ok(CreateResponse {
                     pending: false,
-                    transaction_id: String::new(),
                     data: CreateData {
                         name: domain_create.name.clone(),
                         creation_date: Some(domain_create.creation_date),
@@ -875,7 +868,6 @@ TryFrom<(
             None => {
                 Ok(CreateResponse {
                     pending: false,
-                    transaction_id: String::new(),
                     data: CreateData {
                         name: "".to_string(),
                         creation_date: None,
@@ -966,7 +958,6 @@ TryFrom<(
 
         Ok(RenewResponse {
             pending: false,
-            transaction_id: String::new(),
             data: RenewData {
                 name: domain_renew.name.to_owned(),
                 new_expiry_date: domain_renew.expiry_date,
@@ -1565,7 +1556,6 @@ pub fn handle_create_response(response: proto::EPPResponse) -> Response<CreateRe
             proto::EPPResultDataValue::EPPDomainCreateResult(domain_create) => {
                 let mut res: CreateResponse = (Some(domain_create), &response.extension).try_into()?;
                 res.pending = pending;
-                res.transaction_id = response.transaction_id.server_transaction_id.unwrap_or_default();
                 Ok(res)
             }
             _ => Err(Error::InternalServerError),
@@ -1574,7 +1564,6 @@ pub fn handle_create_response(response: proto::EPPResponse) -> Response<CreateRe
             if response.is_pending() {
                 let mut res: CreateResponse = (None, &response.extension).try_into()?;
                 res.pending = response.is_pending();
-                res.transaction_id = response.transaction_id.server_transaction_id.unwrap_or_default();
                 Ok(res)
             } else {
                 Err(Error::InternalServerError)
@@ -1656,7 +1645,6 @@ pub fn handle_delete_response(response: proto::EPPResponse) -> Response<DeleteRe
 
     Response::Ok(DeleteResponse {
         pending: response.is_pending(),
-        transaction_id: response.transaction_id.server_transaction_id.unwrap_or_default(),
         fee_data,
     })
 }
@@ -1960,7 +1948,6 @@ pub fn handle_update_response(response: proto::EPPResponse) -> Response<UpdateRe
 
     Response::Ok(UpdateResponse {
         pending: response.is_pending(),
-        transaction_id: response.transaction_id.server_transaction_id.unwrap_or_default(),
         fee_data,
         donuts_fee_data,
     })
@@ -2007,7 +1994,6 @@ pub fn handle_renew_response(response: proto::EPPResponse) -> Response<RenewResp
             proto::EPPResultDataValue::EPPDomainRenewResult(domain_renew) => {
                 let mut res: RenewResponse = (domain_renew, &response.extension).try_into()?;
                 res.pending = pending;
-                res.transaction_id = response.transaction_id.server_transaction_id.unwrap_or_default();
                 Ok(res)
             }
             _ => Err(Error::InternalServerError),
@@ -2166,7 +2152,6 @@ pub fn handle_transfer_response(response: proto::EPPResponse) -> Response<Transf
             proto::EPPResultDataValue::EPPDomainTransferResult(domain_transfer) => {
                 let mut res: TransferResponse = (domain_transfer, &response.extension).try_into()?;
                 res.pending = pending;
-                res.transaction_id = response.transaction_id.server_transaction_id.unwrap_or_default();
                 Ok(res)
             }
             _ => Err(Error::InternalServerError),
@@ -2186,7 +2171,7 @@ pub async fn check(
     fee_check: Option<fee::FeeCheck>,
     launch_check: Option<launch::LaunchAvailabilityCheck>,
     client_sender: &mut futures::channel::mpsc::Sender<Request>,
-) -> Result<CheckResponse, super::Error> {
+) -> Result<CommandResponse<CheckResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
     super::send_epp_client_request(
         client_sender,
@@ -2211,7 +2196,7 @@ pub async fn launch_claims_check(
     domain: &str,
     launch_check: launch::LaunchClaimsCheck,
     client_sender: &mut futures::channel::mpsc::Sender<Request>,
-) -> Result<ClaimsCheckResponse, super::Error> {
+) -> Result<CommandResponse<ClaimsCheckResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
     super::send_epp_client_request(
         client_sender,
@@ -2234,7 +2219,7 @@ pub async fn launch_claims_check(
 pub async fn launch_trademark_check(
     domain: &str,
     client_sender: &mut futures::channel::mpsc::Sender<Request>,
-) -> Result<ClaimsCheckResponse, super::Error> {
+) -> Result<CommandResponse<ClaimsCheckResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
     super::send_epp_client_request(
         client_sender,
@@ -2258,7 +2243,7 @@ pub async fn info(
     hosts: Option<InfoHost>,
     launch_info: Option<launch::LaunchInfo>,
     client_sender: &mut futures::channel::mpsc::Sender<Request>,
-) -> Result<InfoResponse, super::Error> {
+) -> Result<CommandResponse<InfoResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
     super::send_epp_client_request(
         client_sender,
@@ -2300,7 +2285,7 @@ pub struct CreateInfo<'a> {
 pub async fn create(
     info: CreateInfo<'_>,
     client_sender: &mut futures::channel::mpsc::Sender<Request>,
-) -> Result<CreateResponse, super::Error> {
+) -> Result<CommandResponse<CreateResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
     super::send_epp_client_request(
         client_sender,
@@ -2332,7 +2317,7 @@ pub async fn delete(
     launch_info: Option<launch::LaunchUpdate>,
     donuts_fee_agreement: Option<fee::DonutsFeeData>,
     client_sender: &mut futures::channel::mpsc::Sender<Request>,
-) -> Result<DeleteResponse, super::Error> {
+) -> Result<CommandResponse<DeleteResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
     super::send_epp_client_request(
         client_sender,
@@ -2367,7 +2352,7 @@ pub async fn update(
     fee_agreement: Option<fee::FeeAgreement>,
     donuts_fee_agreement: Option<fee::DonutsFeeData>,
     client_sender: &mut futures::channel::mpsc::Sender<Request>,
-) -> Result<UpdateResponse, super::Error> {
+) -> Result<CommandResponse<UpdateResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
     super::send_epp_client_request(
         client_sender,
@@ -2402,7 +2387,7 @@ pub async fn renew(
     fee_agreement: Option<fee::FeeAgreement>,
     donuts_fee_agreement: Option<fee::DonutsFeeData>,
     client_sender: &mut futures::channel::mpsc::Sender<Request>,
-) -> Result<RenewResponse, super::Error> {
+) -> Result<CommandResponse<RenewResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
     super::send_epp_client_request(
         client_sender,
@@ -2429,7 +2414,7 @@ pub async fn transfer_query(
     domain: &str,
     auth_info: Option<&str>,
     client_sender: &mut futures::channel::mpsc::Sender<Request>,
-) -> Result<TransferResponse, super::Error> {
+) -> Result<CommandResponse<TransferResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
     super::send_epp_client_request(
         client_sender,
@@ -2457,7 +2442,7 @@ pub async fn transfer_request(
     fee_agreement: Option<fee::FeeAgreement>,
     donuts_fee_agreement: Option<fee::DonutsFeeData>,
     client_sender: &mut futures::channel::mpsc::Sender<Request>,
-) -> Result<TransferResponse, super::Error> {
+) -> Result<CommandResponse<TransferResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
     super::send_epp_client_request(
         client_sender,
@@ -2484,7 +2469,7 @@ pub async fn transfer_cancel(
     domain: &str,
     auth_info: Option<&str>,
     client_sender: &mut futures::channel::mpsc::Sender<Request>,
-) -> Result<TransferResponse, super::Error> {
+) -> Result<CommandResponse<TransferResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
     super::send_epp_client_request(
         client_sender,
@@ -2508,7 +2493,7 @@ pub async fn transfer_accept(
     domain: &str,
     auth_info: Option<&str>,
     client_sender: &mut futures::channel::mpsc::Sender<Request>,
-) -> Result<TransferResponse, super::Error> {
+) -> Result<CommandResponse<TransferResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
     super::send_epp_client_request(
         client_sender,
@@ -2532,7 +2517,7 @@ pub async fn transfer_reject(
     domain: &str,
     auth_info: Option<&str>,
     client_sender: &mut futures::channel::mpsc::Sender<Request>,
-) -> Result<TransferResponse, super::Error> {
+) -> Result<CommandResponse<TransferResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
     super::send_epp_client_request(
         client_sender,

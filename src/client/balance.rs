@@ -1,7 +1,7 @@
 //! EPP commands relating to balance enquiries
 
 use super::router::HandleReqReturn;
-use super::{proto, EPPClientServerFeatures, Error, Request, Response, Sender};
+use super::{proto, EPPClientServerFeatures, Error, Request, Response, CommandResponse, Sender};
 
 #[derive(Debug)]
 pub struct BalanceRequest {
@@ -94,7 +94,7 @@ pub fn handle_balance_response(response: proto::EPPResponse) -> Response<Balance
 /// * `client_sender` - Reference to the tokio channel into the client
 pub async fn balance_info(
     client_sender: &mut futures::channel::mpsc::Sender<Request>,
-) -> Result<BalanceResponse, super::Error> {
+) -> Result<CommandResponse<BalanceResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
     super::send_epp_client_request(
         client_sender,

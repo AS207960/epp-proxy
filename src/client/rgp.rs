@@ -1,7 +1,7 @@
 //! EPP commands relating to nominet specific features
 
 use super::router::HandleReqReturn;
-use super::{proto, fee, EPPClientServerFeatures, Error, Request, Response, Sender};
+use super::{proto, fee, EPPClientServerFeatures, Error, Request, Response, CommandResponse, Sender};
 
 #[derive(Debug)]
 pub struct RestoreRequest {
@@ -165,7 +165,7 @@ pub async fn request(
     domain: &str,
     donuts_fee_agreement: Option<fee::DonutsFeeData>,
     client_sender: &mut futures::channel::mpsc::Sender<Request>,
-) -> Result<RestoreResponse, super::Error> {
+) -> Result<CommandResponse<RestoreResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
     super::send_epp_client_request(
         client_sender,

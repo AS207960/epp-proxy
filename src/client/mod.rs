@@ -26,9 +26,9 @@ pub mod fee;
 pub mod launch;
 
 use crate::proto::EPPServiceExtension;
-pub use router::{Request, Response};
+pub use router::{Request, Response, CommandResponse};
 
-type Sender<T> = futures::channel::oneshot::Sender<Response<T>>;
+type Sender<T> = futures::channel::oneshot::Sender<Result<CommandResponse<T>, Error>>;
 pub type RequestSender = futures::channel::mpsc::Sender<router::Request>;
 
 async fn write_msg_log(msg: &str, msg_type: &str, root: &std::path::Path) -> tokio::io::Result<()> {
@@ -228,6 +228,8 @@ pub struct EPPClientServerFeatures {
     fee_07_supported: bool,
     /// urn:ietf:params:xml:ns:fee-0.5 support
     fee_05_supported: bool,
+    /// urn:ietf:params:xml:ns:epp:unhandled-namespaces-1.0 support
+    unhandled_ns_supported: bool,
 }
 
 impl EPPClientServerFeatures {
@@ -756,6 +758,9 @@ impl EPPClient {
         self.features.fee_05_supported = greeting
             .service_menu
             .supports_ext("urn:ietf:params:xml:ns:fee-0.5");
+        self.features.unhandled_ns_supported = greeting
+            .service_menu
+            .supports_ext("urn:ietf:params:xml:ns:epp:unhandled-namespaces-1.0");
 
         if !(self.features.contact_supported
             | self.features.domain_supported
@@ -845,6 +850,9 @@ impl EPPClient {
                 ext_objects.push("urn:ietf:params:xml:ns:fee-0.7".to_string())
             } else if self.features.fee_05_supported {
                 ext_objects.push("urn:ietf:params:xml:ns:fee-0.5".to_string())
+            }
+            if self.features.unhandled_ns_supported {
+                ext_objects.push("urn:ietf:params:xml:ns:epp:unhandled-namespaces-1.0".to_string())
             }
             if self.features.nominet_tag_list {
                 let new_client = Self {
@@ -1202,7 +1210,7 @@ pub fn handle_logout_response(_response: proto::EPPResponse) -> Response<()> {
 /// * `client_sender` - Reference to the tokio channel into the client
 pub async fn logout(
     mut client_sender: futures::channel::mpsc::Sender<Request>,
-) -> Result<(), Error> {
+) -> Result<CommandResponse<()>, Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
     send_epp_client_request(
         &mut client_sender,

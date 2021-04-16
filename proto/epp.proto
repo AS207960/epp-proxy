@@ -9,6 +9,7 @@ import "host.proto";
 import "rgp.proto";
 import "nominet.proto";
 import "traficom.proto";
+import "common.proto";
 
 service EPPProxy {
     rpc DomainCheck            (domain.DomainCheckRequest)                returns (domain.DomainCheckReply);
@@ -77,6 +78,7 @@ message PollReply {
         BalanceReply verisign_low_balance_data = 19;
     }
     ChangeData change_data = 10;
+    common.CommandResponse cmd_resp = 23;
 }
 
 message ChangeData {
@@ -133,4 +135,5 @@ message BalanceReply {
         google.protobuf.StringValue fixed_credit_threshold = 5;
         google.protobuf.UInt32Value percentage_credit_threshold = 6;
     }
+    common.CommandResponse cmd_resp = 7;
 }

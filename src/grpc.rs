@@ -763,7 +763,8 @@ impl From<client::domain::InfoResponse> for epp_proto::domain::DomainInfoReply {
                 whois_server: i.whois_server,
                 url: i.url,
                 iris_server: i.iris_server,
-            })
+            }),
+            cmd_resp: None,
         }
     }
 }
@@ -773,13 +774,13 @@ impl From<client::domain::CreateResponse> for epp_proto::domain::DomainCreateRep
         epp_proto::domain::DomainCreateReply {
             name: res.data.name,
             pending: res.pending,
-            transaction_id: res.transaction_id,
             creation_date: chrono_to_proto(res.data.creation_date),
             expiry_date: chrono_to_proto(res.data.expiration_date),
             fee_data: res.fee_data.map(Into::into),
             donuts_fee_data: res.donuts_fee_data.map(Into::into),
             registry_name: String::new(),
             launch_data: res.launch_create.map(Into::into),
+            cmd_resp: None,
         }
     }
 }
@@ -789,11 +790,11 @@ impl From<client::domain::RenewResponse> for epp_proto::domain::DomainRenewReply
         epp_proto::domain::DomainRenewReply {
             name: res.data.name,
             pending: res.pending,
-            transaction_id: res.transaction_id,
             expiry_date: chrono_to_proto(res.data.new_expiry_date),
             fee_data: res.fee_data.map(Into::into),
             donuts_fee_data: res.donuts_fee_data.map(Into::into),
             registry_name: String::new(),
+            cmd_resp: None,
         }
     }
 }
@@ -802,7 +803,6 @@ impl From<client::domain::TransferResponse> for epp_proto::domain::DomainTransfe
     fn from(res: client::domain::TransferResponse) -> Self {
         epp_proto::domain::DomainTransferReply {
             pending: res.pending,
-            transaction_id: res.transaction_id,
             name: res.data.name,
             status: i32_from_transfer_status(res.data.status),
             requested_client_id: res.data.requested_client_id,
@@ -813,6 +813,7 @@ impl From<client::domain::TransferResponse> for epp_proto::domain::DomainTransfe
             fee_data: res.fee_data.map(Into::into),
             donuts_fee_data: res.donuts_fee_data.map(Into::into),
             registry_name: String::new(),
+            cmd_resp: None,
         }
     }
 }
@@ -821,12 +822,12 @@ impl From<client::contact::TransferResponse> for epp_proto::contact::ContactTran
     fn from(res: client::contact::TransferResponse) -> Self {
         epp_proto::contact::ContactTransferReply {
             pending: res.pending,
-            transaction_id: res.transaction_id,
             status: i32_from_transfer_status(res.data.status),
             requested_client_id: res.data.requested_client_id,
             requested_date: chrono_to_proto(Some(res.data.requested_date)),
             act_client_id: res.data.act_client_id,
             act_date: chrono_to_proto(Some(res.data.act_date)),
+            cmd_resp: None,
         }
     }
 }
@@ -1065,7 +1066,8 @@ impl From<client::contact::InfoResponse> for epp_proto::contact::ContactInfoRepl
                 date_to_suspend: chrono_to_proto(q.date_to_suspend),
                 lock_applied: q.lock_applied,
                 domains: q.domains.unwrap_or_default(),
-            })
+            }),
+            cmd_resp: None,
         }
     }
 }
@@ -1085,6 +1087,7 @@ impl From<client::balance::BalanceResponse> for epp_proto::BalanceReply {
                     epp_proto::balance_reply::CreditThreshold::PercentageCreditThreshold(p.into())
                 }
             }),
+            cmd_resp: None,
         }
     }
 }
@@ -1104,6 +1107,7 @@ impl From<client::verisign::LowBalanceData> for epp_proto::BalanceReply {
                     epp_proto::balance_reply::CreditThreshold::PercentageCreditThreshold(p.into())
                 }
             }),
+            cmd_resp: None,
         }
     }
 }
@@ -1368,6 +1372,19 @@ impl From<client::traficom::TrnData> for epp_proto::traficom::TrnData {
     }
 }
 
+fn map_command_response<T>(from: client::CommandResponse<T>) -> (T, epp_proto::common::CommandResponse) {
+    return (from.response, epp_proto::common::CommandResponse {
+            extra_values: from.extra_values.into_iter().map(|e| epp_proto::common::CommandExtraValue {
+                reason: e.reason,
+                value: e.value
+            }).collect(),
+            transaction_id: from.transaction_id.map(|t| epp_proto::common::CommandTransactionId {
+                client: t.client,
+                server: t.server
+            })
+        })
+}
+
 // fn client_by_domain(
 //     router: &super::Router,
 //     domain: &str,
@@ -1412,12 +1429,12 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let res = request.into_inner();
         let (mut sender, registry_name) =
             client_by_domain_or_id(&self.client_router, &res.name, res.registry_name)?;
-        let res = client::domain::check(
+        let (res, cmd_resp) = map_command_response(client::domain::check(
             &res.name,
             res.fee_check.map(Into::into),
             None,
             &mut sender,
-        ).await?;
+        ).await?);
 
         let reply = epp_proto::domain::DomainCheckReply {
             available: res.avail,
@@ -1425,6 +1442,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
             fee_check: res.fee_check.map(Into::into),
             donuts_fee_check: res.donuts_fee_check.map(Into::into),
             registry_name,
+            cmd_resp: Some(cmd_resp),
         };
 
         Ok(tonic::Response::new(reply))
@@ -1443,16 +1461,17 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                 "Launch check must be specified",
             ))
         };
-        let res = client::domain::launch_claims_check(
+        let (res, cmd_resp) = map_command_response(client::domain::launch_claims_check(
             &res.name,
             launch_check.into(),
             &mut sender,
-        ).await?;
+        ).await?);
 
         let reply = epp_proto::domain::DomainClaimsCheckReply {
             exists: res.exists,
             claims_keys: res.claims_key.into_iter().map(Into::into).collect(),
             registry_name,
+            cmd_resp: Some(cmd_resp),
         };
 
         Ok(tonic::Response::new(reply))
@@ -1465,15 +1484,16 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let res = request.into_inner();
         let (mut sender, registry_name) =
             client_by_domain_or_id(&self.client_router, &res.name, res.registry_name)?;
-        let res = client::domain::launch_trademark_check(
+        let (res, cmd_resp) = map_command_response(client::domain::launch_trademark_check(
             &res.name,
             &mut sender,
-        ).await?;
+        ).await?);
 
         let reply = epp_proto::domain::DomainClaimsCheckReply {
             exists: res.exists,
             claims_keys: res.claims_key.into_iter().map(Into::into).collect(),
             registry_name,
+            cmd_resp: Some(cmd_resp)
         };
 
         Ok(tonic::Response::new(reply))
@@ -1486,7 +1506,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let req = request.into_inner();
         let (mut sender, registry_name) =
             client_by_domain_or_id(&self.client_router, &req.name, req.registry_name)?;
-        let res = client::domain::info(
+        let (res, cmd_resp) = map_command_response( client::domain::info(
             &req.name,
             req.auth_info.as_deref(),
             req.hosts.map(|h| match epp_proto::domain::DomainHostsType::from_i32(h.hosts) {
@@ -1501,10 +1521,11 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                 None => None
             },
             &mut sender,
-        ).await?;
+        ).await?);
 
         let mut reply: epp_proto::domain::DomainInfoReply = res.into();
         reply.registry_name = registry_name;
+        reply.cmd_resp = Some(cmd_resp);
 
         Ok(tonic::Response::new(reply))
     }
@@ -1561,7 +1582,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
             }
         }
 
-        let res = client::domain::create(
+       let (res, cmd_resp) = map_command_response(client::domain::create(
             client::domain::CreateInfo {
                 domain: &request.name,
                 period: request.period.map(|p| client::domain::Period {
@@ -1635,10 +1656,11 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
             },
             &mut sender,
         )
-            .await?;
+            .await?);
 
         let mut reply: epp_proto::domain::DomainCreateReply = res.into();
         reply.registry_name = registry_name;
+        reply.cmd_resp = Some(cmd_resp);
 
         Ok(tonic::Response::new(reply))
     }
@@ -1650,7 +1672,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let request = request.into_inner();
         let (mut sender, registry_name) =
             client_by_domain_or_id(&self.client_router, &request.name, request.registry_name)?;
-        let res = client::domain::delete(
+        let (res, cmd_resp) = map_command_response(client::domain::delete(
             &request.name,
             match request.launch_data {
                 Some(i) => Some(TryInto::try_into(i)?),
@@ -1658,13 +1680,13 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
             },
             request.donuts_fee_agreement.map(TryInto::try_into).map_or(Ok(None), |v| v.map(Some))?,
             &mut sender,
-        ).await?;
+        ).await?);
 
         let reply = epp_proto::domain::DomainDeleteReply {
             pending: res.pending,
-            transaction_id: res.transaction_id,
             fee_data: res.fee_data.map(Into::into),
             registry_name,
+            cmd_resp: Some(cmd_resp),
         };
 
         Ok(tonic::Response::new(reply))
@@ -1755,7 +1777,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
             map_param(p, &mut rem)?;
         }
 
-        let res = client::domain::update(
+        let (res, cmd_resp) = map_command_response(client::domain::update(
             &request.name,
             add,
             rem,
@@ -1859,14 +1881,14 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
             request.donuts_fee_agreement.map(TryInto::try_into).map_or(Ok(None), |v| v.map(Some))?,
             &mut sender,
         )
-            .await?;
+            .await?);
 
         let reply = epp_proto::domain::DomainUpdateReply {
             pending: res.pending,
-            transaction_id: res.transaction_id,
             fee_data: res.fee_data.map(Into::into),
             donuts_fee_data: res.donuts_fee_data.map(Into::into),
             registry_name,
+            cmd_resp: Some(cmd_resp),
         };
 
         Ok(tonic::Response::new(reply))
@@ -1887,7 +1909,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
             ));
         }
 
-        let res = client::domain::renew(
+        let (res, cmd_resp) = map_command_response(client::domain::renew(
             &request.name,
             request.period.map(|p| client::domain::Period {
                 unit: period_unit_from_i32(p.unit),
@@ -1898,10 +1920,11 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
             request.donuts_fee_agreement.map(TryInto::try_into).map_or(Ok(None), |v| v.map(Some))?,
             &mut sender,
         )
-            .await?;
+            .await?);
 
         let mut reply: epp_proto::domain::DomainRenewReply = res.into();
         reply.registry_name = registry_name;
+        reply.cmd_resp = Some(cmd_resp);
 
         Ok(tonic::Response::new(reply))
     }
@@ -1913,11 +1936,12 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let req = request.into_inner();
         let (mut sender, registry_name) =
             client_by_domain_or_id(&self.client_router, &req.name, req.registry_name)?;
-        let res = client::domain::transfer_query(
-            &req.name, req.auth_info.as_deref(), &mut sender).await?;
+        let (res, cmd_resp) = map_command_response(client::domain::transfer_query(
+            &req.name, req.auth_info.as_deref(), &mut sender).await?);
 
         let mut reply: epp_proto::domain::DomainTransferReply = res.into();
         reply.registry_name = registry_name;
+        reply.cmd_resp = Some(cmd_resp);
 
         Ok(tonic::Response::new(reply))
     }
@@ -1929,7 +1953,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let request = request.into_inner();
         let (mut sender, registry_name) =
             client_by_domain_or_id(&self.client_router, &request.name, request.registry_name)?;
-        let res = client::domain::transfer_request(
+        let (res, cmd_resp) = map_command_response(client::domain::transfer_request(
             &request.name,
             request.period.map(|p| client::domain::Period {
                 unit: period_unit_from_i32(p.unit),
@@ -1940,10 +1964,11 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
             request.donuts_fee_agreement.map(TryInto::try_into).map_or(Ok(None), |v| v.map(Some))?,
             &mut sender,
         )
-            .await?;
+            .await?);
 
         let mut reply: epp_proto::domain::DomainTransferReply = res.into();
         reply.registry_name = registry_name;
+        reply.cmd_resp = Some(cmd_resp);
 
         Ok(tonic::Response::new(reply))
     }
@@ -1955,12 +1980,13 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let request = request.into_inner();
         let (mut sender, registry_name) =
             client_by_domain_or_id(&self.client_router, &request.name, request.registry_name)?;
-        let res = client::domain::transfer_cancel(
+        let (res, cmd_resp) = map_command_response(client::domain::transfer_cancel(
             &request.name, Some(&request.auth_info), &mut sender,
-        ).await?;
+        ).await?);
 
         let mut reply: epp_proto::domain::DomainTransferReply = res.into();
         reply.registry_name = registry_name;
+        reply.cmd_resp = Some(cmd_resp);
 
         Ok(tonic::Response::new(reply))
     }
@@ -1972,12 +1998,12 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let request = request.into_inner();
         let (mut sender, registry_name) =
             client_by_domain_or_id(&self.client_router, &request.name, request.registry_name)?;
-        let res =
-            client::domain::transfer_accept(
-                &request.name, Some(&request.auth_info), &mut sender).await?;
+        let (res, cmd_resp) = map_command_response(client::domain::transfer_accept(
+                &request.name, Some(&request.auth_info), &mut sender).await?);
 
         let mut reply: epp_proto::domain::DomainTransferReply = res.into();
         reply.registry_name = registry_name;
+        reply.cmd_resp = Some(cmd_resp);
 
         Ok(tonic::Response::new(reply))
     }
@@ -1989,12 +2015,12 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let request = request.into_inner();
         let (mut sender, registry_name) =
             client_by_domain_or_id(&self.client_router, &request.name, request.registry_name)?;
-        let res =
-            client::domain::transfer_reject(
-                &request.name, Some(&request.auth_info), &mut sender).await?;
+        let (res, cmd_resp) = map_command_response(client::domain::transfer_reject(
+                &request.name, Some(&request.auth_info), &mut sender).await?);
 
         let mut reply: epp_proto::domain::DomainTransferReply = res.into();
         reply.registry_name = registry_name;
+        reply.cmd_resp = Some(cmd_resp);
 
         Ok(tonic::Response::new(reply))
     }
@@ -2006,18 +2032,18 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let res = request.into_inner();
         let (mut sender, registry_name) =
             client_by_domain_or_id(&self.client_router, &res.name, res.registry_name)?;
-        let res = client::rgp::request(
+       let (res, cmd_resp) = map_command_response(client::rgp::request(
             &res.name,
             res.donuts_fee_agreement.map(TryInto::try_into).map_or(Ok(None), |v| v.map(Some))?,
             &mut sender,
-        ).await?;
+        ).await?);
 
         let reply = epp_proto::rgp::RestoreReply {
             pending: res.pending,
-            transaction_id: res.transaction_id,
             state: res.state.into_iter().map(i32_from_restore_status).collect(),
             fee_data: res.fee_data.map(Into::into),
             registry_name,
+            cmd_resp: Some(cmd_resp)
         };
 
         Ok(tonic::Response::new(reply))
@@ -2030,11 +2056,12 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let request = request.into_inner();
         let name: String = request.name;
         let mut sender = client_by_id(&self.client_router, &request.registry_name)?;
-        let res = client::host::check(&name, &mut sender).await?;
+        let (res, cmd_resp) = map_command_response(client::host::check(&name, &mut sender).await?);
 
         let reply = epp_proto::host::HostCheckReply {
             available: res.avail,
             reason: res.reason,
+            cmd_resp: Some(cmd_resp)
         };
 
         Ok(tonic::Response::new(reply))
@@ -2047,7 +2074,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let request = request.into_inner();
         let name: String = request.name;
         let mut sender = client_by_id(&self.client_router, &request.registry_name)?;
-        let res = client::host::info(&name, &mut sender).await?;
+        let (res, cmd_resp) = map_command_response(client::host::info(&name, &mut sender).await?);
 
         let reply = epp_proto::host::HostInfoReply {
             name: res.name,
@@ -2105,6 +2132,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
             last_updated_client: res.last_updated_client,
             last_updated_date: chrono_to_proto(res.last_updated_date),
             last_transfer_date: chrono_to_proto(res.last_transfer_date),
+            cmd_resp: Some(cmd_resp),
         };
 
         Ok(tonic::Response::new(reply))
@@ -2139,13 +2167,13 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
             })
             .collect::<Result<Vec<client::host::Address>, tonic::Status>>()?;
         let mut sender = client_by_id(&self.client_router, &request.registry_name)?;
-        let res = client::host::create(&name, addresses, &mut sender).await?;
+        let (res, cmd_resp) = map_command_response(client::host::create(&name, addresses, &mut sender).await?);
 
         let reply = epp_proto::host::HostCreateReply {
             name: res.name,
             pending: res.pending,
-            transaction_id: res.transaction_id,
             creation_date: chrono_to_proto(res.creation_date),
+            cmd_resp: Some(cmd_resp)
         };
 
         Ok(tonic::Response::new(reply))
@@ -2158,11 +2186,11 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let request = request.into_inner();
         let name: String = request.name;
         let mut sender = client_by_id(&self.client_router, &request.registry_name)?;
-        let res = client::host::delete(&name, &mut sender).await?;
+        let (res, cmd_resp) = map_command_response(client::host::delete(&name, &mut sender).await?);
 
         let reply = epp_proto::host::HostDeleteReply {
             pending: res.pending,
-            transaction_id: res.transaction_id,
+            cmd_resp: Some(cmd_resp)
         };
 
         Ok(tonic::Response::new(reply))
@@ -2225,11 +2253,11 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
             }
         }
 
-        let res = client::host::update(&name, add, remove, request.new_name, &mut sender).await?;
+        let (res, cmd_resp) = map_command_response(client::host::update(&name, add, remove, request.new_name, &mut sender).await?);
 
         let reply = epp_proto::host::HostUpdateReply {
             pending: res.pending,
-            transaction_id: res.transaction_id,
+            cmd_resp: Some(cmd_resp)
         };
 
         Ok(tonic::Response::new(reply))
@@ -2242,11 +2270,12 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let request = request.into_inner();
         let id: String = request.id;
         let mut sender = client_by_id(&self.client_router, &request.registry_name)?;
-        let res = client::contact::check(&id, &mut sender).await?;
+        let (res, cmd_resp) = map_command_response(client::contact::check(&id, &mut sender).await?);
 
         let reply = epp_proto::contact::ContactCheckReply {
             available: res.avail,
             reason: res.reason,
+            cmd_resp: Some(cmd_resp)
         };
 
         Ok(tonic::Response::new(reply))
@@ -2259,9 +2288,12 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let request = request.into_inner();
         let id: String = request.id;
         let mut sender = client_by_id(&self.client_router, &request.registry_name)?;
-        let res = client::contact::info(&id, &mut sender).await?;
+        let (res, cmd_resp) = map_command_response(client::contact::info(&id, &mut sender).await?);
 
-        Ok(tonic::Response::new(res.into()))
+        let mut reply: epp_proto::contact::ContactInfoReply = res.into();
+        reply.cmd_resp = Some(cmd_resp);
+
+        Ok(tonic::Response::new(reply))
     }
 
     async fn contact_create(
@@ -2283,7 +2315,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
             birth_date: proto_to_chrono(a.birth_date).map(|d| d.date()),
         };
 
-        let res = client::contact::create(
+        let (res, cmd_resp) = map_command_response(client::contact::create(
             &request.id,
             client::contact::NewContactData {
                 local_address: request.local_address.map(addr_map),
@@ -2301,13 +2333,13 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
             },
             &mut sender,
         )
-            .await?;
+            .await?);
 
         let reply = epp_proto::contact::ContactCreateReply {
             id: res.id,
             pending: res.pending,
-            transaction_id: res.transaction_id,
             creation_date: chrono_to_proto(res.creation_date),
+            cmd_resp: Some(cmd_resp),
         };
 
         Ok(tonic::Response::new(reply))
@@ -2320,11 +2352,11 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let request = request.into_inner();
         let mut sender = client_by_id(&self.client_router, &request.registry_name)?;
 
-        let res = client::contact::delete(&request.id, &mut sender).await?;
+        let (res, cmd_resp) = map_command_response(client::contact::delete(&request.id, &mut sender).await?);
 
         let reply = epp_proto::contact::ContactDeleteReply {
             pending: res.pending,
-            transaction_id: res.transaction_id,
+            cmd_resp: Some(cmd_resp)
         };
 
         Ok(tonic::Response::new(reply))
@@ -2349,7 +2381,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
             birth_date: proto_to_chrono(a.birth_date).map(|d| d.date()),
         };
 
-        let res = client::contact::update(
+        let (res, cmd_resp) = map_command_response(client::contact::update(
             &request.id,
             contact_status_from_i32(request.add_statuses),
             contact_status_from_i32(request.remove_statuses),
@@ -2369,11 +2401,11 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
             },
             &mut sender,
         )
-            .await?;
+            .await?);
 
         let reply = epp_proto::contact::ContactUpdateReply {
             pending: res.pending,
-            transaction_id: res.transaction_id,
+            cmd_resp: Some(cmd_resp)
         };
 
         Ok(tonic::Response::new(reply))
@@ -2385,16 +2417,16 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
     ) -> Result<tonic::Response<epp_proto::contact::ContactTransferReply>, tonic::Status> {
         let request = request.into_inner();
         let mut sender = client_by_id(&self.client_router, &request.registry_name)?;
-        let res = client::contact::transfer_query(&request.id, &mut sender).await?;
+        let (res, cmd_resp) = map_command_response( client::contact::transfer_query(&request.id, &mut sender).await?);
 
         let reply = epp_proto::contact::ContactTransferReply {
             pending: res.pending,
-            transaction_id: res.transaction_id,
             status: i32_from_transfer_status(res.data.status),
             requested_client_id: res.data.requested_client_id,
             requested_date: chrono_to_proto(Some(res.data.requested_date)),
             act_client_id: res.data.act_client_id,
             act_date: chrono_to_proto(Some(res.data.act_date)),
+            cmd_resp: Some(cmd_resp)
         };
 
         Ok(tonic::Response::new(reply))
@@ -2407,17 +2439,16 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let request = request.into_inner();
         let mut sender = client_by_id(&self.client_router, &request.registry_name)?;
 
-        let res =
-            client::contact::transfer_request(&request.id, &request.auth_info, &mut sender).await?;
+        let (res, cmd_resp) = map_command_response(client::contact::transfer_request(&request.id, &request.auth_info, &mut sender).await?);
 
         let reply = epp_proto::contact::ContactTransferReply {
             pending: res.pending,
-            transaction_id: res.transaction_id,
             status: i32_from_transfer_status(res.data.status),
             requested_client_id: res.data.requested_client_id,
             requested_date: chrono_to_proto(Some(res.data.requested_date)),
             act_client_id: res.data.act_client_id,
             act_date: chrono_to_proto(Some(res.data.act_date)),
+            cmd_resp: Some(cmd_resp)
         };
 
         Ok(tonic::Response::new(reply))
@@ -2429,17 +2460,16 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
     ) -> Result<tonic::Response<epp_proto::contact::ContactTransferReply>, tonic::Status> {
         let request = request.into_inner();
         let mut sender = client_by_id(&self.client_router, &request.registry_name)?;
-        let res =
-            client::contact::transfer_accept(&request.id, &request.auth_info, &mut sender).await?;
+        let (res, cmd_resp) = map_command_response(client::contact::transfer_accept(&request.id, &request.auth_info, &mut sender).await?);
 
         let reply = epp_proto::contact::ContactTransferReply {
             pending: res.pending,
-            transaction_id: res.transaction_id,
             status: i32_from_transfer_status(res.data.status),
             requested_client_id: res.data.requested_client_id,
             requested_date: chrono_to_proto(Some(res.data.requested_date)),
             act_client_id: res.data.act_client_id,
             act_date: chrono_to_proto(Some(res.data.act_date)),
+            cmd_resp: Some(cmd_resp)
         };
 
         Ok(tonic::Response::new(reply))
@@ -2451,17 +2481,16 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
     ) -> Result<tonic::Response<epp_proto::contact::ContactTransferReply>, tonic::Status> {
         let request = request.into_inner();
         let mut sender = client_by_id(&self.client_router, &request.registry_name)?;
-        let res =
-            client::contact::transfer_reject(&request.id, &request.auth_info, &mut sender).await?;
+        let (res, cmd_resp) = map_command_response(client::contact::transfer_reject(&request.id, &request.auth_info, &mut sender).await?);
 
         let reply = epp_proto::contact::ContactTransferReply {
             pending: res.pending,
-            transaction_id: res.transaction_id,
             status: i32_from_transfer_status(res.data.status),
             requested_client_id: res.data.requested_client_id,
             requested_date: chrono_to_proto(Some(res.data.requested_date)),
             act_client_id: res.data.act_client_id,
             act_date: chrono_to_proto(Some(res.data.act_date)),
+            cmd_resp: Some(cmd_resp)
         };
 
         Ok(tonic::Response::new(reply))
@@ -2492,6 +2521,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
             loop {
                 match client::poll::poll(&mut sender).await {
                     Ok(resp) => {
+                        let (resp, cmd_resp) = map_command_response(resp);
                         if let Some(message) = resp {
                             if message.count > 0 {
                                 should_delay = false;
@@ -2562,6 +2592,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                                     msg_id: message.id.clone(),
                                     enqueue_date: chrono_to_proto(Some(message.enqueue_time)),
                                     message: message.message,
+                                    cmd_resp: Some(cmd_resp),
                                     change_data: change_data.as_ref().map(|c| epp_proto::ChangeData {
                                         change_state: match c.state {
                                             client::poll::ChangeState::After => epp_proto::change_data::ChangeState::After.into(),
@@ -2684,6 +2715,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                                     };
                                     match client::poll::poll_ack(&msg.msg_id, &mut sender).await {
                                         Ok(resp) => {
+                                            let (resp, _cmd_resp) = map_command_response(resp);
                                             if let Some(count) = resp.count {
                                                 if count > 0 {
                                                     should_delay = false;
@@ -2731,10 +2763,10 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let request = request.into_inner();
         let mut sender = client_by_id(&self.client_router, &request.registry_name)?;
 
-        let res = client::nominet::tag_list(&mut sender).await?;
+        let (resp, cmd_resp) = map_command_response(client::nominet::tag_list(&mut sender).await?);
 
         let reply = epp_proto::nominet::NominetTagListReply {
-            tags: res
+            tags: resp
                 .tags
                 .into_iter()
                 .map(|t| epp_proto::nominet::nominet_tag_list_reply::Tag {
@@ -2744,6 +2776,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                     handshake: t.handshake,
                 })
                 .collect(),
+            cmd_resp: Some(cmd_resp),
         };
 
         Ok(tonic::Response::new(reply))
@@ -2756,8 +2789,11 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let request = request.into_inner();
         let mut sender = client_by_id(&self.client_router, &request.registry_name)?;
 
-        let res = client::balance::balance_info(&mut sender).await?;
+        let (resp, cmd_resp) = map_command_response(client::balance::balance_info(&mut sender).await?);
 
-        Ok(tonic::Response::new(res.into()))
+        let mut reply: epp_proto::BalanceReply = resp.into();
+        reply.cmd_resp = Some(cmd_resp);
+
+        Ok(tonic::Response::new(reply))
     }
 }

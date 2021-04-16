@@ -14,6 +14,25 @@ pub type HandleReqReturn<T> = Result<
     Response<T>,
 >;
 
+#[derive(Debug)]
+pub struct CommandExtraValue {
+    pub value: String,
+    pub reason: String,
+}
+
+#[derive(Debug)]
+pub struct CommandTransactionID {
+    pub client: String,
+    pub server: String,
+}
+
+#[derive(Debug)]
+pub struct CommandResponse<T> {
+    pub response: T,
+    pub extra_values: Vec<CommandExtraValue>,
+    pub transaction_id: Option<CommandTransactionID>,
+}
+
 macro_rules! router {
     ($($n:ident, $req:ty, $res:ty, $req_handle:path, $res_handle:path);*) => {
         /// Request into the EPP client, see sibling modules for explanation of requests
@@ -43,7 +62,14 @@ macro_rules! router {
                         let (command, extension) = match $req_handle(client, &req) {
                             Ok(c) => c,
                             Err(e) => {
-                                let _ = req.return_path.send(e);
+                                let _ = req.return_path.send(match e {
+                                    Ok(r) => Ok(CommandResponse {
+                                        response: r,
+                                        extra_values: vec![],
+                                         transaction_id: None
+                                    }),
+                                    Err(e) => Err(e)
+                                });
                                 return None
                             }
                         };
@@ -62,7 +88,18 @@ macro_rules! router {
                             return_path.send(Err(Error::Err(response.response_msg())))
                         }
                     } else {
-                        return_path.send($res_handle(*response))
+                        let trans_id = CommandTransactionID {
+                                    client: response.transaction_id.client_transaction_id.as_deref().unwrap_or_default().to_owned(),
+                                    server: response.transaction_id.server_transaction_id.as_deref().unwrap_or_default().to_owned(),
+                                };
+                        match $res_handle(*response) {
+                            Ok(r) =>  return_path.send(Ok(CommandResponse {
+                                response: r,
+                                extra_values: vec![],
+                                 transaction_id: Some(trans_id)
+                            })),
+                            Err(e) => return_path.send(Err(e))
+                        }
                     };
                 } else)* {}
                 Ok(())

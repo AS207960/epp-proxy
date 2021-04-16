@@ -76,12 +76,14 @@ message DomainCheckReply {
     fee.FeeCheckData fee_check = 4;
     fee.DonutsFeeData donuts_fee_check = 5;
     string registry_name = 3;
+    common.CommandResponse cmd_resp = 6;
 }
 
 message DomainClaimsCheckReply {
     bool exists = 1;
     repeated launch.ClaimsKey claims_keys = 2;
     string registry_name = 3;
+    common.CommandResponse cmd_resp = 4;
 }
 
 message DomainInfoRequest {
@@ -115,6 +117,7 @@ message DomainInfoReply {
     launch.LaunchInfoData launch_info = 19;
     fee.DonutsFeeData donuts_fee_data = 20;
     VerisignWhoisInfo verisign_whois_info = 21;
+    common.CommandResponse cmd_resp = 22;
 }
 
 message DomainCreateRequest {
@@ -132,15 +135,16 @@ message DomainCreateRequest {
 }
 
 message DomainCreateReply {
+    reserved 7;
     string name = 1;
     bool pending = 2;
-    string transaction_id = 7;
     google.protobuf.Timestamp creation_date = 3;
     google.protobuf.Timestamp expiry_date = 4;
     fee.FeeData fee_data = 6;
     fee.DonutsFeeData donuts_fee_data = 9;
     launch.LaunchData launch_data = 8;
     string registry_name = 5;
+    common.CommandResponse cmd_resp = 10;
 }
 
 message DomainDeleteRequest {
@@ -151,10 +155,11 @@ message DomainDeleteRequest {
 }
 
 message DomainDeleteReply {
+    reserved 4;
     bool pending = 1;
-    string transaction_id = 4;
     fee.FeeData fee_data = 3;
     string registry_name = 2;
+    common.CommandResponse cmd_resp = 5;
 }
 
 message DomainUpdateRequest {
@@ -179,11 +184,12 @@ message DomainUpdateRequest {
 }
 
 message DomainUpdateReply {
+    reserved 4;
     bool pending = 1;
-    string transaction_id = 4;
     fee.FeeData fee_data = 3;
     fee.DonutsFeeData donuts_fee_data = 5;
     string registry_name = 2;
+    common.CommandResponse cmd_resp = 6;
 }
 
 message DomainRenewRequest {
@@ -196,13 +202,14 @@ message DomainRenewRequest {
 }
 
 message DomainRenewReply {
+    reserved 5;
     string name = 6;
     bool pending = 1;
-    string transaction_id = 5;
     google.protobuf.Timestamp expiry_date = 2;
     fee.FeeData fee_data = 4;
     fee.DonutsFeeData donuts_fee_data = 7;
     string registry_name = 3;
+    common.CommandResponse cmd_resp = 8;
 }
 
 message DomainTransferQueryRequest {
@@ -227,9 +234,9 @@ message DomainTransferAcceptRejectRequest {
 }
 
 message DomainTransferReply {
+    reserved 10;
     bool pending = 1;
     string name = 12;
-    string transaction_id = 10;
     common.TransferStatus status = 2;
     string requested_client_id = 3;
     google.protobuf.Timestamp requested_date = 4;
@@ -239,6 +246,7 @@ message DomainTransferReply {
     fee.FeeData fee_data = 9;
     fee.DonutsFeeData donuts_fee_data = 11;
     string registry_name = 8;
+    common.CommandResponse cmd_resp = 13;
 }
 
 message SecDNSData {

@@ -2,6 +2,7 @@ syntax = "proto3";
 package epp.rgp;
 
 import "fee.proto";
+import "common.proto";
 import "google/protobuf/wrappers.proto";
 
 enum RGPState {
@@ -22,9 +23,10 @@ message RequestRequest {
 }
 
 message RestoreReply {
+    reserved 5;
     bool pending = 1;
-    string transaction_id = 5;
     repeated RGPState state = 2;
     fee.FeeData fee_data = 4;
     string registry_name = 3;
+    common.CommandResponse cmd_resp = 6;
 }

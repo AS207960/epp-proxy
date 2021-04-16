@@ -31,3 +31,18 @@ message Period {
     uint32 value = 1;
     Unit unit = 2;
 }
+
+message CommandExtraValue {
+    string reason = 1;
+    string value = 2;
+}
+
+message CommandTransactionID {
+    string client = 1;
+    string server = 2;
+}
+
+message CommandResponse {
+    repeated CommandExtraValue extra_values = 1;
+    CommandTransactionID transaction_id = 2;
+}

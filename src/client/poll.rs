@@ -4,7 +4,7 @@ use std::convert::TryInto;
 
 use chrono::prelude::*;
 
-use super::{EPPClientServerFeatures, Error, proto, Request, Response, Sender};
+use super::{EPPClientServerFeatures, Error, proto, Request, Response, CommandResponse, Sender};
 use super::router::HandleReqReturn;
 
 #[derive(Debug)]
@@ -403,7 +403,7 @@ pub fn handle_poll_ack_response(response: proto::EPPResponse) -> Response<PollAc
 /// * `client_sender` - Reference to the tokio channel into the client
 pub async fn poll(
     client_sender: &mut futures::channel::mpsc::Sender<Request>,
-) -> Result<Option<PollResponse>, super::Error> {
+) -> Result<CommandResponse<Option<PollResponse>>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
     super::send_epp_client_request(
         client_sender,
@@ -423,7 +423,7 @@ pub async fn poll(
 pub async fn poll_ack(
     id: &str,
     client_sender: &mut futures::channel::mpsc::Sender<Request>,
-) -> Result<PollAckResponse, super::Error> {
+) -> Result<CommandResponse<PollAckResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
     super::send_epp_client_request(
         client_sender,

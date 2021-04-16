@@ -5,7 +5,7 @@ use std::convert::{TryFrom, TryInto};
 use chrono::prelude::*;
 use regex::Regex;
 
-use super::{EPPClientServerFeatures, Error, proto, Request, Response, Sender};
+use super::{EPPClientServerFeatures, Error, proto, Request, Response, CommandResponse, Sender};
 use super::router::HandleReqReturn;
 
 #[derive(Debug)]
@@ -445,7 +445,6 @@ pub struct CreateResponse {
     pub id: String,
     /// Was the request completed instantly or not
     pub pending: bool,
-    pub transaction_id: String,
     /// What date did the server log as the date of creation
     pub creation_date: Option<DateTime<Utc>>,
 }
@@ -460,7 +459,6 @@ pub struct DeleteRequest {
 pub struct DeleteResponse {
     /// Was the request completed instantly or not
     pub pending: bool,
-    pub transaction_id: String,
 }
 
 #[derive(Debug)]
@@ -485,7 +483,6 @@ pub struct UpdateRequest {
 pub struct UpdateResponse {
     /// Was the request completed instantly or not
     pub pending: bool,
-    pub transaction_id: String,
 }
 
 pub(crate) fn check_id<T>(id: &str) -> Result<(), Response<T>> {
@@ -515,7 +512,6 @@ pub struct TransferRequestRequest {
 pub struct TransferResponse {
     /// Was the request completed instantly or not
     pub pending: bool,
-    pub transaction_id: String,
     pub data: TransferData,
 
 }
@@ -683,7 +679,6 @@ impl From<&proto::contact::EPPContactTransferData> for TransferResponse {
     fn from(contact_transfer: &proto::contact::EPPContactTransferData) -> Self {
         TransferResponse {
             pending: false,
-            transaction_id: String::new(),
             data: TransferData {
                 status: (&contact_transfer.transfer_status).into(),
                 requested_client_id: contact_transfer.requested_client_id.clone(),
@@ -981,7 +976,6 @@ pub fn handle_create_response(response: proto::EPPResponse) -> Response<CreateRe
                 Ok(CreateResponse {
                     id: contact_create.id.clone(),
                     pending: response.is_pending(),
-                    transaction_id: response.transaction_id.server_transaction_id.unwrap_or_default(),
                     creation_date: contact_create.creation_date,
                 })
             }
@@ -1011,7 +1005,6 @@ pub fn handle_delete(
 pub fn handle_delete_response(response: proto::EPPResponse) -> Response<DeleteResponse> {
     Response::Ok(DeleteResponse {
         pending: response.is_pending(),
-        transaction_id: response.transaction_id.server_transaction_id.unwrap_or_default(),
     })
 }
 
@@ -1038,7 +1031,7 @@ pub fn handle_update(
                 "at least one operation must be specified".to_string(),
             )));
         } else if !client.nominet_contact_ext {
-            return Err(Ok(UpdateResponse { pending: false, transaction_id: "".to_string() }));
+            return Err(Ok(UpdateResponse { pending: false }));
         }
     }
     let phone_re = Regex::new(r"^\+\d+\.\d+$").unwrap();
@@ -1179,7 +1172,6 @@ pub fn handle_update(
 pub fn handle_update_response(response: proto::EPPResponse) -> Response<UpdateResponse> {
     Response::Ok(UpdateResponse {
         pending: response.is_pending(),
-        transaction_id: response.transaction_id.server_transaction_id.unwrap_or_default(),
     })
 }
 
@@ -1287,7 +1279,6 @@ pub fn handle_transfer_response(response: proto::EPPResponse) -> Response<Transf
             proto::EPPResultDataValue::EPPContactTransferResult(contact_transfer) => {
                 let mut res: TransferResponse = contact_transfer.into();
                 res.pending = pending;
-                res.transaction_id = response.transaction_id.server_transaction_id.unwrap_or_default();
                 Ok(res)
             }
             _ => Err(Error::InternalServerError),
@@ -1304,7 +1295,7 @@ pub fn handle_transfer_response(response: proto::EPPResponse) -> Response<Transf
 pub async fn check(
     id: &str,
     client_sender: &mut futures::channel::mpsc::Sender<Request>,
-) -> Result<CheckResponse, super::Error> {
+) -> Result<CommandResponse<CheckResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
     super::send_epp_client_request(
         client_sender,
@@ -1325,7 +1316,7 @@ pub async fn check(
 pub async fn info(
     id: &str,
     client_sender: &mut futures::channel::mpsc::Sender<Request>,
-) -> Result<InfoResponse, super::Error> {
+) -> Result<CommandResponse<InfoResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
     super::send_epp_client_request(
         client_sender,
@@ -1374,7 +1365,7 @@ pub async fn create(
     id: &str,
     data: NewContactData,
     client_sender: &mut futures::channel::mpsc::Sender<Request>,
-) -> Result<CreateResponse, super::Error> {
+) -> Result<CommandResponse<CreateResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
     super::send_epp_client_request(
         client_sender,
@@ -1405,7 +1396,7 @@ pub async fn create(
 pub async fn delete(
     id: &str,
     client_sender: &mut futures::channel::mpsc::Sender<Request>,
-) -> Result<DeleteResponse, super::Error> {
+) -> Result<CommandResponse<DeleteResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
     super::send_epp_client_request(
         client_sender,
@@ -1457,7 +1448,7 @@ pub async fn update(
     remove_statuses: Vec<Status>,
     new_data: UpdateContactData,
     client_sender: &mut futures::channel::mpsc::Sender<Request>,
-) -> Result<UpdateResponse, super::Error> {
+) -> Result<CommandResponse<UpdateResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
     super::send_epp_client_request(
         client_sender,
@@ -1490,7 +1481,7 @@ pub async fn update(
 pub async fn transfer_query(
     id: &str,
     client_sender: &mut futures::channel::mpsc::Sender<Request>,
-) -> Result<TransferResponse, super::Error> {
+) -> Result<CommandResponse<TransferResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
     super::send_epp_client_request(
         client_sender,
@@ -1513,7 +1504,7 @@ pub async fn transfer_request(
     id: &str,
     auth_info: &str,
     client_sender: &mut futures::channel::mpsc::Sender<Request>,
-) -> Result<TransferResponse, super::Error> {
+) -> Result<CommandResponse<TransferResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
     super::send_epp_client_request(
         client_sender,
@@ -1537,7 +1528,7 @@ pub async fn transfer_accept(
     id: &str,
     auth_info: &str,
     client_sender: &mut futures::channel::mpsc::Sender<Request>,
-) -> Result<TransferResponse, super::Error> {
+) -> Result<CommandResponse<TransferResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
     super::send_epp_client_request(
         client_sender,
@@ -1561,7 +1552,7 @@ pub async fn transfer_reject(
     id: &str,
     auth_info: &str,
     client_sender: &mut futures::channel::mpsc::Sender<Request>,
-) -> Result<TransferResponse, super::Error> {
+) -> Result<CommandResponse<TransferResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
     super::send_epp_client_request(
         client_sender,

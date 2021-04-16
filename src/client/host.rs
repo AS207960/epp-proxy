@@ -1,7 +1,7 @@
 //! EPP commands relating to host (nameserver) objects
 
 use super::router::HandleReqReturn;
-use super::{proto, EPPClientServerFeatures, Error, Request, Response, Sender};
+use super::{proto, EPPClientServerFeatures, Error, Request, Response, CommandResponse, Sender};
 use chrono::prelude::*;
 
 #[derive(Debug)]
@@ -430,7 +430,7 @@ pub fn handle_update_response(response: proto::EPPResponse) -> Response<UpdateRe
 pub async fn check(
     host: &str,
     client_sender: &mut futures::channel::mpsc::Sender<Request>,
-) -> Result<CheckResponse, super::Error> {
+) -> Result<CommandResponse<CheckResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
     super::send_epp_client_request(
         client_sender,
@@ -446,7 +446,7 @@ pub async fn check(
 pub async fn info(
     host: &str,
     client_sender: &mut futures::channel::mpsc::Sender<Request>,
-) -> Result<InfoResponse, super::Error> {
+) -> Result<CommandResponse<InfoResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
     super::send_epp_client_request(
         client_sender,
@@ -463,7 +463,7 @@ pub async fn create(
     host: &str,
     addresses: Vec<Address>,
     client_sender: &mut futures::channel::mpsc::Sender<Request>,
-) -> Result<CreateResponse, super::Error> {
+) -> Result<CommandResponse<CreateResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
     super::send_epp_client_request(
         client_sender,
@@ -480,7 +480,7 @@ pub async fn create(
 pub async fn delete(
     host: &str,
     client_sender: &mut futures::channel::mpsc::Sender<Request>,
-) -> Result<DeleteResponse, super::Error> {
+) -> Result<CommandResponse<DeleteResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
     super::send_epp_client_request(
         client_sender,
@@ -499,7 +499,7 @@ pub async fn update<N: Into<Option<String>>>(
     remove: Vec<UpdateObject>,
     new_name: N,
     client_sender: &mut futures::channel::mpsc::Sender<Request>,
-) -> Result<UpdateResponse, super::Error> {
+) -> Result<CommandResponse<UpdateResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
     super::send_epp_client_request(
         client_sender,

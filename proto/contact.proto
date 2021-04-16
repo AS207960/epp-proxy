@@ -93,6 +93,7 @@ message ContactCheckRequest {
 message ContactCheckReply {
     bool available = 1;
     google.protobuf.StringValue reason = 2;
+    common.CommandResponse cmd_resp = 3;
 }
 
 message ContactInfoRequest {
@@ -125,6 +126,7 @@ message ContactInfoReply {
     repeated DisclosureType disclosure = 18;
     google.protobuf.StringValue auth_info = 19;
     nominet_ext.DataQuality nominet_data_quality = 20;
+    common.CommandResponse cmd_resp = 21;
 }
 
 message ContactCreateRequest {
@@ -143,10 +145,11 @@ message ContactCreateRequest {
 }
 
 message ContactCreateReply {
+    reserved 4;
     string id = 1;
     bool pending = 2;
-    string transaction_id = 4;
     google.protobuf.Timestamp creation_date = 3;
+    common.CommandResponse cmd_resp = 5;
 }
 
 message ContactDeleteRequest {
@@ -155,8 +158,9 @@ message ContactDeleteRequest {
 }
 
 message ContactDeleteReply {
+    reserved 2;
     bool pending = 1;
-    string transaction_id = 2;
+    common.CommandResponse cmd_resp = 3;
 }
 
 message ContactUpdateRequest {
@@ -177,8 +181,9 @@ message ContactUpdateRequest {
 }
 
 message ContactUpdateReply {
+    reserved 2;
     bool pending = 1;
-    string transaction_id = 2;
+    common.CommandResponse cmd_resp = 3;
 }
 
 message ContactTransferQueryRequest {
@@ -194,13 +199,14 @@ message ContactTransferRequestRequest {
 }
 
 message ContactTransferReply {
+    reserved 7;
     bool pending = 1;
-    string transaction_id = 7;
     common.TransferStatus status = 2;
     string requested_client_id = 3;
     google.protobuf.Timestamp requested_date = 4;
     string act_client_id = 5;
     google.protobuf.Timestamp act_date = 6;
+    common.CommandResponse cmd_resp = 8;
 }
 
 message ContactPANReply {

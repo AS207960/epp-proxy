@@ -1,7 +1,7 @@
 //! EPP commands relating to nominet specific features
 
 use super::router::HandleReqReturn;
-use super::{proto, EPPClientServerFeatures, Error, Request, Response, Sender};
+use super::{proto, EPPClientServerFeatures, Error, Request, Response, CommandResponse, Sender};
 use chrono::prelude::*;
 use std::convert::TryFrom;
 
@@ -300,7 +300,7 @@ pub fn handle_tag_list_response(response: proto::EPPResponse) -> Response<TagLis
 /// * `client_sender` - Reference to the tokio channel into the client
 pub async fn tag_list(
     client_sender: &mut futures::channel::mpsc::Sender<Request>,
-) -> Result<TagListResponse, super::Error> {
+) -> Result<CommandResponse<TagListResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
     super::send_epp_client_request(
         client_sender,

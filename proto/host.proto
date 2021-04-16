@@ -26,6 +26,7 @@ message HostCheckRequest {
 message HostCheckReply {
     bool available = 1;
     google.protobuf.StringValue reason = 2;
+    common.CommandResponse cmd_resp = 3;
 }
 
 message HostInfoRequest {
@@ -44,6 +45,7 @@ message HostInfoReply {
     google.protobuf.StringValue last_updated_client = 8;
     google.protobuf.Timestamp last_updated_date = 9;
     google.protobuf.Timestamp last_transfer_date = 10;
+    common.CommandResponse cmd_resp = 11;
 }
 
 message HostCreateRequest {
@@ -53,10 +55,11 @@ message HostCreateRequest {
 }
 
 message HostCreateReply {
+    reserved 4;
     string name = 1;
     bool pending = 2;
-    string transaction_id = 4;
     google.protobuf.Timestamp creation_date = 3;
+    common.CommandResponse cmd_resp = 5;
 }
 
 message HostDeleteRequest {
@@ -65,8 +68,9 @@ message HostDeleteRequest {
 }
 
 message HostDeleteReply {
+    reserved 2;
     bool pending = 1;
-    string transaction_id = 2;
+    common.CommandResponse cmd_resp = 3;
 }
 
 message HostUpdateRequest {
@@ -85,6 +89,7 @@ message HostUpdateRequest {
 }
 
 message HostUpdateReply {
+    reserved 2;
     bool pending = 1;
-    string transaction_id = 2;
+    common.CommandResponse cmd_resp = 3;
 }
