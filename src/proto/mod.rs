@@ -21,6 +21,7 @@ pub mod launch;
 pub mod corenic;
 pub mod login_sec;
 pub mod maintenance;
+pub mod eurid;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub enum EPPMessageType {
@@ -177,6 +178,12 @@ pub enum EPPCommandExtensionType {
     EPPDonutsChargeAgreement(united_tld::EPPChargeData),
     #[serde(rename = "{urn:ietf:params:xml:ns:epp:loginSec-1.0}loginSec:loginSec")]
     EPPLoginSecurity(login_sec::EPPLoginSecurity),
+    #[serde(rename = "{http://www.eurid.eu/xml/epp/authInfo-1.1}authInfo:info")]
+    EURIDAuthInfo(eurid::EURIDAuthInfo),
+    #[serde(rename = "{http://www.eurid.eu/xml/epp/contact-ext-1.3}contact-ext:create")]
+    EURIDContactCreate(eurid::EURIDContactInfo),
+    #[serde(rename = "{http://www.eurid.eu/xml/epp/contact-ext-1.3}contact-ext:update")]
+    EURIDContactUpdate(eurid::EURIDContactUpdate),
 }
 
 #[derive(Debug, Serialize)]
@@ -568,6 +575,20 @@ pub enum EPPResultDataValue {
     NominetDomainFailData(nominet::EPPDomainFailData),
     #[serde(rename = "{http://www.nominet.org.uk/epp/xml/std-notifications-1.2}trnData")]
     NominetTransferData(nominet::EPPTransferData),
+    #[serde(rename = "{http://www.eurid.eu/xml/epp/registrarFinance-1.0}infData")]
+    EURIDRegistrarFinanceData(eurid::EURIDRegistrarFinanceInfoData),
+    #[serde(rename = "{http://www.eurid.eu/xml/epp/registrarHitPoints-1.0}infData")]
+    EURIDRegistrarHitPointsData(eurid::EURIDRegistrarHitPointsInfoData),
+    #[serde(rename = "{http://www.eurid.eu/xml/epp/registrationLimit-1.1}infData")]
+    EURIDRegistrationLimitData(eurid::EURIDRegistrationLimitInfoData),
+    #[serde(rename = "{http://www.eurid.eu/xml/epp/authInfo-1.1}infData")]
+    EURIDAuthInfoData(eurid::EURIDAuthInfo),
+    #[serde(rename = "{http://www.eurid.eu/xml/epp/homoglyph-1.0}chkData")]
+    EURIDHomoglyphCheckData(eurid::EURIDHomoglyphData),
+    #[serde(rename = "{http://www.eurid.eu/xml/epp/contact-ext-1.3}infData")]
+    EURIDContactInfoData(eurid::EURIDContactInfo),
+    #[serde(rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.4}chkData")]
+    EURIDDomainCheckData(eurid::EURIDDomainCheckData),
 }
 
 #[derive(Debug, Deserialize)]
@@ -764,6 +785,16 @@ pub enum EPPInfo {
     VerisignBalace {},
     #[serde(rename = "{http://www.unitedtld.com/epp/finance-1.0}finance:info")]
     UnitedTLDBalace {},
+    #[serde(rename = "{http://www.eurid.eu/xml/epp/registrarFinance-1.0}registrarFinance:info")]
+    EURIDRegistrarFinance {},
+    #[serde(rename = "{http://www.eurid.eu/xml/epp/registrarHitPoints-1.0}registrarHitPoints:info")]
+    EURIDRegistrarHitPoints {},
+    #[serde(rename = "{http://www.eurid.eu/xml/epp/registrationLimit-1.1}registrationLimit:info")]
+    EURIDRegistrationLimit {},
+    #[serde(rename = "{http://www.eurid.eu/xml/epp/dnsQuality-2.0}dnsQuality:info")]
+    EURIDDNSQuality(eurid::EURIDDNSQualityInfo),
+    #[serde(rename = "{http://www.eurid.eu/xml/epp/dnssecEligibility-1.0}dnssecEligibility:info")]
+    EURIDDNSSECEligibilityInfo(eurid::EURIDDNSSECEligibilityInfo),
 }
 
 #[derive(Debug, Serialize)]

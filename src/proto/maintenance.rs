@@ -71,7 +71,8 @@ pub struct EPPMaintenanceItem {
     pub created_date: DateTime<Utc>,
     #[serde(
         rename = "{urn:ietf:params:xml:ns:epp:maintenance-0.3}upDate",
-        deserialize_with = "super::deserialize_datetime_opt"
+        deserialize_with = "super::deserialize_datetime_opt",
+        default
     )]
     pub update_date: Option<DateTime<Utc>>,
 }
@@ -97,7 +98,8 @@ pub struct EPPMaintenanceListItem {
     pub created_date: DateTime<Utc>,
     #[serde(
         rename = "{urn:ietf:params:xml:ns:epp:maintenance-0.3}upDate",
-        deserialize_with = "super::deserialize_datetime_opt"
+        deserialize_with = "super::deserialize_datetime_opt",
+        default
     )]
     pub update_date: Option<DateTime<Utc>>,
 }
