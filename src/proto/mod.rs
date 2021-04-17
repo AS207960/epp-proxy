@@ -19,6 +19,7 @@ pub mod verisign;
 pub mod united_tld;
 pub mod launch;
 pub mod corenic;
+pub mod login_sec;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub enum EPPMessageType {
@@ -173,6 +174,8 @@ pub enum EPPCommandExtensionType {
     EPPLaunchDelete(launch::EPPLaunchInfo),
     #[serde(rename = "{http://www.unitedtld.com/epp/charge-1.0}charge:agreement")]
     EPPDonutsChargeAgreement(united_tld::EPPChargeData),
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp:loginSec-1.0}loginSec:loginSec")]
+    EPPLoginSecurity(login_sec::EPPLoginSecurity),
 }
 
 #[derive(Debug, Serialize)]
@@ -726,6 +729,8 @@ pub enum EPPResponseExtensionType {
     EPPDonutsChargeRenewData(united_tld::EPPChargeData),
     #[serde(rename = "{http://www.unitedtld.com/epp/charge-1.0}upData")]
     EPPDonutsChargeUpdateData(united_tld::EPPChargeData),
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp:loginSec-1.0}loginSec:loginSecData")]
+    EPPLoginSecurityData(login_sec::EPPLoginSecurityData),
 }
 
 #[derive(Debug, Serialize)]

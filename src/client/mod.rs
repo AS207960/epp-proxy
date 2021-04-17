@@ -230,6 +230,8 @@ pub struct EPPClientServerFeatures {
     fee_05_supported: bool,
     /// urn:ietf:params:xml:ns:epp:unhandled-namespaces-1.0 support
     unhandled_ns_supported: bool,
+    /// RFC8807 support
+    login_sec_supported: bool
 }
 
 impl EPPClientServerFeatures {
@@ -761,6 +763,9 @@ impl EPPClient {
         self.features.unhandled_ns_supported = greeting
             .service_menu
             .supports_ext("urn:ietf:params:xml:ns:epp:unhandled-namespaces-1.0");
+        self.features.login_sec_supported = greeting
+            .service_menu
+            .supports_ext("urn:ietf:params:xml:ns:epp:loginSec-1.0");
 
         if !(self.features.contact_supported
             | self.features.domain_supported
@@ -854,6 +859,9 @@ impl EPPClient {
             if self.features.unhandled_ns_supported {
                 ext_objects.push("urn:ietf:params:xml:ns:epp:unhandled-namespaces-1.0".to_string())
             }
+            if self.features.login_sec_supported {
+                ext_objects.push("urn:ietf:params:xml:ns:epp:loginSec-1.0".to_string())
+            }
             if self.features.nominet_tag_list {
                 let new_client = Self {
                     host: self.host.clone(),
@@ -905,10 +913,10 @@ impl EPPClient {
         ext_objects: Vec<String>,
         sock: &mut tokio_tls::TlsStream<TcpStream>,
     ) -> Result<(), bool> {
-        let command = proto::EPPLogin {
+        let mut command = proto::EPPLogin {
             client_id: self.tag.clone(),
-            password,
-            new_password,
+            password: String::new(),
+            new_password: None,
             options: proto::EPPLoginOptions {
                 version: "1.0".to_string(),
                 language: self.features.language.clone(),
@@ -924,8 +932,34 @@ impl EPPClient {
                 },
             },
         };
+
+        let ext = if self.features.login_sec_supported {
+            command.password = "[LOGIN-SECURITY]".to_string();
+            if new_password.is_some() {
+                command.new_password = Some("[LOGIN-SECURITY]".to_string());
+            }
+
+            Some(vec![proto::EPPCommandExtensionType::EPPLoginSecurity(proto::login_sec::EPPLoginSecurity {
+                password: Some(password),
+                new_password,
+                user_agent: Some(proto::login_sec::EPPLoginSecurityUserAgent {
+                    tech: Some(crate::built_info::RUSTC_VERSION.to_string()),
+                    app: Some(format!("epp-proxy {}", crate::built_info::GIT_VERSION.unwrap_or("unknown"))),
+                    os: match (sys_info::os_type(), sys_info::os_release()) {
+                        (Ok(t), Ok(r)) => Some(format!("{} {}", t, r)),
+                        _ => None
+                    }
+                })
+            })])
+        } else {
+            command.password = password;
+            command.new_password = new_password;
+
+            None
+        };
+
         match self
-            ._send_command(proto::EPPCommandType::Login(command), None, sock, None)
+            ._send_command(proto::EPPCommandType::Login(command), ext, sock, None)
             .await
         {
             Ok(i) => i,
@@ -942,6 +976,39 @@ impl EPPClient {
             }
         };
         if let proto::EPPMessageType::Response(response) = msg.message {
+            let login_sec_info = match &response.extension {
+                Some(ext) => {
+                    ext.value.iter().find_map(|p| match p {
+                        proto::EPPResponseExtensionType::EPPLoginSecurityData(i) => Some(i),
+                        _ => None,
+                    })
+                }
+                None => None,
+            };
+            if let Some(login_sec) = login_sec_info {
+                for event in &login_sec.events {
+                    let mut msg = format!("EPP Logic Security Event; {:?}", &event.event_type);
+                    if let Some(name) = &event.event_name {
+                        msg.push_str(&format!(" ({})", name));
+                    }
+                    if let Some(value) = &event.value {
+                        msg.push_str(&format!(", value: \"{}\"", value));
+                    }
+                    if let Some(duration) = &event.duration {
+                        msg.push_str(&format!(", duration: \"{}\"", duration));
+                    }
+                    if let Some(expiration) = &event.expiration_date {
+                        msg.push_str(&format!(", expiration: {}", expiration));
+                    }
+                    if let Some(event_msg) = &event.msg {
+                        msg.push_str(&format!(", message: \"{}\"", event_msg));
+                    }
+                    match &event.level {
+                        proto::login_sec::EPPLoginSecurityEventLevel::Warning => warn!("{}", msg),
+                        proto::login_sec::EPPLoginSecurityEventLevel::Error => error!("{}", msg),
+                    }
+                }
+            }
             if !response.is_success() {
                 error!(
                     "Login to {} failed with error: {}",

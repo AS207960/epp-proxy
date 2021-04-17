@@ -53,6 +53,11 @@ mod client;
 mod grpc;
 mod proto;
 
+#[allow(missing_docs)]
+pub mod built_info {
+    include!(concat!(env!("OUT_DIR"), "/built.rs"));
+}
+
 #[derive(Debug, Deserialize)]
 struct ConfigFile {
     /// Unique registrar ID
