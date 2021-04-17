@@ -1,0 +1,91 @@
+syntax = "proto3";
+package epp.maintenance;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+import "common.proto";
+
+message MaintenanceInfoRequest {
+    string id = 1;
+    string registry_name = 2;
+}
+
+message MaintenanceInfoReply {
+    string id = 1;
+    google.protobuf.StringValue name = 2;
+    repeated string item_type = 3;
+    PollType poll_type = 17;
+    Environment environment = 4;
+    google.protobuf.StringValue environment_name = 5;
+    repeated System systems = 6;
+    google.protobuf.Timestamp start = 7;
+    google.protobuf.Timestamp end = 8;
+    google.protobuf.Timestamp created = 9;
+    google.protobuf.Timestamp updated = 10;
+    Reason reason = 11;
+    google.protobuf.StringValue detail_url = 12;
+    repeated Description descriptions = 13;
+    repeated string tlds = 14;
+    Intervention intervention = 15;
+    common.CommandResponse cmd_resp = 16;
+}
+
+message MaintenanceListReply {
+    message Item {
+        string id = 1;
+        google.protobuf.StringValue name = 2;
+        google.protobuf.Timestamp start = 7;
+        google.protobuf.Timestamp end = 8;
+        google.protobuf.Timestamp created = 9;
+        google.protobuf.Timestamp updated = 10;
+    }
+
+    repeated Item items = 1;
+    common.CommandResponse cmd_resp = 2;
+}
+
+message System {
+    string name = 1;
+    google.protobuf.StringValue host = 2;
+    Impact impact = 3;
+}
+
+message Description {
+    oneof description {
+        string plain = 1;
+        string html = 2;
+    }
+}
+
+message Intervention {
+    bool connection = 1;
+    bool implementation = 2;
+}
+
+enum Environment {
+    Production = 0;
+    OTE = 1;
+    Staging = 2;
+    Development = 3;
+    Custom = 4;
+}
+
+enum Impact {
+    Full = 0;
+    Partial = 1;
+    None = 2;
+}
+
+enum Reason {
+    Planned = 0;
+    Emergency = 1;
+}
+
+enum PollType {
+    NotSet = 0;
+    Create = 1;
+    Update = 2;
+    Delete = 3;
+    Courtesy = 4;
+    End = 5;
+}

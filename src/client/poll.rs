@@ -94,6 +94,7 @@ pub enum PollData {
     },
     VerisignLowBalanceData(super::verisign::LowBalanceData),
     TraficomTrnData(super::traficom::TrnData),
+    MaintenanceData(super::maintenance::InfoResponse),
     None,
 }
 
@@ -357,6 +358,13 @@ pub fn handle_poll_response(response: proto::EPPResponse) -> Response<Option<Pol
                             }
                             proto::EPPResultDataValue::TraficomTrnData(trn_data) => {
                                 PollData::TraficomTrnData(trn_data.into())
+                            }
+                            proto::EPPResultDataValue::EPPMaintenanceInfo(maint_info) => {
+                                if let Some(item) = maint_info.item {
+                                    PollData::MaintenanceData(item.into())
+                                } else {
+                                    return Err(Error::InternalServerError)
+                                }
                             }
                             _ => return Err(Error::InternalServerError),
                         },

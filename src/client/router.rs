@@ -146,7 +146,8 @@ router!(
     ContactTransferRequest, super::contact::TransferRequestRequest,     super::contact::TransferResponse,   super::contact::handle_transfer_request, super::contact::handle_transfer_response;
     ContactTransferAccept,  super::contact::TransferRequestRequest,     super::contact::TransferResponse,   super::contact::handle_transfer_accept,  super::contact::handle_transfer_response;
     ContactTransferReject,  super::contact::TransferRequestRequest,     super::contact::TransferResponse,   super::contact::handle_transfer_reject,  super::contact::handle_transfer_response;
-
-    NominetTagList,        super::nominet::TagListRequest,              super::nominet::TagListResponse,    super::nominet::handle_tag_list,         super::nominet::handle_tag_list_response;
-    Balance,               super::balance::BalanceRequest,              super::balance::BalanceResponse,    super::balance::handle_balance,          super::balance::handle_balance_response
+    NominetTagList,         super::nominet::TagListRequest,             super::nominet::TagListResponse,    super::nominet::handle_tag_list,         super::nominet::handle_tag_list_response;
+    Balance,                super::balance::BalanceRequest,             super::balance::BalanceResponse,    super::balance::handle_balance,          super::balance::handle_balance_response;
+    MaintenanceList,        super::maintenance::ListRequest,            super::maintenance::ListResponse,   super::maintenance::handle_list,         super::maintenance::handle_list_response;
+    MaintenanceInfo,        super::maintenance::InfoRequest,            super::maintenance::InfoResponse,   super::maintenance::handle_info,         super::maintenance::handle_info_response
 );

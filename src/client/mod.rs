@@ -24,6 +24,7 @@ pub mod verisign;
 pub mod traficom;
 pub mod fee;
 pub mod launch;
+pub mod maintenance;
 
 use crate::proto::EPPServiceExtension;
 pub use router::{Request, Response, CommandResponse};
@@ -232,6 +233,8 @@ pub struct EPPClientServerFeatures {
     unhandled_ns_supported: bool,
     /// urn:ietf:params:xml:ns:epp:eai-0.2 support
     eai_supported: bool,
+    /// urn:ietf:params:xml:ns:epp:maintenance-0.3 support
+    maintenance_supported: bool,
     /// RFC8807 support
     login_sec_supported: bool
 }
@@ -768,6 +771,9 @@ impl EPPClient {
         self.features.eai_supported = greeting
             .service_menu
             .supports_ext("urn:ietf:params:xml:ns:epp:eai-0.2");
+        self.features.maintenance_supported = greeting
+            .service_menu
+            .supports("urn:ietf:params:xml:ns:epp:maintenance-0.3");
         self.features.login_sec_supported = greeting
             .service_menu
             .supports_ext("urn:ietf:params:xml:ns:epp:loginSec-1.0");
@@ -869,6 +875,9 @@ impl EPPClient {
             }
             if self.features.login_sec_supported {
                 ext_objects.push("urn:ietf:params:xml:ns:epp:loginSec-1.0".to_string())
+            }
+            if self.features.maintenance_supported {
+                objects.push("urn:ietf:params:xml:ns:epp:maintenance-0.3".to_string())
             }
             if self.features.nominet_tag_list {
                 let new_client = Self {

@@ -20,6 +20,7 @@ pub mod united_tld;
 pub mod launch;
 pub mod corenic;
 pub mod login_sec;
+pub mod maintenance;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub enum EPPMessageType {
@@ -537,8 +538,10 @@ pub enum EPPResultDataValue {
     EPPContactPendingActionNotification(contact::EPPContactPanData),
     #[serde(rename = "{urn:ietf:params:xml:ns:obj-1.0}trnData")]
     TraficomTrnData(traficom::EPPObjTrnData),
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp:maintenance-0.3}infData")]
+    EPPMaintenanceInfo(maintenance::EPPMaintenanceInfoData),
     #[serde(rename = "{http://www.nominet.org.uk/epp/xml/nom-tag-1.0}listData")]
-    EPPNominetTagInfoResult(nominet::EPPTagListData),
+    NominetTagInfoResult(nominet::EPPTagListData),
     #[serde(rename = "{https://www.nic.ch/epp/balance-1.0}infData")]
     SwitchBalanceInfoResult(switch::EPPBalance),
     #[serde(rename = "{http://www.verisign.com/epp/balance-1.0}infData")]
@@ -751,6 +754,8 @@ pub enum EPPInfo {
     Host(host::EPPHostCheck),
     #[serde(rename = "{urn:ietf:params:xml:ns:contact-1.0}contact:info")]
     Contact(contact::EPPContactCheck),
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp:maintenance-0.3}maint:info")]
+    Maintenance(maintenance::EPPMaintenanceInfo),
     #[serde(rename = "{http://www.nominet.org.uk/epp/xml/nom-tag-1.0}tag:list")]
     TagList {},
     #[serde(rename = "{https://www.nic.ch/epp/balance-1.0}balance:info")]

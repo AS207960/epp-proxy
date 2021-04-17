@@ -268,7 +268,7 @@ pub fn handle_tag_list(
 pub fn handle_tag_list_response(response: proto::EPPResponse) -> Response<TagListResponse> {
     match response.data {
         Some(value) => match value.value {
-            proto::EPPResultDataValue::EPPNominetTagInfoResult(tag_list) => {
+            proto::EPPResultDataValue::NominetTagInfoResult(tag_list) => {
                 Response::Ok(TagListResponse {
                     tags: tag_list
                         .tags

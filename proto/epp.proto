@@ -9,6 +9,7 @@ import "host.proto";
 import "rgp.proto";
 import "nominet.proto";
 import "traficom.proto";
+import "maintenance.proto";
 import "common.proto";
 
 service EPPProxy {
@@ -40,6 +41,8 @@ service EPPProxy {
     rpc ContactTransferRequest (contact.ContactTransferRequestRequest)    returns (contact.ContactTransferReply);
     rpc ContactTransferAccept  (contact.ContactTransferRequestRequest)    returns (contact.ContactTransferReply);
     rpc ContactTransferReject  (contact.ContactTransferRequestRequest)    returns (contact.ContactTransferReply);
+    rpc MaintenanceList        (RegistryInfo)                             returns (maintenance.MaintenanceListReply);
+    rpc MaintenanceInfo        (maintenance.MaintenanceInfoRequest)       returns (maintenance.MaintenanceInfoReply);
     rpc Poll                   (stream PollAck)                           returns (stream PollReply);
     rpc NominetTagList         (RegistryInfo)                             returns (nominet.NominetTagListReply);
     rpc BalanceInfo            (RegistryInfo)                             returns (BalanceReply);
@@ -76,6 +79,7 @@ message PollReply {
         nominet.RegistrantTransferData nominet_registrant_transfer_data = 18;
         traficom.TrnData traficom_trn_data = 22;
         BalanceReply verisign_low_balance_data = 19;
+        maintenance.MaintenanceInfoReply maintenance_info = 24;
     }
     ChangeData change_data = 10;
     common.CommandResponse cmd_resp = 23;

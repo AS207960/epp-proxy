@@ -47,6 +47,10 @@ pub mod epp_proto {
     pub mod launch {
         tonic::include_proto!("epp.launch");
     }
+
+    pub mod maintenance {
+        tonic::include_proto!("epp.maintenance");
+    }
 }
 
 /// Helper function to convert chrono times to protobuf well-known type times
@@ -1372,6 +1376,66 @@ impl From<client::traficom::TrnData> for epp_proto::traficom::TrnData {
     }
 }
 
+
+impl From<client::maintenance::InfoResponse> for epp_proto::maintenance::MaintenanceInfoReply {
+    fn from(from: client::maintenance::InfoResponse) -> Self {
+        epp_proto::maintenance::MaintenanceInfoReply {
+            id: from.id,
+            name: from.name,
+            item_type: from.item_type,
+            poll_type: match from.poll_type {
+                None => epp_proto::maintenance::PollType::NotSet.into(),
+                Some(client::maintenance::PollType::Create) => epp_proto::maintenance::PollType::Create.into(),
+                Some(client::maintenance::PollType::Update) => epp_proto::maintenance::PollType::Update.into(),
+                Some(client::maintenance::PollType::Delete) => epp_proto::maintenance::PollType::Delete.into(),
+                Some(client::maintenance::PollType::Courtesy) => epp_proto::maintenance::PollType::Courtesy.into(),
+                Some(client::maintenance::PollType::End) => epp_proto::maintenance::PollType::End.into(),
+            },
+            environment: match from.environment {
+                client::maintenance::Environment::Production => epp_proto::maintenance::Environment::Production.into(),
+                client::maintenance::Environment::OTE => epp_proto::maintenance::Environment::Ote.into(),
+                client::maintenance::Environment::Staging => epp_proto::maintenance::Environment::Staging.into(),
+                client::maintenance::Environment::Development => epp_proto::maintenance::Environment::Development.into(),
+                client::maintenance::Environment::Custom(_) => epp_proto::maintenance::Environment::Custom.into(),
+            },
+            environment_name: match from.environment {
+                client::maintenance::Environment::Custom(e) => Some(e),
+                _ => None
+            },
+            systems: from.systems.into_iter().map(|s| epp_proto::maintenance::System {
+                name: s.name,
+                host: s.host,
+                impact: match s.impact {
+                    client::maintenance::Impact::Full => epp_proto::maintenance::Impact::Full.into(),
+                    client::maintenance::Impact::Partial => epp_proto::maintenance::Impact::Partial.into(),
+                    client::maintenance::Impact::None => epp_proto::maintenance::Impact::None.into(),
+                }
+            }).collect(),
+            start: chrono_to_proto(Some(from.start)),
+            end: chrono_to_proto(Some(from.end)),
+            created: chrono_to_proto(Some(from.created)),
+            updated: chrono_to_proto(from.updated),
+            reason: match from.reason {
+                client::maintenance::Reason::Planned => epp_proto::maintenance::Reason::Planned.into(),
+                client::maintenance::Reason::Emergency => epp_proto::maintenance::Reason::Emergency.into(),
+            },
+            detail_url: from.detail_url,
+            descriptions: from.descriptions.into_iter().map(|d| epp_proto::maintenance::Description {
+                description: Some(match d {
+                    client::maintenance::Description::Plain(p) => epp_proto::maintenance::description::Description::Plain(p),
+                    client::maintenance::Description::HTML(p) => epp_proto::maintenance::description::Description::Html(p),
+                })
+            }).collect(),
+            tlds: from.tlds,
+            intervention: from.intervention.map(|i| epp_proto::maintenance::Intervention {
+               connection: i.connection,
+                implementation: i.implementation,
+            }),
+            cmd_resp: None,
+        }
+    }
+}
+
 fn map_command_response<T>(from: client::CommandResponse<T>) -> (T, epp_proto::common::CommandResponse) {
     return (from.response, epp_proto::common::CommandResponse {
             extra_values: from.extra_values.into_iter().map(|e| epp_proto::common::CommandExtraValue {
@@ -2490,6 +2554,43 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
             requested_date: chrono_to_proto(Some(res.data.requested_date)),
             act_client_id: res.data.act_client_id,
             act_date: chrono_to_proto(Some(res.data.act_date)),
+            cmd_resp: Some(cmd_resp)
+        };
+
+        Ok(tonic::Response::new(reply))
+    }
+
+    async fn maintenance_info(
+        &self,
+        request: tonic::Request<epp_proto::maintenance::MaintenanceInfoRequest>,
+    ) -> Result<tonic::Response<epp_proto::maintenance::MaintenanceInfoReply>, tonic::Status> {
+        let request = request.into_inner();
+        let mut sender = client_by_id(&self.client_router, &request.registry_name)?;
+        let (res, cmd_resp) = map_command_response(client::maintenance::info(&request.id, &mut sender).await?);
+
+        let mut reply: epp_proto::maintenance::MaintenanceInfoReply = res.into();
+        reply.cmd_resp = Some(cmd_resp);
+
+        Ok(tonic::Response::new(reply))
+    }
+
+    async fn maintenance_list(
+        &self,
+        request: tonic::Request<epp_proto::RegistryInfo>,
+    ) -> Result<tonic::Response<epp_proto::maintenance::MaintenanceListReply>, tonic::Status> {
+        let request = request.into_inner();
+        let mut sender = client_by_id(&self.client_router, &request.registry_name)?;
+        let (res, cmd_resp) = map_command_response(client::maintenance::list(&mut sender).await?);
+
+        let reply = epp_proto::maintenance::MaintenanceListReply {
+            items: res.items.into_iter().map(|i| epp_proto::maintenance::maintenance_list_reply::Item {
+                id: i.id,
+                name: i.name,
+                start: chrono_to_proto(Some(i.start)),
+                end: chrono_to_proto(Some(i.end)),
+                created: chrono_to_proto(Some(i.created)),
+                updated: chrono_to_proto(i.updated),
+            }).collect(),
             cmd_resp: Some(cmd_resp)
         };
 

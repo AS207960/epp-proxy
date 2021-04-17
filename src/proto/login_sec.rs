@@ -40,7 +40,7 @@ pub struct EPPLoginSecurityUserAgent {
 
 #[derive(Debug, Deserialize)]
 pub struct EPPLoginSecurityData {
-    #[serde(rename = "{urn:ietf:params:xml:ns:epp:loginSec-1.0}loginSec:event")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp:loginSec-1.0}event")]
     pub events: Vec<EPPLoginSecurityEvent>
 }
 
