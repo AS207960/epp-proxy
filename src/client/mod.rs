@@ -230,6 +230,8 @@ pub struct EPPClientServerFeatures {
     fee_05_supported: bool,
     /// urn:ietf:params:xml:ns:epp:unhandled-namespaces-1.0 support
     unhandled_ns_supported: bool,
+    /// urn:ietf:params:xml:ns:epp:eai-0.2 support
+    eai_supported: bool,
     /// RFC8807 support
     login_sec_supported: bool
 }
@@ -763,6 +765,9 @@ impl EPPClient {
         self.features.unhandled_ns_supported = greeting
             .service_menu
             .supports_ext("urn:ietf:params:xml:ns:epp:unhandled-namespaces-1.0");
+        self.features.eai_supported = greeting
+            .service_menu
+            .supports_ext("urn:ietf:params:xml:ns:epp:eai-0.2");
         self.features.login_sec_supported = greeting
             .service_menu
             .supports_ext("urn:ietf:params:xml:ns:epp:loginSec-1.0");
@@ -858,6 +863,9 @@ impl EPPClient {
             }
             if self.features.unhandled_ns_supported {
                 ext_objects.push("urn:ietf:params:xml:ns:epp:unhandled-namespaces-1.0".to_string())
+            }
+            if self.features.eai_supported {
+                ext_objects.push("urn:ietf:params:xml:ns:epp:eai-0.2".to_string())
             }
             if self.features.login_sec_supported {
                 ext_objects.push("urn:ietf:params:xml:ns:epp:loginSec-1.0".to_string())
