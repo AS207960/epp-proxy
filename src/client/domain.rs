@@ -1859,12 +1859,12 @@ pub fn handle_update(
         add: if adds.is_empty() {
             None
         } else {
-            Some(proto::domain::EPPDomainUpdateAdd { params: adds })
+            Some(proto::domain::EPPDomainUpdateAddRemove { params: adds })
         },
         remove: if rems.is_empty() {
             None
         } else {
-            Some(proto::domain::EPPDomainUpdateRemove { params: rems })
+            Some(proto::domain::EPPDomainUpdateAddRemove { params: rems })
         },
         change: if is_not_change {
             None

@@ -184,6 +184,14 @@ pub enum EPPCommandExtensionType {
     EURIDContactCreate(eurid::EURIDContactInfo),
     #[serde(rename = "{http://www.eurid.eu/xml/epp/contact-ext-1.3}contact-ext:update")]
     EURIDContactUpdate(eurid::EURIDContactUpdate),
+    #[serde(rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.4}domain-ext:create")]
+    EURIDDomainCreate(eurid::EURIDDomainCreate),
+    #[serde(rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.4}domain-ext:update")]
+    EURIDDomainUpdate(eurid::EURIDDomainUpdate),
+    #[serde(rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.4}domain-ext:transfer")]
+    EURIDDomainTransfer(eurid::EURIDDomainTransfer),
+    #[serde(rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.4}domain-ext:delete")]
+    EURIDDomainDelete(eurid::EURIDDomainDelete),
 }
 
 #[derive(Debug, Serialize)]
@@ -581,14 +589,8 @@ pub enum EPPResultDataValue {
     EURIDRegistrarHitPointsData(eurid::EURIDRegistrarHitPointsInfoData),
     #[serde(rename = "{http://www.eurid.eu/xml/epp/registrationLimit-1.1}infData")]
     EURIDRegistrationLimitData(eurid::EURIDRegistrationLimitInfoData),
-    #[serde(rename = "{http://www.eurid.eu/xml/epp/authInfo-1.1}infData")]
-    EURIDAuthInfoData(eurid::EURIDAuthInfo),
-    #[serde(rename = "{http://www.eurid.eu/xml/epp/homoglyph-1.0}chkData")]
-    EURIDHomoglyphCheckData(eurid::EURIDHomoglyphData),
-    #[serde(rename = "{http://www.eurid.eu/xml/epp/contact-ext-1.3}infData")]
-    EURIDContactInfoData(eurid::EURIDContactInfo),
-    #[serde(rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.4}chkData")]
-    EURIDDomainCheckData(eurid::EURIDDomainCheckData),
+    #[serde(rename = "{http://www.eurid.eu/xml/epp/poll-1.2}pollData")]
+    EURIDPollData(eurid::EURIDPollData),
 }
 
 #[derive(Debug, Deserialize)]
@@ -755,6 +757,14 @@ pub enum EPPResponseExtensionType {
     EPPDonutsChargeUpdateData(united_tld::EPPChargeData),
     #[serde(rename = "{urn:ietf:params:xml:ns:epp:loginSec-1.0}loginSec:loginSecData")]
     EPPLoginSecurityData(login_sec::EPPLoginSecurityData),
+    #[serde(rename = "{http://www.eurid.eu/xml/epp/authInfo-1.1}infData")]
+    EURIDAuthInfoData(eurid::EURIDAuthInfoData),
+    #[serde(rename = "{http://www.eurid.eu/xml/epp/homoglyph-1.0}chkData")]
+    EURIDHomoglyphCheckData(eurid::EURIDHomoglyphData),
+    #[serde(rename = "{http://www.eurid.eu/xml/epp/contact-ext-1.3}infData")]
+    EURIDContactInfoData(eurid::EURIDContactInfo),
+    #[serde(rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.4}chkData")]
+    EURIDDomainCheckData(eurid::EURIDDomainCheckData),
 }
 
 #[derive(Debug, Serialize)]

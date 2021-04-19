@@ -358,12 +358,12 @@ pub struct EPPDomainUpdate {
         rename = "{urn:ietf:params:xml:ns:domain-1.0}domain:add",
         skip_serializing_if = "Option::is_none"
     )]
-    pub add: Option<EPPDomainUpdateAdd>,
+    pub add: Option<EPPDomainUpdateAddRemove>,
     #[serde(
         rename = "{urn:ietf:params:xml:ns:domain-1.0}domain:rem",
         skip_serializing_if = "Option::is_none"
     )]
-    pub remove: Option<EPPDomainUpdateRemove>,
+    pub remove: Option<EPPDomainUpdateAddRemove>,
     #[serde(
         rename = "{urn:ietf:params:xml:ns:domain-1.0}domain:chg",
         skip_serializing_if = "Option::is_none"
@@ -372,13 +372,7 @@ pub struct EPPDomainUpdate {
 }
 
 #[derive(Debug, Serialize)]
-pub struct EPPDomainUpdateAdd {
-    #[serde(rename = "$value")]
-    pub params: Vec<EPPDomainUpdateParam>,
-}
-
-#[derive(Debug, Serialize)]
-pub struct EPPDomainUpdateRemove {
+pub struct EPPDomainUpdateAddRemove {
     #[serde(rename = "$value")]
     pub params: Vec<EPPDomainUpdateParam>,
 }
