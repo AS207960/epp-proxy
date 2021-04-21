@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0">
+  <command>
+    <info>
+      <registrar:info xmlns:registrar="http://www.eurid.eu/xml/epp/registrationLimit-1.1"/>
+    </info>
+    <clTRID>registrationLimits-info03</clTRID>
+  </command>
+</epp>

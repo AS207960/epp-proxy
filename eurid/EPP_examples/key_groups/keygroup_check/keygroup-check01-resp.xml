@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0" xmlns:keygroup="http://www.eurid.eu/xml/epp/keygroup-1.1">
+  <response>
+    <result code="1000">
+      <msg>Command completed successfully</msg>
+    </result>
+    <resData>
+      <keygroup:chkData>
+        <keygroup:cd>
+          <keygroup:name avail="false">keygroup-135089830472</keygroup:name>
+          <keygroup:reason lang="en">in use</keygroup:reason>
+        </keygroup:cd>
+      </keygroup:chkData>
+    </resData>
+    <trID>
+      <svTRID>e1641c7be-e060-4345-9723-488d23f2f368</svTRID>
+    </trID>
+  </response>
+</epp>

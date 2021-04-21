@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0">
+  <response>
+    <result code="1000">
+      <msg>Command completed successfully</msg>
+    </result>
+    <trID>
+      <clTRID>domain-update07</clTRID>
+      <svTRID>e4fb25c0f-a1a1-40fc-8978-b7105e9c49f1</svTRID>
+    </trID>
+  </response>
+</epp>

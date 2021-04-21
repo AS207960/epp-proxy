@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0" xmlns:domain-ext-2.3="http://www.eurid.eu/xml/epp/domain-ext-2.3" xmlns:idn="http://www.eurid.eu/xml/epp/idn-1.0" xmlns:domain="urn:ietf:params:xml:ns:domain-1.0">
+  <response>
+    <result code="1000">
+      <msg>Command completed successfully</msg>
+    </result>
+    <resData>
+      <domain:infData>
+        <domain:name>вмкйршаудхыийведйкгг.ею</domain:name>
+        <domain:roid>xn__80adbeadbhzhddejt0e9bxb3cwd_xn__e1a4c-EURID</domain:roid>
+        <domain:status s="ok"/>
+        <domain:registrant>c193</domain:registrant>
+        <domain:contact type="billing">c192</domain:contact>
+        <domain:contact type="tech">c194</domain:contact>
+        <domain:ns>
+          <domain:hostAttr>
+            <domain:hostName>b.вмкйршаудхыийведйкгг.ею</domain:hostName>
+            <domain:hostAddr ip="v6">2001:db8:85a3:0:0:8a2e:371:7333</domain:hostAddr>
+          </domain:hostAttr>
+          <domain:hostAttr>
+            <domain:hostName>a.вмкйршаудхыийведйкгг.ею</domain:hostName>
+            <domain:hostAddr ip="v4">203.0.113.0</domain:hostAddr>
+          </domain:hostAttr>
+        </domain:ns>
+        <domain:clID>t000001</domain:clID>
+        <domain:crID>t000001</domain:crID>
+        <domain:crDate>2019-11-06T12:16:56.905Z</domain:crDate>
+        <domain:upID>t000001</domain:upID>
+        <domain:upDate>2019-11-06T12:16:56.000Z</domain:upDate>
+        <domain:exDate>2022-11-06T22:59:59.999Z</domain:exDate>
+      </domain:infData>
+    </resData>
+    <extension>
+      <domain-ext-2.3:infData>
+        <domain-ext-2.3:onHold>false</domain-ext-2.3:onHold>
+        <domain-ext-2.3:quarantined>false</domain-ext-2.3:quarantined>
+        <domain-ext-2.3:suspended>false</domain-ext-2.3:suspended>
+        <domain-ext-2.3:seized>false</domain-ext-2.3:seized>
+        <domain-ext-2.3:contact type="onsite">c195</domain-ext-2.3:contact>
+        <domain-ext-2.3:nsgroup>nsgroup-1573042616260</domain-ext-2.3:nsgroup>
+        <domain-ext-2.3:nsgroup>nsgroup-1573042615978</domain-ext-2.3:nsgroup>
+        <domain-ext-2.3:delayed>false</domain-ext-2.3:delayed>
+        <domain-ext-2.3:maxExtensionPeriod>7</domain-ext-2.3:maxExtensionPeriod>
+        <domain-ext-2.3:registrantCountry>BE</domain-ext-2.3:registrantCountry>
+      </domain-ext-2.3:infData>
+      <idn:mapping>
+        <idn:name>
+          <idn:ace>a.xn--80adbeadbhzhddejt0e9bxb3cwd.xn--e1a4c</idn:ace>
+          <idn:unicode>a.вмкйршаудхыийведйкгг.ею</idn:unicode>
+        </idn:name>
+        <idn:name>
+          <idn:ace>b.xn--80adbeadbhzhddejt0e9bxb3cwd.xn--e1a4c</idn:ace>
+          <idn:unicode>b.вмкйршаудхыийведйкгг.ею</idn:unicode>
+        </idn:name>
+        <idn:name>
+          <idn:ace>xn--80adbeadbhzhddejt0e9bxb3cwd.xn--e1a4c</idn:ace>
+          <idn:unicode>вмкйршаудхыийведйкгг.ею</idn:unicode>
+        </idn:name>
+      </idn:mapping>
+    </extension>
+    <trID>
+      <clTRID>domain-info06</clTRID>
+      <svTRID>eea5c141b-870b-47f0-bea5-641a269cc7bc</svTRID>
+    </trID>
+  </response>
+</epp>

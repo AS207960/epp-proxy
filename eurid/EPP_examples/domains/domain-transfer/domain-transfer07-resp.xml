@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0" xmlns:domain="urn:ietf:params:xml:ns:domain-1.0">
+  <response>
+    <result code="1000">
+      <msg>Command completed successfully</msg>
+    </result>
+    <resData>
+      <domain:trnData>
+        <domain:name>somedomain.eu</domain:name>
+        <domain:trStatus>serverApproved</domain:trStatus>
+        <domain:reID>t000002</domain:reID>
+        <domain:reDate>2020-02-24T14:36:27.200Z</domain:reDate>
+        <domain:acID>t000002</domain:acID>
+        <domain:acDate>2020-02-24T14:36:27.200Z</domain:acDate>
+        <domain:exDate>2026-02-24T22:59:59.999Z</domain:exDate>
+      </domain:trnData>
+    </resData>
+    <trID>
+      <svTRID>ee6674c7e-4d51-4fbb-9ef1-e8e38b526a9b</svTRID>
+    </trID>
+  </response>
+</epp>

@@ -95,6 +95,7 @@ pub enum PollData {
     VerisignLowBalanceData(super::verisign::LowBalanceData),
     TraficomTrnData(super::traficom::TrnData),
     MaintenanceData(super::maintenance::InfoResponse),
+    EURIDPoll(super::eurid::PollResponse),
     None,
 }
 
@@ -358,6 +359,9 @@ pub fn handle_poll_response(response: proto::EPPResponse) -> Response<Option<Pol
                             }
                             proto::EPPResultDataValue::TraficomTrnData(trn_data) => {
                                 PollData::TraficomTrnData(trn_data.into())
+                            }
+                            proto::EPPResultDataValue::EURIDPollData(poll_data) => {
+                                PollData::EURIDPoll(poll_data.into())
                             }
                             proto::EPPResultDataValue::EPPMaintenanceInfo(maint_info) => {
                                 if let Some(item) = maint_info.item {
@@ -935,7 +939,7 @@ mod poll_tests {
             } => {
                 assert_eq!(rc_data.originator, "p@epp-example.org.uk");
                 assert_eq!(rc_data.registrar_tag, "EXAMPLE");
-                assert_eq!(rc_data.case_id, "3560");
+                assert_eq!(rc_data.case_id.unwrap(), "3560");
                 assert_eq!(rc_data.contact.id, "CMyContactID");
             }
             _ => unreachable!(),
@@ -1227,7 +1231,7 @@ mod poll_tests {
                 data: create_data,
                 change_data: None
             } => {
-                assert_eq!(create_data.name, "epp-example1.ltd.uk");
+                assert_eq!(create_data.data.name, "epp-example1.ltd.uk");
             }
             _ => unreachable!(),
         }
@@ -1391,13 +1395,13 @@ mod poll_tests {
                 data: trn_data,
                 change_data: None
             } => {
-                assert_eq!(trn_data.name, "example.uk.com");
+                assert_eq!(trn_data.data.name, "example.uk.com");
                 assert_eq!(
-                    trn_data.status,
+                    trn_data.data.status,
                     super::super::TransferStatus::ClientApproved
                 );
-                assert_eq!(trn_data.requested_client_id, "H12345");
-                assert_eq!(trn_data.act_client_id, "H54321");
+                assert_eq!(trn_data.data.requested_client_id, "H12345");
+                assert_eq!(trn_data.data.act_client_id, "H54321");
             }
             _ => unreachable!(),
         }
@@ -1441,10 +1445,10 @@ mod poll_tests {
                 data: trn_data,
                 change_data: None
             } => {
-                assert_eq!(trn_data.name, "example.uk.com");
-                assert_eq!(trn_data.status, super::super::TransferStatus::Pending);
-                assert_eq!(trn_data.requested_client_id, "H12345");
-                assert_eq!(trn_data.act_client_id, "H54321");
+                assert_eq!(trn_data.data.name, "example.uk.com");
+                assert_eq!(trn_data.data.status, super::super::TransferStatus::Pending);
+                assert_eq!(trn_data.data.requested_client_id, "H12345");
+                assert_eq!(trn_data.data.act_client_id, "H54321");
             }
             _ => unreachable!(),
         }
@@ -1536,7 +1540,7 @@ mod poll_tests {
                 data: ren_data,
                 change_data: None
             } => {
-                assert_eq!(ren_data.name, "siatki.eu");
+                assert_eq!(ren_data.data.name, "siatki.eu");
             }
             _ => unreachable!(),
         }
@@ -1587,6 +1591,161 @@ mod poll_tests {
                 assert_eq!(pan_data.result, false);
                 assert_eq!(pan_data.server_transaction_id.unwrap(), "33a2eb76-4295-43f1-a1f6-c757e8d1be41");
                 assert_eq!(pan_data.client_transaction_id.unwrap(), "ECA21919-4B41-40BB-8A9F-ED6849950154");
+            }
+            _ => unreachable!(),
+        }
+    }
+
+    #[test]
+    fn eurid_poll_0() {
+        const XML_DATA: &str = r#"
+<?xml version="1.0" encoding="UTF-8"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0" xmlns:poll-1.2="http://www.eurid.eu/xml/epp/poll-1.2">
+  <response>
+    <result code="1301">
+      <msg>Command completed successfully; ack to dequeue</msg>
+    </result>
+    <msgQ count="1" id="d6f48a64-862e-4490-9835-31fd02fb74d4">
+      <qDate>2019-11-06T12:19:29.223Z</qDate>
+      <msg>Suspended domain name: abcabc-1573042768420.eu</msg>
+    </msgQ>
+    <resData>
+      <poll-1.2:pollData>
+        <poll-1.2:context>LEGAL</poll-1.2:context>
+        <poll-1.2:objectType>DOMAIN</poll-1.2:objectType>
+        <poll-1.2:object>abcabc-1573042768420.eu</poll-1.2:object>
+        <poll-1.2:objectUnicode>abcabc-1573042768420.eu</poll-1.2:objectUnicode>
+        <poll-1.2:action>SUSPENDED</poll-1.2:action>
+        <poll-1.2:code>2110</poll-1.2:code>
+        <poll-1.2:detail>A really good reason for suspending</poll-1.2:detail>
+      </poll-1.2:pollData>
+    </resData>
+    <trID>
+      <clTRID>poll01-req</clTRID>
+      <svTRID>e0b0ae1b7-66b9-475f-a28a-40f94e727061</svTRID>
+    </trID>
+  </response>
+</epp>
+"#;
+        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
+        let res = match res.message {
+            super::proto::EPPMessageType::Response(r) => r,
+            _ => unreachable!(),
+        };
+        let data = super::handle_poll_response(*res).unwrap().unwrap();
+        assert_eq!(data.message, "Suspended domain name: abcabc-1573042768420.eu");
+        match data.data {
+            super::PollData::EURIDPoll(data) => {
+                assert_eq!(data.context, "LEGAL");
+                assert_eq!(data.object_type, "DOMAIN");
+                assert_eq!(data.object, "abcabc-1573042768420.eu");
+                assert_eq!(data.object_unicode.unwrap(), "abcabc-1573042768420.eu");
+                assert_eq!(data.action, "SUSPENDED");
+                assert_eq!(data.code, 2110);
+                assert_eq!(data.detail.unwrap(), "A really good reason for suspending");
+                assert_eq!(data.registrar.is_none(), true);
+            }
+            _ => unreachable!(),
+        }
+    }
+
+    #[test]
+    fn eurid_poll_1() {
+        const XML_DATA: &str = r#"
+<?xml version="1.0" encoding="UTF-8"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0" xmlns:poll-1.2="http://www.eurid.eu/xml/epp/poll-1.2">
+  <response>
+    <result code="1301">
+      <msg>Command completed successfully; ack to dequeue</msg>
+    </result>
+    <msgQ count="1" id="d6108143-3dd4-4c46-b6be-604027dbea54">
+      <qDate>2019-11-08T12:19:40.822Z</qDate>
+      <msg>Domain name quarantined: abcabc-1573042778986.eu</msg>
+    </msgQ>
+    <resData>
+      <poll-1.2:pollData>
+        <poll-1.2:context>DOMAIN</poll-1.2:context>
+        <poll-1.2:objectType>DOMAIN</poll-1.2:objectType>
+        <poll-1.2:object>abcabc-1573042778986.eu</poll-1.2:object>
+        <poll-1.2:objectUnicode>abcabc-1573042778986.eu</poll-1.2:objectUnicode>
+        <poll-1.2:action>QUARANTINED</poll-1.2:action>
+        <poll-1.2:code>1700</poll-1.2:code>
+      </poll-1.2:pollData>
+    </resData>
+    <trID>
+      <clTRID>poll03-req</clTRID>
+      <svTRID>eaa2ed561-3e37-42ae-ad6f-2992a87bb0ba</svTRID>
+    </trID>
+  </response>
+</epp>"#;
+        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
+        let res = match res.message {
+            super::proto::EPPMessageType::Response(r) => r,
+            _ => unreachable!(),
+        };
+        let data = super::handle_poll_response(*res).unwrap().unwrap();
+        assert_eq!(data.message, "Domain name quarantined: abcabc-1573042778986.eu");
+        match data.data {
+            super::PollData::EURIDPoll(data) => {
+                assert_eq!(data.context, "DOMAIN");
+                assert_eq!(data.object_type, "DOMAIN");
+                assert_eq!(data.object, "abcabc-1573042778986.eu");
+                assert_eq!(data.object_unicode.unwrap(), "abcabc-1573042778986.eu");
+                assert_eq!(data.action, "QUARANTINED");
+                assert_eq!(data.code, 1700);
+                assert_eq!(data.detail.is_none(), true);
+                assert_eq!(data.registrar.is_none(), true);
+            }
+            _ => unreachable!(),
+        }
+    }
+
+    #[test]
+    fn eurid_poll_2() {
+        const XML_DATA: &str = r#"
+<?xml version="1.0" encoding="UTF-8"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0" xmlns:poll-1.2="http://www.eurid.eu/xml/epp/poll-1.2">
+  <response>
+    <result code="1301">
+      <msg>Command completed successfully; ack to dequeue</msg>
+    </result>
+    <msgQ count="5" id="7fe53591-f556-4408-a962-bbb79dacd00a">
+      <qDate>2019-11-30T23:00:15.662Z</qDate>
+      <msg>Watermark level reached: 7</msg>
+    </msgQ>
+    <resData>
+      <poll-1.2:pollData>
+        <poll-1.2:context>REGISTRATION_LIMIT</poll-1.2:context>
+        <poll-1.2:objectType>WATERMARK</poll-1.2:objectType>
+        <poll-1.2:object>7</poll-1.2:object>
+        <poll-1.2:objectUnicode>7</poll-1.2:objectUnicode>
+        <poll-1.2:action>REACHED</poll-1.2:action>
+        <poll-1.2:code>2620</poll-1.2:code>
+      </poll-1.2:pollData>
+    </resData>
+    <trID>
+      <clTRID>poll07-req</clTRID>
+      <svTRID>e24e57eb2-4291-4776-9032-4143785dcfb3</svTRID>
+    </trID>
+  </response>
+</epp>"#;
+        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
+        let res = match res.message {
+            super::proto::EPPMessageType::Response(r) => r,
+            _ => unreachable!(),
+        };
+        let data = super::handle_poll_response(*res).unwrap().unwrap();
+        assert_eq!(data.message, "Watermark level reached: 7");
+        match data.data {
+            super::PollData::EURIDPoll(data) => {
+                assert_eq!(data.context, "REGISTRATION_LIMIT");
+                assert_eq!(data.object_type, "WATERMARK");
+                assert_eq!(data.object, "7");
+                assert_eq!(data.object_unicode.unwrap(), "7");
+                assert_eq!(data.action, "REACHED");
+                assert_eq!(data.code, 2620);
+                assert_eq!(data.detail.is_none(), true);
+                assert_eq!(data.registrar.is_none(), true);
             }
             _ => unreachable!(),
         }

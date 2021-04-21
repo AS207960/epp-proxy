@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0">
+  <command>
+    <create>
+      <domain:create xmlns:domain="urn:ietf:params:xml:ns:domain-1.0">
+        <domain:name>αβααβα-1567587491098.ευ</domain:name>
+        <domain:registrant>c132</domain:registrant>
+        <domain:contact type="billing">c131</domain:contact>
+        <domain:contact type="tech">c133</domain:contact>
+        <domain:authInfo>
+          <domain:pw> </domain:pw>
+        </domain:authInfo>
+      </domain:create>
+    </create>
+    <clTRID>domain-create06</clTRID>
+  </command>
+</epp>

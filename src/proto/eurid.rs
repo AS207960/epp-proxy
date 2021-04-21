@@ -382,15 +382,15 @@ pub struct EURIDIDNNameMapping {
 #[derive(Debug, Deserialize)]
 pub struct EURIDRegistrarFinanceInfoData {
     #[serde(rename = "{http://www.eurid.eu/xml/epp/registrarFinance-1.0}paymentMode")]
-    payment_mode: EURIDRegistrarFinancePaymentMode,
+    pub payment_mode: EURIDRegistrarFinancePaymentMode,
     #[serde(rename = "{http://www.eurid.eu/xml/epp/registrarFinance-1.0}accountBalance")]
-    account_balance: String,
+    pub account_balance: String,
     #[serde(rename = "{http://www.eurid.eu/xml/epp/registrarFinance-1.0}availableAmount")]
-    available_amount: Option<String>,
+    pub available_amount: Option<String>,
     #[serde(rename = "{http://www.eurid.eu/xml/epp/registrarFinance-1.0}dueAmount")]
-    due_amount: Option<String>,
+    pub due_amount: Option<String>,
     #[serde(rename = "{http://www.eurid.eu/xml/epp/registrarFinance-1.0}overdueAmount")]
-    overdue_amount: Option<String>,
+    pub overdue_amount: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -406,15 +406,15 @@ pub enum EURIDRegistrarFinancePaymentMode {
 #[derive(Debug, Deserialize)]
 pub struct EURIDRegistrarHitPointsInfoData {
     #[serde(rename = "{http://www.eurid.eu/xml/epp/registrarHitPoints-1.0}nbrHitPoints")]
-    hit_points: u64,
+    pub hit_points: u64,
     #[serde(rename = "{http://www.eurid.eu/xml/epp/registrarHitPoints-1.0}maxNbrHitPoints")]
-    max_hit_points: u64,
+    pub max_hit_points: u64,
     #[serde(
         rename = "{http://www.eurid.eu/xml/epp/registrarHitPoints-1.0}blockedUntil",
         deserialize_with = "super::deserialize_datetime_opt",
         default
     )]
-    blocked_until: Option<DateTime<Utc>>
+    pub blocked_until: Option<DateTime<Utc>>
 }
 
 /// registrationLimit-1.1
@@ -422,15 +422,15 @@ pub struct EURIDRegistrarHitPointsInfoData {
 #[derive(Debug, Deserialize)]
 pub struct EURIDRegistrationLimitInfoData {
     #[serde(rename = "{http://www.eurid.eu/xml/epp/registrationLimit-1.1}monthlyRegistrations")]
-    monthly_registrations: u64,
+    pub monthly_registrations: u64,
     #[serde(rename = "{http://www.eurid.eu/xml/epp/registrationLimit-1.1}maxMonthlyRegistrations", default)]
-    max_monthly_registrations: Option<u64>,
+    pub max_monthly_registrations: Option<u64>,
     #[serde(
         rename = "{http://www.eurid.eu/xml/epp/registrationLimit-1.1}limitedUntil",
         deserialize_with = "super::deserialize_datetime_opt",
         default
     )]
-    limited_until: Option<DateTime<Utc>>
+    pub limited_until: Option<DateTime<Utc>>
 }
 
 /// poll-1.2
@@ -438,19 +438,19 @@ pub struct EURIDRegistrationLimitInfoData {
 #[derive(Debug, Deserialize)]
 pub struct EURIDPollData {
     #[serde(rename = "{http://www.eurid.eu/xml/epp/poll-1.2}context")]
-    context: String,
+    pub context: String,
     #[serde(rename = "{http://www.eurid.eu/xml/epp/poll-1.2}objectType")]
-    object_type: String,
+    pub object_type: String,
     #[serde(rename = "{http://www.eurid.eu/xml/epp/poll-1.2}object")]
-    object: String,
+    pub object: String,
     #[serde(rename = "{http://www.eurid.eu/xml/epp/poll-1.2}objectUnicode", default)]
-    object_unicode: Option<String>,
+    pub object_unicode: Option<String>,
     #[serde(rename = "{http://www.eurid.eu/xml/epp/poll-1.2}action")]
-    action: String,
+    pub action: String,
     #[serde(rename = "{http://www.eurid.eu/xml/epp/poll-1.2}code")]
-    code: u32,
+    pub code: u32,
     #[serde(rename = "{http://www.eurid.eu/xml/epp/poll-1.2}detail", default)]
-    detail: Option<String>,
+    pub detail: Option<String>,
     #[serde(rename = "{http://www.eurid.eu/xml/epp/poll-1.2}registrar", default)]
-    registrar: Option<String>,
+    pub registrar: Option<String>,
 }

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0" xmlns:contact="urn:ietf:params:xml:ns:contact-1.0">
+  <response>
+    <result code="1000">
+      <msg>Command completed successfully</msg>
+    </result>
+    <resData>
+      <contact:creData>
+        <contact:id>c43</contact:id>
+        <contact:crDate>2019-11-06T12:13:50.237Z</contact:crDate>
+      </contact:creData>
+    </resData>
+    <trID>
+      <clTRID>contact-create02</clTRID>
+      <svTRID>e735c9b4c-88d4-48f7-890d-912909c6f691</svTRID>
+    </trID>
+  </response>
+</epp>

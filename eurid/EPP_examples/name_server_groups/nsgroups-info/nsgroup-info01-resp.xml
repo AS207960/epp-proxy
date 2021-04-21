@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0" xmlns:idn="http://www.eurid.eu/xml/epp/idn-1.0" xmlns:nsgroup="http://www.eurid.eu/xml/epp/nsgroup-1.1">
+  <response>
+    <result code="1000">
+      <msg>Command completed successfully</msg>
+    </result>
+    <resData>
+      <nsgroup:infData>
+        <nsgroup:name>nsgroup-1349428719</nsgroup:name>
+        <nsgroup:ns>ns7.xn--e1afmkfd.xn--e1a4c</nsgroup:ns>
+        <nsgroup:ns>ns1.xn--e1afmkfd.xn--e1a4c</nsgroup:ns>
+        <nsgroup:ns>ns3.xn--e1afmkfd.xn--e1a4c</nsgroup:ns>
+        <nsgroup:ns>ns6.xn--e1afmkfd.xn--e1a4c</nsgroup:ns>
+        <nsgroup:ns>ns5.xn--e1afmkfd.xn--e1a4c</nsgroup:ns>
+        <nsgroup:ns>ns4.xn--e1afmkfd.xn--e1a4c</nsgroup:ns>
+        <nsgroup:ns>ns8.xn--e1afmkfd.xn--e1a4c</nsgroup:ns>
+        <nsgroup:ns>ns2.xn--e1afmkfd.xn--e1a4c</nsgroup:ns>
+        <nsgroup:ns>ns9.xn--e1afmkfd.xn--e1a4c</nsgroup:ns>
+      </nsgroup:infData>
+    </resData>
+    <extension>
+      <idn:mapping>
+        <idn:name>
+          <idn:ace>ns1.xn--e1afmkfd.xn--e1a4c</idn:ace>
+          <idn:unicode>ns1.пример.ею</idn:unicode>
+        </idn:name>
+        <idn:name>
+          <idn:ace>ns2.xn--e1afmkfd.xn--e1a4c</idn:ace>
+          <idn:unicode>ns2.пример.ею</idn:unicode>
+        </idn:name>
+        <idn:name>
+          <idn:ace>ns3.xn--e1afmkfd.xn--e1a4c</idn:ace>
+          <idn:unicode>ns3.пример.ею</idn:unicode>
+        </idn:name>
+        <idn:name>
+          <idn:ace>ns4.xn--e1afmkfd.xn--e1a4c</idn:ace>
+          <idn:unicode>ns4.пример.ею</idn:unicode>
+        </idn:name>
+        <idn:name>
+          <idn:ace>ns5.xn--e1afmkfd.xn--e1a4c</idn:ace>
+          <idn:unicode>ns5.пример.ею</idn:unicode>
+        </idn:name>
+        <idn:name>
+          <idn:ace>ns6.xn--e1afmkfd.xn--e1a4c</idn:ace>
+          <idn:unicode>ns6.пример.ею</idn:unicode>
+        </idn:name>
+        <idn:name>
+          <idn:ace>ns7.xn--e1afmkfd.xn--e1a4c</idn:ace>
+          <idn:unicode>ns7.пример.ею</idn:unicode>
+        </idn:name>
+        <idn:name>
+          <idn:ace>ns8.xn--e1afmkfd.xn--e1a4c</idn:ace>
+          <idn:unicode>ns8.пример.ею</idn:unicode>
+        </idn:name>
+        <idn:name>
+          <idn:ace>ns9.xn--e1afmkfd.xn--e1a4c</idn:ace>
+          <idn:unicode>ns9.пример.ею</idn:unicode>
+        </idn:name>
+      </idn:mapping>
+    </extension>
+    <trID>
+      <clTRID>nsgroup-info01</clTRID>
+      <svTRID>ecc8a5a85-1ff5-46fa-8d5e-07442e41ec2e</svTRID>
+    </trID>
+  </response>
+</epp>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0">
+  <command>
+    <info xmlns:keygroup="http://www.eurid.eu/xml/epp/keygroup-1.1">
+      <keygroup:info>
+        <keygroup:name>keygroup-135089830472</keygroup:name>
+        <keygroup:authInfo>
+          <keygroup:pw>XXXX-3W74-EVHN-S5TD</keygroup:pw>
+        </keygroup:authInfo>
+      </keygroup:info>
+    </info>
+    <clTRID>keygroup-info04</clTRID>
+  </command>
+</epp>

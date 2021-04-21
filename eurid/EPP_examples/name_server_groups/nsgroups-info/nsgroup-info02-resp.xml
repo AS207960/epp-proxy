@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0" xmlns:idn="http://www.eurid.eu/xml/epp/idn-1.0" xmlns:nsgroup="http://www.eurid.eu/xml/epp/nsgroup-1.1">
+  <response>
+    <result code="1000">
+      <msg>Command completed successfully</msg>
+    </result>
+    <resData>
+      <nsgroup:infData>
+        <nsgroup:name>nsg-a-1349684934</nsgroup:name>
+        <nsgroup:ns>ns.xn--tfaa.eu</nsgroup:ns>
+        <nsgroup:ns>ns1.some-domain.eu</nsgroup:ns>
+      </nsgroup:infData>
+    </resData>
+    <extension>
+      <idn:mapping>
+        <idn:name>
+          <idn:ace>ns.xn--tfaa.eu</idn:ace>
+          <idn:unicode>ns.łł.eu</idn:unicode>
+        </idn:name>
+      </idn:mapping>
+    </extension>
+    <trID>
+      <clTRID>nsgroup-info03</clTRID>
+      <svTRID>e2242897b-55e5-4463-8108-e9f973aada43</svTRID>
+    </trID>
+  </response>
+</epp>

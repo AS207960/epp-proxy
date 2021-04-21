@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0" xmlns:idn="http://www.eurid.eu/xml/epp/idn-1.0" xmlns:domain="urn:ietf:params:xml:ns:domain-1.0">
+  <response>
+    <result code="1000">
+      <msg>Command completed successfully</msg>
+    </result>
+    <resData>
+      <domain:creData>
+        <domain:name>шххидоыкыекмвдхпп-0005.ею</domain:name>
+        <domain:crDate>2019-11-06T12:15:42.105Z</domain:crDate>
+        <domain:exDate>2020-11-06T22:59:59.999Z</domain:exDate>
+      </domain:creData>
+    </resData>
+    <extension>
+      <idn:mapping>
+        <idn:name>
+          <idn:ace>xn---0005-gwenbh2axb0ayva5gaj2c0db.xn--e1a4c</idn:ace>
+          <idn:unicode>шххидоыкыекмвдхпп-0005.ею</idn:unicode>
+        </idn:name>
+      </idn:mapping>
+    </extension>
+    <trID>
+      <clTRID>domain-create05</clTRID>
+      <svTRID>efa872a05-960e-41c4-b1c1-d019369ccc26</svTRID>
+    </trID>
+  </response>
+</epp>

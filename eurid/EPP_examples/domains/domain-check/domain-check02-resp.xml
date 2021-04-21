@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0" xmlns:domain-ext-2.3="http://www.eurid.eu/xml/epp/domain-ext-2.3" xmlns:domain="urn:ietf:params:xml:ns:domain-1.0">
+  <response>
+    <result code="1000">
+      <msg>Command completed successfully</msg>
+    </result>
+    <resData>
+      <domain:chkData>
+        <domain:cd>
+          <domain:name avail="false">europa.eu</domain:name>
+          <domain:reason lang="en">registered</domain:reason>
+        </domain:cd>
+      </domain:chkData>
+    </resData>
+    <extension>
+      <domain-ext-2.3:chkData>
+        <domain-ext-2.3:domain>
+          <domain-ext-2.3:name>europa.eu</domain-ext-2.3:name>
+          <domain-ext-2.3:status s="serverTransferProhibited"/>
+        </domain-ext-2.3:domain>
+      </domain-ext-2.3:chkData>
+    </extension>
+    <trID>
+      <clTRID>domain-check02</clTRID>
+      <svTRID>ed74a5e3b-4dec-4831-ae37-c74187429d27</svTRID>
+    </trID>
+  </response>
+</epp>

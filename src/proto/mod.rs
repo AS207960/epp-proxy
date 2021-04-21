@@ -591,6 +591,10 @@ pub enum EPPResultDataValue {
     EURIDRegistrationLimitData(eurid::EURIDRegistrationLimitInfoData),
     #[serde(rename = "{http://www.eurid.eu/xml/epp/poll-1.2}pollData")]
     EURIDPollData(eurid::EURIDPollData),
+    #[serde(rename = "{http://www.eurid.eu/xml/epp/dnsQuality-2.0}dnsQuality:infData")]
+    EURIDDNSQualityData(eurid::EURIDDNSQualityInfoData),
+    #[serde(rename = "{http://www.eurid.eu/xml/epp/dnssecEligibility-1.0}dnssecEligibility:infData")]
+    EURIDDNSSECEligibilityInfoData(eurid::EURIDDNSSECEligibilityInfoData),
 }
 
 #[derive(Debug, Deserialize)]
@@ -765,6 +769,8 @@ pub enum EPPResponseExtensionType {
     EURIDContactInfoData(eurid::EURIDContactInfo),
     #[serde(rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.4}chkData")]
     EURIDDomainCheckData(eurid::EURIDDomainCheckData),
+    #[serde(rename = "{http://www.eurid.eu/xml/epp/idn-1.0}mapping")]
+    EURIDIDNMapping(eurid::EURIDIDNMapping),
 }
 
 #[derive(Debug, Serialize)]

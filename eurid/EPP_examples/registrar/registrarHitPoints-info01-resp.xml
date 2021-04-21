@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0" xmlns:registrarHitPoints="http://www.eurid.eu/xml/epp/registrarHitPoints-1.0">
+  <response>
+    <result code="1000">
+      <msg>Command completed successfully</msg>
+    </result>
+    <resData>
+      <registrarHitPoints:infData>
+        <registrarHitPoints:nbrHitPoints>0</registrarHitPoints:nbrHitPoints>
+        <registrarHitPoints:maxNbrHitPoints>2000</registrarHitPoints:maxNbrHitPoints>
+      </registrarHitPoints:infData>
+    </resData>
+    <trID>
+      <clTRID>registrar-info-hitpoints-01</clTRID>
+      <svTRID>e8b374106-8458-4909-8fc0-d9c698837595</svTRID>
+    </trID>
+  </response>
+</epp>

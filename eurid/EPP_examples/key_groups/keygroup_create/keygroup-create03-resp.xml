@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0">
+  <response>
+    <result code="1000">
+      <msg>Command completed successfully</msg>
+    </result>
+    <trID>
+      <clTRID>keygroup-create03</clTRID>
+      <svTRID>ef886bec6-0aa3-4ae7-a037-89af761a7829</svTRID>
+    </trID>
+  </response>
+</epp>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0">
+  <command>
+    <transfer op="request">
+      <domain:transfer xmlns:domain="urn:ietf:params:xml:ns:domain-1.0">
+        <domain:name>some-domain-nãme</domain:name>
+        <domain:period unit="y">1</domain:period>
+        <domain:authInfo>
+          <domain:pw>XXXX-3TZ2-RNSJ-4ACY</domain:pw>
+        </domain:authInfo>
+      </domain:transfer>
+    </transfer>
+    <extension>
+      <domain-ext:transfer xmlns:domain="urn:ietf:params:xml:ns:domain-1.0" xmlns:domain-ext="http://www.eurid.eu/xml/epp/domain-ext-2.3">
+        <domain-ext:request>
+          <domain-ext:registrant>c263</domain-ext:registrant>
+          <domain-ext:contact type="billing">c262</domain-ext:contact>
+          <domain-ext:contact type="tech">c264</domain-ext:contact>
+          <domain-ext:contact type="onsite">c265</domain-ext:contact>
+        </domain-ext:request>
+      </domain-ext:transfer>
+    </extension>
+    <clTRID>domain-transfer02</clTRID>
+  </command>
+</epp>

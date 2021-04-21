@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0" xmlns:eurid="http://www.eurid.eu/xml/epp/eurid-1.0">
+  <command>
+    <create>
+      <domain:create xmlns:domain="urn:ietf:params:xml:ns:domain-1.0">
+        <domain:name>somedomain.eu</domain:name>
+        <domain:period unit="y">3</domain:period>
+        <domain:ns>
+          <domain:hostAttr>
+            <domain:hostName>a.somedomain.eu</domain:hostName>
+            <domain:hostAddr>203.0.113.0</domain:hostAddr>
+          </domain:hostAttr>
+          <domain:hostAttr>
+            <domain:hostName>b.somedomain.eu</domain:hostName>
+            <domain:hostAddr ip="v6">2001:db8:85a3:0:0:8a2e:371:7333</domain:hostAddr>
+          </domain:hostAttr>
+        </domain:ns>
+        <domain:registrant>c117</domain:registrant>
+        <domain:contact type="billing">c116</domain:contact>
+        <domain:contact type="tech">c118</domain:contact>
+        <domain:authInfo>
+          <domain:pw> </domain:pw>
+        </domain:authInfo>
+      </domain:create>
+    </create>
+    <extension>
+      <domain-ext:create xmlns:domain-ext="http://www.eurid.eu/xml/epp/domain-ext-2.3">
+        <domain-ext:contact type="onsite">c119</domain-ext:contact>
+        <domain-ext:nsgroup>nsgroup-1573042531183</domain-ext:nsgroup>
+        <domain-ext:nsgroup>nsgroup-1573042531498</domain-ext:nsgroup>
+      </domain-ext:create>
+    </extension>
+    <clTRID>domain-create03</clTRID>
+  </command>
+</epp>

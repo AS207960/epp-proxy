@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0" xmlns:domain-ext-2.3="http://www.eurid.eu/xml/epp/domain-ext-2.3" xmlns:idn="http://www.eurid.eu/xml/epp/idn-1.0" xmlns:domain="urn:ietf:params:xml:ns:domain-1.0">
+  <response>
+    <result code="1000">
+      <msg>Command completed successfully</msg>
+    </result>
+    <resData>
+      <domain:infData>
+        <domain:name>αβααβα-1567587491098.ευ</domain:name>
+        <domain:roid>xn___1567587491098_f9jaaaqc_xn__qxa6a-EURID</domain:roid>
+        <domain:status s="ok"/>
+        <domain:registrant>c218</domain:registrant>
+        <domain:contact type="billing">c217</domain:contact>
+        <domain:contact type="tech">c219</domain:contact>
+        <domain:clID>t000001</domain:clID>
+        <domain:crID>t000001</domain:crID>
+        <domain:crDate>2019-11-06T12:17:23.588Z</domain:crDate>
+        <domain:upID>t000001</domain:upID>
+        <domain:upDate>2019-11-06T12:17:23.000Z</domain:upDate>
+        <domain:exDate>2020-11-06T22:59:59.999Z</domain:exDate>
+      </domain:infData>
+    </resData>
+    <extension>
+      <domain-ext-2.3:infData>
+        <domain-ext-2.3:onHold>false</domain-ext-2.3:onHold>
+        <domain-ext-2.3:quarantined>false</domain-ext-2.3:quarantined>
+        <domain-ext-2.3:suspended>false</domain-ext-2.3:suspended>
+        <domain-ext-2.3:seized>false</domain-ext-2.3:seized>
+        <domain-ext-2.3:delayed>false</domain-ext-2.3:delayed>
+        <domain-ext-2.3:maxExtensionPeriod>9</domain-ext-2.3:maxExtensionPeriod>
+        <domain-ext-2.3:registrantCountry>BE</domain-ext-2.3:registrantCountry>
+      </domain-ext-2.3:infData>
+      <idn:mapping>
+        <idn:name>
+          <idn:ace>xn---1567587491098-f9jaaaqc.xn--qxa6a</idn:ace>
+          <idn:unicode>αβααβα-1567587491098.ευ</idn:unicode>
+        </idn:name>
+      </idn:mapping>
+    </extension>
+    <trID>
+      <clTRID>domain-info11</clTRID>
+      <svTRID>e99c2d3aa-ca1a-4641-954c-7e9ff0741b3c</svTRID>
+    </trID>
+  </response>
+</epp>

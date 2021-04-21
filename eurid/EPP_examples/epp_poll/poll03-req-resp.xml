@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0" xmlns:poll-1.2="http://www.eurid.eu/xml/epp/poll-1.2">
+  <response>
+    <result code="1301">
+      <msg>Command completed successfully; ack to dequeue</msg>
+    </result>
+    <msgQ count="1" id="d6108143-3dd4-4c46-b6be-604027dbea54">
+      <qDate>2019-11-08T12:19:40.822Z</qDate>
+      <msg>Domain name quarantined: abcabc-1573042778986.eu</msg>
+    </msgQ>
+    <resData>
+      <poll-1.2:pollData>
+        <poll-1.2:context>DOMAIN</poll-1.2:context>
+        <poll-1.2:objectType>DOMAIN</poll-1.2:objectType>
+        <poll-1.2:object>abcabc-1573042778986.eu</poll-1.2:object>
+        <poll-1.2:objectUnicode>abcabc-1573042778986.eu</poll-1.2:objectUnicode>
+        <poll-1.2:action>QUARANTINED</poll-1.2:action>
+        <poll-1.2:code>1700</poll-1.2:code>
+      </poll-1.2:pollData>
+    </resData>
+    <trID>
+      <clTRID>poll03-req</clTRID>
+      <svTRID>eaa2ed561-3e37-42ae-ad6f-2992a87bb0ba</svTRID>
+    </trID>
+  </response>
+</epp>

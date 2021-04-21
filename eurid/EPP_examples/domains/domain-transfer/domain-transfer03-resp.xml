@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0" xmlns:domain="urn:ietf:params:xml:ns:domain-1.0">
+  <response>
+    <result code="1000">
+      <msg>Command completed successfully</msg>
+    </result>
+    <resData>
+      <domain:trnData>
+        <domain:name>somedomain.eu</domain:name>
+        <domain:trStatus>serverApproved</domain:trStatus>
+        <domain:reID>t000002</domain:reID>
+        <domain:reDate>2019-11-06T12:18:13.515Z</domain:reDate>
+        <domain:acID>t000002</domain:acID>
+        <domain:acDate>2019-11-06T12:18:13.515Z</domain:acDate>
+        <domain:exDate>2021-11-06T22:59:59.999Z</domain:exDate>
+      </domain:trnData>
+    </resData>
+    <trID>
+      <clTRID>domain-transfer-from-quarantine-with-ns-and-nsgroup</clTRID>
+      <svTRID>e32e0d565-5147-4252-b736-dfb9088433a0</svTRID>
+    </trID>
+  </response>
+</epp>

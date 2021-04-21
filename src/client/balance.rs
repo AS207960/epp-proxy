@@ -42,6 +42,11 @@ pub fn handle_balance(
             proto::EPPCommandType::Info(proto::EPPInfo::UnitedTLDBalace {}),
             None,
         ))
+    } else if client.eurid_finance_supported {
+        Ok((
+            proto::EPPCommandType::Info(proto::EPPInfo::EURIDRegistrarFinance {}),
+            None,
+        ))
     } else {
         Err(Err(Error::Unsupported))
     }
@@ -79,6 +84,18 @@ pub fn handle_balance_response(response: proto::EPPResponse) -> Response<Balance
                     currency: "USD".to_string(),
                     credit_limit: None,
                     available_credit: None,
+                    credit_threshold: None,
+                })
+            }
+            proto::EPPResultDataValue::EURIDRegistrarFinanceData(eurid_balance) => {
+                Response::Ok(BalanceResponse {
+                    balance: eurid_balance.account_balance,
+                    currency: "EUR".to_string(),
+                    credit_limit: None,
+                    available_credit: match eurid_balance.payment_mode {
+                        proto::eurid::EURIDRegistrarFinancePaymentMode::PrePayment => eurid_balance.available_amount,
+                        proto::eurid::EURIDRegistrarFinancePaymentMode::PostPayment => None,
+                    },
                     credit_threshold: None,
                 })
             }
@@ -245,5 +262,72 @@ mod balance_tests {
         assert_eq!(data.credit_limit.unwrap(), "1000.00");
         assert_eq!(data.available_credit.unwrap(), "800.00");
         assert_eq!(data.credit_threshold.unwrap(), super::CreditThreshold::Fixed("500.00".to_string()));
+    }
+
+    #[test]
+    fn eurid_pre_payment() {
+        const XML_DATA: &str = r#"
+<?xml version="1.0" encoding="UTF-8"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0" xmlns:registrarFinance="http://www.eurid.eu/xml/epp/registrarFinance-1.0">
+  <response>
+    <result code="1000">
+      <msg>Command completed successfully</msg>
+    </result>
+    <resData>
+      <registrarFinance:infData>
+        <registrarFinance:paymentMode>PRE_PAYMENT</registrarFinance:paymentMode>
+        <registrarFinance:availableAmount>10000.00</registrarFinance:availableAmount>
+        <registrarFinance:accountBalance>3950.00</registrarFinance:accountBalance>
+      </registrarFinance:infData>
+    </resData>
+    <trID>
+      <clTRID>registrar-info01</clTRID>
+      <svTRID>e4fc5e12b-2bfd-4196-bc52-0bdc88f31672</svTRID>
+    </trID>
+  </response>
+</epp>"#;
+        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
+        let res = match res.message {
+            super::proto::EPPMessageType::Response(r) => r,
+            _ => unreachable!(),
+        };
+        let data = super::handle_balance_response(*res).unwrap();
+        assert_eq!(data.balance, "3950.00");
+        assert_eq!(data.currency, "EUR");
+        assert_eq!(data.available_credit.unwrap(), "10000.00");
+    }
+
+    #[test]
+    fn eurid_post_payment() {
+        const XML_DATA: &str = r#"
+<?xml version="1.0" encoding="UTF-8"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0" xmlns:registrarFinance="http://www.eurid.eu/xml/epp/registrarFinance-1.0">
+  <response>
+    <result code="1000">
+      <msg>Command completed successfully</msg>
+    </result>
+    <resData>
+      <registrarFinance:infData>
+        <registrarFinance:paymentMode>POST_PAYMENT</registrarFinance:paymentMode>
+        <registrarFinance:accountBalance>10000.00</registrarFinance:accountBalance>
+        <registrarFinance:overdueAmount>0.00</registrarFinance:overdueAmount>
+        <registrarFinance:dueAmount>0.00</registrarFinance:dueAmount>
+      </registrarFinance:infData>
+    </resData>
+    <trID>
+      <clTRID>registrar-info02</clTRID>
+      <svTRID>e287d5d2f-6611-4d68-b362-784c25e4002a</svTRID>
+    </trID>
+  </response>
+</epp>"#;
+        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
+        let res = match res.message {
+            super::proto::EPPMessageType::Response(r) => r,
+            _ => unreachable!(),
+        };
+        let data = super::handle_balance_response(*res).unwrap();
+        assert_eq!(data.balance, "10000.00");
+        assert_eq!(data.currency, "EUR");
+        assert_eq!(data.available_credit.is_none(), true);
     }
 }

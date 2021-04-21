@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0">
+  <response>
+    <result code="1000">
+      <msg>Command completed successfully</msg>
+    </result>
+    <trID>
+      <clTRID>nsgroup-delete01</clTRID>
+      <svTRID>ea6d19ca9-2e78-4b23-810c-ab045e14b2b2</svTRID>
+    </trID>
+  </response>
+</epp>

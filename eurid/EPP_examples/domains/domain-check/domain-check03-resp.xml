@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0" xmlns:homoglyph="http://www.eurid.eu/xml/epp/homoglyph-1.0" xmlns:idn="http://www.eurid.eu/xml/epp/idn-1.0" xmlns:domain="urn:ietf:params:xml:ns:domain-1.0">
+  <response>
+    <result code="1000">
+      <msg>Command completed successfully</msg>
+    </result>
+    <resData>
+      <domain:chkData>
+        <domain:cd>
+          <domain:name avail="false">123.ею</domain:name>
+          <domain:reason lang="en">blocked</domain:reason>
+        </domain:cd>
+        <domain:cd>
+          <domain:name avail="true">xn--80aicaztaaflfnmi8azba8ddf.xn--e1a4c</domain:name>
+        </domain:cd>
+      </domain:chkData>
+    </resData>
+    <extension>
+      <idn:mapping>
+        <idn:name>
+          <idn:ace>123.xn--e1a4c</idn:ace>
+          <idn:unicode>123.ею</idn:unicode>
+        </idn:name>
+        <idn:name>
+          <idn:ace>xn--80aicaztaaflfnmi8azba8ddf.xn--e1a4c</idn:ace>
+          <idn:unicode>аырхеытсеччыкодпннтн.ею</idn:unicode>
+        </idn:name>
+      </idn:mapping>
+      <homoglyph:chkData>
+        <homoglyph:domain>
+          <homoglyph:name>123.ею</homoglyph:name>
+          <homoglyph:blockedBy>123.eu</homoglyph:blockedBy>
+        </homoglyph:domain>
+      </homoglyph:chkData>
+    </extension>
+    <trID>
+      <clTRID>domain-check03</clTRID>
+      <svTRID>e2b505036-1d68-488c-83c5-bb347afcb6c4</svTRID>
+    </trID>
+  </response>
+</epp>

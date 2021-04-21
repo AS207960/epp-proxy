@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0">
+  <command>
+    <info>
+      <dnssecEligibility:info xmlns:dnssecEligibility="http://www.eurid.eu/xml/epp/dnssecEligibility-1.0">
+        <dnssecEligibility:name>somedomain.eu</dnssecEligibility:name>
+      </dnssecEligibility:info>
+    </info>
+    <clTRID>dnssecEligibility11-info</clTRID>
+  </command>
+</epp>

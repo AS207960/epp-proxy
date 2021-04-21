@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0">
+  <command>
+    <update>
+      <domain:update xmlns:domain="urn:ietf:params:xml:ns:domain-1.0">
+        <domain:name>somedomain</domain:name>
+        <domain:add>
+          <domain:contact type="tech">c313</domain:contact>
+        </domain:add>
+        <domain:rem>
+          <domain:contact type="tech">c309</domain:contact>
+        </domain:rem>
+        <domain:chg>
+          <domain:registrant>c312</domain:registrant>
+        </domain:chg>
+      </domain:update>
+    </update>
+    <extension>
+      <domain-ext:update xmlns:domain-ext="http://www.eurid.eu/xml/epp/domain-ext-2.3">
+        <domain-ext:add>
+          <domain-ext:contact type="onsite">c314</domain-ext:contact>
+        </domain-ext:add>
+        <domain-ext:rem>
+          <domain-ext:contact type="onsite">c310</domain-ext:contact>
+        </domain-ext:rem>
+      </domain-ext:update>
+    </extension>
+    <clTRID>domain-update01</clTRID>
+  </command>
+</epp>

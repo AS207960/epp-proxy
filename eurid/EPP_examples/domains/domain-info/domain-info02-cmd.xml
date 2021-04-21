@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0">
+  <command>
+    <info>
+      <domain:info xmlns:domain="urn:ietf:params:xml:ns:domain-1.0">
+        <domain:name>somedomain.eu</domain:name>
+      </domain:info>
+    </info>
+    <extension>
+      <authInfo:info xmlns:authInfo="http://www.eurid.eu/xml/epp/authInfo-1.1">
+        <authInfo:request/>
+      </authInfo:info>
+    </extension>
+    <clTRID>domain-info02</clTRID>
+  </command>
+</epp>

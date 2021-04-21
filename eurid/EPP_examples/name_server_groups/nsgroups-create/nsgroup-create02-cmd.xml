@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0">
+  <command>
+    <create>
+      <nsgroup:create xmlns:nsgroup="http://www.eurid.eu/xml/epp/nsgroup-1.1">
+        <nsgroup:name>nsgroup-13123455678</nsgroup:name>
+      </nsgroup:create>
+    </create>
+    <clTRID>nsgroup-create02-empty</clTRID>
+  </command>
+</epp>

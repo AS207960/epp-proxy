@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0" xmlns:domain="http://www.eurid.eu/xml/epp/domain-1.0" xmlns:eurid="http://www.eurid.eu/xml/epp/eurid-1.0">
+  <command>
+    <transfer op="request">
+      <domain:transfer xmlns:domain="urn:ietf:params:xml:ns:domain-1.0">
+        <domain:name>somedomain.eu</domain:name>
+        <domain:authInfo>
+          <domain:pw>XXXX-3UXL-XRK3-KUT4</domain:pw>
+        </domain:authInfo>
+      </domain:transfer>
+    </transfer>
+    <extension>
+      <domain-ext:transfer xmlns:domain="urn:ietf:params:xml:ns:domain-1.0" xmlns:domain-ext="http://www.eurid.eu/xml/epp/domain-ext-2.3">
+        <domain-ext:request>
+          <domain-ext:registrant>c273</domain-ext:registrant>
+          <domain-ext:contact type="billing">c272</domain-ext:contact>
+          <domain-ext:contact type="onsite">c275</domain-ext:contact>
+          <domain-ext:contact type="reseller">c276</domain-ext:contact>
+          <domain-ext:ns>
+            <domain:hostAttr>
+              <domain:hostName>ns1.somedomain.eu</domain:hostName>
+              <domain:hostAddr>192.0.2.0</domain:hostAddr>
+            </domain:hostAttr>
+            <domain:hostAttr>
+              <domain:hostName>ns2.somedomain.eu</domain:hostName>
+              <domain:hostAddr ip="v6">2001:0db8:85a3::7344</domain:hostAddr>
+            </domain:hostAttr>
+          </domain-ext:ns>
+          <domain-ext:nsgroup>nsgroup-1573042692275</domain-ext:nsgroup>
+        </domain-ext:request>
+      </domain-ext:transfer>
+    </extension>
+    <clTRID>domain-transfer-from-quarantine-with-ns-and-nsgroup</clTRID>
+  </command>
+</epp>

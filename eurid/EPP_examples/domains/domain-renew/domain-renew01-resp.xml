@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0" xmlns:domain="urn:ietf:params:xml:ns:domain-1.0">
+  <response>
+    <result code="1000">
+      <msg>Command completed successfully</msg>
+    </result>
+    <resData>
+      <domain:renData>
+        <domain:name>somedomain.eu</domain:name>
+        <domain:exDate>2025-11-06T22:59:59.999Z</domain:exDate>
+      </domain:renData>
+    </resData>
+    <trID>
+      <clTRID>Extend the term for 5 years, period in years</clTRID>
+      <svTRID>eb287b350-d956-4e1a-a751-5f26d25d3a11</svTRID>
+    </trID>
+  </response>
+</epp>

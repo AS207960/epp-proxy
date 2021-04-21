@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0">
+  <command>
+    <check>
+      <domain:check xmlns:domain="urn:ietf:params:xml:ns:domain-1.0">
+        <domain:name>123.ею</domain:name>
+        <domain:name>xn--80aicaztaaflfnmi8azba8ddf.xn--e1a4c</domain:name>
+      </domain:check>
+    </check>
+    <clTRID>domain-check03</clTRID>
+  </command>
+</epp>

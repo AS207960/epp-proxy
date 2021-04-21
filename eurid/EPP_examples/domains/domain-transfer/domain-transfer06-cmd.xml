@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0" xmlns:domain="urn:ietf:params:xml:ns:domain-1.0">
+  <command>
+    <transfer op="request">
+      <domain:transfer>
+        <domain:name>somedomain.eu</domain:name>
+        <domain:authInfo>
+          <domain:pw>XXXX-3U2N-GN5C-4V5S</domain:pw>
+        </domain:authInfo>
+      </domain:transfer>
+    </transfer>
+    <extension>
+      <domain-ext:transfer xmlns:domain-ext="http://www.eurid.eu/xml/epp/domain-ext-2.3">
+        <domain-ext:request>
+          <domain-ext:registrant>c303</domain-ext:registrant>
+          <domain-ext:contact type="billing">c302</domain-ext:contact>
+          <domain-ext:contact type="onsite">c305</domain-ext:contact>
+          <domain-ext:ns>
+            <domain:hostAttr>
+              <domain:hostName>ns1.somedomain.eu</domain:hostName>
+              <domain:hostAddr ip="v4">198.51.100.0</domain:hostAddr>
+            </domain:hostAttr>
+            <domain:hostAttr>
+              <domain:hostName>ns2.somedomain.eu</domain:hostName>
+              <domain:hostAddr ip="v4">192.0.2.0</domain:hostAddr>
+              <domain:hostAddr ip="v6">2001:db8:85a3:0:0:8a2e:370:1234
+              </domain:hostAddr>
+            </domain:hostAttr>
+          </domain-ext:ns>
+        </domain-ext:request>
+      </domain-ext:transfer>
+      <secDNS:create xmlns:secDNS="urn:ietf:params:xml:ns:secDNS-1.1">
+        <secDNS:keyData>
+          <secDNS:flags>257</secDNS:flags>
+          <secDNS:protocol>3</secDNS:protocol>
+          <secDNS:alg>7</secDNS:alg>
+          <secDNS:pubKey>AwEAAaPjgcfoxJ1C5lJu+S39YO8jQI7llpNtbcl9TpUW6y5WwSnRMgX4
+            jVQ9OkD+aoee3QB3AHXLdufvem66fkxgM1c=
+          </secDNS:pubKey>
+        </secDNS:keyData>
+        <secDNS:keyData>
+          <secDNS:flags>256</secDNS:flags>
+          <secDNS:protocol>3</secDNS:protocol>
+          <secDNS:alg>7</secDNS:alg>
+          <secDNS:pubKey>AwEAAb3LKIHxMWmKRYXhi0Rl+x8dwmQbsr46ArbxgpPm1fPIyCgJrxGx
+            NzmHsxDKjP9oU4j9jwXJ2GfVlSSj+TLx3lk=
+          </secDNS:pubKey>
+        </secDNS:keyData>
+      </secDNS:create>
+    </extension>
+    <clTRID>domain-transfer06</clTRID>
+  </command>
+</epp>

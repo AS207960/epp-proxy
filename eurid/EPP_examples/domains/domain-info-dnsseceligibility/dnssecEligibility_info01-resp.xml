@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0" xmlns:dnssecEligibility="http://www.eurid.eu/xml/epp/dnssecEligibility-1.0">
+  <response>
+    <result code="1000">
+      <msg>Command completed successfully</msg>
+    </result>
+    <resData>
+      <dnssecEligibility:infData>
+        <dnssecEligibility:name>somedomain.eu</dnssecEligibility:name>
+        <dnssecEligibility:eligible>true</dnssecEligibility:eligible>
+        <dnssecEligibility:msg>Eligible for DNSSEC discount</dnssecEligibility:msg>
+        <dnssecEligibility:code>1001</dnssecEligibility:code>
+      </dnssecEligibility:infData>
+    </resData>
+    <trID>
+      <clTRID>dnssecEligibility11-info</clTRID>
+      <svTRID>e212b738c-f55d-40ec-a736-d49aca0898a9</svTRID>
+    </trID>
+  </response>
+</epp>

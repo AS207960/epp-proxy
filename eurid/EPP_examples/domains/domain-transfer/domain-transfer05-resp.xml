@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0" xmlns:domain-ext-2.3="http://www.eurid.eu/xml/epp/domain-ext-2.3" xmlns:idn="http://www.eurid.eu/xml/epp/idn-1.0" xmlns:domain="urn:ietf:params:xml:ns:domain-1.0">
+  <response>
+    <result code="1000">
+      <msg>Command completed successfully</msg>
+    </result>
+    <resData>
+      <domain:trnData>
+        <domain:name>вмкйршаудхыийведйкгг.ею</domain:name>
+        <domain:trStatus>pending</domain:trStatus>
+        <domain:reID>t000002</domain:reID>
+        <domain:reDate>2019-11-06T12:18:29.541Z</domain:reDate>
+        <domain:acID>eurid.eu</domain:acID>
+        <domain:acDate>2019-11-11T12:18:29.541Z</domain:acDate>
+        <domain:exDate>2021-11-06T22:59:59.999Z</domain:exDate>
+      </domain:trnData>
+    </resData>
+    <extension>
+      <domain-ext-2.3:trnData>
+        <domain-ext-2.3:onHold>false</domain-ext-2.3:onHold>
+        <domain-ext-2.3:quarantined>false</domain-ext-2.3:quarantined>
+        <domain-ext-2.3:suspended>false</domain-ext-2.3:suspended>
+        <domain-ext-2.3:registrant>c293</domain-ext-2.3:registrant>
+        <domain-ext-2.3:contact type="billing">c292</domain-ext-2.3:contact>
+        <domain-ext-2.3:contact type="tech">c294</domain-ext-2.3:contact>
+        <domain-ext-2.3:delayed>false</domain-ext-2.3:delayed>
+        <domain-ext-2.3:reason>RANDOM CHECK</domain-ext-2.3:reason>
+      </domain-ext-2.3:trnData>
+      <idn:mapping>
+        <idn:name>
+          <idn:ace>xn--80adbeadbhzhddejt0e9bxb3cwd.xn--e1a4c</idn:ace>
+          <idn:unicode>вмкйршаудхыийведйкгг.ею</idn:unicode>
+        </idn:name>
+      </idn:mapping>
+    </extension>
+    <trID>
+      <clTRID>domain-transfer05</clTRID>
+      <svTRID>ed9518b51-41aa-4d5f-bbe8-08ab182c7fee</svTRID>
+    </trID>
+  </response>
+</epp>

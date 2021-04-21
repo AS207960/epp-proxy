@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0" xmlns:domain-ext-2.4="http://www.eurid.eu/xml/epp/domain-ext-2.4" xmlns:domain="urn:ietf:params:xml:ns:domain-1.0">
+  <response>
+    <result code="1000">
+      <msg>Command completed successfully</msg>
+    </result>
+    <resData>
+      <domain:infData>
+        <domain:name>some-domain.eu</domain:name>
+        <domain:roid>some_domain_eu-EURID</domain:roid>
+        <domain:status s="clientDeleteProhibited"/>
+        <domain:status s="clientTransferProhibited"/>
+        <domain:status s="clientUpdateProhibited"/>
+        <domain:registrant>c113</domain:registrant>
+        <domain:contact type="billing">c112</domain:contact>
+        <domain:contact type="tech">c114</domain:contact>
+        <domain:clID>t000002</domain:clID>
+        <domain:crID>t000002</domain:crID>
+        <domain:crDate>2020-06-12T08:58:47.302Z</domain:crDate>
+        <domain:upID>t000002</domain:upID>
+        <domain:upDate>2020-06-12T08:58:48.000Z</domain:upDate>
+        <domain:exDate>2021-06-12T21:59:59.999Z</domain:exDate>
+      </domain:infData>
+    </resData>
+    <extension>
+      <domain-ext-2.4:infData>
+        <domain-ext-2.4:onHold>false</domain-ext-2.4:onHold>
+        <domain-ext-2.4:quarantined>false</domain-ext-2.4:quarantined>
+        <domain-ext-2.4:suspended>false</domain-ext-2.4:suspended>
+        <domain-ext-2.4:seized>false</domain-ext-2.4:seized>
+        <domain-ext-2.4:delayed>false</domain-ext-2.4:delayed>
+        <domain-ext-2.4:maxExtensionPeriod>9</domain-ext-2.4:maxExtensionPeriod>
+        <domain-ext-2.4:registrantCountry>BE</domain-ext-2.4:registrantCountry>
+      </domain-ext-2.4:infData>
+    </extension>
+    <trID>
+      <clTRID>domain-info</clTRID>
+      <svTRID>e67701b7e-fa1e-4f16-80ee-64acf9e3c80b</svTRID>
+    </trID>
+  </response>
+</epp>

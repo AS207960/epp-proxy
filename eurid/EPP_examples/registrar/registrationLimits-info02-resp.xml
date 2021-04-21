@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0" xmlns:registrationLimit="http://www.eurid.eu/xml/epp/registrationLimit-1.1">
+  <response>
+    <result code="1000">
+      <msg>Command completed successfully</msg>
+    </result>
+    <resData>
+      <registrationLimit:infData>
+        <registrationLimit:monthlyRegistrations>0</registrationLimit:monthlyRegistrations>
+      </registrationLimit:infData>
+    </resData>
+    <trID>
+      <clTRID>registrationLimits-info03</clTRID>
+      <svTRID>e037713b8-8e41-4507-ae46-7d5881da3e0c</svTRID>
+    </trID>
+  </response>
+</epp>

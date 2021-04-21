@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0">
+  <response>
+    <result code="1000">
+      <msg>Command completed successfully</msg>
+    </result>
+    <msgQ count="1" id="c5281e9a-067a-48e4-9ad9-2a866675549d"/>
+    <trID>
+      <clTRID>poll02-ack</clTRID>
+      <svTRID>e5e6e1cb8-2c4c-46eb-908e-13bd65025a03</svTRID>
+    </trID>
+  </response>
+</epp>

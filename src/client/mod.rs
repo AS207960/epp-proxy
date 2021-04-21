@@ -25,6 +25,7 @@ pub mod traficom;
 pub mod fee;
 pub mod launch;
 pub mod maintenance;
+pub mod eurid;
 
 use crate::proto::EPPServiceExtension;
 pub use router::{Request, Response, CommandResponse};
@@ -236,7 +237,25 @@ pub struct EPPClientServerFeatures {
     /// urn:ietf:params:xml:ns:epp:maintenance-0.3 support
     maintenance_supported: bool,
     /// RFC8807 support
-    login_sec_supported: bool
+    login_sec_supported: bool,
+    /// http://www.eurid.eu/xml/epp/dnsQuality-2.0 support
+    eurid_dns_quality_support: bool,
+    /// http://www.eurid.eu/xml/epp/dnssecEligibility-1.0 support
+    eurid_dnssec_eligibility_support: bool,
+    /// http://www.eurid.eu/xml/epp/homoglyph-1.0 support
+    eurid_homoglyph_supported: bool,
+    /// http://www.eurid.eu/xml/epp/authInfo-1.1 support
+    eurid_auth_info_supported: bool,
+    /// http://www.eurid.eu/xml/epp/idn-1.0 support
+    eurid_idn_supported: bool,
+    /// http://www.eurid.eu/xml/epp/registrarFinance-1.0 support
+    eurid_finance_supported: bool,
+    /// http://www.eurid.eu/xml/epp/registrarHitPoints-1.0 support
+    eurid_hit_points_supported: bool,
+    /// http://www.eurid.eu/xml/epp/registrationLimit-1.1 support
+    eurid_registration_limit_supported: bool,
+    /// http://www.eurid.eu/xml/epp/poll-1.2 support
+    eurid_poll_supported: bool,
 }
 
 impl EPPClientServerFeatures {
@@ -777,6 +796,24 @@ impl EPPClient {
         self.features.login_sec_supported = greeting
             .service_menu
             .supports_ext("urn:ietf:params:xml:ns:epp:loginSec-1.0");
+        self.features.login_sec_supported = greeting
+            .service_menu
+            .supports_ext("urn:ietf:params:xml:ns:epp:loginSec-1.0");
+        self.features.eurid_hit_points_supported = greeting
+            .service_menu
+            .supports("http://www.eurid.eu/xml/epp/registrarHitPoints-1.0");
+        self.features.eurid_registration_limit_supported = greeting
+            .service_menu
+            .supports("http://www.eurid.eu/xml/epp/registrationLimit-1.1");
+        self.features.eurid_finance_supported = greeting
+            .service_menu
+            .supports("http://www.eurid.eu/xml/epp/registrarFinance-1.0");
+        self.features.eurid_dnssec_eligibility_support = greeting
+            .service_menu
+            .supports("http://www.eurid.eu/xml/epp/dnssecEligibility-1.0");
+        self.features.eurid_dns_quality_support = greeting
+            .service_menu
+            .supports("http://www.eurid.eu/xml/epp/dnsQuality-2.0");
 
         if !(self.features.contact_supported
             | self.features.domain_supported
@@ -878,6 +915,21 @@ impl EPPClient {
             }
             if self.features.maintenance_supported {
                 objects.push("urn:ietf:params:xml:ns:epp:maintenance-0.3".to_string())
+            }
+            if self.features.eurid_hit_points_supported {
+                objects.push("http://www.eurid.eu/xml/epp/registrarHitPoints-1.0".to_string())
+            }
+            if self.features.eurid_registration_limit_supported {
+                objects.push("http://www.eurid.eu/xml/epp/registrationLimit-1.1".to_string())
+            }
+            if self.features.eurid_finance_supported {
+                objects.push("http://www.eurid.eu/xml/epp/registrarFinance-1.0".to_string())
+            }
+            if self.features.eurid_dns_quality_support {
+                objects.push("http://www.eurid.eu/xml/epp/dnsQuality-2.0".to_string())
+            }
+            if self.features.eurid_dnssec_eligibility_support {
+                objects.push("http://www.eurid.eu/xml/epp/dnssecEligibility-1.0".to_string())
             }
             if self.features.nominet_tag_list {
                 let new_client = Self {

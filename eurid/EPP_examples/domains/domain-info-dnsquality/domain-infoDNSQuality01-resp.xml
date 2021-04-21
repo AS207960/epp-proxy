@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0" xmlns:dnsQuality="http://www.eurid.eu/xml/epp/dnsQuality-2.0">
+  <response>
+    <result code="1000">
+      <msg>Command completed successfully</msg>
+    </result>
+    <resData>
+      <dnsQuality:infData>
+        <dnsQuality:name>somedomain.eu</dnsQuality:name>
+        <dnsQuality:checkTime>2017-08-17T11:23:44.312+02:00</dnsQuality:checkTime>
+        <dnsQuality:score>10000</dnsQuality:score>
+      </dnsQuality:infData>
+    </resData>
+    <trID>
+      <clTRID>dnsQuality-info01</clTRID>
+      <svTRID>e92ec1b29-58f3-4e24-9b0f-6a3f0027ef07</svTRID>
+    </trID>
+  </response>
+</epp>

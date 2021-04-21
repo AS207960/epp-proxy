@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0" xmlns:idn="http://www.eurid.eu/xml/epp/idn-1.0" xmlns:domain="urn:ietf:params:xml:ns:domain-1.0">
+  <response>
+    <result code="1000">
+      <msg>Command completed successfully</msg>
+    </result>
+    <resData>
+      <domain:chkData>
+        <domain:cd>
+          <domain:name avail="false">αβααβα-1573042515287.ευ</domain:name>
+          <domain:reason lang="en">registered</domain:reason>
+        </domain:cd>
+      </domain:chkData>
+    </resData>
+    <extension>
+      <idn:mapping>
+        <idn:name>
+          <idn:ace>xn---1573042515287-f9jaaaqc.xn--qxa6a</idn:ace>
+          <idn:unicode>αβααβα-1573042515287.ευ</idn:unicode>
+        </idn:name>
+      </idn:mapping>
+    </extension>
+    <trID>
+      <clTRID>domain-check04</clTRID>
+      <svTRID>e9024936b-bbae-48a4-b599-43f025b27cf8</svTRID>
+    </trID>
+  </response>
+</epp>

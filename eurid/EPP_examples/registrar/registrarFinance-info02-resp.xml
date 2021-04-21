@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0" xmlns:registrarFinance="http://www.eurid.eu/xml/epp/registrarFinance-1.0">
+  <response>
+    <result code="1000">
+      <msg>Command completed successfully</msg>
+    </result>
+    <resData>
+      <registrarFinance:infData>
+        <registrarFinance:paymentMode>POST_PAYMENT</registrarFinance:paymentMode>
+        <registrarFinance:accountBalance>10000.00</registrarFinance:accountBalance>
+        <registrarFinance:overdueAmount>0.00</registrarFinance:overdueAmount>
+        <registrarFinance:dueAmount>0.00</registrarFinance:dueAmount>
+      </registrarFinance:infData>
+    </resData>
+    <trID>
+      <clTRID>registrar-info02</clTRID>
+      <svTRID>e287d5d2f-6611-4d68-b362-784c25e4002a</svTRID>
+    </trID>
+  </response>
+</epp>

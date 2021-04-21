@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0">
+  <command>
+    <update>
+      <domain:update xmlns:domain="urn:ietf:params:xml:ns:domain-1.0">
+        <domain:name>αβααβα-1567587491098.ευ</domain:name>
+        <domain:add>
+          <domain:ns>
+            <domain:hostAttr>
+              <domain:hostName>ns1.αβααβα-1567587491098.ευ</domain:hostName>
+              <domain:hostAddr ip="v4">203.0.113.0</domain:hostAddr>
+            </domain:hostAttr>
+            <domain:hostAttr>
+              <domain:hostName>ns1.αβααβα-1567587491098.ευ</domain:hostName>
+              <domain:hostAddr ip="v6">2001:db8:85a3:0:0:8a2e:371:7334</domain:hostAddr>
+            </domain:hostAttr>
+            <domain:hostAttr>
+              <domain:hostName>ns2.αβααβα-1567587491098.ευ</domain:hostName>
+              <domain:hostAddr ip="v4">192.0.2.0</domain:hostAddr>
+              <domain:hostAddr ip="v6">2001:db8:85a3:0:0:8a2e:371:7333</domain:hostAddr>
+            </domain:hostAttr>
+          </domain:ns>
+        </domain:add>
+      </domain:update>
+    </update>
+    <clTRID>domain-update09</clTRID>
+  </command>
+</epp>

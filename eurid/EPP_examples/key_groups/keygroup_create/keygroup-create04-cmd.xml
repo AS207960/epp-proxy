@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0">
+  <command>
+    <create>
+      <keygroup:create xmlns:keygroup="http://www.eurid.eu/xml/epp/keygroup-1.1">
+        <keygroup:name>keygroup-1573042860938</keygroup:name>
+        <keygroup:keyData>
+          <keygroup:flags>257</keygroup:flags>
+          <keygroup:protocol>3</keygroup:protocol>
+          <keygroup:alg>13</keygroup:alg>
+          <keygroup:pubKey>Y6Gs0nmFzV2jeAFX99PfCkRhtEXnL5QEpLIRXxZeSFninICveFYovQzO 1KoRSkmDq/B/QsH7JfQ2fL6bfxIzUg==</keygroup:pubKey>
+        </keygroup:keyData>
+        <keygroup:keyData>
+          <keygroup:flags>257</keygroup:flags>
+          <keygroup:protocol>3</keygroup:protocol>
+          <keygroup:alg>14</keygroup:alg>
+          <keygroup:pubKey>IL8fSAYSEGhdGHmNltFIAPu5Oji+yVpucJS2eYmcBhlmRTZTx/G2rLpO 9iD1WGRfBDW6a5pI9lZrEly+08vDp8YW7+uX7a0e4SWSbWI5FTRKn0zp eh30CAajo68Z50Q4</keygroup:pubKey>
+        </keygroup:keyData>
+        <keygroup:keyData>
+          <keygroup:flags>256</keygroup:flags>
+          <keygroup:protocol>3</keygroup:protocol>
+          <keygroup:alg>15</keygroup:alg>
+          <keygroup:pubKey>zPnZ/QwEe7S8C5SPz2OfS5RR40ATk2/rYnE9xHIEijs=</keygroup:pubKey>
+        </keygroup:keyData>
+        <keygroup:keyData>
+          <keygroup:flags>257</keygroup:flags>
+          <keygroup:protocol>3</keygroup:protocol>
+          <keygroup:alg>16</keygroup:alg>
+          <keygroup:pubKey>3kgROaDjrh0H2iuixWBrc8g2EpBBLCdGzHmn+G2MpTPhpj/OiBVHHSfPodx1FYYUcJKm1MDpJtIA</keygroup:pubKey>
+        </keygroup:keyData>
+      </keygroup:create>
+    </create>
+    <clTRID>keygroup11-create</clTRID>
+  </command>
+</epp>

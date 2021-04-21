@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0" xmlns:domain-ext-2.3="http://www.eurid.eu/xml/epp/domain-ext-2.3" xmlns:domain="urn:ietf:params:xml:ns:domain-1.0">
+  <response>
+    <result code="1000">
+      <msg>Command completed successfully</msg>
+    </result>
+    <resData>
+      <domain:infData>
+        <domain:name>somedomain.eu</domain:name>
+        <domain:roid>somedomain_eu-EURID</domain:roid>
+        <domain:status s="serverHold"/>
+        <domain:registrant>c213</domain:registrant>
+        <domain:contact type="billing">c212</domain:contact>
+        <domain:contact type="tech">c214</domain:contact>
+        <domain:clID>t000001</domain:clID>
+        <domain:crID>t000001</domain:crID>
+        <domain:crDate>2019-11-06T12:17:18.435Z</domain:crDate>
+        <domain:upID>t000001</domain:upID>
+        <domain:upDate>2019-11-06T12:17:18.000Z</domain:upDate>
+        <domain:exDate>2020-11-06T22:59:59.999Z</domain:exDate>
+      </domain:infData>
+    </resData>
+    <extension>
+      <domain-ext-2.3:infData>
+        <domain-ext-2.3:onHold>false</domain-ext-2.3:onHold>
+        <domain-ext-2.3:quarantined>false</domain-ext-2.3:quarantined>
+        <domain-ext-2.3:suspended>true</domain-ext-2.3:suspended>
+        <domain-ext-2.3:seized>false</domain-ext-2.3:seized>
+        <domain-ext-2.3:delayed>false</domain-ext-2.3:delayed>
+        <domain-ext-2.3:maxExtensionPeriod>9</domain-ext-2.3:maxExtensionPeriod>
+        <domain-ext-2.3:registrantCountry>BE</domain-ext-2.3:registrantCountry>
+      </domain-ext-2.3:infData>
+    </extension>
+    <trID>
+      <clTRID>domain-info10</clTRID>
+      <svTRID>e2bddc101-2bc9-446a-b6e8-57b7e8d0871d</svTRID>
+    </trID>
+  </response>
+</epp>
