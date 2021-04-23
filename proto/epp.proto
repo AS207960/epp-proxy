@@ -10,6 +10,7 @@ import "rgp.proto";
 import "nominet.proto";
 import "traficom.proto";
 import "maintenance.proto";
+import "eurid.proto";
 import "common.proto";
 
 service EPPProxy {
@@ -80,6 +81,7 @@ message PollReply {
         traficom.TrnData traficom_trn_data = 22;
         BalanceReply verisign_low_balance_data = 19;
         maintenance.MaintenanceInfoReply maintenance_info = 24;
+        eurid.PollReply eurid_poll_data = 25;
     }
     ChangeData change_data = 10;
     common.CommandResponse cmd_resp = 23;

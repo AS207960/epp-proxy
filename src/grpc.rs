@@ -51,6 +51,10 @@ pub mod epp_proto {
     pub mod maintenance {
         tonic::include_proto!("epp.maintenance");
     }
+
+    pub mod eurid {
+        tonic::include_proto!("epp.eurid");
+    }
 }
 
 /// Helper function to convert chrono times to protobuf well-known type times

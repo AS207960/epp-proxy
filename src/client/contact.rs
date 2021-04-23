@@ -66,6 +66,7 @@ pub struct InfoResponse {
     pub disclosure: Vec<DisclosureType>,
     pub auth_info: Option<String>,
     pub nominet_data_quality: Option<super::nominet::DataQualityData>,
+    pub eurid_contact_extension: Option<super::eurid::ContactExtension>,
 }
 
 #[derive(Debug)]
@@ -96,7 +97,7 @@ pub struct Address {
     pub birth_date: Option<Date<Utc>>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub enum EntityType {
     UkLimitedCompany,
     UkPublicLimitedCompany,
@@ -436,6 +437,7 @@ pub struct CreateRequest {
     company_number: Option<String>,
     disclosure: Option<Vec<DisclosureType>>,
     auth_info: String,
+    eurid_contact_extension: Option<super::eurid::ContactExtension>,
     pub return_path: Sender<CreateResponse>,
 }
 
@@ -476,6 +478,7 @@ pub struct UpdateRequest {
     new_company_number: Option<String>,
     new_disclosure: Option<Vec<DisclosureType>>,
     new_auth_info: Option<String>,
+    new_eurid_contact_extension: Option<super::eurid::ContactExtensionUpdate>,
     pub return_path: Sender<UpdateResponse>,
 }
 
@@ -600,6 +603,19 @@ TryFrom<(
             },
             None => None,
         };
+        let eurid_ext_info = match extension {
+            Some(e) => match e.value.iter().find(|e| match e {
+                proto::EPPResponseExtensionType::EURIDContactInfoData(_) => true,
+                _ => false,
+            }) {
+                Some(e) => match e {
+                    proto::EPPResponseExtensionType::EURIDContactInfoData(e) => Some(e),
+                    _ => unreachable!(),
+                },
+                None => None,
+            },
+            None => None,
+        };
 
         let local_address = contact_info
             .postal_info
@@ -653,7 +669,10 @@ TryFrom<(
                             None => false,
                         },
                     ),
-                    None => EntityType::Unknown,
+                    None => match &eurid_ext_info {
+                        Some(e) => super::eurid::eurid_ext_to_entity(e),
+                        None => EntityType::Unknown,
+                    }
                 },
             },
             disclosure: match contact_info.disclose {
@@ -670,7 +689,8 @@ TryFrom<(
                 Some(a) => a.password,
                 None => None,
             },
-            nominet_data_quality: data_quality_ext_info.map(Into::into)
+            nominet_data_quality: data_quality_ext_info.map(Into::into),
+            eurid_contact_extension: eurid_ext_info.map(Into::into),
         })
     }
 }
@@ -920,6 +940,18 @@ pub fn handle_create(
             },
         ));
     }
+    if client.eurid_contact_support {
+        match &req.eurid_contact_extension {
+            Some(e) => {
+                ext.push(proto::EPPCommandExtensionType::EURIDContactCreate(
+                    super::eurid::contact_info_from_extension(e, &req.entity_type)
+                ))
+            },
+            None => return Err(Err(Error::Err(
+                "contact extension required for EURid".to_string(),
+            )))
+        }
+    }
     super::verisign::handle_verisign_namestore_erratum(client, &mut ext);
 
     let command = proto::EPPCreate::Contact(Box::new(proto::contact::EPPContactCreate {
@@ -1025,13 +1057,26 @@ pub fn handle_update(
     let is_not_nom_change = req.new_entity_type.is_none()
         && req.new_trading_name.is_none()
         && req.new_company_number.is_none();
+    let is_not_eurid_change = match &req.new_eurid_contact_extension {
+        Some(e) => e.language.is_none()
+        && e.contact_type.is_none()
+        && e.citizenship_country.is_none()
+        && e.whois_email.is_none()
+        && e.vat.is_none(),
+        None => true
+    };
     if req.add_statuses.is_empty() && req.remove_statuses.is_empty() && is_not_change {
-        if is_not_nom_change {
+        if is_not_nom_change && is_not_eurid_change {
             return Err(Err(Error::Err(
                 "at least one operation must be specified".to_string(),
             )));
-        } else if !client.nominet_contact_ext {
-            return Err(Ok(UpdateResponse { pending: false }));
+        } else {
+            if (!is_not_nom_change) && (!client.nominet_contact_ext) {
+                return Err(Ok(UpdateResponse { pending: false }));
+            }
+            if (!is_not_eurid_change) && (!client.eurid_contact_support) {
+                return Err(Ok(UpdateResponse { pending: false }));
+            }
         }
     }
     let phone_re = Regex::new(r"^\+\d+\.\d+$").unwrap();
@@ -1160,6 +1205,15 @@ pub fn handle_update(
                 company_number: req.new_company_number.clone(),
             },
         ));
+    }
+    if client.eurid_contact_support {
+        ext.push(proto::EPPCommandExtensionType::EURIDContactUpdate(
+            super::eurid::contact_info_update_from_extension(&req.new_eurid_contact_extension, &req.new_entity_type)
+        ));
+    } else {
+        if req.new_eurid_contact_extension.is_some() {
+            return Err(Err(Error::Unsupported));
+        }
     }
     super::verisign::handle_verisign_namestore_erratum(client, &mut ext);
 
@@ -1381,6 +1435,7 @@ pub async fn create(
             company_number: data.company_number,
             disclosure: data.disclosure,
             auth_info: data.auth_info,
+            eurid_contact_extension: None,
             return_path: sender,
         })),
         receiver,
@@ -1466,6 +1521,7 @@ pub async fn update(
             new_company_number: new_data.company_number,
             new_disclosure: new_data.disclosure,
             new_auth_info: new_data.auth_info,
+            new_eurid_contact_extension: None,
             return_path: sender,
         })),
         receiver,

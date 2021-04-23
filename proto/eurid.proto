@@ -1,0 +1,52 @@
+syntax = "proto3";
+package epp.eurid;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+import "common.proto";
+
+message HitPointsReply {
+    uint64 hit_points = 1;
+    uint64 max_hit_points = 2;
+    google.protobuf.Timestamp blocked_until = 3;
+    common.CommandResponse cmd_resp = 4;
+}
+
+message RegistrationLimitReply {
+    uint64 monthly_registrations = 1;
+    uint64 max_monthly_registrations = 2;
+    google.protobuf.Timestamp limited_until = 3;
+    common.CommandResponse cmd_resp = 4;
+}
+
+message DNSSECEligibilityRequest {
+    string name = 1;
+}
+
+message DNSSECEligibilityReply {
+    bool eligible = 1;
+    string message = 2;
+    uint32 code = 3;
+    common.CommandResponse cmd_resp = 4;
+}
+
+message DNSQualityRequest {
+    string name = 1;
+}
+
+message DNSQualityReply {
+    string score = 1;
+    google.protobuf.Timestamp check_time = 2;
+    common.CommandResponse cmd_resp = 3;
+}
+
+message PollReply {
+    string context = 1;
+    string object_type = 2;
+    string object = 3;
+    string object_unicode = 4;
+    string action = 5;
+    uint32 code = 6;
+    google.protobuf.StringValue detail = 7;
+    google.protobuf.StringValue registrar = 8;
+}

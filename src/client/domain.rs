@@ -38,6 +38,8 @@ pub struct CheckResponse {
     /// Fee information (if supplied by the registry)
     pub fee_check: Option<fee::FeeCheckData>,
     pub donuts_fee_check: Option<fee::DonutsFeeData>,
+    pub eurid_check: Option<super::eurid::DomainCheck>,
+    pub eurid_idn: Option<super::eurid::IDN>,
 }
 
 /// Response to a domain claims check query
@@ -346,7 +348,7 @@ pub struct TransferData {
     pub expiry_date: Option<DateTime<Utc>>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub enum Status {
     ClientDeleteProhibited,
     ClientHold,
@@ -1261,6 +1263,8 @@ pub fn handle_check_response(response: proto::EPPResponse) -> Response<CheckResp
                         reason: domain_check.reason.to_owned(),
                         fee_check,
                         donuts_fee_check,
+                        eurid_check: super::eurid::extract_eurid_domain_check_singular(&response.extension)?,
+                        eurid_idn: super::eurid::extract_eurid_idn_singular(&response.extension)?,
                     })
                 } else {
                     Err(Error::InternalServerError)

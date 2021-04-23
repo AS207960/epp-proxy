@@ -118,7 +118,7 @@ pub struct EPPDomainInfoData {
     pub auth_info: Option<EPPDomainAuthInfo>,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct EPPDomainStatus {
     #[serde(rename = "$attr:s")]
     pub status: EPPDomainStatusType,
@@ -126,7 +126,7 @@ pub struct EPPDomainStatus {
     pub message: Option<String>,
 }
 
-#[derive(Debug, Deserialize, Serialize, PartialEq)]
+#[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
 pub enum EPPDomainStatusType {
     #[serde(rename = "clientDeleteProhibited")]
     ClientDeleteProhibited,

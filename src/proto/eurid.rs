@@ -8,7 +8,7 @@ pub struct EURIDDomainCheckData {
     pub domains: Vec<EURIDDomainCheckDatum>
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 pub struct EURIDDomainCheckDatum {
     #[serde(rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.4}name")]
     pub name: String,
