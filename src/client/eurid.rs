@@ -221,11 +221,12 @@ pub fn extract_eurid_idn(from: &Option<proto::EPPResponseExtension>) -> Option<V
     }
 }
 
-pub fn extract_eurid_idn_singular(from: &Option<proto::EPPResponseExtension>) -> Result<Option<IDN>, Error> {
+pub fn extract_eurid_idn_singular<'o, O: Into<Option<&'o str>>>(from: &Option<proto::EPPResponseExtension>, orig_name: O) -> Result<Option<IDN>, Error> {
     match extract_eurid_idn(from) {
-        Some(mut i) => match i.len() {
-            1 => Ok(Some(i.pop().unwrap())),
-            _ => Err(Error::InternalServerError)
+        Some(mut i) => match (i.len(), orig_name.into()) {
+            (1, None) => Ok(Some(i.pop().unwrap())),
+            (_, None) => Err(Error::InternalServerError),
+            (_, Some(o)) => Ok(i.into_iter().find(|i| i.ace == o || i.unicode == o))
         },
         None => Ok(None)
     }
@@ -268,6 +269,106 @@ pub fn extract_eurid_domain_check_singular(from: &Option<proto::EPPResponseExten
              }
          },
         None => Ok(None)
+    }
+}
+
+#[derive(Debug)]
+pub struct DomainCreate {
+    pub on_site: Option<String>,
+    pub reseller: Option<String>,
+}
+
+impl From<&DomainCreate> for proto::eurid::EURIDDomainCreate {
+    fn from(from: &DomainCreate) -> Self {
+        let mut contacts = vec![];
+
+        if let Some(on_site) = &from.on_site {
+            contacts.push(proto::eurid::EURIDDomainContact {
+                contact_type: proto::eurid::EURIDContactType::OnSite,
+                contact_id: on_site.to_string()
+            });
+        }
+
+        if let Some(reseller) = &from.reseller {
+            contacts.push(proto::eurid::EURIDDomainContact {
+                contact_type: proto::eurid::EURIDContactType::Reseller,
+                contact_id: reseller.to_string()
+            });
+        }
+
+        proto::eurid::EURIDDomainCreate {
+            contacts,
+            nsgroups: vec![],
+            keygroup: None
+        }
+    }
+}
+
+
+#[derive(Debug)]
+pub enum DomainDelete {
+    Schedule(DateTime<Utc>),
+    Cancel
+}
+
+impl From<&DomainDelete> for proto::eurid::EURIDDomainDelete {
+    fn from(from: &DomainDelete) -> Self {
+        match from {
+            DomainDelete::Schedule(t) => proto::eurid::EURIDDomainDelete::Schedule(
+                proto::eurid::EURIDDomainDeleteSchedule {
+                    delete_date: t.to_owned()
+                }
+            ),
+            DomainDelete::Cancel => proto::eurid::EURIDDomainDelete::Cancel {}
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct DomainInfo {
+    pub on_hold: bool,
+    pub quarantined: bool,
+    pub suspended: bool,
+    pub delayed: bool,
+    pub seized: bool,
+    pub deletion_date: Option<DateTime<Utc>>,
+    pub on_site: Option<String>,
+    pub reseller: Option<String>,
+    pub max_extension_period: u32,
+    pub registrant_country: String,
+    pub registrant_country_of_citizenship: Option<String>,
+}
+
+pub fn extract_eurid_domain_info(from: &Option<proto::EPPResponseExtension>) -> Option<DomainInfo>{
+    let eurid_ext_info = match from {
+        Some(e) => e.value.iter().find_map(|e| match e {
+            proto::EPPResponseExtensionType::EURIDDomainInfoData(e) => Some(e),
+            _ => None,
+        }),
+        None => None,
+    };
+
+    match eurid_ext_info {
+         Some(e) => Some(DomainInfo {
+             on_hold: e.on_hold,
+             quarantined: e.quarantined,
+             suspended: e.suspended,
+             delayed: e.delayed,
+             seized: e.seized,
+             deletion_date: e.deletion_date,
+             max_extension_period: e.max_extension_period,
+             registrant_country: e.registrant_country.to_string(),
+             registrant_country_of_citizenship: e.registrant_country_of_citizenship.as_deref().map(Into::into),
+             on_site: e.contacts.iter().find_map(|c| match c.contact_type {
+                 proto::eurid::EURIDContactType::OnSite => Some(c.contact_id.to_owned()),
+                 _ => None,
+             }),
+             reseller: e.contacts.iter().find_map(|c| match c.contact_type {
+                 proto::eurid::EURIDContactType::Reseller => Some(c.contact_id.to_string()),
+                 _ => None,
+             })
+         }),
+        None => None
     }
 }
 
@@ -358,7 +459,7 @@ pub fn handle_dnssec_eligibility_response(response: proto::EPPResponse) -> Respo
                     eligible: dnssec_eligibility.eligible,
                     message: dnssec_eligibility.msg,
                     code: dnssec_eligibility.code,
-                    idn: extract_eurid_idn_singular(&response.extension)?
+                    idn: extract_eurid_idn_singular(&response.extension, dnssec_eligibility.name.as_str())?
                 })
             }
             _ => Err(Error::InternalServerError),
@@ -392,7 +493,7 @@ pub fn handle_dns_quality_response(response: proto::EPPResponse) -> Response<DNS
                 Response::Ok(DNSQualityResponse {
                     check_time: dns_quality.check_time,
                     score: dns_quality.score,
-                    idn: extract_eurid_idn_singular(&response.extension)?
+                    idn: extract_eurid_idn_singular(&response.extension, dns_quality.name.as_str())?
                 })
             }
             _ => Err(Error::InternalServerError),
@@ -1004,7 +1105,7 @@ mod eurid_tests {
     fn domain_check_0() {
         const XML_DATA: &str = r#"
 <?xml version="1.0" encoding="UTF-8"?>
-<epp xmlns="urn:ietf:params:xml:ns:epp-1.0" xmlns:domain-ext-2.3="http://www.eurid.eu/xml/epp/domain-ext-2.4" xmlns:domain="urn:ietf:params:xml:ns:domain-1.0">
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0" xmlns:domain-ext-2.4="http://www.eurid.eu/xml/epp/domain-ext-2.4" xmlns:domain="urn:ietf:params:xml:ns:domain-1.0">
   <response>
     <result code="1000">
       <msg>Command completed successfully</msg>
@@ -1018,12 +1119,12 @@ mod eurid_tests {
       </domain:chkData>
     </resData>
     <extension>
-      <domain-ext-2.3:chkData>
-        <domain-ext-2.3:domain>
-          <domain-ext-2.3:name>europa.eu</domain-ext-2.3:name>
-          <domain-ext-2.3:status s="serverTransferProhibited"/>
-        </domain-ext-2.3:domain>
-      </domain-ext-2.3:chkData>
+      <domain-ext-2.4:chkData>
+        <domain-ext-2.4:domain>
+          <domain-ext-2.4:name>europa.eu</domain-ext-2.4:name>
+          <domain-ext-2.4:status s="serverTransferProhibited"/>
+        </domain-ext-2.4:domain>
+      </domain-ext-2.4:chkData>
     </extension>
     <trID>
       <clTRID>domain-check02</clTRID>
@@ -1088,5 +1189,174 @@ mod eurid_tests {
         assert_eq!(data.eurid_check.is_none(), true);
         assert_eq!(idn.ace, "xn---1573042515287-f9jaaaqc.xn--qxa6a");
         assert_eq!(idn.unicode, "αβααβα-1573042515287.ευ");
+    }
+
+    #[test]
+    fn domain_info_0() {
+        const XML_DATA: &str = r#"
+<?xml version="1.0" encoding="UTF-8"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0" xmlns:domain-ext-2.3="http://www.eurid.eu/xml/epp/domain-ext-2.4" xmlns:domain="urn:ietf:params:xml:ns:domain-1.0">
+  <response>
+    <result code="1000">
+      <msg>Command completed successfully</msg>
+    </result>
+    <resData>
+      <domain:infData>
+        <domain:name>somedomain.eu</domain:name>
+        <domain:roid>somedomain_eu-EURID</domain:roid>
+        <domain:status s="ok"/>
+        <domain:registrant>c167</domain:registrant>
+        <domain:contact type="billing">c166</domain:contact>
+        <domain:contact type="tech">c168</domain:contact>
+        <domain:ns>
+          <domain:hostAttr>
+            <domain:hostName>b.somedomain.eu</domain:hostName>
+            <domain:hostAddr ip="v6">2001:db8:85a3:0:0:8a2e:371:7333</domain:hostAddr>
+          </domain:hostAttr>
+          <domain:hostAttr>
+            <domain:hostName>a.somedomain.eu</domain:hostName>
+            <domain:hostAddr ip="v4">203.0.113.0</domain:hostAddr>
+          </domain:hostAttr>
+        </domain:ns>
+        <domain:clID>t000001</domain:clID>
+        <domain:crID>t000001</domain:crID>
+        <domain:crDate>2019-11-06T12:16:28.629Z</domain:crDate>
+        <domain:upID>t000001</domain:upID>
+        <domain:upDate>2019-11-06T12:16:28.000Z</domain:upDate>
+        <domain:exDate>2022-11-06T22:59:59.999Z</domain:exDate>
+      </domain:infData>
+    </resData>
+    <extension>
+      <domain-ext-2.3:infData>
+        <domain-ext-2.3:onHold>false</domain-ext-2.3:onHold>
+        <domain-ext-2.3:quarantined>false</domain-ext-2.3:quarantined>
+        <domain-ext-2.3:suspended>false</domain-ext-2.3:suspended>
+        <domain-ext-2.3:seized>false</domain-ext-2.3:seized>
+        <domain-ext-2.3:contact type="onsite">c169</domain-ext-2.3:contact>
+        <domain-ext-2.3:nsgroup>nsgroup-1573042588055</domain-ext-2.3:nsgroup>
+        <domain-ext-2.3:nsgroup>nsgroup-1573042587789</domain-ext-2.3:nsgroup>
+        <domain-ext-2.3:delayed>false</domain-ext-2.3:delayed>
+        <domain-ext-2.3:maxExtensionPeriod>7</domain-ext-2.3:maxExtensionPeriod>
+        <domain-ext-2.3:registrantCountry>BE</domain-ext-2.3:registrantCountry>
+      </domain-ext-2.3:infData>
+    </extension>
+    <trID>
+      <clTRID>domain-info01</clTRID>
+      <svTRID>eaeddd5eb-534b-4602-95e1-bf5fd4328912</svTRID>
+    </trID>
+  </response>
+</epp>"#;
+        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
+        let res = match res.message {
+            super::proto::EPPMessageType::Response(r) => r,
+            _ => unreachable!(),
+        };
+        let data = super::super::domain::handle_info_response(*res).unwrap();
+        let eurid_data = data.eurid_data.unwrap();
+        assert_eq!(data.name, "somedomain.eu");
+        assert_eq!(eurid_data.on_hold, false);
+        assert_eq!(eurid_data.quarantined, false);
+        assert_eq!(eurid_data.suspended, false);
+        assert_eq!(eurid_data.seized, false);
+        assert_eq!(eurid_data.on_site.unwrap(), "c169");
+        assert_eq!(eurid_data.delayed, false);
+        assert_eq!(eurid_data.max_extension_period, 7);
+        assert_eq!(eurid_data.registrant_country, "BE");
+        assert_eq!(eurid_data.registrant_country_of_citizenship.is_none(), true);
+        assert_eq!(eurid_data.reseller.is_none(), true);
+        assert_eq!(eurid_data.deletion_date.is_none(), true);
+    }
+
+    #[test]
+    fn domain_info_1() {
+        const XML_DATA: &str = r#"
+<?xml version="1.0" encoding="UTF-8"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0" xmlns:domain-ext-2.3="http://www.eurid.eu/xml/epp/domain-ext-2.4" xmlns:idn="http://www.eurid.eu/xml/epp/idn-1.0" xmlns:domain="urn:ietf:params:xml:ns:domain-1.0">
+  <response>
+    <result code="1000">
+      <msg>Command completed successfully</msg>
+    </result>
+    <resData>
+      <domain:infData>
+        <domain:name>вмкйршаудхыийведйкгг.ею</domain:name>
+        <domain:roid>xn__80adbeadbhzhddejt0e9bxb3cwd_xn__e1a4c-EURID</domain:roid>
+        <domain:status s="ok"/>
+        <domain:registrant>c193</domain:registrant>
+        <domain:contact type="billing">c192</domain:contact>
+        <domain:contact type="tech">c194</domain:contact>
+        <domain:ns>
+          <domain:hostAttr>
+            <domain:hostName>b.вмкйршаудхыийведйкгг.ею</domain:hostName>
+            <domain:hostAddr ip="v6">2001:db8:85a3:0:0:8a2e:371:7333</domain:hostAddr>
+          </domain:hostAttr>
+          <domain:hostAttr>
+            <domain:hostName>a.вмкйршаудхыийведйкгг.ею</domain:hostName>
+            <domain:hostAddr ip="v4">203.0.113.0</domain:hostAddr>
+          </domain:hostAttr>
+        </domain:ns>
+        <domain:clID>t000001</domain:clID>
+        <domain:crID>t000001</domain:crID>
+        <domain:crDate>2019-11-06T12:16:56.905Z</domain:crDate>
+        <domain:upID>t000001</domain:upID>
+        <domain:upDate>2019-11-06T12:16:56.000Z</domain:upDate>
+        <domain:exDate>2022-11-06T22:59:59.999Z</domain:exDate>
+      </domain:infData>
+    </resData>
+    <extension>
+      <domain-ext-2.3:infData>
+        <domain-ext-2.3:onHold>false</domain-ext-2.3:onHold>
+        <domain-ext-2.3:quarantined>false</domain-ext-2.3:quarantined>
+        <domain-ext-2.3:suspended>false</domain-ext-2.3:suspended>
+        <domain-ext-2.3:seized>false</domain-ext-2.3:seized>
+        <domain-ext-2.3:contact type="onsite">c195</domain-ext-2.3:contact>
+        <domain-ext-2.3:nsgroup>nsgroup-1573042616260</domain-ext-2.3:nsgroup>
+        <domain-ext-2.3:nsgroup>nsgroup-1573042615978</domain-ext-2.3:nsgroup>
+        <domain-ext-2.3:delayed>false</domain-ext-2.3:delayed>
+        <domain-ext-2.3:maxExtensionPeriod>7</domain-ext-2.3:maxExtensionPeriod>
+        <domain-ext-2.3:registrantCountry>BE</domain-ext-2.3:registrantCountry>
+      </domain-ext-2.3:infData>
+      <idn:mapping>
+        <idn:name>
+          <idn:ace>a.xn--80adbeadbhzhddejt0e9bxb3cwd.xn--e1a4c</idn:ace>
+          <idn:unicode>a.вмкйршаудхыийведйкгг.ею</idn:unicode>
+        </idn:name>
+        <idn:name>
+          <idn:ace>b.xn--80adbeadbhzhddejt0e9bxb3cwd.xn--e1a4c</idn:ace>
+          <idn:unicode>b.вмкйршаудхыийведйкгг.ею</idn:unicode>
+        </idn:name>
+        <idn:name>
+          <idn:ace>xn--80adbeadbhzhddejt0e9bxb3cwd.xn--e1a4c</idn:ace>
+          <idn:unicode>вмкйршаудхыийведйкгг.ею</idn:unicode>
+        </idn:name>
+      </idn:mapping>
+    </extension>
+    <trID>
+      <clTRID>domain-info06</clTRID>
+      <svTRID>eea5c141b-870b-47f0-bea5-641a269cc7bc</svTRID>
+    </trID>
+  </response>
+</epp>"#;
+        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
+        let res = match res.message {
+            super::proto::EPPMessageType::Response(r) => r,
+            _ => unreachable!(),
+        };
+        let data = super::super::domain::handle_info_response(*res).unwrap();
+        let eurid_data = data.eurid_data.unwrap();
+        let eurid_idn = data.eurid_idn.unwrap();
+        assert_eq!(data.name, "вмкйршаудхыийведйкгг.ею");
+        assert_eq!(eurid_data.on_hold, false);
+        assert_eq!(eurid_data.quarantined, false);
+        assert_eq!(eurid_data.suspended, false);
+        assert_eq!(eurid_data.seized, false);
+        assert_eq!(eurid_data.on_site.unwrap(), "c195");
+        assert_eq!(eurid_data.delayed, false);
+        assert_eq!(eurid_data.max_extension_period, 7);
+        assert_eq!(eurid_data.registrant_country, "BE");
+        assert_eq!(eurid_data.registrant_country_of_citizenship.is_none(), true);
+        assert_eq!(eurid_data.reseller.is_none(), true);
+        assert_eq!(eurid_data.deletion_date.is_none(), true);
+        assert_eq!(eurid_idn.unicode, "вмкйршаудхыийведйкгг.ею");
+        assert_eq!(eurid_idn.ace, "xn--80adbeadbhzhddejt0e9bxb3cwd.xn--e1a4c");
     }
 }

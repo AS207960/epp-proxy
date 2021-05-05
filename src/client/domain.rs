@@ -107,6 +107,8 @@ pub struct InfoResponse {
     pub launch_info: Option<launch::LaunchInfoData>,
     pub donuts_fee_data: Option<fee::DonutsFeeData>,
     pub whois_info: Option<super::verisign::InfoWhois>,
+    pub eurid_data: Option<super::eurid::DomainInfo>,
+    pub eurid_idn: Option<super::eurid::IDN>,
 }
 
 /// Additional contact associated with a domain
@@ -172,6 +174,7 @@ pub struct CreateRequest {
     launch_create: Option<launch::LaunchCreate>,
     fee_agreement: Option<fee::FeeAgreement>,
     donuts_fee_agreement: Option<fee::DonutsFeeData>,
+    eurid_data: Option<super::eurid::DomainCreate>,
     pub return_path: Sender<CreateResponse>,
 }
 
@@ -200,6 +203,7 @@ pub struct CreateResponse {
     pub fee_data: Option<fee::FeeData>,
     pub donuts_fee_data: Option<fee::DonutsFeeData>,
     pub launch_create: Option<launch::LaunchCreateData>,
+    pub eurid_idn: Option<super::eurid::IDN>,
 }
 
 #[derive(Debug)]
@@ -217,6 +221,7 @@ pub struct DeleteRequest {
     name: String,
     launch_info: Option<launch::LaunchUpdate>,
     donuts_fee_agreement: Option<fee::DonutsFeeData>,
+    eurid_data: Option<super::eurid::DomainDelete>,
     pub return_path: Sender<DeleteResponse>,
 }
 
@@ -226,6 +231,7 @@ pub struct DeleteResponse {
     pub pending: bool,
     /// Fee information (if supplied by the registry)
     pub fee_data: Option<fee::FeeData>,
+    pub eurid_idn: Option<super::eurid::IDN>,
 }
 
 #[derive(Debug)]
@@ -290,6 +296,7 @@ pub struct RenewResponse {
     /// Fee information (if supplied by the registry)
     pub fee_data: Option<fee::FeeData>,
     pub donuts_fee_data: Option<fee::DonutsFeeData>,
+    pub eurid_idn: Option<super::eurid::IDN>,
 }
 
 #[derive(Debug)]
@@ -602,6 +609,7 @@ TryFrom<(
         };
 
         Ok(InfoResponse {
+            eurid_idn: super::eurid::extract_eurid_idn_singular(extension, domain_info.name.as_str())?,
             name: domain_info.name,
             registry_id: domain_info.registry_id.unwrap_or_default(),
             statuses: domain_info
@@ -669,6 +677,7 @@ TryFrom<(
             launch_info,
             donuts_fee_data,
             whois_info,
+            eurid_data: super::eurid::extract_eurid_domain_info(extension),
         })
     }
 }
@@ -857,6 +866,7 @@ TryFrom<(
             Some(domain_create) => {
                 Ok(CreateResponse {
                     pending: false,
+                    eurid_idn: super::eurid::extract_eurid_idn_singular(extension, domain_create.name.as_str())?,
                     data: CreateData {
                         name: domain_create.name.clone(),
                         creation_date: Some(domain_create.creation_date),
@@ -870,6 +880,7 @@ TryFrom<(
             None => {
                 Ok(CreateResponse {
                     pending: false,
+                    eurid_idn: super::eurid::extract_eurid_idn_singular(extension, None)?,
                     data: CreateData {
                         name: "".to_string(),
                         creation_date: None,
@@ -960,6 +971,7 @@ TryFrom<(
 
         Ok(RenewResponse {
             pending: false,
+            eurid_idn: super::eurid::extract_eurid_idn_singular(extension, domain_renew.name.as_str())?,
             data: RenewData {
                 name: domain_renew.name.to_owned(),
                 new_expiry_date: domain_renew.expiry_date,
@@ -1259,12 +1271,12 @@ pub fn handle_check_response(response: proto::EPPResponse) -> Response<CheckResp
             proto::EPPResultDataValue::EPPDomainCheckResult(domain_check) => {
                 if let Some(domain_check) = domain_check.data.first() {
                     Response::Ok(CheckResponse {
+                        eurid_idn: super::eurid::extract_eurid_idn_singular(&response.extension, domain_check.name.name.as_str())?,
                         avail: domain_check.name.available,
                         reason: domain_check.reason.to_owned(),
                         fee_check,
                         donuts_fee_check,
                         eurid_check: super::eurid::extract_eurid_domain_check_singular(&response.extension)?,
-                        eurid_idn: super::eurid::extract_eurid_idn_singular(&response.extension)?,
                     })
                 } else {
                     Err(Error::InternalServerError)
@@ -1512,6 +1524,14 @@ pub fn handle_create(
         }
     }
 
+    if let Some(eurid_data) = &req.eurid_data {
+        if client.eurid_domain_support {
+            exts.push(proto::EPPCommandExtensionType::EURIDDomainCreate(eurid_data.into()))
+        } else {
+            return Err(Err(Error::Unsupported));
+        }
+    }
+
     super::verisign::handle_verisign_namestore_erratum(client, &mut exts);
     super::fee::handle_donuts_fee_agreement(client, &req.donuts_fee_agreement, &mut exts)?;
 
@@ -1590,6 +1610,14 @@ pub fn handle_delete(
     });
     let mut ext = vec![];
 
+    if let Some(eurid_data) = &req.eurid_data {
+        if client.eurid_domain_support {
+            ext.push(proto::EPPCommandExtensionType::EURIDDomainDelete(eurid_data.into()))
+        } else {
+            return Err(Err(Error::Unsupported));
+        }
+    }
+
     super::verisign::handle_verisign_namestore_erratum(client, &mut ext);
     super::fee::handle_donuts_fee_agreement(client, &req.donuts_fee_agreement, &mut ext)?;
 
@@ -1650,6 +1678,7 @@ pub fn handle_delete_response(response: proto::EPPResponse) -> Response<DeleteRe
     Response::Ok(DeleteResponse {
         pending: response.is_pending(),
         fee_data,
+        eurid_idn: super::eurid::extract_eurid_idn_singular(&response.extension, None)?,
     })
 }
 
@@ -2274,6 +2303,7 @@ pub struct CreateInfo<'a> {
     pub launch_create: Option<launch::LaunchCreate>,
     pub fee_agreement: Option<fee::FeeAgreement>,
     pub donuts_fee_agreement: Option<fee::DonutsFeeData>,
+    pub eurid_data: Option<super::eurid::DomainCreate>,
 }
 
 /// Registers a new domain
@@ -2304,6 +2334,7 @@ pub async fn create(
             launch_create: info.launch_create,
             fee_agreement: info.fee_agreement,
             donuts_fee_agreement: info.donuts_fee_agreement,
+            eurid_data: info.eurid_data,
             return_path: sender,
         })),
         receiver,
@@ -2320,6 +2351,7 @@ pub async fn delete(
     domain: &str,
     launch_info: Option<launch::LaunchUpdate>,
     donuts_fee_agreement: Option<fee::DonutsFeeData>,
+    eurid_data: Option<super::eurid::DomainDelete>,
     client_sender: &mut futures::channel::mpsc::Sender<Request>,
 ) -> Result<CommandResponse<DeleteResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
@@ -2329,6 +2361,7 @@ pub async fn delete(
             name: domain.to_string(),
             launch_info,
             donuts_fee_agreement,
+            eurid_data,
             return_path: sender,
         })),
         receiver,

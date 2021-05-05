@@ -1721,6 +1721,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                 },
                 fee_agreement: request.fee_agreement.map(Into::into),
                 donuts_fee_agreement: request.donuts_fee_agreement.map(TryInto::try_into).map_or(Ok(None), |v| v.map(Some))?,
+                eurid_data: None,
             },
             &mut sender,
         )
@@ -1747,6 +1748,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                 None => None
             },
             request.donuts_fee_agreement.map(TryInto::try_into).map_or(Ok(None), |v| v.map(Some))?,
+            None,
             &mut sender,
         ).await?);
 

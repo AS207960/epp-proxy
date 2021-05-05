@@ -278,7 +278,7 @@ pub enum EURIDContactType {
     Tech,
     #[serde(rename = "registrant")]
     Registrant,
-    #[serde(rename = "on-site")]
+    #[serde(rename = "onsite")]
     OnSite,
     #[serde(rename = "reseller")]
     Reseller,

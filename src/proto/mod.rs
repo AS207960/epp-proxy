@@ -769,6 +769,8 @@ pub enum EPPResponseExtensionType {
     EURIDContactInfoData(eurid::EURIDContactInfo),
     #[serde(rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.4}chkData")]
     EURIDDomainCheckData(eurid::EURIDDomainCheckData),
+    #[serde(rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.4}infData")]
+    EURIDDomainInfoData(eurid::EURIDDomainInfo),
     #[serde(rename = "{http://www.eurid.eu/xml/epp/idn-1.0}mapping")]
     EURIDIDNMapping(eurid::EURIDIDNMapping),
 }
