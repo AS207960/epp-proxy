@@ -4,6 +4,8 @@ package epp.contact;
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/wrappers.proto";
 import "common.proto";
+import "eurid.proto";
+import "qualified_lawyer.proto";
 import "nominet_ext.proto";
 
 enum EntityType {
@@ -126,7 +128,9 @@ message ContactInfoReply {
     repeated DisclosureType disclosure = 18;
     google.protobuf.StringValue auth_info = 19;
     nominet_ext.DataQuality nominet_data_quality = 20;
+    eurid.ContactExtension eurid_info = 22;
     common.CommandResponse cmd_resp = 21;
+    qualified_lawyer.QualifiedLawyer qualified_lawyer = 23;
 }
 
 message ContactCreateRequest {
@@ -140,8 +144,10 @@ message ContactCreateRequest {
     google.protobuf.StringValue trading_name = 8;
     google.protobuf.StringValue company_number = 9;
     Disclosure disclosure = 10;
+    eurid.ContactExtension eurid_info = 13;
     string registry_name = 11;
     string auth_info = 12;
+    qualified_lawyer.QualifiedLawyer qualified_lawyer = 14;
 }
 
 message ContactCreateReply {
@@ -178,6 +184,8 @@ message ContactUpdateRequest {
     Disclosure disclosure = 12;
     string registry_name = 13;
     google.protobuf.StringValue new_auth_info = 14;
+    eurid.ContactUpdateExtension new_eurid_info = 15;
+    qualified_lawyer.QualifiedLawyer qualified_lawyer = 16;
 }
 
 message ContactUpdateReply {

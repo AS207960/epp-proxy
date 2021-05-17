@@ -47,6 +47,10 @@ service EPPProxy {
     rpc Poll                   (stream PollAck)                           returns (stream PollReply);
     rpc NominetTagList         (RegistryInfo)                             returns (nominet.NominetTagListReply);
     rpc BalanceInfo            (RegistryInfo)                             returns (BalanceReply);
+    rpc HitPointsInfo          (RegistryInfo)                             returns (eurid.HitPointsReply);
+    rpc RegistrationLimitInfo  (RegistryInfo)                             returns (eurid.RegistrationLimitReply);
+    rpc DNSQualityInfo         (eurid.DNSQualityRequest)                  returns (eurid.DNSQualityReply);
+    rpc DNSSECEligibilityInfo  (eurid.DNSSECEligibilityRequest)           returns (eurid.DNSSECEligibilityReply);
 }
 
 message RegistryInfo {

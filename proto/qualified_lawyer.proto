@@ -1,0 +1,12 @@
+syntax = "proto3";
+package epp.contact.qualified_lawyer;
+
+import "google/protobuf/wrappers.proto";
+
+message QualifiedLawyer {
+  string accreditation_id = 1;
+  string accreditation_body = 2;
+  int32 accreditation_year = 3;
+  string jurisdiction_country = 4;
+  google.protobuf.StringValue jurisdiction_province = 5;
+}

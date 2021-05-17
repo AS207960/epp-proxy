@@ -22,6 +22,7 @@ pub mod corenic;
 pub mod login_sec;
 pub mod maintenance;
 pub mod eurid;
+pub mod qualified_lawyer;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub enum EPPMessageType {
@@ -192,6 +193,10 @@ pub enum EPPCommandExtensionType {
     EURIDDomainTransfer(eurid::EURIDDomainTransfer),
     #[serde(rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.4}domain-ext:delete")]
     EURIDDomainDelete(eurid::EURIDDomainDelete),
+    #[serde(rename = "{urn:ietf:params:xml:ns:qualifiedLawyer-1.0}qualifiedLawyer:create")]
+    QualifiedLawyerCreate(qualified_lawyer::QualifiedLawyerInfoData),
+    #[serde(rename = "{urn:ietf:params:xml:ns:qualifiedLawyer-1.0}qualifiedLawyer:update")]
+    QualifiedLawyerUpdate(qualified_lawyer::QualifiedLawyerInfoData),
 }
 
 #[derive(Debug, Serialize)]
@@ -771,8 +776,14 @@ pub enum EPPResponseExtensionType {
     EURIDDomainCheckData(eurid::EURIDDomainCheckData),
     #[serde(rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.4}infData")]
     EURIDDomainInfoData(eurid::EURIDDomainInfo),
+    #[serde(rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.4}renData")]
+    EURIDDomainRenewData(eurid::EURIDDomainRenewData),
+    #[serde(rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.4}trnData")]
+    EURIDDomainTransferData(eurid::EURIDDomainTransferData),
     #[serde(rename = "{http://www.eurid.eu/xml/epp/idn-1.0}mapping")]
     EURIDIDNMapping(eurid::EURIDIDNMapping),
+    #[serde(rename = "{urn:ietf:params:xml:ns:qualifiedLawyer-1.0}info")]
+    QualifiedLawyerInfo(qualified_lawyer::QualifiedLawyerInfoData),
 }
 
 #[derive(Debug, Serialize)]

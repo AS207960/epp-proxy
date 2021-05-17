@@ -120,13 +120,14 @@ pub struct EURIDDomainContact {
 
 #[derive(Debug, Deserialize)]
 pub struct EURIDDomainRenewData {
-    #[serde(rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.4}removedDeletionDate", default)]
-    pub removed_deletion_date: Option<EURIDDomainRenewRemovedDeletionDate>
+    #[serde(rename = "$value", default)]
+    pub data: Vec<EURIDDomainRenewDataType>
 }
 
-#[derive(Debug, Deserialize)]
-pub struct EURIDDomainRenewRemovedDeletionDate {
-
+#[derive(Debug, Deserialize, PartialEq, Eq)]
+pub enum EURIDDomainRenewDataType {
+    #[serde(rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.4}removedDeletionDate")]
+    RemovedDeletionDate
 }
 
 #[derive(Debug, Serialize)]
@@ -238,11 +239,6 @@ pub struct EURIDContactUpdate {
 
 #[derive(Debug, Serialize)]
 pub struct EURIDContactUpdateInfo {
-    #[serde(
-        rename = "{http://www.eurid.eu/xml/epp/contact-ext-1.3}contact-ext:type",
-        skip_serializing_if = "Option::is_none"
-    )]
-    pub contact_type: Option<EURIDContactType>,
     #[serde(
         rename = "{http://www.eurid.eu/xml/epp/contact-ext-1.3}contact-ext:whoisEmial",
         skip_serializing_if = "Option::is_none"

@@ -6,7 +6,9 @@ import "google/protobuf/wrappers.proto";
 import "common.proto";
 import "rgp.proto";
 import "fee.proto";
+import "eurid.proto";
 import "launch.proto";
+import "domain_common.proto";
 
 message Contact {
     string id = 1;
@@ -19,26 +21,7 @@ message NameServer {
         string host_name = 3;
     }
     repeated common.IPAddress addresses = 2;
-}
-
-enum DomainStatus {
-    ClientDeleteProhibited = 0;
-    ClientHold = 1;
-    ClientRenewProhibited = 2;
-    ClientTransferProhibited = 3;
-    ClientUpdateProhibited = 4;
-    Inactive = 5;
-    Ok = 6;
-    PendingCreate = 7;
-    PendingDelete = 8;
-    PendingRenew = 9;
-    PendingTransfer = 10;
-    PendingUpdate = 11;
-    ServerDeleteProhibited = 12;
-    ServerHold = 13;
-    ServerRenewProhibited = 14;
-    ServerTransferProhibited = 15;
-    ServerUpdateProhibited = 16;
+    eurid.IDN eurid_idn = 4;
 }
 
 enum DomainHostsType {
@@ -77,6 +60,8 @@ message DomainCheckReply {
     fee.DonutsFeeData donuts_fee_check = 5;
     string registry_name = 3;
     common.CommandResponse cmd_resp = 6;
+    eurid.IDN eurid_idn = 7;
+    eurid.DomainCheckData eurid_data = 8;
 }
 
 message DomainClaimsCheckReply {
@@ -93,6 +78,7 @@ message DomainInfoRequest {
     launch.LaunchInfo launch_info = 3;
     google.protobuf.StringValue registry_name = 4;
     fee.DonutsFeeData donuts_fee_agreement = 5;
+    eurid.DomainInfoRequest eurid_data = 7;
 }
 
 message DomainInfoReply {
@@ -118,6 +104,8 @@ message DomainInfoReply {
     fee.DonutsFeeData donuts_fee_data = 20;
     VerisignWhoisInfo verisign_whois_info = 21;
     common.CommandResponse cmd_resp = 22;
+    eurid.IDN eurid_idn = 23;
+    eurid.DomainInfo eurid_data = 24;
 }
 
 message DomainCreateRequest {
@@ -132,6 +120,7 @@ message DomainCreateRequest {
     google.protobuf.StringValue registry_name = 9;
     fee.DonutsFeeData donuts_fee_agreement = 10;
     fee.FeeAgreement fee_agreement = 11;
+    eurid.DomainCreateExtension eurid_data = 12;
 }
 
 message DomainCreateReply {
@@ -145,6 +134,7 @@ message DomainCreateReply {
     launch.LaunchData launch_data = 8;
     string registry_name = 5;
     common.CommandResponse cmd_resp = 10;
+    eurid.IDN eurid_idn = 11;
 }
 
 message DomainDeleteRequest {
@@ -152,6 +142,7 @@ message DomainDeleteRequest {
     launch.LaunchData launch_data = 2;
     google.protobuf.StringValue registry_name = 3;
     fee.DonutsFeeData donuts_fee_agreement = 4;
+    eurid.DomainDeleteExtension eurid_data = 5;
 }
 
 message DomainDeleteReply {
@@ -160,6 +151,7 @@ message DomainDeleteReply {
     fee.FeeData fee_data = 3;
     string registry_name = 2;
     common.CommandResponse cmd_resp = 5;
+    eurid.IDN eurid_idn = 6;
 }
 
 message DomainUpdateRequest {
@@ -181,6 +173,7 @@ message DomainUpdateRequest {
     google.protobuf.StringValue registry_name = 8;
     fee.DonutsFeeData donuts_fee_agreement = 9;
     fee.FeeAgreement fee_agreement = 10;
+    eurid.DomainUpdateExtension eurid_data = 11;
 }
 
 message DomainUpdateReply {
@@ -210,6 +203,8 @@ message DomainRenewReply {
     fee.DonutsFeeData donuts_fee_data = 7;
     string registry_name = 3;
     common.CommandResponse cmd_resp = 8;
+    eurid.IDN eurid_idn = 9;
+    eurid.DomainRenewInfo eurid_data = 10;
 }
 
 message DomainTransferQueryRequest {
@@ -225,6 +220,7 @@ message DomainTransferRequestRequest {
     google.protobuf.StringValue registry_name = 4;
     fee.DonutsFeeData donuts_fee_agreement = 5;
     fee.FeeAgreement fee_agreement = 6;
+    eurid.DomainTransferExtension eurid_data = 7;
 }
 
 message DomainTransferAcceptRejectRequest {
@@ -247,6 +243,8 @@ message DomainTransferReply {
     fee.DonutsFeeData donuts_fee_data = 11;
     string registry_name = 8;
     common.CommandResponse cmd_resp = 13;
+    eurid.IDN eurid_idn = 14;
+    eurid.DomainTransferInfo eurid_data = 15;
 }
 
 message SecDNSData {

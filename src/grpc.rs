@@ -22,6 +22,10 @@ pub mod epp_proto {
 
     pub mod contact {
         tonic::include_proto!("epp.contact");
+
+        pub mod qualified_lawyer {
+            tonic::include_proto!("epp.contact.qualified_lawyer");
+        }
     }
 
     pub mod rgp {
@@ -359,6 +363,60 @@ fn domain_status_from_i32(from: i32) -> Option<client::domain::Status> {
     }
 }
 
+fn i32_from_domain_status(from: client::domain::Status) -> i32 {
+    match from {
+        client::domain::Status::ClientDeleteProhibited => {
+            epp_proto::domain::DomainStatus::ClientDeleteProhibited.into()
+        }
+        client::domain::Status::ClientHold => {
+            epp_proto::domain::DomainStatus::ClientHold.into()
+        }
+        client::domain::Status::ClientRenewProhibited => {
+            epp_proto::domain::DomainStatus::ClientRenewProhibited.into()
+        }
+        client::domain::Status::ClientTransferProhibited => {
+            epp_proto::domain::DomainStatus::ClientTransferProhibited.into()
+        }
+        client::domain::Status::ClientUpdateProhibited => {
+            epp_proto::domain::DomainStatus::ClientUpdateProhibited.into()
+        }
+        client::domain::Status::Inactive => {
+            epp_proto::domain::DomainStatus::Inactive.into()
+        }
+        client::domain::Status::Ok => epp_proto::domain::DomainStatus::Ok.into(),
+        client::domain::Status::PendingCreate => {
+            epp_proto::domain::DomainStatus::PendingCreate.into()
+        }
+        client::domain::Status::PendingDelete => {
+            epp_proto::domain::DomainStatus::PendingDelete.into()
+        }
+        client::domain::Status::PendingRenew => {
+            epp_proto::domain::DomainStatus::PendingRenew.into()
+        }
+        client::domain::Status::PendingTransfer => {
+            epp_proto::domain::DomainStatus::PendingTransfer.into()
+        }
+        client::domain::Status::PendingUpdate => {
+            epp_proto::domain::DomainStatus::PendingUpdate.into()
+        }
+        client::domain::Status::ServerDeleteProhibited => {
+            epp_proto::domain::DomainStatus::ServerDeleteProhibited.into()
+        }
+        client::domain::Status::ServerHold => {
+            epp_proto::domain::DomainStatus::ServerHold.into()
+        }
+        client::domain::Status::ServerRenewProhibited => {
+            epp_proto::domain::DomainStatus::ServerRenewProhibited.into()
+        }
+        client::domain::Status::ServerTransferProhibited => {
+            epp_proto::domain::DomainStatus::ServerTransferProhibited.into()
+        }
+        client::domain::Status::ServerUpdateProhibited => {
+            epp_proto::domain::DomainStatus::ServerUpdateProhibited.into()
+        }
+    }
+}
+
 fn i32_from_transfer_status(from: client::TransferStatus) -> i32 {
     match from {
         client::TransferStatus::ClientApproved => {
@@ -409,6 +467,155 @@ impl From<client::contact::Phone> for epp_proto::contact::Phone {
         epp_proto::contact::Phone {
             number: from.number,
             extension: from.extension,
+        }
+    }
+}
+
+impl From<client::contact::QualifiedLawyerInfo> for epp_proto::contact::qualified_lawyer::QualifiedLawyer {
+    fn from(from: client::contact::QualifiedLawyerInfo) -> Self {
+        epp_proto::contact::qualified_lawyer::QualifiedLawyer {
+            accreditation_id: from.accreditation_id,
+            accreditation_body: from.accreditation_body,
+            accreditation_year: from.accreditation_year,
+            jurisdiction_country: from.jurisdiction_country,
+            jurisdiction_province: from.jurisdiction_province,
+        }
+    }
+}
+
+impl From<epp_proto::contact::qualified_lawyer::QualifiedLawyer> for client::contact::QualifiedLawyerInfo {
+    fn from(from: epp_proto::contact::qualified_lawyer::QualifiedLawyer) -> Self {
+        client::contact::QualifiedLawyerInfo {
+            accreditation_id: from.accreditation_id,
+            accreditation_body: from.accreditation_body,
+            accreditation_year: from.accreditation_year,
+            jurisdiction_country: from.jurisdiction_country,
+            jurisdiction_province: from.jurisdiction_province,
+        }
+    }
+}
+
+fn i32_from_eurid_contact_type(from: client::eurid::ContactType) -> i32 {
+    match from {
+        client::eurid::ContactType::Registrant => epp_proto::eurid::ContactType::Registrant.into(),
+        client::eurid::ContactType::Tech => epp_proto::eurid::ContactType::Tech.into(),
+        client::eurid::ContactType::Billing => epp_proto::eurid::ContactType::Billing.into(),
+        client::eurid::ContactType::OnSite => epp_proto::eurid::ContactType::OnSite.into(),
+        client::eurid::ContactType::Reseller => epp_proto::eurid::ContactType::Reseller.into(),
+    }
+}
+
+
+fn eurid_contact_type_from_i32(from: i32) -> client::eurid::ContactType {
+    match epp_proto::eurid::ContactType::from_i32(from) {
+        Some(e) => match e {
+            epp_proto::eurid::ContactType::Registrant => client::eurid::ContactType::Registrant,
+            epp_proto::eurid::ContactType::Tech => client::eurid::ContactType::Tech,
+            epp_proto::eurid::ContactType::Billing => client::eurid::ContactType::Billing,
+            epp_proto::eurid::ContactType::OnSite => client::eurid::ContactType::OnSite,
+            epp_proto::eurid::ContactType::Reseller => client::eurid::ContactType::Reseller,
+        },
+        None => client::eurid::ContactType::Registrant,
+    }
+}
+
+impl From<client::eurid::IDN> for epp_proto::eurid::Idn {
+    fn from(from: client::eurid::IDN) -> Self {
+        epp_proto::eurid::Idn {
+            ace: from.ace,
+            unicode: from.unicode,
+        }
+    }
+}
+
+impl From<client::eurid::ContactExtension> for epp_proto::eurid::ContactExtension {
+    fn from(from: client::eurid::ContactExtension) -> Self {
+        epp_proto::eurid::ContactExtension {
+            contact_type: i32_from_eurid_contact_type(from.contact_type),
+            citizenship_country: from.citizenship_country,
+            vat: from.vat,
+            language: from.language,
+            whois_email: from.whois_email,
+        }
+    }
+}
+
+impl From<epp_proto::eurid::ContactExtension> for client::eurid::ContactExtension {
+    fn from(from: epp_proto::eurid::ContactExtension) -> Self {
+        client::eurid::ContactExtension {
+            contact_type: eurid_contact_type_from_i32(from.contact_type),
+            citizenship_country: from.citizenship_country,
+            vat: from.vat,
+            language: from.language,
+            whois_email: from.whois_email,
+        }
+    }
+}
+
+impl From<epp_proto::eurid::ContactUpdateExtension> for client::eurid::ContactExtensionUpdate {
+    fn from(from: epp_proto::eurid::ContactUpdateExtension) -> Self {
+        client::eurid::ContactExtensionUpdate {
+            citizenship_country: from.new_citizenship_country,
+            vat: from.new_vat,
+            language: from.new_language,
+            whois_email: from.new_whois_email,
+        }
+    }
+}
+
+impl From<epp_proto::eurid::DomainCreateExtension> for client::eurid::DomainCreate {
+    fn from(from: epp_proto::eurid::DomainCreateExtension) -> Self {
+        client::eurid::DomainCreate {
+            on_site: from.on_site,
+            reseller: from.reseller,
+        }
+    }
+}
+
+impl From<epp_proto::eurid::DomainUpdateExtension> for client::eurid::DomainUpdate {
+    fn from(from: epp_proto::eurid::DomainUpdateExtension) -> Self {
+        client::eurid::DomainUpdate {
+            remove_on_site: from.remove_on_site,
+            remove_reseller: from.remove_reseller,
+            add_on_site: from.add_on_site,
+            add_reseller: from.add_reseller,
+        }
+    }
+}
+
+impl From<epp_proto::eurid::DomainTransferExtension> for client::eurid::DomainTransfer {
+    fn from(from: epp_proto::eurid::DomainTransferExtension) -> Self {
+        client::eurid::DomainTransfer {
+            on_site: from.on_site,
+            reseller: from.reseller,
+            technical: from.technical,
+            billing: from.billing,
+            registrant: from.registrant,
+        }
+    }
+}
+
+impl From<epp_proto::eurid::DomainDeleteExtension> for Option<client::eurid::DomainDelete> {
+    fn from(from: epp_proto::eurid::DomainDeleteExtension) -> Self {
+        match from.delete {
+            Some(epp_proto::eurid::domain_delete_extension::Delete::Schedule(t)) => match proto_to_chrono(Some(t)) {
+                Some(t) => Some(client::eurid::DomainDelete::Schedule(t)),
+                None => None
+            },
+            Some(epp_proto::eurid::domain_delete_extension::Delete::Cancel(_)) => Some(client::eurid::DomainDelete::Cancel),
+            None => None,
+        }
+    }
+}
+
+impl From<epp_proto::eurid::DomainInfoRequest> for client::eurid::DomainInfoRequest {
+    fn from(from: epp_proto::eurid::DomainInfoRequest) -> Self {
+        client::eurid::DomainInfoRequest {
+            auth_info: match from.auth_info {
+                None => None,
+                Some(epp_proto::eurid::domain_info_request::AuthInfo::Request(_)) => Some(client::eurid::DomainAuthInfo::Request),
+                Some(epp_proto::eurid::domain_info_request::AuthInfo::Cancel(_)) => Some(client::eurid::DomainAuthInfo::Cancel),
+            }
         }
     }
 }
@@ -617,61 +824,7 @@ impl From<client::domain::InfoResponse> for epp_proto::domain::DomainInfoReply {
         epp_proto::domain::DomainInfoReply {
             name: res.name,
             registry_id: res.registry_id,
-            statuses: res
-                .statuses
-                .into_iter()
-                .map(|s| match s {
-                    client::domain::Status::ClientDeleteProhibited => {
-                        epp_proto::domain::DomainStatus::ClientDeleteProhibited.into()
-                    }
-                    client::domain::Status::ClientHold => {
-                        epp_proto::domain::DomainStatus::ClientHold.into()
-                    }
-                    client::domain::Status::ClientRenewProhibited => {
-                        epp_proto::domain::DomainStatus::ClientRenewProhibited.into()
-                    }
-                    client::domain::Status::ClientTransferProhibited => {
-                        epp_proto::domain::DomainStatus::ClientTransferProhibited.into()
-                    }
-                    client::domain::Status::ClientUpdateProhibited => {
-                        epp_proto::domain::DomainStatus::ClientUpdateProhibited.into()
-                    }
-                    client::domain::Status::Inactive => {
-                        epp_proto::domain::DomainStatus::Inactive.into()
-                    }
-                    client::domain::Status::Ok => epp_proto::domain::DomainStatus::Ok.into(),
-                    client::domain::Status::PendingCreate => {
-                        epp_proto::domain::DomainStatus::PendingCreate.into()
-                    }
-                    client::domain::Status::PendingDelete => {
-                        epp_proto::domain::DomainStatus::PendingDelete.into()
-                    }
-                    client::domain::Status::PendingRenew => {
-                        epp_proto::domain::DomainStatus::PendingRenew.into()
-                    }
-                    client::domain::Status::PendingTransfer => {
-                        epp_proto::domain::DomainStatus::PendingTransfer.into()
-                    }
-                    client::domain::Status::PendingUpdate => {
-                        epp_proto::domain::DomainStatus::PendingUpdate.into()
-                    }
-                    client::domain::Status::ServerDeleteProhibited => {
-                        epp_proto::domain::DomainStatus::ServerDeleteProhibited.into()
-                    }
-                    client::domain::Status::ServerHold => {
-                        epp_proto::domain::DomainStatus::ServerHold.into()
-                    }
-                    client::domain::Status::ServerRenewProhibited => {
-                        epp_proto::domain::DomainStatus::ServerRenewProhibited.into()
-                    }
-                    client::domain::Status::ServerTransferProhibited => {
-                        epp_proto::domain::DomainStatus::ServerTransferProhibited.into()
-                    }
-                    client::domain::Status::ServerUpdateProhibited => {
-                        epp_proto::domain::DomainStatus::ServerUpdateProhibited.into()
-                    }
-                })
-                .collect(),
+            statuses: res.statuses.into_iter().map(i32_from_domain_status).collect(),
             registrant: res.registrant,
             contacts: res
                 .contacts
@@ -688,8 +841,9 @@ impl From<client::domain::InfoResponse> for epp_proto::domain::DomainInfoReply {
                     client::domain::InfoNameserver::HostOnly(h) => epp_proto::domain::NameServer {
                         server: Some(epp_proto::domain::name_server::Server::HostObj(h)),
                         addresses: vec![],
+                        eurid_idn: None,
                     },
-                    client::domain::InfoNameserver::HostAndAddress { host, addresses } => {
+                    client::domain::InfoNameserver::HostAndAddress { host, addresses, eurid_idn } => {
                         epp_proto::domain::NameServer {
                             server: Some(epp_proto::domain::name_server::Server::HostName(host)),
                             addresses: addresses
@@ -706,6 +860,7 @@ impl From<client::domain::InfoResponse> for epp_proto::domain::DomainInfoReply {
                                     },
                                 })
                                 .collect(),
+                            eurid_idn: eurid_idn.map(Into::into),
                         }
                     }
                 })
@@ -773,6 +928,21 @@ impl From<client::domain::InfoResponse> for epp_proto::domain::DomainInfoReply {
                 iris_server: i.iris_server,
             }),
             cmd_resp: None,
+            eurid_idn: res.eurid_idn.map(Into::into),
+            eurid_data: res.eurid_data.map(|d| epp_proto::eurid::DomainInfo {
+                on_hold: d.on_hold,
+                quarantined: d.quarantined,
+                suspended: d.suspended,
+                delayed: d.delayed,
+                seized: d.seized,
+                deletion_date: chrono_to_proto(d.deletion_date),
+                on_site: d.on_site,
+                reseller: d.reseller,
+                max_extension_period: d.max_extension_period,
+                registrant_country: d.registrant_country,
+                registrant_country_of_citizenship: d.registrant_country_of_citizenship,
+                auth_info_valid_until: chrono_to_proto(d.auth_info_valid_until),
+            })
         }
     }
 }
@@ -789,6 +959,7 @@ impl From<client::domain::CreateResponse> for epp_proto::domain::DomainCreateRep
             registry_name: String::new(),
             launch_data: res.launch_create.map(Into::into),
             cmd_resp: None,
+            eurid_idn: res.data.eurid_idn.map(Into::into),
         }
     }
 }
@@ -803,6 +974,10 @@ impl From<client::domain::RenewResponse> for epp_proto::domain::DomainRenewReply
             donuts_fee_data: res.donuts_fee_data.map(Into::into),
             registry_name: String::new(),
             cmd_resp: None,
+            eurid_idn: res.data.eurid_idn.map(Into::into),
+            eurid_data: res.data.eurid_data.map(|d| epp_proto::eurid::DomainRenewInfo {
+                removed_deletion: d.removed_deletion,
+            })
         }
     }
 }
@@ -822,6 +997,18 @@ impl From<client::domain::TransferResponse> for epp_proto::domain::DomainTransfe
             donuts_fee_data: res.donuts_fee_data.map(Into::into),
             registry_name: String::new(),
             cmd_resp: None,
+            eurid_idn: res.data.eurid_idn.map(Into::into),
+            eurid_data: res.data.eurid_data.map(|d| epp_proto::eurid::DomainTransferInfo {
+                on_hold: d.on_hold,
+                quarantined: d.quarantined,
+                reason: d.reason,
+                delayed: d.delayed,
+                registrant: d.registrant,
+                billing: d.billing,
+                technical: d.technical,
+                on_site: d.on_site,
+                reseller: d.reseller,
+            })
         }
     }
 }
@@ -1075,6 +1262,8 @@ impl From<client::contact::InfoResponse> for epp_proto::contact::ContactInfoRepl
                 lock_applied: q.lock_applied,
                 domains: q.domains.unwrap_or_default(),
             }),
+            eurid_info: res.eurid_contact_extension.map(Into::into),
+            qualified_lawyer: res.qualified_lawyer.map(Into::into),
             cmd_resp: None,
         }
     }
@@ -1381,6 +1570,22 @@ impl From<client::traficom::TrnData> for epp_proto::traficom::TrnData {
 }
 
 
+impl From<client::eurid::PollResponse> for epp_proto::eurid::PollReply {
+    fn from(from: client::eurid::PollResponse) -> Self {
+        epp_proto::eurid::PollReply {
+            context: from.context,
+            object_type: from.object_type,
+            object: from.object,
+            object_unicode: from.object_unicode,
+            action: from.action,
+            code: from.code,
+            detail: from.detail,
+            registrar: from.registrar,
+        }
+    }
+}
+
+
 impl From<client::maintenance::InfoResponse> for epp_proto::maintenance::MaintenanceInfoReply {
     fn from(from: client::maintenance::InfoResponse) -> Self {
         epp_proto::maintenance::MaintenanceInfoReply {
@@ -1511,6 +1716,11 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
             donuts_fee_check: res.donuts_fee_check.map(Into::into),
             registry_name,
             cmd_resp: Some(cmd_resp),
+            eurid_idn: res.eurid_idn.map(Into::into),
+            eurid_data: res.eurid_check.map(|c| epp_proto::eurid::DomainCheckData {
+                available_date: chrono_to_proto(c.available_date),
+                status: c.status.into_iter().map(i32_from_domain_status).collect(),
+            })
         };
 
         Ok(tonic::Response::new(reply))
@@ -1588,6 +1798,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                 Some(i) => Some(TryInto::try_into(i)?),
                 None => None
             },
+            req.eurid_data.map(Into::into),
             &mut sender,
         ).await?);
 
@@ -1615,6 +1826,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                 }
                 Some(epp_proto::domain::name_server::Server::HostName(h)) => {
                     ns.push(client::domain::InfoNameserver::HostAndAddress {
+                        eurid_idn: None,
                         host: h.clone(),
                         addresses: n
                             .addresses
@@ -1721,7 +1933,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                 },
                 fee_agreement: request.fee_agreement.map(Into::into),
                 donuts_fee_agreement: request.donuts_fee_agreement.map(TryInto::try_into).map_or(Ok(None), |v| v.map(Some))?,
-                eurid_data: None,
+                eurid_data: request.eurid_data.map(Into::into),
             },
             &mut sender,
         )
@@ -1748,7 +1960,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                 None => None
             },
             request.donuts_fee_agreement.map(TryInto::try_into).map_or(Ok(None), |v| v.map(Some))?,
-            None,
+            request.eurid_data.map_or(None, Into::into),
             &mut sender,
         ).await?);
 
@@ -1757,6 +1969,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
             fee_data: res.fee_data.map(Into::into),
             registry_name,
             cmd_resp: Some(cmd_resp),
+            eurid_idn: res.eurid_idn.map(Into::into),
         };
 
         Ok(tonic::Response::new(reply))
@@ -1781,6 +1994,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                     }
                     Some(epp_proto::domain::name_server::Server::HostName(h)) => {
                         client::domain::InfoNameserver::HostAndAddress {
+                            eurid_idn: None,
                             host: h.clone(),
                             addresses: n
                                 .addresses
@@ -1949,6 +2163,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
             },
             request.fee_agreement.map(Into::into),
             request.donuts_fee_agreement.map(TryInto::try_into).map_or(Ok(None), |v| v.map(Some))?,
+            request.eurid_data.map(Into::into),
             &mut sender,
         )
             .await?);
@@ -2032,6 +2247,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
             &request.auth_info,
             request.fee_agreement.map(Into::into),
             request.donuts_fee_agreement.map(TryInto::try_into).map_or(Ok(None), |v| v.map(Some))?,
+            request.eurid_data.map(Into::into),
             &mut sender,
         )
             .await?);
@@ -2400,6 +2616,8 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                     .disclosure
                     .map(|d| disclosure_type_from_i32(d.disclosure)),
                 auth_info: request.auth_info,
+                eurid_info: request.eurid_info.map(Into::into),
+                qualified_lawyer: request.qualified_lawyer.map(Into::into),
             },
             &mut sender,
         )
@@ -2468,6 +2686,8 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                     .disclosure
                     .map(|d| disclosure_type_from_i32(d.disclosure)),
                 auth_info: request.new_auth_info,
+                eurid_info: request.new_eurid_info.map(Into::into),
+                qualified_lawyer: request.qualified_lawyer.map(Into::into),
             },
             &mut sender,
         )
@@ -2597,6 +2817,81 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                 created: chrono_to_proto(Some(i.created)),
                 updated: chrono_to_proto(i.updated),
             }).collect(),
+            cmd_resp: Some(cmd_resp)
+        };
+
+        Ok(tonic::Response::new(reply))
+    }
+
+    async fn hit_points_info(
+        &self,
+        request: tonic::Request<epp_proto::RegistryInfo>,
+    ) -> Result<tonic::Response<epp_proto::eurid::HitPointsReply>, tonic::Status> {
+        let request = request.into_inner();
+        let mut sender = client_by_id(&self.client_router, &request.registry_name)?;
+        let (res, cmd_resp) = map_command_response(client::eurid::hit_points_info(&mut sender).await?);
+
+        let reply = epp_proto::eurid::HitPointsReply {
+            hit_points: res.hit_points,
+            max_hit_points: res.max_hit_points,
+            blocked_until: chrono_to_proto(res.blocked_until),
+            cmd_resp: Some(cmd_resp)
+        };
+
+        Ok(tonic::Response::new(reply))
+    }
+
+    async fn registration_limit_info(
+        &self,
+        request: tonic::Request<epp_proto::RegistryInfo>,
+    ) -> Result<tonic::Response<epp_proto::eurid::RegistrationLimitReply>, tonic::Status> {
+        let request = request.into_inner();
+        let mut sender = client_by_id(&self.client_router, &request.registry_name)?;
+        let (res, cmd_resp) = map_command_response(client::eurid::registration_limit_info(&mut sender).await?);
+
+        let reply = epp_proto::eurid::RegistrationLimitReply {
+            monthly_registrations: res.monthly_registrations,
+            max_monthly_registrations: res.max_monthly_registrations,
+            limited_until: chrono_to_proto(res.limited_until),
+            cmd_resp: Some(cmd_resp)
+        };
+
+        Ok(tonic::Response::new(reply))
+    }
+
+    async fn dns_quality_info(
+        &self,
+        request: tonic::Request<epp_proto::eurid::DnsQualityRequest>,
+    ) -> Result<tonic::Response<epp_proto::eurid::DnsQualityReply>, tonic::Status> {
+        let request = request.into_inner();
+        let (mut sender, registry_name) =
+            client_by_domain_or_id(&self.client_router, &request.name, request.registry_name)?;
+        let (res, cmd_resp) = map_command_response(client::eurid::dns_quality_info(&request.name, &mut sender).await?);
+
+        let reply = epp_proto::eurid::DnsQualityReply {
+            score: res.score,
+            check_time: chrono_to_proto(res.check_time),
+            registry_name,
+            cmd_resp: Some(cmd_resp)
+        };
+
+        Ok(tonic::Response::new(reply))
+    }
+
+    async fn dnssec_eligibility_info(
+        &self,
+        request: tonic::Request<epp_proto::eurid::DnssecEligibilityRequest>,
+    ) -> Result<tonic::Response<epp_proto::eurid::DnssecEligibilityReply>, tonic::Status> {
+        let request = request.into_inner();
+        let (mut sender, registry_name) =
+            client_by_domain_or_id(&self.client_router, &request.name, request.registry_name)?;
+        let (res, cmd_resp) = map_command_response(client::eurid::dnssec_eligibility_info(&request.name, &mut sender).await?);
+
+        let reply = epp_proto::eurid::DnssecEligibilityReply {
+            eligible: res.eligible,
+            message: res.message,
+            code: res.code,
+            registry_name,
             cmd_resp: Some(cmd_resp)
         };
 
@@ -2799,6 +3094,8 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                                             Some(epp_proto::poll_reply::Data::VerisignLowBalanceData(i.into())),
                                         client::poll::PollData::TraficomTrnData(i) =>
                                             Some(epp_proto::poll_reply::Data::TraficomTrnData(i.into())),
+                                        client::poll::PollData::EURIDPoll(i) =>
+                                            Some(epp_proto::poll_reply::Data::EuridPollData(i.into())),
                                         _ => None
                                     },
                                 }))

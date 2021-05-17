@@ -67,6 +67,7 @@ pub struct InfoResponse {
     pub auth_info: Option<String>,
     pub nominet_data_quality: Option<super::nominet::DataQualityData>,
     pub eurid_contact_extension: Option<super::eurid::ContactExtension>,
+    pub qualified_lawyer: Option<QualifiedLawyerInfo>,
 }
 
 #[derive(Debug)]
@@ -425,6 +426,39 @@ impl From<&Phone> for proto::contact::EPPContactPhone {
 }
 
 #[derive(Debug)]
+pub struct QualifiedLawyerInfo {
+    pub accreditation_id: String,
+    pub accreditation_body: String,
+    pub accreditation_year: i32,
+    pub jurisdiction_country: String,
+    pub jurisdiction_province: Option<String>,
+}
+
+impl From<&proto::qualified_lawyer::QualifiedLawyerInfoData> for QualifiedLawyerInfo {
+    fn from(from: &proto::qualified_lawyer::QualifiedLawyerInfoData) -> QualifiedLawyerInfo {
+        QualifiedLawyerInfo {
+            accreditation_id: from.accreditation_id.to_string(),
+            accreditation_body: from.accreditation_body.to_string(),
+            accreditation_year: from.accreditation_year,
+            jurisdiction_country: from.jurisdiction_country.to_string(),
+            jurisdiction_province: from.jurisdiction_province.as_deref().map(Into::into),
+        }
+    }
+}
+
+impl From<&QualifiedLawyerInfo> for proto::qualified_lawyer::QualifiedLawyerInfoData {
+    fn from(from: &QualifiedLawyerInfo) -> proto::qualified_lawyer::QualifiedLawyerInfoData {
+        proto::qualified_lawyer::QualifiedLawyerInfoData {
+            accreditation_id: from.accreditation_id.to_string(),
+            accreditation_body: from.accreditation_body.to_string(),
+            accreditation_year: from.accreditation_year,
+            jurisdiction_country: from.jurisdiction_country.to_string(),
+            jurisdiction_province: from.jurisdiction_province.as_deref().map(Into::into),
+        }
+    }
+}
+
+#[derive(Debug)]
 pub struct CreateRequest {
     id: String,
     local_address: Option<Address>,
@@ -438,6 +472,7 @@ pub struct CreateRequest {
     disclosure: Option<Vec<DisclosureType>>,
     auth_info: String,
     eurid_contact_extension: Option<super::eurid::ContactExtension>,
+    qualified_lawyer: Option<QualifiedLawyerInfo>,
     pub return_path: Sender<CreateResponse>,
 }
 
@@ -479,6 +514,7 @@ pub struct UpdateRequest {
     new_disclosure: Option<Vec<DisclosureType>>,
     new_auth_info: Option<String>,
     new_eurid_contact_extension: Option<super::eurid::ContactExtensionUpdate>,
+    qualified_lawyer: Option<QualifiedLawyerInfo>,
     pub return_path: Sender<UpdateResponse>,
 }
 
@@ -616,6 +652,19 @@ TryFrom<(
             },
             None => None,
         };
+        let qualified_lawyer_ext_info = match extension {
+            Some(e) => match e.value.iter().find(|e| match e {
+                proto::EPPResponseExtensionType::QualifiedLawyerInfo(_) => true,
+                _ => false,
+            }) {
+                Some(e) => match e {
+                    proto::EPPResponseExtensionType::QualifiedLawyerInfo(e) => Some(e),
+                    _ => unreachable!(),
+                },
+                None => None,
+            },
+            None => None,
+        };
 
         let local_address = contact_info
             .postal_info
@@ -691,6 +740,7 @@ TryFrom<(
             },
             nominet_data_quality: data_quality_ext_info.map(Into::into),
             eurid_contact_extension: eurid_ext_info.map(Into::into),
+            qualified_lawyer: qualified_lawyer_ext_info.map(Into::into),
         })
     }
 }
@@ -705,7 +755,7 @@ impl From<&proto::contact::EPPContactTransferData> for TransferResponse {
                 requested_date: contact_transfer.requested_date,
                 act_client_id: contact_transfer.act_client_id.clone(),
                 act_date: contact_transfer.act_date,
-            }
+            },
         }
     }
 }
@@ -940,16 +990,27 @@ pub fn handle_create(
             },
         ));
     }
-    if client.eurid_contact_support {
-        match &req.eurid_contact_extension {
-            Some(e) => {
+    match &req.eurid_contact_extension {
+        Some(e) => {
+            if client.eurid_contact_support {
                 ext.push(proto::EPPCommandExtensionType::EURIDContactCreate(
                     super::eurid::contact_info_from_extension(e, &req.entity_type)
                 ))
-            },
-            None => return Err(Err(Error::Err(
+            } else {
+                return Err(Err(Error::Unsupported));
+            }
+        }
+        None => if client.eurid_contact_support {
+            return Err(Err(Error::Err(
                 "contact extension required for EURid".to_string(),
             )))
+        }
+    }
+    if let Some(qualified_lawyer) = &req.qualified_lawyer {
+        if client.qualified_lawyer_supported {
+            ext.push(proto::EPPCommandExtensionType::QualifiedLawyerCreate(qualified_lawyer.into()))
+        } else {
+            return Err(Err(Error::Unsupported));
         }
     }
     super::verisign::handle_verisign_namestore_erratum(client, &mut ext);
@@ -1059,10 +1120,9 @@ pub fn handle_update(
         && req.new_company_number.is_none();
     let is_not_eurid_change = match &req.new_eurid_contact_extension {
         Some(e) => e.language.is_none()
-        && e.contact_type.is_none()
-        && e.citizenship_country.is_none()
-        && e.whois_email.is_none()
-        && e.vat.is_none(),
+            && e.citizenship_country.is_none()
+            && e.whois_email.is_none()
+            && e.vat.is_none(),
         None => true
     };
     if req.add_statuses.is_empty() && req.remove_statuses.is_empty() && is_not_change {
@@ -1212,6 +1272,13 @@ pub fn handle_update(
         ));
     } else {
         if req.new_eurid_contact_extension.is_some() {
+            return Err(Err(Error::Unsupported));
+        }
+    }
+    if let Some(qualified_lawyer) = &req.qualified_lawyer {
+        if client.qualified_lawyer_supported {
+            ext.push(proto::EPPCommandExtensionType::QualifiedLawyerUpdate(qualified_lawyer.into()))
+        } else {
             return Err(Err(Error::Unsupported));
         }
     }
@@ -1403,6 +1470,8 @@ pub struct NewContactData {
     /// Elements the contact has consented to disclosure of
     pub disclosure: Option<Vec<DisclosureType>>,
     pub auth_info: String,
+    pub eurid_info: Option<super::eurid::ContactExtension>,
+    pub qualified_lawyer: Option<QualifiedLawyerInfo>,
 }
 
 /// Creates a new contact
@@ -1435,7 +1504,8 @@ pub async fn create(
             company_number: data.company_number,
             disclosure: data.disclosure,
             auth_info: data.auth_info,
-            eurid_contact_extension: None,
+            eurid_contact_extension: data.eurid_info,
+            qualified_lawyer: data.qualified_lawyer,
             return_path: sender,
         })),
         receiver,
@@ -1484,6 +1554,8 @@ pub struct UpdateContactData {
     /// Elements the contact has consented to disclosure of
     pub disclosure: Option<Vec<DisclosureType>>,
     pub auth_info: Option<String>,
+    pub eurid_info: Option<super::eurid::ContactExtensionUpdate>,
+    pub qualified_lawyer: Option<QualifiedLawyerInfo>,
 }
 
 /// Updates an existing contact
@@ -1521,7 +1593,8 @@ pub async fn update(
             new_company_number: new_data.company_number,
             new_disclosure: new_data.disclosure,
             new_auth_info: new_data.auth_info,
-            new_eurid_contact_extension: None,
+            new_eurid_contact_extension: new_data.eurid_info,
+            qualified_lawyer: new_data.qualified_lawyer,
             return_path: sender,
         })),
         receiver,
@@ -1620,4 +1693,74 @@ pub async fn transfer_reject(
         receiver,
     )
         .await
+}
+
+mod test {
+    #[test]
+    fn qualified_lawyer_info() {
+        const XML_DATA: &str = r#"
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemalocation="urn:ietf:params:xml:ns:epp-1.0 epp-1.0.xsd">
+    <response>
+        <result code="1000">
+            <msg>Command completed successfully</msg>
+        </result>
+        <resData>
+            <contact:infData xmlns:contact="urn:ietf:params:xml:ns:contact-1.0" xsi:schemalocation="urn:ietf:params:xml:ns:contact-1.0 contact-1.0.xsd">
+                <contact:id>aw2015</contact:id>
+                <contact:roid>51-Minds</contact:roid>
+                <contact:status s="ok">No changes pending</contact:status>
+                <contact:postalinfo type="int">
+                    <contact:name>Andy Wiens</contact:name>
+                    <contact:org>Minds + Machines</contact:org>
+                    <contact:addr>
+                        <contact:street>32 Nassau St</contact:street>
+                        <contact:city>Dublin</contact:city>
+                        <contact:sp>Leinster</contact:sp>
+                        <contact:pc>Dublin 2</contact:pc>
+                        <contact:cc>IE</contact:cc>
+                    </contact:addr>
+                </contact:postalinfo>
+                <contact:voice>+353.16778933</contact:voice>
+                <contact:email>andy@mindsandmachines.com</contact:email>
+                <contact:clID>basic</contact:clID   >
+                <contact:crID>basic</contact:crID>
+                <contact:crdate>2015-09-28T18:18:51.0156Z</contact:crdate>
+                <contact:authinfo>
+                    <contact:pw>takeAw@y</contact:pw>
+                </contact:authinfo>
+                <contact:disclose flag="0">
+                    <contact:name type="loc">
+                    </contact:name>
+                </contact:disclose>
+            </contact:infData>
+        </resData>
+        <extension>
+            <qualifiedLawyer:info xmlns:qualifiedLawyer="urn:ietf:params:xml:ns:qualifiedLawyer-1.0" xsi:schemalocation="urn:ietf:params:xml:ns:qualifiedLawyer-1.0.xsd">
+                <qualifiedLawyer:accreditationId>KS-123456</qualifiedLawyer:accreditationId>
+                <qualifiedLawyer:accreditationBody>Kansas Bar Association</qualifiedLawyer:accreditationBody>
+                <qualifiedLawyer:accreditationYear>2003Z</qualifiedLawyer:accreditationYear>
+                <qualifiedLawyer:jurisdictionCC>US</qualifiedLawyer:jurisdictionCC>
+                <qualifiedLawyer:jurisdictionSP>Kansas</qualifiedLawyer:jurisdictionSP>
+            </qualifiedLawyer:info>
+        </extension>
+        <trID>
+            <cltrID>ABC-12345</cltrID>
+            <svtrID>14435333324890</svtrID>
+        </trID>
+    </response>
+</epp>"#;
+        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
+        let res = match res.message {
+            super::proto::EPPMessageType::Response(r) => r,
+            _ => unreachable!(),
+        };
+        let data = super::handle_info_response(*res).unwrap();
+        let qualified_lawyer = data.qualified_lawyer.unwrap();
+        assert_eq!(data.id, "aw2015");
+        assert_eq!(qualified_lawyer.accreditation_id, "KS-123456");
+        assert_eq!(qualified_lawyer.accreditation_body, "Kansas Bar Association");
+        assert_eq!(qualified_lawyer.accreditation_year, 2003);
+        assert_eq!(qualified_lawyer.jurisdiction_country, "US");
+        assert_eq!(qualified_lawyer.jurisdiction_province.unwrap(), "Kansas");
+    }
 }

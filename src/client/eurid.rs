@@ -78,7 +78,6 @@ pub struct ContactExtension {
 
 #[derive(Debug)]
 pub struct ContactExtensionUpdate {
-    pub contact_type: Option<ContactType>,
     pub whois_email: Option<String>,
     pub vat: Option<String>,
     pub citizenship_country: Option<String>,
@@ -157,16 +156,8 @@ pub fn contact_info_from_extension(from: &ContactExtension, entity_type: &Option
 }
 
 pub fn contact_info_update_from_extension(from: &Option<ContactExtensionUpdate>, entity_type: &Option<super::contact::EntityType>) -> proto::eurid::EURIDContactUpdate {
-    use proto::eurid::EURIDContactType;
     proto::eurid::EURIDContactUpdate {
         change: proto::eurid::EURIDContactUpdateInfo {
-            contact_type: from.as_ref().map_or(None, |f| f.contact_type.as_ref().map(|c| match c {
-                ContactType::Billing => EURIDContactType::Billing,
-                ContactType::Tech => EURIDContactType::Tech,
-                ContactType::Registrant => EURIDContactType::Registrant,
-                ContactType::OnSite => EURIDContactType::OnSite,
-                ContactType::Reseller => EURIDContactType::Reseller,
-            })),
             whois_email: from.as_ref().map_or(None, |f| f.whois_email.as_deref().map(Into::into)),
             vat: from.as_ref().map_or(None, |f| f.vat.as_deref().map(Into::into)),
             language: from.as_ref().map_or(None, |f| f.language.as_deref().map(Into::into)),
@@ -304,6 +295,66 @@ impl From<&DomainCreate> for proto::eurid::EURIDDomainCreate {
     }
 }
 
+#[derive(Debug)]
+pub struct DomainUpdate {
+    pub add_on_site: Option<String>,
+    pub add_reseller: Option<String>,
+    pub remove_on_site: Option<String>,
+    pub remove_reseller: Option<String>,
+}
+
+impl From<&DomainUpdate> for proto::eurid::EURIDDomainUpdate {
+    fn from(from: &DomainUpdate) -> Self {
+        let mut add_contacts = vec![];
+        let mut rem_contacts = vec![];
+
+        if let Some(on_site) = &from.add_on_site {
+            add_contacts.push(proto::eurid::EURIDDomainContact {
+                contact_type: proto::eurid::EURIDContactType::OnSite,
+                contact_id: on_site.to_string()
+            });
+        }
+        if let Some(on_site) = &from.remove_on_site {
+            rem_contacts.push(proto::eurid::EURIDDomainContact {
+                contact_type: proto::eurid::EURIDContactType::OnSite,
+                contact_id: on_site.to_string()
+            });
+        }
+
+        if let Some(reseller) = &from.add_reseller {
+            add_contacts.push(proto::eurid::EURIDDomainContact {
+                contact_type: proto::eurid::EURIDContactType::Reseller,
+                contact_id: reseller.to_string()
+            });
+        }
+        if let Some(reseller) = &from.remove_reseller {
+            rem_contacts.push(proto::eurid::EURIDDomainContact {
+                contact_type: proto::eurid::EURIDContactType::Reseller,
+                contact_id: reseller.to_string()
+            });
+        }
+
+        proto::eurid::EURIDDomainUpdate {
+            add: match add_contacts.is_empty() {
+                true => None,
+                false => Some(proto::eurid::EURIDDomainUpdateAddRemove {
+                    contacts: add_contacts,
+                    nsgroups: vec![],
+                    keygroup: None
+                })
+            },
+            remove: match rem_contacts.is_empty() {
+                true => None,
+                false => Some(proto::eurid::EURIDDomainUpdateAddRemove {
+                    contacts: rem_contacts,
+                    nsgroups: vec![],
+                    keygroup: None
+                })
+            }
+        }
+    }
+}
+
 
 #[derive(Debug)]
 pub enum DomainDelete {
@@ -325,6 +376,83 @@ impl From<&DomainDelete> for proto::eurid::EURIDDomainDelete {
 }
 
 #[derive(Debug)]
+pub struct DomainTransfer {
+    pub on_site: Option<String>,
+    pub reseller: Option<String>,
+    pub technical: Option<String>,
+    pub billing: String,
+    pub registrant: String,
+}
+
+impl From<&DomainTransfer> for proto::eurid::EURIDDomainTransfer {
+    fn from(from: &DomainTransfer) -> Self {
+        let mut contacts = vec![proto::eurid::EURIDDomainContact {
+            contact_type: proto::eurid::EURIDContactType::Registrant,
+            contact_id: from.registrant.clone(),
+        }, proto::eurid::EURIDDomainContact {
+            contact_type: proto::eurid::EURIDContactType::Registrant,
+            contact_id: from.registrant.clone(),
+        }];
+
+        if let Some(on_site) = &from.on_site {
+            contacts.push(proto::eurid::EURIDDomainContact {
+                contact_type: proto::eurid::EURIDContactType::OnSite,
+                contact_id: on_site.clone(),
+            });
+        }
+
+        if let Some(technical) = &from.technical {
+            contacts.push(proto::eurid::EURIDDomainContact {
+                contact_type: proto::eurid::EURIDContactType::Tech,
+                contact_id: technical.clone(),
+            });
+        }
+
+        if let Some(reseller) = &from.reseller {
+            contacts.push(proto::eurid::EURIDDomainContact {
+                contact_type: proto::eurid::EURIDContactType::Reseller,
+                contact_id: reseller.clone(),
+            });
+        }
+
+        proto::eurid::EURIDDomainTransfer {
+            transfer_request: Some(proto::eurid::EURIDDomainTransferRequest {
+                registrant: from.registrant.clone(),
+                contacts,
+                nameservers: None,
+                nsgroups: vec![],
+                keygroup: None,
+            })
+        }
+    }
+}
+
+
+#[derive(Debug)]
+pub struct DomainInfoRequest {
+    pub auth_info: Option<DomainAuthInfo>,
+}
+
+#[derive(Debug)]
+pub enum DomainAuthInfo {
+    Request,
+    Cancel
+}
+
+impl From<&DomainInfoRequest> for Option<proto::eurid::EURIDAuthInfo> {
+    fn from(from: &DomainInfoRequest) -> Option<proto::eurid::EURIDAuthInfo> {
+        match &from.auth_info {
+            None => None,
+            Some(a) => Some(match a {
+                DomainAuthInfo::Request => proto::eurid::EURIDAuthInfo::Request {},
+                DomainAuthInfo::Cancel => proto::eurid::EURIDAuthInfo::Cancel {},
+            })
+        }
+    }
+}
+
+
+#[derive(Debug)]
 pub struct DomainInfo {
     pub on_hold: bool,
     pub quarantined: bool,
@@ -337,12 +465,21 @@ pub struct DomainInfo {
     pub max_extension_period: u32,
     pub registrant_country: String,
     pub registrant_country_of_citizenship: Option<String>,
+    pub auth_info_valid_until: Option<DateTime<Utc>>,
 }
 
 pub fn extract_eurid_domain_info(from: &Option<proto::EPPResponseExtension>) -> Option<DomainInfo>{
     let eurid_ext_info = match from {
         Some(e) => e.value.iter().find_map(|e| match e {
             proto::EPPResponseExtensionType::EURIDDomainInfoData(e) => Some(e),
+            _ => None,
+        }),
+        None => None,
+    };
+
+    let eurid_auth_info = match from {
+        Some(e) => e.value.iter().find_map(|e| match e {
+            proto::EPPResponseExtensionType::EURIDAuthInfoData(e) => Some(e),
             _ => None,
         }),
         None => None,
@@ -366,12 +503,89 @@ pub fn extract_eurid_domain_info(from: &Option<proto::EPPResponseExtension>) -> 
              reseller: e.contacts.iter().find_map(|c| match c.contact_type {
                  proto::eurid::EURIDContactType::Reseller => Some(c.contact_id.to_string()),
                  _ => None,
-             })
+             }),
+             auth_info_valid_until: match eurid_auth_info {
+                 Some(a) => Some(a.valid_until),
+                 None => None,
+             }
          }),
         None => None
     }
 }
 
+#[derive(Debug)]
+pub struct DomainTransferInfo {
+    pub on_hold: bool,
+    pub quarantined: bool,
+    pub delayed: bool,
+    pub reason: String,
+    pub registrant: String,
+    pub billing: String,
+    pub on_site: Option<String>,
+    pub technical: Option<String>,
+    pub reseller: Option<String>,
+}
+
+pub fn extract_eurid_domain_transfer_info(from: &Option<proto::EPPResponseExtension>) -> Option<DomainTransferInfo>{
+    let eurid_ext_info = match from {
+        Some(e) => e.value.iter().find_map(|e| match e {
+            proto::EPPResponseExtensionType::EURIDDomainTransferData(e) => Some(e),
+            _ => None,
+        }),
+        None => None,
+    };
+
+    match eurid_ext_info {
+         Some(e) => Some(DomainTransferInfo {
+             on_hold: e.on_hold,
+             quarantined: e.quarantined,
+             delayed: e.delayed,
+             on_site: e.contacts.iter().find_map(|c| match c.contact_type {
+                 proto::eurid::EURIDContactType::OnSite => Some(c.contact_id.to_owned()),
+                 _ => None,
+             }),
+             reseller: e.contacts.iter().find_map(|c| match c.contact_type {
+                 proto::eurid::EURIDContactType::Reseller => Some(c.contact_id.to_string()),
+                 _ => None,
+             }),
+             billing: e.contacts.iter().find_map(|c| match c.contact_type {
+                 proto::eurid::EURIDContactType::Billing => Some(c.contact_id.to_string()),
+                 _ => None,
+             }).unwrap_or_default(),
+             technical: e.contacts.iter().find_map(|c| match c.contact_type {
+                 proto::eurid::EURIDContactType::Tech => Some(c.contact_id.to_string()),
+                 _ => None,
+             }),
+             registrant: e.registrant.to_string(),
+             reason: e.reason.to_string(),
+         }),
+        None => None
+    }
+}
+
+#[derive(Debug)]
+pub struct DomainRenewInfo {
+    pub removed_deletion: bool
+}
+
+pub fn extract_eurid_domain_renew_info(from: &Option<proto::EPPResponseExtension>) -> Option<DomainRenewInfo> {
+    let eurid_ext_info = match from {
+        Some(e) => e.value.iter().find_map(|e| match e {
+            proto::EPPResponseExtensionType::EURIDDomainRenewData(e) => Some(e),
+            _ => None,
+        }),
+        None => None,
+    };
+
+    match eurid_ext_info {
+         Some(e) => {
+             Some(DomainRenewInfo {
+                 removed_deletion: e.data.contains(&proto::eurid::EURIDDomainRenewDataType::RemovedDeletionDate),
+             })
+         },
+        None => None
+    }
+}
 
 pub fn handle_hit_points(
     client: &EPPClientServerFeatures,
@@ -1344,6 +1558,18 @@ mod eurid_tests {
         let data = super::super::domain::handle_info_response(*res).unwrap();
         let eurid_data = data.eurid_data.unwrap();
         let eurid_idn = data.eurid_idn.unwrap();
+        for ns in &data.nameservers {
+            match ns {
+                super::super::domain::InfoNameserver::HostAndAddress {
+                    addresses: _,
+                    host: _,
+                    eurid_idn
+                } => {
+                    assert_eq!(eurid_idn.is_some(), true);
+                },
+                _ => unreachable!()
+            }
+        }
         assert_eq!(data.name, "вмкйршаудхыийведйкгг.ею");
         assert_eq!(eurid_data.on_hold, false);
         assert_eq!(eurid_data.quarantined, false);
@@ -1358,5 +1584,144 @@ mod eurid_tests {
         assert_eq!(eurid_data.deletion_date.is_none(), true);
         assert_eq!(eurid_idn.unicode, "вмкйршаудхыийведйкгг.ею");
         assert_eq!(eurid_idn.ace, "xn--80adbeadbhzhddejt0e9bxb3cwd.xn--e1a4c");
+    }
+
+    #[test]
+    fn domain_renew_0() {
+        const XML_DATA: &str = r#"
+<?xml version="1.0" encoding="UTF-8"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0" xmlns:domain-ext-2.3="http://www.eurid.eu/xml/epp/domain-ext-2.4" xmlns:domain="urn:ietf:params:xml:ns:domain-1.0">
+  <response>
+    <result code="1000">
+      <msg>Command completed successfully</msg>
+    </result>
+    <resData>
+      <domain:renData>
+        <domain:name>somedomain.eu</domain:name>
+        <domain:exDate>2028-11-06T22:59:59.999Z</domain:exDate>
+      </domain:renData>
+    </resData>
+    <extension>
+      <domain-ext-2.3:renData>
+        <domain-ext-2.3:removedDeletionDate/>
+      </domain-ext-2.3:renData>
+    </extension>
+    <trID>
+      <clTRID>Extend domain for 8y,deletion date is removed</clTRID>
+      <svTRID>e2d4cddb6-a01b-4a6b-ae28-ff213fa9be8a</svTRID>
+    </trID>
+  </response>
+</epp>"#;
+        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
+        let res = match res.message {
+            super::proto::EPPMessageType::Response(r) => r,
+            _ => unreachable!(),
+        };
+        let data = super::super::domain::handle_renew_response(*res).unwrap();
+        let eurid_data = data.data.eurid_data.unwrap();
+        assert_eq!(data.data.eurid_idn.is_none(), true);
+        assert_eq!(data.data.name, "somedomain.eu");
+        assert_eq!(eurid_data.removed_deletion, true);
+    }
+
+    #[test]
+    fn domain_renew_1() {
+        const XML_DATA: &str = r#"
+<?xml version="1.0" encoding="UTF-8"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0" xmlns:domain-ext-2.3="http://www.eurid.eu/xml/epp/domain-ext-2.4" xmlns:domain="urn:ietf:params:xml:ns:domain-1.0">
+  <response>
+    <result code="1000">
+      <msg>Command completed successfully</msg>
+    </result>
+    <resData>
+      <domain:renData>
+        <domain:name>somedomain.eu</domain:name>
+        <domain:exDate>2028-11-06T22:59:59.999Z</domain:exDate>
+      </domain:renData>
+    </resData>
+    <extension>
+      <domain-ext-2.3:renData>
+      </domain-ext-2.3:renData>
+    </extension>
+    <trID>
+      <clTRID>Extend domain for 8y,deletion date is removed</clTRID>
+      <svTRID>e2d4cddb6-a01b-4a6b-ae28-ff213fa9be8a</svTRID>
+    </trID>
+  </response>
+</epp>"#;
+        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
+        let res = match res.message {
+            super::proto::EPPMessageType::Response(r) => r,
+            _ => unreachable!(),
+        };
+        let data = super::super::domain::handle_renew_response(*res).unwrap();
+        let eurid_data = data.data.eurid_data.unwrap();
+        assert_eq!(data.data.eurid_idn.is_none(), true);
+        assert_eq!(data.data.name, "somedomain.eu");
+        assert_eq!(eurid_data.removed_deletion, false);
+    }
+
+    #[test]
+    fn domain_transfer_0() {
+        const XML_DATA: &str = r#"
+<?xml version="1.0" encoding="UTF-8"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0" xmlns:domain-ext-2.3="http://www.eurid.eu/xml/epp/domain-ext-2.4" xmlns:idn="http://www.eurid.eu/xml/epp/idn-1.0" xmlns:domain="urn:ietf:params:xml:ns:domain-1.0">
+  <response>
+    <result code="1000">
+      <msg>Command completed successfully</msg>
+    </result>
+    <resData>
+      <domain:trnData>
+        <domain:name>вмкйршаудхыийведйкгг.ею</domain:name>
+        <domain:trStatus>pending</domain:trStatus>
+        <domain:reID>t000002</domain:reID>
+        <domain:reDate>2019-11-06T12:18:29.541Z</domain:reDate>
+        <domain:acID>eurid.eu</domain:acID>
+        <domain:acDate>2019-11-11T12:18:29.541Z</domain:acDate>
+        <domain:exDate>2021-11-06T22:59:59.999Z</domain:exDate>
+      </domain:trnData>
+    </resData>
+    <extension>
+      <domain-ext-2.3:trnData>
+        <domain-ext-2.3:onHold>false</domain-ext-2.3:onHold>
+        <domain-ext-2.3:quarantined>false</domain-ext-2.3:quarantined>
+        <domain-ext-2.3:registrant>c293</domain-ext-2.3:registrant>
+        <domain-ext-2.3:contact type="billing">c292</domain-ext-2.3:contact>
+        <domain-ext-2.3:contact type="tech">c294</domain-ext-2.3:contact>
+        <domain-ext-2.3:delayed>false</domain-ext-2.3:delayed>
+        <domain-ext-2.3:reason>RANDOM CHECK</domain-ext-2.3:reason>
+      </domain-ext-2.3:trnData>
+      <idn:mapping>
+        <idn:name>
+          <idn:ace>xn--80adbeadbhzhddejt0e9bxb3cwd.xn--e1a4c</idn:ace>
+          <idn:unicode>вмкйршаудхыийведйкгг.ею</idn:unicode>
+        </idn:name>
+      </idn:mapping>
+    </extension>
+    <trID>
+      <clTRID>domain-transfer05</clTRID>
+      <svTRID>ed9518b51-41aa-4d5f-bbe8-08ab182c7fee</svTRID>
+    </trID>
+  </response>
+</epp>"#;
+        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
+        let res = match res.message {
+            super::proto::EPPMessageType::Response(r) => r,
+            _ => unreachable!(),
+        };
+        let data = super::super::domain::handle_transfer_response(*res).unwrap();
+        let eurid_data = data.data.eurid_data.unwrap();
+        let eurid_idn = data.data.eurid_idn.unwrap();
+        assert_eq!(data.data.name, "вмкйршаудхыийведйкгг.ею");
+        assert_eq!(eurid_idn.ace, "xn--80adbeadbhzhddejt0e9bxb3cwd.xn--e1a4c");
+        assert_eq!(eurid_data.on_hold, false);
+        assert_eq!(eurid_data.quarantined, false);
+        assert_eq!(eurid_data.delayed, false);
+        assert_eq!(eurid_data.reason, "RANDOM CHECK");
+        assert_eq!(eurid_data.registrant, "c293");
+        assert_eq!(eurid_data.billing, "c292");
+        assert_eq!(eurid_data.technical.unwrap(), "c294");
+        assert_eq!(eurid_data.reseller.is_none(), true);
+        assert_eq!(eurid_data.on_site.is_none(), true);
     }
 }

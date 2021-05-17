@@ -260,6 +260,8 @@ pub struct EPPClientServerFeatures {
     eurid_registration_limit_supported: bool,
     /// http://www.eurid.eu/xml/epp/poll-1.2 support
     eurid_poll_supported: bool,
+    /// urn:ietf:params:xml:ns:qualifiedLawyer-1.0 support
+    qualified_lawyer_supported: bool,
 }
 
 impl EPPClientServerFeatures {
@@ -824,6 +826,9 @@ impl EPPClient {
         self.features.eurid_dns_quality_support = greeting
             .service_menu
             .supports("http://www.eurid.eu/xml/epp/dnsQuality-2.0");
+        self.features.qualified_lawyer_supported = greeting
+            .service_menu
+            .supports("urn:ietf:params:xml:ns:qualifiedLawyer-1.0");
 
         if !(self.features.contact_supported
             | self.features.domain_supported
@@ -946,6 +951,9 @@ impl EPPClient {
             }
             if self.features.eurid_contact_support {
                 ext_objects.push("http://www.eurid.eu/xml/epp/domain-ext-2.4".to_string())
+            }
+            if self.features.qualified_lawyer_supported {
+                ext_objects.push("urn:ietf:params:xml:ns:qualifiedLawyer-1.0".to_string())
             }
             if self.features.nominet_tag_list {
                 let new_client = Self {

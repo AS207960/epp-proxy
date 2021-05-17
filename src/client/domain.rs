@@ -65,6 +65,7 @@ pub struct InfoRequest {
     auth_info: Option<String>,
     launch_info: Option<launch::LaunchInfo>,
     hosts: Option<InfoHost>,
+    eurid_data: Option<super::eurid::DomainInfoRequest>,
     pub return_path: Sender<InfoResponse>,
 }
 
@@ -129,6 +130,7 @@ pub enum InfoNameserver {
     HostAndAddress {
         host: String,
         addresses: Vec<super::host::Address>,
+        eurid_idn: Option<super::eurid::IDN>,
     },
 }
 
@@ -203,7 +205,6 @@ pub struct CreateResponse {
     pub fee_data: Option<fee::FeeData>,
     pub donuts_fee_data: Option<fee::DonutsFeeData>,
     pub launch_create: Option<launch::LaunchCreateData>,
-    pub eurid_idn: Option<super::eurid::IDN>,
 }
 
 #[derive(Debug)]
@@ -214,6 +215,7 @@ pub struct CreateData {
     pub creation_date: Option<DateTime<Utc>>,
     /// When will the domain expire
     pub expiration_date: Option<DateTime<Utc>>,
+    pub eurid_idn: Option<super::eurid::IDN>,
 }
 
 #[derive(Debug)]
@@ -245,6 +247,7 @@ pub struct UpdateRequest {
     launch_info: Option<launch::LaunchUpdate>,
     fee_agreement: Option<fee::FeeAgreement>,
     donuts_fee_agreement: Option<fee::DonutsFeeData>,
+    eurid_data: Option<super::eurid::DomainUpdate>,
     pub return_path: Sender<UpdateResponse>,
 }
 
@@ -296,13 +299,14 @@ pub struct RenewResponse {
     /// Fee information (if supplied by the registry)
     pub fee_data: Option<fee::FeeData>,
     pub donuts_fee_data: Option<fee::DonutsFeeData>,
-    pub eurid_idn: Option<super::eurid::IDN>,
 }
 
 #[derive(Debug)]
 pub struct RenewData {
     pub name: String,
     pub new_expiry_date: Option<DateTime<Utc>>,
+    pub eurid_idn: Option<super::eurid::IDN>,
+    pub eurid_data: Option<super::eurid::DomainRenewInfo>,
 }
 
 #[derive(Debug)]
@@ -319,6 +323,7 @@ pub struct TransferRequestRequest {
     add_period: Option<Period>,
     fee_agreement: Option<fee::FeeAgreement>,
     donuts_fee_agreement: Option<fee::DonutsFeeData>,
+    eurid_data: Option<super::eurid::DomainTransfer>,
     pub return_path: Sender<TransferResponse>,
 }
 
@@ -353,6 +358,8 @@ pub struct TransferData {
     pub act_date: DateTime<Utc>,
     /// New domain expiry date if amended by the transfer
     pub expiry_date: Option<DateTime<Utc>>,
+    pub eurid_idn: Option<super::eurid::IDN>,
+    pub eurid_data: Option<super::eurid::DomainTransferInfo>,
 }
 
 #[derive(Debug, PartialEq, Eq)]
@@ -443,7 +450,7 @@ impl From<&InfoNameserver> for proto::domain::EPPDomainInfoNameserver {
             InfoNameserver::HostOnly(h) => {
                 proto::domain::EPPDomainInfoNameserver::HostOnly(h.to_string())
             }
-            InfoNameserver::HostAndAddress { host, addresses } => {
+            InfoNameserver::HostAndAddress { host, addresses, .. } => {
                 proto::domain::EPPDomainInfoNameserver::HostAndAddress {
                     host: host.to_string(),
                     addresses: addresses
@@ -631,7 +638,7 @@ TryFrom<(
                 Some(n) => n
                     .servers
                     .into_iter()
-                    .map(|s| match s {
+                    .map(|s| Ok(match s {
                         proto::domain::EPPDomainInfoNameserver::HostOnly(h) => {
                             InfoNameserver::HostOnly(h)
                         }
@@ -639,6 +646,7 @@ TryFrom<(
                             host,
                             addresses,
                         } => InfoNameserver::HostAndAddress {
+                            eurid_idn: super::eurid::extract_eurid_idn_singular(extension, host.as_str())?,
                             host,
                             addresses: addresses
                                 .into_iter()
@@ -657,8 +665,8 @@ TryFrom<(
                                 })
                                 .collect(),
                         },
-                    })
-                    .collect(),
+                    }))
+                    .collect::<Result<Vec<_>, _>>()?,
             },
             hosts: domain_info.hosts,
             client_id: domain_info.client_id,
@@ -766,6 +774,8 @@ TryFrom<(
                 act_client_id: domain_transfer.act_client_id.clone(),
                 act_date: domain_transfer.act_date,
                 expiry_date: domain_transfer.expiry_date,
+                eurid_data: super::eurid::extract_eurid_domain_transfer_info(extension),
+                eurid_idn: super::eurid::extract_eurid_idn_singular(extension, None)?,
             },
             fee_data,
             donuts_fee_data,
@@ -866,8 +876,8 @@ TryFrom<(
             Some(domain_create) => {
                 Ok(CreateResponse {
                     pending: false,
-                    eurid_idn: super::eurid::extract_eurid_idn_singular(extension, domain_create.name.as_str())?,
                     data: CreateData {
+                        eurid_idn: super::eurid::extract_eurid_idn_singular(extension, domain_create.name.as_str())?,
                         name: domain_create.name.clone(),
                         creation_date: Some(domain_create.creation_date),
                         expiration_date: domain_create.expiry_date,
@@ -880,8 +890,8 @@ TryFrom<(
             None => {
                 Ok(CreateResponse {
                     pending: false,
-                    eurid_idn: super::eurid::extract_eurid_idn_singular(extension, None)?,
                     data: CreateData {
+                        eurid_idn: super::eurid::extract_eurid_idn_singular(extension, None)?,
                         name: "".to_string(),
                         creation_date: None,
                         expiration_date: None,
@@ -971,10 +981,11 @@ TryFrom<(
 
         Ok(RenewResponse {
             pending: false,
-            eurid_idn: super::eurid::extract_eurid_idn_singular(extension, domain_renew.name.as_str())?,
             data: RenewData {
+                eurid_idn: super::eurid::extract_eurid_idn_singular(extension, domain_renew.name.as_str())?,
                 name: domain_renew.name.to_owned(),
                 new_expiry_date: domain_renew.expiry_date,
+                eurid_data: super::eurid::extract_eurid_domain_renew_info(extension),
             },
             fee_data,
             donuts_fee_data,
@@ -1098,6 +1109,7 @@ pub fn handle_check(
             return Err(Err(Error::Unsupported));
         }
     }
+
     if let Some(launch_check) = &req.launch_check {
         if client.launch_supported {
             ext.push(proto::EPPCommandExtensionType::EPPLaunchCheck(
@@ -1107,6 +1119,7 @@ pub fn handle_check(
             return Err(Err(Error::Unsupported));
         }
     }
+
     Ok((proto::EPPCommandType::Check(command), match ext.is_empty() {
         true => None,
         false => Some(ext)
@@ -1401,6 +1414,16 @@ pub fn handle_info(
         exts.push(proto::EPPCommandExtensionType::VerisignWhoisInfExt(proto::verisign::EPPWhoisInfoExt {
             flag: true
         }))
+    }
+
+    if let Some(eurid_data) = &req.eurid_data {
+        if let Some(euird_auth_info) = eurid_data.into() {
+            if client.eurid_auth_info_supported {
+                exts.push(proto::EPPCommandExtensionType::EURIDAuthInfo(euird_auth_info))
+            } else {
+                return Err(Err(Error::Unsupported));
+            }
+        }
     }
 
     super::verisign::handle_verisign_namestore_erratum(client, &mut exts);
@@ -1862,7 +1885,7 @@ pub fn handle_update(
             } else {
                 return Err(Err(Error::Unsupported));
             }
-        },
+        }
         None => {}
     }
 
@@ -1882,6 +1905,14 @@ pub fn handle_update(
     if let Some(launch_info) = &req.launch_info {
         if client.launch_supported {
             exts.push(proto::EPPCommandExtensionType::EPPLaunchUpdate(launch_info.into()))
+        } else {
+            return Err(Err(Error::Unsupported));
+        }
+    }
+
+    if let Some(eurid_data) = &req.eurid_data {
+        if client.eurid_domain_support {
+            exts.push(proto::EPPCommandExtensionType::EURIDDomainUpdate(eurid_data.into()))
         } else {
             return Err(Err(Error::Unsupported));
         }
@@ -2093,6 +2124,14 @@ pub fn handle_transfer_request(
     super::verisign::handle_verisign_namestore_erratum(client, &mut ext);
     super::fee::handle_donuts_fee_agreement(client, &req.donuts_fee_agreement, &mut ext)?;
 
+    if let Some(eurid_data) = &req.eurid_data {
+        if client.eurid_domain_support {
+            ext.push(proto::EPPCommandExtensionType::EURIDDomainTransfer(eurid_data.into()))
+        } else {
+            return Err(Err(Error::Unsupported));
+        }
+    }
+
     Ok((proto::EPPCommandType::Transfer(command), match ext.is_empty() {
         true => None,
         false => Some(ext)
@@ -2106,6 +2145,10 @@ pub fn handle_transfer_cancel(
     if !client.domain_supported {
         return Err(Err(Error::Unsupported));
     }
+    if client.eurid_domain_support {
+        return Err(Err(Error::Unsupported));
+    }
+
     check_domain(&req.name)?;
     let command = proto::EPPTransfer {
         operation: proto::EPPTransferOperation::Cancel,
@@ -2132,6 +2175,10 @@ pub fn handle_transfer_accept(
     if !client.domain_supported {
         return Err(Err(Error::Unsupported));
     }
+    if client.eurid_domain_support {
+        return Err(Err(Error::Unsupported));
+    }
+
     check_domain(&req.name)?;
     let command = proto::EPPTransfer {
         operation: proto::EPPTransferOperation::Accept,
@@ -2158,6 +2205,10 @@ pub fn handle_transfer_reject(
     if !client.domain_supported {
         return Err(Err(Error::Unsupported));
     }
+    if client.eurid_domain_support {
+        return Err(Err(Error::Unsupported));
+    }
+
     check_domain(&req.name)?;
     let command = proto::EPPTransfer {
         operation: proto::EPPTransferOperation::Reject,
@@ -2275,6 +2326,7 @@ pub async fn info(
     auth_info: Option<&str>,
     hosts: Option<InfoHost>,
     launch_info: Option<launch::LaunchInfo>,
+    eurid_data: Option<super::eurid::DomainInfoRequest>,
     client_sender: &mut futures::channel::mpsc::Sender<Request>,
 ) -> Result<CommandResponse<InfoResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
@@ -2285,6 +2337,7 @@ pub async fn info(
             auth_info: auth_info.map(|s| s.into()),
             hosts,
             launch_info,
+            eurid_data,
             return_path: sender,
         })),
         receiver,
@@ -2388,6 +2441,7 @@ pub async fn update(
     launch_info: Option<launch::LaunchUpdate>,
     fee_agreement: Option<fee::FeeAgreement>,
     donuts_fee_agreement: Option<fee::DonutsFeeData>,
+    eurid_data: Option<super::eurid::DomainUpdate>,
     client_sender: &mut futures::channel::mpsc::Sender<Request>,
 ) -> Result<CommandResponse<UpdateResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
@@ -2403,6 +2457,7 @@ pub async fn update(
             launch_info,
             fee_agreement,
             donuts_fee_agreement,
+            eurid_data,
             return_path: sender,
         })),
         receiver,
@@ -2478,6 +2533,7 @@ pub async fn transfer_request(
     auth_info: &str,
     fee_agreement: Option<fee::FeeAgreement>,
     donuts_fee_agreement: Option<fee::DonutsFeeData>,
+    eurid_data: Option<super::eurid::DomainTransfer>,
     client_sender: &mut futures::channel::mpsc::Sender<Request>,
 ) -> Result<CommandResponse<TransferResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
@@ -2489,6 +2545,7 @@ pub async fn transfer_request(
             auth_info: auth_info.to_string(),
             fee_agreement,
             donuts_fee_agreement,
+            eurid_data,
             return_path: sender,
         })),
         receiver,
