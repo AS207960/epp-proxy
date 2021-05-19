@@ -262,6 +262,8 @@ pub struct EPPClientServerFeatures {
     eurid_poll_supported: bool,
     /// urn:ietf:params:xml:ns:qualifiedLawyer-1.0 support
     qualified_lawyer_supported: bool,
+    /// http://www.verisign.com/epp/sync-1.0support
+    verisign_sync_supported: bool,
 }
 
 impl EPPClientServerFeatures {
@@ -829,6 +831,9 @@ impl EPPClient {
         self.features.qualified_lawyer_supported = greeting
             .service_menu
             .supports("urn:ietf:params:xml:ns:qualifiedLawyer-1.0");
+        self.features.verisign_sync_supported = greeting
+            .service_menu
+            .supports("http://www.verisign.com/epp/sync-1.0");
 
         if !(self.features.contact_supported
             | self.features.domain_supported
@@ -954,6 +959,9 @@ impl EPPClient {
             }
             if self.features.qualified_lawyer_supported {
                 ext_objects.push("urn:ietf:params:xml:ns:qualifiedLawyer-1.0".to_string())
+            }
+            if self.features.verisign_sync_supported {
+                ext_objects.push("http://www.verisign.com/epp/sync-1.0".to_string())
             }
             if self.features.nominet_tag_list {
                 let new_client = Self {

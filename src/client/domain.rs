@@ -282,6 +282,14 @@ pub struct UpdateResponse {
 }
 
 #[derive(Debug)]
+pub struct VerisignSyncRequest {
+    name: String,
+    month: u32,
+    day: u32,
+    pub return_path: Sender<UpdateResponse>,
+}
+
+#[derive(Debug)]
 pub struct RenewRequest {
     name: String,
     add_period: Option<Period>,
@@ -1957,6 +1965,47 @@ pub fn handle_update(
     ))
 }
 
+pub fn handle_verisign_sync(
+    client: &EPPClientServerFeatures,
+    req: &VerisignSyncRequest,
+) -> HandleReqReturn<UpdateResponse> {
+    if !client.domain_supported {
+        return Err(Err(Error::Unsupported));
+    }
+    check_domain(&req.name)?;
+
+    if !client.verisign_sync_supported {
+        return Err(Err(Error::Unsupported));
+    }
+
+    let mut exts = vec![];
+    super::verisign::handle_verisign_namestore_erratum(client, &mut exts);
+
+    exts.push(proto::EPPCommandExtensionType::VerisignSyncUpdate(proto::verisign::EPPSyncUpdate {
+        month_day: proto::verisign::EPPSyncUpdateMonthDay {
+            month: req.month,
+            day: req.day,
+        }
+    }));
+
+    let command = proto::EPPUpdate::Domain(proto::domain::EPPDomainUpdate {
+        name: req.name.clone(),
+        add: None,
+        remove: None,
+        change: Some(proto::domain::EPPDomainUpdateChange {
+            registrant: None,
+            auth_info: None
+        })
+    });
+    Ok((
+        proto::EPPCommandType::Update(Box::new(command)),
+        match exts.len() {
+            0 => None,
+            _ => Some(exts),
+        },
+    ))
+}
+
 pub fn handle_update_response(response: proto::EPPResponse) -> Response<UpdateResponse> {
     let fee_data = match &response.extension {
         Some(ext) => {
@@ -2458,6 +2507,32 @@ pub async fn update(
             fee_agreement,
             donuts_fee_agreement,
             eurid_data,
+            return_path: sender,
+        })),
+        receiver,
+    )
+        .await
+}
+
+/// Performs a Verisign ConsoliDate
+///
+/// # Arguments
+/// * `domain` - The domain to be updated
+/// * `month` - Month to move renewal to
+/// * `day` - Day of month to move renewal to
+pub async fn verisign_sync(
+    domain: &str,
+    month: u32,
+    day: u32,
+    client_sender: &mut futures::channel::mpsc::Sender<Request>,
+) -> Result<CommandResponse<UpdateResponse>, super::Error> {
+    let (sender, receiver) = futures::channel::oneshot::channel();
+    super::send_epp_client_request(
+        client_sender,
+        Request::VerisignSync(Box::new(VerisignSyncRequest {
+            name: domain.to_string(),
+            month,
+            day,
             return_path: sender,
         })),
         receiver,

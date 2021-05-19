@@ -197,6 +197,8 @@ pub enum EPPCommandExtensionType {
     QualifiedLawyerCreate(qualified_lawyer::QualifiedLawyerInfoData),
     #[serde(rename = "{urn:ietf:params:xml:ns:qualifiedLawyer-1.0}qualifiedLawyer:update")]
     QualifiedLawyerUpdate(qualified_lawyer::QualifiedLawyerInfoData),
+    #[serde(rename = "{http://www.verisign.com/epp/sync-1.0}sync:update")]
+    VerisignSyncUpdate(verisign::EPPSyncUpdate),
 }
 
 #[derive(Debug, Serialize)]

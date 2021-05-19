@@ -28,6 +28,7 @@ service EPPProxy {
     rpc DomainTransferAccept   (domain.DomainTransferAcceptRejectRequest) returns (domain.DomainTransferReply);
     rpc DomainTransferReject   (domain.DomainTransferAcceptRejectRequest) returns (domain.DomainTransferReply);
     rpc DomainRestoreRequest   (rgp.RequestRequest)                       returns (rgp.RestoreReply);
+    rpc DomainSync             (domain.DomainSyncRequest)                 returns (domain.DomainUpdateReply);
     rpc HostCheck              (host.HostCheckRequest)                    returns (host.HostCheckReply);
     rpc HostInfo               (host.HostInfoRequest)                     returns (host.HostInfoReply);
     rpc HostCreate             (host.HostCreateRequest)                   returns (host.HostCreateReply);

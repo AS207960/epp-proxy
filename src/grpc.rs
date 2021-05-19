@@ -2179,6 +2179,33 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         Ok(tonic::Response::new(reply))
     }
 
+    async fn domain_sync(
+        &self,
+        request: tonic::Request<epp_proto::domain::DomainSyncRequest>,
+    ) -> Result<tonic::Response<epp_proto::domain::DomainUpdateReply>, tonic::Status> {
+        let request = request.into_inner();
+        let (mut sender, registry_name) =
+            client_by_domain_or_id(&self.client_router, &request.name, request.registry_name)?;
+
+        let (res, cmd_resp) = map_command_response(client::domain::verisign_sync(
+            &request.name,
+            request.month,
+            request.day,
+            &mut sender,
+        )
+            .await?);
+
+        let reply = epp_proto::domain::DomainUpdateReply {
+            pending: res.pending,
+            fee_data: res.fee_data.map(Into::into),
+            donuts_fee_data: res.donuts_fee_data.map(Into::into),
+            registry_name,
+            cmd_resp: Some(cmd_resp),
+        };
+
+        Ok(tonic::Response::new(reply))
+    }
+
     async fn domain_renew(
         &self,
         request: tonic::Request<epp_proto::domain::DomainRenewRequest>,

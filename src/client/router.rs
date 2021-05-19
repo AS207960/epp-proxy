@@ -131,6 +131,7 @@ router!(
     DomainTransferCancel,   super::domain::TransferAcceptRejectRequest, super::domain::TransferResponse,         super::domain::handle_transfer_cancel,    super::domain::handle_transfer_response;
     DomainTransferAccept,   super::domain::TransferAcceptRejectRequest, super::domain::TransferResponse,         super::domain::handle_transfer_accept,    super::domain::handle_transfer_response;
     DomainTransferReject,   super::domain::TransferAcceptRejectRequest, super::domain::TransferResponse,         super::domain::handle_transfer_reject,    super::domain::handle_transfer_response;
+    VerisignSync,           super::domain::VerisignSyncRequest,         super::domain::UpdateResponse,           super::domain::handle_verisign_sync,      super::domain::handle_update_response;
     RestoreRequest,         super::rgp::RestoreRequest,                 super::rgp::RestoreResponse,             super::rgp::handle_restore,               super::rgp::handle_restore_response;
     HostCheck,              super::host::CheckRequest,                  super::host::CheckResponse,              super::host::handle_check,                super::host::handle_check_response;
     HostInfo,               super::host::InfoRequest,                   super::host::InfoResponse,               super::host::handle_info,                 super::host::handle_info_response;

@@ -89,3 +89,29 @@ pub struct EPPWhoisInfoExtData {
     #[serde(rename = "{http://www.verisign.com/epp/whoisInf-1.0}irisServer", default)]
     pub iris_server: Option<String>,
 }
+
+#[derive(Debug, Serialize)]
+pub struct EPPSyncUpdate {
+    #[serde(
+        rename = "{http://www.verisign.com/epp/sync-1.0}sync:expMonthDay",
+        serialize_with = "serialize_month_day"
+    )]
+    pub month_day: EPPSyncUpdateMonthDay
+}
+
+#[derive(Debug)]
+pub struct EPPSyncUpdateMonthDay {
+    pub month: u32,
+    pub day: u32,
+}
+
+fn serialize_month_day<S>(d: &EPPSyncUpdateMonthDay, s: S) -> Result<S::Ok, S::Error>
+where
+    S: serde::ser::Serializer,
+{
+    s.serialize_str(&format!(
+        "--{:0>2}-{:0>2}",
+        std::cmp::min(12, std::cmp::max(1, d.month)),
+        std::cmp::min(31, std::cmp::max(1, d.day))
+    ))
+}

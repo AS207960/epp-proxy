@@ -176,6 +176,13 @@ message DomainUpdateRequest {
     eurid.DomainUpdateExtension eurid_data = 11;
 }
 
+message DomainSyncRequest {
+    string name = 1;
+    google.protobuf.StringValue registry_name = 2;
+    uint32 month = 3;
+    uint32 day = 4;
+}
+
 message DomainUpdateReply {
     reserved 4;
     bool pending = 1;
