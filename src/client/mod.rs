@@ -8,9 +8,9 @@ use chrono::prelude::*;
 use futures::future::FutureExt;
 use futures::sink::SinkExt;
 use futures::stream::StreamExt;
-use native_tls::TlsConnector;
 use tokio::net::TcpStream;
-use tokio::prelude::*;
+use tokio::io::{AsyncReadExt, AsyncWriteExt};
+use foreign_types_shared::ForeignType;
 
 pub mod balance;
 pub mod contact;
@@ -99,7 +99,7 @@ async fn recv_msg<R: std::marker::Unpin + tokio::io::AsyncRead>(
             return Err(false);
         }
     };
-    debug!("Received EPP message with contents: {}", data);
+    debug!("Received EPP message from {} with contents: {}", host, data);
     match write_msg_log(&data, "recv", root).await {
         Ok(_) => {}
         Err(e) => {
@@ -113,7 +113,7 @@ async fn recv_msg<R: std::marker::Unpin + tokio::io::AsyncRead>(
             return Err(false);
         }
     };
-    debug!("Decoded EPP message to: {:#?}", message);
+    debug!("Decoded EPP message from {} to: {:#?}", host, message);
     Ok(message)
 }
 
@@ -122,7 +122,7 @@ struct EPPClientReceiver {
     /// Host name for error reporting
     host: String,
     /// Read half of the TLS stream used to connect to the server
-    reader: tokio::io::ReadHalf<tokio_tls::TlsStream<TcpStream>>,
+    reader: tokio::io::ReadHalf<tokio_openssl::SslStream<TcpStream>>,
     /// Path to store received messages in
     root: std::path::PathBuf,
 }
@@ -150,17 +150,15 @@ impl EPPClientReceiver {
 }
 
 /// Main client struct for the EEP client
-#[derive(Debug, Default)]
+#[derive(Debug)]
 pub struct EPPClient {
     log_dir: std::path::PathBuf,
     host: String,
+    hostname: String,
     tag: String,
     password: String,
     new_password: Option<String>,
-    client_cert: Option<String>,
-    root_certs: Vec<String>,
-    danger_accept_invalid_certs: bool,
-    danger_accept_invalid_hostname: bool,
+    tls_context: openssl::ssl::SslContext,
     server_id: String,
     pipelining: bool,
     is_awaiting_response: bool,
@@ -275,7 +273,17 @@ impl EPPClientServerFeatures {
     }
 }
 
-pub struct ClientConf<'a, C> {
+pub enum ClientCertConf<'a> {
+    /// PCKS#12 file path for client identity
+    PKCS12(&'a str),
+    /// PCKS#11 HSM details
+    PKCS11 {
+        key_id: &'a str,
+        cert_chain: &'a str,
+    },
+}
+
+pub struct ClientConf<'a, C: Into<Option<&'a str>>, S: Into<Option<ClientCertConf<'a>>>> {
     /// The server connection string, in the form `domain:port`
     pub host: &'a str,
     /// The client ID/tag to login with
@@ -284,10 +292,11 @@ pub struct ClientConf<'a, C> {
     pub password: &'a str,
     /// Directory path to log commands to
     pub log_dir: std::path::PathBuf,
-    /// PCKS#12 file path for client identity
-    pub client_cert: C,
+    pub client_cert: S,
+    /// PCKS#11 key ID client identity (requires HSM)
+    pub client_key_id: C,
     /// List of PEM file paths
-    pub root_certs: &'a[&'a str],
+    pub root_certs: &'a [&'a str],
     /// Accept invalid TLS certs
     pub danger_accept_invalid_certs: bool,
     /// Accept TLS certs with a hostname that doesn't match the DNS label
@@ -300,33 +309,130 @@ pub struct ClientConf<'a, C> {
     pub errata: Option<String>,
 }
 
+lazy_static! {
+    static ref TLS_CONNECT_LOCK: tokio::sync::Semaphore = tokio::sync::Semaphore::new(1);
+}
+
 impl EPPClient {
     /// Creates a new EPP client ready to be started
     ///
     /// # Arguments
     /// * `conf` - Configuration to use for this client
-    pub fn new<'a, C: Into<Option<&'a str>>>(conf: ClientConf<'a, C>) -> Self {
-        Self {
+    pub async fn new<'a, C: Into<Option<&'a str>>, S: Into<Option<ClientCertConf<'a>>>>(
+        conf: ClientConf<'a, C, S>,
+        pkcs11_engine: Option<crate::P11Engine>,
+    ) -> std::io::Result<Self> {
+        let mut context_builder = openssl::ssl::SslContext::builder(
+            openssl::ssl::SslMethod::tls_client()
+        )?;
+        context_builder.set_min_proto_version(Some(openssl::ssl::SslVersion::TLS1_2))?;
+
+        if conf.danger_accept_invalid_certs {
+            context_builder.set_verify(openssl::ssl::SslVerifyMode::NONE);
+        } else {
+            context_builder.set_verify(openssl::ssl::SslVerifyMode::PEER);
+        }
+
+        let hostname = conf.host.rsplitn(2, ':').collect::<Vec<_>>().pop().unwrap().to_string();
+
+        let mut cert_store = openssl::x509::store::X509StoreBuilder::new()?;
+        if conf.root_certs.is_empty() {
+            cert_store.set_default_paths()?;
+        } else {
+            for root_cert_path in conf.root_certs.into_iter() {
+                let root_cert_bytes = tokio::fs::read(root_cert_path).await?;
+                let root_cert = openssl::x509::X509::from_pem(&root_cert_bytes)?;
+                cert_store.add_cert(root_cert)?;
+            }
+        }
+        let cert_store = cert_store.build();
+        context_builder.set_cert_store(cert_store);
+
+        if !conf.danger_accept_invalid_hostname {
+            context_builder.verify_param_mut().set_hostflags(openssl::x509::verify::X509CheckFlags::NO_PARTIAL_WILDCARDS);
+            context_builder.verify_param_mut().set_host(&hostname)?;
+        }
+
+        let mut priv_key = None;
+
+        if let Some(client_cert) = conf.client_cert.into() {
+            match client_cert {
+                ClientCertConf::PKCS12(pkcs12_file) => {
+                    let pkcs = tokio::fs::read(pkcs12_file).await?;
+                    let identity = openssl::pkcs12::Pkcs12::from_der(&pkcs)?.parse("")?;
+                    context_builder.set_certificate(&identity.cert)?;
+                    context_builder.set_private_key(&identity.pkey)?;
+                    for cert in identity.chain.into_iter().flatten() {
+                        context_builder.add_extra_chain_cert(cert)?;
+                    }
+                }
+                ClientCertConf::PKCS11 {
+                    key_id, cert_chain
+                } => {
+                    context_builder.set_certificate_chain_file(cert_chain)?;
+                    priv_key.replace(key_id);
+                }
+            }
+        }
+
+        let context = context_builder.build();
+
+        if let Some(key_id) = priv_key {
+            let pkcs11_engine = match pkcs11_engine {
+                Some(e) => e,
+                None => {
+                    return Err(std::io::Error::new(std::io::ErrorKind::Other, "PKCS#11 engine required to used PKCS#11 keys"));
+                }
+            };
+
+            info!("Using PKCS#11 key ID {} for {} ", key_id, hostname);
+            let engine_key_id = std::ffi::CString::new(key_id).unwrap();
+            let ctx = context.clone();
+            let h = hostname.clone();
+            // This sometimes takes absolutely forever to run, so throw it in a thread type thing.
+            tokio::task::spawn_blocking(move || -> std::io::Result<()> {
+                unsafe {
+                    trace!("Loading OpenSSL UI for {}", h);
+                    let ui = crate::cvt_p(openssl_sys::UI_OpenSSL())?;
+                    trace!("Loading private key for for {}", h);
+                    let priv_key = crate::cvt_p(openssl_sys::ENGINE_load_private_key(
+                        **pkcs11_engine.claim(), engine_key_id.as_ptr(),
+                        ui, std::ptr::null_mut(),
+                    ))?;
+                    trace!("Setting private key for for {}", h);
+                    openssl_sys::SSL_CTX_use_PrivateKey(ctx.as_ptr(), priv_key);
+                    trace!("Freeing private key for {}", h);
+                    openssl_sys::EVP_PKEY_free(priv_key);
+                    Ok(())
+                }
+            }).await??;
+        }
+
+        Ok(Self {
             log_dir: conf.log_dir,
             host: conf.host.to_string(),
+            hostname,
             tag: conf.tag.to_string(),
             password: conf.password.to_string(),
-            client_cert: conf.client_cert.into().map(|c| c.to_string()),
-            root_certs: conf.root_certs.into_iter().map(|c| c.to_string()).collect(),
-            danger_accept_invalid_certs: conf.danger_accept_invalid_certs,
-            danger_accept_invalid_hostname: conf.danger_accept_invalid_hostname,
+            tls_context: context,
             new_password: conf.new_password.into().map(|c| c.to_string()),
             pipelining: conf.pipelining,
             features: EPPClientServerFeatures {
                 errata: conf.errata,
                 ..Default::default()
             },
-            ..Default::default()
-        }
+            server_id: String::new(),
+            is_awaiting_response: false,
+            is_closing: false,
+            nominet_tag_list_subordinate: false,
+            nominet_tag_list_subordinate_client: None,
+            ready: false,
+            router: router::Router::default(),
+        })
     }
 
-    /// Starts up the EPP server and returns the sending end of a tokio channel to inject
-    /// commands into the client to be processed
+    // Starts up the EPP server and returns the sending end of a tokio channel to inject
+    // commands into the client to be processed
     pub fn start(mut self) -> futures::channel::mpsc::Sender<Request> {
         info!("EPP Client for {} starting...", &self.host);
         if self.nominet_tag_list_subordinate {
@@ -346,6 +452,7 @@ impl EPPClient {
             self.is_awaiting_response = false;
 
             let mut sock = {
+                trace!("Getting connection for {}", self.hostname);
                 let connect_fut = self._connect().fuse();
                 futures::pin_mut!(connect_fut);
 
@@ -366,9 +473,11 @@ impl EPPClient {
                     }
                 }
             };
+            trace!("Got connection for {}", self.hostname);
 
             {
                 let exit_str = format!("All senders for {} dropped, exiting...", self.host);
+                trace!("Setting up connection to {}", self.hostname);
                 let setup_fut = self._setup_connection(&mut sock).fuse();
                 futures::pin_mut!(setup_fut);
                 match loop {
@@ -392,12 +501,13 @@ impl EPPClient {
                         if r {
                             break;
                         } else {
-                            tokio::time::delay_for(tokio::time::Duration::new(5, 0)).await;
+                            tokio::time::sleep(tokio::time::Duration::new(5, 0)).await;
                             continue;
                         }
                     }
                 }
             }
+            trace!("Connection setup to {}", self.hostname);
 
             let (sock_read, mut sock_write) = tokio::io::split(sock);
             let msg_receiver = EPPClientReceiver {
@@ -407,8 +517,9 @@ impl EPPClient {
             };
             let mut message_channel = msg_receiver.run().fuse();
             let mut keepalive_interval =
-                tokio::time::interval(tokio::time::Duration::new(120, 0)).fuse();
+                tokio::time::interval(tokio::time::Duration::new(120, 0));
 
+            trace!("Entering event loop for {}", self.hostname);
             loop {
                 if self.pipelining || !self.is_awaiting_response {
                     futures::select! {
@@ -417,7 +528,7 @@ impl EPPClient {
                                 Some(r) => match self._handle_request(r, &mut sock_write).await {
                                     Ok(_) => {},
                                     Err(_) => {
-                                        tokio::time::delay_for(tokio::time::Duration::new(5, 0)).await;
+                                        tokio::time::sleep(tokio::time::Duration::new(5, 0)).await;
                                         break;
                                     }
                                 },
@@ -447,7 +558,7 @@ impl EPPClient {
                                 None => break
                             }
                         }
-                        _ = keepalive_interval.next() => {
+                        _ = keepalive_interval.tick().fuse() => {
                             match self._send_keepalive(&mut sock_write).await {
                                 Ok(_) => {},
                                 Err(_) => {
@@ -458,7 +569,7 @@ impl EPPClient {
                     }
                 } else {
                     let mut delay =
-                        tokio::time::delay_for(tokio::time::Duration::new(15, 0)).fuse();
+                        Box::pin(tokio::time::sleep(tokio::time::Duration::new(15, 0)).fuse());
                     let resp = futures::select! {
                         r = message_channel.next() => r,
                         _ = delay => {
@@ -490,7 +601,7 @@ impl EPPClient {
                     }
                 }
             }
-            tokio::time::delay_for(tokio::time::Duration::new(5, 0)).await;
+            tokio::time::sleep(tokio::time::Duration::new(5, 0)).await;
         }
     }
 
@@ -503,7 +614,7 @@ impl EPPClient {
         };
         self.is_awaiting_response = true;
         let receiver = self._send_msg(&message, sock_write).fuse();
-        let mut delay = tokio::time::delay_for(tokio::time::Duration::new(15, 0)).fuse();
+        let mut delay = Box::pin(tokio::time::sleep(tokio::time::Duration::new(15, 0)).fuse());
         futures::pin_mut!(receiver);
         let resp = futures::select! {
             r = receiver => r,
@@ -651,7 +762,7 @@ impl EPPClient {
 
     async fn _setup_connection(
         &mut self,
-        sock: &mut tokio_tls::TlsStream<TcpStream>,
+        sock: &mut tokio_openssl::SslStream<TcpStream>,
     ) -> Result<(), bool> {
         let msg = match recv_msg(sock, &self.host, &self.log_dir).await {
             Ok(m) => m,
@@ -847,7 +958,7 @@ impl EPPClient {
         Ok(())
     }
 
-    async fn _login(&mut self, sock: &mut tokio_tls::TlsStream<TcpStream>) -> Result<(), ()> {
+    async fn _login(&mut self, sock: &mut tokio_openssl::SslStream<TcpStream>) -> Result<(), ()> {
         let mut objects = vec![];
         let mut ext_objects = vec![];
 
@@ -966,12 +1077,24 @@ impl EPPClient {
             if self.features.nominet_tag_list {
                 let new_client = Self {
                     host: self.host.clone(),
+                    hostname: self.hostname.clone(),
                     tag: self.tag.clone(),
                     password: self.password.clone(),
                     nominet_tag_list_subordinate: true,
                     log_dir: self.log_dir.clone(),
-                    client_cert: self.client_cert.clone(),
-                    ..Default::default()
+                    tls_context: self.tls_context.clone(),
+                    new_password: None,
+                    pipelining: self.pipelining,
+                    features: EPPClientServerFeatures {
+                        errata: self.features.errata.clone(),
+                        ..Default::default()
+                    },
+                    server_id: String::new(),
+                    is_awaiting_response: false,
+                    is_closing: false,
+                    nominet_tag_list_subordinate_client: None,
+                    ready: false,
+                    router: router::Router::default(),
                 };
                 self.nominet_tag_list_subordinate_client = Some(new_client.start());
             }
@@ -1012,7 +1135,7 @@ impl EPPClient {
         new_password: Option<String>,
         objects: Vec<String>,
         ext_objects: Vec<String>,
-        sock: &mut tokio_tls::TlsStream<TcpStream>,
+        sock: &mut tokio_openssl::SslStream<TcpStream>,
     ) -> Result<(), bool> {
         let mut command = proto::EPPLogin {
             client_id: self.tag.clone(),
@@ -1049,8 +1172,8 @@ impl EPPClient {
                     os: match (sys_info::os_type(), sys_info::os_release()) {
                         (Ok(t), Ok(r)) => Some(format!("{} {}", t, r)),
                         _ => None
-                    }
-                })
+                    },
+                }),
             })])
         } else {
             command.password = password;
@@ -1167,7 +1290,7 @@ impl EPPClient {
         sock: &mut W,
     ) -> Result<(), ()> {
         let encoded_msg = xml_serde::to_string(message).unwrap();
-        debug!("Sending EPP message with contents: {}", encoded_msg);
+        debug!("Sending EPP message to {} with contents: {}", self.hostname, encoded_msg);
         let msg_bytes = encoded_msg.as_bytes();
         let msg_len = msg_bytes.len() + 4;
         match sock.write_u32(msg_len as u32).await {
@@ -1193,7 +1316,7 @@ impl EPPClient {
         Ok(())
     }
 
-    async fn _close(&mut self, sock: &mut tokio_tls::TlsStream<TcpStream>) {
+    async fn _close(&mut self, sock: &mut tokio_openssl::SslStream<TcpStream>) {
         self.router.drain();
         match sock.shutdown().await {
             Ok(_) => {
@@ -1208,7 +1331,7 @@ impl EPPClient {
         }
     }
 
-    async fn _connect(&self) -> tokio_tls::TlsStream<TcpStream> {
+    async fn _connect(&self) -> tokio_openssl::SslStream<TcpStream> {
         loop {
             match self._try_connect().await {
                 Ok(s) => {
@@ -1216,14 +1339,13 @@ impl EPPClient {
                     return s;
                 }
                 Err(_) => {
-                    tokio::time::delay_for(tokio::time::Duration::new(5, 0)).await;
+                    tokio::time::sleep(tokio::time::Duration::new(5, 0)).await;
                 }
             }
         }
     }
 
-    async fn _try_connect(&self) -> Result<tokio_tls::TlsStream<TcpStream>, ()> {
-        let hostname = self.host.rsplitn(2, ':').collect::<Vec<_>>().pop().unwrap();
+    async fn _try_connect(&self) -> Result<tokio_openssl::SslStream<TcpStream>, ()> {
         let addr = match tokio::net::lookup_host(&self.host).await {
             Ok(mut s) => match s.next() {
                 Some(s) => s,
@@ -1237,60 +1359,62 @@ impl EPPClient {
                 return Err(());
             }
         };
-        let socket = match TcpStream::connect(&addr).await {
+
+        // Many servers <drop the connection if no TLS data is sent within ~10 seconds.
+        // We therefore have to make sure only one thread at a time connects TLS otherwise a thread
+        // could open a TCP stream and then wait a while for another thread to negotiate TLS
+        // (it shouldn't be blocking because async, but sometimes it is), by which time the server
+        // has dropped the connection and it all has to start again.
+        //
+        // Please don't ask how this happens>, or how I found out, just don't try and fix this.
+        trace!("Getting connect lock for {}", self.hostname);
+        let lock = TLS_CONNECT_LOCK.acquire().await.unwrap();
+        trace!("Setting up TLS stream for {}", self.hostname);
+
+        trace!("Opening TCP connection to {}", self.hostname);
+        let socket = match tokio::net::TcpStream::connect(&addr).await {
             Ok(s) => s,
             Err(err) => {
                 error!("Unable to connect to {}: {}", self.host, err);
                 return Err(());
             }
         };
-        let mut cx = TlsConnector::builder();
-        cx.danger_accept_invalid_certs(self.danger_accept_invalid_certs);
-        cx.danger_accept_invalid_hostnames(self.danger_accept_invalid_hostname);
-        for root_cert_path in &self.root_certs {
-            let root_cert_bytes = match std::fs::read(root_cert_path) {
-                Ok(p) => p,
+
+        trace!("Creating TLS context for {}", self.hostname);
+        let mut cx = match (move || -> std::io::Result<tokio_openssl::SslStream<TcpStream>> {
+            let mut ssl = openssl::ssl::Ssl::new(&self.tls_context)?;
+            ssl.set_hostname(&self.hostname)?;
+            let cx = tokio_openssl::SslStream::new(ssl, socket)?;
+            Ok(cx)
+        })() {
+            Ok(s) => Box::pin(s),
+            Err(err) => {
+                error!("Unable to create TLS context: {}", err);
+                return Err(());
+            }
+        };
+        // I know this is disgusting, but OpenSSL isn't actually async compatible when using
+        // a HSM.
+        trace!("Negotiating TLS connection to {}", self.hostname);
+        let res = match tokio::task::spawn_blocking(move || -> Result<tokio_openssl::SslStream<TcpStream>, openssl::ssl::Error> {
+            futures::executor::block_on(std::pin::Pin::as_mut(&mut cx).connect())?;
+            Ok(*std::pin::Pin::into_inner(cx))
+        }).await {
+            Ok(s) => match s {
+                Ok(c) => Ok(c),
                 Err(err) => {
-                    error!("Unable read root cert {}: {}", root_cert_path, err);
+                    error!("Unable to start TLS session to {}: {}", self.host, err);
                     return Err(());
                 }
-            };
-            let root_cert = match native_tls::Certificate::from_pem(&root_cert_bytes) {
-                Ok(i) => i,
-                Err(err) => {
-                    error!("Unable read root cert {}: {}", root_cert_path, err);
-                    return Err(());
-                }
-            };
-            cx.disable_built_in_roots(true);
-            cx.add_root_certificate(root_cert);
-        }
-        if let Some(client_cert) = &self.client_cert {
-            let pkcs = match std::fs::read(client_cert) {
-                Ok(p) => p,
-                Err(err) => {
-                    error!("Unable read client cert {}: {}", client_cert, err);
-                    return Err(());
-                }
-            };
-            let identity = match native_tls::Identity::from_pkcs12(&pkcs, "") {
-                Ok(i) => i,
-                Err(err) => {
-                    error!("Unable read client cert {}: {}", client_cert, err);
-                    return Err(());
-                }
-            };
-            cx.identity(identity);
-        }
-        let cx = tokio_tls::TlsConnector::from(cx.build().unwrap());
-        let socket = match cx.connect(&hostname, socket).await {
-            Ok(s) => s,
+            },
             Err(err) => {
                 error!("Unable to start TLS session to {}: {}", self.host, err);
                 return Err(());
             }
         };
-        Ok(socket)
+        trace!("Dropping connect lock for {}", self.hostname);
+        std::mem::drop(lock);
+        res
     }
 }
 
@@ -1304,7 +1428,7 @@ async fn send_epp_client_request<R>(
         Err(_) => return Err(Error::InternalServerError),
     }
     let mut receiver = receiver.fuse();
-    let mut delay = tokio::time::delay_for(tokio::time::Duration::new(15, 0)).fuse();
+    let mut delay = Box::pin(tokio::time::sleep(tokio::time::Duration::new(15, 0)).fuse());
     let resp = futures::select! {
         r = receiver => r,
         _ = delay => {
@@ -1387,5 +1511,5 @@ pub async fn logout(
         })),
         receiver,
     )
-    .await
+        .await
 }

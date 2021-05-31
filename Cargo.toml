@@ -7,12 +7,14 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-tokio = { version = "0.2", features = ["rt-core", "dns", "tcp", "macros", "time", "io-util", "fs", "signal"] }
+tokio = { version = "1.0", features = ["rt-multi-thread", "net", "macros", "time", "io-util", "fs", "signal", "parking_lot"] }
 futures = "0.3"
 log = "0.4"
 pretty_env_logger = "0.4"
-native-tls = "0.2"
-tokio-tls = "0.3.0"
+libc = "0.2"
+openssl = { version = "0.10", features = [] }
+openssl-sys = { version = "0.9", features = [] }
+tokio-openssl = "0.6"
 quick-xml = { version = "0.18", features = ["serialize"]}
 serde = "1.0"
 serde_derive = "1.0"
@@ -22,9 +24,9 @@ time = "0.1"
 uuid = { version = "0.8", features = ["v4"] }
 hex = "0.4"
 regex = "1"
-tonic = { version = "0.2", features = ["transport", "tls"] }
-prost = "0.6"
-prost-types = "0.6"
+tonic = { version = "0.4", features = ["transport", "tls"] }
+prost = "0.7"
+prost-types = "0.7"
 clap = "2.33"
 base64 = "0.12"
 xml_serde = { git = "https://github.com/as207960/xml-serde", rev = "9fc66f9f5f5927c01b874b17c3e0839169785dff" }
@@ -35,7 +37,12 @@ tower-service = "0.3"
 http = "0.2"
 sys-info = "0.9"
 sentry = { version = "0.21.0", features = ["log"] }
+foreign-types-shared = "0.1"
+lazy_static = "1"
 
 [build-dependencies]
-tonic-build = "0.2"
+tonic-build = "0.4"
 built = { version = "0.4", features = ["git2"] }
+
+[patch.crates-io]
+openssl-sys = { git = "https://github.com/AS207960/rust-openssl", rev = "3ea7e492d78b506689c8c31ee9427399ae4735e9" }

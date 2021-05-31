@@ -3179,7 +3179,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                     },
                 }
                 if should_delay {
-                    tokio::time::delay_for(tokio::time::Duration::new(15, 0)).await;
+                    tokio::time::sleep(tokio::time::Duration::new(15, 0)).await;
                 }
             }
         });
