@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["StatusType",""]],"mod":[["launch_create","Nested message and enum types in `LaunchCreate`."],["phase","Nested message and enum types in `Phase`."]],"struct":[["ClaimsKey",""],["CodeMark",""],["CoreNicApplicationInfo",""],["LaunchCreate",""],["LaunchData",""],["LaunchInfo",""],["LaunchInfoData",""],["Notice",""],["Phase",""],["Status",""]]});

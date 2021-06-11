@@ -1,1 +1,1 @@
-initSidebarItems({"mod":[["param",""]],"struct":[["Param",""]]});
+initSidebarItems({"mod":[["param","Nested message and enum types in `Param`."]],"struct":[["Param",""]]});

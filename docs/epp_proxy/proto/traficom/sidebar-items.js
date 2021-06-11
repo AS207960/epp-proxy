@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["EPPContactTraficomRole",""],["EPPContactTraficomType",""],["EPPDomainDelete",""]]});
+initSidebarItems({"enum":[["EPPContactTraficomRole",""],["EPPContactTraficomType",""],["EPPDomainDelete",""]],"struct":[["EPPObjTrnData",""]]});

@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["handle_balance",""],["handle_balance_response",""]]});
