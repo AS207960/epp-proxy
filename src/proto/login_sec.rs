@@ -16,7 +16,7 @@ pub struct EPPLoginSecurity {
         rename = "{urn:ietf:params:xml:ns:epp:loginSec-1.0}loginSec:pw",
         skip_serializing_if = "Option::is_none"
     )]
-    pub new_password: Option<String>
+    pub new_password: Option<String>,
 }
 
 #[derive(Debug, Serialize)]
@@ -35,13 +35,13 @@ pub struct EPPLoginSecurityUserAgent {
         rename = "{urn:ietf:params:xml:ns:epp:loginSec-1.0}loginSec:os",
         skip_serializing_if = "Option::is_none"
     )]
-    pub os: Option<String>
+    pub os: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct EPPLoginSecurityData {
     #[serde(rename = "{urn:ietf:params:xml:ns:epp:loginSec-1.0}event")]
-    pub events: Vec<EPPLoginSecurityEvent>
+    pub events: Vec<EPPLoginSecurityEvent>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -65,7 +65,7 @@ pub struct EPPLoginSecurityEvent {
     #[serde(rename = "$attr:lang", default)]
     pub lang: Option<String>,
     #[serde(rename = "$value", default)]
-    pub msg: Option<String>
+    pub msg: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -83,7 +83,7 @@ pub enum EPPLoginSecurityEventType {
     #[serde(rename = "stat")]
     Statistical,
     #[serde(rename = "custom")]
-    Custom
+    Custom,
 }
 
 #[derive(Debug, Deserialize)]
@@ -91,5 +91,5 @@ pub enum EPPLoginSecurityEventLevel {
     #[serde(rename = "warning")]
     Warning,
     #[serde(rename = "error")]
-    Error
+    Error,
 }

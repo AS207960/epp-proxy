@@ -2,14 +2,18 @@ use std::str::FromStr;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct QualifiedLawyerInfoData {
-    #[serde(rename = "{urn:ietf:params:xml:ns:qualifiedLawyer-1.0}qualifiedLawyer:accreditationId")]
+    #[serde(
+        rename = "{urn:ietf:params:xml:ns:qualifiedLawyer-1.0}qualifiedLawyer:accreditationId"
+    )]
     pub accreditation_id: String,
-    #[serde(rename = "{urn:ietf:params:xml:ns:qualifiedLawyer-1.0}qualifiedLawyer:accreditationBody")]
+    #[serde(
+        rename = "{urn:ietf:params:xml:ns:qualifiedLawyer-1.0}qualifiedLawyer:accreditationBody"
+    )]
     pub accreditation_body: String,
     #[serde(
         rename = "{urn:ietf:params:xml:ns:qualifiedLawyer-1.0}qualifiedLawyer:accreditationYear",
         deserialize_with = "deserialize_date_year",
-        serialize_with = "serialize_date_year",
+        serialize_with = "serialize_date_year"
     )]
     pub accreditation_year: i32,
     #[serde(rename = "{urn:ietf:params:xml:ns:qualifiedLawyer-1.0}qualifiedLawyer:jurisdictionCC")]
@@ -19,9 +23,8 @@ pub struct QualifiedLawyerInfoData {
         skip_serializing_if = "Option::is_none",
         default
     )]
-    pub jurisdiction_province: Option<String>
+    pub jurisdiction_province: Option<String>,
 }
-
 
 struct DateYearVisitor;
 
@@ -41,12 +44,12 @@ impl<'de> serde::de::Visitor<'de> for DateYearVisitor {
             if len < 2 {
                 return Err(E::custom("Invalid year"));
             }
-            match i32::from_str(&value[..len-1]) {
+            match i32::from_str(&value[..len - 1]) {
                 Ok(v) => Ok(v),
                 Err(e) => Err(E::custom(e)),
             }
         } else {
-            return Err(E::custom("Invalid year"));
+            Err(E::custom("Invalid year"))
         }
     }
 }
@@ -57,7 +60,6 @@ where
 {
     d.deserialize_str(DateYearVisitor)
 }
-
 
 #[allow(clippy::trivially_copy_pass_by_ref)]
 fn serialize_date_year<S>(d: &i32, s: S) -> Result<S::Ok, S::Error>

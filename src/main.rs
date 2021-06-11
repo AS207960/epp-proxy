@@ -49,8 +49,8 @@ extern crate serde_derive;
 #[macro_use]
 extern crate lazy_static;
 
+use crate::client::epp::EPPClient;
 use std::collections::HashMap;
-use crate::client::EPPClient;
 
 mod client;
 mod grpc;
@@ -65,16 +65,16 @@ pub mod built_info {
 #[serde(untagged)]
 enum ClientCertConfig {
     PKCS12(String),
-    PKCS11 {
-        key_id: String,
-        cert_chain: String,
-    },
+    PKCS11 { key_id: String, cert_chain: String },
 }
 
 #[derive(Debug, Deserialize)]
 struct ConfigFile {
-    /// Unique registrar ID
+    /// Unique registry ID
     id: String,
+    /// Type/protocol of server being connected to
+    #[serde(default)]
+    server_type: ConfigServerType,
     /// Server host in the form `domain:port`
     server: String,
     /// Client ID to login to the server
@@ -97,6 +97,18 @@ struct ConfigFile {
     pipelining: bool,
     /// For naughty servers
     errata: Option<String>,
+}
+
+#[derive(Debug, Deserialize)]
+enum ConfigServerType {
+    Epp,
+    Tmch,
+}
+
+impl Default for ConfigServerType {
+    fn default() -> Self {
+        ConfigServerType::Epp
+    }
 }
 
 #[derive(Debug, Deserialize)]
@@ -125,16 +137,12 @@ impl Router {
             self.zone_to_client
                 .insert(zone.clone(), (epp_client_sender.clone(), config.id.clone()));
         }
-        self.id_to_client
-            .insert(config.id.clone(), epp_client_sender);
+        self.id_to_client.insert(config.id, epp_client_sender);
     }
 
     /// Fetches client sender by registry ID
     pub fn client_by_id(&self, id: &str) -> Option<client::RequestSender> {
-        match self.id_to_client.get(id) {
-            Some(c) => Some(c.clone()),
-            None => None,
-        }
+        self.id_to_client.get(id).cloned()
     }
 
     /// Searches for client sender by a domain the client is authoritative for
@@ -224,7 +232,9 @@ unsafe impl Send for P11EngineInner {}
 
 impl P11Engine {
     fn new(engine: *mut openssl_sys::ENGINE) -> Self {
-        Self(std::sync::Arc::new(std::sync::Mutex::new(P11EngineInner(engine))))
+        Self(std::sync::Arc::new(std::sync::Mutex::new(P11EngineInner(
+            engine,
+        ))))
     }
 
     fn claim(&self) -> std::sync::MutexGuard<'_, P11EngineInner> {
@@ -327,17 +337,27 @@ async fn main() {
         let engine_pin_ctrl = std::ffi::CString::new("PIN").unwrap();
         let engine_pin = std::ffi::CString::new(conf.pin).unwrap();
 
-        let engine = match match tokio::task::spawn_blocking(move || -> Result<P11Engine, openssl::error::ErrorStack> {
-            unsafe {
-                // Something here seems to be blocking, even though we shouldn't be talking to the HSM yet.
-                openssl_sys::ENGINE_load_builtin_engines();
-                let engine = P11Engine::new(cvt_p(openssl_sys::ENGINE_by_id(engine_id.as_ptr()))?);
-                cvt(openssl_sys::ENGINE_init(**engine.claim()))?;
-                cvt(openssl_sys::ENGINE_ctrl_cmd_string(**engine.claim(), engine_pin_ctrl.as_ptr(), engine_pin.as_ptr(), 1))?;
-                info!("Loaded PKCS#11 engine");
-                Ok(engine)
-            }
-        }).await {
+        let engine = match match tokio::task::spawn_blocking(
+            move || -> Result<P11Engine, openssl::error::ErrorStack> {
+                unsafe {
+                    // Something here seems to be blocking, even though we shouldn't be talking to the HSM yet.
+                    openssl_sys::ENGINE_load_builtin_engines();
+                    let engine =
+                        P11Engine::new(cvt_p(openssl_sys::ENGINE_by_id(engine_id.as_ptr()))?);
+                    cvt(openssl_sys::ENGINE_init(**engine.claim()))?;
+                    cvt(openssl_sys::ENGINE_ctrl_cmd_string(
+                        **engine.claim(),
+                        engine_pin_ctrl.as_ptr(),
+                        engine_pin.as_ptr(),
+                        1,
+                    ))?;
+                    info!("Loaded PKCS#11 engine");
+                    Ok(engine)
+                }
+            },
+        )
+        .await
+        {
             Ok(e) => e,
             Err(e) => {
                 error!("Can't setup OpenSSL: {}", e);
@@ -416,32 +436,39 @@ async fn main() {
                 return;
             }
         }
-        let epp_client = match client::EPPClient::new(client::ClientConf {
-            host: &config.server,
-            tag: &config.tag,
-            password: &config.password,
-            log_dir,
-            client_cert: match &config.client_cert {
-                Some(ClientCertConfig::PKCS12(s)) => Some(client::ClientCertConf::PKCS12(&s)),
-                Some(ClientCertConfig::PKCS11 {
-                         key_id, cert_chain
-                     }) => Some(client::ClientCertConf::PKCS11 {
-                    key_id: &key_id,
-                    cert_chain: &cert_chain,
-                }),
-                _ => None,
+        let epp_client = match client::epp::EPPClient::new(
+            client::ClientConf {
+                host: &config.server,
+                tag: &config.tag,
+                password: &config.password,
+                log_dir,
+                client_cert: match &config.client_cert {
+                    Some(ClientCertConfig::PKCS12(s)) => Some(client::ClientCertConf::PKCS12(&s)),
+                    Some(ClientCertConfig::PKCS11 { key_id, cert_chain }) => {
+                        Some(client::ClientCertConf::PKCS11 {
+                            key_id: &key_id,
+                            cert_chain: &cert_chain,
+                        })
+                    }
+                    _ => None,
+                },
+                client_key_id: None,
+                root_certs: &match config.root_certs.as_ref() {
+                    Some(r) => r.iter().map(|c| c.as_str()).collect::<Vec<_>>(),
+                    None => vec![],
+                },
+                danger_accept_invalid_certs: config.danger_accept_invalid_certs.unwrap_or(false),
+                danger_accept_invalid_hostname: config
+                    .danger_accept_invalid_hostnames
+                    .unwrap_or(false),
+                new_password: config.new_password.as_deref(),
+                pipelining: config.pipelining,
+                errata: config.errata.clone(),
             },
-            client_key_id: None,
-            root_certs: &match config.root_certs.as_ref() {
-                Some(r) => r.iter().map(|c| c.as_str()).collect::<Vec<_>>(),
-                None => vec![]
-            },
-            danger_accept_invalid_certs: config.danger_accept_invalid_certs.unwrap_or(false),
-            danger_accept_invalid_hostname: config.danger_accept_invalid_hostnames.unwrap_or(false),
-            new_password: config.new_password.as_deref(),
-            pipelining: config.pipelining,
-            errata: config.errata.clone(),
-        }, pkcs11_engine.clone()).await {
+            pkcs11_engine.clone(),
+        )
+        .await
+        {
             Ok(c) => c,
             Err(e) => {
                 error!("Can't create EPP client: {}", e);
@@ -510,12 +537,12 @@ struct AuthService<T> {
 }
 
 impl<T, B> tower_service::Service<http::Request<B>> for AuthService<T>
-    where
-        T: tower_service::Service<http::Request<B>> + Send + Clone + 'static,
-        T::Future: Send + 'static,
-        T::Error: 'static,
-        T::Response: From<http::response::Response<tonic::body::BoxBody>> + 'static,
-        B: tonic::codegen::HttpBody + Send + Sync + 'static,
+where
+    T: tower_service::Service<http::Request<B>> + Send + Clone + 'static,
+    T::Future: Send + 'static,
+    T::Error: 'static,
+    T::Response: From<http::response::Response<tonic::body::BoxBody>> + 'static,
+    B: tonic::codegen::HttpBody + Send + Sync + 'static,
 {
     type Response = T::Response;
     type Error = T::Error;
@@ -538,11 +565,8 @@ impl<T, B> tower_service::Service<http::Request<B>> for AuthService<T>
                 Some(t) => match t.to_str() {
                     Ok(t) => {
                         let auth_token_str = t.trim();
-                        if auth_token_str.starts_with("Bearer ") {
-                            match client
-                                .verify_token(&auth_token_str[7..], "access-epp")
-                                .await
-                            {
+                        if let Some(auth_token) = auth_token_str.strip_prefix("Bearer ") {
+                            match client.verify_token(&auth_token, "access-epp").await {
                                 Ok(_) => Ok(inner.call(req).await?),
                                 Err(_) => Err("Invalid auth token"),
                             }
@@ -584,8 +608,8 @@ impl<T, B> tower_service::Service<http::Request<B>> for AuthService<T>
 }
 
 impl<T> tonic::transport::server::NamedService for AuthService<T>
-    where
-        T: tonic::transport::server::NamedService,
+where
+    T: tonic::transport::server::NamedService,
 {
     const NAME: &'static str = T::NAME;
 }

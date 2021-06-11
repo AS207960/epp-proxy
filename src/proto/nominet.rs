@@ -105,14 +105,17 @@ pub enum EPPDataQualityStatus {
     #[serde(rename = "valid")]
     Valid,
     #[serde(rename = "invalid")]
-    Invalid
+    Invalid,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct EPPDataQualityInfo {
     #[serde(rename = "{http://www.nominet.org.uk/epp/xml/nom-data-quality-1.1}status")]
     pub status: EPPDataQualityStatus,
-    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/nom-data-quality-1.1}reason", default)]
+    #[serde(
+        rename = "{http://www.nominet.org.uk/epp/xml/nom-data-quality-1.1}reason",
+        default
+    )]
     pub reason: Option<String>,
     #[serde(
         rename = "{http://www.nominet.org.uk/epp/xml/nom-data-quality-1.1}dateCommenced",
@@ -126,7 +129,10 @@ pub struct EPPDataQualityInfo {
         default
     )]
     pub date_to_suspend: Option<DateTime<Utc>>,
-    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/nom-data-quality-1.1}lockApplied", default)]
+    #[serde(
+        rename = "{http://www.nominet.org.uk/epp/xml/nom-data-quality-1.1}lockApplied",
+        default
+    )]
     pub lock_applied: Option<bool>,
     #[serde(
         rename = "{http://www.nominet.org.uk/epp/xml/nom-data-quality-1.1}domainListData",
@@ -201,9 +207,15 @@ pub struct EPPRegistrarChangeData {
     pub originator: String,
     #[serde(rename = "{http://www.nominet.org.uk/epp/xml/std-notifications-1.2}registrarTag")]
     pub registrar_tag: String,
-    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/std-notifications-1.2}caseId", default)]
+    #[serde(
+        rename = "{http://www.nominet.org.uk/epp/xml/std-notifications-1.2}caseId",
+        default
+    )]
     pub case_id: Option<String>,
-    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/std-notifications-1.2}domainListData", default)]
+    #[serde(
+        rename = "{http://www.nominet.org.uk/epp/xml/std-notifications-1.2}domainListData",
+        default
+    )]
     pub domain_list: Option<EPPExpandedDomainListData>,
     #[serde(rename = "{urn:ietf:params:xml:ns:contact-1.0}infData")]
     pub contact: super::contact::EPPContactInfoData,

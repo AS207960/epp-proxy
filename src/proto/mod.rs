@@ -7,22 +7,22 @@ use std::collections::HashMap;
 pub mod centralnic;
 pub mod change_poll;
 pub mod contact;
+pub mod corenic;
 pub mod domain;
+pub mod eurid;
 pub mod fee;
 pub mod host;
+pub mod launch;
+pub mod login_sec;
+pub mod maintenance;
 pub mod nominet;
+pub mod qualified_lawyer;
 pub mod rgp;
 pub mod secdns;
 pub mod switch;
 pub mod traficom;
-pub mod verisign;
 pub mod united_tld;
-pub mod launch;
-pub mod corenic;
-pub mod login_sec;
-pub mod maintenance;
-pub mod eurid;
-pub mod qualified_lawyer;
+pub mod verisign;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub enum EPPMessageType {
@@ -127,9 +127,7 @@ pub enum EPPCommandExtensionType {
         rename = "{http://www.verisign-grs.com/epp/namestoreExt-1.1}namestoreExt:namestoreExt"
     )]
     VerisignNameStoreExt(verisign::EPPNameStoreExt),
-    #[serde(
-        rename = "{http://www.verisign.com/epp/whoisInf-1.0}whoisInf:whoisInf"
-    )]
+    #[serde(rename = "{http://www.verisign.com/epp/whoisInf-1.0}whoisInf:whoisInf")]
     VerisignWhoisInfExt(verisign::EPPWhoisInfoExt),
     #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.5}fee:check")]
     EPPFee05Check(fee::EPPFee05Check),
@@ -274,9 +272,7 @@ impl EPPResponse {
         for r in &self.results {
             match r.extra_values.as_ref().map(|v| {
                 v.iter()
-                    .map(|e| {
-                        format!("({}) {}", e.value, e.reason)
-                    })
+                    .map(|e| format!("({}) {}", e.value, e.reason))
                     .collect::<Vec<_>>()
             }) {
                 Some(extra) => {
@@ -365,34 +361,34 @@ pub enum EPPResultCode {
 
 impl EPPResultCode {
     fn is_success(&self) -> bool {
-        match self {
+        matches!(
+            self,
             EPPResultCode::Success
-            | EPPResultCode::SuccessActionPending
-            | EPPResultCode::SuccessNoMessages
-            | EPPResultCode::SuccessAckToDequeue
-            | EPPResultCode::SuccessEndingSession => true,
-            _ => false,
-        }
+                | EPPResultCode::SuccessActionPending
+                | EPPResultCode::SuccessNoMessages
+                | EPPResultCode::SuccessAckToDequeue
+                | EPPResultCode::SuccessEndingSession
+        )
     }
 
     fn is_closing(&self) -> bool {
-        match self {
+        matches!(
+            self,
             EPPResultCode::SuccessEndingSession
-            | EPPResultCode::CommandFailedServerClosingConnection
-            | EPPResultCode::AuthenticationServerClosingConnection
-            | EPPResultCode::SessionLimitExceededServerClosingConnection => true,
-            _ => false,
-        }
+                | EPPResultCode::CommandFailedServerClosingConnection
+                | EPPResultCode::AuthenticationServerClosingConnection
+                | EPPResultCode::SessionLimitExceededServerClosingConnection
+        )
     }
 
     fn is_server_error(&self) -> bool {
-        match self {
+        matches!(
+            self,
             EPPResultCode::CommandFailed
-            | EPPResultCode::CommandFailedServerClosingConnection
-            | EPPResultCode::AuthenticationServerClosingConnection
-            | EPPResultCode::SessionLimitExceededServerClosingConnection => true,
-            _ => false,
-        }
+                | EPPResultCode::CommandFailedServerClosingConnection
+                | EPPResultCode::AuthenticationServerClosingConnection
+                | EPPResultCode::SessionLimitExceededServerClosingConnection
+        )
     }
 }
 
@@ -600,7 +596,9 @@ pub enum EPPResultDataValue {
     EURIDPollData(eurid::EURIDPollData),
     #[serde(rename = "{http://www.eurid.eu/xml/epp/dnsQuality-2.0}dnsQuality:infData")]
     EURIDDNSQualityData(eurid::EURIDDNSQualityInfoData),
-    #[serde(rename = "{http://www.eurid.eu/xml/epp/dnssecEligibility-1.0}dnssecEligibility:infData")]
+    #[serde(
+        rename = "{http://www.eurid.eu/xml/epp/dnssecEligibility-1.0}dnssecEligibility:infData"
+    )]
     EURIDDNSSECEligibilityInfoData(eurid::EURIDDNSSECEligibilityInfoData),
 }
 
@@ -818,7 +816,9 @@ pub enum EPPInfo {
     UnitedTLDBalace {},
     #[serde(rename = "{http://www.eurid.eu/xml/epp/registrarFinance-1.0}registrarFinance:info")]
     EURIDRegistrarFinance {},
-    #[serde(rename = "{http://www.eurid.eu/xml/epp/registrarHitPoints-1.0}registrarHitPoints:info")]
+    #[serde(
+        rename = "{http://www.eurid.eu/xml/epp/registrarHitPoints-1.0}registrarHitPoints:info"
+    )]
     EURIDRegistrarHitPoints {},
     #[serde(rename = "{http://www.eurid.eu/xml/epp/registrationLimit-1.1}registrationLimit:info")]
     EURIDRegistrationLimit {},

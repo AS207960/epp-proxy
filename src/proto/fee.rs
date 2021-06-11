@@ -368,7 +368,6 @@ pub struct EPPFee011Command {
     pub standard: bool,
 }
 
-
 #[derive(Debug, Deserialize)]
 pub struct EPPFee10Command {
     #[serde(rename = "$attr:name")]
@@ -622,25 +621,25 @@ pub struct EPPFee08Fee {
 #[derive(Debug, Deserialize, Serialize)]
 pub struct EPPFee10Fee {
     #[serde(
-    rename = "$attr:description",
+        rename = "$attr:description",
         skip_serializing_if = "Option::is_none",
         default
     )]
     pub description: Option<String>,
     #[serde(
-    rename = "$attr:refundable",
+        rename = "$attr:refundable",
         skip_serializing_if = "Option::is_none",
         default
     )]
     pub refundable: Option<bool>,
     #[serde(
-    rename = "$attr:grace-period",
+        rename = "$attr:grace-period",
         skip_serializing_if = "Option::is_none",
         default
     )]
     pub grace_period: Option<String>,
     #[serde(
-    rename = "$attr:applied",
+        rename = "$attr:applied",
         skip_serializing_if = "Option::is_none",
         default
     )]
@@ -700,7 +699,6 @@ pub struct EPPFee10Credit {
     #[serde(rename = "$value")]
     pub value: String,
 }
-
 
 #[derive(Debug, Deserialize)]
 pub struct EPPFee011Credit {

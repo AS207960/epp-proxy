@@ -2,7 +2,10 @@
 pub struct EPPBalance {
     #[serde(rename = "{http://www.unitedtld.com/epp/finance-1.0}balance")]
     pub balance: String,
-    #[serde(rename = "{http://www.unitedtld.com/epp/finance-1.0}threshold", default)]
+    #[serde(
+        rename = "{http://www.unitedtld.com/epp/finance-1.0}threshold",
+        default
+    )]
     pub thresholds: Vec<EPPBalanceThreshold>,
 }
 
@@ -75,7 +78,7 @@ pub enum EPPChargeTypes {
     #[serde(rename = "price")]
     Price,
     #[serde(rename = "custom")]
-    Custom
+    Custom,
 }
 
 #[derive(Debug, Deserialize, Serialize)]

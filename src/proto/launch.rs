@@ -7,11 +7,8 @@ pub struct EPPLaunchCheck {
         skip_serializing_if = "Option::is_none"
     )]
     pub phase: Option<EPPLaunchPhase>,
-    #[serde(
-        rename = "$attr:type",
-        skip_serializing_if = "Option::is_none"
-    )]
-    pub check_type: Option<EPPLaunchCheckType>
+    #[serde(rename = "$attr:type", skip_serializing_if = "Option::is_none")]
+    pub check_type: Option<EPPLaunchCheckType>,
 }
 
 #[derive(Debug, Deserialize, Serialize, PartialEq)]
@@ -21,7 +18,7 @@ pub enum EPPLaunchCheckType {
     #[serde(rename = "avail")]
     Availability,
     #[serde(rename = "trademark")]
-    Trademark
+    Trademark,
 }
 
 #[derive(Debug, Deserialize)]
@@ -53,15 +50,12 @@ pub struct EPPLaunchClaimKey {
     #[serde(rename = "$value")]
     pub key: String,
     #[serde(rename = "$attr:validatorID", default)]
-    pub validator_id: Option<String>
+    pub validator_id: Option<String>,
 }
 
 #[derive(Debug, Serialize)]
 pub struct EPPLaunchInfo {
-    #[serde(
-        rename = "$attr:includeMark",
-        skip_serializing_if = "Option::is_none"
-    )]
+    #[serde(rename = "$attr:includeMark", skip_serializing_if = "Option::is_none")]
     pub include_mark: Option<bool>,
     #[serde(rename = "{urn:ietf:params:xml:ns:launch-1.0}launch:phase")]
     pub phase: EPPLaunchPhase,
@@ -69,7 +63,7 @@ pub struct EPPLaunchInfo {
         rename = "{urn:ietf:params:xml:ns:launch-1.0}launch:applicationID",
         skip_serializing_if = "Option::is_none"
     )]
-    pub application_id: Option<String>
+    pub application_id: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -88,10 +82,7 @@ pub struct EPPLaunchInfoData {
 
 #[derive(Debug, Serialize)]
 pub struct EPPLaunchCreate {
-    #[serde(
-        rename = "$attr:type",
-        skip_serializing_if = "Option::is_none"
-    )]
+    #[serde(rename = "$attr:type", skip_serializing_if = "Option::is_none")]
     pub create_type: Option<EPPLaunchCreateType>,
     #[serde(rename = "{urn:ietf:params:xml:ns:launch-1.0}launch:phase")]
     pub phase: EPPLaunchPhase,
@@ -99,10 +90,7 @@ pub struct EPPLaunchCreate {
     pub code_marks: Vec<EPPLaunchCodeMark>,
     #[serde(rename = "{urn:ietf:params:xml:ns:launch-1.0}launch:notice")]
     pub notices: Vec<EPPLaunchNotice>,
-    #[serde(
-        rename = "$valueRaw",
-        skip_serializing_if = "Option::is_none"
-    )]
+    #[serde(rename = "$valueRaw", skip_serializing_if = "Option::is_none")]
     pub signed_mark: Option<String>,
     #[serde(
         rename = "{http://xmlns.corenic.net/epp/mark-ext-1.0}ext:augmentedMark",
@@ -182,7 +170,7 @@ pub enum EPPLaunchStatusType {
     #[serde(rename = "rejected")]
     Rejected,
     #[serde(rename = "custom")]
-    Custom
+    Custom,
 }
 
 #[derive(Debug, Serialize)]
@@ -192,10 +180,7 @@ pub struct EPPLaunchCodeMark {
         skip_serializing_if = "Option::is_none"
     )]
     pub code: Option<EPPLaunchCode>,
-    #[serde(
-        rename = "$valueRaw",
-        skip_serializing_if = "Option::is_none"
-    )]
+    #[serde(rename = "$valueRaw", skip_serializing_if = "Option::is_none")]
     pub mark: Option<String>,
     // #[serde(
     //     rename = "{urn:ietf:params:xml:ns:mark-1.0}mark",
@@ -208,11 +193,8 @@ pub struct EPPLaunchCodeMark {
 pub struct EPPLaunchCode {
     #[serde(rename = "$value")]
     pub code: String,
-    #[serde(
-        rename = "$attr:validatorID",
-        skip_serializing_if = "Option::is_none"
-    )]
-    pub validator_id: Option<String>
+    #[serde(rename = "$attr:validatorID", skip_serializing_if = "Option::is_none")]
+    pub validator_id: Option<String>,
 }
 
 #[derive(Debug, Serialize)]
@@ -229,9 +211,6 @@ pub struct EPPLaunchNotice {
 pub struct EPPLaunchNoticeID {
     #[serde(rename = "$value")]
     pub code: String,
-    #[serde(
-        rename = "$attr:validatorID",
-        skip_serializing_if = "Option::is_none"
-    )]
-    pub validator_id: Option<String>
+    #[serde(rename = "$attr:validatorID", skip_serializing_if = "Option::is_none")]
+    pub validator_id: Option<String>,
 }

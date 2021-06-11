@@ -82,11 +82,17 @@ pub struct EPPWhoisInfoExt {
 pub struct EPPWhoisInfoExtData {
     #[serde(rename = "{http://www.verisign.com/epp/whoisInf-1.0}registrar")]
     pub registrar: String,
-    #[serde(rename = "{http://www.verisign.com/epp/whoisInf-1.0}whoisServer", default)]
+    #[serde(
+        rename = "{http://www.verisign.com/epp/whoisInf-1.0}whoisServer",
+        default
+    )]
     pub whois_server: Option<String>,
     #[serde(rename = "{http://www.verisign.com/epp/whoisInf-1.0}url", default)]
     pub url: Option<String>,
-    #[serde(rename = "{http://www.verisign.com/epp/whoisInf-1.0}irisServer", default)]
+    #[serde(
+        rename = "{http://www.verisign.com/epp/whoisInf-1.0}irisServer",
+        default
+    )]
     pub iris_server: Option<String>,
 }
 
@@ -96,7 +102,7 @@ pub struct EPPSyncUpdate {
         rename = "{http://www.verisign.com/epp/sync-1.0}sync:expMonthDay",
         serialize_with = "serialize_month_day"
     )]
-    pub month_day: EPPSyncUpdateMonthDay
+    pub month_day: EPPSyncUpdateMonthDay,
 }
 
 #[derive(Debug)]

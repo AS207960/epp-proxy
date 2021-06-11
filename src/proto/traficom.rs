@@ -45,5 +45,5 @@ pub enum EPPDomainDelete {
 #[derive(Debug, Deserialize)]
 pub struct EPPObjTrnData {
     #[serde(rename = "{urn:ietf:params:xml:ns:obj-1.0}name")]
-    pub name: String
+    pub name: String,
 }
