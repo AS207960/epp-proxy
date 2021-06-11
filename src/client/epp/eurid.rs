@@ -5,7 +5,7 @@ use super::super::eurid::{
     DNSQualityRequest, DNSQualityResponse, DNSSECEligibilityRequest, DNSSECEligibilityResponse,
     DomainAuthInfo, DomainCheck, DomainCreate, DomainDelete, DomainInfo, DomainInfoRequest,
     DomainRenewInfo, DomainTransfer, DomainTransferInfo, DomainUpdate, HitPointsRequest,
-    HitPointsResponse, PollResponse, RegistrationLimitRequest, RegistrationLimitResponse, Idn,
+    HitPointsResponse, Idn, PollResponse, RegistrationLimitRequest, RegistrationLimitResponse,
 };
 use super::super::{proto, Error, Response, ServerFeatures};
 use super::router::HandleReqReturn;

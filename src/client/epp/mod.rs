@@ -1,4 +1,6 @@
-use super::{router as outer_router, ClientCertConf, LogoutRequest, RequestMessage, ServerFeatures};
+use super::{
+    router as outer_router, ClientCertConf, LogoutRequest, RequestMessage, ServerFeatures,
+};
 use crate::proto;
 use chrono::prelude::*;
 use foreign_types_shared::ForeignType;
@@ -404,7 +406,10 @@ impl EPPClient {
                     Some(c) => c,
                     None => return Err(()),
                 };
-                match client.send(outer_router::RequestMessage::NominetTagList(t)).await {
+                match client
+                    .send(outer_router::RequestMessage::NominetTagList(t))
+                    .await
+                {
                     Ok(_) => Ok(()),
                     Err(e) => {
                         warn!("Failed to send to subordinate server: {}", e);
@@ -417,9 +422,11 @@ impl EPPClient {
                     Some(client) => {
                         let (sender, _) = futures::channel::oneshot::channel();
                         match client
-                            .send(outer_router::RequestMessage::Logout(Box::new(LogoutRequest {
-                                return_path: sender,
-                            })))
+                            .send(outer_router::RequestMessage::Logout(Box::new(
+                                LogoutRequest {
+                                    return_path: sender,
+                                },
+                            )))
                             .await
                         {
                             Ok(_) => {}

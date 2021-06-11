@@ -445,10 +445,7 @@ async fn main() {
                 client_cert: match &config.client_cert {
                     Some(ClientCertConfig::PKCS12(s)) => Some(client::ClientCertConf::PKCS12(s)),
                     Some(ClientCertConfig::PKCS11 { key_id, cert_chain }) => {
-                        Some(client::ClientCertConf::PKCS11 {
-                            key_id,
-                            cert_chain,
-                        })
+                        Some(client::ClientCertConf::PKCS11 { key_id, cert_chain })
                     }
                     _ => None,
                 },
