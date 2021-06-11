@@ -66,8 +66,8 @@ fn change_data_from_response(
                     name: c.name.clone(),
                     case_id: c.case_id.clone(),
                     case_type: match c.case_type {
-                        proto::change_poll::EPPChangeCaseIdType::UDRP => ChangeCaseIdType::UDRP,
-                        proto::change_poll::EPPChangeCaseIdType::URS => ChangeCaseIdType::URS,
+                        proto::change_poll::EPPChangeCaseIdType::Udrp => ChangeCaseIdType::Udrp,
+                        proto::change_poll::EPPChangeCaseIdType::Urs => ChangeCaseIdType::Urs,
                         proto::change_poll::EPPChangeCaseIdType::Custom => ChangeCaseIdType::Custom,
                     },
                 }),
@@ -213,19 +213,19 @@ pub fn handle_poll_response(response: proto::EPPResponse) -> Response<Option<Pol
                                 if let Some(item) = maint_info.item {
                                     PollData::MaintenanceData(item.into())
                                 } else {
-                                    return Err(Error::InternalServerError);
+                                    return Err(Error::ServerInternal);
                                 }
                             }
-                            _ => return Err(Error::InternalServerError),
+                            _ => return Err(Error::ServerInternal),
                         },
                         None => PollData::None,
                     },
                 })),
-                None => Err(Error::InternalServerError),
+                None => Err(Error::ServerInternal),
             },
-            _ => Err(Error::InternalServerError),
+            _ => Err(Error::ServerInternal),
         },
-        None => Err(Error::InternalServerError),
+        None => Err(Error::ServerInternal),
     }
 }
 

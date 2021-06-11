@@ -83,12 +83,12 @@ pub fn handle_check_response(response: proto::EPPResponse) -> Response<CheckResp
                         reason: host_check.reason.to_owned(),
                     })
                 } else {
-                    Err(Error::InternalServerError)
+                    Err(Error::ServerInternal)
                 }
             }
-            _ => Err(Error::InternalServerError),
+            _ => Err(Error::ServerInternal),
         },
-        None => Err(Error::InternalServerError),
+        None => Err(Error::ServerInternal),
     }
 }
 
@@ -140,9 +140,9 @@ pub fn handle_info_response(response: proto::EPPResponse) -> Response<InfoRespon
                 last_updated_date: host_info.last_updated_date,
                 last_transfer_date: host_info.last_transfer_date,
             }),
-            _ => Err(Error::InternalServerError),
+            _ => Err(Error::ServerInternal),
         },
-        None => Err(Error::InternalServerError),
+        None => Err(Error::ServerInternal),
     }
 }
 
@@ -205,9 +205,9 @@ pub fn handle_create_response(response: proto::EPPResponse) -> Response<CreateRe
                     creation_date: host_create.creation_date,
                 })
             }
-            _ => Err(Error::InternalServerError),
+            _ => Err(Error::ServerInternal),
         },
-        None => Err(Error::InternalServerError),
+        None => Err(Error::ServerInternal),
     }
 }
 

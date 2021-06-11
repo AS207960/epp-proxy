@@ -82,9 +82,9 @@ pub fn handle_balance_response(response: proto::EPPResponse) -> Response<Balance
                     credit_threshold: None,
                 })
             }
-            _ => Err(Error::InternalServerError),
+            _ => Err(Error::ServerInternal),
         },
-        None => Err(Error::InternalServerError),
+        None => Err(Error::ServerInternal),
     }
 }
 

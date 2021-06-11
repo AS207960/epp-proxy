@@ -443,11 +443,11 @@ async fn main() {
                 password: &config.password,
                 log_dir,
                 client_cert: match &config.client_cert {
-                    Some(ClientCertConfig::PKCS12(s)) => Some(client::ClientCertConf::PKCS12(&s)),
+                    Some(ClientCertConfig::PKCS12(s)) => Some(client::ClientCertConf::PKCS12(s)),
                     Some(ClientCertConfig::PKCS11 { key_id, cert_chain }) => {
                         Some(client::ClientCertConf::PKCS11 {
-                            key_id: &key_id,
-                            cert_chain: &cert_chain,
+                            key_id,
+                            cert_chain,
                         })
                     }
                     _ => None,
@@ -566,7 +566,7 @@ where
                     Ok(t) => {
                         let auth_token_str = t.trim();
                         if let Some(auth_token) = auth_token_str.strip_prefix("Bearer ") {
-                            match client.verify_token(&auth_token, "access-epp").await {
+                            match client.verify_token(auth_token, "access-epp").await {
                                 Ok(_) => Ok(inner.call(req).await?),
                                 Err(_) => Err("Invalid auth token"),
                             }

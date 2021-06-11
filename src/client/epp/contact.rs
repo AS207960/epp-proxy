@@ -534,12 +534,12 @@ pub fn handle_check_response(response: proto::EPPResponse) -> Response<CheckResp
                         reason: contact_check.reason.to_owned(),
                     })
                 } else {
-                    Err(Error::InternalServerError)
+                    Err(Error::ServerInternal)
                 }
             }
-            _ => Err(Error::InternalServerError),
+            _ => Err(Error::ServerInternal),
         },
-        None => Err(Error::InternalServerError),
+        None => Err(Error::ServerInternal),
     }
 }
 
@@ -566,9 +566,9 @@ pub fn handle_info_response(response: proto::EPPResponse) -> Response<InfoRespon
             proto::EPPResultDataValue::EPPContactInfoResult(contact_info) => {
                 (*contact_info, &response.extension).try_into()
             }
-            _ => Err(Error::InternalServerError),
+            _ => Err(Error::ServerInternal),
         },
-        None => Err(Error::InternalServerError),
+        None => Err(Error::ServerInternal),
     }
 }
 
@@ -814,9 +814,9 @@ pub fn handle_create_response(response: proto::EPPResponse) -> Response<CreateRe
                     creation_date: contact_create.creation_date,
                 })
             }
-            _ => Err(Error::InternalServerError),
+            _ => Err(Error::ServerInternal),
         },
-        None => Err(Error::InternalServerError),
+        None => Err(Error::ServerInternal),
     }
 }
 
@@ -1167,9 +1167,9 @@ pub fn handle_transfer_response(response: proto::EPPResponse) -> Response<Transf
                 res.pending = pending;
                 Ok(res)
             }
-            _ => Err(Error::InternalServerError),
+            _ => Err(Error::ServerInternal),
         },
-        None => Err(Error::InternalServerError),
+        None => Err(Error::ServerInternal),
     }
 }
 

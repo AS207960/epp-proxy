@@ -16,7 +16,7 @@ impl TryFrom<super::proto::verisign::EPPLowBalanceData> for LowBalanceData {
                     CreditThreshold::Percentage(
                         match from.credit_threshold.threshold.parse::<u8>() {
                             Ok(v) => v,
-                            Err(_) => return Err(Error::InternalServerError),
+                            Err(_) => return Err(Error::ServerInternal),
                         },
                     )
                 }

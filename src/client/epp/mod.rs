@@ -1,10 +1,10 @@
-use super::{router as outer_router, ClientCertConf, LogoutRequest, Request, ServerFeatures};
+use super::{router as outer_router, ClientCertConf, LogoutRequest, RequestMessage, ServerFeatures};
 use crate::proto;
 use chrono::prelude::*;
 use foreign_types_shared::ForeignType;
 use futures::future::FutureExt;
-use futures::sink::SinkExt;
 use futures::stream::StreamExt;
+use futures::SinkExt;
 use tokio::io::AsyncWriteExt;
 use tokio::net::TcpStream;
 
@@ -57,7 +57,7 @@ pub struct EPPClient {
     /// What features does the server support
     features: ServerFeatures,
     nominet_tag_list_subordinate: bool,
-    nominet_tag_list_subordinate_client: Option<futures::channel::mpsc::Sender<Request>>,
+    nominet_tag_list_subordinate_client: Option<futures::channel::mpsc::Sender<RequestMessage>>,
 }
 
 lazy_static! {
@@ -195,19 +195,19 @@ impl EPPClient {
 
     // Starts up the EPP server and returns the sending end of a tokio channel to inject
     // commands into the client to be processed
-    pub fn start(mut self) -> futures::channel::mpsc::Sender<Request> {
+    pub fn start(mut self) -> futures::channel::mpsc::Sender<RequestMessage> {
         info!("EPP Client for {} starting...", &self.host);
         if self.nominet_tag_list_subordinate {
             info!("This is a Nominet Tag list subordinate client");
         }
-        let (sender, receiver) = futures::channel::mpsc::channel::<Request>(16);
+        let (sender, receiver) = futures::channel::mpsc::channel::<RequestMessage>(16);
         tokio::spawn(async move {
             self._main_loop(receiver).await;
         });
         sender
     }
 
-    async fn _main_loop(&mut self, receiver: futures::channel::mpsc::Receiver<Request>) {
+    async fn _main_loop(&mut self, receiver: futures::channel::mpsc::Receiver<RequestMessage>) {
         let mut receiver = receiver.fuse();
         loop {
             self.is_closing = false;
@@ -395,16 +395,16 @@ impl EPPClient {
 
     async fn _handle_request<W: std::marker::Unpin + tokio::io::AsyncWrite>(
         &mut self,
-        req: outer_router::Request,
+        req: outer_router::RequestMessage,
         sock_write: &mut W,
     ) -> Result<(), ()> {
         match (req, self.nominet_tag_list_subordinate) {
-            (outer_router::Request::NominetTagList(t), false) => {
+            (outer_router::RequestMessage::NominetTagList(t), false) => {
                 let client = match &mut self.nominet_tag_list_subordinate_client {
                     Some(c) => c,
                     None => return Err(()),
                 };
-                match client.send(outer_router::Request::NominetTagList(t)).await {
+                match client.send(outer_router::RequestMessage::NominetTagList(t)).await {
                     Ok(_) => Ok(()),
                     Err(e) => {
                         warn!("Failed to send to subordinate server: {}", e);
@@ -412,12 +412,12 @@ impl EPPClient {
                     }
                 }
             }
-            (outer_router::Request::Logout(t), _) => {
+            (outer_router::RequestMessage::Logout(t), _) => {
                 match &mut self.nominet_tag_list_subordinate_client {
                     Some(client) => {
                         let (sender, _) = futures::channel::oneshot::channel();
                         match client
-                            .send(outer_router::Request::Logout(Box::new(LogoutRequest {
+                            .send(outer_router::RequestMessage::Logout(Box::new(LogoutRequest {
                                 return_path: sender,
                             })))
                             .await
@@ -434,7 +434,7 @@ impl EPPClient {
                 self.is_closing = true;
                 match self
                     .router
-                    .handle_request(&self.features, outer_router::Request::Logout(t))
+                    .handle_request(&self.features, outer_router::RequestMessage::Logout(t))
                 {
                     Some(((command, extension), command_id)) => {
                         self.is_awaiting_response = true;
@@ -487,7 +487,7 @@ impl EPPClient {
                     }
                 };
                 let is_closing = response.is_closing();
-                let transaction_id = match uuid::Uuid::parse_str(&transaction_id) {
+                let transaction_id = match uuid::Uuid::parse_str(transaction_id) {
                     Ok(i) => i,
                     Err(e) => {
                         error!(
@@ -1065,7 +1065,7 @@ impl EPPClient {
                 return Err(());
             }
         };
-        match sock.write(&msg_bytes).await {
+        match sock.write(msg_bytes).await {
             Ok(_) => {}
             Err(err) => {
                 error!("Error writing data unit to {}: {}", &self.host, err);

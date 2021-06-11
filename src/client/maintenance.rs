@@ -1,6 +1,6 @@
 //! EPP commands relating to draft-ietf-regext-epp-registry-maintenance
 
-use super::{CommandResponse, Request, Sender};
+use super::{CommandResponse, RequestMessage, Sender};
 use chrono::prelude::*;
 
 #[derive(Debug)]
@@ -80,7 +80,7 @@ pub struct Intervention {
 #[derive(Debug)]
 pub enum Environment {
     Production,
-    OTE,
+    Ote,
     Staging,
     Development,
     Custom(String),
@@ -95,7 +95,7 @@ pub enum Reason {
 #[derive(Debug)]
 pub enum Description {
     Plain(String),
-    HTML(String),
+    Html(String),
 }
 
 /// Fetches all maintenance items
@@ -103,12 +103,12 @@ pub enum Description {
 /// # Arguments
 /// * `client_sender` - Reference to the tokio channel into the client
 pub async fn list(
-    client_sender: &mut futures::channel::mpsc::Sender<Request>,
+    client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<ListResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
     super::send_epp_client_request(
         client_sender,
-        Request::MaintenanceList(Box::new(ListRequest {
+        RequestMessage::MaintenanceList(Box::new(ListRequest {
             return_path: sender,
         })),
         receiver,
@@ -123,12 +123,12 @@ pub async fn list(
 /// * `client_sender` - Reference to the tokio channel into the client
 pub async fn info(
     id: &str,
-    client_sender: &mut futures::channel::mpsc::Sender<Request>,
+    client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<InfoResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
     super::send_epp_client_request(
         client_sender,
-        Request::MaintenanceInfo(Box::new(InfoRequest {
+        RequestMessage::MaintenanceInfo(Box::new(InfoRequest {
             id: id.to_string(),
             return_path: sender,
         })),

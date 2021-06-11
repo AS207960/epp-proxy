@@ -24,7 +24,7 @@ impl From<proto::maintenance::EPPMaintenanceItem> for InfoResponse {
                 proto::maintenance::EPPMaintenanceEnvironmentEnum::Production => {
                     Environment::Production
                 }
-                proto::maintenance::EPPMaintenanceEnvironmentEnum::OTE => Environment::OTE,
+                proto::maintenance::EPPMaintenanceEnvironmentEnum::Ote => Environment::Ote,
                 proto::maintenance::EPPMaintenanceEnvironmentEnum::Staging => Environment::Staging,
                 proto::maintenance::EPPMaintenanceEnvironmentEnum::Development => {
                     Environment::Development
@@ -63,8 +63,8 @@ impl From<proto::maintenance::EPPMaintenanceItem> for InfoResponse {
                     proto::maintenance::EPPMaintenanceDescriptionType::Plain => {
                         Description::Plain(d.description)
                     }
-                    proto::maintenance::EPPMaintenanceDescriptionType::HTML => {
-                        Description::HTML(d.description)
+                    proto::maintenance::EPPMaintenanceDescriptionType::Html => {
+                        Description::Html(d.description)
                     }
                 })
                 .collect(),
@@ -115,12 +115,12 @@ pub fn handle_list_response(response: proto::EPPResponse) -> Response<ListRespon
                             .collect(),
                     })
                 } else {
-                    Err(Error::InternalServerError)
+                    Err(Error::ServerInternal)
                 }
             }
-            _ => Err(Error::InternalServerError),
+            _ => Err(Error::ServerInternal),
         },
-        None => Err(Error::InternalServerError),
+        None => Err(Error::ServerInternal),
     }
 }
 
@@ -146,11 +146,11 @@ pub fn handle_info_response(response: proto::EPPResponse) -> Response<InfoRespon
                 if let Some(item) = maint_info.item {
                     Response::Ok(item.into())
                 } else {
-                    Err(Error::InternalServerError)
+                    Err(Error::ServerInternal)
                 }
             }
-            _ => Err(Error::InternalServerError),
+            _ => Err(Error::ServerInternal),
         },
-        None => Err(Error::InternalServerError),
+        None => Err(Error::ServerInternal),
     }
 }

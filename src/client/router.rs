@@ -4,7 +4,7 @@ use paste::paste;
 use std::collections::HashMap;
 pub type Response<T> = Result<T, Error>;
 pub type Sender<T> = futures::channel::oneshot::Sender<Result<CommandResponse<T>, Error>>;
-pub type RequestSender = futures::channel::mpsc::Sender<Request>;
+pub type RequestSender = futures::channel::mpsc::Sender<RequestMessage>;
 
 #[derive(Debug)]
 pub struct CommandExtraValue {
@@ -28,7 +28,7 @@ pub struct CommandResponse<T> {
 macro_rules! router {
     ($($n:ident, $req:ty, $res:ty);*) => {
         #[derive(Debug)]
-        pub enum Request {
+        pub enum RequestMessage {
             $($n(Box<$req>),)*
         }
 
@@ -56,9 +56,9 @@ macro_rules! router {
         }
 
         impl<I: InnerRouter> Router<I> {
-            pub fn reject_request(req: Request) {
+            pub fn reject_request(req: RequestMessage) {
                 match req {
-                    $(Request::$n(req) => {let _ = req.return_path.send(Err(Error::NotReady));},)*
+                    $(RequestMessage::$n(req) => {let _ = req.return_path.send(Err(Error::NotReady));},)*
                 };
             }
 
@@ -68,10 +68,10 @@ macro_rules! router {
                 })*
             }
 
-            pub fn handle_request(&mut self, client: &super::ServerFeatures, req: Request) ->
+            pub fn handle_request(&mut self, client: &super::ServerFeatures, req: RequestMessage) ->
              Option<(I::Request, uuid::Uuid)> {
                 match req {
-                    $(Request::$n(req) => {
+                    $(RequestMessage::$n(req) => {
                         let command_id = uuid::Uuid::new_v4();
                         paste! {
                             let res = match I::[<$n _request>](&mut self.inner, client, &req, command_id.clone()) {

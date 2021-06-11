@@ -80,9 +80,9 @@ pub struct EPPChangeCaseId {
 #[derive(Debug, Deserialize)]
 pub enum EPPChangeCaseIdType {
     #[serde(rename = "udrp")]
-    UDRP,
+    Udrp,
     #[serde(rename = "urs")]
-    URS,
+    Urs,
     #[serde(rename = "custom")]
     Custom,
 }

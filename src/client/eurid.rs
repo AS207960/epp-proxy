@@ -1,6 +1,6 @@
 //! EPP commands relating to EURid extensions
 
-use super::{CommandResponse, Request, Sender};
+use super::{CommandResponse, RequestMessage, Sender};
 use chrono::prelude::*;
 
 #[derive(Debug)]
@@ -38,7 +38,7 @@ pub struct DNSSECEligibilityResponse {
     pub eligible: bool,
     pub message: String,
     pub code: u32,
-    pub idn: Option<IDN>,
+    pub idn: Option<Idn>,
 }
 
 #[derive(Debug)]
@@ -51,7 +51,7 @@ pub struct DNSQualityRequest {
 pub struct DNSQualityResponse {
     pub check_time: Option<DateTime<Utc>>,
     pub score: String,
-    pub idn: Option<IDN>,
+    pub idn: Option<Idn>,
 }
 
 #[derive(Debug)]
@@ -105,7 +105,7 @@ pub enum ContactType {
 }
 
 #[derive(Debug)]
-pub struct IDN {
+pub struct Idn {
     pub ace: String,
     pub unicode: String,
 }
@@ -195,12 +195,12 @@ pub struct DomainRenewInfo {
 /// # Arguments
 /// * `client_sender` - Reference to the tokio channel into the client
 pub async fn hit_points_info(
-    client_sender: &mut futures::channel::mpsc::Sender<Request>,
+    client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<HitPointsResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
     super::send_epp_client_request(
         client_sender,
-        Request::EURIDHitPoints(Box::new(HitPointsRequest {
+        RequestMessage::EURIDHitPoints(Box::new(HitPointsRequest {
             return_path: sender,
         })),
         receiver,
@@ -213,12 +213,12 @@ pub async fn hit_points_info(
 /// # Arguments
 /// * `client_sender` - Reference to the tokio channel into the client
 pub async fn registration_limit_info(
-    client_sender: &mut futures::channel::mpsc::Sender<Request>,
+    client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<RegistrationLimitResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
     super::send_epp_client_request(
         client_sender,
-        Request::EURIDRegistrationLimit(Box::new(RegistrationLimitRequest {
+        RequestMessage::EURIDRegistrationLimit(Box::new(RegistrationLimitRequest {
             return_path: sender,
         })),
         receiver,
@@ -232,12 +232,12 @@ pub async fn registration_limit_info(
 /// * `client_sender` - Reference to the tokio channel into the client
 pub async fn dnssec_eligibility_info(
     name: &str,
-    client_sender: &mut futures::channel::mpsc::Sender<Request>,
+    client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<DNSSECEligibilityResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
     super::send_epp_client_request(
         client_sender,
-        Request::EURIDDNSSECEligibility(Box::new(DNSSECEligibilityRequest {
+        RequestMessage::EURIDDNSSECEligibility(Box::new(DNSSECEligibilityRequest {
             name: name.to_string(),
             return_path: sender,
         })),
@@ -252,12 +252,12 @@ pub async fn dnssec_eligibility_info(
 /// * `client_sender` - Reference to the tokio channel into the client
 pub async fn dns_quality_info(
     name: &str,
-    client_sender: &mut futures::channel::mpsc::Sender<Request>,
+    client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<DNSQualityResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
     super::send_epp_client_request(
         client_sender,
-        Request::EURIDDNSQuality(Box::new(DNSQualityRequest {
+        RequestMessage::EURIDDNSQuality(Box::new(DNSQualityRequest {
             name: name.to_string(),
             return_path: sender,
         })),

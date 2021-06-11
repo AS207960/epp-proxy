@@ -1,6 +1,6 @@
 //! EPP commands relating to nominet specific features
 
-use super::{CommandResponse, Request, Sender};
+use super::{CommandResponse, RequestMessage, Sender};
 use chrono::prelude::*;
 
 #[derive(Debug)]
@@ -117,12 +117,12 @@ pub struct DataQualityData {
 /// # Arguments
 /// * `client_sender` - Reference to the tokio channel into the client
 pub async fn tag_list(
-    client_sender: &mut futures::channel::mpsc::Sender<Request>,
+    client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<TagListResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
     super::send_epp_client_request(
         client_sender,
-        Request::NominetTagList(Box::new(TagListRequest {
+        RequestMessage::NominetTagList(Box::new(TagListRequest {
             return_path: sender,
         })),
         receiver,

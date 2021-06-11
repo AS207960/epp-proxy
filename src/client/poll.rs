@@ -2,7 +2,7 @@
 
 use chrono::prelude::*;
 
-use super::{CommandResponse, Request, Sender};
+use super::{CommandResponse, RequestMessage, Sender};
 
 #[derive(Debug)]
 pub struct PollRequest {
@@ -142,8 +142,8 @@ pub struct ChangeCaseId {
 
 #[derive(Debug)]
 pub enum ChangeCaseIdType {
-    UDRP,
-    URS,
+    Udrp,
+    Urs,
     Custom,
 }
 
@@ -169,12 +169,12 @@ pub struct PollAckResponse {
 /// # Arguments
 /// * `client_sender` - Reference to the tokio channel into the client
 pub async fn poll(
-    client_sender: &mut futures::channel::mpsc::Sender<Request>,
+    client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<Option<PollResponse>>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
     super::send_epp_client_request(
         client_sender,
-        Request::Poll(Box::new(PollRequest {
+        RequestMessage::Poll(Box::new(PollRequest {
             return_path: sender,
         })),
         receiver,
@@ -189,12 +189,12 @@ pub async fn poll(
 /// * `client_sender` - Reference to the tokio channel into the client
 pub async fn poll_ack(
     id: &str,
-    client_sender: &mut futures::channel::mpsc::Sender<Request>,
+    client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<PollAckResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
     super::send_epp_client_request(
         client_sender,
-        Request::PollAck(Box::new(PollAckRequest {
+        RequestMessage::PollAck(Box::new(PollAckRequest {
             id: id.to_string(),
             return_path: sender,
         })),

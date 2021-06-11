@@ -25,7 +25,7 @@ pub mod router;
 pub mod traficom;
 pub mod verisign;
 
-pub use router::{CommandResponse, Request, RequestSender, Response, Sender};
+pub use router::{CommandResponse, RequestMessage, RequestSender, Response, Sender};
 
 /// Features supported by the server
 #[derive(Debug, Default)]
@@ -165,13 +165,13 @@ pub struct ClientConf<'a, C: Into<Option<&'a str>>, S: Into<Option<ClientCertCon
 }
 
 async fn send_epp_client_request<R>(
-    client_sender: &mut futures::channel::mpsc::Sender<router::Request>,
-    req: router::Request,
+    client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
+    req: RequestMessage,
     receiver: futures::channel::oneshot::Receiver<Response<R>>,
 ) -> Result<R, Error> {
     match client_sender.try_send(req) {
         Ok(_) => {}
-        Err(_) => return Err(Error::InternalServerError),
+        Err(_) => return Err(Error::ServerInternal),
     }
     let mut receiver = receiver.fuse();
     let mut delay = Box::pin(tokio::time::sleep(tokio::time::Duration::new(15, 0)).fuse());
@@ -183,7 +183,7 @@ async fn send_epp_client_request<R>(
     };
     match resp {
         Ok(r) => r,
-        Err(_) => Err(Error::InternalServerError),
+        Err(_) => Err(Error::ServerInternal),
     }
 }
 
@@ -195,7 +195,7 @@ pub enum Error {
     /// The EPP server doesn't support the requested action
     Unsupported,
     /// The EPP client or server encountered an internal unexpected error processing the request
-    InternalServerError,
+    ServerInternal,
     /// The EPP server didn't respond in time to the request
     Timeout,
     /// The EPP server returned an error message (probably invalid parameters)
@@ -236,12 +236,12 @@ pub struct LogoutRequest {
 /// # Arguments
 /// * `client_sender` - Reference to the tokio channel into the client
 pub async fn logout(
-    mut client_sender: futures::channel::mpsc::Sender<Request>,
+    mut client_sender: futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<()>, Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
     send_epp_client_request(
         &mut client_sender,
-        Request::Logout(Box::new(LogoutRequest {
+        RequestMessage::Logout(Box::new(LogoutRequest {
             return_path: sender,
         })),
         receiver,

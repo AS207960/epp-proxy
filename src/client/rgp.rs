@@ -1,6 +1,6 @@
 //! EPP commands relating to nominet specific features
 
-use super::{fee, CommandResponse, Request, Sender};
+use super::{fee, CommandResponse, RequestMessage, Sender};
 
 #[derive(Debug)]
 pub struct RestoreRequest {
@@ -38,12 +38,12 @@ pub enum RGPState {
 pub async fn request(
     domain: &str,
     donuts_fee_agreement: Option<fee::DonutsFeeData>,
-    client_sender: &mut futures::channel::mpsc::Sender<Request>,
+    client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<RestoreResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
     super::send_epp_client_request(
         client_sender,
-        Request::RestoreRequest(Box::new(RestoreRequest {
+        RequestMessage::RestoreRequest(Box::new(RestoreRequest {
             name: domain.to_string(),
             donuts_fee_agreement,
             return_path: sender,

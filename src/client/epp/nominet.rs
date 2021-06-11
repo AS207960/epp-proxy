@@ -197,15 +197,15 @@ pub fn handle_tag_list_response(response: proto::EPPResponse) -> Response<TagLis
                                 handshake: match t.handshake.as_str() {
                                     "Y" => true,
                                     "N" => false,
-                                    _ => return Err(Error::InternalServerError),
+                                    _ => return Err(Error::ServerInternal),
                                 },
                             })
                         })
                         .collect::<Response<Vec<Tag>>>()?,
                 })
             }
-            _ => Err(Error::InternalServerError),
+            _ => Err(Error::ServerInternal),
         },
-        None => Err(Error::InternalServerError),
+        None => Err(Error::ServerInternal),
     }
 }

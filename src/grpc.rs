@@ -97,7 +97,7 @@ impl From<client::Error> for tonic::Status {
             client::Error::Timeout => {
                 tonic::Status::deadline_exceeded("registrar didn't respond in time")
             }
-            client::Error::InternalServerError => tonic::Status::internal("internal server error"),
+            client::Error::ServerInternal => tonic::Status::internal("internal server error"),
         }
     }
 }
@@ -508,8 +508,8 @@ fn eurid_contact_type_from_i32(from: i32) -> client::eurid::ContactType {
     }
 }
 
-impl From<client::eurid::IDN> for epp_proto::eurid::Idn {
-    fn from(from: client::eurid::IDN) -> Self {
+impl From<client::eurid::Idn> for epp_proto::eurid::Idn {
+    fn from(from: client::eurid::Idn) -> Self {
         epp_proto::eurid::Idn {
             ace: from.ace,
             unicode: from.unicode,
@@ -1377,18 +1377,18 @@ impl From<client::verisign::LowBalanceData> for epp_proto::BalanceReply {
     }
 }
 
-impl From<client::nominet::CancelData> for epp_proto::nominet::DomainCancelData {
+impl From<client::nominet::CancelData> for epp_proto::nominet::DomainCancel {
     fn from(res: client::nominet::CancelData) -> Self {
-        epp_proto::nominet::DomainCancelData {
+        epp_proto::nominet::DomainCancel {
             name: res.domain_name,
             originator: res.originator,
         }
     }
 }
 
-impl From<client::nominet::ReleaseData> for epp_proto::nominet::DomainReleaseData {
+impl From<client::nominet::ReleaseData> for epp_proto::nominet::DomainRelease {
     fn from(res: client::nominet::ReleaseData) -> Self {
-        epp_proto::nominet::DomainReleaseData {
+        epp_proto::nominet::DomainRelease {
             account_id: res.account_id,
             account_moved: res.account_moved,
             from: res.from,
@@ -1398,9 +1398,9 @@ impl From<client::nominet::ReleaseData> for epp_proto::nominet::DomainReleaseDat
     }
 }
 
-impl From<client::nominet::RegistrarChangeData> for epp_proto::nominet::DomainRegistrarChangeData {
+impl From<client::nominet::RegistrarChangeData> for epp_proto::nominet::DomainRegistrarChange {
     fn from(res: client::nominet::RegistrarChangeData) -> Self {
-        epp_proto::nominet::DomainRegistrarChangeData {
+        epp_proto::nominet::DomainRegistrarChange {
             originator: res.originator,
             registrar_tag: res.registrar_tag,
             case_id: res.case_id,
@@ -1410,24 +1410,24 @@ impl From<client::nominet::RegistrarChangeData> for epp_proto::nominet::DomainRe
     }
 }
 
-impl From<client::nominet::HostCancelData> for epp_proto::nominet::HostCancelData {
+impl From<client::nominet::HostCancelData> for epp_proto::nominet::HostCancel {
     fn from(res: client::nominet::HostCancelData) -> Self {
-        epp_proto::nominet::HostCancelData {
+        epp_proto::nominet::HostCancel {
             host_objects: res.host_objects,
             domain_names: res.domain_names,
         }
     }
 }
 
-impl From<client::nominet::ProcessData> for epp_proto::nominet::ProcessData {
+impl From<client::nominet::ProcessData> for epp_proto::nominet::Process {
     fn from(res: client::nominet::ProcessData) -> Self {
-        epp_proto::nominet::ProcessData {
+        epp_proto::nominet::Process {
             stage: match res.stage {
                 client::nominet::ProcessStage::Initial => {
-                    epp_proto::nominet::process_data::ProcessStage::Initial.into()
+                    epp_proto::nominet::process::ProcessStage::Initial.into()
                 }
                 client::nominet::ProcessStage::Updated => {
-                    epp_proto::nominet::process_data::ProcessStage::Updated.into()
+                    epp_proto::nominet::process::ProcessStage::Updated.into()
                 }
             },
             contact: Some(res.contact.into()),
@@ -1439,9 +1439,9 @@ impl From<client::nominet::ProcessData> for epp_proto::nominet::ProcessData {
     }
 }
 
-impl From<client::nominet::SuspendData> for epp_proto::nominet::SuspendData {
+impl From<client::nominet::SuspendData> for epp_proto::nominet::Suspend {
     fn from(res: client::nominet::SuspendData) -> Self {
-        epp_proto::nominet::SuspendData {
+        epp_proto::nominet::Suspend {
             reason: res.reason,
             cancel_date: chrono_to_proto(res.cancel_date),
             domain_names: res.domain_names,
@@ -1449,18 +1449,18 @@ impl From<client::nominet::SuspendData> for epp_proto::nominet::SuspendData {
     }
 }
 
-impl From<client::nominet::DomainFailData> for epp_proto::nominet::DomainFailData {
+impl From<client::nominet::DomainFailData> for epp_proto::nominet::DomainFail {
     fn from(res: client::nominet::DomainFailData) -> Self {
-        epp_proto::nominet::DomainFailData {
+        epp_proto::nominet::DomainFail {
             domain: res.domain_name,
             reason: res.reason,
         }
     }
 }
 
-impl From<client::nominet::RegistrantTransferData> for epp_proto::nominet::RegistrantTransferData {
+impl From<client::nominet::RegistrantTransferData> for epp_proto::nominet::RegistrantTransfer {
     fn from(res: client::nominet::RegistrantTransferData) -> Self {
-        epp_proto::nominet::RegistrantTransferData {
+        epp_proto::nominet::RegistrantTransfer {
             originator: res.originator,
             account_id: res.account_id,
             old_account_id: res.old_account_id,
@@ -1739,7 +1739,7 @@ impl From<client::maintenance::InfoResponse> for epp_proto::maintenance::Mainten
                 client::maintenance::Environment::Production => {
                     epp_proto::maintenance::Environment::Production.into()
                 }
-                client::maintenance::Environment::OTE => {
+                client::maintenance::Environment::Ote => {
                     epp_proto::maintenance::Environment::Ote.into()
                 }
                 client::maintenance::Environment::Staging => {
@@ -1796,7 +1796,7 @@ impl From<client::maintenance::InfoResponse> for epp_proto::maintenance::Mainten
                         client::maintenance::Description::Plain(p) => {
                             epp_proto::maintenance::description::Description::Plain(p)
                         }
-                        client::maintenance::Description::HTML(p) => {
+                        client::maintenance::Description::Html(p) => {
                             epp_proto::maintenance::description::Description::Html(p)
                         }
                     }),
@@ -2315,10 +2315,10 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                                 ),
                             }),
                             remove: sec_dns.remove.map(|r| match r {
-                                epp_proto::domain::update_sec_dns_data::Remove::RemoveAll(a) => {
+                                epp_proto::domain::update_sec_dns_data::Remove::All(a) => {
                                     client::domain::UpdateSecDNSRemove::All(a)
                                 }
-                                epp_proto::domain::update_sec_dns_data::Remove::RemoveDsData(
+                                epp_proto::domain::update_sec_dns_data::Remove::RemDsData(
                                     ds_data,
                                 ) => client::domain::UpdateSecDNSRemove::Data(
                                     client::domain::SecDNSDataType::DSData(
@@ -2342,7 +2342,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                                             .collect(),
                                     ),
                                 ),
-                                epp_proto::domain::update_sec_dns_data::Remove::RemoveKeyData(
+                                epp_proto::domain::update_sec_dns_data::Remove::RemKeyData(
                                     key_data,
                                 ) => client::domain::UpdateSecDNSRemove::Data(
                                     client::domain::SecDNSDataType::KeyData(
@@ -3302,8 +3302,8 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                                         who: c.who.clone(),
                                         case_id: c.case_id.as_ref().map(|i| epp_proto::change_data::CaseId {
                                             case_id_type: match i.case_type {
-                                                client::poll::ChangeCaseIdType::UDRP => epp_proto::change_data::case_id::CaseIdType::Udrp.into(),
-                                                client::poll::ChangeCaseIdType::URS => epp_proto::change_data::case_id::CaseIdType::Urs.into(),
+                                                client::poll::ChangeCaseIdType::Udrp => epp_proto::change_data::case_id::CaseIdType::Udrp.into(),
+                                                client::poll::ChangeCaseIdType::Urs => epp_proto::change_data::case_id::CaseIdType::Urs.into(),
                                                 client::poll::ChangeCaseIdType::Custom => epp_proto::change_data::case_id::CaseIdType::Custom.into(),
                                             },
                                             name: i.name.clone(),
@@ -3343,41 +3343,41 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                                         client::poll::PollData::NominetDomainCancelData {
                                             change_data: _,
                                             data: i
-                                        } => Some(epp_proto::poll_reply::Data::NominetDomainCancelData(i.into())),
+                                        } => Some(epp_proto::poll_reply::Data::NominetDomainCancel(i.into())),
                                         client::poll::PollData::NominetDomainReleaseData {
                                             change_data: _,
                                             data: i
-                                        } => Some(epp_proto::poll_reply::Data::NominetDomainReleaseData(i.into())),
+                                        } => Some(epp_proto::poll_reply::Data::NominetDomainRelease(i.into())),
                                         client::poll::PollData::NominetDomainRegistrarChangeData {
                                             change_data: _,
                                             data: i
-                                        } => Some(epp_proto::poll_reply::Data::NominetDomainRegistrarChangeData(i.into())),
+                                        } => Some(epp_proto::poll_reply::Data::NominetDomainRegistrarChange(i.into())),
                                         client::poll::PollData::NominetHostCancelData {
                                             change_data: _,
                                             data: i
-                                        } => Some(epp_proto::poll_reply::Data::NominetHostCancelData(i.into())),
+                                        } => Some(epp_proto::poll_reply::Data::NominetHostCancel(i.into())),
                                         client::poll::PollData::NominetProcessData {
                                             change_data: _,
                                             data: i
-                                        } => Some(epp_proto::poll_reply::Data::NominetProcessData(i.into())),
+                                        } => Some(epp_proto::poll_reply::Data::NominetProcess(i.into())),
                                         client::poll::PollData::NominetSuspendData {
                                             change_data: _,
                                             data: i
-                                        } => Some(epp_proto::poll_reply::Data::NominetSuspendData(i.into())),
+                                        } => Some(epp_proto::poll_reply::Data::NominetSuspend(i.into())),
                                         client::poll::PollData::NominetDomainFailData {
                                             change_data: _,
                                             data: i
-                                        } => Some(epp_proto::poll_reply::Data::NominetDomainFailData(i.into())),
+                                        } => Some(epp_proto::poll_reply::Data::NominetDomainFail(i.into())),
                                         client::poll::PollData::NominetRegistrantTransferData {
                                             change_data: _,
                                             data: i
-                                        } => Some(epp_proto::poll_reply::Data::NominetRegistrantTransferData(i.into())),
+                                        } => Some(epp_proto::poll_reply::Data::NominetRegistrantTransfer(i.into())),
                                         client::poll::PollData::VerisignLowBalanceData(i) =>
-                                            Some(epp_proto::poll_reply::Data::VerisignLowBalanceData(i.into())),
+                                            Some(epp_proto::poll_reply::Data::VerisignLowBalance(i.into())),
                                         client::poll::PollData::TraficomTrnData(i) =>
-                                            Some(epp_proto::poll_reply::Data::TraficomTrnData(i.into())),
+                                            Some(epp_proto::poll_reply::Data::TraficomTrn(i.into())),
                                         client::poll::PollData::EURIDPoll(i) =>
-                                            Some(epp_proto::poll_reply::Data::EuridPollData(i.into())),
+                                            Some(epp_proto::poll_reply::Data::EuridPoll(i.into())),
                                         _ => None
                                     },
                                 }))

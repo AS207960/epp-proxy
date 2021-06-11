@@ -5,7 +5,7 @@ use super::super::eurid::{
     DNSQualityRequest, DNSQualityResponse, DNSSECEligibilityRequest, DNSSECEligibilityResponse,
     DomainAuthInfo, DomainCheck, DomainCreate, DomainDelete, DomainInfo, DomainInfoRequest,
     DomainRenewInfo, DomainTransfer, DomainTransferInfo, DomainUpdate, HitPointsRequest,
-    HitPointsResponse, PollResponse, RegistrationLimitRequest, RegistrationLimitResponse, IDN,
+    HitPointsResponse, PollResponse, RegistrationLimitRequest, RegistrationLimitResponse, Idn,
 };
 use super::super::{proto, Error, Response, ServerFeatures};
 use super::router::HandleReqReturn;
@@ -103,7 +103,7 @@ impl From<proto::eurid::EURIDPollData> for PollResponse {
     }
 }
 
-pub fn extract_eurid_idn(from: &Option<proto::EPPResponseExtension>) -> Option<Vec<IDN>> {
+pub fn extract_eurid_idn(from: &Option<proto::EPPResponseExtension>) -> Option<Vec<Idn>> {
     let eurid_ext_idn = match from {
         Some(e) => match e
             .value
@@ -122,7 +122,7 @@ pub fn extract_eurid_idn(from: &Option<proto::EPPResponseExtension>) -> Option<V
     eurid_ext_idn.map(|e| {
         e.names
             .iter()
-            .map(|n| IDN {
+            .map(|n| Idn {
                 ace: (&n.ace).into(),
                 unicode: (&n.unicode).into(),
             })
@@ -133,11 +133,11 @@ pub fn extract_eurid_idn(from: &Option<proto::EPPResponseExtension>) -> Option<V
 pub fn extract_eurid_idn_singular<'o, O: Into<Option<&'o str>>>(
     from: &Option<proto::EPPResponseExtension>,
     orig_name: O,
-) -> Result<Option<IDN>, Error> {
+) -> Result<Option<Idn>, Error> {
     match extract_eurid_idn(from) {
         Some(mut i) => match (i.len(), orig_name.into()) {
             (1, None) => Ok(Some(i.pop().unwrap())),
-            (_, None) => Err(Error::InternalServerError),
+            (_, None) => Err(Error::ServerInternal),
             (_, Some(o)) => Ok(i.into_iter().find(|i| i.ace == o || i.unicode == o)),
         },
         None => Ok(None),
@@ -173,7 +173,7 @@ pub fn extract_eurid_domain_check_singular(
                         status: c.status.into_iter().map(|s| s.status.into()).collect(),
                     }))
                 }
-                _ => Err(Error::InternalServerError),
+                _ => Err(Error::ServerInternal),
             }
         }
         None => Ok(None),
@@ -450,9 +450,9 @@ pub fn handle_hit_points_response(response: proto::EPPResponse) -> Response<HitP
                     blocked_until: hit_points.blocked_until,
                 })
             }
-            _ => Err(Error::InternalServerError),
+            _ => Err(Error::ServerInternal),
         },
-        None => Err(Error::InternalServerError),
+        None => Err(Error::ServerInternal),
     }
 }
 
@@ -482,9 +482,9 @@ pub fn handle_registration_limits_response(
                     limited_until: registration_limit.limited_until,
                 })
             }
-            _ => Err(Error::InternalServerError),
+            _ => Err(Error::ServerInternal),
         },
-        None => Err(Error::InternalServerError),
+        None => Err(Error::ServerInternal),
     }
 }
 
@@ -522,9 +522,9 @@ pub fn handle_dnssec_eligibility_response(
                     )?,
                 })
             }
-            _ => Err(Error::InternalServerError),
+            _ => Err(Error::ServerInternal),
         },
-        None => Err(Error::InternalServerError),
+        None => Err(Error::ServerInternal),
     }
 }
 
@@ -559,9 +559,9 @@ pub fn handle_dns_quality_response(response: proto::EPPResponse) -> Response<DNS
                     )?,
                 })
             }
-            _ => Err(Error::InternalServerError),
+            _ => Err(Error::ServerInternal),
         },
-        None => Err(Error::InternalServerError),
+        None => Err(Error::ServerInternal),
     }
 }
 

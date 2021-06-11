@@ -187,7 +187,7 @@ impl
                                     .collect(),
                             )
                         } else {
-                            return Err(Error::InternalServerError);
+                            return Err(Error::ServerInternal);
                         },
                     })
                 }) {
@@ -816,7 +816,7 @@ pub fn handle_check_response(response: proto::EPPResponse) -> Response<CheckResp
             if let Some(f) = fee10 {
                 let d = match f.objects.get(0) {
                     Some(o) => o,
-                    None => return Err(Error::InternalServerError),
+                    None => return Err(Error::ServerInternal),
                 };
                 Some(fee::FeeCheckData {
                     available: d.available,
@@ -839,7 +839,7 @@ pub fn handle_check_response(response: proto::EPPResponse) -> Response<CheckResp
             } else if let Some(f) = fee011 {
                 let d = match f.objects.get(0) {
                     Some(o) => o,
-                    None => return Err(Error::InternalServerError),
+                    None => return Err(Error::ServerInternal),
                 };
                 Some(fee::FeeCheckData {
                     available: d.available,
@@ -950,7 +950,7 @@ pub fn handle_check_response(response: proto::EPPResponse) -> Response<CheckResp
             if let Some(c) = charge {
                 let d = match c.domains.get(0) {
                     Some(o) => o,
-                    None => return Err(Error::InternalServerError),
+                    None => return Err(Error::ServerInternal),
                 };
                 Some(d.into())
             } else {
@@ -978,12 +978,12 @@ pub fn handle_check_response(response: proto::EPPResponse) -> Response<CheckResp
                         )?,
                     })
                 } else {
-                    Err(Error::InternalServerError)
+                    Err(Error::ServerInternal)
                 }
             }
-            _ => Err(Error::InternalServerError),
+            _ => Err(Error::ServerInternal),
         },
-        None => Err(Error::InternalServerError),
+        None => Err(Error::ServerInternal),
     }
 }
 
@@ -1060,10 +1060,10 @@ pub fn handle_claims_check_response(response: proto::EPPResponse) -> Response<Cl
     };
 
     match response.data {
-        Some(_) => Err(Error::InternalServerError),
+        Some(_) => Err(Error::ServerInternal),
         None => match claims_check {
             Some(c) => Response::Ok(c),
-            None => Err(Error::InternalServerError),
+            None => Err(Error::ServerInternal),
         },
     }
 }
@@ -1134,9 +1134,9 @@ pub fn handle_info_response(response: proto::EPPResponse) -> Response<InfoRespon
             proto::EPPResultDataValue::EPPDomainInfoResult(domain_info) => {
                 (*domain_info, &response.extension).try_into()
             }
-            _ => Err(Error::InternalServerError),
+            _ => Err(Error::ServerInternal),
         },
-        None => Err(Error::InternalServerError),
+        None => Err(Error::ServerInternal),
     }
 }
 
@@ -1312,7 +1312,7 @@ pub fn handle_create_response(response: proto::EPPResponse) -> Response<CreateRe
                 res.pending = pending;
                 Ok(res)
             }
-            _ => Err(Error::InternalServerError),
+            _ => Err(Error::ServerInternal),
         },
         None => {
             if response.is_pending() {
@@ -1320,7 +1320,7 @@ pub fn handle_create_response(response: proto::EPPResponse) -> Response<CreateRe
                 res.pending = response.is_pending();
                 Ok(res)
             } else {
-                Err(Error::InternalServerError)
+                Err(Error::ServerInternal)
             }
         }
     }
@@ -1431,7 +1431,7 @@ pub fn handle_update(
         || client.has_erratum("verisign-tv");
     if !no_registrant {
         if let Some(new_registrant) = &req.new_registrant {
-            super::contact::check_id(&new_registrant)?;
+            super::contact::check_id(new_registrant)?;
         }
     }
     let mut adds = vec![];
@@ -1829,9 +1829,9 @@ pub fn handle_renew_response(response: proto::EPPResponse) -> Response<RenewResp
                 res.pending = pending;
                 Ok(res)
             }
-            _ => Err(Error::InternalServerError),
+            _ => Err(Error::ServerInternal),
         },
-        None => Err(Error::InternalServerError),
+        None => Err(Error::ServerInternal),
     }
 }
 
@@ -2041,9 +2041,9 @@ pub fn handle_transfer_response(response: proto::EPPResponse) -> Response<Transf
                 res.pending = pending;
                 Ok(res)
             }
-            _ => Err(Error::InternalServerError),
+            _ => Err(Error::ServerInternal),
         },
-        None => Err(Error::InternalServerError),
+        None => Err(Error::ServerInternal),
     }
 }
 

@@ -1,6 +1,6 @@
 //! EPP commands relating to host (nameserver) objects
 
-use super::{CommandResponse, Request, Sender};
+use super::{CommandResponse, RequestMessage, Sender};
 use chrono::prelude::*;
 
 #[derive(Debug)]
@@ -111,12 +111,12 @@ pub enum Status {
 
 pub async fn check(
     host: &str,
-    client_sender: &mut futures::channel::mpsc::Sender<Request>,
+    client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<CheckResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
     super::send_epp_client_request(
         client_sender,
-        Request::HostCheck(Box::new(CheckRequest {
+        RequestMessage::HostCheck(Box::new(CheckRequest {
             name: host.to_string(),
             return_path: sender,
         })),
@@ -127,12 +127,12 @@ pub async fn check(
 
 pub async fn info(
     host: &str,
-    client_sender: &mut futures::channel::mpsc::Sender<Request>,
+    client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<InfoResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
     super::send_epp_client_request(
         client_sender,
-        Request::HostInfo(Box::new(InfoRequest {
+        RequestMessage::HostInfo(Box::new(InfoRequest {
             name: host.to_string(),
             return_path: sender,
         })),
@@ -144,12 +144,12 @@ pub async fn info(
 pub async fn create(
     host: &str,
     addresses: Vec<Address>,
-    client_sender: &mut futures::channel::mpsc::Sender<Request>,
+    client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<CreateResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
     super::send_epp_client_request(
         client_sender,
-        Request::HostCreate(Box::new(CreateRequest {
+        RequestMessage::HostCreate(Box::new(CreateRequest {
             name: host.to_string(),
             addresses,
             return_path: sender,
@@ -161,12 +161,12 @@ pub async fn create(
 
 pub async fn delete(
     host: &str,
-    client_sender: &mut futures::channel::mpsc::Sender<Request>,
+    client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<DeleteResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
     super::send_epp_client_request(
         client_sender,
-        Request::HostDelete(Box::new(DeleteRequest {
+        RequestMessage::HostDelete(Box::new(DeleteRequest {
             name: host.to_string(),
             return_path: sender,
         })),
@@ -180,12 +180,12 @@ pub async fn update<N: Into<Option<String>>>(
     add: Vec<UpdateObject>,
     remove: Vec<UpdateObject>,
     new_name: N,
-    client_sender: &mut futures::channel::mpsc::Sender<Request>,
+    client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<UpdateResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
     super::send_epp_client_request(
         client_sender,
-        Request::HostUpdate(Box::new(UpdateRequest {
+        RequestMessage::HostUpdate(Box::new(UpdateRequest {
             name: host.to_string(),
             add,
             remove,

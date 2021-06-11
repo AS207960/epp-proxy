@@ -19,12 +19,12 @@ message NominetTagListReply {
     common.CommandResponse cmd_resp = 2;
 }
 
-message DomainCancelData {
+message DomainCancel {
     string name = 1;
     string originator = 2;
 }
 
-message DomainReleaseData {
+message DomainRelease {
     string account_id = 1;
     bool account_moved = 2;
     string from = 3;
@@ -32,7 +32,7 @@ message DomainReleaseData {
     repeated string domains = 5;
 }
 
-message DomainRegistrarChangeData {
+message DomainRegistrarChange {
     string originator = 1;
     string registrar_tag = 2;
     google.protobuf.StringValue case_id = 3;
@@ -40,12 +40,12 @@ message DomainRegistrarChangeData {
     contact.ContactInfoReply contact = 5;
 }
 
-message HostCancelData {
+message HostCancel {
     repeated string host_objects = 1;
     repeated string domain_names = 2;
 }
 
-message ProcessData {
+message Process {
     enum ProcessStage {
         Initial = 0;
         Updated = 1;
@@ -59,18 +59,18 @@ message ProcessData {
     repeated string domain_names = 6;
 }
 
-message SuspendData {
+message Suspend {
     string reason = 1;
     google.protobuf.Timestamp cancel_date = 2;
     repeated string domain_names = 3;
 }
 
-message DomainFailData {
+message DomainFail {
     string domain = 1;
     string reason = 2;
 }
 
-message RegistrantTransferData {
+message RegistrantTransfer {
     string originator = 1;
     string account_id = 2;
     string old_account_id = 3;

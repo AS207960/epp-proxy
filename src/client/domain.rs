@@ -2,7 +2,7 @@
 
 use chrono::prelude::*;
 
-use super::{fee, launch, CommandResponse, Request, Sender};
+use super::{fee, launch, CommandResponse, RequestMessage, Sender};
 
 #[derive(Debug)]
 pub struct CheckRequest {
@@ -36,7 +36,7 @@ pub struct CheckResponse {
     pub fee_check: Option<fee::FeeCheckData>,
     pub donuts_fee_check: Option<fee::DonutsFeeData>,
     pub eurid_check: Option<super::eurid::DomainCheck>,
-    pub eurid_idn: Option<super::eurid::IDN>,
+    pub eurid_idn: Option<super::eurid::Idn>,
 }
 
 /// Response to a domain claims check query
@@ -106,7 +106,7 @@ pub struct InfoResponse {
     pub donuts_fee_data: Option<fee::DonutsFeeData>,
     pub whois_info: Option<super::verisign::InfoWhois>,
     pub eurid_data: Option<super::eurid::DomainInfo>,
-    pub eurid_idn: Option<super::eurid::IDN>,
+    pub eurid_idn: Option<super::eurid::Idn>,
 }
 
 /// Additional contact associated with a domain
@@ -127,7 +127,7 @@ pub enum InfoNameserver {
     HostAndAddress {
         host: String,
         addresses: Vec<super::host::Address>,
-        eurid_idn: Option<super::eurid::IDN>,
+        eurid_idn: Option<super::eurid::Idn>,
     },
 }
 
@@ -212,7 +212,7 @@ pub struct CreateData {
     pub creation_date: Option<DateTime<Utc>>,
     /// When will the domain expire
     pub expiration_date: Option<DateTime<Utc>>,
-    pub eurid_idn: Option<super::eurid::IDN>,
+    pub eurid_idn: Option<super::eurid::Idn>,
 }
 
 #[derive(Debug)]
@@ -230,7 +230,7 @@ pub struct DeleteResponse {
     pub pending: bool,
     /// Fee information (if supplied by the registry)
     pub fee_data: Option<fee::FeeData>,
-    pub eurid_idn: Option<super::eurid::IDN>,
+    pub eurid_idn: Option<super::eurid::Idn>,
 }
 
 #[derive(Debug)]
@@ -310,7 +310,7 @@ pub struct RenewResponse {
 pub struct RenewData {
     pub name: String,
     pub new_expiry_date: Option<DateTime<Utc>>,
-    pub eurid_idn: Option<super::eurid::IDN>,
+    pub eurid_idn: Option<super::eurid::Idn>,
     pub eurid_data: Option<super::eurid::DomainRenewInfo>,
 }
 
@@ -363,7 +363,7 @@ pub struct TransferData {
     pub act_date: DateTime<Utc>,
     /// New domain expiry date if amended by the transfer
     pub expiry_date: Option<DateTime<Utc>>,
-    pub eurid_idn: Option<super::eurid::IDN>,
+    pub eurid_idn: Option<super::eurid::Idn>,
     pub eurid_data: Option<super::eurid::DomainTransferInfo>,
 }
 
@@ -407,12 +407,12 @@ pub async fn check(
     domain: &str,
     fee_check: Option<fee::FeeCheck>,
     launch_check: Option<launch::LaunchAvailabilityCheck>,
-    client_sender: &mut futures::channel::mpsc::Sender<Request>,
+    client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<CheckResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
     super::send_epp_client_request(
         client_sender,
-        Request::DomainCheck(Box::new(CheckRequest {
+        RequestMessage::DomainCheck(Box::new(CheckRequest {
             name: domain.to_string(),
             fee_check,
             launch_check,
@@ -432,12 +432,12 @@ pub async fn check(
 pub async fn launch_claims_check(
     domain: &str,
     launch_check: launch::LaunchClaimsCheck,
-    client_sender: &mut futures::channel::mpsc::Sender<Request>,
+    client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<ClaimsCheckResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
     super::send_epp_client_request(
         client_sender,
-        Request::DomainClaimsCheck(Box::new(ClaimsCheckRequest {
+        RequestMessage::DomainClaimsCheck(Box::new(ClaimsCheckRequest {
             name: domain.to_string(),
             launch_check,
             return_path: sender,
@@ -454,12 +454,12 @@ pub async fn launch_claims_check(
 /// * `client_sender` - Reference to the tokio channel into the client
 pub async fn launch_trademark_check(
     domain: &str,
-    client_sender: &mut futures::channel::mpsc::Sender<Request>,
+    client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<ClaimsCheckResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
     super::send_epp_client_request(
         client_sender,
-        Request::DomainTrademarkCheck(Box::new(TrademarkCheckRequest {
+        RequestMessage::DomainTrademarkCheck(Box::new(TrademarkCheckRequest {
             name: domain.to_string(),
             return_path: sender,
         })),
@@ -479,12 +479,12 @@ pub async fn info(
     hosts: Option<InfoHost>,
     launch_info: Option<launch::LaunchInfo>,
     eurid_data: Option<super::eurid::DomainInfoRequest>,
-    client_sender: &mut futures::channel::mpsc::Sender<Request>,
+    client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<InfoResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
     super::send_epp_client_request(
         client_sender,
-        Request::DomainInfo(Box::new(InfoRequest {
+        RequestMessage::DomainInfo(Box::new(InfoRequest {
             name: domain.to_string(),
             auth_info: auth_info.map(|s| s.into()),
             hosts,
@@ -523,12 +523,12 @@ pub struct CreateInfo<'a> {
 /// * `client_sender` - Reference to the tokio channel into the client
 pub async fn create(
     info: CreateInfo<'_>,
-    client_sender: &mut futures::channel::mpsc::Sender<Request>,
+    client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<CreateResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
     super::send_epp_client_request(
         client_sender,
-        Request::DomainCreate(Box::new(CreateRequest {
+        RequestMessage::DomainCreate(Box::new(CreateRequest {
             name: info.domain.to_string(),
             period: info.period,
             registrant: info.registrant.to_string(),
@@ -557,12 +557,12 @@ pub async fn delete(
     launch_info: Option<launch::LaunchUpdate>,
     donuts_fee_agreement: Option<fee::DonutsFeeData>,
     eurid_data: Option<super::eurid::DomainDelete>,
-    client_sender: &mut futures::channel::mpsc::Sender<Request>,
+    client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<DeleteResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
     super::send_epp_client_request(
         client_sender,
-        Request::DomainDelete(Box::new(DeleteRequest {
+        RequestMessage::DomainDelete(Box::new(DeleteRequest {
             name: domain.to_string(),
             launch_info,
             donuts_fee_agreement,
@@ -598,12 +598,12 @@ pub struct UpdateInfo<'a> {
 /// * `client_sender` - Reference to the tokio channel into the client
 pub async fn update(
     info: UpdateInfo<'_>,
-    client_sender: &mut futures::channel::mpsc::Sender<Request>,
+    client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<UpdateResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
     super::send_epp_client_request(
         client_sender,
-        Request::DomainUpdate(Box::new(UpdateRequest {
+        RequestMessage::DomainUpdate(Box::new(UpdateRequest {
             name: info.domain.to_string(),
             add: info.add,
             remove: info.remove,
@@ -631,12 +631,12 @@ pub async fn verisign_sync(
     domain: &str,
     month: u32,
     day: u32,
-    client_sender: &mut futures::channel::mpsc::Sender<Request>,
+    client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<UpdateResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
     super::send_epp_client_request(
         client_sender,
-        Request::VerisignSync(Box::new(VerisignSyncRequest {
+        RequestMessage::VerisignSync(Box::new(VerisignSyncRequest {
             name: domain.to_string(),
             month,
             day,
@@ -660,12 +660,12 @@ pub async fn renew(
     cur_expiry_date: DateTime<Utc>,
     fee_agreement: Option<fee::FeeAgreement>,
     donuts_fee_agreement: Option<fee::DonutsFeeData>,
-    client_sender: &mut futures::channel::mpsc::Sender<Request>,
+    client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<RenewResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
     super::send_epp_client_request(
         client_sender,
-        Request::DomainRenew(Box::new(RenewRequest {
+        RequestMessage::DomainRenew(Box::new(RenewRequest {
             name: domain.to_string(),
             add_period,
             cur_expiry_date,
@@ -687,12 +687,12 @@ pub async fn renew(
 pub async fn transfer_query(
     domain: &str,
     auth_info: Option<&str>,
-    client_sender: &mut futures::channel::mpsc::Sender<Request>,
+    client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<TransferResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
     super::send_epp_client_request(
         client_sender,
-        Request::DomainTransferQuery(Box::new(TransferQueryRequest {
+        RequestMessage::DomainTransferQuery(Box::new(TransferQueryRequest {
             name: domain.to_string(),
             auth_info: auth_info.map(|s| s.into()),
             return_path: sender,
@@ -716,12 +716,12 @@ pub async fn transfer_request(
     fee_agreement: Option<fee::FeeAgreement>,
     donuts_fee_agreement: Option<fee::DonutsFeeData>,
     eurid_data: Option<super::eurid::DomainTransfer>,
-    client_sender: &mut futures::channel::mpsc::Sender<Request>,
+    client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<TransferResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
     super::send_epp_client_request(
         client_sender,
-        Request::DomainTransferRequest(Box::new(TransferRequestRequest {
+        RequestMessage::DomainTransferRequest(Box::new(TransferRequestRequest {
             name: domain.to_string(),
             add_period,
             auth_info: auth_info.to_string(),
@@ -744,12 +744,12 @@ pub async fn transfer_request(
 pub async fn transfer_cancel(
     domain: &str,
     auth_info: Option<&str>,
-    client_sender: &mut futures::channel::mpsc::Sender<Request>,
+    client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<TransferResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
     super::send_epp_client_request(
         client_sender,
-        Request::DomainTransferCancel(Box::new(TransferAcceptRejectRequest {
+        RequestMessage::DomainTransferCancel(Box::new(TransferAcceptRejectRequest {
             name: domain.to_string(),
             auth_info: auth_info.map(|s| s.into()),
             return_path: sender,
@@ -768,12 +768,12 @@ pub async fn transfer_cancel(
 pub async fn transfer_accept(
     domain: &str,
     auth_info: Option<&str>,
-    client_sender: &mut futures::channel::mpsc::Sender<Request>,
+    client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<TransferResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
     super::send_epp_client_request(
         client_sender,
-        Request::DomainTransferAccept(Box::new(TransferAcceptRejectRequest {
+        RequestMessage::DomainTransferAccept(Box::new(TransferAcceptRejectRequest {
             name: domain.to_string(),
             auth_info: auth_info.map(|s| s.into()),
             return_path: sender,
@@ -792,12 +792,12 @@ pub async fn transfer_accept(
 pub async fn transfer_reject(
     domain: &str,
     auth_info: Option<&str>,
-    client_sender: &mut futures::channel::mpsc::Sender<Request>,
+    client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<TransferResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
     super::send_epp_client_request(
         client_sender,
-        Request::DomainTransferReject(Box::new(TransferAcceptRejectRequest {
+        RequestMessage::DomainTransferReject(Box::new(TransferAcceptRejectRequest {
             name: domain.to_string(),
             auth_info: auth_info.map(|s| s.into()),
             return_path: sender,

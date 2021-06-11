@@ -2,7 +2,7 @@
 
 use chrono::prelude::*;
 
-use super::{CommandResponse, Request, Sender};
+use super::{CommandResponse, RequestMessage, Sender};
 
 #[derive(Debug)]
 pub struct CheckRequest {
@@ -282,12 +282,12 @@ pub struct PanData {
 /// * `client_sender` - Reference to the tokio channel into the client
 pub async fn check(
     id: &str,
-    client_sender: &mut futures::channel::mpsc::Sender<Request>,
+    client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<CheckResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
     super::send_epp_client_request(
         client_sender,
-        Request::ContactCheck(Box::new(CheckRequest {
+        RequestMessage::ContactCheck(Box::new(CheckRequest {
             id: id.to_string(),
             return_path: sender,
         })),
@@ -303,12 +303,12 @@ pub async fn check(
 /// * `client_sender` - Reference to the tokio channel into the client
 pub async fn info(
     id: &str,
-    client_sender: &mut futures::channel::mpsc::Sender<Request>,
+    client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<InfoResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
     super::send_epp_client_request(
         client_sender,
-        Request::ContactInfo(Box::new(InfoRequest {
+        RequestMessage::ContactInfo(Box::new(InfoRequest {
             id: id.to_string(),
             return_path: sender,
         })),
@@ -354,12 +354,12 @@ pub struct NewContactData {
 pub async fn create(
     id: &str,
     data: NewContactData,
-    client_sender: &mut futures::channel::mpsc::Sender<Request>,
+    client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<CreateResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
     super::send_epp_client_request(
         client_sender,
-        Request::ContactCreate(Box::new(CreateRequest {
+        RequestMessage::ContactCreate(Box::new(CreateRequest {
             id: id.to_string(),
             local_address: data.local_address,
             internationalised_address: data.internationalised_address,
@@ -387,12 +387,12 @@ pub async fn create(
 /// * `client_sender` - Reference to the tokio channel into the client
 pub async fn delete(
     id: &str,
-    client_sender: &mut futures::channel::mpsc::Sender<Request>,
+    client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<DeleteResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
     super::send_epp_client_request(
         client_sender,
-        Request::ContactDelete(Box::new(DeleteRequest {
+        RequestMessage::ContactDelete(Box::new(DeleteRequest {
             id: id.to_string(),
             return_path: sender,
         })),
@@ -441,12 +441,12 @@ pub async fn update(
     add_statuses: Vec<Status>,
     remove_statuses: Vec<Status>,
     new_data: UpdateContactData,
-    client_sender: &mut futures::channel::mpsc::Sender<Request>,
+    client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<UpdateResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
     super::send_epp_client_request(
         client_sender,
-        Request::ContactUpdate(Box::new(UpdateRequest {
+        RequestMessage::ContactUpdate(Box::new(UpdateRequest {
             id: id.to_string(),
             add_statuses,
             remove_statuses,
@@ -476,12 +476,12 @@ pub async fn update(
 /// * `client_sender` - Reference to the tokio channel into the client
 pub async fn transfer_query(
     id: &str,
-    client_sender: &mut futures::channel::mpsc::Sender<Request>,
+    client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<TransferResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
     super::send_epp_client_request(
         client_sender,
-        Request::ContactTransferQuery(Box::new(TransferQueryRequest {
+        RequestMessage::ContactTransferQuery(Box::new(TransferQueryRequest {
             id: id.to_string(),
             return_path: sender,
         })),
@@ -499,12 +499,12 @@ pub async fn transfer_query(
 pub async fn transfer_request(
     id: &str,
     auth_info: &str,
-    client_sender: &mut futures::channel::mpsc::Sender<Request>,
+    client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<TransferResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
     super::send_epp_client_request(
         client_sender,
-        Request::ContactTransferRequest(Box::new(TransferRequestRequest {
+        RequestMessage::ContactTransferRequest(Box::new(TransferRequestRequest {
             id: id.to_string(),
             auth_info: auth_info.to_string(),
             return_path: sender,
@@ -523,12 +523,12 @@ pub async fn transfer_request(
 pub async fn transfer_accept(
     id: &str,
     auth_info: &str,
-    client_sender: &mut futures::channel::mpsc::Sender<Request>,
+    client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<TransferResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
     super::send_epp_client_request(
         client_sender,
-        Request::ContactTransferAccept(Box::new(TransferRequestRequest {
+        RequestMessage::ContactTransferAccept(Box::new(TransferRequestRequest {
             id: id.to_string(),
             auth_info: auth_info.to_string(),
             return_path: sender,
@@ -547,12 +547,12 @@ pub async fn transfer_accept(
 pub async fn transfer_reject(
     id: &str,
     auth_info: &str,
-    client_sender: &mut futures::channel::mpsc::Sender<Request>,
+    client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<TransferResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
     super::send_epp_client_request(
         client_sender,
-        Request::ContactTransferReject(Box::new(TransferRequestRequest {
+        RequestMessage::ContactTransferReject(Box::new(TransferRequestRequest {
             id: id.to_string(),
             auth_info: auth_info.to_string(),
             return_path: sender,

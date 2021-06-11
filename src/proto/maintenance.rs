@@ -185,7 +185,7 @@ pub enum EPPMaintenanceEnvironmentEnum {
     #[serde(rename = "production")]
     Production,
     #[serde(rename = "ote")]
-    OTE,
+    Ote,
     #[serde(rename = "staging")]
     Staging,
     #[serde(rename = "dev")]
@@ -217,7 +217,7 @@ pub enum EPPMaintenanceDescriptionType {
     #[serde(rename = "plain")]
     Plain,
     #[serde(rename = "html")]
-    HTML,
+    Html,
 }
 
 impl Default for EPPMaintenanceDescriptionType {

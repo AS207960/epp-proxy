@@ -293,9 +293,9 @@ message UpdateSecDNSData {
         SecDNSKeyData add_key_data = 4;
     }
     oneof remove {
-        bool remove_all = 5;
-        SecDNSDSData remove_ds_data = 6;
-        SecDNSKeyData remove_key_data = 7;
+        bool all = 5;
+        SecDNSDSData rem_ds_data = 6;
+        SecDNSKeyData rem_key_data = 7;
     }
 }
 
