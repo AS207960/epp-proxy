@@ -26,7 +26,7 @@ jobs:
     - name: Clippy
       run: cargo clippy -- -D warnings
     - name: Build docs
-      run: cargo rustdoc -- --enable-index-page -Z unstable-options --document-private-items
+      run: cargo rustdoc -- --enable-index-page -Z unstable-options
     - name: Setup git
       run: git config --global user.name ${GITHUB_ACTOR} && git config --global user.email ${GITHUB_ACTOR}@users.noreply.github.com
     - name: Push docs
