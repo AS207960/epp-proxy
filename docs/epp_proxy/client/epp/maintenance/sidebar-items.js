@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["handle_info",""],["handle_info_response",""],["handle_list",""],["handle_list_response",""]]});

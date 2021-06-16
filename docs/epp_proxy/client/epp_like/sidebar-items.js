@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["recv_length_msg","Attempts to read a message where the first two bytes give length."],["recv_msg",""],["write_msg_log",""]],"struct":[["ClientReceiver","Tokio task that attemps to read in messages and push them onto a tokio channel as received."]]});

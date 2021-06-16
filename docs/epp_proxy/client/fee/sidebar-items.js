@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["Applied",""],["Command",""],["DonutsFeeTypes",""]],"struct":[["Credit",""],["DonutsAmount",""],["DonutsCategory",""],["DonutsFeeData",""],["DonutsFeeSet",""],["DonutsFeeType",""],["Fee",""],["FeeAgreement",""],["FeeCheck",""],["FeeCheckCommand",""],["FeeCheckData",""],["FeeCommand",""],["FeeData",""]]});

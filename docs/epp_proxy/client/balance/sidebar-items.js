@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["CreditThreshold",""]],"fn":[["balance_info","Makes a balance enquiry to the registry"],["handle_balance",""],["handle_balance_response",""]],"struct":[["BalanceRequest",""],["BalanceResponse",""]]});
+initSidebarItems({"enum":[["CreditThreshold",""]],"fn":[["balance_info","Makes a balance enquiry to the registry"]],"struct":[["BalanceRequest",""],["BalanceResponse",""]]});

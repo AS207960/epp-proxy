@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["CreditThreshold",""]],"struct":[["LowBalanceData",""]]});
+initSidebarItems({"enum":[["CreditThreshold",""]],"struct":[["InfoWhois",""],["LowBalanceData",""]]});

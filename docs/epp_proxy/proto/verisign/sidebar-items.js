@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["EPPCreditThreshold",""],["EPPLowCreditThresholdType",""]],"struct":[["EPPBalance",""],["EPPLowBalanceData",""],["EPPLowCreditThreshold",""],["EPPNameStoreExt",""],["EPPRGPPollData",""]]});
+initSidebarItems({"enum":[["EPPCreditThreshold",""],["EPPLowCreditThresholdType",""]],"fn":[["serialize_month_day",""]],"struct":[["EPPBalance",""],["EPPLowBalanceData",""],["EPPLowCreditThreshold",""],["EPPNameStoreExt",""],["EPPRGPPollData",""],["EPPSyncUpdate",""],["EPPSyncUpdateMonthDay",""],["EPPWhoisInfoExt",""],["EPPWhoisInfoExtData",""]]});

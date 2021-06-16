@@ -1,0 +1,1 @@
+initSidebarItems({"mod":[["nominet_tag_list_reply","Nested message and enum types in `NominetTagListReply`."],["process","Nested message and enum types in `Process`."]],"struct":[["DomainCancel",""],["DomainFail",""],["DomainRegistrarChange",""],["DomainRelease",""],["HostCancel",""],["NominetTagListReply",""],["Process",""],["RegistrantTransfer",""],["Suspend",""]]});
