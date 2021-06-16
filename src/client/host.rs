@@ -51,6 +51,7 @@ pub enum AddressVersion {
 pub struct CreateRequest {
     pub(super) name: String,
     pub(super) addresses: Vec<Address>,
+    pub(super) isnic_info: Option<super::isnic::HostInfo>,
     pub return_path: Sender<CreateResponse>,
 }
 
@@ -80,6 +81,7 @@ pub struct UpdateRequest {
     pub(super) add: Vec<UpdateObject>,
     pub(super) remove: Vec<UpdateObject>,
     pub(super) new_name: Option<String>,
+    pub(super) isnic_info: Option<super::isnic::HostInfo>,
     pub return_path: Sender<UpdateResponse>,
 }
 
@@ -144,6 +146,7 @@ pub async fn info(
 pub async fn create(
     host: &str,
     addresses: Vec<Address>,
+    isnic_info: Option<super::isnic::HostInfo>,
     client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<CreateResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
@@ -152,6 +155,7 @@ pub async fn create(
         RequestMessage::HostCreate(Box::new(CreateRequest {
             name: host.to_string(),
             addresses,
+            isnic_info,
             return_path: sender,
         })),
         receiver,
@@ -180,6 +184,7 @@ pub async fn update<N: Into<Option<String>>>(
     add: Vec<UpdateObject>,
     remove: Vec<UpdateObject>,
     new_name: N,
+    isnic_info: Option<super::isnic::HostInfo>,
     client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<UpdateResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
@@ -190,6 +195,7 @@ pub async fn update<N: Into<Option<String>>>(
             add,
             remove,
             new_name: new_name.into(),
+            isnic_info,
             return_path: sender,
         })),
         receiver,

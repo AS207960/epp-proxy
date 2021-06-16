@@ -258,11 +258,11 @@ impl From<&Status> for proto::contact::EPPContactStatusType {
     }
 }
 
-impl From<proto::contact::EPPContactPhone> for Phone {
-    fn from(from: proto::contact::EPPContactPhone) -> Self {
+impl From<&proto::contact::EPPContactPhone> for Phone {
+    fn from(from: &proto::contact::EPPContactPhone) -> Self {
         Phone {
-            number: from.number,
-            extension: from.extension,
+            number: from.number.clone(),
+            extension: from.extension.clone(),
         }
     }
 }
@@ -400,11 +400,26 @@ impl
             },
             None => None,
         };
+        let isnic_ext_info = match extension {
+            Some(e) => match e
+                .value
+                .iter()
+                .find(|e| matches!(e, proto::EPPResponseExtensionType::ISNICContactInfo(_)))
+            {
+                Some(e) => match e {
+                    proto::EPPResponseExtensionType::ISNICContactInfo(e) => Some(e),
+                    _ => unreachable!(),
+                },
+                None => None,
+            },
+            None => None,
+        };
 
         let local_address = contact_info
             .postal_info
             .iter()
             .find(|p| p.addr_type == proto::contact::EPPContactPostalInfoType::Local);
+        let any_address = contact_info.postal_info.get(0);
         Ok(InfoResponse {
             id: contact_info.id,
             statuses: contact_info
@@ -417,8 +432,8 @@ impl
             internationalised_address: map_addr(contact_info.postal_info.iter().find(|p| {
                 p.addr_type == proto::contact::EPPContactPostalInfoType::Internationalised
             })),
-            phone: contact_info.phone.map(|p| p.into()),
-            fax: contact_info.fax.map(|p| p.into()),
+            phone: contact_info.phone.as_ref().map(|p| p.into()),
+            fax: contact_info.fax.as_ref().map(|p| p.into()),
             email: match contact_info.email {
                 Some(e) => e,
                 None => contact_info.traficom_legal_email.unwrap_or_default(),
@@ -440,24 +455,25 @@ impl
                     None => None,
                 },
             },
-            entity_type: match &contact_ext_info {
-                Some(e) => match &e.contact_type {
+            entity_type: if let Some(e) = &contact_ext_info {
+                match &e.contact_type {
                     Some(i) => i.into(),
                     None => EntityType::Unknown,
-                },
-                None => match contact_info.traficom_type {
-                    Some(t) => traficom_type_to_entity_type(
-                        &t,
-                        match local_address {
-                            Some(a) => a.traficom_is_finnish.unwrap_or(false),
-                            None => false,
-                        },
-                    ),
-                    None => match &eurid_ext_info {
-                        Some(e) => super::eurid::eurid_ext_to_entity(e),
-                        None => EntityType::Unknown,
+                }
+            } else if let Some(t) = contact_info.traficom_type {
+                traficom_type_to_entity_type(
+                    &t,
+                    match local_address {
+                        Some(a) => a.traficom_is_finnish.unwrap_or(false),
+                        None => false,
                     },
-                },
+                )
+            } else if let Some(e) = &eurid_ext_info {
+                super::eurid::eurid_ext_to_entity(e)
+            } else if let Some(i) = &isnic_ext_info {
+                super::isnic::isnic_ext_to_entity(i, any_address)
+            } else {
+                EntityType::Unknown
             },
             disclosure: match contact_info.disclose {
                 Some(d) => {
@@ -476,6 +492,7 @@ impl
             nominet_data_quality: data_quality_ext_info.map(Into::into),
             eurid_contact_extension: eurid_ext_info.map(Into::into),
             qualified_lawyer: qualified_lawyer_ext_info.map(Into::into),
+            isnic_info: isnic_ext_info.map(Into::into),
         })
     }
 }
@@ -743,6 +760,24 @@ pub fn handle_create(
             }
         }
     }
+    match &req.isnic_info {
+        Some(e) => {
+            if client.isnic_contact_supported {
+                ext.push(proto::EPPCommandExtensionType::ISNICContactCreate(
+                    (e, &req.entity_type).into(),
+                ))
+            } else {
+                return Err(Err(Error::Unsupported));
+            }
+        }
+        None => {
+            if client.isnic_contact_supported {
+                return Err(Err(Error::Err(
+                    "contact extension required for ISNIC".to_string(),
+                )));
+            }
+        }
+    }
     if let Some(qualified_lawyer) = &req.qualified_lawyer {
         if client.qualified_lawyer_supported {
             ext.push(proto::EPPCommandExtensionType::QualifiedLawyerCreate(
@@ -753,6 +788,10 @@ pub fn handle_create(
         }
     }
     super::verisign::handle_verisign_namestore_erratum(client, &mut ext);
+
+    if !req.auth_info.is_empty() {
+        super::domain::check_pass(&req.auth_info)?;
+    }
 
     let command = proto::EPPCreate::Contact(Box::new(proto::contact::EPPContactCreate {
         id: req.id.clone(),
@@ -827,6 +866,9 @@ pub fn handle_delete(
     if !client.contact_supported {
         return Err(Err(Error::Unsupported));
     }
+    if client.isnic_contact_supported {
+        return Err(Err(Error::Unsupported));
+    }
     check_id(&req.id)?;
     let command = proto::EPPDelete::Contact(proto::contact::EPPContactCheck { id: req.id.clone() });
     let mut ext = vec![];
@@ -872,8 +914,22 @@ pub fn handle_update(
         }
         None => true,
     };
+    let is_not_qualified_lawyer_change = req.qualified_lawyer.is_none();
+    let is_not_isnic_change = match &req.isnic_info {
+        Some(e) => {
+            e.lang.is_none()
+                && e.mobile.is_none()
+                && e.auto_update_from_national_registry.is_none()
+                && e.paper_invoices.is_none()
+        }
+        None => true,
+    };
     if req.add_statuses.is_empty() && req.remove_statuses.is_empty() && is_not_change {
-        if is_not_nom_change && is_not_eurid_change {
+        if is_not_nom_change
+            && is_not_eurid_change
+            && is_not_qualified_lawyer_change
+            && is_not_isnic_change
+        {
             return Err(Err(Error::Err(
                 "at least one operation must be specified".to_string(),
             )));
@@ -884,16 +940,22 @@ pub fn handle_update(
             if (!is_not_eurid_change) && (!client.eurid_contact_support) {
                 return Err(Ok(UpdateResponse { pending: false }));
             }
+            if (!is_not_qualified_lawyer_change) && (!client.qualified_lawyer_supported) {
+                return Err(Ok(UpdateResponse { pending: false }));
+            }
+            if (!is_not_isnic_change) && (!client.isnic_contact_supported) {
+                return Err(Ok(UpdateResponse { pending: false }));
+            }
         }
     }
     let phone_re = Regex::new(r"^\+\d+\.\d+$").unwrap();
     if let Some(phone) = &req.new_phone {
-        if !phone_re.is_match(&phone.number) && !&phone.number.is_empty() {
+        if !phone_re.is_match(&phone.number) && !phone.number.is_empty() {
             return Err(Err(Error::Err("invalid phone number format".to_string())));
         }
     }
     if let Some(fax) = &req.new_fax {
-        if !phone_re.is_match(&fax.number) && !&fax.number.is_empty() {
+        if !phone_re.is_match(&fax.number) && !fax.number.is_empty() {
             return Err(Err(Error::Err("invalid fax number format".to_string())));
         }
     }
@@ -1023,6 +1085,22 @@ pub fn handle_update(
     } else if req.new_eurid_contact_extension.is_some() {
         return Err(Err(Error::Unsupported));
     }
+
+    if let Some(isnic_info) = &req.isnic_info {
+        if client.isnic_contact_supported {
+            super::domain::check_pass(&isnic_info.password)?;
+            ext.push(proto::EPPCommandExtensionType::ISNICContactUpdate(
+                isnic_info.into(),
+            ))
+        } else {
+            return Err(Err(Error::Unsupported));
+        }
+    } else if client.isnic_domain_supported {
+        return Err(Err(Error::Err(
+            "contact extension required for ISNIC".to_string(),
+        )));
+    }
+
     if let Some(qualified_lawyer) = &req.qualified_lawyer {
         if client.qualified_lawyer_supported {
             ext.push(proto::EPPCommandExtensionType::QualifiedLawyerUpdate(
@@ -1056,7 +1134,12 @@ pub fn handle_transfer_query(
     if !client.contact_supported {
         return Err(Err(Error::Unsupported));
     }
+    if client.isnic_contact_supported {
+        return Err(Err(Error::Unsupported));
+    }
+
     check_id(&req.id)?;
+
     let command = proto::EPPTransfer {
         operation: proto::EPPTransferOperation::Query,
         command: proto::EPPTransferCommand::ContactQuery(proto::contact::EPPContactCheck {
@@ -1081,7 +1164,16 @@ pub fn handle_transfer_request(
     if !client.contact_supported {
         return Err(Err(Error::Unsupported));
     }
+    if client.isnic_contact_supported {
+        return Err(Err(Error::Unsupported));
+    }
+
     check_id(&req.id)?;
+
+    if !req.auth_info.is_empty() {
+        super::domain::check_pass(&req.auth_info)?;
+    }
+
     let command = proto::EPPTransfer {
         operation: proto::EPPTransferOperation::Request,
         command: proto::EPPTransferCommand::ContactRequest(proto::contact::EPPContactTransfer {
@@ -1109,7 +1201,16 @@ pub fn handle_transfer_accept(
     if !client.contact_supported {
         return Err(Err(Error::Unsupported));
     }
+    if client.isnic_contact_supported {
+        return Err(Err(Error::Unsupported));
+    }
+
     check_id(&req.id)?;
+
+    if !req.auth_info.is_empty() {
+        super::domain::check_pass(&req.auth_info)?;
+    }
+
     let command = proto::EPPTransfer {
         operation: proto::EPPTransferOperation::Accept,
         command: proto::EPPTransferCommand::ContactRequest(proto::contact::EPPContactTransfer {
@@ -1137,7 +1238,15 @@ pub fn handle_transfer_reject(
     if !client.contact_supported {
         return Err(Err(Error::Unsupported));
     }
+    if client.isnic_contact_supported {
+        return Err(Err(Error::Unsupported));
+    }
     check_id(&req.id)?;
+
+    if !req.auth_info.is_empty() {
+        super::domain::check_pass(&req.auth_info)?;
+    }
+
     let command = proto::EPPTransfer {
         operation: proto::EPPTransferOperation::Reject,
         command: proto::EPPTransferCommand::ContactRequest(proto::contact::EPPContactTransfer {

@@ -1,0 +1,62 @@
+syntax = "proto3";
+package epp.isnic;
+
+import "google/protobuf/wrappers.proto";
+import "common.proto";
+
+message PaymentInfo {
+  message Card {
+    uint32 id = 1;
+    string cvc = 2;
+  }
+
+  oneof payment_method {
+    uint32 prepaid = 1;
+    Card card = 2;
+  }
+}
+
+message DomainInfo {
+  google.protobuf.StringValue zone_contact = 1;
+}
+
+message DomainUpdate {
+  bool remove_all_ns = 1;
+  repeated string new_master_ns = 2;
+}
+
+enum ContactStatus {
+  Ok = 0;
+  OkUnconfirmed = 1;
+  PendingCreate = 2;
+  ServerExpired = 3;
+  ServerSuspended = 4;
+}
+
+message ContactInfo {
+  repeated ContactStatus statuses = 1;
+  common.Phone mobile = 2;
+  google.protobuf.StringValue sid = 3;
+  bool auto_update_from_national_registry = 4;
+  bool paper_invoices = 5;
+}
+
+message ContactCreate {
+  common.Phone mobile = 1;
+  google.protobuf.StringValue sid = 2;
+  bool auto_update_from_national_registry = 3;
+  bool paper_invoices = 4;
+  google.protobuf.StringValue lang = 5;
+}
+
+message ContactUpdate {
+  common.Phone mobile = 1;
+  google.protobuf.BoolValue auto_update_from_national_registry = 2;
+  google.protobuf.BoolValue paper_invoices = 3;
+  google.protobuf.StringValue lang = 4;
+  string password = 5;
+}
+
+message HostInfo {
+  google.protobuf.StringValue zone_contact = 1;
+}

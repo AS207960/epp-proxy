@@ -7,6 +7,7 @@ import "common.proto";
 import "eurid.proto";
 import "qualified_lawyer.proto";
 import "nominet_ext.proto";
+import "isnic.proto";
 
 enum EntityType {
     NotSet = 0;
@@ -67,11 +68,6 @@ message PostalAddress {
     google.protobuf.Timestamp birth_date = 10;
 }
 
-message Phone {
-    string number = 1;
-    google.protobuf.StringValue extension = 2;
-}
-
 enum ContactStatus {
     ClientDeleteProhibited = 0;
     ClientTransferProhibited = 1;
@@ -113,8 +109,8 @@ message ContactInfoReply {
     repeated ContactStatus statuses = 3;
     PostalAddress local_address = 4;
     PostalAddress internationalised_address = 5;
-    Phone phone = 6;
-    Phone fax = 7;
+    common.Phone phone = 6;
+    common.Phone fax = 7;
     string email = 8;
     string client_id = 9;
     google.protobuf.StringValue client_created_id = 10;
@@ -131,14 +127,15 @@ message ContactInfoReply {
     eurid.ContactExtension eurid_info = 22;
     common.CommandResponse cmd_resp = 21;
     qualified_lawyer.QualifiedLawyer qualified_lawyer = 23;
+    isnic.ContactInfo isnic_info = 24;
 }
 
 message ContactCreateRequest {
     string id = 1;
     PostalAddress local_address = 2;
     PostalAddress internationalised_address = 3;
-    Phone phone = 4;
-    Phone fax = 5;
+    common.Phone phone = 4;
+    common.Phone fax = 5;
     string email = 6;
     EntityType entity_type = 7;
     google.protobuf.StringValue trading_name = 8;
@@ -148,6 +145,7 @@ message ContactCreateRequest {
     string registry_name = 11;
     string auth_info = 12;
     qualified_lawyer.QualifiedLawyer qualified_lawyer = 14;
+    isnic.ContactCreate isnic_info = 15;
 }
 
 message ContactCreateReply {
@@ -175,8 +173,8 @@ message ContactUpdateRequest {
     repeated ContactStatus remove_statuses = 3;
     PostalAddress new_local_address = 4;
     PostalAddress new_internationalised_address = 5;
-    Phone new_phone = 6;
-    Phone new_fax = 7;
+    common.Phone new_phone = 6;
+    common.Phone new_fax = 7;
     google.protobuf.StringValue new_email = 8;
     EntityType new_entity_type = 9;
     google.protobuf.StringValue new_trading_name = 10;
@@ -186,6 +184,7 @@ message ContactUpdateRequest {
     google.protobuf.StringValue new_auth_info = 14;
     eurid.ContactUpdateExtension new_eurid_info = 15;
     qualified_lawyer.QualifiedLawyer qualified_lawyer = 16;
+    isnic.ContactUpdate isnic_info = 17;
 }
 
 message ContactUpdateReply {

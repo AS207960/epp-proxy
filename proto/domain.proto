@@ -9,6 +9,7 @@ import "fee.proto";
 import "eurid.proto";
 import "launch.proto";
 import "domain_common.proto";
+import "isnic.proto";
 
 message Contact {
     string id = 1;
@@ -106,6 +107,7 @@ message DomainInfoReply {
     common.CommandResponse cmd_resp = 22;
     eurid.IDN eurid_idn = 23;
     eurid.DomainInfo eurid_data = 24;
+    isnic.DomainInfo isnic_info = 25;
 }
 
 message DomainCreateRequest {
@@ -121,6 +123,7 @@ message DomainCreateRequest {
     fee.DonutsFeeData donuts_fee_agreement = 10;
     fee.FeeAgreement fee_agreement = 11;
     eurid.DomainCreateExtension eurid_data = 12;
+    isnic.PaymentInfo isnic_payment = 13;
 }
 
 message DomainCreateReply {
@@ -174,6 +177,7 @@ message DomainUpdateRequest {
     fee.DonutsFeeData donuts_fee_agreement = 9;
     fee.FeeAgreement fee_agreement = 10;
     eurid.DomainUpdateExtension eurid_data = 11;
+    isnic.DomainUpdate isnic_info = 12;
 }
 
 message DomainSyncRequest {
@@ -199,6 +203,7 @@ message DomainRenewRequest {
     google.protobuf.StringValue registry_name = 4;
     fee.DonutsFeeData donuts_fee_agreement = 5;
     fee.FeeAgreement fee_agreement = 6;
+    isnic.PaymentInfo isnic_payment = 7;
 }
 
 message DomainRenewReply {

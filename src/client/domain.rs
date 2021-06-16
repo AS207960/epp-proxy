@@ -105,6 +105,7 @@ pub struct InfoResponse {
     pub launch_info: Option<launch::LaunchInfoData>,
     pub donuts_fee_data: Option<fee::DonutsFeeData>,
     pub whois_info: Option<super::verisign::InfoWhois>,
+    pub isnic_info: Option<super::isnic::DomainInfo>,
     pub eurid_data: Option<super::eurid::DomainInfo>,
     pub eurid_idn: Option<super::eurid::Idn>,
 }
@@ -174,6 +175,7 @@ pub struct CreateRequest {
     pub(super) fee_agreement: Option<fee::FeeAgreement>,
     pub(super) donuts_fee_agreement: Option<fee::DonutsFeeData>,
     pub(super) eurid_data: Option<super::eurid::DomainCreate>,
+    pub(super) isnic_payment: Option<super::isnic::PaymentInfo>,
     pub return_path: Sender<CreateResponse>,
 }
 
@@ -245,6 +247,7 @@ pub struct UpdateRequest {
     pub(super) fee_agreement: Option<fee::FeeAgreement>,
     pub(super) donuts_fee_agreement: Option<fee::DonutsFeeData>,
     pub(super) eurid_data: Option<super::eurid::DomainUpdate>,
+    pub(super) isnic_info: Option<super::isnic::DomainUpdate>,
     pub return_path: Sender<UpdateResponse>,
 }
 
@@ -293,6 +296,7 @@ pub struct RenewRequest {
     pub(super) cur_expiry_date: DateTime<Utc>,
     pub(super) fee_agreement: Option<fee::FeeAgreement>,
     pub(super) donuts_fee_agreement: Option<fee::DonutsFeeData>,
+    pub(super) isnic_payment: Option<super::isnic::PaymentInfo>,
     pub return_path: Sender<RenewResponse>,
 }
 
@@ -509,6 +513,7 @@ pub struct CreateInfo<'a> {
     pub fee_agreement: Option<fee::FeeAgreement>,
     pub donuts_fee_agreement: Option<fee::DonutsFeeData>,
     pub eurid_data: Option<super::eurid::DomainCreate>,
+    pub isnic_payment: Option<super::isnic::PaymentInfo>,
 }
 
 /// Registers a new domain
@@ -540,6 +545,7 @@ pub async fn create(
             fee_agreement: info.fee_agreement,
             donuts_fee_agreement: info.donuts_fee_agreement,
             eurid_data: info.eurid_data,
+            isnic_payment: info.isnic_payment,
             return_path: sender,
         })),
         receiver,
@@ -585,6 +591,7 @@ pub struct UpdateInfo<'a> {
     pub fee_agreement: Option<fee::FeeAgreement>,
     pub donuts_fee_agreement: Option<fee::DonutsFeeData>,
     pub eurid_data: Option<super::eurid::DomainUpdate>,
+    pub isnic_info: Option<super::isnic::DomainUpdate>,
 }
 
 /// Updates properties of a domain name
@@ -614,6 +621,7 @@ pub async fn update(
             fee_agreement: info.fee_agreement,
             donuts_fee_agreement: info.donuts_fee_agreement,
             eurid_data: info.eurid_data,
+            isnic_info: info.isnic_info,
             return_path: sender,
         })),
         receiver,
@@ -660,6 +668,7 @@ pub async fn renew(
     cur_expiry_date: DateTime<Utc>,
     fee_agreement: Option<fee::FeeAgreement>,
     donuts_fee_agreement: Option<fee::DonutsFeeData>,
+    isnic_payment: Option<super::isnic::PaymentInfo>,
     client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<RenewResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
@@ -671,6 +680,7 @@ pub async fn renew(
             cur_expiry_date,
             fee_agreement,
             donuts_fee_agreement,
+            isnic_payment,
             return_path: sender,
         })),
         receiver,

@@ -16,6 +16,7 @@ pub mod domain;
 pub mod eurid;
 pub mod fee;
 pub mod host;
+pub mod isnic;
 pub mod launch;
 pub mod maintenance;
 pub mod nominet;
@@ -115,8 +116,18 @@ pub struct ServerFeatures {
     eurid_poll_supported: bool,
     /// urn:ietf:params:xml:ns:qualifiedLawyer-1.0 support
     qualified_lawyer_supported: bool,
-    /// http://www.verisign.com/epp/sync-1.0support
+    /// http://www.verisign.com/epp/sync-1.0 support
     verisign_sync_supported: bool,
+    /// urn:is.isnic:xml:ns:is-ext-domain-1.0 support
+    isnic_domain_supported: bool,
+    /// urn:is.isnic:xml:ns:is-ext-host-1.0 support
+    isnic_host_supported: bool,
+    /// urn:is.isnic:xml:ns:is-ext-contact-1.0 support
+    isnic_contact_supported: bool,
+    /// urn:is.isnic:xml:ns:is-ext-list-1.0 support
+    isnic_list_supported: bool,
+    /// urn:is.isnic:xml:ns:is-ext-account-1.0 support
+    isnic_account_supported: bool,
 }
 
 impl ServerFeatures {

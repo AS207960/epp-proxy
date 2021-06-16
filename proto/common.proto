@@ -1,6 +1,8 @@
 syntax = "proto3";
 package epp.common;
 
+import "google/protobuf/wrappers.proto";
+
 message IPAddress {
     enum IPVersion {
         UNKNOWN = 0;
@@ -45,4 +47,9 @@ message CommandTransactionID {
 message CommandResponse {
     repeated CommandExtraValue extra_values = 1;
     CommandTransactionID transaction_id = 2;
+}
+
+message Phone {
+    string number = 1;
+    google.protobuf.StringValue extension = 2;
 }

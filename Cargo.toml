@@ -7,7 +7,7 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-tokio = { version = "1.0", features = ["rt-multi-thread", "net", "macros", "time", "io-util", "fs", "signal", "parking_lot"] }
+tokio = { version = "1", features = ["rt-multi-thread", "net", "macros", "time", "io-util", "fs", "signal", "parking_lot"] }
 futures = "0.3"
 log = "0.4"
 pretty_env_logger = "0.4"
@@ -31,7 +31,7 @@ clap = "2.33"
 base64 = "0.12"
 xml_serde = { git = "https://github.com/as207960/xml-serde", rev = "9fc66f9f5f5927c01b874b17c3e0839169785dff" }
 #xml_serde = { path = "../xml_serde" }
-rust-keycloak = { git = "https://github.com/TheEnbyperor/rust-keycloak", rev = "b4f76d59331d991909d199dca65e269e391dac82" }
+rust-keycloak = { git = "https://github.com/TheEnbyperor/rust-keycloak", rev = "31dc156acbf3048d9ff765f3cd6d32be6ae9b18a" }
 dotenv = "0.9.0"
 tower-service = "0.3"
 http = "0.2"

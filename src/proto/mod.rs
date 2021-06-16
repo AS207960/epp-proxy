@@ -12,6 +12,7 @@ pub mod domain;
 pub mod eurid;
 pub mod fee;
 pub mod host;
+pub mod isnic;
 pub mod launch;
 pub mod login_sec;
 pub mod maintenance;
@@ -197,6 +198,20 @@ pub enum EPPCommandExtensionType {
     QualifiedLawyerUpdate(qualified_lawyer::QualifiedLawyerInfoData),
     #[serde(rename = "{http://www.verisign.com/epp/sync-1.0}sync:update")]
     VerisignSyncUpdate(verisign::EPPSyncUpdate),
+    #[serde(rename = "{urn:is.isnic:xml:ns:is-ext-domain-1.0}is-domain:create")]
+    ISNICDomainCreate(isnic::DomainCreateRenew),
+    #[serde(rename = "{urn:is.isnic:xml:ns:is-ext-domain-1.0}is-domain:renew")]
+    ISNICDomainRenew(isnic::DomainCreateRenew),
+    #[serde(rename = "{urn:is.isnic:xml:ns:is-ext-domain-1.0}is-domain:update")]
+    ISNICDomainUpdate(isnic::DomainUpdate),
+    #[serde(rename = "{urn:is.isnic:xml:ns:is-ext-contact-1.0}is-contact:create")]
+    ISNICContactCreate(isnic::ContactCreate),
+    #[serde(rename = "{urn:is.isnic:xml:ns:is-ext-contact-1.0}is-contact:update")]
+    ISNICContactUpdate(isnic::ContactUpdate),
+    #[serde(rename = "{urn:is.isnic:xml:ns:is-ext-host-1.0}is-host:create")]
+    ISNICHostCreate(isnic::HostCreateUpdate),
+    #[serde(rename = "{urn:is.isnic:xml:ns:is-ext-host-1.0}is-host:update")]
+    ISNICHostUpdate(isnic::HostCreateUpdate),
 }
 
 #[derive(Debug, Serialize)]
@@ -600,6 +615,8 @@ pub enum EPPResultDataValue {
         rename = "{http://www.eurid.eu/xml/epp/dnssecEligibility-1.0}dnssecEligibility:infData"
     )]
     EURIDDNSSECEligibilityInfoData(eurid::EURIDDNSSECEligibilityInfoData),
+    #[serde(rename = "{urn:is.isnic:xml:ns:is-ext-account-1.0}infData")]
+    ISNICAccountInfo(isnic::AccountInfo),
 }
 
 #[derive(Debug, Deserialize)]
@@ -784,6 +801,10 @@ pub enum EPPResponseExtensionType {
     EURIDIDNMapping(eurid::EURIDIDNMapping),
     #[serde(rename = "{urn:ietf:params:xml:ns:qualifiedLawyer-1.0}info")]
     QualifiedLawyerInfo(qualified_lawyer::QualifiedLawyerInfoData),
+    #[serde(rename = "{urn:is.isnic:xml:ns:is-ext-domain-1.0}infData")]
+    ISNICDomainInfo(isnic::DomainInfo),
+    #[serde(rename = "{urn:is.isnic:xml:ns:is-ext-contact-1.0}infData")]
+    ISNICContactInfo(isnic::ContactInfo),
 }
 
 #[derive(Debug, Serialize)]
@@ -826,6 +847,8 @@ pub enum EPPInfo {
     EURIDDNSQuality(eurid::EURIDDNSQualityInfo),
     #[serde(rename = "{http://www.eurid.eu/xml/epp/dnssecEligibility-1.0}dnssecEligibility:info")]
     EURIDDNSSECEligibilityInfo(eurid::EURIDDNSSECEligibilityInfo),
+    // #[serde(rename = "{urn:is.isnic:xml:ns:is-ext-account-1.0}is-account:info")]
+    // ISNICAccountInfo {},
 }
 
 #[derive(Debug, Serialize)]

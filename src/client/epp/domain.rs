@@ -226,11 +226,22 @@ impl
 
         let whois_info = match extension {
             Some(ext) => {
-                let charge = ext.value.iter().find_map(|p| match p {
+                let i = ext.value.iter().find_map(|p| match p {
                     proto::EPPResponseExtensionType::VerisignWhoisInfo(i) => Some(i),
                     _ => None,
                 });
-                charge.map(Into::into)
+                i.map(Into::into)
+            }
+            None => None,
+        };
+
+        let isnic_info = match extension {
+            Some(ext) => {
+                let i = ext.value.iter().find_map(|p| match p {
+                    proto::EPPResponseExtensionType::ISNICDomainInfo(i) => Some(i),
+                    _ => None,
+                });
+                i.map(Into::into)
             }
             None => None,
         };
@@ -305,6 +316,7 @@ impl
             launch_info,
             donuts_fee_data,
             whois_info,
+            isnic_info,
             eurid_data: super::eurid::extract_eurid_domain_info(extension),
         })
     }
@@ -624,6 +636,16 @@ pub(crate) fn check_domain<T>(id: &str) -> Result<(), Response<T>> {
     } else {
         Err(Err(Error::Err(
             "domain name has a min length of 1".to_string(),
+        )))
+    }
+}
+
+pub(crate) fn check_pass<T>(id: &str) -> Result<(), Response<T>> {
+    if let 6..=16 = id.len() {
+        Ok(())
+    } else {
+        Err(Err(Error::Err(
+            "passwords have a min length of 6 and a max length of 16".to_string(),
         )))
     }
 }
@@ -1261,8 +1283,29 @@ pub fn handle_create(
         }
     }
 
+    match &req.isnic_payment {
+        Some(e) => {
+            if client.isnic_domain_supported {
+                exts.push(proto::EPPCommandExtensionType::ISNICDomainCreate(e.into()))
+            } else {
+                return Err(Err(Error::Unsupported));
+            }
+        }
+        None => {
+            if client.isnic_domain_supported {
+                return Err(Err(Error::Err(
+                    "payment extension required for ISNIC".to_string(),
+                )));
+            }
+        }
+    }
+
     super::verisign::handle_verisign_namestore_erratum(client, &mut exts);
     super::fee::handle_donuts_fee_agreement(client, &req.donuts_fee_agreement, &mut exts)?;
+
+    if !req.auth_info.is_empty() {
+        check_pass(&req.auth_info)?;
+    }
 
     let command = proto::EPPCreate::Domain(proto::domain::EPPDomainCreate {
         name: req.name.clone(),
@@ -1425,10 +1468,12 @@ pub fn handle_update(
         return Err(Err(Error::Unsupported));
     }
     check_domain(&req.name)?;
+
     let no_registrant = client.has_erratum("verisign-com")
         || client.has_erratum("verisign-net")
         || client.has_erratum("verisign-cc")
         || client.has_erratum("verisign-tv");
+
     if !no_registrant {
         if let Some(new_registrant) = &req.new_registrant {
             super::contact::check_id(new_registrant)?;
@@ -1498,10 +1543,27 @@ pub fn handle_update(
     rems.sort_unstable_by_key(update_as_i32);
 
     let is_not_change = req.new_registrant.is_none() && req.new_auth_info.is_none();
+
+    let is_not_isnic_change = match &req.isnic_info {
+        Some(e) => !e.remove_all_ns && e.new_master_ns.is_empty(),
+        None => true,
+    };
+    let is_not_eurid_change = match &req.eurid_data {
+        Some(e) => {
+            e.remove_on_site.is_none()
+                && e.remove_reseller.is_none()
+                && e.add_reseller.is_none()
+                && e.add_on_site.is_none()
+        }
+        None => true,
+    };
+
     if req.add.is_empty()
         && req.remove.is_empty()
         && is_not_change
         && (req.sec_dns.is_none() || !client.secdns_supported)
+        && is_not_eurid_change
+        && is_not_isnic_change
     {
         return Err(Err(Error::Err(
             "at least one operation must be specified".to_string(),
@@ -1639,6 +1701,22 @@ pub fn handle_update(
             ))
         } else {
             return Err(Err(Error::Unsupported));
+        }
+    }
+
+    if let Some(isnic_info) = &req.isnic_info {
+        if client.isnic_contact_supported {
+            exts.push(proto::EPPCommandExtensionType::ISNICDomainUpdate(
+                isnic_info.into(),
+            ))
+        } else {
+            return Err(Err(Error::Unsupported));
+        }
+    }
+
+    if let Some(auth_info) = &req.new_auth_info {
+        if !auth_info.is_empty() {
+            check_pass(auth_info)?;
         }
     }
 
@@ -1808,6 +1886,23 @@ pub fn handle_renew(client: &ServerFeatures, req: &RenewRequest) -> HandleReqRet
         }
     }
 
+    match &req.isnic_payment {
+        Some(e) => {
+            if client.isnic_domain_supported {
+                ext.push(proto::EPPCommandExtensionType::ISNICDomainRenew(e.into()))
+            } else {
+                return Err(Err(Error::Unsupported));
+            }
+        }
+        None => {
+            if client.isnic_domain_supported {
+                return Err(Err(Error::Err(
+                    "payment extension required for ISNIC".to_string(),
+                )));
+            }
+        }
+    }
+
     super::verisign::handle_verisign_namestore_erratum(client, &mut ext);
     super::fee::handle_donuts_fee_agreement(client, &req.donuts_fee_agreement, &mut ext)?;
 
@@ -1842,7 +1937,17 @@ pub fn handle_transfer_query(
     if !client.domain_supported {
         return Err(Err(Error::Unsupported));
     }
+    if client.isnic_contact_supported {
+        return Err(Err(Error::Unsupported));
+    }
     check_domain(&req.name)?;
+
+    if let Some(auth_info) = &req.auth_info {
+        if !auth_info.is_empty() {
+            check_pass(auth_info)?;
+        }
+    }
+
     let command = proto::EPPTransfer {
         operation: proto::EPPTransferOperation::Query,
         command: proto::EPPTransferCommand::DomainQuery(proto::domain::EPPDomainCheck {
@@ -1873,7 +1978,15 @@ pub fn handle_transfer_request(
     if !client.domain_supported {
         return Err(Err(Error::Unsupported));
     }
+    if client.isnic_contact_supported {
+        return Err(Err(Error::Unsupported));
+    }
     check_domain(&req.name)?;
+
+    if !req.auth_info.is_empty() {
+        check_pass(&req.auth_info)?;
+    }
+
     let command = proto::EPPTransfer {
         operation: proto::EPPTransferOperation::Request,
         command: proto::EPPTransferCommand::DomainRequest(proto::domain::EPPDomainTransfer {
@@ -1929,11 +2042,21 @@ pub fn handle_transfer_cancel(
     if !client.domain_supported {
         return Err(Err(Error::Unsupported));
     }
+    if client.isnic_contact_supported {
+        return Err(Err(Error::Unsupported));
+    }
     if client.eurid_domain_support {
         return Err(Err(Error::Unsupported));
     }
 
     check_domain(&req.name)?;
+
+    if let Some(auth_info) = &req.auth_info {
+        if !auth_info.is_empty() {
+            check_pass(auth_info)?;
+        }
+    }
+
     let command = proto::EPPTransfer {
         operation: proto::EPPTransferOperation::Cancel,
         command: proto::EPPTransferCommand::DomainRequest(proto::domain::EPPDomainTransfer {
@@ -1965,11 +2088,21 @@ pub fn handle_transfer_accept(
     if !client.domain_supported {
         return Err(Err(Error::Unsupported));
     }
+    if client.isnic_contact_supported {
+        return Err(Err(Error::Unsupported));
+    }
     if client.eurid_domain_support {
         return Err(Err(Error::Unsupported));
     }
 
     check_domain(&req.name)?;
+
+    if let Some(auth_info) = &req.auth_info {
+        if !auth_info.is_empty() {
+            check_pass(auth_info)?;
+        }
+    }
+
     let command = proto::EPPTransfer {
         operation: proto::EPPTransferOperation::Accept,
         command: proto::EPPTransferCommand::DomainRequest(proto::domain::EPPDomainTransfer {
@@ -2001,11 +2134,21 @@ pub fn handle_transfer_reject(
     if !client.domain_supported {
         return Err(Err(Error::Unsupported));
     }
+    if client.isnic_contact_supported {
+        return Err(Err(Error::Unsupported));
+    }
     if client.eurid_domain_support {
         return Err(Err(Error::Unsupported));
     }
 
     check_domain(&req.name)?;
+
+    if let Some(auth_info) = &req.auth_info {
+        if !auth_info.is_empty() {
+            check_pass(auth_info)?;
+        }
+    }
+
     let command = proto::EPPTransfer {
         operation: proto::EPPTransferOperation::Reject,
         command: proto::EPPTransferCommand::DomainRequest(proto::domain::EPPDomainTransfer {

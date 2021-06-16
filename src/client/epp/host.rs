@@ -155,6 +155,16 @@ pub fn handle_create(
     }
     check_host(&req.name)?;
     let mut ext = vec![];
+
+    if let Some(isnic_info) = &req.isnic_info {
+        if !client.isnic_host_supported {
+            return Err(Err(Error::Unsupported));
+        }
+        ext.push(proto::EPPCommandExtensionType::ISNICHostCreate(
+            isnic_info.into(),
+        ))
+    }
+
     super::verisign::handle_verisign_namestore_erratum(client, &mut ext);
     let command = proto::EPPCreate::Host(proto::host::EPPHostCreate {
         name: req.name.clone(),
@@ -207,7 +217,15 @@ pub fn handle_create_response(response: proto::EPPResponse) -> Response<CreateRe
             }
             _ => Err(Error::ServerInternal),
         },
-        None => Err(Error::ServerInternal),
+        None => Response::Ok(CreateResponse {
+            name: "".to_string(),
+            pending: response.is_pending(),
+            transaction_id: response
+                .transaction_id
+                .server_transaction_id
+                .unwrap_or_default(),
+            creation_date: None,
+        }),
     }
 }
 
@@ -252,6 +270,16 @@ pub fn handle_update(
     }
     check_host(&req.name)?;
     let mut ext = vec![];
+
+    if let Some(isnic_info) = &req.isnic_info {
+        if !client.isnic_host_supported {
+            return Err(Err(Error::Unsupported));
+        }
+        ext.push(proto::EPPCommandExtensionType::ISNICHostUpdate(
+            isnic_info.into(),
+        ))
+    }
+
     super::verisign::handle_verisign_namestore_erratum(client, &mut ext);
     if req.add.is_empty() && req.remove.is_empty() && req.new_name.is_none() {
         return Err(Err(Error::Err(

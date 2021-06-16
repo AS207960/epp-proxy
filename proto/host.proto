@@ -4,6 +4,7 @@ package epp.host;
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/wrappers.proto";
 import "common.proto";
+import "isnic.proto";
 
 enum HostStatus {
     ClientDeleteProhibited = 0;
@@ -52,6 +53,7 @@ message HostCreateRequest {
     string name = 1;
     repeated common.IPAddress addresses = 2;
     string registry_name = 3;
+    isnic.HostInfo isnic_info = 4;
 }
 
 message HostCreateReply {
@@ -86,6 +88,7 @@ message HostUpdateRequest {
     repeated Param remove = 3;
     google.protobuf.StringValue new_name = 4;
     string registry_name = 5;
+    isnic.HostInfo isnic_info = 6;
 }
 
 message HostUpdateReply {

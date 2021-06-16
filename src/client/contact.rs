@@ -63,6 +63,7 @@ pub struct InfoResponse {
     pub auth_info: Option<String>,
     pub nominet_data_quality: Option<super::nominet::DataQualityData>,
     pub eurid_contact_extension: Option<super::eurid::ContactExtension>,
+    pub isnic_info: Option<super::isnic::ContactInfo>,
     pub qualified_lawyer: Option<QualifiedLawyerInfo>,
 }
 
@@ -182,6 +183,7 @@ pub struct CreateRequest {
     pub(super) auth_info: String,
     pub(super) eurid_contact_extension: Option<super::eurid::ContactExtension>,
     pub(super) qualified_lawyer: Option<QualifiedLawyerInfo>,
+    pub(super) isnic_info: Option<super::isnic::ContactCreate>,
     pub return_path: Sender<CreateResponse>,
 }
 
@@ -224,6 +226,7 @@ pub struct UpdateRequest {
     pub(super) new_auth_info: Option<String>,
     pub(super) new_eurid_contact_extension: Option<super::eurid::ContactExtensionUpdate>,
     pub(super) qualified_lawyer: Option<QualifiedLawyerInfo>,
+    pub(super) isnic_info: Option<super::isnic::ContactUpdate>,
     pub return_path: Sender<UpdateResponse>,
 }
 
@@ -338,6 +341,7 @@ pub struct NewContactData {
     pub disclosure: Option<Vec<DisclosureType>>,
     pub auth_info: String,
     pub eurid_info: Option<super::eurid::ContactExtension>,
+    pub isnic_info: Option<super::isnic::ContactCreate>,
     pub qualified_lawyer: Option<QualifiedLawyerInfo>,
 }
 
@@ -372,6 +376,7 @@ pub async fn create(
             disclosure: data.disclosure,
             auth_info: data.auth_info,
             eurid_contact_extension: data.eurid_info,
+            isnic_info: data.isnic_info,
             qualified_lawyer: data.qualified_lawyer,
             return_path: sender,
         })),
@@ -422,6 +427,7 @@ pub struct UpdateContactData {
     pub disclosure: Option<Vec<DisclosureType>>,
     pub auth_info: Option<String>,
     pub eurid_info: Option<super::eurid::ContactExtensionUpdate>,
+    pub isnic_info: Option<super::isnic::ContactUpdate>,
     pub qualified_lawyer: Option<QualifiedLawyerInfo>,
 }
 
@@ -461,6 +467,7 @@ pub async fn update(
             new_disclosure: new_data.disclosure,
             new_auth_info: new_data.auth_info,
             new_eurid_contact_extension: new_data.eurid_info,
+            isnic_info: new_data.isnic_info,
             qualified_lawyer: new_data.qualified_lawyer,
             return_path: sender,
         })),

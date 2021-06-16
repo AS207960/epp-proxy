@@ -1,4 +1,6 @@
-use super::{router as outer_router, ClientCertConf, LogoutRequest, RequestMessage, ServerFeatures};
+use super::{
+    router as outer_router, ClientCertConf, LogoutRequest, RequestMessage, ServerFeatures,
+};
 use crate::proto;
 use chrono::prelude::*;
 use foreign_types_shared::ForeignType;
@@ -14,6 +16,7 @@ pub mod domain;
 pub mod eurid;
 pub mod fee;
 pub mod host;
+pub mod isnic;
 pub mod launch;
 pub mod maintenance;
 pub mod nominet;
@@ -404,7 +407,10 @@ impl EPPClient {
                     Some(c) => c,
                     None => return Err(()),
                 };
-                match client.send(outer_router::RequestMessage::NominetTagList(t)).await {
+                match client
+                    .send(outer_router::RequestMessage::NominetTagList(t))
+                    .await
+                {
                     Ok(_) => Ok(()),
                     Err(e) => {
                         warn!("Failed to send to subordinate server: {}", e);
@@ -417,9 +423,11 @@ impl EPPClient {
                     Some(client) => {
                         let (sender, _) = futures::channel::oneshot::channel();
                         match client
-                            .send(outer_router::RequestMessage::Logout(Box::new(LogoutRequest {
-                                return_path: sender,
-                            })))
+                            .send(outer_router::RequestMessage::Logout(Box::new(
+                                LogoutRequest {
+                                    return_path: sender,
+                                },
+                            )))
                             .await
                         {
                             Ok(_) => {}
@@ -700,10 +708,22 @@ impl EPPClient {
             .supports("http://www.eurid.eu/xml/epp/dnsQuality-2.0");
         self.features.qualified_lawyer_supported = greeting
             .service_menu
-            .supports("urn:ietf:params:xml:ns:qualifiedLawyer-1.0");
+            .supports_ext("urn:ietf:params:xml:ns:qualifiedLawyer-1.0");
         self.features.verisign_sync_supported = greeting
             .service_menu
-            .supports("http://www.verisign.com/epp/sync-1.0");
+            .supports_ext("http://www.verisign.com/epp/sync-1.0");
+        self.features.isnic_domain_supported = greeting
+            .service_menu
+            .supports_ext("urn:is.isnic:xml:ns:is-ext-domain-1.0");
+        self.features.isnic_contact_supported = greeting
+            .service_menu
+            .supports_ext("urn:is.isnic:xml:ns:is-ext-contact-1.0");
+        self.features.isnic_host_supported = greeting
+            .service_menu
+            .supports_ext("urn:is.isnic:xml:ns:is-ext-host-1.0");
+        self.features.isnic_account_supported = greeting
+            .service_menu
+            .supports_ext("urn:is.isnic:xml:ns:is-ext-account-1.0");
 
         if !(self.features.contact_supported
             | self.features.domain_supported
@@ -832,6 +852,18 @@ impl EPPClient {
             }
             if self.features.verisign_sync_supported {
                 ext_objects.push("http://www.verisign.com/epp/sync-1.0".to_string())
+            }
+            if self.features.isnic_domain_supported {
+                ext_objects.push("urn:is.isnic:xml:ns:is-ext-domain-1.0".to_string())
+            }
+            if self.features.isnic_contact_supported {
+                ext_objects.push("urn:is.isnic:xml:ns:is-ext-contact-1.0".to_string())
+            }
+            if self.features.isnic_host_supported {
+                ext_objects.push("urn:is.isnic:xml:ns:is-ext-host-1.0".to_string())
+            }
+            if self.features.isnic_account_supported {
+                ext_objects.push("urn:is.isnic:xml:ns:is-ext-account-1.0".to_string())
             }
             if self.features.nominet_tag_list {
                 let new_client = Self {

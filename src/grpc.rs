@@ -59,6 +59,10 @@ pub mod epp_proto {
     pub mod eurid {
         tonic::include_proto!("epp.eurid");
     }
+
+    pub mod isnic {
+        tonic::include_proto!("epp.isnic");
+    }
 }
 
 /// Helper function to convert chrono times to protobuf well-known type times
@@ -439,8 +443,8 @@ fn i32_from_restore_status(from: client::rgp::RGPState) -> i32 {
     }
 }
 
-impl From<epp_proto::contact::Phone> for client::contact::Phone {
-    fn from(from: epp_proto::contact::Phone) -> Self {
+impl From<epp_proto::common::Phone> for client::contact::Phone {
+    fn from(from: epp_proto::common::Phone) -> Self {
         client::contact::Phone {
             number: from.number,
             extension: from.extension,
@@ -448,9 +452,9 @@ impl From<epp_proto::contact::Phone> for client::contact::Phone {
     }
 }
 
-impl From<client::contact::Phone> for epp_proto::contact::Phone {
+impl From<client::contact::Phone> for epp_proto::common::Phone {
     fn from(from: client::contact::Phone) -> Self {
-        epp_proto::contact::Phone {
+        epp_proto::common::Phone {
             number: from.number,
             extension: from.extension,
         }
@@ -1000,6 +1004,9 @@ impl From<client::domain::InfoResponse> for epp_proto::domain::DomainInfoReply {
                 registrant_country_of_citizenship: d.registrant_country_of_citizenship,
                 auth_info_valid_until: chrono_to_proto(d.auth_info_valid_until),
             }),
+            isnic_info: res.isnic_info.map(|d| epp_proto::isnic::DomainInfo {
+                zone_contact: d.zone_contact,
+            }),
         }
     }
 }
@@ -1173,8 +1180,8 @@ impl From<client::contact::InfoResponse> for epp_proto::contact::ContactInfoRepl
                 .collect(),
             local_address: res.local_address.map(map_addr),
             internationalised_address: res.internationalised_address.map(map_addr),
-            phone: res.phone.map(|p| p.into()),
-            fax: res.fax.map(|p| p.into()),
+            phone: res.phone.map(Into::into),
+            fax: res.fax.map(Into::into),
             email: res.email,
             client_id: res.client_id,
             client_created_id: res.client_created_id,
@@ -1332,6 +1339,33 @@ impl From<client::contact::InfoResponse> for epp_proto::contact::ContactInfoRepl
             }),
             eurid_info: res.eurid_contact_extension.map(Into::into),
             qualified_lawyer: res.qualified_lawyer.map(Into::into),
+            isnic_info: res.isnic_info.map(|c| epp_proto::isnic::ContactInfo {
+                statuses: c
+                    .statuses
+                    .into_iter()
+                    .map(|s| match s {
+                        client::isnic::ContactStatus::Ok => {
+                            epp_proto::isnic::ContactStatus::Ok.into()
+                        }
+                        client::isnic::ContactStatus::OkUnconfirmed => {
+                            epp_proto::isnic::ContactStatus::OkUnconfirmed.into()
+                        }
+                        client::isnic::ContactStatus::PendingCreate => {
+                            epp_proto::isnic::ContactStatus::PendingCreate.into()
+                        }
+                        client::isnic::ContactStatus::ServerExpired => {
+                            epp_proto::isnic::ContactStatus::ServerExpired.into()
+                        }
+                        client::isnic::ContactStatus::ServerSuspended => {
+                            epp_proto::isnic::ContactStatus::ServerSuspended.into()
+                        }
+                    })
+                    .collect(),
+                mobile: c.mobile.map(Into::into),
+                sid: c.sid,
+                auto_update_from_national_registry: c.auto_update_from_national_registry,
+                paper_invoices: c.paper_invoices,
+            }),
             cmd_resp: None,
         }
     }
@@ -1814,6 +1848,63 @@ impl From<client::maintenance::InfoResponse> for epp_proto::maintenance::Mainten
     }
 }
 
+impl From<epp_proto::isnic::PaymentInfo> for Option<client::isnic::PaymentInfo> {
+    fn from(from: epp_proto::isnic::PaymentInfo) -> Self {
+        from.payment_method.map(|m| match m {
+            epp_proto::isnic::payment_info::PaymentMethod::Prepaid(id) => {
+                client::isnic::PaymentInfo::Prepaid(id)
+            }
+            epp_proto::isnic::payment_info::PaymentMethod::Card(card) => {
+                client::isnic::PaymentInfo::Card {
+                    id: card.id,
+                    cvc: card.cvc,
+                }
+            }
+        })
+    }
+}
+
+impl From<epp_proto::isnic::HostInfo> for client::isnic::HostInfo {
+    fn from(from: epp_proto::isnic::HostInfo) -> Self {
+        client::isnic::HostInfo {
+            zone_contact: from.zone_contact,
+        }
+    }
+}
+
+impl From<epp_proto::isnic::DomainUpdate> for client::isnic::DomainUpdate {
+    fn from(from: epp_proto::isnic::DomainUpdate) -> Self {
+        client::isnic::DomainUpdate {
+            remove_all_ns: from.remove_all_ns,
+            new_master_ns: from.new_master_ns,
+        }
+    }
+}
+
+impl From<epp_proto::isnic::ContactCreate> for client::isnic::ContactCreate {
+    fn from(from: epp_proto::isnic::ContactCreate) -> Self {
+        client::isnic::ContactCreate {
+            mobile: from.mobile.map(Into::into),
+            sid: from.sid,
+            auto_update_from_national_registry: from.auto_update_from_national_registry,
+            paper_invoices: from.paper_invoices,
+            lang: from.lang,
+        }
+    }
+}
+
+impl From<epp_proto::isnic::ContactUpdate> for client::isnic::ContactUpdate {
+    fn from(from: epp_proto::isnic::ContactUpdate) -> Self {
+        client::isnic::ContactUpdate {
+            mobile: from.mobile.map(Into::into),
+            auto_update_from_national_registry: from.auto_update_from_national_registry,
+            paper_invoices: from.paper_invoices,
+            lang: from.lang,
+            password: from.password,
+        }
+    }
+}
+
 fn map_command_response<T>(
     from: client::CommandResponse<T>,
 ) -> (T, epp_proto::common::CommandResponse) {
@@ -2127,6 +2218,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                         .map(TryInto::try_into)
                         .map_or(Ok(None), |v| v.map(Some))?,
                     eurid_data: request.eurid_data.map(Into::into),
+                    isnic_payment: request.isnic_payment.and_then(Into::into),
                 },
                 &mut sender,
             )
@@ -2372,6 +2464,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                         .map(TryInto::try_into)
                         .map_or(Ok(None), |v| v.map(Some))?,
                     eurid_data: request.eurid_data.map(Into::into),
+                    isnic_info: request.isnic_info.map(Into::into),
                 },
                 &mut sender,
             )
@@ -2441,6 +2534,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                     .donuts_fee_agreement
                     .map(TryInto::try_into)
                     .map_or(Ok(None), |v| v.map(Some))?,
+                request.isnic_payment.and_then(Into::into),
                 &mut sender,
             )
             .await?,
@@ -2709,8 +2803,15 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
             })
             .collect::<Result<Vec<client::host::Address>, tonic::Status>>()?;
         let mut sender = client_by_id(&self.client_router, &request.registry_name)?;
-        let (res, cmd_resp) =
-            map_command_response(client::host::create(&name, addresses, &mut sender).await?);
+        let (res, cmd_resp) = map_command_response(
+            client::host::create(
+                &name,
+                addresses,
+                request.isnic_info.map(Into::into),
+                &mut sender,
+            )
+            .await?,
+        );
 
         let reply = epp_proto::host::HostCreateReply {
             name: res.name,
@@ -2797,7 +2898,15 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         }
 
         let (res, cmd_resp) = map_command_response(
-            client::host::update(&name, add, remove, request.new_name, &mut sender).await?,
+            client::host::update(
+                &name,
+                add,
+                remove,
+                request.new_name,
+                request.isnic_info.map(Into::into),
+                &mut sender,
+            )
+            .await?,
         );
 
         let reply = epp_proto::host::HostUpdateReply {
@@ -2877,6 +2986,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                         .map(|d| disclosure_type_from_i32(d.disclosure)),
                     auth_info: request.auth_info,
                     eurid_info: request.eurid_info.map(Into::into),
+                    isnic_info: request.isnic_info.map(Into::into),
                     qualified_lawyer: request.qualified_lawyer.map(Into::into),
                 },
                 &mut sender,
@@ -2950,6 +3060,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                         .map(|d| disclosure_type_from_i32(d.disclosure)),
                     auth_info: request.new_auth_info,
                     eurid_info: request.new_eurid_info.map(Into::into),
+                    isnic_info: request.isnic_info.map(Into::into),
                     qualified_lawyer: request.qualified_lawyer.map(Into::into),
                 },
                 &mut sender,
