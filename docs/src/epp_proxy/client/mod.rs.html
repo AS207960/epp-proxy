@@ -250,6 +250,17 @@
 <span id="248">248</span>
 <span id="249">249</span>
 <span id="250">250</span>
+<span id="251">251</span>
+<span id="252">252</span>
+<span id="253">253</span>
+<span id="254">254</span>
+<span id="255">255</span>
+<span id="256">256</span>
+<span id="257">257</span>
+<span id="258">258</span>
+<span id="259">259</span>
+<span id="260">260</span>
+<span id="261">261</span>
 </pre><pre class="rust">
 <span class="doccomment">//! # Async/await EPP client.</span>
 <span class="doccomment">//!</span>
@@ -269,6 +280,7 @@
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">eurid</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">fee</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">host</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">isnic</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">launch</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">maintenance</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">nominet</span>;
@@ -368,8 +380,18 @@
     <span class="ident">eurid_poll_supported</span>: <span class="ident">bool</span>,
     <span class="doccomment">/// urn:ietf:params:xml:ns:qualifiedLawyer-1.0 support</span>
     <span class="ident">qualified_lawyer_supported</span>: <span class="ident">bool</span>,
-    <span class="doccomment">/// http://www.verisign.com/epp/sync-1.0support</span>
+    <span class="doccomment">/// http://www.verisign.com/epp/sync-1.0 support</span>
     <span class="ident">verisign_sync_supported</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// urn:is.isnic:xml:ns:is-ext-domain-1.0 support</span>
+    <span class="ident">isnic_domain_supported</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// urn:is.isnic:xml:ns:is-ext-host-1.0 support</span>
+    <span class="ident">isnic_host_supported</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// urn:is.isnic:xml:ns:is-ext-contact-1.0 support</span>
+    <span class="ident">isnic_contact_supported</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// urn:is.isnic:xml:ns:is-ext-list-1.0 support</span>
+    <span class="ident">isnic_list_supported</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// urn:is.isnic:xml:ns:is-ext-account-1.0 support</span>
+    <span class="ident">isnic_account_supported</span>: <span class="ident">bool</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">ServerFeatures</span> {
