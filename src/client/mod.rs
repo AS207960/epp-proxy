@@ -185,7 +185,7 @@ async fn send_epp_client_request<R>(
         Err(_) => return Err(Error::ServerInternal),
     }
     let mut receiver = receiver.fuse();
-    let mut delay = Box::pin(tokio::time::sleep(tokio::time::Duration::new(15, 0)).fuse());
+    let mut delay = Box::pin(tokio::time::sleep(tokio::time::Duration::new(60, 0)).fuse());
     let resp = futures::select! {
         r = receiver => r,
         _ = delay => {

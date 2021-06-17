@@ -764,7 +764,7 @@ pub fn handle_create(
         Some(e) => {
             if client.isnic_contact_supported {
                 ext.push(proto::EPPCommandExtensionType::ISNICContactCreate(
-                    (e, &req.entity_type).into(),
+                    (Some(e), &req.entity_type).into(),
                 ))
             } else {
                 return Err(Err(Error::Unsupported));
@@ -772,9 +772,9 @@ pub fn handle_create(
         }
         None => {
             if client.isnic_contact_supported {
-                return Err(Err(Error::Err(
-                    "contact extension required for ISNIC".to_string(),
-                )));
+                ext.push(proto::EPPCommandExtensionType::ISNICContactCreate(
+                    (None, &req.entity_type).into(),
+                ))
             }
         }
     }

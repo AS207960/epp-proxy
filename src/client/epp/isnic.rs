@@ -97,8 +97,8 @@ pub(super) fn isnic_ext_to_entity(
     }
 }
 
-impl From<(&ContactCreate, &Option<EntityType>)> for proto::isnic::ContactCreate {
-    fn from(from: (&ContactCreate, &Option<EntityType>)) -> Self {
+impl From<(Option<&ContactCreate>, &Option<EntityType>)> for proto::isnic::ContactCreate {
+    fn from(from: (Option<&ContactCreate>, &Option<EntityType>)) -> Self {
         let (from, entity_type) = from;
         proto::isnic::ContactCreate {
             contact_type: match entity_type {
@@ -108,13 +108,14 @@ impl From<(&ContactCreate, &Option<EntityType>)> for proto::isnic::ContactCreate
                 | None => proto::isnic::ContactType::Person,
                 _ => proto::isnic::ContactType::Role,
             },
-            mobile: from.mobile.as_ref().map(|p| p.into()),
-            sid: from.sid.as_ref().map(Into::into),
-            auto_update_from_national_registry: Some(from.auto_update_from_national_registry),
-            cancel_paper: Some(!from.paper_invoices),
+            mobile: from.and_then(|c| c.mobile.as_ref()).map(|p| p.into()),
+            sid: from.and_then(|c| c.sid.as_ref()).map(Into::into),
+            auto_update_from_national_registry: Some(
+                from.map(|c| c.auto_update_from_national_registry).unwrap_or(false)
+            ),
+            cancel_paper: Some(!from.map(|c| c.paper_invoices).unwrap_or(false)),
             lang: Some(
-                from.lang
-                    .as_ref()
+                from.and_then(|c| c.lang.as_ref())
                     .map(Into::into)
                     .unwrap_or_else(|| "en".to_string()),
             ),
