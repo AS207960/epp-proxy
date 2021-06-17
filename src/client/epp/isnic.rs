@@ -111,7 +111,8 @@ impl From<(Option<&ContactCreate>, &Option<EntityType>)> for proto::isnic::Conta
             mobile: from.and_then(|c| c.mobile.as_ref()).map(|p| p.into()),
             sid: from.and_then(|c| c.sid.as_ref()).map(Into::into),
             auto_update_from_national_registry: Some(
-                from.map(|c| c.auto_update_from_national_registry).unwrap_or(false)
+                from.map(|c| c.auto_update_from_national_registry)
+                    .unwrap_or(false),
             ),
             cancel_paper: Some(!from.map(|c| c.paper_invoices).unwrap_or(false)),
             lang: Some(
