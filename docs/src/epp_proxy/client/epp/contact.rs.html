@@ -2123,7 +2123,7 @@
         <span class="prelude-val">Some</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
             <span class="kw">if</span> <span class="ident">client</span>.<span class="ident">isnic_contact_supported</span> {
                 <span class="ident">ext</span>.<span class="ident">push</span>(<span class="ident">proto::EPPCommandExtensionType::ISNICContactCreate</span>(
-                    (<span class="ident">e</span>, <span class="kw-2">&amp;</span><span class="ident">req</span>.<span class="ident">entity_type</span>).<span class="ident">into</span>(),
+                    (<span class="prelude-val">Some</span>(<span class="ident">e</span>), <span class="kw-2">&amp;</span><span class="ident">req</span>.<span class="ident">entity_type</span>).<span class="ident">into</span>(),
                 ))
             } <span class="kw">else</span> {
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">Err</span>(<span class="ident">Error::Unsupported</span>));
@@ -2131,9 +2131,9 @@
         }
         <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
             <span class="kw">if</span> <span class="ident">client</span>.<span class="ident">isnic_contact_supported</span> {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">Err</span>(<span class="ident">Error::Err</span>(
-                    <span class="string">&quot;contact extension required for ISNIC&quot;</span>.<span class="ident">to_string</span>(),
-                )));
+                <span class="ident">ext</span>.<span class="ident">push</span>(<span class="ident">proto::EPPCommandExtensionType::ISNICContactCreate</span>(
+                    (<span class="prelude-val">None</span>, <span class="kw-2">&amp;</span><span class="ident">req</span>.<span class="ident">entity_type</span>).<span class="ident">into</span>(),
+                ))
             }
         }
     }
