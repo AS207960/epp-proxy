@@ -1206,6 +1206,31 @@
 <span id="1204">1204</span>
 <span id="1205">1205</span>
 <span id="1206">1206</span>
+<span id="1207">1207</span>
+<span id="1208">1208</span>
+<span id="1209">1209</span>
+<span id="1210">1210</span>
+<span id="1211">1211</span>
+<span id="1212">1212</span>
+<span id="1213">1213</span>
+<span id="1214">1214</span>
+<span id="1215">1215</span>
+<span id="1216">1216</span>
+<span id="1217">1217</span>
+<span id="1218">1218</span>
+<span id="1219">1219</span>
+<span id="1220">1220</span>
+<span id="1221">1221</span>
+<span id="1222">1222</span>
+<span id="1223">1223</span>
+<span id="1224">1224</span>
+<span id="1225">1225</span>
+<span id="1226">1226</span>
+<span id="1227">1227</span>
+<span id="1228">1228</span>
+<span id="1229">1229</span>
+<span id="1230">1230</span>
+<span id="1231">1231</span>
 </pre><pre class="rust">
 <span class="kw">use</span> <span class="kw">super</span>::{
     <span class="ident">router</span> <span class="kw">as</span> <span class="ident">outer_router</span>, <span class="ident">ClientCertConf</span>, <span class="ident">LogoutRequest</span>, <span class="ident">RequestMessage</span>, <span class="ident">ServerFeatures</span>,
@@ -1225,6 +1250,7 @@
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">eurid</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">fee</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">host</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">isnic</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">launch</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">maintenance</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">nominet</span>;
@@ -1916,10 +1942,22 @@
             .<span class="ident">supports</span>(<span class="string">&quot;http://www.eurid.eu/xml/epp/dnsQuality-2.0&quot;</span>);
         <span class="self">self</span>.<span class="ident">features</span>.<span class="ident">qualified_lawyer_supported</span> <span class="op">=</span> <span class="ident">greeting</span>
             .<span class="ident">service_menu</span>
-            .<span class="ident">supports</span>(<span class="string">&quot;urn:ietf:params:xml:ns:qualifiedLawyer-1.0&quot;</span>);
+            .<span class="ident">supports_ext</span>(<span class="string">&quot;urn:ietf:params:xml:ns:qualifiedLawyer-1.0&quot;</span>);
         <span class="self">self</span>.<span class="ident">features</span>.<span class="ident">verisign_sync_supported</span> <span class="op">=</span> <span class="ident">greeting</span>
             .<span class="ident">service_menu</span>
-            .<span class="ident">supports</span>(<span class="string">&quot;http://www.verisign.com/epp/sync-1.0&quot;</span>);
+            .<span class="ident">supports_ext</span>(<span class="string">&quot;http://www.verisign.com/epp/sync-1.0&quot;</span>);
+        <span class="self">self</span>.<span class="ident">features</span>.<span class="ident">isnic_domain_supported</span> <span class="op">=</span> <span class="ident">greeting</span>
+            .<span class="ident">service_menu</span>
+            .<span class="ident">supports_ext</span>(<span class="string">&quot;urn:is.isnic:xml:ns:is-ext-domain-1.0&quot;</span>);
+        <span class="self">self</span>.<span class="ident">features</span>.<span class="ident">isnic_contact_supported</span> <span class="op">=</span> <span class="ident">greeting</span>
+            .<span class="ident">service_menu</span>
+            .<span class="ident">supports_ext</span>(<span class="string">&quot;urn:is.isnic:xml:ns:is-ext-contact-1.0&quot;</span>);
+        <span class="self">self</span>.<span class="ident">features</span>.<span class="ident">isnic_host_supported</span> <span class="op">=</span> <span class="ident">greeting</span>
+            .<span class="ident">service_menu</span>
+            .<span class="ident">supports_ext</span>(<span class="string">&quot;urn:is.isnic:xml:ns:is-ext-host-1.0&quot;</span>);
+        <span class="self">self</span>.<span class="ident">features</span>.<span class="ident">isnic_account_supported</span> <span class="op">=</span> <span class="ident">greeting</span>
+            .<span class="ident">service_menu</span>
+            .<span class="ident">supports_ext</span>(<span class="string">&quot;urn:is.isnic:xml:ns:is-ext-account-1.0&quot;</span>);
 
         <span class="kw">if</span> <span class="op">!</span>(<span class="self">self</span>.<span class="ident">features</span>.<span class="ident">contact_supported</span>
             <span class="op">|</span> <span class="self">self</span>.<span class="ident">features</span>.<span class="ident">domain_supported</span>
@@ -2048,6 +2086,18 @@
             }
             <span class="kw">if</span> <span class="self">self</span>.<span class="ident">features</span>.<span class="ident">verisign_sync_supported</span> {
                 <span class="ident">ext_objects</span>.<span class="ident">push</span>(<span class="string">&quot;http://www.verisign.com/epp/sync-1.0&quot;</span>.<span class="ident">to_string</span>())
+            }
+            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">features</span>.<span class="ident">isnic_domain_supported</span> {
+                <span class="ident">ext_objects</span>.<span class="ident">push</span>(<span class="string">&quot;urn:is.isnic:xml:ns:is-ext-domain-1.0&quot;</span>.<span class="ident">to_string</span>())
+            }
+            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">features</span>.<span class="ident">isnic_contact_supported</span> {
+                <span class="ident">ext_objects</span>.<span class="ident">push</span>(<span class="string">&quot;urn:is.isnic:xml:ns:is-ext-contact-1.0&quot;</span>.<span class="ident">to_string</span>())
+            }
+            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">features</span>.<span class="ident">isnic_host_supported</span> {
+                <span class="ident">ext_objects</span>.<span class="ident">push</span>(<span class="string">&quot;urn:is.isnic:xml:ns:is-ext-host-1.0&quot;</span>.<span class="ident">to_string</span>())
+            }
+            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">features</span>.<span class="ident">isnic_account_supported</span> {
+                <span class="ident">ext_objects</span>.<span class="ident">push</span>(<span class="string">&quot;urn:is.isnic:xml:ns:is-ext-account-1.0&quot;</span>.<span class="ident">to_string</span>())
             }
             <span class="kw">if</span> <span class="self">self</span>.<span class="ident">features</span>.<span class="ident">nominet_tag_list</span> {
                 <span class="kw">let</span> <span class="ident">new_client</span> <span class="op">=</span> <span class="self">Self</span> {

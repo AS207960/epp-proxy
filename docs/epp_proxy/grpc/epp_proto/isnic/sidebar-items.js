@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["ContactStatus",""]],"mod":[["payment_info","Nested message and enum types in `PaymentInfo`."]],"struct":[["ContactCreate",""],["ContactInfo",""],["ContactUpdate",""],["DomainInfo",""],["DomainUpdate",""],["HostInfo",""],["PaymentInfo",""]]});

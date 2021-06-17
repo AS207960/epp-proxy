@@ -563,6 +563,13 @@
 <span id="561">561</span>
 <span id="562">562</span>
 <span id="563">563</span>
+<span id="564">564</span>
+<span id="565">565</span>
+<span id="566">566</span>
+<span id="567">567</span>
+<span id="568">568</span>
+<span id="569">569</span>
+<span id="570">570</span>
 </pre><pre class="rust">
 <span class="doccomment">//! Commands relating to contact objects</span>
 
@@ -629,6 +636,7 @@
     <span class="kw">pub</span> <span class="ident">auth_info</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">nominet_data_quality</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">super</span><span class="ident">::nominet::DataQualityData</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">eurid_contact_extension</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">super</span><span class="ident">::eurid::ContactExtension</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">isnic_info</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">super</span><span class="ident">::isnic::ContactInfo</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">qualified_lawyer</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">QualifiedLawyerInfo</span><span class="op">&gt;</span>,
 }
 
@@ -748,6 +756,7 @@
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">auth_info</span>: <span class="ident">String</span>,
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">eurid_contact_extension</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">super</span><span class="ident">::eurid::ContactExtension</span><span class="op">&gt;</span>,
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">qualified_lawyer</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">QualifiedLawyerInfo</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">isnic_info</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">super</span><span class="ident">::isnic::ContactCreate</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">return_path</span>: <span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">CreateResponse</span><span class="op">&gt;</span>,
 }
 
@@ -790,6 +799,7 @@
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">new_auth_info</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">new_eurid_contact_extension</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">super</span><span class="ident">::eurid::ContactExtensionUpdate</span><span class="op">&gt;</span>,
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">qualified_lawyer</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">QualifiedLawyerInfo</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">isnic_info</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">super</span><span class="ident">::isnic::ContactUpdate</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">return_path</span>: <span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">UpdateResponse</span><span class="op">&gt;</span>,
 }
 
@@ -904,6 +914,7 @@
     <span class="kw">pub</span> <span class="ident">disclosure</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">DisclosureType</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">auth_info</span>: <span class="ident">String</span>,
     <span class="kw">pub</span> <span class="ident">eurid_info</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">super</span><span class="ident">::eurid::ContactExtension</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">isnic_info</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">super</span><span class="ident">::isnic::ContactCreate</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">qualified_lawyer</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">QualifiedLawyerInfo</span><span class="op">&gt;</span>,
 }
 
@@ -938,6 +949,7 @@
             <span class="ident">disclosure</span>: <span class="ident">data</span>.<span class="ident">disclosure</span>,
             <span class="ident">auth_info</span>: <span class="ident">data</span>.<span class="ident">auth_info</span>,
             <span class="ident">eurid_contact_extension</span>: <span class="ident">data</span>.<span class="ident">eurid_info</span>,
+            <span class="ident">isnic_info</span>: <span class="ident">data</span>.<span class="ident">isnic_info</span>,
             <span class="ident">qualified_lawyer</span>: <span class="ident">data</span>.<span class="ident">qualified_lawyer</span>,
             <span class="ident">return_path</span>: <span class="ident">sender</span>,
         })),
@@ -988,6 +1000,7 @@
     <span class="kw">pub</span> <span class="ident">disclosure</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">DisclosureType</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">auth_info</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">eurid_info</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">super</span><span class="ident">::eurid::ContactExtensionUpdate</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">isnic_info</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">super</span><span class="ident">::isnic::ContactUpdate</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">qualified_lawyer</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">QualifiedLawyerInfo</span><span class="op">&gt;</span>,
 }
 
@@ -1027,6 +1040,7 @@
             <span class="ident">new_disclosure</span>: <span class="ident">new_data</span>.<span class="ident">disclosure</span>,
             <span class="ident">new_auth_info</span>: <span class="ident">new_data</span>.<span class="ident">auth_info</span>,
             <span class="ident">new_eurid_contact_extension</span>: <span class="ident">new_data</span>.<span class="ident">eurid_info</span>,
+            <span class="ident">isnic_info</span>: <span class="ident">new_data</span>.<span class="ident">isnic_info</span>,
             <span class="ident">qualified_lawyer</span>: <span class="ident">new_data</span>.<span class="ident">qualified_lawyer</span>,
             <span class="ident">return_path</span>: <span class="ident">sender</span>,
         })),
