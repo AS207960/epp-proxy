@@ -85,6 +85,9 @@ router!(
     ContactTransferAccept,  super::contact::handle_transfer_accept,   super::contact::handle_transfer_response;
     ContactTransferReject,  super::contact::handle_transfer_reject,   super::contact::handle_transfer_response;
     NominetTagList,         super::nominet::handle_tag_list,          super::nominet::handle_tag_list_response;
+    NominetAccept,          super::nominet::handle_accept,            super::nominet::handle_handshake_response;
+    NominetReject,          super::nominet::handle_reject,            super::nominet::handle_handshake_response;
+    NominetRelease,         super::nominet::handle_release,           super::nominet::handle_release_response;
     Balance,                super::balance::handle_balance,           super::balance::handle_balance_response;
     MaintenanceList,        super::maintenance::handle_list,          super::maintenance::handle_list_response;
     MaintenanceInfo,        super::maintenance::handle_info,          super::maintenance::handle_info_response;

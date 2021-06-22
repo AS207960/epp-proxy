@@ -140,6 +140,9 @@ router!(
     ContactTransferAccept,  super::contact::TransferRequestRequest,     super::contact::TransferResponse;
     ContactTransferReject,  super::contact::TransferRequestRequest,     super::contact::TransferResponse;
     NominetTagList,         super::nominet::TagListRequest,             super::nominet::TagListResponse;
+    NominetAccept,          super::nominet::HandshakeAcceptRequest,     super::nominet::HandshakeResponse;
+    NominetReject,          super::nominet::HandshakeRejectRequest,     super::nominet::HandshakeResponse;
+    NominetRelease,         super::nominet::ReleaseRequest,             super::nominet::ReleaseResponse;
     Balance,                super::balance::BalanceRequest,             super::balance::BalanceResponse;
     MaintenanceList,        super::maintenance::ListRequest,            super::maintenance::ListResponse;
     MaintenanceInfo,        super::maintenance::InfoRequest,            super::maintenance::InfoResponse;

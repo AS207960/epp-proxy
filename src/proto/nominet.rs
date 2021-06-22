@@ -18,6 +18,145 @@ pub struct EPPTagInfoData {
     pub handshake: String,
 }
 
+#[derive(Debug, Serialize)]
+pub struct EPPDomainCreate {
+    #[serde(
+        rename = "{http://www.nominet.org.uk/epp/xml/domain-nom-ext-1.2}domain-nom-ext:first-bill",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub first_bill: Option<EPPDomainBillCode>,
+    #[serde(
+        rename = "{http://www.nominet.org.uk/epp/xml/domain-nom-ext-1.2}domain-nom-ext:recur-bill",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub recur_bill: Option<EPPDomainBillCode>,
+    #[serde(
+        rename = "{http://www.nominet.org.uk/epp/xml/domain-nom-ext-1.2}domain-nom-ext:auto-bill",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub auto_bill: Option<u8>,
+    #[serde(
+        rename = "{http://www.nominet.org.uk/epp/xml/domain-nom-ext-1.2}domain-nom-ext:next-bill",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub next_bill: Option<u8>,
+    #[serde(
+        rename = "{http://www.nominet.org.uk/epp/xml/domain-nom-ext-1.2}domain-nom-ext:auto-period",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub auto_period: Option<u8>,
+    #[serde(
+        rename = "{http://www.nominet.org.uk/epp/xml/domain-nom-ext-1.2}domain-nom-ext:next-period",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub next_period: Option<u8>,
+    #[serde(
+        rename = "{http://www.nominet.org.uk/epp/xml/domain-nom-ext-1.2}domain-nom-ext:notes",
+        skip_serializing_if = "Vec::is_empty"
+    )]
+    pub notes: Vec<String>,
+    #[serde(
+        rename = "{http://www.nominet.org.uk/epp/xml/domain-nom-ext-1.2}domain-nom-ext:reseller",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub reseller: Option<String>,
+}
+
+#[derive(Debug, Serialize)]
+pub struct EPPDomainUpdate {
+    #[serde(
+        rename = "{http://www.nominet.org.uk/epp/xml/domain-nom-ext-1.2}domain-nom-ext:first-bill",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub first_bill: Option<Option<EPPDomainBillCode>>,
+    #[serde(
+        rename = "{http://www.nominet.org.uk/epp/xml/domain-nom-ext-1.2}domain-nom-ext:recur-bill",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub recur_bill: Option<Option<EPPDomainBillCode>>,
+    #[serde(
+        rename = "{http://www.nominet.org.uk/epp/xml/domain-nom-ext-1.2}domain-nom-ext:auto-bill",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub auto_bill: Option<Option<u8>>,
+    #[serde(
+        rename = "{http://www.nominet.org.uk/epp/xml/domain-nom-ext-1.2}domain-nom-ext:next-bill",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub next_bill: Option<Option<u8>>,
+    #[serde(
+        rename = "{http://www.nominet.org.uk/epp/xml/domain-nom-ext-1.2}domain-nom-ext:auto-period",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub auto_period: Option<Option<u8>>,
+    #[serde(
+        rename = "{http://www.nominet.org.uk/epp/xml/domain-nom-ext-1.2}domain-nom-ext:next-period",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub next_period: Option<Option<u8>>,
+    #[serde(
+        rename = "{http://www.nominet.org.uk/epp/xml/domain-nom-ext-1.2}domain-nom-ext:renew-not-required",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub renew_not_required: Option<bool>,
+    #[serde(
+        rename = "{http://www.nominet.org.uk/epp/xml/domain-nom-ext-1.2}domain-nom-ext:notes",
+        skip_serializing_if = "Vec::is_empty"
+    )]
+    pub notes: Vec<String>,
+    #[serde(
+        rename = "{http://www.nominet.org.uk/epp/xml/domain-nom-ext-1.2}domain-nom-ext:reseller",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub reseller: Option<Option<String>>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct EPPDomainCheckData {
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/domain-nom-ext-1.2}abuse-limit")]
+    pub abuse_limit: u64
+}
+
+#[derive(Debug, Deserialize)]
+pub struct EPPDomainInfoData {
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/domain-nom-ext-1.2}reg-status")]
+    pub reg_status: EPPDomainRegistrationStatus,
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/domain-nom-ext-1.2}first-bill")]
+    pub first_bill: Option<EPPDomainBillCode>,
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/domain-nom-ext-1.2}recur-bill")]
+    pub recur_bill: Option<EPPDomainBillCode>,
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/domain-nom-ext-1.2}auto-bill")]
+    pub auto_bill: Option<u8>,
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/domain-nom-ext-1.2}next-bill")]
+    pub next_bill: Option<u8>,
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/domain-nom-ext-1.2}auto-period")]
+    pub auto_period: Option<u8>,
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/domain-nom-ext-1.2}next-period")]
+    pub next_period: Option<u8>,
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/domain-nom-ext-1.2}notes")]
+    pub notes: Vec<String>,
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/domain-nom-ext-1.2}reseller")]
+    pub reseller: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub enum EPPDomainBillCode {
+    #[serde(rename = "th")]
+    Registrar,
+    #[serde(rename = "bc")]
+    Customer
+}
+
+#[derive(Debug, Deserialize)]
+pub enum EPPDomainRegistrationStatus {
+    #[serde(rename = "Registered until expiry date.")]
+    RegisteredUntilExpiry,
+    #[serde(rename = "Renewal required.")]
+    RenewalRequired,
+    #[serde(rename = "No longer required")]
+    NoLongerRequired,
+}
+
 #[derive(Debug, Deserialize, Serialize)]
 pub struct EPPContactInfo {
     #[serde(
@@ -85,6 +224,14 @@ pub struct EPPIgnoredField {
 }
 
 #[derive(Debug, Deserialize)]
+pub struct EPPHostIgnored {
+    #[serde(rename = "$attr:host-name")]
+    pub host_name: String,
+    #[serde(rename = "$value")]
+    pub message: String,
+}
+
+#[derive(Debug, Deserialize)]
 pub struct EPPTruncatedField {
     #[serde(rename = "$attr:field-name")]
     pub field_name: String,
@@ -106,6 +253,12 @@ pub enum EPPDataQualityStatus {
     Valid,
     #[serde(rename = "invalid")]
     Invalid,
+}
+
+#[derive(Debug, Serialize)]
+pub enum EPPDataQualityUpdate {
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/nom-data-quality-1.1}validate")]
+    Validate {}
 }
 
 #[derive(Debug, Deserialize)]
@@ -300,4 +453,85 @@ pub struct EPPTransferData {
     pub domain_list: EPPDomainListData,
     #[serde(rename = "{urn:ietf:params:xml:ns:contact-1.0}infData")]
     pub contact: super::contact::EPPContactInfoData,
+}
+
+#[derive(Debug, Serialize)]
+pub struct EPPHandshakeAccept {
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/std-handshake-1.0}handshake:caseId")]
+    pub case_id: String,
+    #[serde(
+        rename = "{http://www.nominet.org.uk/epp/xml/std-handshake-1.0}handshake:registrant",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub registrant: Option<String>,
+}
+
+#[derive(Debug, Serialize)]
+pub struct EPPHandshakeReject {
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/std-handshake-1.0}handshake:caseId")]
+    pub case_id: String,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct EPPHandshakeData {
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/std-handshake-1.0}caseId")]
+    pub case_id: String,
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/std-handshake-1.0}domainListData", default)]
+    pub domain_list: Option<EPPHandshakeDomainListData>
+}
+
+#[derive(Debug, Deserialize)]
+pub struct EPPHandshakeDomainListData {
+    #[serde(rename = "$attr:noDomains")]
+    pub count: u32,
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/std-handshake-1.0}domainName")]
+    pub domain_names: Vec<String>,
+}
+
+#[derive(Debug, Serialize)]
+pub struct EPPRelease {
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/std-release-1.0}release:registrarTag")]
+    pub registrar_tag: String,
+    #[serde(rename = "$value")]
+    pub object: EPPReleaseObject,
+}
+
+#[derive(Debug, Serialize)]
+pub enum EPPReleaseObject {
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/std-release-1.0}release:domainName")]
+    Domain(String),
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/std-release-1.0}release:registrant")]
+    Registrant(String)
+}
+
+#[derive(Debug, Serialize)]
+pub struct EPPLock {
+    #[serde(rename = "$attr:type")]
+    pub lock_type: String,
+    #[serde(rename = "$attr:object")]
+    pub object_type: EPPLockObjectType,
+    #[serde(rename = "$value")]
+    pub object: EPPReleaseObject,
+}
+
+#[derive(Debug, Serialize)]
+pub enum EPPLockObject {
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/std-locks-1.0}lock:domainName")]
+    Domain(String),
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/std-locks-1.0}lock:contactId")]
+    Registrant(String)
+}
+
+#[derive(Debug, Serialize)]
+pub enum EPPLockObjectType {
+    #[serde(rename = "domain")]
+    Domain,
+    #[serde(rename = "contact")]
+    Registrant
+}
+
+#[derive(Debug, Serialize)]
+pub struct EPPUnrenew {
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/std-unrenew-1.0}unrenew:domainName")]
+    pub domains: Vec<String>
 }

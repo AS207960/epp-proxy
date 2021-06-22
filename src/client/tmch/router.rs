@@ -87,6 +87,9 @@ router!(
     ContactTransferAccept,  request_nop,  response_nop;
     ContactTransferReject,  request_nop,  response_nop;
     NominetTagList,         request_nop,  response_nop;
+    NominetAccept,          request_nop,  response_nop;
+    NominetReject,          request_nop,  response_nop;
+    NominetRelease,         request_nop,  response_nop;
     Balance,                request_nop,  response_nop;
     MaintenanceList,        request_nop,  response_nop;
     MaintenanceInfo,        request_nop,  response_nop;

@@ -47,6 +47,9 @@ service EPPProxy {
     rpc MaintenanceInfo        (maintenance.MaintenanceInfoRequest)       returns (maintenance.MaintenanceInfoReply);
     rpc Poll                   (stream PollAck)                           returns (stream PollReply);
     rpc NominetTagList         (RegistryInfo)                             returns (nominet.NominetTagListReply);
+    rpc NominetAccept          (nominet.HandshakeAcceptRequest)           returns (nominet.HandshakeReply);
+    rpc NominetReject          (nominet.HandshakeRejectRequest)           returns (nominet.HandshakeReply);
+    rpc NominetRelease         (nominet.ReleaseRequest)                   returns (nominet.ReleaseReply);
     rpc BalanceInfo            (RegistryInfo)                             returns (BalanceReply);
     rpc HitPointsInfo          (RegistryInfo)                             returns (eurid.HitPointsReply);
     rpc RegistrationLimitInfo  (RegistryInfo)                             returns (eurid.RegistrationLimitReply);

@@ -1505,6 +1505,16 @@ impl From<client::nominet::RegistrantTransferData> for epp_proto::nominet::Regis
     }
 }
 
+impl From<client::nominet::HandshakeResponse> for epp_proto::nominet::HandshakeReply {
+    fn from(res: client::nominet::HandshakeResponse) -> Self {
+        epp_proto::nominet::HandshakeReply {
+            case_id: res.case_id,
+            domains: res.domains,
+            cmd_resp: None,
+        }
+    }
+}
+
 impl From<epp_proto::launch::Phase> for client::launch::LaunchPhase {
     fn from(from: epp_proto::launch::Phase) -> Self {
         client::launch::LaunchPhase {
@@ -3571,6 +3581,71 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                     handshake: t.handshake,
                 })
                 .collect(),
+            cmd_resp: Some(cmd_resp),
+        };
+
+        Ok(tonic::Response::new(reply))
+    }
+
+    async fn nominet_accept(
+        &self,
+        request: tonic::Request<epp_proto::nominet::HandshakeAcceptRequest>,
+    ) -> Result<tonic::Response<epp_proto::nominet::HandshakeReply>, tonic::Status> {
+        let request = request.into_inner();
+        let mut sender = client_by_id(&self.client_router, &request.registry_name)?;
+
+        let (resp, cmd_resp) = map_command_response(client::nominet::handshake_accept(
+            &request.case_id,
+            request.registrant.as_deref(),
+            &mut sender
+        ).await?);
+
+        let mut reply: epp_proto::nominet::HandshakeReply = resp.into();
+        reply.cmd_resp = Some(cmd_resp);
+
+        Ok(tonic::Response::new(reply))
+    }
+
+    async fn nominet_reject(
+        &self,
+        request: tonic::Request<epp_proto::nominet::HandshakeRejectRequest>,
+    ) -> Result<tonic::Response<epp_proto::nominet::HandshakeReply>, tonic::Status> {
+        let request = request.into_inner();
+        let mut sender = client_by_id(&self.client_router, &request.registry_name)?;
+
+        let (resp, cmd_resp) = map_command_response(client::nominet::handshake_reject(
+            &request.case_id,
+            &mut sender
+        ).await?);
+
+        let mut reply: epp_proto::nominet::HandshakeReply = resp.into();
+        reply.cmd_resp = Some(cmd_resp);
+
+        Ok(tonic::Response::new(reply))
+    }
+
+    async fn nominet_release(
+        &self,
+        request: tonic::Request<epp_proto::nominet::ReleaseRequest>,
+    ) -> Result<tonic::Response<epp_proto::nominet::ReleaseReply>, tonic::Status> {
+        let request = request.into_inner();
+        let mut sender = client_by_id(&self.client_router, &request.registry_name)?;
+
+        let (resp, cmd_resp) = map_command_response(client::nominet::release(
+            &request.registrar_tag,
+            match request.object {
+                Some(epp_proto::nominet::release_request::Object::Domain(d)) => client::nominet::ReleaseObject::Domain(d),
+                Some(epp_proto::nominet::release_request::Object::Registrant(r)) => client::nominet::ReleaseObject::Registrant(r),
+                None => return Err(tonic::Status::invalid_argument(
+                    "release object must be specified",
+                ))
+            },
+            &mut sender
+        ).await?);
+
+        let reply = epp_proto::nominet::ReleaseReply {
+            pending: resp.pending,
+            message: resp.message,
             cmd_resp: Some(cmd_resp),
         };
 

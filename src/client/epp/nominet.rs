@@ -3,7 +3,8 @@
 use super::super::nominet::{
     CancelData, DataQualityData, DataQualityStatus, DomainFailData, HostCancelData, ProcessData,
     ProcessStage, RegistrantTransferData, RegistrarChangeData, ReleaseData, SuspendData, Tag,
-    TagListRequest, TagListResponse,
+    TagListRequest, TagListResponse, HandshakeAcceptRequest, HandshakeRejectRequest,
+    HandshakeResponse, ReleaseRequest, ReleaseResponse, ReleaseObject,
 };
 use super::super::{proto, Error, Response, ServerFeatures};
 use super::router::HandleReqReturn;
@@ -167,6 +168,91 @@ impl From<&proto::nominet::EPPDataQualityInfo> for DataQualityData {
                 .as_ref()
                 .map(|d| d.domains.iter().map(|s| s.into()).collect()),
         }
+    }
+}
+
+pub fn handle_accept(
+    client: &ServerFeatures,
+    req: &HandshakeAcceptRequest,
+) -> HandleReqReturn<HandshakeResponse> {
+    if !client.nominet_handshake {
+        return Err(Err(Error::Unsupported));
+    }
+    let command = proto::nominet::EPPHandshakeAccept {
+        case_id: req.case_id.to_owned(),
+        registrant: req.registrant.as_deref().map(Into::into)
+    };
+    Ok((proto::EPPCommandType::Update(Box::new(
+        proto::EPPUpdate::NominetHandshakeAccept(command)
+    )), None))
+}
+
+pub fn handle_reject(
+    client: &ServerFeatures,
+    req: &HandshakeRejectRequest,
+) -> HandleReqReturn<HandshakeResponse> {
+    if !client.nominet_handshake {
+        return Err(Err(Error::Unsupported));
+    }
+    let command = proto::nominet::EPPHandshakeReject {
+        case_id: req.case_id.to_owned(),
+    };
+    Ok((proto::EPPCommandType::Update(Box::new(
+        proto::EPPUpdate::NominetHandshakeReject(command)
+    )), None))
+}
+
+
+pub fn handle_handshake_response(response: proto::EPPResponse) -> Response<HandshakeResponse> {
+    match response.data {
+        Some(value) => match value.value {
+            proto::EPPResultDataValue::NominetHandshakeData(msg) => {
+                Response::Ok(HandshakeResponse {
+                    case_id: msg.case_id,
+                    domains: msg.domain_list.and_then(|l| Some(l.domain_names)).unwrap_or_else(|| vec![]),
+                })
+            }
+            _ => Err(Error::ServerInternal),
+        },
+        None => Err(Error::ServerInternal),
+    }
+}
+
+pub fn handle_release(
+    client: &ServerFeatures,
+    req: &ReleaseRequest,
+) -> HandleReqReturn<ReleaseResponse> {
+    if !client.nominet_release {
+        return Err(Err(Error::Unsupported));
+    }
+    let command = proto::nominet::EPPRelease {
+        registrar_tag: req.registrar_tag.to_owned(),
+        object: match &req.object {
+            ReleaseObject::Domain(d) => proto::nominet::EPPReleaseObject::Domain(d.to_owned()),
+            ReleaseObject::Registrant(d) => proto::nominet::EPPReleaseObject::Registrant(d.to_owned()),
+        }
+    };
+    Ok((proto::EPPCommandType::Update(Box::new(
+        proto::EPPUpdate::NominetRelease(command)
+    )), None))
+}
+
+pub fn handle_release_response(response: proto::EPPResponse) -> Response<ReleaseResponse> {
+    let pending = response.is_pending();
+    match response.data {
+        Some(value) => match value.value {
+            proto::EPPResultDataValue::NominetReleasePending(msg) => {
+                Response::Ok(ReleaseResponse {
+                    pending,
+                    message: Some(msg),
+                })
+            }
+            _ => Err(Error::ServerInternal),
+        },
+        None => Response::Ok(ReleaseResponse {
+            pending,
+            message: None
+        }),
     }
 }
 

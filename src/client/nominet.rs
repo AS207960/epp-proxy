@@ -4,6 +4,44 @@ use super::{CommandResponse, RequestMessage, Sender};
 use chrono::prelude::*;
 
 #[derive(Debug)]
+pub struct HandshakeAcceptRequest {
+    pub(super) case_id: String,
+    pub(super) registrant: Option<String>,
+    pub return_path: Sender<HandshakeResponse>,
+}
+
+#[derive(Debug)]
+pub struct HandshakeRejectRequest {
+    pub(super) case_id: String,
+    pub return_path: Sender<HandshakeResponse>,
+}
+
+#[derive(Debug)]
+pub struct HandshakeResponse {
+    pub case_id: String,
+    pub domains: Vec<String>,
+}
+
+#[derive(Debug)]
+pub struct ReleaseRequest {
+    pub(super) registrar_tag: String,
+    pub(super) object: ReleaseObject,
+    pub return_path: Sender<ReleaseResponse>,
+}
+
+#[derive(Debug)]
+pub enum ReleaseObject {
+    Domain(String),
+    Registrant(String)
+}
+
+#[derive(Debug)]
+pub struct ReleaseResponse {
+    pub pending: bool,
+    pub message: Option<String>
+}
+
+#[derive(Debug)]
 pub struct TagListRequest {
     pub return_path: Sender<TagListResponse>,
 }
@@ -111,6 +149,78 @@ pub struct DataQualityData {
     pub lock_applied: Option<bool>,
     pub domains: Option<Vec<String>>,
 }
+
+/// Accepts a pending transfer in
+///
+/// # Arguments
+/// * `case_id` - The Nominet assigned case ID
+/// * `registrant` - Optional account to assign the domain to
+/// * `client_sender` - Reference to the tokio channel into the client
+pub async fn handshake_accept(
+    case_id: &str,
+    registrant: Option<&str>,
+    client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
+) -> Result<CommandResponse<HandshakeResponse>, super::Error> {
+    let (sender, receiver) = futures::channel::oneshot::channel();
+    super::send_epp_client_request(
+        client_sender,
+        RequestMessage::NominetAccept(Box::new(HandshakeAcceptRequest {
+            case_id: case_id.to_owned(),
+            registrant: registrant.map(Into::into),
+            return_path: sender,
+        })),
+        receiver,
+    )
+    .await
+}
+
+
+/// Rejects a pending transfer in
+///
+/// # Arguments
+/// * `case_id` - The Nominet assigned case ID
+/// * `client_sender` - Reference to the tokio channel into the client
+pub async fn handshake_reject(
+    case_id: &str,
+    client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
+) -> Result<CommandResponse<HandshakeResponse>, super::Error> {
+    let (sender, receiver) = futures::channel::oneshot::channel();
+    super::send_epp_client_request(
+        client_sender,
+        RequestMessage::NominetReject(Box::new(HandshakeRejectRequest {
+            case_id: case_id.to_owned(),
+            return_path: sender,
+        })),
+        receiver,
+    )
+    .await
+}
+
+
+/// Requests the transfer out of a domain
+///
+/// # Arguments
+/// * `registrar_tag` - Target registrar TAG
+/// * `object` - Object to release
+/// * `client_sender` - Reference to the tokio channel into the client
+pub async fn release(
+    registrar_tag: &str,
+    object: ReleaseObject,
+    client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
+) -> Result<CommandResponse<ReleaseResponse>, super::Error> {
+    let (sender, receiver) = futures::channel::oneshot::channel();
+    super::send_epp_client_request(
+        client_sender,
+        RequestMessage::NominetRelease(Box::new(ReleaseRequest {
+            registrar_tag: registrar_tag.to_owned(),
+            object,
+            return_path: sender,
+        })),
+        receiver,
+    )
+    .await
+}
+
 
 /// Fetches a list of registered tags
 ///

@@ -24,6 +24,7 @@ pub mod switch;
 pub mod traficom;
 pub mod united_tld;
 pub mod verisign;
+pub mod tmch;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub enum EPPMessageType {
@@ -601,6 +602,10 @@ pub enum EPPResultDataValue {
     NominetDomainFailData(nominet::EPPDomainFailData),
     #[serde(rename = "{http://www.nominet.org.uk/epp/xml/std-notifications-1.2}trnData")]
     NominetTransferData(nominet::EPPTransferData),
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/std-handshake-1.0}hanData")]
+    NominetHandshakeData(nominet::EPPHandshakeData),
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/std-release-1.0}releasePending")]
+    NominetReleasePending(String),
     #[serde(rename = "{http://www.eurid.eu/xml/epp/registrarFinance-1.0}infData")]
     EURIDRegistrarFinanceData(eurid::EURIDRegistrarFinanceInfoData),
     #[serde(rename = "{http://www.eurid.eu/xml/epp/registrarHitPoints-1.0}infData")]
@@ -673,6 +678,8 @@ pub enum EPPResponseExtensionType {
     NominetPostalInfoIgnored(nominet::EPPPostalInfoIgnored),
     #[serde(rename = "{http://www.nominet.org.uk/epp/xml/std-warning-1.1}truncated-field")]
     NominetTruncatedField(nominet::EPPTruncatedField),
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/std-warning-1.1}host-ignored")]
+    NominetHostIgnored(nominet::EPPHostIgnored),
     #[serde(rename = "{http://www.nominet.org.uk/epp/xml/nom-data-quality-1.1}infData")]
     NominetDataQuality(nominet::EPPDataQualityInfo),
     #[serde(rename = "{http://www.verisign.com/epp/whoisInf-1.0}whoisInfData")]
@@ -879,6 +886,12 @@ pub enum EPPUpdate {
     Contact(contact::EPPContactUpdate),
     #[serde(rename = "{urn:ietf:params:xml:ns:domain-1.0}domain:update")]
     Domain(domain::EPPDomainUpdate),
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/std-handshake-1.0}handshake:accept")]
+    NominetHandshakeAccept(nominet::EPPHandshakeAccept),
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/std-handshake-1.0}handshake:reject")]
+    NominetHandshakeReject(nominet::EPPHandshakeReject),
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/std-release-1.0}release:release")]
+    NominetRelease(nominet::EPPRelease),
 }
 
 #[derive(Debug, Serialize)]

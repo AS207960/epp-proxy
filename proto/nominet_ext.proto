@@ -4,6 +4,58 @@ package epp.nominet_ext;
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/wrappers.proto";
 
+message DomainCreate {
+    BillType first_bill = 1;
+    BillType recur_bill = 2;
+    google.protobuf.UInt32Value auto_bill = 3;
+    google.protobuf.UInt32Value next_bill = 4;
+    google.protobuf.UInt32Value auto_period = 5;
+    google.protobuf.UInt32Value next_period = 6;
+    repeated string notes = 7;
+    google.protobuf.StringValue reseller = 8;
+}
+
+message DomainUpdate {
+    BillType first_bill = 1;
+    BillType recur_bill = 2;
+    google.protobuf.UInt32Value auto_bill = 3;
+    google.protobuf.UInt32Value next_bill = 4;
+    google.protobuf.UInt32Value auto_period = 5;
+    google.protobuf.UInt32Value next_period = 6;
+    bool renewal_not_required = 7;
+    repeated string notes = 8;
+    google.protobuf.StringValue reseller = 9;
+}
+
+enum BillType {
+    Unspecified = 0;
+    BillRegistrar = 1;
+    BillCustomer = 2;
+}
+
+message DomainCheckInfo {
+    uint64 abuse_limit = 1;
+}
+
+message DomainInfo {
+    RegistrationStatus registration_status = 1;
+    BillType first_bill = 2;
+    BillType recur_bill = 3;
+    google.protobuf.UInt32Value auto_bill = 4;
+    google.protobuf.UInt32Value next_bill = 5;
+    google.protobuf.UInt32Value auto_period = 6;
+    google.protobuf.UInt32Value next_period = 7;
+    bool renewal_not_required = 8;
+    repeated string notes = 9;
+    google.protobuf.StringValue reseller = 10;
+}
+
+enum RegistrationStatus {
+    RegisteredUntilExpiry = 0;
+    RenewalRequired = 1;
+    NoLongerRequired = 2;
+}
+
 enum DataQualityStatus {
     Invalid = 0;
     Valid = 1;

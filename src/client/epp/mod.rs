@@ -625,6 +625,12 @@ impl EPPClient {
         self.features.nominet_data_quality = greeting
             .service_menu
             .supports_ext("http://www.nominet.org.uk/epp/xml/nom-data-quality-1.1");
+        self.features.nominet_handshake = greeting
+            .service_menu
+            .supports_ext("http://www.nominet.org.uk/epp/xml/std-handshake-1.0");
+        self.features.nominet_release = greeting
+            .service_menu
+            .supports_ext("http://www.nominet.org.uk/epp/xml/std-release-1.0");
         self.features.switch_balance = greeting
             .service_menu
             .supports_ext("https://www.nic.ch/epp/balance-1.0");
@@ -773,6 +779,12 @@ impl EPPClient {
             if self.features.nominet_data_quality {
                 ext_objects
                     .push("http://www.nominet.org.uk/epp/xml/nom-data-quality-1.1".to_string())
+            }
+            if self.features.nominet_handshake {
+                ext_objects.push("http://www.nominet.org.uk/epp/xml/std-handshake-1.0".to_string())
+            }
+            if self.features.nominet_release {
+                ext_objects.push("http://www.nominet.org.uk/epp/xml/std-release-1.0".to_string())
             }
             if self.features.switch_balance {
                 ext_objects.push("https://www.nic.ch/epp/balance-1.0".to_string())

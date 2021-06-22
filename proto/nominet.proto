@@ -7,6 +7,38 @@ import "domain.proto";
 import "contact.proto";
 import "common.proto";
 
+message HandshakeAcceptRequest {
+    string registry_name = 1;
+    string case_id = 2;
+    google.protobuf.StringValue registrant = 3;
+}
+
+message HandshakeRejectRequest {
+    string registry_name = 1;
+    string case_id = 2;
+}
+
+message HandshakeReply {
+    string case_id = 1;
+    repeated string domains = 2;
+    common.CommandResponse cmd_resp = 3;
+}
+
+message ReleaseRequest {
+    string registry_name = 1;
+    string registrar_tag = 2;
+    oneof object {
+        string domain = 3;
+        string registrant = 4;
+    }
+}
+
+message ReleaseReply {
+    bool pending = 1;
+    google.protobuf.StringValue message = 2;
+    common.CommandResponse cmd_resp = 3;
+}
+
 message NominetTagListReply {
     message Tag {
         string tag = 1;

@@ -54,6 +54,10 @@ pub struct ServerFeatures {
     nominet_contact_ext: bool,
     /// http://www.nominet.org.uk/epp/xml/nom-data-quality-1.1 support
     nominet_data_quality: bool,
+    /// http://www.nominet.org.uk/epp/xml/std-handshake-1.0 support
+    nominet_release: bool,
+    /// http://www.nominet.org.uk/epp/xml/std-release-1.0 support
+    nominet_handshake: bool,
     /// https://www.nic.ch/epp/balance-1.0 support
     switch_balance: bool,
     /// http://www.verisign.com/epp/balance-1.0 support
