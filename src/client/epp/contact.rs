@@ -812,15 +812,19 @@ pub fn handle_create(
                 let contains_local_org = d.contains(&DisclosureType::LocalOrganisation);
                 let contains_int_org = d.contains(&DisclosureType::InternationalisedOrganisation);
 
-                let suppress_int_name = client.nominet_contact_ext && contains_local_name
-                    && contains_int_name && req.local_address.is_some();
-                let suppress_local_name = client.nominet_contact_ext && contains_local_name
-                    && contains_int_name && !suppress_int_name;
+                let suppress_int_name = client.nominet_contact_ext;
+                let suppress_local_name = client.nominet_contact_ext;
 
                 let suppress_int_addr = client.nominet_contact_ext && contains_local_addr
                     && contains_int_addr && req.local_address.is_some();
                 let suppress_local_addr = client.nominet_contact_ext && contains_local_addr
                     && contains_int_addr && !suppress_int_addr;
+
+                if client.nominet_contact_ext && contains_local_name && !contains_local_org {
+                    d.push(DisclosureType::LocalOrganisation);
+                } else if client.nominet_contact_ext && contains_int_name && !contains_int_org {
+                    d.push(DisclosureType::InternationalisedOrganisation);
+                }
 
                 let suppress_int_org = client.nominet_contact_ext && contains_local_org
                     && contains_int_org && req.local_address.is_some();
