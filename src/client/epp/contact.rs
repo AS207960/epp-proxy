@@ -805,10 +805,43 @@ pub fn handle_create(
         disclose: match client.switch_balance {
             true => None,
             false => req.disclosure.clone().map(|mut d| {
+                let contains_local_name = d.contains(&DisclosureType::LocalName);
+                let contains_int_name = d.contains(&DisclosureType::InternationalisedName);
+                let contains_local_addr = d.contains(&DisclosureType::LocalAddress);
+                let contains_int_addr = d.contains(&DisclosureType::InternationalisedAddress);
+                let contains_local_org = d.contains(&DisclosureType::LocalOrganisation);
+                let contains_int_org = d.contains(&DisclosureType::InternationalisedOrganisation);
+
+                let suppress_int_name = client.nominet_contact_ext && contains_local_name
+                    && contains_int_name && req.local_address.is_some();
+                let suppress_local_name = client.nominet_contact_ext && contains_local_name
+                    && contains_int_name && !suppress_int_name;
+
+                let suppress_int_addr = client.nominet_contact_ext && contains_local_addr
+                    && contains_int_addr && req.local_address.is_some();
+                let suppress_local_addr = client.nominet_contact_ext && contains_local_addr
+                    && contains_int_addr && !suppress_int_addr;
+
+                let suppress_int_org = client.nominet_contact_ext && contains_local_org
+                    && contains_int_org && req.local_address.is_some();
+                let suppress_local_org = client.nominet_contact_ext && contains_local_org
+                    && contains_int_org && !suppress_int_org;
+
+
                 d.sort_unstable_by_key(|a| (*a as i32));
                 proto::contact::EPPContactDisclosure {
                     flag: true,
-                    elements: d.iter().map(|e| e.into()).collect(),
+                    elements: d.iter()
+                        .filter(|d| match d {
+                            DisclosureType::LocalName => !suppress_local_name,
+                            DisclosureType::InternationalisedName => !suppress_int_name,
+                            DisclosureType::LocalAddress => !suppress_local_addr,
+                            DisclosureType::InternationalisedAddress => !suppress_int_addr,
+                            DisclosureType::LocalOrganisation => !suppress_local_org,
+                            DisclosureType::InternationalisedOrganisation => !suppress_int_org,
+                            _ => true
+                        })
+                        .map(|e| e.into()).collect(),
                 }
             }),
         },

@@ -130,7 +130,7 @@ pub enum EntityType {
     Unknown,
 }
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub enum DisclosureType {
     LocalName = 1,
     InternationalisedName = 2,
@@ -143,7 +143,7 @@ pub enum DisclosureType {
     Email = 9,
 }
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub enum Status {
     ClientDeleteProhibited,
     ClientTransferProhibited,
