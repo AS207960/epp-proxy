@@ -2,19 +2,19 @@ use paste::paste;
 
 pub use super::super::{router, Error, Response};
 
-pub type HandleReqReturn<T> = Result<(), Response<T>>;
+pub type HandleReqReturn<T> = Result<super::tmch_proto::TMCHCommandType, Response<T>>;
 
 macro_rules! router {
     ($($n:ident, $req_handle:path, $res_handle:path);*) => {
         #[derive(Default, Debug)]
         pub struct Router {}
 
-        impl router::InnerRouter for Router {
-            type Request = ();
-            type Response = ();
+        impl router::InnerRouter<()> for Router {
+            type Request = super::tmch_proto::TMCHCommandType;
+            type Response = super::tmch_proto::TMCHResponse;
 
             paste! {
-                $(fn [<$n _request>](&mut self, client: &super::ServerFeatures, req: &router::[<$n Request>], _command_id: uuid::Uuid) -> HandleReqReturn<router::[<$n Response>]> {
+                $(fn [<$n _request>](&mut self, client: &(), req: &router::[<$n Request>], _command_id: uuid::Uuid) -> HandleReqReturn<router::[<$n Response>]> {
                     $req_handle(client, &req)
                 })*
 
@@ -45,7 +45,7 @@ macro_rules! router {
     }
 }
 
-fn request_nop<T, R>(_client: &super::ServerFeatures, _req: &T) -> HandleReqReturn<R> {
+fn request_nop<T, R>(_client: &(), _req: &T) -> HandleReqReturn<R> {
     Err(Response::Err(Error::Unsupported))
 }
 
@@ -54,7 +54,7 @@ fn response_nop<T, R>(_response: T) -> Result<R, Error> {
 }
 
 router!(
-    Logout,                 request_nop,  response_nop;
+    Logout,                 super::handle_logout,  super::handle_logout_response;
     Poll,                   request_nop,  response_nop;
     PollAck,                request_nop,  response_nop;
     DomainCheck,            request_nop,  response_nop;

@@ -5,7 +5,8 @@ use super::super::host::{
     DeleteRequest, DeleteResponse, InfoRequest, InfoResponse, Status, UpdateObject, UpdateRequest,
     UpdateResponse,
 };
-use super::super::{proto, Error, Response, ServerFeatures};
+use super::super::{proto, Error, Response};
+use super::ServerFeatures;
 use super::router::HandleReqReturn;
 
 impl From<proto::host::EPPHostStatusType> for Status {

@@ -1,6 +1,7 @@
 use paste::paste;
 
 pub use super::super::{router, Error, Response};
+use super::ServerFeatures;
 
 pub type HandleReqReturn<T> = Result<
     (
@@ -15,7 +16,7 @@ macro_rules! router {
         #[derive(Default, Debug)]
         pub struct Router {}
 
-        impl router::InnerRouter for Router {
+        impl router::InnerRouter<ServerFeatures> for Router {
             type Request = (super::proto::EPPCommandType, Option<Vec<super::proto::EPPCommandExtensionType>>);
             type Response = super::proto::EPPResponse;
 

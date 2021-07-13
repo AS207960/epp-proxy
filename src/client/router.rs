@@ -34,7 +34,8 @@ macro_rules! router {
 
         #[allow(non_snake_case)]
         #[derive(Default, Debug)]
-        pub struct Router<I: InnerRouter> {
+        pub struct Router<I: InnerRouter<T>, T> {
+            _marker: std::marker::PhantomData<T>,
             inner: Box<I>,
             $($n: HashMap<uuid::Uuid, Sender<$res>>,)*
         }
@@ -46,16 +47,16 @@ macro_rules! router {
 
         paste! {
             #[allow(non_snake_case)]
-            pub trait InnerRouter {
+            pub trait InnerRouter<T> {
                 type Request;
                 type Response;
 
-                $(fn [<$n _request>](&mut self, client: &super::ServerFeatures, req: &$req, command_id: uuid::Uuid) -> Result<Self::Request, Response<$res>>;)*
+                $(fn [<$n _request>](&mut self, client: &T, req: &$req, command_id: uuid::Uuid) -> Result<Self::Request, Response<$res>>;)*
                 $(fn [<$n _response>](&mut self, return_path: Sender<$res>, response: Self::Response);)*
             }
         }
 
-        impl<I: InnerRouter> Router<I> {
+        impl<T, I: InnerRouter<T>> Router<I, T> {
             pub fn reject_request(req: RequestMessage) {
                 match req {
                     $(RequestMessage::$n(req) => {let _ = req.return_path.send(Err(Error::NotReady));},)*
@@ -68,7 +69,7 @@ macro_rules! router {
                 })*
             }
 
-            pub fn handle_request(&mut self, client: &super::ServerFeatures, req: RequestMessage) ->
+            pub fn handle_request(&mut self, client: &T, req: RequestMessage) ->
              Option<(I::Request, uuid::Uuid)> {
                 match req {
                     $(RequestMessage::$n(req) => {

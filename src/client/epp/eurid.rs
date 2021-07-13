@@ -7,7 +7,8 @@ use super::super::eurid::{
     DomainRenewInfo, DomainTransfer, DomainTransferInfo, DomainUpdate, HitPointsRequest,
     HitPointsResponse, Idn, PollResponse, RegistrationLimitRequest, RegistrationLimitResponse,
 };
-use super::super::{proto, Error, Response, ServerFeatures};
+use super::super::{proto, Error, Response};
+use super::ServerFeatures;
 use super::router::HandleReqReturn;
 
 pub fn eurid_ext_to_entity(

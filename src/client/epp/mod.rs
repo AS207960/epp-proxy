@@ -1,14 +1,12 @@
 use super::{
-    router as outer_router, ClientCertConf, LogoutRequest, RequestMessage, ServerFeatures,
+    router as outer_router, LogoutRequest, RequestMessage,
 };
+use super::Client;
 use crate::proto;
 use chrono::prelude::*;
-use foreign_types_shared::ForeignType;
 use futures::future::FutureExt;
 use futures::stream::StreamExt;
 use futures::SinkExt;
-use tokio::io::AsyncWriteExt;
-use tokio::net::TcpStream;
 
 pub mod balance;
 pub mod contact;
@@ -40,31 +38,170 @@ fn recv_msg(data: String, host: &str) -> Result<proto::EPPMessage, ()> {
     Ok(message)
 }
 
+fn send_msg(data: &proto::EPPMessage, host: &str) -> Result<String, ()> {
+    let encoded_msg = match xml_serde::to_string(data) {
+        Ok(m) => m,
+        Err(err) => {
+            error!("Error serialising message for {}: {}", host, err);
+            return Err(());
+        }
+    };
+    Ok(encoded_msg)
+}
+
+
+/// Features supported by the server
+#[derive(Debug, Default)]
+pub struct ServerFeatures {
+    /// For naughty servers
+    errata: Option<String>,
+    language: String,
+    /// RFC 5731 support
+    domain_supported: bool,
+    /// RFC 5732 support
+    host_supported: bool,
+    /// RFC 5733 support
+    contact_supported: bool,
+    /// RFC 8590 support
+    change_poll_supported: bool,
+    /// RFC 3915 support
+    rgp_supported: bool,
+    /// RFC 5910 support
+    secdns_supported: bool,
+    /// http://www.nominet.org.uk/epp/xml/std-notifications-1.2 support
+    nominet_notifications: bool,
+    /// http://www.nominet.org.uk/epp/xml/nom-tag-1.0 support
+    nominet_tag_list: bool,
+    /// http://www.nominet.org.uk/epp/xml/contact-nom-ext-1.0 support
+    nominet_contact_ext: bool,
+    /// http://www.nominet.org.uk/epp/xml/nom-data-quality-1.1 support
+    nominet_data_quality: bool,
+    /// http://www.nominet.org.uk/epp/xml/std-handshake-1.0 support
+    nominet_release: bool,
+    /// http://www.nominet.org.uk/epp/xml/std-release-1.0 support
+    nominet_handshake: bool,
+    /// https://www.nic.ch/epp/balance-1.0 support
+    switch_balance: bool,
+    /// http://www.verisign.com/epp/balance-1.0 support
+    verisign_balance: bool,
+    /// http://www.unitedtld.com/epp/finance-1.0 support
+    unitedtld_balance: bool,
+    /// http://www.unitedtld.com/epp/charge-1.0 support
+    unitedtld_charge: bool,
+    /// http://www.verisign.com/epp/lowbalance-poll-1.0 support
+    verisign_low_balance: bool,
+    /// http://www.verisign.com/epp/whoisInf-1.0 support
+    verisign_whois_info: bool,
+    /// http://xmlns.corenic.net/epp/mark-ext-1.0 support
+    corenic_mark: bool,
+    /// urn:ietf:params:xml:ns:nsset-1.2 support (NOT AN ACTUAL IETF NAMESPACE)
+    nsset_supported: bool,
+    /// RFC 8748 support
+    fee_supported: bool,
+    /// RFC 8334 support
+    launch_supported: bool,
+    /// urn:ietf:params:xml:ns:fee-0.11 support
+    fee_011_supported: bool,
+    /// urn:ietf:params:xml:ns:fee-0.9 support
+    fee_09_supported: bool,
+    /// urn:ietf:params:xml:ns:fee-0.8 support
+    fee_08_supported: bool,
+    /// urn:ietf:params:xml:ns:fee-0.7 support
+    fee_07_supported: bool,
+    /// urn:ietf:params:xml:ns:fee-0.5 support
+    fee_05_supported: bool,
+    /// urn:ietf:params:xml:ns:epp:unhandled-namespaces-1.0 support
+    unhandled_ns_supported: bool,
+    /// urn:ietf:params:xml:ns:epp:eai-0.2 support
+    eai_supported: bool,
+    /// urn:ietf:params:xml:ns:epp:maintenance-0.3 support
+    maintenance_supported: bool,
+    /// RFC8807 support
+    login_sec_supported: bool,
+    /// http://www.eurid.eu/xml/epp/contact-ext-1.3 support
+    eurid_contact_support: bool,
+    /// http://www.eurid.eu/xml/epp/domain-ext-2.4 support
+    eurid_domain_support: bool,
+    /// http://www.eurid.eu/xml/epp/dnsQuality-2.0 support
+    eurid_dns_quality_support: bool,
+    /// http://www.eurid.eu/xml/epp/dnssecEligibility-1.0 support
+    eurid_dnssec_eligibility_support: bool,
+    /// http://www.eurid.eu/xml/epp/homoglyph-1.0 support
+    eurid_homoglyph_supported: bool,
+    /// http://www.eurid.eu/xml/epp/authInfo-1.1 support
+    eurid_auth_info_supported: bool,
+    /// http://www.eurid.eu/xml/epp/idn-1.0 support
+    eurid_idn_supported: bool,
+    /// http://www.eurid.eu/xml/epp/registrarFinance-1.0 support
+    eurid_finance_supported: bool,
+    /// http://www.eurid.eu/xml/epp/registrarHitPoints-1.0 support
+    eurid_hit_points_supported: bool,
+    /// http://www.eurid.eu/xml/epp/registrationLimit-1.1 support
+    eurid_registration_limit_supported: bool,
+    /// http://www.eurid.eu/xml/epp/poll-1.2 support
+    eurid_poll_supported: bool,
+    /// urn:ietf:params:xml:ns:qualifiedLawyer-1.0 support
+    qualified_lawyer_supported: bool,
+    /// http://www.verisign.com/epp/sync-1.0 support
+    verisign_sync_supported: bool,
+    /// urn:is.isnic:xml:ns:is-ext-domain-1.0 support
+    isnic_domain_supported: bool,
+    /// urn:is.isnic:xml:ns:is-ext-host-1.0 support
+    isnic_host_supported: bool,
+    /// urn:is.isnic:xml:ns:is-ext-contact-1.0 support
+    isnic_contact_supported: bool,
+    /// urn:is.isnic:xml:ns:is-ext-list-1.0 support
+    isnic_list_supported: bool,
+    /// urn:is.isnic:xml:ns:is-ext-account-1.0 support
+    isnic_account_supported: bool,
+}
+
+impl ServerFeatures {
+    fn has_erratum(&self, name: &str) -> bool {
+        match &self.errata {
+            Some(s) => s == name,
+            None => false,
+        }
+    }
+}
+
+
 /// Main client struct for the EEP client
 #[derive(Debug)]
 pub struct EPPClient {
     log_dir: std::path::PathBuf,
     host: String,
-    hostname: String,
     tag: String,
     password: String,
     new_password: Option<String>,
-    tls_context: openssl::ssl::SslContext,
     server_id: String,
     pipelining: bool,
     is_awaiting_response: bool,
     is_closing: bool,
     /// Is the EPP server in a state to receive and process commands
     ready: bool,
-    router: outer_router::Router<router::Router>,
+    router: outer_router::Router<router::Router, ServerFeatures>,
     /// What features does the server support
     features: ServerFeatures,
     nominet_tag_list_subordinate: bool,
     nominet_tag_list_subordinate_client: Option<futures::channel::mpsc::Sender<RequestMessage>>,
+    tls_client: super::epp_like::tls_client::TLSClient,
 }
 
-lazy_static! {
-    static ref TLS_CONNECT_LOCK: tokio::sync::Semaphore = tokio::sync::Semaphore::new(1);
+impl super::Client for EPPClient {
+    // Starts up the EPP client and returns the sending end of a tokio channel to inject
+    // commands into the client to be processed
+    fn start(mut self: Box<Self>) -> futures::channel::mpsc::Sender<RequestMessage> {
+        info!("EPP Client for {} starting...", &self.host);
+        if self.nominet_tag_list_subordinate {
+            info!("This is a Nominet Tag list subordinate client");
+        }
+        let (sender, receiver) = futures::channel::mpsc::channel::<RequestMessage>(16);
+        tokio::spawn(async move {
+            self._main_loop(receiver).await;
+        });
+        sender
+    }
 }
 
 impl EPPClient {
@@ -72,114 +209,19 @@ impl EPPClient {
     ///
     /// # Arguments
     /// * `conf` - Configuration to use for this client
-    pub async fn new<'a, C: Into<Option<&'a str>>, S: Into<Option<ClientCertConf<'a>>>>(
-        conf: super::ClientConf<'a, C, S>,
+    pub async fn new<'a, C: Into<Option<&'a str>>>(
+        conf: super::ClientConf<'a, C>,
         pkcs11_engine: Option<crate::P11Engine>,
     ) -> std::io::Result<Self> {
-        let mut context_builder =
-            openssl::ssl::SslContext::builder(openssl::ssl::SslMethod::tls_client())?;
-        context_builder.set_min_proto_version(Some(openssl::ssl::SslVersion::TLS1_2))?;
-
-        if conf.danger_accept_invalid_certs {
-            context_builder.set_verify(openssl::ssl::SslVerifyMode::NONE);
-        } else {
-            context_builder.set_verify(openssl::ssl::SslVerifyMode::PEER);
-        }
-
-        let hostname = conf
-            .host
-            .rsplitn(2, ':')
-            .collect::<Vec<_>>()
-            .pop()
-            .unwrap()
-            .to_string();
-
-        let mut cert_store = openssl::x509::store::X509StoreBuilder::new()?;
-        if conf.root_certs.is_empty() {
-            cert_store.set_default_paths()?;
-        } else {
-            for root_cert_path in conf.root_certs.iter() {
-                let root_cert_bytes = tokio::fs::read(root_cert_path).await?;
-                let root_cert = openssl::x509::X509::from_pem(&root_cert_bytes)?;
-                cert_store.add_cert(root_cert)?;
-            }
-        }
-        let cert_store = cert_store.build();
-        context_builder.set_cert_store(cert_store);
-
-        if !conf.danger_accept_invalid_hostname {
-            context_builder
-                .verify_param_mut()
-                .set_hostflags(openssl::x509::verify::X509CheckFlags::NO_PARTIAL_WILDCARDS);
-            context_builder.verify_param_mut().set_host(&hostname)?;
-        }
-
-        let mut priv_key = None;
-
-        if let Some(client_cert) = conf.client_cert.into() {
-            match client_cert {
-                ClientCertConf::PKCS12(pkcs12_file) => {
-                    let pkcs = tokio::fs::read(pkcs12_file).await?;
-                    let identity = openssl::pkcs12::Pkcs12::from_der(&pkcs)?.parse("")?;
-                    context_builder.set_certificate(&identity.cert)?;
-                    context_builder.set_private_key(&identity.pkey)?;
-                    for cert in identity.chain.into_iter().flatten() {
-                        context_builder.add_extra_chain_cert(cert)?;
-                    }
-                }
-                ClientCertConf::PKCS11 { key_id, cert_chain } => {
-                    context_builder.set_certificate_chain_file(cert_chain)?;
-                    priv_key.replace(key_id);
-                }
-            }
-        }
-
-        let context = context_builder.build();
-
-        if let Some(key_id) = priv_key {
-            let pkcs11_engine = match pkcs11_engine {
-                Some(e) => e,
-                None => {
-                    return Err(std::io::Error::new(
-                        std::io::ErrorKind::Other,
-                        "PKCS#11 engine required to used PKCS#11 keys",
-                    ));
-                }
-            };
-
-            info!("Using PKCS#11 key ID {} for {} ", key_id, hostname);
-            let engine_key_id = std::ffi::CString::new(key_id).unwrap();
-            let ctx = context.clone();
-            let h = hostname.clone();
-            // This sometimes takes absolutely forever to run, so throw it in a thread type thing.
-            tokio::task::spawn_blocking(move || -> std::io::Result<()> {
-                unsafe {
-                    trace!("Loading OpenSSL UI for {}", h);
-                    let ui = crate::cvt_p(openssl_sys::UI_OpenSSL())?;
-                    trace!("Loading private key for for {}", h);
-                    let priv_key = crate::cvt_p(openssl_sys::ENGINE_load_private_key(
-                        **pkcs11_engine.claim(),
-                        engine_key_id.as_ptr(),
-                        ui,
-                        std::ptr::null_mut(),
-                    ))?;
-                    trace!("Setting private key for for {}", h);
-                    openssl_sys::SSL_CTX_use_PrivateKey(ctx.as_ptr(), priv_key);
-                    trace!("Freeing private key for {}", h);
-                    openssl_sys::EVP_PKEY_free(priv_key);
-                    Ok(())
-                }
-            })
-            .await??;
-        }
+        let tls_client = super::epp_like::tls_client::TLSClient::new(
+            (&conf).into(), pkcs11_engine
+        ).await?;
 
         Ok(Self {
             log_dir: conf.log_dir,
             host: conf.host.to_string(),
-            hostname,
             tag: conf.tag.to_string(),
             password: conf.password.to_string(),
-            tls_context: context,
             new_password: conf.new_password.into().map(|c| c.to_string()),
             pipelining: conf.pipelining,
             features: ServerFeatures {
@@ -193,21 +235,8 @@ impl EPPClient {
             nominet_tag_list_subordinate_client: None,
             ready: false,
             router: outer_router::Router::default(),
+            tls_client,
         })
-    }
-
-    // Starts up the EPP server and returns the sending end of a tokio channel to inject
-    // commands into the client to be processed
-    pub fn start(mut self) -> futures::channel::mpsc::Sender<RequestMessage> {
-        info!("EPP Client for {} starting...", &self.host);
-        if self.nominet_tag_list_subordinate {
-            info!("This is a Nominet Tag list subordinate client");
-        }
-        let (sender, receiver) = futures::channel::mpsc::channel::<RequestMessage>(16);
-        tokio::spawn(async move {
-            self._main_loop(receiver).await;
-        });
-        sender
     }
 
     async fn _main_loop(&mut self, receiver: futures::channel::mpsc::Receiver<RequestMessage>) {
@@ -217,15 +246,15 @@ impl EPPClient {
             self.is_awaiting_response = false;
 
             let mut sock = {
-                trace!("Getting connection for {}", self.hostname);
-                let connect_fut = self._connect().fuse();
+                trace!("Getting connection for {}", self.host);
+                let connect_fut = self.tls_client.connect().fuse();
                 futures::pin_mut!(connect_fut);
 
                 loop {
                     futures::select! {
                         x = receiver.next() => {
                             match x {
-                                Some(x) => outer_router::Router::<router::Router>::reject_request(x),
+                                Some(x) => outer_router::Router::<router::Router, ServerFeatures>::reject_request(x),
                                 None => {
                                     info!("All senders for {} dropped, exiting...", self.host);
                                     return
@@ -238,18 +267,18 @@ impl EPPClient {
                     }
                 }
             };
-            trace!("Got connection for {}", self.hostname);
+            trace!("Got connection for {}", self.host);
 
             {
                 let exit_str = format!("All senders for {} dropped, exiting...", self.host);
-                trace!("Setting up connection to {}", self.hostname);
+                trace!("Setting up connection to {}", self.host);
                 let setup_fut = self._setup_connection(&mut sock).fuse();
                 futures::pin_mut!(setup_fut);
                 match loop {
                     futures::select! {
                         x = receiver.next() => {
                             match x {
-                                Some(x) => outer_router::Router::<router::Router>::reject_request(x),
+                                Some(x) => outer_router::Router::<router::Router, ServerFeatures>::reject_request(x),
                                 None => {
                                     info!("{}", exit_str);
                                     return
@@ -272,7 +301,7 @@ impl EPPClient {
                     }
                 }
             }
-            trace!("Connection setup to {}", self.hostname);
+            trace!("Connection setup to {}", self.host);
 
             let (sock_read, mut sock_write) = tokio::io::split(sock);
             let msg_receiver = super::epp_like::ClientReceiver {
@@ -284,7 +313,7 @@ impl EPPClient {
             let mut message_channel = msg_receiver.run().fuse();
             let mut keepalive_interval = tokio::time::interval(tokio::time::Duration::new(120, 0));
 
-            trace!("Entering event loop for {}", self.hostname);
+            trace!("Entering event loop for {}", self.host);
             loop {
                 if self.pipelining || !self.is_awaiting_response {
                     futures::select! {
@@ -378,7 +407,9 @@ impl EPPClient {
             message: proto::EPPMessageType::Hello {},
         };
         self.is_awaiting_response = true;
-        let receiver = self._send_msg(&message, sock_write).fuse();
+        let receiver = super::epp_like::send_msg(
+            &self.host, sock_write, &self.log_dir, send_msg, &message
+        ).fuse();
         let mut delay = Box::pin(tokio::time::sleep(tokio::time::Duration::new(15, 0)).fuse());
         futures::pin_mut!(receiver);
         let resp = futures::select! {
@@ -529,7 +560,7 @@ impl EPPClient {
 
     async fn _setup_connection(
         &mut self,
-        sock: &mut tokio_openssl::SslStream<TcpStream>,
+        sock: &mut super::epp_like::tls_client::TLSConnection,
     ) -> Result<(), bool> {
         let msg = match super::epp_like::recv_msg(sock, &self.host, &self.log_dir, recv_msg).await {
             Ok(m) => m,
@@ -743,7 +774,7 @@ impl EPPClient {
         Ok(())
     }
 
-    async fn _login(&mut self, sock: &mut tokio_openssl::SslStream<TcpStream>) -> Result<(), ()> {
+    async fn _login(&mut self, sock: &mut super::epp_like::tls_client::TLSConnection) -> Result<(), ()> {
         let mut objects = vec![];
         let mut ext_objects = vec![];
 
@@ -880,12 +911,10 @@ impl EPPClient {
             if self.features.nominet_tag_list {
                 let new_client = Self {
                     host: self.host.clone(),
-                    hostname: self.hostname.clone(),
                     tag: self.tag.clone(),
                     password: self.password.clone(),
                     nominet_tag_list_subordinate: true,
                     log_dir: self.log_dir.clone(),
-                    tls_context: self.tls_context.clone(),
                     new_password: None,
                     pipelining: self.pipelining,
                     features: ServerFeatures {
@@ -898,8 +927,9 @@ impl EPPClient {
                     nominet_tag_list_subordinate_client: None,
                     ready: false,
                     router: outer_router::Router::default(),
+                    tls_client: self.tls_client.clone(),
                 };
-                self.nominet_tag_list_subordinate_client = Some(new_client.start());
+                self.nominet_tag_list_subordinate_client = Some(Box::new(new_client).start());
             }
         }
 
@@ -938,7 +968,7 @@ impl EPPClient {
         new_password: Option<String>,
         objects: Vec<String>,
         ext_objects: Vec<String>,
-        sock: &mut tokio_openssl::SslStream<TcpStream>,
+        sock: &mut super::epp_like::tls_client::TLSConnection,
     ) -> Result<(), bool> {
         let mut command = proto::EPPLogin {
             client_id: self.tag.clone(),
@@ -1084,155 +1114,22 @@ impl EPPClient {
         let message = proto::EPPMessage {
             message: proto::EPPMessageType::Command(Box::new(command)),
         };
-        match self._send_msg(&message, sock).await {
+        match super::epp_like::send_msg(
+            &self.host, sock, &self.log_dir, send_msg, &message
+        ).await {
             Ok(_) => Ok(message_id),
             Err(_) => Err(()),
         }
     }
 
-    async fn _send_msg<W: std::marker::Unpin + tokio::io::AsyncWrite>(
-        &self,
-        message: &proto::EPPMessage,
-        sock: &mut W,
-    ) -> Result<(), ()> {
-        let encoded_msg = xml_serde::to_string(message).unwrap();
-        debug!(
-            "Sending EPP message to {} with contents: {}",
-            self.hostname, encoded_msg
-        );
-        let msg_bytes = encoded_msg.as_bytes();
-        let msg_len = msg_bytes.len() + 4;
-        match sock.write_u32(msg_len as u32).await {
-            Ok(_) => {}
-            Err(err) => {
-                error!("Error writing data unit length to {}: {}", &self.host, err);
-                return Err(());
-            }
-        };
-        match sock.write(msg_bytes).await {
-            Ok(_) => {}
-            Err(err) => {
-                error!("Error writing data unit to {}: {}", &self.host, err);
-                return Err(());
-            }
-        }
-        match super::epp_like::write_msg_log(&encoded_msg, "send", &self.log_dir).await {
-            Ok(_) => {}
-            Err(e) => {
-                error!("Failed writing sent message to message log: {}", e);
-            }
-        }
-        Ok(())
-    }
-
-    async fn _close(&mut self, sock: &mut tokio_openssl::SslStream<TcpStream>) {
+    async fn _close(&mut self, sock: &mut super::epp_like::tls_client::TLSConnection) {
         self.router.drain();
-        match sock.shutdown().await {
-            Ok(_) => {
-                info!("Connection to {} closed", &self.host);
-            }
-            Err(err) => {
-                error!(
-                    "Error closing connection to {}: {}, dropping anyway",
-                    &self.host, err
-                );
-            }
-        }
-    }
-
-    async fn _connect(&self) -> tokio_openssl::SslStream<TcpStream> {
-        loop {
-            match self._try_connect().await {
-                Ok(s) => {
-                    info!("Successfully connected to {}", &self.host);
-                    return s;
-                }
-                Err(_) => {
-                    tokio::time::sleep(tokio::time::Duration::new(5, 0)).await;
-                }
-            }
-        }
-    }
-
-    async fn _try_connect(&self) -> Result<tokio_openssl::SslStream<TcpStream>, ()> {
-        let addr = match tokio::net::lookup_host(&self.host).await {
-            Ok(mut s) => match s.next() {
-                Some(s) => s,
-                None => {
-                    error!("Resolving {} returned no records", self.host);
-                    return Err(());
-                }
-            },
-            Err(err) => {
-                error!("Failed to resolve {}: {}", self.host, err);
-                return Err(());
-            }
-        };
-
-        // Many servers <drop the connection if no TLS data is sent within ~10 seconds.
-        // We therefore have to make sure only one thread at a time connects TLS otherwise a thread
-        // could open a TCP stream and then wait a while for another thread to negotiate TLS
-        // (it shouldn't be blocking because async, but sometimes it is), by which time the server
-        // has dropped the connection and it all has to start again.
-        //
-        // Please don't ask how this happens>, or how I found out, just don't try and fix this.
-        trace!("Getting connect lock for {}", self.hostname);
-        let lock = TLS_CONNECT_LOCK.acquire().await.unwrap();
-        trace!("Setting up TLS stream for {}", self.hostname);
-
-        trace!("Opening TCP connection to {}", self.hostname);
-        let socket = match tokio::net::TcpStream::connect(&addr).await {
-            Ok(s) => s,
-            Err(err) => {
-                error!("Unable to connect to {}: {}", self.host, err);
-                return Err(());
-            }
-        };
-
-        trace!("Creating TLS context for {}", self.hostname);
-        let mut cx = match (move || -> std::io::Result<tokio_openssl::SslStream<TcpStream>> {
-            let mut ssl = openssl::ssl::Ssl::new(&self.tls_context)?;
-            ssl.set_hostname(&self.hostname)?;
-            let cx = tokio_openssl::SslStream::new(ssl, socket)?;
-            Ok(cx)
-        })() {
-            Ok(s) => Box::pin(s),
-            Err(err) => {
-                error!("Unable to create TLS context: {}", err);
-                return Err(());
-            }
-        };
-        // I know this is disgusting, but OpenSSL isn't actually async compatible when using
-        // a HSM.
-        trace!("Negotiating TLS connection to {}", self.hostname);
-        let res = match tokio::task::spawn_blocking(
-            move || -> Result<tokio_openssl::SslStream<TcpStream>, openssl::ssl::Error> {
-                futures::executor::block_on(std::pin::Pin::as_mut(&mut cx).connect())?;
-                Ok(*std::pin::Pin::into_inner(cx))
-            },
-        )
-        .await
-        {
-            Ok(s) => match s {
-                Ok(c) => Ok(c),
-                Err(err) => {
-                    error!("Unable to start TLS session to {}: {}", self.host, err);
-                    return Err(());
-                }
-            },
-            Err(err) => {
-                error!("Unable to start TLS session to {}: {}", self.host, err);
-                return Err(());
-            }
-        };
-        trace!("Dropping connect lock for {}", self.hostname);
-        std::mem::drop(lock);
-        res
+        sock.close().await
     }
 }
 
 pub fn handle_logout(
-    _client: &super::ServerFeatures,
+    _client: &ServerFeatures,
     _req: &LogoutRequest,
 ) -> router::HandleReqReturn<()> {
     Ok((proto::EPPCommandType::Logout {}, None))
@@ -1240,4 +1137,18 @@ pub fn handle_logout(
 
 pub fn handle_logout_response(_response: proto::EPPResponse) -> super::Response<()> {
     super::Response::Ok(())
+}
+
+impl From<&proto::EPPTransferStatus> for super::TransferStatus {
+    fn from(from: &proto::EPPTransferStatus) -> Self {
+        use proto::EPPTransferStatus;
+        match from {
+            EPPTransferStatus::ClientApproved => super::TransferStatus::ClientApproved,
+            EPPTransferStatus::ClientCancelled => super::TransferStatus::ClientCancelled,
+            EPPTransferStatus::ClientRejected => super::TransferStatus::ClientRejected,
+            EPPTransferStatus::Pending => super::TransferStatus::Pending,
+            EPPTransferStatus::ServerApproved => super::TransferStatus::ServerApproved,
+            EPPTransferStatus::ServerCancelled => super::TransferStatus::ServerCancelled,
+        }
+    }
 }

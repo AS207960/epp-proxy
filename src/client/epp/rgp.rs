@@ -1,7 +1,8 @@
 //! EPP commands relating to nominet specific features
 
 use super::super::rgp::{RGPState, RestoreRequest, RestoreResponse};
-use super::super::{proto, Error, Response, ServerFeatures};
+use super::super::{proto, Error, Response};
+use super::ServerFeatures;
 use super::router::HandleReqReturn;
 
 impl From<&proto::rgp::EPPRGPState> for RGPState {

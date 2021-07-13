@@ -1,7 +1,8 @@
 //! EPP commands relating to balance enquiries
 
 use super::super::balance::{BalanceRequest, BalanceResponse, CreditThreshold};
-use super::super::{proto, Error, Response, ServerFeatures};
+use super::super::{proto, Error, Response};
+use super::ServerFeatures;
 use super::router::HandleReqReturn;
 
 pub fn handle_balance(

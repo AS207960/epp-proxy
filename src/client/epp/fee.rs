@@ -2,6 +2,7 @@ use super::super::fee::{
     Applied, Command, Credit, DonutsAmount, DonutsCategory, DonutsFeeData, DonutsFeeSet,
     DonutsFeeType, DonutsFeeTypes, Fee, FeeAgreement, FeeData,
 };
+use super::ServerFeatures;
 use super::super::proto;
 
 impl From<&proto::fee::EPPFeeCommand> for Command {
@@ -436,7 +437,7 @@ impl From<&FeeAgreement> for proto::fee::EPPFee10Agreement {
 }
 
 pub fn handle_donuts_fee_agreement<T>(
-    client: &super::super::ServerFeatures,
+    client: &ServerFeatures,
     agreement: &Option<DonutsFeeData>,
     exts: &mut Vec<super::proto::EPPCommandExtensionType>,
 ) -> Result<(), super::super::router::Response<T>> {

@@ -11,7 +11,8 @@ use super::super::domain::{
     TransferRequestRequest, TransferResponse, UpdateObject, UpdateRequest, UpdateResponse,
     UpdateSecDNSRemove, VerisignSyncRequest,
 };
-use super::super::{fee, launch, proto, Error, Response, ServerFeatures};
+use super::super::{fee, launch, proto, Error, Response};
+use super::ServerFeatures;
 use super::router::HandleReqReturn;
 
 impl From<proto::domain::EPPDomainStatusType> for Status {

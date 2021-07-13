@@ -4,7 +4,8 @@ use super::super::maintenance::{
     Description, Environment, Impact, InfoRequest, InfoResponse, Intervention, ListRequest,
     ListResponse, ListResponseItem, PollType, Reason, System,
 };
-use super::super::{proto, Error, Response, ServerFeatures};
+use super::super::{proto, Error, Response};
+use super::ServerFeatures;
 use super::router::HandleReqReturn;
 
 impl From<proto::maintenance::EPPMaintenanceItem> for InfoResponse {

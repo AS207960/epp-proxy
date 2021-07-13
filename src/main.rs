@@ -49,7 +49,6 @@ extern crate serde_derive;
 #[macro_use]
 extern crate lazy_static;
 
-use crate::client::epp::EPPClient;
 use std::collections::HashMap;
 
 mod client;
@@ -101,7 +100,9 @@ struct ConfigFile {
 
 #[derive(Debug, Deserialize)]
 enum ConfigServerType {
+    #[serde(rename = "EPP")]
     Epp,
+    #[serde(rename = "TMCH")]
     Tmch,
 }
 
@@ -130,7 +131,7 @@ impl Router {
         }
     }
 
-    fn add_client(&mut self, epp_client: EPPClient, config: ConfigFile) {
+    fn add_client(&mut self, epp_client: Box<dyn client::Client>, config: ConfigFile) {
         let epp_client_sender = epp_client.start();
 
         for zone in &config.zones {
@@ -436,39 +437,39 @@ async fn main() {
                 return;
             }
         }
-        let epp_client = match client::epp::EPPClient::new(
-            client::ClientConf {
-                host: &config.server,
-                tag: &config.tag,
-                password: &config.password,
-                log_dir,
-                client_cert: match &config.client_cert {
-                    Some(ClientCertConfig::PKCS12(s)) => Some(client::ClientCertConf::PKCS12(s)),
-                    Some(ClientCertConfig::PKCS11 { key_id, cert_chain }) => {
-                        Some(client::ClientCertConf::PKCS11 { key_id, cert_chain })
-                    }
-                    _ => None,
-                },
-                client_key_id: None,
-                root_certs: &match config.root_certs.as_ref() {
-                    Some(r) => r.iter().map(|c| c.as_str()).collect::<Vec<_>>(),
-                    None => vec![],
-                },
-                danger_accept_invalid_certs: config.danger_accept_invalid_certs.unwrap_or(false),
-                danger_accept_invalid_hostname: config
-                    .danger_accept_invalid_hostnames
-                    .unwrap_or(false),
-                new_password: config.new_password.as_deref(),
-                pipelining: config.pipelining,
-                errata: config.errata.clone(),
+        let client_conf = client::ClientConf {
+            host: &config.server,
+            tag: &config.tag,
+            password: &config.password,
+            log_dir,
+            client_cert: match &config.client_cert {
+                Some(ClientCertConfig::PKCS12(s)) => Some(client::ClientCertConf::PKCS12(s)),
+                Some(ClientCertConfig::PKCS11 { key_id, cert_chain }) => {
+                    Some(client::ClientCertConf::PKCS11 { key_id, cert_chain })
+                }
+                _ => None,
             },
-            pkcs11_engine.clone(),
-        )
-        .await
-        {
+            root_certs: &match config.root_certs.as_ref() {
+                Some(r) => r.iter().map(|c| c.as_str()).collect::<Vec<_>>(),
+                None => vec![],
+            },
+            danger_accept_invalid_certs: config.danger_accept_invalid_certs.unwrap_or(false),
+            danger_accept_invalid_hostname: config
+                .danger_accept_invalid_hostnames
+                .unwrap_or(false),
+            new_password: config.new_password.as_deref(),
+            pipelining: config.pipelining,
+            errata: config.errata.clone(),
+        };
+        let epp_client = match match config.server_type {
+            ConfigServerType::Epp => client::epp::EPPClient::new(client_conf, pkcs11_engine.clone())
+                .await.map(|c| Box::new(c) as Box::<dyn client::Client>),
+            ConfigServerType::Tmch => client::tmch::TMCHClient::new(client_conf, pkcs11_engine.clone())
+                .await.map(|c| Box::new(c) as Box::<dyn client::Client>),
+        } {
             Ok(c) => c,
             Err(e) => {
-                error!("Can't create EPP client: {}", e);
+                error!("Can't create client: {}", e);
                 return;
             }
         };

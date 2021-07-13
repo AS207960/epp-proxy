@@ -6,7 +6,8 @@ use super::super::nominet::{
     TagListRequest, TagListResponse, HandshakeAcceptRequest, HandshakeRejectRequest,
     HandshakeResponse, ReleaseRequest, ReleaseResponse, ReleaseObject,
 };
-use super::super::{proto, Error, Response, ServerFeatures};
+use super::super::{proto, Error, Response};
+use super::ServerFeatures;
 use super::router::HandleReqReturn;
 use std::convert::TryFrom;
 

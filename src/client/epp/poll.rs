@@ -8,7 +8,8 @@ use super::super::poll::{
     ChangeCaseId, ChangeCaseIdType, ChangeData, ChangeOperation, ChangeOperationType, ChangeState,
     PollAckRequest, PollAckResponse, PollData, PollRequest, PollResponse,
 };
-use super::super::{proto, Error, Response, ServerFeatures};
+use super::super::{proto, Error, Response};
+use super::ServerFeatures;
 use super::router::HandleReqReturn;
 
 fn change_data_from_response(

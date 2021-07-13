@@ -2,6 +2,8 @@ use chrono::prelude::*;
 use futures::sink::SinkExt;
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 
+pub(super) mod tls_client;
+
 pub(super) async fn write_msg_log(
     msg: &str,
     msg_type: &str,
@@ -90,21 +92,55 @@ pub(super) async fn recv_msg<T, R: std::marker::Unpin + tokio::io::AsyncRead>(
     Ok(msg)
 }
 
+pub(super) async fn send_msg<T, W: std::marker::Unpin + tokio::io::AsyncWrite>(
+    host: &str,
+    sock: &mut W,
+    root: &std::path::Path,
+    encode_fn: fn(message: &T, host: &str) -> Result<String, ()>,
+    message: &T,
+) -> Result<(), ()> {
+    let encoded_msg = encode_fn(message, host)?;
+    debug!("Sending message to {} with contents: {}", host, encoded_msg);
+    let msg_bytes = encoded_msg.as_bytes();
+    let msg_len = msg_bytes.len() + 4;
+    match sock.write_u32(msg_len as u32).await {
+        Ok(_) => {}
+        Err(err) => {
+            error!("Error writing data unit length to {}: {}", &host, err);
+            return Err(());
+        }
+    };
+    match sock.write(msg_bytes).await {
+        Ok(_) => {}
+        Err(err) => {
+            error!("Error writing data unit to {}: {}", &host, err);
+            return Err(());
+        }
+    }
+    match write_msg_log(&encoded_msg, "send", root).await {
+        Ok(_) => {}
+        Err(e) => {
+            error!("Failed writing sent message to message log: {}", e);
+        }
+    }
+    Ok(())
+}
+
 /// Tokio task that attemps to read in messages and push them onto a tokio channel as received.
 pub(super) struct ClientReceiver<T, R: std::marker::Unpin + tokio::io::AsyncRead> {
     /// Host name for error reporting
     pub host: String,
     /// Read half of the TLS stream used to connect to the server
-    pub reader: tokio::io::ReadHalf<R>,
+    pub reader: R,
     /// Path to store received messages in
     pub root: std::path::PathBuf,
     pub decode_fn: fn(data: String, host: &str) -> Result<T, ()>,
 }
 
 impl<
-        T: 'static + std::marker::Send,
-        R: 'static + std::marker::Unpin + tokio::io::AsyncRead + std::marker::Send,
-    > ClientReceiver<T, R>
+    T: 'static + std::marker::Send,
+    R: 'static + std::marker::Unpin + tokio::io::AsyncRead + std::marker::Send,
+> ClientReceiver<T, R>
 {
     /// Starts the tokio task, and returns the receiving end of the channel to read messages from.
     pub fn run(mut self) -> futures::channel::mpsc::Receiver<Result<T, bool>> {
