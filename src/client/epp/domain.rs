@@ -5,13 +5,13 @@ use std::convert::{TryFrom, TryInto};
 use super::super::domain::{
     CheckRequest, CheckResponse, ClaimsCheckRequest, ClaimsCheckResponse, CreateData,
     CreateRequest, CreateResponse, DeleteRequest, DeleteResponse, InfoContact, InfoHost,
-    InfoNameserver, InfoRequest, InfoResponse, PanData, Period, PeriodUnit, RenewData,
+    InfoNameserver, InfoRequest, InfoResponse, PanData, RenewData,
     RenewRequest, RenewResponse, SecDNSDSData, SecDNSData, SecDNSDataType, SecDNSKeyData, Status,
     TrademarkCheckRequest, TransferAcceptRejectRequest, TransferData, TransferQueryRequest,
     TransferRequestRequest, TransferResponse, UpdateObject, UpdateRequest, UpdateResponse,
     UpdateSecDNSRemove, VerisignSyncRequest,
 };
-use super::super::{fee, launch, proto, Error, Response};
+use super::super::{fee, launch, proto, Error, Response, Period, PeriodUnit};
 use super::ServerFeatures;
 use super::router::HandleReqReturn;
 
@@ -1868,7 +1868,7 @@ pub fn handle_renew(client: &ServerFeatures, req: &RenewRequest) -> HandleReqRet
     check_domain(&req.name)?;
     let command = proto::EPPRenew::Domain(proto::domain::EPPDomainRenew {
         name: req.name.clone(),
-        period: req.add_period.as_ref().map(|p| p.into()),
+        period: req.add_period.as_ref().map(Into::into),
         current_expiry_date: req.cur_expiry_date.date(),
     });
     let mut ext = vec![];

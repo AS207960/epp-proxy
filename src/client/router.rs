@@ -150,5 +150,17 @@ router!(
     EURIDHitPoints,         super::eurid::HitPointsRequest,             super::eurid::HitPointsResponse;
     EURIDRegistrationLimit, super::eurid::RegistrationLimitRequest,     super::eurid::RegistrationLimitResponse;
     EURIDDNSSECEligibility, super::eurid::DNSSECEligibilityRequest,     super::eurid::DNSSECEligibilityResponse;
-    EURIDDNSQuality,        super::eurid::DNSQualityRequest,            super::eurid::DNSQualityResponse
+    EURIDDNSQuality,        super::eurid::DNSQualityRequest,            super::eurid::DNSQualityResponse;
+    TMCHCheck,              super::tmch::CheckRequest,                  super::tmch::CheckResponse;
+    TMCHCreate,             super::tmch::CreateRequest,                 super::tmch::CreateResponse;
+    TMCHMarkInfo,           super::tmch::MarkInfoRequest,               super::tmch::MarkInfoResponse;
+    TMCHMarkSMDInfo,        super::tmch::MarkSMDInfoRequest,            super::tmch::MarkSMDInfoResponse;
+    TMCHMarkEncodedSMDInfo, super::tmch::MarkSMDInfoRequest,            super::tmch::MarkSMDInfoResponse;
+    TMCHMarkFileInfo,       super::tmch::MarkSMDInfoRequest,            super::tmch::MarkSMDInfoResponse;
+    TMCHUpdate,             super::tmch::UpdateRequest,                 super::tmch::UpdateResponse;
+    TMCHRenew,              super::tmch::RenewRequest,                  super::tmch::RenewResponse;
+    TMCHTransferInitiate,   super::tmch::TransferInitiateRequest,       super::tmch::TransferInitiateResponse;
+    TMCHTransfer,           super::tmch::TransferRequest,               super::tmch::TransferResponse;
+    TMCHTrexActivate,       super::tmch::TrexActivateRequest,           super::tmch::TrexActivateResponse;
+    TMCHTrexRenew,          super::tmch::TrexRenewRequest,              super::tmch::TrexRenewResponse
 );

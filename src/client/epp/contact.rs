@@ -6,11 +6,11 @@ use regex::Regex;
 
 use super::super::contact::{
     Address, CheckRequest, CheckResponse, CreateRequest, CreateResponse, DeleteRequest,
-    DeleteResponse, DisclosureType, EntityType, InfoRequest, InfoResponse, PanData, Phone,
+    DeleteResponse, DisclosureType, EntityType, InfoRequest, InfoResponse, PanData,
     QualifiedLawyerInfo, Status, TransferData, TransferQueryRequest, TransferRequestRequest,
     TransferResponse, UpdateRequest, UpdateResponse,
 };
-use super::super::{proto, Error, Response};
+use super::super::{proto, Error, Response, Phone};
 use super::ServerFeatures;
 use super::router::HandleReqReturn;
 

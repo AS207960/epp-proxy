@@ -18,7 +18,7 @@ pub struct DomainUpdate {
 #[derive(Debug)]
 pub struct ContactInfo {
     pub statuses: Vec<ContactStatus>,
-    pub mobile: Option<super::contact::Phone>,
+    pub mobile: Option<super::Phone>,
     pub sid: Option<String>,
     pub auto_update_from_national_registry: bool,
     pub paper_invoices: bool,
@@ -26,7 +26,7 @@ pub struct ContactInfo {
 
 #[derive(Debug)]
 pub struct ContactCreate {
-    pub mobile: Option<super::contact::Phone>,
+    pub mobile: Option<super::Phone>,
     pub sid: Option<String>,
     pub auto_update_from_national_registry: bool,
     pub paper_invoices: bool,
@@ -35,7 +35,7 @@ pub struct ContactCreate {
 
 #[derive(Debug)]
 pub struct ContactUpdate {
-    pub mobile: Option<super::contact::Phone>,
+    pub mobile: Option<super::Phone>,
     pub auto_update_from_national_registry: Option<bool>,
     pub paper_invoices: Option<bool>,
     pub lang: Option<String>,

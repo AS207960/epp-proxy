@@ -23,6 +23,7 @@ pub mod rgp;
 pub mod router;
 pub mod traficom;
 pub mod verisign;
+pub mod mark;
 
 use crate::proto::EPPServiceExtension;
 

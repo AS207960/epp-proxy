@@ -1,0 +1,106 @@
+syntax = "proto3";
+package epp.mark;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+import "common.proto";
+
+message Mark {
+  oneof mark {
+    TradeMark trademark = 1;
+    TreatyOrStatute treaty_or_statute = 2;
+    Court court = 3;
+  }
+}
+
+message TradeMark {
+  string id = 1;
+  string mark_name = 2;
+  repeated Holder holders = 3;
+  repeated Contact contacts = 4;
+  string jurisdiction = 5;
+  repeated uint32 classes = 6;
+  repeated string labels = 7;
+  string goods_and_services = 8;
+  google.protobuf.StringValue application_id = 9;
+  google.protobuf.Timestamp application_date = 10;
+  string registration_id = 11;
+  google.protobuf.Timestamp registration_date = 12;
+  google.protobuf.Timestamp expiry_date = 13;
+}
+
+message TreatyOrStatute {
+  string id = 1;
+  string mark_name = 2;
+  repeated Holder holders = 3;
+  repeated Contact contacts = 4;
+  repeated Protection protections = 5;
+  repeated string labels = 7;
+  string goods_and_services = 8;
+  string reference_number = 9;
+  google.protobuf.Timestamp protection_date = 10;
+  string title = 11;
+  google.protobuf.Timestamp execution_date = 12;
+}
+
+message Protection {
+  string country_code = 1;
+  google.protobuf.StringValue region = 2;
+  repeated string ruling = 3;
+}
+
+message Court {
+  string id = 1;
+  string mark_name = 2;
+  repeated Holder holders = 3;
+  repeated Contact contacts = 4;
+  repeated string labels = 7;
+  string goods_and_services = 8;
+  string reference_number = 9;
+  google.protobuf.Timestamp protection_date = 10;
+  string country_code = 11;
+  repeated string regions = 12;
+  string court_name = 13;
+}
+
+message Holder {
+  google.protobuf.StringValue name = 1;
+  google.protobuf.StringValue organisation = 2;
+  Address address = 3;
+  common.Phone voice = 4;
+  common.Phone fax = 5;
+  google.protobuf.StringValue email = 6;
+  Entitlement entitlement = 7;
+}
+
+message Contact {
+  string name = 1;
+  google.protobuf.StringValue organisation = 2;
+  Address address = 3;
+  common.Phone voice = 4;
+  common.Phone fax = 5;
+  string email = 6;
+  ContactType contact_type = 7;
+}
+
+enum Entitlement {
+  Owner = 0;
+  Assignee = 1;
+  Licensee = 2;
+}
+
+enum ContactType {
+  OwnerContact = 0;
+  Agent = 1;
+  ThirdParty = 2;
+}
+
+message Address {
+  google.protobuf.StringValue street1 = 1;
+  google.protobuf.StringValue street2 = 2;
+  google.protobuf.StringValue street3 = 3;
+  string city = 4;
+  google.protobuf.StringValue province = 5;
+  google.protobuf.StringValue postal_code = 6;
+  string country_code = 7;
+}

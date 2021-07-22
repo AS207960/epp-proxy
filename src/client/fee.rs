@@ -33,7 +33,7 @@ pub enum Applied {
 #[derive(Debug)]
 pub struct FeeCheckCommand {
     pub command: Command,
-    pub period: Option<super::domain::Period>,
+    pub period: Option<super::Period>,
 }
 
 #[derive(Debug)]
@@ -46,7 +46,7 @@ pub struct FeeCheckData {
 #[derive(Debug)]
 pub struct FeeCommand {
     pub command: Command,
-    pub period: Option<super::domain::Period>,
+    pub period: Option<super::Period>,
     pub standard: Option<bool>,
     pub currency: String,
     pub fees: Vec<Fee>,
@@ -73,7 +73,7 @@ pub struct Credit {
 #[derive(Debug)]
 pub struct FeeData {
     pub currency: String,
-    pub period: Option<super::domain::Period>,
+    pub period: Option<super::Period>,
     pub fees: Vec<Fee>,
     pub credits: Vec<Credit>,
     pub balance: Option<String>,

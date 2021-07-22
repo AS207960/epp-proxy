@@ -53,6 +53,7 @@ pub struct TLSClient {
     host: String,
     hostname: String,
     tls_context: openssl::ssl::SslContext,
+    should_lock: bool,
 }
 
 #[derive(Debug)]
@@ -67,6 +68,8 @@ impl TLSClient {
     /// # Arguments
     /// * `conf` - Configuration to use for this client
     pub async fn new(conf: TLSConfig, pkcs11_engine: Option<crate::P11Engine>) -> std::io::Result<Self> {
+        let mut should_lock = false;
+
         let mut context_builder =
             openssl::ssl::SslContext::builder(openssl::ssl::SslMethod::tls_client())?;
         context_builder.set_min_proto_version(Some(openssl::ssl::SslVersion::TLS1_2))?;
@@ -139,6 +142,7 @@ impl TLSClient {
             };
 
             info!("Using PKCS#11 key ID {} for {} ", key_id, hostname);
+            should_lock = true;
             let engine_key_id = std::ffi::CString::new(key_id).unwrap();
             let ctx = context.clone();
             let h = hostname.clone();
@@ -168,6 +172,7 @@ impl TLSClient {
             host: conf.host.to_string(),
             hostname,
             tls_context: context,
+            should_lock,
         })
     }
 
@@ -208,7 +213,11 @@ impl TLSClient {
         //
         // Please don't ask how this happens>, or how I found out, just don't try and fix this.
         trace!("Getting connect lock for {}", self.hostname);
-        let lock = TLS_CONNECT_LOCK.acquire().await.unwrap();
+        let lock = if self.should_lock || TLS_CONNECT_LOCK.available_permits() == 0 {
+            Some(TLS_CONNECT_LOCK.acquire().await.unwrap())
+        } else {
+            None
+        };
         trace!("Setting up TLS stream for {}", self.hostname);
 
         trace!("Opening TCP connection to {}", self.hostname);

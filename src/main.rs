@@ -464,7 +464,7 @@ async fn main() {
         let epp_client = match match config.server_type {
             ConfigServerType::Epp => client::epp::EPPClient::new(client_conf, pkcs11_engine.clone())
                 .await.map(|c| Box::new(c) as Box::<dyn client::Client>),
-            ConfigServerType::Tmch => client::tmch::TMCHClient::new(client_conf, pkcs11_engine.clone())
+            ConfigServerType::Tmch => client::tmch_client::TMCHClient::new(client_conf, pkcs11_engine.clone())
                 .await.map(|c| Box::new(c) as Box::<dyn client::Client>),
         } {
             Ok(c) => c,

@@ -7,6 +7,9 @@ use futures::future::FutureExt;
 use futures::stream::StreamExt;
 
 mod router;
+mod mark;
+mod poll;
+mod trex;
 
 fn recv_msg(data: String, host: &str) -> Result<tmch_proto::TMCHMessage, ()> {
     let message: tmch_proto::TMCHMessage = match xml_serde::from_str(&data) {
@@ -408,6 +411,15 @@ impl TMCHClient {
         let command = tmch_proto::TMCHLogin {
             client_id: self.client_id.clone(),
             password: self.password.clone(),
+            services: Some(tmch_proto::TMCHLoginServices {
+                extensions: Some(tmch_proto::TMCHLoginServiceExtension {
+                    uris: vec![
+                        "urn:ietf:params:xml:ns:tmch:variation".to_string(),
+                        "urn:ietf:params:xml:ns:tmch:trex".to_string(),
+                        "urn:ietf:params:xml:ns:brandPulse-1.0".to_string()
+                    ]
+                })
+            })
         };
 
         match self
@@ -464,6 +476,7 @@ impl TMCHClient {
         let command = tmch_proto::TMCHCommand {
             command,
             client_transaction_id: Some(message_id.to_hyphenated().to_string()),
+            extension: None
         };
         let message = tmch_proto::TMCHMessage {
             message: tmch_proto::TMCHMessageType::Command(Box::new(command)),

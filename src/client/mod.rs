@@ -8,7 +8,7 @@ use futures::future::FutureExt;
 
 pub mod epp;
 pub mod epp_like;
-pub mod tmch;
+pub mod tmch_client;
 
 pub mod balance;
 pub mod contact;
@@ -25,6 +25,8 @@ pub mod rgp;
 pub mod router;
 pub mod traficom;
 pub mod verisign;
+pub mod tmch;
+pub mod mark;
 
 pub use router::{CommandResponse, RequestMessage, RequestSender, Response, Sender};
 
@@ -109,6 +111,29 @@ pub enum TransferStatus {
     ServerApproved,
     ServerCancelled,
 }
+
+#[derive(Debug)]
+pub struct Period {
+    /// Unit of time
+    pub unit: PeriodUnit,
+    /// Number of units of time
+    pub value: u32,
+}
+
+#[derive(Debug)]
+pub enum PeriodUnit {
+    Years,
+    Months,
+}
+
+#[derive(Debug)]
+pub struct Phone {
+    /// Initial dialable part of the number
+    pub number: String,
+    /// Optional internal extension
+    pub extension: Option<String>,
+}
+
 
 #[derive(Debug)]
 pub struct LogoutRequest {

@@ -1,5 +1,10 @@
 use chrono::prelude::*;
 use std::collections::HashMap;
+use super::mark;
+
+pub mod trex;
+pub mod variation;
+pub mod brand_pulse;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub enum TMCHMessageType {
@@ -33,6 +38,11 @@ pub struct TMCHCommand {
     #[serde(rename = "$value")]
     pub command: TMCHCommandType,
     #[serde(
+        rename = "{urn:ietf:params:xml:ns:tmch-1.1}extension",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub extension: Option<TMCHCommandExtension>,
+    #[serde(
         rename = "{urn:ietf:params:xml:ns:tmch-1.1}clTRID",
         skip_serializing_if = "Option::is_none"
     )]
@@ -62,6 +72,17 @@ pub enum TMCHCommandType {
 }
 
 #[derive(Debug, Serialize)]
+pub struct TMCHCommandExtension {
+    #[serde(rename = "$value")]
+    pub values: Vec<TMCHCommandExtensionValue>
+}
+
+#[derive(Debug, Serialize)]
+pub enum TMCHCommandExtensionValue {
+
+}
+
+#[derive(Debug, Serialize)]
 pub struct TMCHCheck {
     #[serde(rename = "{urn:ietf:params:xml:ns:tmch-1.1}id")]
     pub id: Vec<String>
@@ -70,7 +91,7 @@ pub struct TMCHCheck {
 #[derive(Debug, Serialize)]
 pub struct TMCHPeriod {
     #[serde(rename = "$value")]
-    pub value: u8,
+    pub value: u32,
     #[serde(rename = "$attr:unit")]
     pub unit: TMCHPeriodUnit,
 }
@@ -82,7 +103,11 @@ pub enum TMCHPeriodUnit {
 
 #[derive(Debug, Serialize)]
 pub struct TMCHCreate {
-    // TODO: Add abstract mark field
+    #[serde(
+        rename = "{urn:ietf:params:xml:ns:mark-1.0}mark",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub mark: Option<mark::Mark>,
     #[serde(
         rename = "{urn:ietf:params:xml:ns:tmch-1.1}period",
         skip_serializing_if = "Option::is_none"
@@ -98,6 +123,11 @@ pub struct TMCHCreate {
         skip_serializing_if = "Vec::is_empty"
     )]
     pub labels: Vec<TMCHLabel>,
+    #[serde(
+        rename = "{urn:ietf:params:xml:ns:tmch-1.1}variation",
+        skip_serializing_if = "Vec::is_empty"
+    )]
+    pub variations: Vec<variation::Variation>,
 }
 
 #[derive(Debug, Serialize)]
@@ -152,7 +182,17 @@ pub struct TMCHLabel {
         rename = "{urn:ietf:params:xml:ns:tmch-1.1}claimsNotify",
         skip_serializing_if = "Option::is_none"
     )]
-    pub claims_notify: Option<TMCHNotify>
+    pub claims_notify: Option<TMCHNotify>,
+    #[serde(
+        rename = "{urn:ietf:params:xml:ns:tmch-1.1}activatetrex",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub trex_activate: Option<trex::Activate>,
+    #[serde(
+        rename = "{urn:ietf:params:xml:ns:tmch-1.1}renewtrex",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub trex_renew: Option<trex::Renew>
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -189,15 +229,35 @@ pub struct TMCHLogin {
     #[serde(rename = "{urn:ietf:params:xml:ns:tmch-1.1}clID")]
     pub client_id: String,
     #[serde(rename = "{urn:ietf:params:xml:ns:tmch-1.1}pw")]
-    pub password: String
+    pub password: String,
+    #[serde(
+        rename = "{urn:ietf:params:xml:ns:tmch-1.1}svcs",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub services: Option<TMCHLoginServices>,
+}
+
+#[derive(Debug, Serialize)]
+pub struct TMCHLoginServices {
+    #[serde(
+        rename = "{urn:ietf:params:xml:ns:tmch-1.1}svcExtension",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub extensions: Option<TMCHLoginServiceExtension>,
+}
+
+#[derive(Debug, Serialize)]
+pub struct TMCHLoginServiceExtension {
+    #[serde(rename = "{urn:ietf:params:xml:ns:tmch-1.1}extURI")]
+    pub uris: Vec<String>,
 }
 
 #[derive(Debug, Serialize)]
 pub struct TMCHPoll {
     #[serde(rename = "$attr:op")]
-    operation: TMCHPollOperation,
-    #[serde(rename = "$attr:msgID")]
-    message_id: String,
+    pub operation: TMCHPollOperation,
+    #[serde(rename = "$attr:msgID", skip_serializing_if = "Option::is_none")]
+    pub message_id: Option<String>,
 }
 
 #[derive(Debug, Serialize)]
@@ -367,6 +427,11 @@ pub struct TMCHAdd {
     )]
     pub labels: Vec<TMCHLabel>,
     #[serde(
+        rename = "{urn:ietf:params:xml:ns:tmch-1.1}variation",
+        skip_serializing_if = "Vec::is_empty"
+    )]
+    pub variations: Vec<variation::Variation>,
+    #[serde(
         rename = "{urn:ietf:params:xml:ns:tmch-1.1}case",
         skip_serializing_if = "Vec::is_empty"
     )]
@@ -381,6 +446,11 @@ pub struct TMCHRemove {
     )]
     pub labels: Vec<TMCHLabel>,
     #[serde(
+        rename = "{urn:ietf:params:xml:ns:tmch-1.1}variation",
+        skip_serializing_if = "Vec::is_empty"
+    )]
+    pub variations: Vec<variation::Variation>,
+    #[serde(
         rename = "{urn:ietf:params:xml:ns:tmch-1.1}case",
         skip_serializing_if = "Vec::is_empty"
     )]
@@ -390,7 +460,11 @@ pub struct TMCHRemove {
 
 #[derive(Debug, Serialize)]
 pub struct TMCHChange {
-    // TODO: Add abstract mark field
+    #[serde(
+        rename = "{urn:ietf:params:xml:ns:mark-1.0}mark",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub mark: Option<mark::Mark>,
     #[serde(
         rename = "{urn:ietf:params:xml:ns:tmch-1.1}label",
         skip_serializing_if = "Vec::is_empty"
@@ -411,6 +485,8 @@ pub struct TMCHResponse {
     pub message_queue: Option<TMCHMessageQueue>,
     #[serde(rename = "{urn:ietf:params:xml:ns:tmch-1.1}resData", default)]
     pub data: Option<TMCHResultData>,
+    #[serde(rename = "{urn:ietf:params:xml:ns:tmch-1.1}extension", default)]
+    pub extension: Option<TMCHResponseExtension>,
     #[serde(rename = "{urn:ietf:params:xml:ns:tmch-1.1}trID")]
     pub transaction_id: TMCHTransactionIdentifier,
 }
@@ -655,6 +731,19 @@ pub enum TMCHResultDataValue {
     TMCHTransferData(TMCHTransferData),
 }
 
+
+#[derive(Debug, Deserialize)]
+pub struct TMCHResponseExtension {
+    #[serde(rename = "$value")]
+    pub value: Vec<TMCHResponseExtensionValue>,
+}
+
+#[derive(Debug, Deserialize)]
+pub enum TMCHResponseExtensionValue {
+    #[serde(rename = "{urn:ietf:params:xml:ns:brandPulse-1.0}brandPulseData")]
+    BrandPulseData(brand_pulse::Data)
+}
+
 #[derive(Debug, Deserialize)]
 pub struct TMCHCheckData {
     #[serde(rename = "{urn:ietf:params:xml:ns:tmch-1.1}cd", default)]
@@ -695,7 +784,7 @@ pub struct TMCHBalance {
     #[serde(rename = "{urn:ietf:params:xml:ns:tmch-1.1}amount")]
     pub amount: TMCHCurrencyAmount,
     #[serde(rename = "{urn:ietf:params:xml:ns:tmch-1.1}status_points")]
-    pub status_points: i64,
+    pub status_points: u32,
 }
 
 #[derive(Debug, Deserialize)]
@@ -716,42 +805,52 @@ pub struct TMCHInfoData {
     pub pou_status: Option<TMCHStatus<TMCHPOUStatusType>>,
     #[serde(rename = "{urn:ietf:params:xml:ns:tmch-1.1}smdId", default)]
     pub smd_id: Option<String>,
-    // TODO: Add abstract mark field
-    // TODO: Add signed mark field
-    // TODO: Add encoded signed mark field
+    #[serde(rename = "{urn:ietf:params:xml:ns:mark-1.0}mark", default)]
+    pub mark: Option<mark::Mark>,
+    #[serde(rename = "{urn:ietf:params:xml:ns:signedMark-1.0}signedMark", default)]
+    pub signed_mark: Option<String>,
+    #[serde(rename = "{urn:ietf:params:xml:ns:signedMark-1.0}encodedSignedMark", default)]
+    pub encoded_signed_mark: Option<String>,
     #[serde(rename = "{urn:ietf:params:xml:ns:tmch-1.1}encFile", default)]
     pub enc_file: Option<String>,
     #[serde(rename = "{urn:ietf:params:xml:ns:tmch-1.1}document", default)]
     pub documents: Vec<TMCHInfoDocument>,
     #[serde(rename = "{urn:ietf:params:xml:ns:tmch-1.1}label", default)]
     pub labels: Vec<TMCHInfoLabel>,
+    #[serde(rename = "{urn:ietf:params:xml:ns:tmch-1.1}variation", default)]
+    pub variations: Vec<variation::Variation>,
     #[serde(rename = "{urn:ietf:params:xml:ns:tmch-1.1}comment", default)]
     pub comment: Option<String>,
     #[serde(rename = "{urn:ietf:params:xml:ns:tmch-1.1}case", default)]
     pub cases: Vec<TMCHInfoCase>,
     #[serde(
         rename = "{urn:ietf:params:xml:ns:tmch-1.1}crDate",
-        deserialize_with = "super::deserialize_datetime_opt"
+        deserialize_with = "super::deserialize_datetime_opt",
+        default
     )]
     pub creation_date: Option<DateTime<Utc>>,
     #[serde(
         rename = "{urn:ietf:params:xml:ns:tmch-1.1}upDate",
-        deserialize_with = "super::deserialize_datetime_opt"
+        deserialize_with = "super::deserialize_datetime_opt",
+        default
     )]
     pub update_date: Option<DateTime<Utc>>,
     #[serde(
         rename = "{urn:ietf:params:xml:ns:tmch-1.1}exDate",
-        deserialize_with = "super::deserialize_datetime_opt"
+        deserialize_with = "super::deserialize_datetime_opt",
+        default
     )]
     pub expiry_date: Option<DateTime<Utc>>,
     #[serde(
         rename = "{urn:ietf:params:xml:ns:tmch-1.1}pouExDate",
-        deserialize_with = "super::deserialize_datetime_opt"
+        deserialize_with = "super::deserialize_datetime_opt",
+        default
     )]
     pub pou_expiry_date: Option<DateTime<Utc>>,
     #[serde(
         rename = "{urn:ietf:params:xml:ns:tmch-1.1}correctBefore",
-        deserialize_with = "super::deserialize_datetime_opt"
+        deserialize_with = "super::deserialize_datetime_opt",
+        default
     )]
     pub correct_before: Option<DateTime<Utc>>,
     #[serde(rename = "{urn:ietf:params:xml:ns:tmch-1.1}authCode", default)]
@@ -786,7 +885,7 @@ pub enum TMCHStatusType {
 
 #[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
 pub enum TMCHPOUStatusType {
-    #[serde(rename = "nonSet")]
+    #[serde(rename = "notSet")]
     NotSet,
     #[serde(rename = "valid")]
     Valid,
@@ -839,7 +938,9 @@ pub struct TMCHInfoLabel {
     #[serde(rename = "{urn:ietf:params:xml:ns:tmch-1.1}smdInclusion", default)]
     pub smd_inclusion: Option<TMCHNotify>,
     #[serde(rename = "{urn:ietf:params:xml:ns:tmch-1.1}claimsNotify", default)]
-    pub claims_notify: Option<TMCHNotify>
+    pub claims_notify: Option<TMCHNotify>,
+    #[serde(rename = "{urn:ietf:params:xml:ns:tmch-1.1}trex", default)]
+    pub trex: Option<trex::TrexInfo>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -860,7 +961,8 @@ pub struct TMCHInfoCase {
     pub comment: Option<String>,
     #[serde(
         rename = "{urn:ietf:params:xml:ns:tmch-1.1}upDate",
-        deserialize_with = "super::deserialize_datetime_opt"
+        deserialize_with = "super::deserialize_datetime_opt",
+        default
     )]
     pub update_date: Option<DateTime<Utc>>,
 }
