@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["ContactType",""],["Entitlement",""]],"mod":[["mark","Nested message and enum types in `Mark`."]],"struct":[["Address",""],["Contact",""],["Court",""],["Holder",""],["Mark",""],["Protection",""],["TradeMark",""],["TreatyOrStatute",""]]});

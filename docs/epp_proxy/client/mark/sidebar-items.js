@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["ContactType",""],["Entitlement",""],["Mark",""]],"struct":[["Address",""],["Contact",""],["Court",""],["Holder",""],["Protection",""],["TradeMark",""],["TreatyOrStatute",""]]});
