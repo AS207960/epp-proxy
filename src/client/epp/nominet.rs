@@ -1,14 +1,15 @@
 //! EPP commands relating to nominet specific features
 
 use super::super::nominet::{
-    CancelData, DataQualityData, DataQualityStatus, DomainFailData, HostCancelData, ProcessData,
-    ProcessStage, RegistrantTransferData, RegistrarChangeData, ReleaseData, SuspendData, Tag,
-    TagListRequest, TagListResponse, HandshakeAcceptRequest, HandshakeRejectRequest,
-    HandshakeResponse, ReleaseRequest, ReleaseResponse, ReleaseObject,
+    CancelData, DataQualityData, DataQualityStatus, DomainFailData, HandshakeAcceptRequest,
+    HandshakeRejectRequest, HandshakeResponse, HostCancelData, LockRequest, LockResponse, Object,
+    ProcessData, ProcessStage, RegistrantTransferData, RegistrarChangeData, ReleaseData,
+    ReleaseRequest, ReleaseResponse, SuspendData, Tag, TagListRequest, TagListResponse,
 };
 use super::super::{proto, Error, Response};
-use super::ServerFeatures;
 use super::router::HandleReqReturn;
+use super::ServerFeatures;
+use crate::client::nominet::{ContactValidateRequest, ContactValidateResponse};
 use std::convert::TryFrom;
 
 impl From<proto::nominet::EPPCancelData> for CancelData {
@@ -181,11 +182,12 @@ pub fn handle_accept(
     }
     let command = proto::nominet::EPPHandshakeAccept {
         case_id: req.case_id.to_owned(),
-        registrant: req.registrant.as_deref().map(Into::into)
+        registrant: req.registrant.as_deref().map(Into::into),
     };
-    Ok((proto::EPPCommandType::Update(Box::new(
-        proto::EPPUpdate::NominetHandshakeAccept(command)
-    )), None))
+    Ok((
+        proto::EPPCommandType::Update(Box::new(proto::EPPUpdate::NominetHandshakeAccept(command))),
+        None,
+    ))
 }
 
 pub fn handle_reject(
@@ -198,11 +200,11 @@ pub fn handle_reject(
     let command = proto::nominet::EPPHandshakeReject {
         case_id: req.case_id.to_owned(),
     };
-    Ok((proto::EPPCommandType::Update(Box::new(
-        proto::EPPUpdate::NominetHandshakeReject(command)
-    )), None))
+    Ok((
+        proto::EPPCommandType::Update(Box::new(proto::EPPUpdate::NominetHandshakeReject(command))),
+        None,
+    ))
 }
-
 
 pub fn handle_handshake_response(response: proto::EPPResponse) -> Response<HandshakeResponse> {
     match response.data {
@@ -210,7 +212,10 @@ pub fn handle_handshake_response(response: proto::EPPResponse) -> Response<Hands
             proto::EPPResultDataValue::NominetHandshakeData(msg) => {
                 Response::Ok(HandshakeResponse {
                     case_id: msg.case_id,
-                    domains: msg.domain_list.and_then(|l| Some(l.domain_names)).unwrap_or_else(|| vec![]),
+                    domains: msg
+                        .domain_list
+                        .map(|l| l.domain_names)
+                        .unwrap_or_else(Vec::new),
                 })
             }
             _ => Err(Error::ServerInternal),
@@ -229,13 +234,14 @@ pub fn handle_release(
     let command = proto::nominet::EPPRelease {
         registrar_tag: req.registrar_tag.to_owned(),
         object: match &req.object {
-            ReleaseObject::Domain(d) => proto::nominet::EPPReleaseObject::Domain(d.to_owned()),
-            ReleaseObject::Registrant(d) => proto::nominet::EPPReleaseObject::Registrant(d.to_owned()),
-        }
+            Object::Domain(d) => proto::nominet::EPPReleaseObject::Domain(d.to_owned()),
+            Object::Registrant(d) => proto::nominet::EPPReleaseObject::Registrant(d.to_owned()),
+        },
     };
-    Ok((proto::EPPCommandType::Update(Box::new(
-        proto::EPPUpdate::NominetRelease(command)
-    )), None))
+    Ok((
+        proto::EPPCommandType::Update(Box::new(proto::EPPUpdate::NominetRelease(command))),
+        None,
+    ))
 }
 
 pub fn handle_release_response(response: proto::EPPResponse) -> Response<ReleaseResponse> {
@@ -252,7 +258,7 @@ pub fn handle_release_response(response: proto::EPPResponse) -> Response<Release
         },
         None => Response::Ok(ReleaseResponse {
             pending,
-            message: None
+            message: None,
         }),
     }
 }
@@ -294,5 +300,81 @@ pub fn handle_tag_list_response(response: proto::EPPResponse) -> Response<TagLis
             _ => Err(Error::ServerInternal),
         },
         None => Err(Error::ServerInternal),
+    }
+}
+
+pub fn handle_contact_validate(
+    client: &ServerFeatures,
+    req: &ContactValidateRequest,
+) -> HandleReqReturn<ContactValidateResponse> {
+    if !client.nominet_data_quality {
+        return Err(Err(Error::Unsupported));
+    }
+    let command = proto::EPPUpdate::Contact(proto::contact::EPPContactUpdate {
+        id: req.contact_id.to_string(),
+        traficom_role: None,
+        add: None,
+        remove: None,
+        change: None,
+    });
+    Ok((
+        proto::EPPCommandType::Update(Box::new(command)),
+        Some(vec![
+            proto::EPPCommandExtensionType::NominetDataQualityUpdate(
+                proto::nominet::EPPDataQualityUpdate::Validate {},
+            ),
+        ]),
+    ))
+}
+
+pub fn handle_contact_validate_response(
+    response: proto::EPPResponse,
+) -> Response<ContactValidateResponse> {
+    match response.data {
+        Some(_) => Err(Error::ServerInternal),
+        None => Response::Ok(ContactValidateResponse {}),
+    }
+}
+
+pub fn handle_lock(client: &ServerFeatures, req: &LockRequest) -> HandleReqReturn<LockResponse> {
+    if !client.nominet_data_quality {
+        return Err(Err(Error::Unsupported));
+    }
+    let command = proto::EPPUpdate::NominetLock(proto::nominet::EPPLock {
+        lock_type: req.lock_type.to_string(),
+        object_type: match req.object {
+            Object::Domain(_) => proto::nominet::EPPLockObjectType::Domain,
+            Object::Registrant(_) => proto::nominet::EPPLockObjectType::Registrant,
+        },
+        object: match &req.object {
+            Object::Domain(d) => proto::nominet::EPPLockObject::Domain(d.to_owned()),
+            Object::Registrant(d) => proto::nominet::EPPLockObject::Registrant(d.to_owned()),
+        },
+    });
+    Ok((proto::EPPCommandType::Update(Box::new(command)), None))
+}
+
+pub fn handle_unlock(client: &ServerFeatures, req: &LockRequest) -> HandleReqReturn<LockResponse> {
+    if !client.nominet_data_quality {
+        return Err(Err(Error::Unsupported));
+    }
+    let command = proto::EPPUpdate::NominetUnlock(proto::nominet::EPPLock {
+        lock_type: req.lock_type.to_string(),
+        object_type: match req.object {
+            Object::Domain(_) => proto::nominet::EPPLockObjectType::Domain,
+            Object::Registrant(_) => proto::nominet::EPPLockObjectType::Registrant,
+        },
+        object: match &req.object {
+            Object::Domain(d) => proto::nominet::EPPLockObject::Domain(d.to_owned()),
+            Object::Registrant(d) => proto::nominet::EPPLockObject::Registrant(d.to_owned()),
+        },
+    });
+    Ok((proto::EPPCommandType::Update(Box::new(command)), None))
+}
+
+pub fn handle_lock_response(response: proto::EPPResponse) -> Response<LockResponse> {
+    match response.data {
+        Some(_) => Err(Error::ServerInternal),
+        None => Response::Ok(LockResponse {}),
     }
 }

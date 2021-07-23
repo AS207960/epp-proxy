@@ -2,8 +2,8 @@
 
 use super::super::balance::{BalanceRequest, BalanceResponse, CreditThreshold};
 use super::super::{proto, Error, Response};
-use super::ServerFeatures;
 use super::router::HandleReqReturn;
+use super::ServerFeatures;
 
 pub fn handle_balance(
     client: &ServerFeatures,

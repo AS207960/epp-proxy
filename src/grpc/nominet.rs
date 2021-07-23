@@ -1,8 +1,6 @@
 use super::super::client;
 use super::epp_proto;
 
-
-
 impl From<client::nominet::CancelData> for epp_proto::nominet::DomainCancel {
     fn from(res: client::nominet::CancelData) -> Self {
         epp_proto::nominet::DomainCancel {

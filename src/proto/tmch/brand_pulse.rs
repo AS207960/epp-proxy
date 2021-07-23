@@ -11,13 +11,13 @@ pub enum StatusType {
     #[serde(rename = "brandPulseEnabled")]
     Enabled,
     #[serde(rename = "brandPulseDisabled")]
-    Disabled
+    Disabled,
 }
 
 #[derive(Debug, Serialize)]
 pub struct Renew {
     #[serde(rename = "{urn:ietf:params:xml:ns:brandPulse-1.0}curExpYear")]
-    pub current_expiry_year: i32
+    pub current_expiry_year: i32,
 }
 
 #[derive(Debug, Serialize)]
@@ -55,7 +55,7 @@ pub struct WhitelistData {
         skip_serializing_if = "Vec::is_empty",
         default
     )]
-    pub domains: Vec<String>
+    pub domains: Vec<String>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -85,7 +85,7 @@ pub struct Match {
     #[serde(rename = "{urn:ietf:params:xml:ns:brandPulse-1.0}service")]
     pub service: Service,
     #[serde(rename = "{urn:ietf:params:xml:ns:brandPulse-1.0}whois")]
-    pub whois: WHOIS,
+    pub whois: Whois,
 }
 
 #[derive(Debug, Deserialize)]
@@ -119,7 +119,7 @@ pub struct Service {
 }
 
 #[derive(Debug, Deserialize)]
-pub struct WHOIS {
+pub struct Whois {
     #[serde(rename = "{urn:ietf:params:xml:ns:brandPulse-1.0}registrar")]
     pub registrar: String,
     #[serde(rename = "{urn:ietf:params:xml:ns:brandPulse-1.0}registrant")]
@@ -128,8 +128,14 @@ pub struct WHOIS {
     pub contact: String,
     #[serde(rename = "{urn:ietf:params:xml:ns:brandPulse-1.0}email")]
     pub email: String,
-    #[serde(rename = "{urn:ietf:params:xml:ns:brandPulse-1.0}creationTime", default)]
+    #[serde(
+        rename = "{urn:ietf:params:xml:ns:brandPulse-1.0}creationTime",
+        default
+    )]
     pub creation: Option<DateTime<Utc>>,
-    #[serde(rename = "{urn:ietf:params:xml:ns:brandPulse-1.0}modificationTime", default)]
+    #[serde(
+        rename = "{urn:ietf:params:xml:ns:brandPulse-1.0}modificationTime",
+        default
+    )]
     pub modification: Option<DateTime<Utc>>,
 }

@@ -90,6 +90,9 @@ router!(
     NominetAccept,          request_nop,                               response_nop;
     NominetReject,          request_nop,                               response_nop;
     NominetRelease,         request_nop,                               response_nop;
+    NominetContactValidate, request_nop,                               response_nop;
+    NominetLock,            request_nop,                               response_nop;
+    NominetUnlock,          request_nop,                               response_nop;
     Balance,                request_nop,                               response_nop;
     MaintenanceList,        request_nop,                               response_nop;
     MaintenanceInfo,        request_nop,                               response_nop;

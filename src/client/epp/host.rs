@@ -6,8 +6,8 @@ use super::super::host::{
     UpdateResponse,
 };
 use super::super::{proto, Error, Response};
-use super::ServerFeatures;
 use super::router::HandleReqReturn;
+use super::ServerFeatures;
 
 impl From<proto::host::EPPHostStatusType> for Status {
     fn from(from: proto::host::EPPHostStatusType) -> Self {

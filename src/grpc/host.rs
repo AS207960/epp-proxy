@@ -82,7 +82,7 @@ impl From<client::host::InfoResponse> for epp_proto::host::HostInfoReply {
             last_updated_client: res.last_updated_client,
             last_updated_date: super::utils::chrono_to_proto(res.last_updated_date),
             last_transfer_date: super::utils::chrono_to_proto(res.last_transfer_date),
-            cmd_resp: None
+            cmd_resp: None,
         }
     }
 }

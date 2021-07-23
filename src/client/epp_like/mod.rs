@@ -138,9 +138,9 @@ pub(super) struct ClientReceiver<T, R: std::marker::Unpin + tokio::io::AsyncRead
 }
 
 impl<
-    T: 'static + std::marker::Send,
-    R: 'static + std::marker::Unpin + tokio::io::AsyncRead + std::marker::Send,
-> ClientReceiver<T, R>
+        T: 'static + std::marker::Send,
+        R: 'static + std::marker::Unpin + tokio::io::AsyncRead + std::marker::Send,
+    > ClientReceiver<T, R>
 {
     /// Starts the tokio task, and returns the receiving end of the channel to read messages from.
     pub fn run(mut self) -> futures::channel::mpsc::Receiver<Result<T, bool>> {

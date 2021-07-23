@@ -4,7 +4,7 @@ package epp.tmch;
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/wrappers.proto";
 import "common.proto";
-import "mark.proto";
+import "marks.proto";
 
 message MarkCheckRequest {
     string id = 1;
@@ -24,7 +24,7 @@ message BalanceData {
 }
 
 message MarkCreateRequest {
-    mark.Mark mark = 1;
+    marks.Mark mark = 1;
     common.Period period = 2;
     repeated Document documents = 3;
     repeated CreateLabel labels = 4;
@@ -166,9 +166,10 @@ message MarkUpdateRequest {
     string id = 1;
     repeated MarkUpdateAdd add = 2;
     repeated MarkUpdateRemove remove = 3;
-    mark.Mark new_mark = 4;
+    marks.Mark new_mark = 4;
     repeated CreateLabel update_labels = 5;
-    string registry_name = 6;
+    repeated CaseUpdate update_cases = 6;
+    string registry_name = 7;
 }
 
 message MarkUpdateResponse {
@@ -180,6 +181,7 @@ message MarkUpdateAdd {
         Document document = 1;
         CreateLabel label = 2;
         string variation = 3;
+        AddCase case = 4;
     }
 }
 
@@ -188,6 +190,65 @@ message MarkUpdateRemove {
         string label = 1;
         string variation = 2;
     }
+}
+
+message AddCase {
+    string id = 1;
+    oneof case {
+        UDRPCase udrp = 2;
+        CourtCase court = 3;
+    }
+    repeated CaseDocument documents = 4;
+    repeated string labels = 5;
+}
+
+message CaseUpdate {
+    string id = 1;
+    repeated CaseAdd add = 2;
+    repeated CaseRemove remove = 3;
+    oneof new_case {
+        UDRPCase new_udrp = 4;
+        CourtCase new_court = 5;
+    }
+}
+
+message CaseAdd {
+    oneof update {
+        CaseDocument document = 4;
+        string label = 2;
+    }
+}
+
+message CaseRemove {
+    oneof update {
+        string label = 1;
+    }
+}
+
+message UDRPCase {
+    string case_id = 1;
+    string provider = 2;
+    string case_language = 3;
+}
+
+message CourtCase {
+    string decision_id = 1;
+    string court_name = 2;
+    string country_code = 3;
+    string case_language = 4;
+    repeated string regions = 5;
+}
+
+message CaseDocument {
+    CourtDocumentClass document_class = 1;
+    string file_name = 2;
+    FileType file_type = 3;
+    bytes contents = 4;
+}
+
+enum CourtDocumentClass {
+    CourtOther = 0;
+    CourtDecision = 1;
 }
 
 message MarkRenewRequest {

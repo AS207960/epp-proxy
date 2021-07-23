@@ -320,7 +320,6 @@ impl From<client::domain::TransferResponse> for epp_proto::domain::DomainTransfe
     }
 }
 
-
 impl From<client::domain::PanData> for epp_proto::domain::DomainPanReply {
     fn from(res: client::domain::PanData) -> Self {
         epp_proto::domain::DomainPanReply {

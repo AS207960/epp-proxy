@@ -5,8 +5,8 @@ use super::super::maintenance::{
     ListResponse, ListResponseItem, PollType, Reason, System,
 };
 use super::super::{proto, Error, Response};
-use super::ServerFeatures;
 use super::router::HandleReqReturn;
+use super::ServerFeatures;
 
 impl From<proto::maintenance::EPPMaintenanceItem> for InfoResponse {
     fn from(from: proto::maintenance::EPPMaintenanceItem) -> Self {

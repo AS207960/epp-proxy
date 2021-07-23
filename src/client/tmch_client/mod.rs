@@ -1,14 +1,12 @@
-use super::{
-    router as outer_router, LogoutRequest, RequestMessage,
-};
 use super::proto::tmch as tmch_proto;
+use super::{router as outer_router, LogoutRequest, RequestMessage};
 use chrono::prelude::*;
 use futures::future::FutureExt;
 use futures::stream::StreamExt;
 
-mod router;
 mod mark;
 mod poll;
+mod router;
 mod trex;
 
 fn recv_msg(data: String, host: &str) -> Result<tmch_proto::TMCHMessage, ()> {
@@ -73,9 +71,8 @@ impl TMCHClient {
         conf: super::ClientConf<'a, C>,
         pkcs11_engine: Option<crate::P11Engine>,
     ) -> std::io::Result<Self> {
-        let tls_client = super::epp_like::tls_client::TLSClient::new(
-            (&conf).into(), pkcs11_engine
-        ).await?;
+        let tls_client =
+            super::epp_like::tls_client::TLSClient::new((&conf).into(), pkcs11_engine).await?;
 
         Ok(Self {
             log_dir: conf.log_dir,
@@ -260,9 +257,9 @@ impl TMCHClient {
             message: tmch_proto::TMCHMessageType::Hello {},
         };
         self.is_awaiting_response = true;
-        let receiver = super::epp_like::send_msg(
-            &self.host, sock_write, &self.log_dir, send_msg, &message
-        ).fuse();
+        let receiver =
+            super::epp_like::send_msg(&self.host, sock_write, &self.log_dir, send_msg, &message)
+                .fuse();
         let mut delay = Box::pin(tokio::time::sleep(tokio::time::Duration::new(15, 0)).fuse());
         futures::pin_mut!(receiver);
         let resp = futures::select! {
@@ -288,13 +285,10 @@ impl TMCHClient {
         if let outer_router::RequestMessage::Logout(_) = req {
             self.is_closing = true;
         }
-         match self.router.handle_request(&(), req) {
+        match self.router.handle_request(&(), req) {
             Some((command, command_id)) => {
                 self.is_awaiting_response = true;
-                match self
-                    ._send_command(command, sock_write, command_id)
-                    .await
-                {
+                match self._send_command(command, sock_write, command_id).await {
                     Ok(_) => Ok(()),
                     Err(_) => Err(()),
                 }
@@ -407,7 +401,10 @@ impl TMCHClient {
         Ok(())
     }
 
-    async fn _login(&mut self, sock: &mut super::epp_like::tls_client::TLSConnection) -> Result<(), ()> {
+    async fn _login(
+        &mut self,
+        sock: &mut super::epp_like::tls_client::TLSConnection,
+    ) -> Result<(), ()> {
         let command = tmch_proto::TMCHLogin {
             client_id: self.client_id.clone(),
             password: self.password.clone(),
@@ -416,10 +413,10 @@ impl TMCHClient {
                     uris: vec![
                         "urn:ietf:params:xml:ns:tmch:variation".to_string(),
                         "urn:ietf:params:xml:ns:tmch:trex".to_string(),
-                        "urn:ietf:params:xml:ns:brandPulse-1.0".to_string()
-                    ]
-                })
-            })
+                        "urn:ietf:params:xml:ns:brandPulse-1.0".to_string(),
+                    ],
+                }),
+            }),
         };
 
         match self
@@ -476,14 +473,12 @@ impl TMCHClient {
         let command = tmch_proto::TMCHCommand {
             command,
             client_transaction_id: Some(message_id.to_hyphenated().to_string()),
-            extension: None
+            extension: None,
         };
         let message = tmch_proto::TMCHMessage {
             message: tmch_proto::TMCHMessageType::Command(Box::new(command)),
         };
-        match super::epp_like::send_msg(
-            &self.host, sock, &self.log_dir, send_msg, &message
-        ).await {
+        match super::epp_like::send_msg(&self.host, sock, &self.log_dir, send_msg, &message).await {
             Ok(_) => Ok(message_id),
             Err(_) => Err(()),
         }
@@ -495,11 +490,7 @@ impl TMCHClient {
     }
 }
 
-
-pub fn handle_logout(
-    _client: &(),
-    _req: &LogoutRequest,
-) -> router::HandleReqReturn<()> {
+pub fn handle_logout(_client: &(), _req: &LogoutRequest) -> router::HandleReqReturn<()> {
     Ok(tmch_proto::TMCHCommandType::Logout {})
 }
 

@@ -16,16 +16,16 @@ pub mod isnic;
 pub mod launch;
 pub mod login_sec;
 pub mod maintenance;
+pub mod mark;
 pub mod nominet;
 pub mod qualified_lawyer;
 pub mod rgp;
 pub mod secdns;
 pub mod switch;
+pub mod tmch;
 pub mod traficom;
 pub mod united_tld;
 pub mod verisign;
-pub mod tmch;
-pub mod mark;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub enum EPPMessageType {
@@ -118,6 +118,10 @@ pub enum EPPCommandExtensionType {
         rename = "{http://www.nominet.org.uk/epp/xml/contact-nom-ext-1.0}contact-nom-ext:update"
     )]
     NominetContactExtUpdate(nominet::EPPContactInfo),
+    #[serde(
+        rename = "{http://www.nominet.org.uk/epp/xml/nom-data-quality-1.0}nom-data-quality:update"
+    )]
+    NominetDataQualityUpdate(nominet::EPPDataQualityUpdate),
     #[serde(rename = "{urn:ietf:params:xml:ns:rgp-1.0}rgp:update")]
     EPPRGPUpdate(rgp::EPPRGPUpdate),
     #[serde(rename = "{urn:ietf:params:xml:ns:secDNS-1.1}secDNS:create")]
@@ -893,6 +897,10 @@ pub enum EPPUpdate {
     NominetHandshakeReject(nominet::EPPHandshakeReject),
     #[serde(rename = "{http://www.nominet.org.uk/epp/xml/std-release-1.0}release:release")]
     NominetRelease(nominet::EPPRelease),
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/std-locks-1.0}lock:lock")]
+    NominetLock(nominet::EPPLock),
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/std-locks-1.0}lock:unlock")]
+    NominetUnlock(nominet::EPPLock),
 }
 
 #[derive(Debug, Serialize)]

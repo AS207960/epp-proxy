@@ -144,6 +144,9 @@ router!(
     NominetAccept,          super::nominet::HandshakeAcceptRequest,     super::nominet::HandshakeResponse;
     NominetReject,          super::nominet::HandshakeRejectRequest,     super::nominet::HandshakeResponse;
     NominetRelease,         super::nominet::ReleaseRequest,             super::nominet::ReleaseResponse;
+    NominetContactValidate, super::nominet::ContactValidateRequest,     super::nominet::ContactValidateResponse;
+    NominetLock,            super::nominet::LockRequest,                super::nominet::LockResponse;
+    NominetUnlock,          super::nominet::LockRequest,                super::nominet::LockResponse;
     Balance,                super::balance::BalanceRequest,             super::balance::BalanceResponse;
     MaintenanceList,        super::maintenance::ListRequest,            super::maintenance::ListResponse;
     MaintenanceInfo,        super::maintenance::InfoRequest,            super::maintenance::InfoResponse;

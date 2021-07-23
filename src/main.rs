@@ -454,18 +454,22 @@ async fn main() {
                 None => vec![],
             },
             danger_accept_invalid_certs: config.danger_accept_invalid_certs.unwrap_or(false),
-            danger_accept_invalid_hostname: config
-                .danger_accept_invalid_hostnames
-                .unwrap_or(false),
+            danger_accept_invalid_hostname: config.danger_accept_invalid_hostnames.unwrap_or(false),
             new_password: config.new_password.as_deref(),
             pipelining: config.pipelining,
             errata: config.errata.clone(),
         };
         let epp_client = match match config.server_type {
-            ConfigServerType::Epp => client::epp::EPPClient::new(client_conf, pkcs11_engine.clone())
-                .await.map(|c| Box::new(c) as Box::<dyn client::Client>),
-            ConfigServerType::Tmch => client::tmch_client::TMCHClient::new(client_conf, pkcs11_engine.clone())
-                .await.map(|c| Box::new(c) as Box::<dyn client::Client>),
+            ConfigServerType::Epp => {
+                client::epp::EPPClient::new(client_conf, pkcs11_engine.clone())
+                    .await
+                    .map(|c| Box::new(c) as Box<dyn client::Client>)
+            }
+            ConfigServerType::Tmch => {
+                client::tmch_client::TMCHClient::new(client_conf, pkcs11_engine.clone())
+                    .await
+                    .map(|c| Box::new(c) as Box<dyn client::Client>)
+            }
         } {
             Ok(c) => c,
             Err(e) => {

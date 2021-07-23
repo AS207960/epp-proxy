@@ -97,6 +97,9 @@ router!(
     NominetAccept,          super::nominet::handle_accept,            super::nominet::handle_handshake_response;
     NominetReject,          super::nominet::handle_reject,            super::nominet::handle_handshake_response;
     NominetRelease,         super::nominet::handle_release,           super::nominet::handle_release_response;
+    NominetContactValidate, super::nominet::handle_contact_validate,  super::nominet::handle_contact_validate_response;
+    NominetLock,            super::nominet::handle_lock,              super::nominet::handle_lock_response;
+    NominetUnlock,          super::nominet::handle_unlock,            super::nominet::handle_lock_response;
     Balance,                super::balance::handle_balance,           super::balance::handle_balance_response;
     MaintenanceList,        super::maintenance::handle_list,          super::maintenance::handle_list_response;
     MaintenanceInfo,        super::maintenance::handle_info,          super::maintenance::handle_info_response;

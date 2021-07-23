@@ -44,8 +44,8 @@ pub enum DocumentClass {
 
 #[derive(Debug)]
 pub enum FileType {
-    JPG,
-    PDF
+    Jpg,
+    Pdf
 }
 
 #[derive(Debug)]
@@ -85,7 +85,7 @@ pub struct MarkInfoResponse {
 #[derive(Debug)]
 pub struct Status<T> {
     pub status_type: T,
-    pub message: Option<String>
+    pub message: Option<String>,
 }
 
 #[derive(Debug)]
@@ -175,6 +175,7 @@ pub struct UpdateRequest {
     pub(super) remove: Vec<UpdateRemove>,
     pub(super) new_mark: Option<super::mark::Mark>,
     pub(super) update_labels: Vec<CreateLabel>,
+    pub(super) update_cases: Vec<CaseUpdate>,
     pub return_path: Sender<UpdateResponse>,
 }
 
@@ -182,13 +183,71 @@ pub struct UpdateRequest {
 pub enum UpdateAdd {
     Document(Document),
     Label(CreateLabel),
-    Variation(String)
+    Variation(String),
+    Case(AddCase),
 }
 
 #[derive(Debug)]
 pub enum UpdateRemove {
     Label(String),
-    Variation(String)
+    Variation(String),
+}
+
+#[derive(Debug)]
+pub struct AddCase {
+    pub id: String,
+    pub case: CaseType,
+    pub documents: Vec<CaseDocument>,
+    pub labels: Vec<String>,
+}
+
+#[derive(Debug)]
+pub enum CaseType {
+    Udrp {
+        case_id: String,
+        provider: String,
+        case_language: String,
+    },
+    Court {
+        decision_id: String,
+        court_name: String,
+        country_code: String,
+        case_language: String,
+        regions: Vec<String>,
+    },
+}
+
+#[derive(Debug)]
+pub struct CaseDocument {
+    pub class: CaseDocumentClass,
+    pub file_name: String,
+    pub file_type: FileType,
+    pub contents: Vec<u8>,
+}
+
+#[derive(Debug)]
+pub enum CaseDocumentClass {
+    CourtDecision,
+    Other,
+}
+
+#[derive(Debug)]
+pub struct CaseUpdate {
+    pub id: String,
+    pub add: Vec<CaseAdd>,
+    pub remove: Vec<CaseRemove>,
+    pub new_case: Option<CaseType>,
+}
+
+#[derive(Debug)]
+pub enum CaseAdd {
+    Label(String),
+    Document(CaseDocument),
+}
+
+#[derive(Debug)]
+pub enum CaseRemove {
+    Label(String),
 }
 
 #[derive(Debug)]
@@ -245,7 +304,7 @@ pub struct TrexActivateRequest {
 #[derive(Debug)]
 pub struct TrexActivateLabel {
     pub label: String,
-    pub period: Option<super::Period>
+    pub period: Option<super::Period>,
 }
 
 #[derive(Debug)]
@@ -262,7 +321,7 @@ pub struct TrexRenewRequest {
 pub struct TrexRenewLabel {
     pub label: String,
     pub current_expiry_date: Date<Utc>,
-    pub period: Option<super::Period>
+    pub period: Option<super::Period>,
 }
 
 #[derive(Debug)]
@@ -424,6 +483,7 @@ pub async fn update(
     remove: Vec<UpdateRemove>,
     new_mark: Option<super::mark::Mark>,
     update_labels: Vec<CreateLabel>,
+    update_cases: Vec<CaseUpdate>,
     client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<UpdateResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
@@ -435,6 +495,7 @@ pub async fn update(
             remove,
             new_mark,
             update_labels,
+            update_cases,
             return_path: sender,
         })),
         receiver,

@@ -1,6 +1,6 @@
 use super::super::mark::{
-    Mark, Holder, Contact, Entitlement, ContactType, Address, TradeMark, TreatyOrStatute, Court,
-    Protection
+    Address, Contact, ContactType, Court, Entitlement, Holder, Mark, Protection, TradeMark,
+    TreatyOrStatute,
 };
 use super::super::{proto, Phone};
 
@@ -22,23 +22,29 @@ impl From<&Mark> for proto::mark::Mark {
                 registration_date: m.registration_date,
                 expiry_date: m.expiry_date,
             }),
-            Mark::TreatyOrStatute(m) => proto::mark::Mark::TreatyOrStatute(proto::mark::TreatyOrStatute {
-                id: m.id.to_string(),
-                mark_name: m.mark_name.to_string(),
-                holders: m.holders.iter().map(Into::into).collect(),
-                contacts: m.contacts.iter().map(Into::into).collect(),
-                protections: m.protections.iter().map(|p| proto::mark::Protection {
-                    country_code: p.country_code.to_string(),
-                    region: p.region.as_ref().map(Into::into),
-                    ruling: p.ruling.iter().map(Into::into).collect(),
-                }).collect(),
-                labels: m.labels.clone(),
-                goods_and_services: m.goods_and_services.to_string(),
-                reference_number: m.reference_number.to_string(),
-                protection_date: m.protection_date,
-                title: m.title.to_string(),
-                execution_date: m.execution_date,
-            }),
+            Mark::TreatyOrStatute(m) => {
+                proto::mark::Mark::TreatyOrStatute(proto::mark::TreatyOrStatute {
+                    id: m.id.to_string(),
+                    mark_name: m.mark_name.to_string(),
+                    holders: m.holders.iter().map(Into::into).collect(),
+                    contacts: m.contacts.iter().map(Into::into).collect(),
+                    protections: m
+                        .protections
+                        .iter()
+                        .map(|p| proto::mark::Protection {
+                            country_code: p.country_code.to_string(),
+                            region: p.region.as_ref().map(Into::into),
+                            ruling: p.ruling.iter().map(Into::into).collect(),
+                        })
+                        .collect(),
+                    labels: m.labels.clone(),
+                    goods_and_services: m.goods_and_services.to_string(),
+                    reference_number: m.reference_number.to_string(),
+                    protection_date: m.protection_date,
+                    title: m.title.to_string(),
+                    execution_date: m.execution_date,
+                })
+            }
             Mark::Court(m) => proto::mark::Mark::Court(proto::mark::Court {
                 id: m.id.to_string(),
                 mark_name: m.mark_name.to_string(),
@@ -59,7 +65,7 @@ impl From<&Mark> for proto::mark::Mark {
 impl From<proto::mark::Mark> for Mark {
     fn from(from: proto::mark::Mark) -> Self {
         match from {
-             proto::mark::Mark::TradeMark(m) => Mark::TradeMark(TradeMark {
+            proto::mark::Mark::TradeMark(m) => Mark::TradeMark(TradeMark {
                 id: m.id,
                 mark_name: m.mark_name,
                 holders: m.holders.into_iter().map(Into::into).collect(),
@@ -79,11 +85,15 @@ impl From<proto::mark::Mark> for Mark {
                 mark_name: m.mark_name,
                 holders: m.holders.into_iter().map(Into::into).collect(),
                 contacts: m.contacts.into_iter().map(Into::into).collect(),
-                protections: m.protections.into_iter().map(|p| Protection {
-                    country_code: p.country_code,
-                    region: p.region,
-                    ruling: p.ruling.into_iter().map(Into::into).collect(),
-                }).collect(),
+                protections: m
+                    .protections
+                    .into_iter()
+                    .map(|p| Protection {
+                        country_code: p.country_code,
+                        region: p.region,
+                        ruling: p.ruling.into_iter().map(Into::into).collect(),
+                    })
+                    .collect(),
                 labels: m.labels,
                 goods_and_services: m.goods_and_services,
                 reference_number: m.reference_number,

@@ -24,12 +24,12 @@ impl<'a, C: Into<Option<&'a str>>> From<&super::super::ClientConf<'a, C>> for TL
             host: conf.host.to_string(),
             client_cert: conf.client_cert.as_ref().map(|c| match c {
                 super::super::ClientCertConf::PKCS12(s) => ClientCertConf::PKCS12(s.to_string()),
-                super::super::ClientCertConf::PKCS11 {
-                    cert_chain, key_id
-                } => ClientCertConf::PKCS11 {
-                    key_id: key_id.to_string(),
-                    cert_chain: cert_chain.to_string(),
-                },
+                super::super::ClientCertConf::PKCS11 { cert_chain, key_id } => {
+                    ClientCertConf::PKCS11 {
+                        key_id: key_id.to_string(),
+                        cert_chain: cert_chain.to_string(),
+                    }
+                }
             }),
             root_certs: conf.root_certs.iter().map(|c| c.to_string()).collect(),
             danger_accept_invalid_certs: conf.danger_accept_invalid_certs,
@@ -42,10 +42,7 @@ pub enum ClientCertConf {
     /// PCKS#12 file path for client identity
     PKCS12(String),
     /// PCKS#11 HSM details
-    PKCS11 {
-        key_id: String,
-        cert_chain: String,
-    },
+    PKCS11 { key_id: String, cert_chain: String },
 }
 
 #[derive(Clone, Debug)]
@@ -67,7 +64,10 @@ impl TLSClient {
     ///
     /// # Arguments
     /// * `conf` - Configuration to use for this client
-    pub async fn new(conf: TLSConfig, pkcs11_engine: Option<crate::P11Engine>) -> std::io::Result<Self> {
+    pub async fn new(
+        conf: TLSConfig,
+        pkcs11_engine: Option<crate::P11Engine>,
+    ) -> std::io::Result<Self> {
         let mut should_lock = false;
 
         let mut context_builder =
@@ -110,7 +110,7 @@ impl TLSClient {
 
         let mut priv_key = None;
 
-        if let Some(client_cert) = conf.client_cert.into() {
+        if let Some(client_cert) = conf.client_cert {
             match client_cert {
                 ClientCertConf::PKCS12(pkcs12_file) => {
                     let pkcs = tokio::fs::read(pkcs12_file).await?;
@@ -165,7 +165,7 @@ impl TLSClient {
                     Ok(())
                 }
             })
-                .await??;
+            .await??;
         }
 
         Ok(Self {
@@ -251,7 +251,7 @@ impl TLSClient {
                 Ok(*std::pin::Pin::into_inner(cx))
             },
         )
-            .await
+        .await
         {
             Ok(s) => match s {
                 Ok(c) => Ok(c),
@@ -291,21 +291,35 @@ impl TLSConnection {
 }
 
 impl<'a> tokio::io::AsyncRead for TLSConnection {
-    fn poll_read(mut self: core::pin::Pin<&mut Self>, cx: &mut core::task::Context, buf: &mut tokio::io::ReadBuf) -> core::task::Poll<std::io::Result<()>> {
+    fn poll_read(
+        mut self: core::pin::Pin<&mut Self>,
+        cx: &mut core::task::Context,
+        buf: &mut tokio::io::ReadBuf,
+    ) -> core::task::Poll<std::io::Result<()>> {
         std::pin::Pin::new(&mut self.socket).poll_read(cx, buf)
     }
 }
 
 impl<'a> tokio::io::AsyncWrite for TLSConnection {
-    fn poll_write(mut self: core::pin::Pin<&mut Self>, cx: &mut core::task::Context, buf: &[u8]) -> core::task::Poll<std::io::Result<usize>> {
+    fn poll_write(
+        mut self: core::pin::Pin<&mut Self>,
+        cx: &mut core::task::Context,
+        buf: &[u8],
+    ) -> core::task::Poll<std::io::Result<usize>> {
         std::pin::Pin::new(&mut self.socket).poll_write(cx, buf)
     }
 
-    fn poll_flush(mut self: core::pin::Pin<&mut Self>, cx: &mut core::task::Context) -> core::task::Poll<std::io::Result<()>> {
+    fn poll_flush(
+        mut self: core::pin::Pin<&mut Self>,
+        cx: &mut core::task::Context,
+    ) -> core::task::Poll<std::io::Result<()>> {
         std::pin::Pin::new(&mut self.socket).poll_flush(cx)
     }
 
-    fn poll_shutdown(mut self: core::pin::Pin<&mut Self>, cx: &mut core::task::Context) -> core::task::Poll<std::io::Result<()>> {
+    fn poll_shutdown(
+        mut self: core::pin::Pin<&mut Self>,
+        cx: &mut core::task::Context,
+    ) -> core::task::Poll<std::io::Result<()>> {
         std::pin::Pin::new(&mut self.socket).poll_shutdown(cx)
     }
 }

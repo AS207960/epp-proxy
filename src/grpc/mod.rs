@@ -6,19 +6,19 @@ use futures::sink::SinkExt;
 
 use super::client;
 
-mod utils;
 mod contact;
 mod domain;
-mod host;
 mod eurid;
-mod nominet;
-mod launch;
 mod fee;
+mod host;
 mod isnic;
+mod launch;
 mod maintenance;
+mod mark;
+mod nominet;
 mod rgp;
 mod tmch;
-mod mark;
+mod utils;
 
 pub mod epp_proto {
     tonic::include_proto!("epp");
@@ -78,8 +78,8 @@ pub mod epp_proto {
         tonic::include_proto!("epp.isnic");
     }
 
-    pub mod mark {
-        tonic::include_proto!("epp.mark");
+    pub mod marks {
+        tonic::include_proto!("epp.marks");
     }
 
     pub mod tmch {
@@ -164,7 +164,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
             None => {
                 return Err(tonic::Status::invalid_argument(
                     "Launch check must be specified",
-                ))
+                ));
             }
         };
         let (res, cmd_resp) = utils::map_command_response(
@@ -818,7 +818,11 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
 
         let reply = epp_proto::rgp::RestoreReply {
             pending: res.pending,
-            state: res.state.into_iter().map(rgp::i32_from_restore_status).collect(),
+            state: res
+                .state
+                .into_iter()
+                .map(rgp::i32_from_restore_status)
+                .collect(),
             fee_data: res.fee_data.map(Into::into),
             registry_name,
             cmd_resp: Some(cmd_resp),
@@ -834,7 +838,8 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let request = request.into_inner();
         let name: String = request.name;
         let mut sender = client_by_id(&self.client_router, &request.registry_name)?;
-        let (res, cmd_resp) = utils::map_command_response(client::host::check(&name, &mut sender).await?);
+        let (res, cmd_resp) =
+            utils::map_command_response(client::host::check(&name, &mut sender).await?);
 
         let reply = epp_proto::host::HostCheckReply {
             available: res.avail,
@@ -852,7 +857,8 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let request = request.into_inner();
         let name: String = request.name;
         let mut sender = client_by_id(&self.client_router, &request.registry_name)?;
-        let (res, cmd_resp) = utils::map_command_response(client::host::info(&name, &mut sender).await?);
+        let (res, cmd_resp) =
+            utils::map_command_response(client::host::info(&name, &mut sender).await?);
 
         let mut reply: epp_proto::host::HostInfoReply = res.into();
         reply.cmd_resp = Some(cmd_resp);
@@ -916,7 +922,8 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let request = request.into_inner();
         let name: String = request.name;
         let mut sender = client_by_id(&self.client_router, &request.registry_name)?;
-        let (res, cmd_resp) = utils::map_command_response(client::host::delete(&name, &mut sender).await?);
+        let (res, cmd_resp) =
+            utils::map_command_response(client::host::delete(&name, &mut sender).await?);
 
         let reply = epp_proto::host::HostDeleteReply {
             pending: res.pending,
@@ -1010,7 +1017,8 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let request = request.into_inner();
         let id: String = request.id;
         let mut sender = client_by_id(&self.client_router, &request.registry_name)?;
-        let (res, cmd_resp) = utils::map_command_response(client::contact::check(&id, &mut sender).await?);
+        let (res, cmd_resp) =
+            utils::map_command_response(client::contact::check(&id, &mut sender).await?);
 
         let reply = epp_proto::contact::ContactCheckReply {
             available: res.avail,
@@ -1028,7 +1036,8 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let request = request.into_inner();
         let id: String = request.id;
         let mut sender = client_by_id(&self.client_router, &request.registry_name)?;
-        let (res, cmd_resp) = utils::map_command_response(client::contact::info(&id, &mut sender).await?);
+        let (res, cmd_resp) =
+            utils::map_command_response(client::contact::info(&id, &mut sender).await?);
 
         let mut reply: epp_proto::contact::ContactInfoReply = res.into();
         reply.cmd_resp = Some(cmd_resp);
@@ -1168,8 +1177,9 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
     ) -> Result<tonic::Response<epp_proto::contact::ContactTransferReply>, tonic::Status> {
         let request = request.into_inner();
         let mut sender = client_by_id(&self.client_router, &request.registry_name)?;
-        let (res, cmd_resp) =
-            utils::map_command_response(client::contact::transfer_query(&request.id, &mut sender).await?);
+        let (res, cmd_resp) = utils::map_command_response(
+            client::contact::transfer_query(&request.id, &mut sender).await?,
+        );
 
         let mut reply: epp_proto::contact::ContactTransferReply = res.into();
         reply.cmd_resp = Some(cmd_resp);
@@ -1247,7 +1257,8 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
     ) -> Result<tonic::Response<epp_proto::maintenance::MaintenanceListReply>, tonic::Status> {
         let request = request.into_inner();
         let mut sender = client_by_id(&self.client_router, &request.registry_name)?;
-        let (res, cmd_resp) = utils::map_command_response(client::maintenance::list(&mut sender).await?);
+        let (res, cmd_resp) =
+            utils::map_command_response(client::maintenance::list(&mut sender).await?);
 
         let reply = epp_proto::maintenance::MaintenanceListReply {
             items: res
@@ -1616,7 +1627,8 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let request = request.into_inner();
         let mut sender = client_by_id(&self.client_router, &request.registry_name)?;
 
-        let (resp, cmd_resp) = utils::map_command_response(client::nominet::tag_list(&mut sender).await?);
+        let (resp, cmd_resp) =
+            utils::map_command_response(client::nominet::tag_list(&mut sender).await?);
 
         let reply = epp_proto::nominet::NominetTagListReply {
             tags: resp
@@ -1635,6 +1647,110 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         Ok(tonic::Response::new(reply))
     }
 
+    async fn nominet_contact_validate(
+        &self,
+        request: tonic::Request<epp_proto::nominet::ContactValidateRequest>,
+    ) -> Result<tonic::Response<epp_proto::nominet::ContactValidateReply>, tonic::Status> {
+        let request = request.into_inner();
+        let mut sender = client_by_id(&self.client_router, &request.registry_name)?;
+
+        let (_resp, cmd_resp) = utils::map_command_response(
+            client::nominet::contact_validate(&request.contact_id, &mut sender).await?,
+        );
+
+        let reply = epp_proto::nominet::ContactValidateReply {
+            cmd_resp: Some(cmd_resp),
+        };
+
+        Ok(tonic::Response::new(reply))
+    }
+
+    async fn nominet_lock(
+        &self,
+        request: tonic::Request<epp_proto::nominet::LockRequest>,
+    ) -> Result<tonic::Response<epp_proto::nominet::LockReply>, tonic::Status> {
+        let request = request.into_inner();
+        let mut sender = client_by_id(&self.client_router, &request.registry_name)?;
+
+        let (_resp, cmd_resp) = utils::map_command_response(
+            client::nominet::lock(
+                match request.object {
+                    Some(o) => match o.object {
+                        Some(epp_proto::nominet::object::Object::Domain(d)) => {
+                            client::nominet::Object::Domain(d)
+                        }
+                        Some(epp_proto::nominet::object::Object::Registrant(r)) => {
+                            client::nominet::Object::Registrant(r)
+                        }
+
+                        None => {
+                            return Err(tonic::Status::invalid_argument(
+                                "release object must be specified",
+                            ))
+                        }
+                    },
+                    None => {
+                        return Err(tonic::Status::invalid_argument(
+                            "release object must be specified",
+                        ))
+                    }
+                },
+                &request.lock_type,
+                &mut sender,
+            )
+            .await?,
+        );
+
+        let reply = epp_proto::nominet::LockReply {
+            cmd_resp: Some(cmd_resp),
+        };
+
+        Ok(tonic::Response::new(reply))
+    }
+
+    async fn nominet_unlock(
+        &self,
+        request: tonic::Request<epp_proto::nominet::LockRequest>,
+    ) -> Result<tonic::Response<epp_proto::nominet::LockReply>, tonic::Status> {
+        let request = request.into_inner();
+        let mut sender = client_by_id(&self.client_router, &request.registry_name)?;
+
+        let (_resp, cmd_resp) = utils::map_command_response(
+            client::nominet::unlock(
+                match request.object {
+                    Some(o) => match o.object {
+                        Some(epp_proto::nominet::object::Object::Domain(d)) => {
+                            client::nominet::Object::Domain(d)
+                        }
+                        Some(epp_proto::nominet::object::Object::Registrant(r)) => {
+                            client::nominet::Object::Registrant(r)
+                        }
+
+                        None => {
+                            return Err(tonic::Status::invalid_argument(
+                                "release object must be specified",
+                            ))
+                        }
+                    },
+                    None => {
+                        return Err(tonic::Status::invalid_argument(
+                            "release object must be specified",
+                        ))
+                    }
+                },
+                &request.lock_type,
+                &mut sender,
+            )
+            .await?,
+        );
+
+        let reply = epp_proto::nominet::LockReply {
+            cmd_resp: Some(cmd_resp),
+        };
+
+        Ok(tonic::Response::new(reply))
+    }
+
     async fn nominet_accept(
         &self,
         request: tonic::Request<epp_proto::nominet::HandshakeAcceptRequest>,
@@ -1642,11 +1758,14 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let request = request.into_inner();
         let mut sender = client_by_id(&self.client_router, &request.registry_name)?;
 
-        let (resp, cmd_resp) = utils::map_command_response(client::nominet::handshake_accept(
-            &request.case_id,
-            request.registrant.as_deref(),
-            &mut sender
-        ).await?);
+        let (resp, cmd_resp) = utils::map_command_response(
+            client::nominet::handshake_accept(
+                &request.case_id,
+                request.registrant.as_deref(),
+                &mut sender,
+            )
+            .await?,
+        );
 
         let mut reply: epp_proto::nominet::HandshakeReply = resp.into();
         reply.cmd_resp = Some(cmd_resp);
@@ -1661,10 +1780,9 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let request = request.into_inner();
         let mut sender = client_by_id(&self.client_router, &request.registry_name)?;
 
-        let (resp, cmd_resp) = utils::map_command_response(client::nominet::handshake_reject(
-            &request.case_id,
-            &mut sender
-        ).await?);
+        let (resp, cmd_resp) = utils::map_command_response(
+            client::nominet::handshake_reject(&request.case_id, &mut sender).await?,
+        );
 
         let mut reply: epp_proto::nominet::HandshakeReply = resp.into();
         reply.cmd_resp = Some(cmd_resp);
@@ -1679,17 +1797,34 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let request = request.into_inner();
         let mut sender = client_by_id(&self.client_router, &request.registry_name)?;
 
-        let (resp, cmd_resp) = utils::map_command_response(client::nominet::release(
-            &request.registrar_tag,
-            match request.object {
-                Some(epp_proto::nominet::release_request::Object::Domain(d)) => client::nominet::ReleaseObject::Domain(d),
-                Some(epp_proto::nominet::release_request::Object::Registrant(r)) => client::nominet::ReleaseObject::Registrant(r),
-                None => return Err(tonic::Status::invalid_argument(
-                    "release object must be specified",
-                ))
-            },
-            &mut sender
-        ).await?);
+        let (resp, cmd_resp) = utils::map_command_response(
+            client::nominet::release(
+                &request.registrar_tag,
+                match request.object {
+                    Some(o) => match o.object {
+                        Some(epp_proto::nominet::object::Object::Domain(d)) => {
+                            client::nominet::Object::Domain(d)
+                        }
+                        Some(epp_proto::nominet::object::Object::Registrant(r)) => {
+                            client::nominet::Object::Registrant(r)
+                        }
+
+                        None => {
+                            return Err(tonic::Status::invalid_argument(
+                                "release object must be specified",
+                            ))
+                        }
+                    },
+                    None => {
+                        return Err(tonic::Status::invalid_argument(
+                            "release object must be specified",
+                        ))
+                    }
+                },
+                &mut sender,
+            )
+            .await?,
+        );
 
         let reply = epp_proto::nominet::ReleaseReply {
             pending: resp.pending,
@@ -1723,7 +1858,8 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let request = request.into_inner();
         let id: String = request.id;
         let mut sender = client_by_id(&self.client_router, &request.registry_name)?;
-        let (res, cmd_resp) = utils::map_command_response(client::tmch::check(&id, &mut sender).await?);
+        let (res, cmd_resp) =
+            utils::map_command_response(client::tmch::check(&id, &mut sender).await?);
 
         let mut reply: epp_proto::tmch::MarkCheckResponse = res.into();
         reply.cmd_resp = Some(cmd_resp);
@@ -1731,26 +1867,26 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         Ok(tonic::Response::new(reply))
     }
 
-
     async fn tmch_mark_create(
         &self,
         request: tonic::Request<epp_proto::tmch::MarkCreateRequest>,
     ) -> Result<tonic::Response<epp_proto::tmch::MarkCreateResponse>, tonic::Status> {
         let request = request.into_inner();
         let mut sender = client_by_id(&self.client_router, &request.registry_name)?;
-        let (res, cmd_resp) = utils::map_command_response(client::tmch::create(
-            match request.mark {
-                Some(m) => m.try_into()?,
-                None => return Err(tonic::Status::invalid_argument(
-                    "mark must be specified",
-                ))
-            },
-            request.period.map(Into::into),
-            request.documents.into_iter().map(Into::into).collect(),
-            request.labels.into_iter().map(Into::into).collect(),
-            request.variations,
-            &mut sender
-        ).await?);
+        let (res, cmd_resp) = utils::map_command_response(
+            client::tmch::create(
+                match request.mark {
+                    Some(m) => m.try_into()?,
+                    None => return Err(tonic::Status::invalid_argument("mark must be specified")),
+                },
+                request.period.map(Into::into),
+                request.documents.into_iter().map(Into::into).collect(),
+                request.labels.into_iter().map(Into::into).collect(),
+                request.variations,
+                &mut sender,
+            )
+            .await?,
+        );
 
         let mut reply: epp_proto::tmch::MarkCreateResponse = res.into();
         reply.cmd_resp = Some(cmd_resp);
@@ -1765,7 +1901,8 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let request = request.into_inner();
         let id: String = request.id;
         let mut sender = client_by_id(&self.client_router, &request.registry_name)?;
-        let (res, cmd_resp) = utils::map_command_response(client::tmch::mark_info(&id, &mut sender).await?);
+        let (res, cmd_resp) =
+            utils::map_command_response(client::tmch::mark_info(&id, &mut sender).await?);
 
         let mut reply: epp_proto::tmch::MarkInfoResponse = res.into();
         reply.cmd_resp = Some(cmd_resp);
@@ -1780,7 +1917,8 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let request = request.into_inner();
         let id: String = request.id;
         let mut sender = client_by_id(&self.client_router, &request.registry_name)?;
-        let (res, cmd_resp) = utils::map_command_response(client::tmch::mark_smd_info(&id, &mut sender).await?);
+        let (res, cmd_resp) =
+            utils::map_command_response(client::tmch::mark_smd_info(&id, &mut sender).await?);
 
         let mut reply: epp_proto::tmch::MarkSmdInfoResponse = res.into();
         reply.cmd_resp = Some(cmd_resp);
@@ -1795,7 +1933,9 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let request = request.into_inner();
         let id: String = request.id;
         let mut sender = client_by_id(&self.client_router, &request.registry_name)?;
-        let (res, cmd_resp) = utils::map_command_response(client::tmch::mark_encoded_smd_info(&id, &mut sender).await?);
+        let (res, cmd_resp) = utils::map_command_response(
+            client::tmch::mark_encoded_smd_info(&id, &mut sender).await?,
+        );
 
         let mut reply: epp_proto::tmch::MarkSmdInfoResponse = res.into();
         reply.cmd_resp = Some(cmd_resp);
@@ -1810,7 +1950,8 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let request = request.into_inner();
         let id: String = request.id;
         let mut sender = client_by_id(&self.client_router, &request.registry_name)?;
-        let (res, cmd_resp) = utils::map_command_response(client::tmch::mark_file_info(&id, &mut sender).await?);
+        let (res, cmd_resp) =
+            utils::map_command_response(client::tmch::mark_file_info(&id, &mut sender).await?);
 
         let mut reply: epp_proto::tmch::MarkSmdInfoResponse = res.into();
         reply.cmd_resp = Some(cmd_resp);
@@ -1825,26 +1966,54 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let request = request.into_inner();
         let mut sender = client_by_id(&self.client_router, &request.registry_name)?;
 
-        let (res, cmd_resp) = utils::map_command_response(client::tmch::update(
-            &request.id,
-            request.add.into_iter().filter_map(|a| match a.update {
-                Some(epp_proto::tmch::mark_update_add::Update::Document(d)) => Some(client::tmch::UpdateAdd::Document(d.into())),
-                Some(epp_proto::tmch::mark_update_add::Update::Label(l)) => Some(client::tmch::UpdateAdd::Label(l.into())),
-                Some(epp_proto::tmch::mark_update_add::Update::Variation(v)) => Some(client::tmch::UpdateAdd::Variation(v)),
-                None => None,
-            }).collect(),
-            request.remove.into_iter().filter_map(|a| match a.update {
-                Some(epp_proto::tmch::mark_update_remove::Update::Label(l)) => Some(client::tmch::UpdateRemove::Label(l)),
-                Some(epp_proto::tmch::mark_update_remove::Update::Variation(v)) => Some(client::tmch::UpdateRemove::Variation(v)),
-                None => None,
-            }).collect(),
-            match request.new_mark {
-                Some(m) => Some(m.try_into()?),
-                None => None,
-            },
-            request.update_labels.into_iter().map(Into::into).collect(),
-            &mut sender
-        ).await?);
+        let (res, cmd_resp) = utils::map_command_response(
+            client::tmch::update(
+                &request.id,
+                request
+                    .add
+                    .into_iter()
+                    .filter_map(|a| match a.update {
+                        Some(epp_proto::tmch::mark_update_add::Update::Document(d)) => {
+                            Some(Ok(client::tmch::UpdateAdd::Document(d.into())))
+                        }
+                        Some(epp_proto::tmch::mark_update_add::Update::Label(l)) => {
+                            Some(Ok(client::tmch::UpdateAdd::Label(l.into())))
+                        }
+                        Some(epp_proto::tmch::mark_update_add::Update::Variation(v)) => {
+                            Some(Ok(client::tmch::UpdateAdd::Variation(v)))
+                        }
+                        Some(epp_proto::tmch::mark_update_add::Update::Case(c)) => {
+                            match c.try_into() {
+                                Ok(c) => Some(Ok(client::tmch::UpdateAdd::Case(c))),
+                                Err(e) => Some(Err(e)),
+                            }
+                        }
+                        None => None,
+                    })
+                    .collect::<Result<Vec<_>, _>>()?,
+                request
+                    .remove
+                    .into_iter()
+                    .filter_map(|a| match a.update {
+                        Some(epp_proto::tmch::mark_update_remove::Update::Label(l)) => {
+                            Some(client::tmch::UpdateRemove::Label(l))
+                        }
+                        Some(epp_proto::tmch::mark_update_remove::Update::Variation(v)) => {
+                            Some(client::tmch::UpdateRemove::Variation(v))
+                        }
+                        None => None,
+                    })
+                    .collect(),
+                match request.new_mark {
+                    Some(m) => Some(m.try_into()?),
+                    None => None,
+                },
+                request.update_labels.into_iter().map(Into::into).collect(),
+                request.update_cases.into_iter().map(Into::into).collect(),
+                &mut sender,
+            )
+            .await?,
+        );
 
         let mut reply: epp_proto::tmch::MarkUpdateResponse = res.into();
         reply.cmd_resp = Some(cmd_resp);
@@ -1866,12 +2035,15 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
             ));
         }
 
-        let (res, cmd_resp) = utils::map_command_response(client::tmch::renew(
-            &request.id,
-            cur_expiry_date.unwrap(),
-            request.add_period.map(Into::into),
-            &mut sender
-        ).await?);
+        let (res, cmd_resp) = utils::map_command_response(
+            client::tmch::renew(
+                &request.id,
+                cur_expiry_date.unwrap(),
+                request.add_period.map(Into::into),
+                &mut sender,
+            )
+            .await?,
+        );
 
         let mut reply: epp_proto::tmch::MarkRenewResponse = res.into();
         reply.cmd_resp = Some(cmd_resp);
@@ -1886,7 +2058,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let request = request.into_inner();
         let mut sender = client_by_id(&self.client_router, &request.registry_name)?;
         let (res, cmd_resp) = utils::map_command_response(
-            client::tmch::transfer_initiate(&request.id, &mut sender).await?
+            client::tmch::transfer_initiate(&request.id, &mut sender).await?,
         );
 
         let mut reply: epp_proto::tmch::MarkTransferInitiateResponse = res.into();
@@ -1902,7 +2074,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let request = request.into_inner();
         let mut sender = client_by_id(&self.client_router, &request.registry_name)?;
         let (res, cmd_resp) = utils::map_command_response(
-            client::tmch::transfer(&request.id, &request.auth_info, &mut sender).await?
+            client::tmch::transfer(&request.id, &request.auth_info, &mut sender).await?,
         );
 
         let mut reply: epp_proto::tmch::MarkTransferResponse = res.into();
@@ -1910,5 +2082,4 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
 
         Ok(tonic::Response::new(reply))
     }
-
 }

@@ -1,6 +1,7 @@
 use chrono::prelude::*;
 
 #[derive(Debug, Serialize, Deserialize)]
+#[allow(clippy::enum_variant_names)]
 pub enum Mark {
     #[serde(rename = "{urn:ietf:params:xml:ns:mark-1.0}trademark")]
     TradeMark(TradeMark),
@@ -267,5 +268,5 @@ pub struct Phone {
     #[serde(rename = "$value")]
     pub number: String,
     #[serde(rename = "$attr:x", skip_serializing_if = "Option::is_none", default)]
-    pub extension: Option<String>
+    pub extension: Option<String>,
 }

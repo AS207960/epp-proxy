@@ -19,14 +19,14 @@ pub mod host;
 pub mod isnic;
 pub mod launch;
 pub mod maintenance;
+pub mod mark;
 pub mod nominet;
 pub mod poll;
 pub mod rgp;
 pub mod router;
+pub mod tmch;
 pub mod traficom;
 pub mod verisign;
-pub mod tmch;
-pub mod mark;
 
 pub use router::{CommandResponse, RequestMessage, RequestSender, Response, Sender};
 
@@ -133,7 +133,6 @@ pub struct Phone {
     /// Optional internal extension
     pub extension: Option<String>,
 }
-
 
 #[derive(Debug)]
 pub struct LogoutRequest {

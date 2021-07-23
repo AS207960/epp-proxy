@@ -5,15 +5,15 @@ use std::convert::{TryFrom, TryInto};
 use super::super::domain::{
     CheckRequest, CheckResponse, ClaimsCheckRequest, ClaimsCheckResponse, CreateData,
     CreateRequest, CreateResponse, DeleteRequest, DeleteResponse, InfoContact, InfoHost,
-    InfoNameserver, InfoRequest, InfoResponse, PanData, RenewData,
-    RenewRequest, RenewResponse, SecDNSDSData, SecDNSData, SecDNSDataType, SecDNSKeyData, Status,
-    TrademarkCheckRequest, TransferAcceptRejectRequest, TransferData, TransferQueryRequest,
-    TransferRequestRequest, TransferResponse, UpdateObject, UpdateRequest, UpdateResponse,
-    UpdateSecDNSRemove, VerisignSyncRequest,
+    InfoNameserver, InfoRequest, InfoResponse, PanData, RenewData, RenewRequest, RenewResponse,
+    SecDNSDSData, SecDNSData, SecDNSDataType, SecDNSKeyData, Status, TrademarkCheckRequest,
+    TransferAcceptRejectRequest, TransferData, TransferQueryRequest, TransferRequestRequest,
+    TransferResponse, UpdateObject, UpdateRequest, UpdateResponse, UpdateSecDNSRemove,
+    VerisignSyncRequest,
 };
-use super::super::{fee, launch, proto, Error, Response, Period, PeriodUnit};
-use super::ServerFeatures;
+use super::super::{fee, launch, proto, Error, Period, PeriodUnit, Response};
 use super::router::HandleReqReturn;
+use super::ServerFeatures;
 
 impl From<proto::domain::EPPDomainStatusType> for Status {
     fn from(from: proto::domain::EPPDomainStatusType) -> Self {

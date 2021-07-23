@@ -4,7 +4,11 @@ use chrono::prelude::*;
 pub struct TrexInfo {
     #[serde(rename = "$attr:enable")]
     pub enable: bool,
-    #[serde(rename = "$attr:until", deserialize_with = "super::super::deserialize_datetime_opt", default)]
+    #[serde(
+        rename = "$attr:until",
+        deserialize_with = "super::super::deserialize_datetime_opt",
+        default
+    )]
     pub until: Option<DateTime<Utc>>,
     #[serde(rename = "{urn:ietf:params:xml:ns:tmch-1.1}tld", default)]
     pub tlds: Vec<TLDInfo>,

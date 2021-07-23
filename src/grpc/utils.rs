@@ -31,7 +31,9 @@ pub fn chrono_to_proto<T: chrono::TimeZone>(
     })
 }
 
-pub fn proto_to_chrono(time: Option<prost_types::Timestamp>) -> Option<chrono::DateTime<chrono::Utc>> {
+pub fn proto_to_chrono(
+    time: Option<prost_types::Timestamp>,
+) -> Option<chrono::DateTime<chrono::Utc>> {
     use chrono::offset::TimeZone;
     match time {
         Some(t) => chrono::Utc
@@ -122,7 +124,6 @@ pub fn map_command_response<T>(
     )
 }
 
-
 pub fn period_unit_from_i32(from: i32) -> client::PeriodUnit {
     match epp_proto::common::period::Unit::from_i32(from) {
         Some(e) => match e {
@@ -149,7 +150,6 @@ impl From<epp_proto::common::Period> for client::Period {
     }
 }
 
-
 impl From<epp_proto::common::Phone> for client::Phone {
     fn from(from: epp_proto::common::Phone) -> Self {
         client::Phone {
@@ -167,4 +167,3 @@ impl From<client::Phone> for epp_proto::common::Phone {
         }
     }
 }
-

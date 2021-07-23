@@ -1,15 +1,10 @@
-use chrono::prelude::*;
-use super::super::poll::{
-    PollAckRequest, PollAckResponse, PollRequest, PollResponse, PollData
-};
-use super::tmch_proto;
+use super::super::poll::{PollAckRequest, PollAckResponse, PollData, PollRequest, PollResponse};
 use super::super::{Error, Response};
 use super::router::HandleReqReturn;
+use super::tmch_proto;
+use chrono::prelude::*;
 
-pub fn handle_poll(
-    _client: &(),
-    _req: &PollRequest,
-) -> HandleReqReturn<Option<PollResponse>> {
+pub fn handle_poll(_client: &(), _req: &PollRequest) -> HandleReqReturn<Option<PollResponse>> {
     let command = tmch_proto::TMCHPoll {
         operation: tmch_proto::TMCHPollOperation::Request,
         message_id: None,
@@ -28,9 +23,7 @@ pub fn handle_poll_response(response: tmch_proto::TMCHResponse) -> Response<Opti
                     enqueue_time: value.enqueue_date.unwrap_or_else(Utc::now),
                     message: value.message.unwrap_or_default(),
                     data: match response.data {
-                        Some(value) => match value.value {
-                            _ => return Err(Error::ServerInternal),
-                        },
+                        Some(_value) => return Err(Error::ServerInternal),
                         None => PollData::None,
                     },
                 })),
@@ -42,10 +35,7 @@ pub fn handle_poll_response(response: tmch_proto::TMCHResponse) -> Response<Opti
     }
 }
 
-pub fn handle_poll_ack(
-    _client: &(),
-    req: &PollAckRequest,
-) -> HandleReqReturn<PollAckResponse> {
+pub fn handle_poll_ack(_client: &(), req: &PollAckRequest) -> HandleReqReturn<PollAckResponse> {
     let command = tmch_proto::TMCHPoll {
         operation: tmch_proto::TMCHPollOperation::Acknowledge,
         message_id: Some(req.id.clone()),

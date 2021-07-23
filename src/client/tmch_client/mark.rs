@@ -1,15 +1,15 @@
 use super::super::tmch::{
-    MarkStatus, MarkPOUStatus, Status, MarkSMDInfoRequest, MarkSMDInfoResponse,
-    MarkInfoRequest, MarkInfoResponse, MarkLabel, RenewResponse, RenewRequest,
-    CheckRequest, CheckResponse, TransferRequest, TransferResponse,
-    TransferInitiateResponse, TransferInitiateRequest, BalanceData,
-    MarkVariation, TrexStatus, CreateRequest, CreateResponse, DocumentClass,
-    Document, FileType, UpdateRequest, UpdateResponse, UpdateAdd, UpdateRemove,
-    CreateLabel
+    AddCase, BalanceData, CaseAdd, CaseDocument, CaseDocumentClass, CaseRemove, CheckRequest,
+    CheckResponse, CreateLabel, CreateRequest, CreateResponse, Document, DocumentClass, FileType,
+    MarkInfoRequest, MarkInfoResponse, MarkLabel, MarkPOUStatus, MarkSMDInfoRequest,
+    MarkSMDInfoResponse, MarkStatus, MarkVariation, RenewRequest, RenewResponse, Status,
+    TransferInitiateRequest, TransferInitiateResponse, TransferRequest, TransferResponse,
+    TrexStatus, UpdateAdd, UpdateRemove, UpdateRequest, UpdateResponse,
 };
-use super::tmch_proto;
-use super::super::{Error, Response, Period, PeriodUnit};
+use super::super::{Error, Period, PeriodUnit, Response};
 use super::router::HandleReqReturn;
+use super::tmch_proto;
+use crate::client::tmch::CaseType;
 use std::convert::{TryFrom, TryInto};
 
 pub(crate) fn check_mark_id<T>(id: &str) -> Result<(), Response<T>> {
@@ -19,12 +19,20 @@ pub(crate) fn check_mark_id<T>(id: &str) -> Result<(), Response<T>> {
     if RE.is_match(id) {
         Ok(())
     } else {
-        Err(Err(Error::Err(
-            "invalid mark_id".to_string(),
-        )))
+        Err(Err(Error::Err("invalid mark_id".to_string())))
     }
 }
 
+pub(crate) fn check_case_id<T>(id: &str) -> Result<(), Response<T>> {
+    lazy_static! {
+        static ref RE: regex::Regex = regex::Regex::new("case-\\d+").unwrap();
+    }
+    if RE.is_match(id) {
+        Ok(())
+    } else {
+        Err(Err(Error::Err("invalid case_id".to_string())))
+    }
+}
 
 impl From<&CreateLabel> for tmch_proto::TMCHLabel {
     fn from(from: &CreateLabel) -> Self {
@@ -48,19 +56,90 @@ impl From<&Document> for tmch_proto::TMCHDocument {
     fn from(from: &Document) -> Self {
         tmch_proto::TMCHDocument {
             document_class: match from.class {
-                DocumentClass::AssigneeDeclaration => tmch_proto::TMCHDocumentClass::AssigneeDeclaration,
-                DocumentClass::LicenseeDeclaration => tmch_proto::TMCHDocumentClass::LicenseeDeclaration,
-                DocumentClass::DeclarationProofOfUseOneSample => tmch_proto::TMCHDocumentClass::DeclarationProofOfUseOneSample,
+                DocumentClass::AssigneeDeclaration => {
+                    tmch_proto::TMCHDocumentClass::AssigneeDeclaration
+                }
+                DocumentClass::LicenseeDeclaration => {
+                    tmch_proto::TMCHDocumentClass::LicenseeDeclaration
+                }
+                DocumentClass::DeclarationProofOfUseOneSample => {
+                    tmch_proto::TMCHDocumentClass::DeclarationProofOfUseOneSample
+                }
                 DocumentClass::OtherProofOfUse => tmch_proto::TMCHDocumentClass::OtherProofOfUse,
                 DocumentClass::CopyOfCourtOrder => tmch_proto::TMCHDocumentClass::CopyOfCourtOrder,
                 DocumentClass::Other => tmch_proto::TMCHDocumentClass::Other,
             },
             file_name: Some(from.file_name.to_string()),
             file_type: match from.file_type {
-                FileType::JPG => tmch_proto::TMCHFileType::JPG,
-                FileType::PDF => tmch_proto::TMCHFileType::PDF,
+                FileType::Jpg => tmch_proto::TMCHFileType::Jpg,
+                FileType::Pdf => tmch_proto::TMCHFileType::Pdf,
             },
             file_content: base64::encode(&from.contents),
+        }
+    }
+}
+
+impl From<&CaseDocument> for tmch_proto::TMCHCaseDocument {
+    fn from(from: &CaseDocument) -> Self {
+        tmch_proto::TMCHCaseDocument {
+            document_class: match from.class {
+                CaseDocumentClass::CourtDecision => {
+                    tmch_proto::TMCHCaseDocumentClass::CourtCaseDocument
+                }
+                CaseDocumentClass::Other => tmch_proto::TMCHCaseDocumentClass::Other,
+            },
+            file_name: Some(from.file_name.to_string()),
+            file_type: match from.file_type {
+                FileType::Jpg => tmch_proto::TMCHFileType::Jpg,
+                FileType::Pdf => tmch_proto::TMCHFileType::Pdf,
+            },
+            file_content: base64::encode(&from.contents),
+        }
+    }
+}
+
+impl From<&AddCase> for tmch_proto::TMCHCase {
+    fn from(from: &AddCase) -> Self {
+        tmch_proto::TMCHCase {
+            id: from.id.to_string(),
+            case_type: None,
+            documents: from.documents.iter().map(Into::into).collect(),
+            labels: from
+                .labels
+                .iter()
+                .map(|l| tmch_proto::TMCHCaseLabel {
+                    label: l.to_string(),
+                })
+                .collect(),
+        }
+    }
+}
+
+impl From<&CaseType> for tmch_proto::TMCHCaseType {
+    fn from(from: &CaseType) -> Self {
+        match from {
+            CaseType::Court {
+                decision_id,
+                country_code,
+                regions,
+                court_name,
+                case_language,
+            } => tmch_proto::TMCHCaseType::Court(tmch_proto::TMCHCourt {
+                reference: decision_id.to_string(),
+                country_code: country_code.to_string(),
+                regions: regions.iter().map(Into::into).collect(),
+                court_name: court_name.to_string(),
+                case_language: case_language.to_string(),
+            }),
+            CaseType::Udrp {
+                case_language,
+                case_id,
+                provider,
+            } => tmch_proto::TMCHCaseType::Udrp(tmch_proto::TMCHUdrp {
+                case_number: case_id.to_string(),
+                udrp_provider: provider.to_string(),
+                case_language: case_language.to_string(),
+            }),
         }
     }
 }
@@ -76,7 +155,7 @@ pub fn handle_check(_client: &(), req: &CheckRequest) -> HandleReqReturn<CheckRe
 pub fn handle_check_response(response: tmch_proto::TMCHResponse) -> Response<CheckResponse> {
     match response.data {
         Some(value) => match value.value {
-            tmch_proto::TMCHResultDataValue::TMCHCheckData(msg) => {
+            tmch_proto::TMCHResultDataValue::TMCHCheck(msg) => {
                 if let Some(mark_check) = msg.data.first() {
                     Response::Ok(CheckResponse {
                         avail: mark_check.id.available,
@@ -92,15 +171,12 @@ pub fn handle_check_response(response: tmch_proto::TMCHResponse) -> Response<Che
     }
 }
 
-pub fn handle_create(
-    _client: &(),
-    req: &CreateRequest,
-) -> HandleReqReturn<CreateResponse> {
+pub fn handle_create(_client: &(), req: &CreateRequest) -> HandleReqReturn<CreateResponse> {
     let command = tmch_proto::TMCHCreate {
         mark: Some((&req.mark).into()),
         period: match req.period.as_ref() {
             Some(r) => Some(r.try_into().map_err(Result::Err)?),
-            None => None
+            None => None,
         },
         documents: req.documents.iter().map(Into::into).collect(),
         labels: req.labels.iter().map(Into::into).collect(),
@@ -108,39 +184,38 @@ pub fn handle_create(
             vec![]
         } else {
             vec![tmch_proto::variation::Variation {
-                labels: req.variations.iter().map(|l| tmch_proto::variation::Label {
-                    id: None,
-                    a_label: l.to_string(),
-                    u_label: None,
-                    variation_type: None,
-                    active: None,
-                }).collect()
+                labels: req
+                    .variations
+                    .iter()
+                    .map(|l| tmch_proto::variation::Label {
+                        id: None,
+                        a_label: l.to_string(),
+                        u_label: None,
+                        variation_type: None,
+                        active: None,
+                    })
+                    .collect(),
             }]
         },
     };
-    Ok(tmch_proto::TMCHCommandType::Create(command))
+    Ok(tmch_proto::TMCHCommandType::Create(Box::new(command)))
 }
 
 pub fn handle_create_response(response: tmch_proto::TMCHResponse) -> Response<CreateResponse> {
     match response.data {
         Some(value) => match value.value {
-            tmch_proto::TMCHResultDataValue::TMCHCreateData(msg) => {
-                Response::Ok(CreateResponse {
-                    id: msg.id,
-                    created_date: msg.creation_date,
-                    balance: msg.balance.into(),
-                })
-            }
+            tmch_proto::TMCHResultDataValue::TMCHCreate(msg) => Response::Ok(CreateResponse {
+                id: msg.id,
+                created_date: msg.creation_date,
+                balance: msg.balance.into(),
+            }),
             _ => Err(Error::ServerInternal),
         },
         None => Err(Error::ServerInternal),
     }
 }
 
-pub fn handle_mark_info(
-    _client: &(),
-    req: &MarkInfoRequest,
-) -> HandleReqReturn<MarkInfoResponse> {
+pub fn handle_mark_info(_client: &(), req: &MarkInfoRequest) -> HandleReqReturn<MarkInfoResponse> {
     check_mark_id(&req.id)?;
     let command = tmch_proto::TMCHInfo {
         id: req.id.to_string(),
@@ -220,11 +295,12 @@ impl From<tmch_proto::TMCHStatus<tmch_proto::TMCHPOUStatusType>> for Status<Mark
     }
 }
 
-
 impl From<tmch_proto::trex::TLDStatus> for TrexStatus {
     fn from(from: tmch_proto::trex::TLDStatus) -> Self {
         match from {
-            tmch_proto::trex::TLDStatus::NotProtectedRegistered => TrexStatus::NotProtectedRegistered,
+            tmch_proto::trex::TLDStatus::NotProtectedRegistered => {
+                TrexStatus::NotProtectedRegistered
+            }
             tmch_proto::trex::TLDStatus::NotProtectedExempt => TrexStatus::NotProtectedExempt,
             tmch_proto::trex::TLDStatus::NotProtectedOther => TrexStatus::NotProtectedOther,
             tmch_proto::trex::TLDStatus::NotProtectedOverride => TrexStatus::NotProtectedOverride,
@@ -277,7 +353,11 @@ impl TryFrom<&Period> for tmch_proto::TMCHPeriod {
             value: std::cmp::min(99, std::cmp::max(from.value, 1)),
             unit: match from.unit {
                 PeriodUnit::Years => tmch_proto::TMCHPeriodUnit::Years,
-                PeriodUnit::Months => return Err(Error::Err("month based periods are not valid for TMCH".to_string()))
+                PeriodUnit::Months => {
+                    return Err(Error::Err(
+                        "month based periods are not valid for TMCH".to_string(),
+                    ))
+                }
             },
         })
     }
@@ -286,14 +366,20 @@ impl TryFrom<&Period> for tmch_proto::TMCHPeriod {
 pub fn handle_mark_info_response(response: tmch_proto::TMCHResponse) -> Response<MarkInfoResponse> {
     match response.data {
         Some(value) => match value.value {
-            tmch_proto::TMCHResultDataValue::TMCHInfoData(msg) => {
+            tmch_proto::TMCHResultDataValue::TMCHInfo(msg) => {
                 match (msg.pou_status, msg.mark) {
                     (Some(pou_status), Some(_mark)) => Response::Ok(MarkInfoResponse {
                         id: msg.id,
                         status: msg.status.into(),
                         pou_status: pou_status.into(),
                         labels: msg.labels.into_iter().map(Into::into).collect(),
-                        variations: msg.variations.into_iter().map(|v| v.labels).flatten().map(Into::into).collect(),
+                        variations: msg
+                            .variations
+                            .into_iter()
+                            .map(|v| v.labels)
+                            .flatten()
+                            .map(Into::into)
+                            .collect(),
                         creation_date: msg.creation_date,
                         update_date: msg.update_date,
                         expiry_date: msg.expiry_date,
@@ -315,15 +401,15 @@ struct SMDInfo {
     pub signed_mark: String,
 }
 
-pub fn handle_mark_smd_info_response(response: tmch_proto::TMCHResponse) -> Response<MarkSMDInfoResponse> {
+pub fn handle_mark_smd_info_response(
+    response: tmch_proto::TMCHResponse,
+) -> Response<MarkSMDInfoResponse> {
     match response.data {
         Some(value) => match value.value {
-            tmch_proto::TMCHResultDataValue::TMCHInfoData(msg) => {
+            tmch_proto::TMCHResultDataValue::TMCHInfo(msg) => {
                 match (msg.signed_mark, msg.smd_id) {
                     (Some(smd), Some(smd_id)) => {
-                        let smd = SMDInfo {
-                            signed_mark: smd
-                        };
+                        let smd = SMDInfo { signed_mark: smd };
 
                         Response::Ok(MarkSMDInfoResponse {
                             id: msg.id,
@@ -341,10 +427,12 @@ pub fn handle_mark_smd_info_response(response: tmch_proto::TMCHResponse) -> Resp
     }
 }
 
-pub fn handle_mark_encoded_smd_info_response(response: tmch_proto::TMCHResponse) -> Response<MarkSMDInfoResponse> {
+pub fn handle_mark_encoded_smd_info_response(
+    response: tmch_proto::TMCHResponse,
+) -> Response<MarkSMDInfoResponse> {
     match response.data {
         Some(value) => match value.value {
-            tmch_proto::TMCHResultDataValue::TMCHInfoData(msg) => {
+            tmch_proto::TMCHResultDataValue::TMCHInfo(msg) => {
                 match (msg.encoded_signed_mark, msg.smd_id) {
                     (Some(smd), Some(smd_id)) => Response::Ok(MarkSMDInfoResponse {
                         id: msg.id,
@@ -361,10 +449,12 @@ pub fn handle_mark_encoded_smd_info_response(response: tmch_proto::TMCHResponse)
     }
 }
 
-pub fn handle_mark_file_info_response(response: tmch_proto::TMCHResponse) -> Response<MarkSMDInfoResponse> {
+pub fn handle_mark_file_info_response(
+    response: tmch_proto::TMCHResponse,
+) -> Response<MarkSMDInfoResponse> {
     match response.data {
         Some(value) => match value.value {
-            tmch_proto::TMCHResultDataValue::TMCHInfoData(msg) => {
+            tmch_proto::TMCHResultDataValue::TMCHInfo(msg) => {
                 match (msg.enc_file, msg.smd_id) {
                     (Some(smd), Some(smd_id)) => Response::Ok(MarkSMDInfoResponse {
                         id: msg.id,
@@ -381,10 +471,7 @@ pub fn handle_mark_file_info_response(response: tmch_proto::TMCHResponse) -> Res
     }
 }
 
-pub fn handle_update(
-    _client: &(),
-    req: &UpdateRequest,
-) -> HandleReqReturn<UpdateResponse> {
+pub fn handle_update(_client: &(), req: &UpdateRequest) -> HandleReqReturn<UpdateResponse> {
     let mut add_documents: Vec<tmch_proto::TMCHDocument> = vec![];
     let mut add_labels: Vec<tmch_proto::TMCHLabel> = vec![];
     let mut add_variations: Vec<String> = vec![];
@@ -392,18 +479,23 @@ pub fn handle_update(
     let mut rem_labels: Vec<tmch_proto::TMCHLabel> = vec![];
     let mut rem_variations: Vec<String> = vec![];
     let mut rem_cases: Vec<tmch_proto::TMCHCase> = vec![];
+    let mut chg_cases: Vec<tmch_proto::TMCHCaseType> = vec![];
 
     for add in &req.add {
         match add {
             UpdateAdd::Document(d) => {
-                add_documents.push(d.into())
-            },
+                add_documents.push(d.into());
+            }
             UpdateAdd::Label(d) => {
-                add_labels.push(d.into())
-            },
+                add_labels.push(d.into());
+            }
             UpdateAdd::Variation(d) => {
-                add_variations.push(d.to_string())
-            },
+                add_variations.push(d.to_string());
+            }
+            UpdateAdd::Case(d) => {
+                check_case_id(&d.id)?;
+                add_cases.push(d.into());
+            }
         }
     }
 
@@ -415,19 +507,73 @@ pub fn handle_update(
                     smd_inclusion: None,
                     claims_notify: None,
                     trex_activate: None,
-                    trex_renew: None
-                })
-            },
+                    trex_renew: None,
+                });
+            }
             UpdateRemove::Variation(d) => {
-                rem_variations.push(d.to_string())
-            },
+                rem_variations.push(d.to_string());
+            }
+        }
+    }
+
+    for case in &req.update_cases {
+        check_case_id(&case.id)?;
+        let mut add_case_documents: Vec<tmch_proto::TMCHCaseDocument> = vec![];
+        let mut add_case_labels: Vec<tmch_proto::TMCHCaseLabel> = vec![];
+        let mut rem_case_labels: Vec<tmch_proto::TMCHCaseLabel> = vec![];
+        for case_add in &case.add {
+            match case_add {
+                CaseAdd::Document(d) => {
+                    add_case_documents.push(d.into());
+                }
+                CaseAdd::Label(l) => {
+                    add_case_labels.push(tmch_proto::TMCHCaseLabel {
+                        label: l.to_string(),
+                    });
+                }
+            }
+        }
+        for case_rem in &case.remove {
+            match case_rem {
+                CaseRemove::Label(l) => {
+                    rem_case_labels.push(tmch_proto::TMCHCaseLabel {
+                        label: l.to_string(),
+                    });
+                }
+            }
+        }
+
+        if !(add_case_labels.is_empty() && add_case_documents.is_empty()) {
+            add_cases.push(tmch_proto::TMCHCase {
+                id: case.id.clone(),
+                case_type: None,
+                documents: add_case_documents,
+                labels: add_case_labels,
+            })
+        }
+
+        if !rem_case_labels.is_empty() {
+            rem_cases.push(tmch_proto::TMCHCase {
+                id: case.id.clone(),
+                case_type: None,
+                documents: vec![],
+                labels: rem_case_labels,
+            })
+        }
+
+        if let Some(case) = &case.new_case {
+            chg_cases.push(case.into())
         }
     }
 
     let command = tmch_proto::TMCHUpdate {
         id: req.id.to_string(),
         case: None,
-        add: if add_documents.is_empty() && add_labels.is_empty() && add_variations.is_empty() && add_cases.is_empty() {
+        add: if add_documents.is_empty()
+            && add_labels.is_empty()
+            && add_variations.is_empty()
+            && add_cases.is_empty()
+        {
             None
         } else {
             Some(tmch_proto::TMCHAdd {
@@ -437,16 +583,19 @@ pub fn handle_update(
                     vec![]
                 } else {
                     vec![tmch_proto::variation::Variation {
-                        labels: add_variations.into_iter().map(|l| tmch_proto::variation::Label {
-                            id: None,
-                            a_label: l,
-                            u_label: None,
-                            active: None,
-                            variation_type: None
-                        }).collect()
+                        labels: add_variations
+                            .into_iter()
+                            .map(|l| tmch_proto::variation::Label {
+                                id: None,
+                                a_label: l,
+                                u_label: None,
+                                active: None,
+                                variation_type: None,
+                            })
+                            .collect(),
                     }]
                 },
-                cases: add_cases
+                cases: add_cases,
             })
         },
         remove: if rem_labels.is_empty() && rem_variations.is_empty() && rem_cases.is_empty() {
@@ -458,16 +607,19 @@ pub fn handle_update(
                     vec![]
                 } else {
                     vec![tmch_proto::variation::Variation {
-                        labels: rem_variations.into_iter().map(|l| tmch_proto::variation::Label {
-                            id: None,
-                            a_label: l,
-                            u_label: None,
-                            active: None,
-                            variation_type: None
-                        }).collect()
+                        labels: rem_variations
+                            .into_iter()
+                            .map(|l| tmch_proto::variation::Label {
+                                id: None,
+                                a_label: l,
+                                u_label: None,
+                                active: None,
+                                variation_type: None,
+                            })
+                            .collect(),
                     }]
                 },
-                cases: rem_cases
+                cases: rem_cases,
             })
         },
         change: if req.new_mark.is_none() && req.update_labels.is_empty() {
@@ -476,11 +628,11 @@ pub fn handle_update(
             Some(tmch_proto::TMCHChange {
                 mark: req.new_mark.as_ref().map(Into::into),
                 labels: req.update_labels.iter().map(Into::into).collect(),
-                case: None
+                case: None,
             })
-        }
+        },
     };
-    Ok(tmch_proto::TMCHCommandType::Update(command))
+    Ok(tmch_proto::TMCHCommandType::Update(Box::new(command)))
 }
 
 pub fn handle_update_response(response: tmch_proto::TMCHResponse) -> Response<UpdateResponse> {
@@ -490,17 +642,14 @@ pub fn handle_update_response(response: tmch_proto::TMCHResponse) -> Response<Up
     }
 }
 
-pub fn handle_renew(
-    _client: &(),
-    req: &RenewRequest,
-) -> HandleReqReturn<RenewResponse> {
+pub fn handle_renew(_client: &(), req: &RenewRequest) -> HandleReqReturn<RenewResponse> {
     check_mark_id(&req.id)?;
     let command = tmch_proto::TMCHRenew {
         id: req.id.to_string(),
         current_expiry_date: req.cur_expiry_date.date(),
         period: match req.add_period.as_ref() {
             Some(r) => Some(r.try_into().map_err(Result::Err)?),
-            None => None
+            None => None,
         },
     };
     Ok(tmch_proto::TMCHCommandType::Renew(command))
@@ -509,20 +658,21 @@ pub fn handle_renew(
 pub fn handle_renew_response(response: tmch_proto::TMCHResponse) -> Response<RenewResponse> {
     match response.data {
         Some(value) => match value.value {
-            tmch_proto::TMCHResultDataValue::TMCHRenewData(msg) => {
-                Response::Ok(RenewResponse {
-                    id: msg.id,
-                    new_expiry_date: msg.expiry_date,
-                    balance: msg.balance.into(),
-                })
-            }
+            tmch_proto::TMCHResultDataValue::TMCHRenew(msg) => Response::Ok(RenewResponse {
+                id: msg.id,
+                new_expiry_date: msg.expiry_date,
+                balance: msg.balance.into(),
+            }),
             _ => Err(Error::ServerInternal),
         },
         None => Err(Error::ServerInternal),
     }
 }
 
-pub fn handle_transfer_initiate(_client: &(), req: &TransferInitiateRequest) -> HandleReqReturn<TransferInitiateResponse> {
+pub fn handle_transfer_initiate(
+    _client: &(),
+    req: &TransferInitiateRequest,
+) -> HandleReqReturn<TransferInitiateResponse> {
     check_mark_id(&req.id)?;
     let command = tmch_proto::TMCHTransfer {
         id: req.id.to_string(),
@@ -532,19 +682,18 @@ pub fn handle_transfer_initiate(_client: &(), req: &TransferInitiateRequest) -> 
     Ok(tmch_proto::TMCHCommandType::Transfer(command))
 }
 
-pub fn handle_transfer_initiate_response(response: tmch_proto::TMCHResponse) -> Response<TransferInitiateResponse> {
+pub fn handle_transfer_initiate_response(
+    response: tmch_proto::TMCHResponse,
+) -> Response<TransferInitiateResponse> {
     match response.data {
         Some(value) => match value.value {
-            tmch_proto::TMCHResultDataValue::TMCHInfoData(msg) => {
-                match msg.auth_info {
-                    Some(auth_info) =>
-                        Response::Ok(TransferInitiateResponse {
-                            id: msg.id,
-                            auth_info,
-                        }),
-                    None => Err(Error::ServerInternal),
-                }
-            }
+            tmch_proto::TMCHResultDataValue::TMCHInfo(msg) => match msg.auth_info {
+                Some(auth_info) => Response::Ok(TransferInitiateResponse {
+                    id: msg.id,
+                    auth_info,
+                }),
+                None => Err(Error::ServerInternal),
+            },
             _ => Err(Error::ServerInternal),
         },
         None => Err(Error::ServerInternal),
@@ -564,7 +713,7 @@ pub fn handle_transfer(_client: &(), req: &TransferRequest) -> HandleReqReturn<T
 pub fn handle_transfer_response(response: tmch_proto::TMCHResponse) -> Response<TransferResponse> {
     match response.data {
         Some(value) => match value.value {
-            tmch_proto::TMCHResultDataValue::TMCHTransferData(msg) => {
+            tmch_proto::TMCHResultDataValue::TMCHTransfer(msg) => {
                 Response::Ok(TransferResponse {
                     id: msg.id,
                     transfer_date: msg.transfer_date,

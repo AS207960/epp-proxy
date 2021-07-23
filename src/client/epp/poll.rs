@@ -9,8 +9,8 @@ use super::super::poll::{
     PollAckRequest, PollAckResponse, PollData, PollRequest, PollResponse,
 };
 use super::super::{proto, Error, Response};
-use super::ServerFeatures;
 use super::router::HandleReqReturn;
+use super::ServerFeatures;
 
 fn change_data_from_response(
     from: &Option<proto::EPPResponseExtension>,

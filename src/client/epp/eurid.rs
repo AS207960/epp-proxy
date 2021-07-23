@@ -8,8 +8,8 @@ use super::super::eurid::{
     HitPointsResponse, Idn, PollResponse, RegistrationLimitRequest, RegistrationLimitResponse,
 };
 use super::super::{proto, Error, Response};
-use super::ServerFeatures;
 use super::router::HandleReqReturn;
+use super::ServerFeatures;
 
 pub fn eurid_ext_to_entity(
     from: &proto::eurid::EURIDContactInfo,

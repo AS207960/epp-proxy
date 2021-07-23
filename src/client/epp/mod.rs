@@ -1,7 +1,5 @@
-use super::{
-    router as outer_router, LogoutRequest, RequestMessage,
-};
 use super::Client;
+use super::{router as outer_router, LogoutRequest, RequestMessage};
 use crate::proto;
 use chrono::prelude::*;
 use futures::future::FutureExt;
@@ -17,13 +15,13 @@ pub mod host;
 pub mod isnic;
 pub mod launch;
 pub mod maintenance;
+pub mod mark;
 pub mod nominet;
 pub mod poll;
 pub mod rgp;
 pub mod router;
 pub mod traficom;
 pub mod verisign;
-pub mod mark;
 
 use crate::proto::EPPServiceExtension;
 
@@ -49,7 +47,6 @@ fn send_msg(data: &proto::EPPMessage, host: &str) -> Result<String, ()> {
     };
     Ok(encoded_msg)
 }
-
 
 /// Features supported by the server
 #[derive(Debug, Default)]
@@ -166,7 +163,6 @@ impl ServerFeatures {
     }
 }
 
-
 /// Main client struct for the EEP client
 #[derive(Debug)]
 pub struct EPPClient {
@@ -214,9 +210,8 @@ impl EPPClient {
         conf: super::ClientConf<'a, C>,
         pkcs11_engine: Option<crate::P11Engine>,
     ) -> std::io::Result<Self> {
-        let tls_client = super::epp_like::tls_client::TLSClient::new(
-            (&conf).into(), pkcs11_engine
-        ).await?;
+        let tls_client =
+            super::epp_like::tls_client::TLSClient::new((&conf).into(), pkcs11_engine).await?;
 
         Ok(Self {
             log_dir: conf.log_dir,
@@ -408,9 +403,9 @@ impl EPPClient {
             message: proto::EPPMessageType::Hello {},
         };
         self.is_awaiting_response = true;
-        let receiver = super::epp_like::send_msg(
-            &self.host, sock_write, &self.log_dir, send_msg, &message
-        ).fuse();
+        let receiver =
+            super::epp_like::send_msg(&self.host, sock_write, &self.log_dir, send_msg, &message)
+                .fuse();
         let mut delay = Box::pin(tokio::time::sleep(tokio::time::Duration::new(15, 0)).fuse());
         futures::pin_mut!(receiver);
         let resp = futures::select! {
@@ -775,7 +770,10 @@ impl EPPClient {
         Ok(())
     }
 
-    async fn _login(&mut self, sock: &mut super::epp_like::tls_client::TLSConnection) -> Result<(), ()> {
+    async fn _login(
+        &mut self,
+        sock: &mut super::epp_like::tls_client::TLSConnection,
+    ) -> Result<(), ()> {
         let mut objects = vec![];
         let mut ext_objects = vec![];
 
@@ -1115,9 +1113,7 @@ impl EPPClient {
         let message = proto::EPPMessage {
             message: proto::EPPMessageType::Command(Box::new(command)),
         };
-        match super::epp_like::send_msg(
-            &self.host, sock, &self.log_dir, send_msg, &message
-        ).await {
+        match super::epp_like::send_msg(&self.host, sock, &self.log_dir, send_msg, &message).await {
             Ok(_) => Ok(message_id),
             Err(_) => Err(()),
         }
