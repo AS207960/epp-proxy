@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src&#x2F;client&#x2F;domain.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>domain.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../epp_proxy/index.html'><div class='logo-container rust-logo'><img src='https:&#x2F;&#x2F;as207960.net&#x2F;img&#x2F;logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input"name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src&#x2F;client&#x2F;domain.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>domain.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../epp_proxy/index.html'><div class='logo-container rust-logo'><img src='https:&#x2F;&#x2F;as207960.net&#x2F;img&#x2F;logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -838,8 +838,8 @@
     <span class="doccomment">/// Fee information (if supplied by the registry)</span>
     <span class="kw">pub</span> <span class="ident">fee_check</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">fee::FeeCheckData</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">donuts_fee_check</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">fee::DonutsFeeData</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">eurid_check</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">super</span><span class="ident">::eurid::DomainCheck</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">eurid_idn</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">super</span><span class="ident">::eurid::Idn</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">eurid_check</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::eurid::DomainCheck</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">eurid_idn</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::eurid::Idn</span><span class="op">&gt;</span>,
 }
 
 <span class="doccomment">/// Response to a domain claims check query</span>
@@ -865,7 +865,7 @@
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">auth_info</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">launch_info</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">launch::LaunchInfo</span><span class="op">&gt;</span>,
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">hosts</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">InfoHost</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">eurid_data</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">super</span><span class="ident">::eurid::DomainInfoRequest</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">eurid_data</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::eurid::DomainInfoRequest</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">return_path</span>: <span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">InfoResponse</span><span class="op">&gt;</span>,
 }
 
@@ -901,16 +901,16 @@
     <span class="doccomment">/// Date of last transfer</span>
     <span class="kw">pub</span> <span class="ident">last_transfer_date</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Redemption grace period state of the domain</span>
-    <span class="kw">pub</span> <span class="ident">rgp_state</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">super</span><span class="ident">::rgp::RGPState</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">rgp_state</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::rgp::RGPState</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">auth_info</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     <span class="doccomment">/// DNSSEC data</span>
     <span class="kw">pub</span> <span class="ident">sec_dns</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SecDNSData</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">launch_info</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">launch::LaunchInfoData</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">donuts_fee_data</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">fee::DonutsFeeData</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">whois_info</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">super</span><span class="ident">::verisign::InfoWhois</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">isnic_info</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">super</span><span class="ident">::isnic::DomainInfo</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">eurid_data</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">super</span><span class="ident">::eurid::DomainInfo</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">eurid_idn</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">super</span><span class="ident">::eurid::Idn</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">whois_info</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::verisign::InfoWhois</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">isnic_info</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::isnic::DomainInfo</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">eurid_data</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::eurid::DomainInfo</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">eurid_idn</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::eurid::Idn</span><span class="op">&gt;</span>,
 }
 
 <span class="doccomment">/// Additional contact associated with a domain</span>
@@ -930,8 +930,8 @@
     <span class="doccomment">/// Host name with glue records</span>
     <span class="ident">HostAndAddress</span> {
         <span class="ident">host</span>: <span class="ident">String</span>,
-        <span class="ident">addresses</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">super</span><span class="ident">::host::Address</span><span class="op">&gt;</span>,
-        <span class="ident">eurid_idn</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">super</span><span class="ident">::eurid::Idn</span><span class="op">&gt;</span>,
+        <span class="ident">addresses</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::host::Address</span><span class="op">&gt;</span>,
+        <span class="ident">eurid_idn</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::eurid::Idn</span><span class="op">&gt;</span>,
     },
 }
 
@@ -968,7 +968,7 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CreateRequest</span> {
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">name</span>: <span class="ident">String</span>,
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">period</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">super</span><span class="ident">::Period</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">period</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::Period</span><span class="op">&gt;</span>,
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">registrant</span>: <span class="ident">String</span>,
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">contacts</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">InfoContact</span><span class="op">&gt;</span>,
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">nameservers</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">InfoNameserver</span><span class="op">&gt;</span>,
@@ -977,8 +977,8 @@
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">launch_create</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">launch::LaunchCreate</span><span class="op">&gt;</span>,
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">fee_agreement</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">fee::FeeAgreement</span><span class="op">&gt;</span>,
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">donuts_fee_agreement</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">fee::DonutsFeeData</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">eurid_data</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">super</span><span class="ident">::eurid::DomainCreate</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">isnic_payment</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">super</span><span class="ident">::isnic::PaymentInfo</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">eurid_data</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::eurid::DomainCreate</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">isnic_payment</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::isnic::PaymentInfo</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">return_path</span>: <span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">CreateResponse</span><span class="op">&gt;</span>,
 }
 
@@ -1001,7 +1001,7 @@
     <span class="kw">pub</span> <span class="ident">creation_date</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="doccomment">/// When will the domain expire</span>
     <span class="kw">pub</span> <span class="ident">expiration_date</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">eurid_idn</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">super</span><span class="ident">::eurid::Idn</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">eurid_idn</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::eurid::Idn</span><span class="op">&gt;</span>,
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
@@ -1009,7 +1009,7 @@
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">name</span>: <span class="ident">String</span>,
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">launch_info</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">launch::LaunchUpdate</span><span class="op">&gt;</span>,
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">donuts_fee_agreement</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">fee::DonutsFeeData</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">eurid_data</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">super</span><span class="ident">::eurid::DomainDelete</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">eurid_data</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::eurid::DomainDelete</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">return_path</span>: <span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">DeleteResponse</span><span class="op">&gt;</span>,
 }
 
@@ -1019,7 +1019,7 @@
     <span class="kw">pub</span> <span class="ident">pending</span>: <span class="ident">bool</span>,
     <span class="doccomment">/// Fee information (if supplied by the registry)</span>
     <span class="kw">pub</span> <span class="ident">fee_data</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">fee::FeeData</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">eurid_idn</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">super</span><span class="ident">::eurid::Idn</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">eurid_idn</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::eurid::Idn</span><span class="op">&gt;</span>,
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
@@ -1033,8 +1033,8 @@
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">launch_info</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">launch::LaunchUpdate</span><span class="op">&gt;</span>,
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">fee_agreement</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">fee::FeeAgreement</span><span class="op">&gt;</span>,
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">donuts_fee_agreement</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">fee::DonutsFeeData</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">eurid_data</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">super</span><span class="ident">::eurid::DomainUpdate</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">isnic_info</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">super</span><span class="ident">::isnic::DomainUpdate</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">eurid_data</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::eurid::DomainUpdate</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">isnic_info</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::isnic::DomainUpdate</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">return_path</span>: <span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">UpdateResponse</span><span class="op">&gt;</span>,
 }
 
@@ -1079,11 +1079,11 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RenewRequest</span> {
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">name</span>: <span class="ident">String</span>,
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">add_period</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">super</span><span class="ident">::Period</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">add_period</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::Period</span><span class="op">&gt;</span>,
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">cur_expiry_date</span>: <span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span>,
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">fee_agreement</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">fee::FeeAgreement</span><span class="op">&gt;</span>,
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">donuts_fee_agreement</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">fee::DonutsFeeData</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">isnic_payment</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">super</span><span class="ident">::isnic::PaymentInfo</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">isnic_payment</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::isnic::PaymentInfo</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">return_path</span>: <span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">RenewResponse</span><span class="op">&gt;</span>,
 }
 
@@ -1101,8 +1101,8 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RenewData</span> {
     <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
     <span class="kw">pub</span> <span class="ident">new_expiry_date</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">eurid_idn</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">super</span><span class="ident">::eurid::Idn</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">eurid_data</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">super</span><span class="ident">::eurid::DomainRenewInfo</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">eurid_idn</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::eurid::Idn</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">eurid_data</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::eurid::DomainRenewInfo</span><span class="op">&gt;</span>,
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
@@ -1116,10 +1116,10 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TransferRequestRequest</span> {
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">name</span>: <span class="ident">String</span>,
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">auth_info</span>: <span class="ident">String</span>,
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">add_period</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">super</span><span class="ident">::Period</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">add_period</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::Period</span><span class="op">&gt;</span>,
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">fee_agreement</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">fee::FeeAgreement</span><span class="op">&gt;</span>,
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">donuts_fee_agreement</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">fee::DonutsFeeData</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">eurid_data</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">super</span><span class="ident">::eurid::DomainTransfer</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">eurid_data</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::eurid::DomainTransfer</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">return_path</span>: <span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">TransferResponse</span><span class="op">&gt;</span>,
 }
 
@@ -1143,7 +1143,7 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TransferData</span> {
     <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
-    <span class="kw">pub</span> <span class="ident">status</span>: <span class="kw">super</span><span class="ident">::TransferStatus</span>,
+    <span class="kw">pub</span> <span class="ident">status</span>: <span class="ident"><span class="kw">super</span>::TransferStatus</span>,
     <span class="doccomment">/// Which client requested the transfer</span>
     <span class="kw">pub</span> <span class="ident">requested_client_id</span>: <span class="ident">String</span>,
     <span class="doccomment">/// The date of the transfer request</span>
@@ -1154,8 +1154,8 @@
     <span class="kw">pub</span> <span class="ident">act_date</span>: <span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span>,
     <span class="doccomment">/// New domain expiry date if amended by the transfer</span>
     <span class="kw">pub</span> <span class="ident">expiry_date</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">eurid_idn</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">super</span><span class="ident">::eurid::Idn</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">eurid_data</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">super</span><span class="ident">::eurid::DomainTransferInfo</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">eurid_idn</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::eurid::Idn</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">eurid_data</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::eurid::DomainTransferInfo</span><span class="op">&gt;</span>,
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
@@ -1199,9 +1199,9 @@
     <span class="ident">fee_check</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">fee::FeeCheck</span><span class="op">&gt;</span>,
     <span class="ident">launch_check</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">launch::LaunchAvailabilityCheck</span><span class="op">&gt;</span>,
     <span class="ident">client_sender</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">futures::channel::mpsc::Sender</span><span class="op">&lt;</span><span class="ident">RequestMessage</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CommandResponse</span><span class="op">&lt;</span><span class="ident">CheckResponse</span><span class="op">&gt;</span>, <span class="kw">super</span><span class="ident">::Error</span><span class="op">&gt;</span> {
+) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CommandResponse</span><span class="op">&lt;</span><span class="ident">CheckResponse</span><span class="op">&gt;</span>, <span class="ident"><span class="kw">super</span>::Error</span><span class="op">&gt;</span> {
     <span class="kw">let</span> (<span class="ident">sender</span>, <span class="ident">receiver</span>) <span class="op">=</span> <span class="ident">futures::channel::oneshot::channel</span>();
-    <span class="kw">super</span><span class="ident">::send_epp_client_request</span>(
+    <span class="ident"><span class="kw">super</span>::send_epp_client_request</span>(
         <span class="ident">client_sender</span>,
         <span class="ident">RequestMessage::DomainCheck</span>(<span class="ident">Box::new</span>(<span class="ident">CheckRequest</span> {
             <span class="ident">name</span>: <span class="ident">domain</span>.<span class="ident">to_string</span>(),
@@ -1224,9 +1224,9 @@
     <span class="ident">domain</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
     <span class="ident">launch_check</span>: <span class="ident">launch::LaunchClaimsCheck</span>,
     <span class="ident">client_sender</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">futures::channel::mpsc::Sender</span><span class="op">&lt;</span><span class="ident">RequestMessage</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CommandResponse</span><span class="op">&lt;</span><span class="ident">ClaimsCheckResponse</span><span class="op">&gt;</span>, <span class="kw">super</span><span class="ident">::Error</span><span class="op">&gt;</span> {
+) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CommandResponse</span><span class="op">&lt;</span><span class="ident">ClaimsCheckResponse</span><span class="op">&gt;</span>, <span class="ident"><span class="kw">super</span>::Error</span><span class="op">&gt;</span> {
     <span class="kw">let</span> (<span class="ident">sender</span>, <span class="ident">receiver</span>) <span class="op">=</span> <span class="ident">futures::channel::oneshot::channel</span>();
-    <span class="kw">super</span><span class="ident">::send_epp_client_request</span>(
+    <span class="ident"><span class="kw">super</span>::send_epp_client_request</span>(
         <span class="ident">client_sender</span>,
         <span class="ident">RequestMessage::DomainClaimsCheck</span>(<span class="ident">Box::new</span>(<span class="ident">ClaimsCheckRequest</span> {
             <span class="ident">name</span>: <span class="ident">domain</span>.<span class="ident">to_string</span>(),
@@ -1246,9 +1246,9 @@
 <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">launch_trademark_check</span>(
     <span class="ident">domain</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
     <span class="ident">client_sender</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">futures::channel::mpsc::Sender</span><span class="op">&lt;</span><span class="ident">RequestMessage</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CommandResponse</span><span class="op">&lt;</span><span class="ident">ClaimsCheckResponse</span><span class="op">&gt;</span>, <span class="kw">super</span><span class="ident">::Error</span><span class="op">&gt;</span> {
+) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CommandResponse</span><span class="op">&lt;</span><span class="ident">ClaimsCheckResponse</span><span class="op">&gt;</span>, <span class="ident"><span class="kw">super</span>::Error</span><span class="op">&gt;</span> {
     <span class="kw">let</span> (<span class="ident">sender</span>, <span class="ident">receiver</span>) <span class="op">=</span> <span class="ident">futures::channel::oneshot::channel</span>();
-    <span class="kw">super</span><span class="ident">::send_epp_client_request</span>(
+    <span class="ident"><span class="kw">super</span>::send_epp_client_request</span>(
         <span class="ident">client_sender</span>,
         <span class="ident">RequestMessage::DomainTrademarkCheck</span>(<span class="ident">Box::new</span>(<span class="ident">TrademarkCheckRequest</span> {
             <span class="ident">name</span>: <span class="ident">domain</span>.<span class="ident">to_string</span>(),
@@ -1269,11 +1269,11 @@
     <span class="ident">auth_info</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
     <span class="ident">hosts</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">InfoHost</span><span class="op">&gt;</span>,
     <span class="ident">launch_info</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">launch::LaunchInfo</span><span class="op">&gt;</span>,
-    <span class="ident">eurid_data</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">super</span><span class="ident">::eurid::DomainInfoRequest</span><span class="op">&gt;</span>,
+    <span class="ident">eurid_data</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::eurid::DomainInfoRequest</span><span class="op">&gt;</span>,
     <span class="ident">client_sender</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">futures::channel::mpsc::Sender</span><span class="op">&lt;</span><span class="ident">RequestMessage</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CommandResponse</span><span class="op">&lt;</span><span class="ident">InfoResponse</span><span class="op">&gt;</span>, <span class="kw">super</span><span class="ident">::Error</span><span class="op">&gt;</span> {
+) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CommandResponse</span><span class="op">&lt;</span><span class="ident">InfoResponse</span><span class="op">&gt;</span>, <span class="ident"><span class="kw">super</span>::Error</span><span class="op">&gt;</span> {
     <span class="kw">let</span> (<span class="ident">sender</span>, <span class="ident">receiver</span>) <span class="op">=</span> <span class="ident">futures::channel::oneshot::channel</span>();
-    <span class="kw">super</span><span class="ident">::send_epp_client_request</span>(
+    <span class="ident"><span class="kw">super</span>::send_epp_client_request</span>(
         <span class="ident">client_sender</span>,
         <span class="ident">RequestMessage::DomainInfo</span>(<span class="ident">Box::new</span>(<span class="ident">InfoRequest</span> {
             <span class="ident">name</span>: <span class="ident">domain</span>.<span class="ident">to_string</span>(),
@@ -1290,7 +1290,7 @@
 
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CreateInfo</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="kw">pub</span> <span class="ident">domain</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
-    <span class="kw">pub</span> <span class="ident">period</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">super</span><span class="ident">::Period</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">period</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::Period</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">registrant</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
     <span class="kw">pub</span> <span class="ident">contacts</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">InfoContact</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">nameservers</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">InfoNameserver</span><span class="op">&gt;</span>,
@@ -1299,8 +1299,8 @@
     <span class="kw">pub</span> <span class="ident">launch_create</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">launch::LaunchCreate</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">fee_agreement</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">fee::FeeAgreement</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">donuts_fee_agreement</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">fee::DonutsFeeData</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">eurid_data</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">super</span><span class="ident">::eurid::DomainCreate</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">isnic_payment</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">super</span><span class="ident">::isnic::PaymentInfo</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">eurid_data</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::eurid::DomainCreate</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">isnic_payment</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::isnic::PaymentInfo</span><span class="op">&gt;</span>,
 }
 
 <span class="doccomment">/// Registers a new domain</span>
@@ -1316,9 +1316,9 @@
 <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create</span>(
     <span class="ident">info</span>: <span class="ident">CreateInfo</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
     <span class="ident">client_sender</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">futures::channel::mpsc::Sender</span><span class="op">&lt;</span><span class="ident">RequestMessage</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CommandResponse</span><span class="op">&lt;</span><span class="ident">CreateResponse</span><span class="op">&gt;</span>, <span class="kw">super</span><span class="ident">::Error</span><span class="op">&gt;</span> {
+) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CommandResponse</span><span class="op">&lt;</span><span class="ident">CreateResponse</span><span class="op">&gt;</span>, <span class="ident"><span class="kw">super</span>::Error</span><span class="op">&gt;</span> {
     <span class="kw">let</span> (<span class="ident">sender</span>, <span class="ident">receiver</span>) <span class="op">=</span> <span class="ident">futures::channel::oneshot::channel</span>();
-    <span class="kw">super</span><span class="ident">::send_epp_client_request</span>(
+    <span class="ident"><span class="kw">super</span>::send_epp_client_request</span>(
         <span class="ident">client_sender</span>,
         <span class="ident">RequestMessage::DomainCreate</span>(<span class="ident">Box::new</span>(<span class="ident">CreateRequest</span> {
             <span class="ident">name</span>: <span class="ident">info</span>.<span class="ident">domain</span>.<span class="ident">to_string</span>(),
@@ -1349,11 +1349,11 @@
     <span class="ident">domain</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
     <span class="ident">launch_info</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">launch::LaunchUpdate</span><span class="op">&gt;</span>,
     <span class="ident">donuts_fee_agreement</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">fee::DonutsFeeData</span><span class="op">&gt;</span>,
-    <span class="ident">eurid_data</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">super</span><span class="ident">::eurid::DomainDelete</span><span class="op">&gt;</span>,
+    <span class="ident">eurid_data</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::eurid::DomainDelete</span><span class="op">&gt;</span>,
     <span class="ident">client_sender</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">futures::channel::mpsc::Sender</span><span class="op">&lt;</span><span class="ident">RequestMessage</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CommandResponse</span><span class="op">&lt;</span><span class="ident">DeleteResponse</span><span class="op">&gt;</span>, <span class="kw">super</span><span class="ident">::Error</span><span class="op">&gt;</span> {
+) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CommandResponse</span><span class="op">&lt;</span><span class="ident">DeleteResponse</span><span class="op">&gt;</span>, <span class="ident"><span class="kw">super</span>::Error</span><span class="op">&gt;</span> {
     <span class="kw">let</span> (<span class="ident">sender</span>, <span class="ident">receiver</span>) <span class="op">=</span> <span class="ident">futures::channel::oneshot::channel</span>();
-    <span class="kw">super</span><span class="ident">::send_epp_client_request</span>(
+    <span class="ident"><span class="kw">super</span>::send_epp_client_request</span>(
         <span class="ident">client_sender</span>,
         <span class="ident">RequestMessage::DomainDelete</span>(<span class="ident">Box::new</span>(<span class="ident">DeleteRequest</span> {
             <span class="ident">name</span>: <span class="ident">domain</span>.<span class="ident">to_string</span>(),
@@ -1377,8 +1377,8 @@
     <span class="kw">pub</span> <span class="ident">launch_info</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">launch::LaunchUpdate</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">fee_agreement</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">fee::FeeAgreement</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">donuts_fee_agreement</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">fee::DonutsFeeData</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">eurid_data</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">super</span><span class="ident">::eurid::DomainUpdate</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">isnic_info</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">super</span><span class="ident">::isnic::DomainUpdate</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">eurid_data</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::eurid::DomainUpdate</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">isnic_info</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::isnic::DomainUpdate</span><span class="op">&gt;</span>,
 }
 
 <span class="doccomment">/// Updates properties of a domain name</span>
@@ -1393,9 +1393,9 @@
 <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update</span>(
     <span class="ident">info</span>: <span class="ident">UpdateInfo</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
     <span class="ident">client_sender</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">futures::channel::mpsc::Sender</span><span class="op">&lt;</span><span class="ident">RequestMessage</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CommandResponse</span><span class="op">&lt;</span><span class="ident">UpdateResponse</span><span class="op">&gt;</span>, <span class="kw">super</span><span class="ident">::Error</span><span class="op">&gt;</span> {
+) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CommandResponse</span><span class="op">&lt;</span><span class="ident">UpdateResponse</span><span class="op">&gt;</span>, <span class="ident"><span class="kw">super</span>::Error</span><span class="op">&gt;</span> {
     <span class="kw">let</span> (<span class="ident">sender</span>, <span class="ident">receiver</span>) <span class="op">=</span> <span class="ident">futures::channel::oneshot::channel</span>();
-    <span class="kw">super</span><span class="ident">::send_epp_client_request</span>(
+    <span class="ident"><span class="kw">super</span>::send_epp_client_request</span>(
         <span class="ident">client_sender</span>,
         <span class="ident">RequestMessage::DomainUpdate</span>(<span class="ident">Box::new</span>(<span class="ident">UpdateRequest</span> {
             <span class="ident">name</span>: <span class="ident">info</span>.<span class="ident">domain</span>.<span class="ident">to_string</span>(),
@@ -1427,9 +1427,9 @@
     <span class="ident">month</span>: <span class="ident">u32</span>,
     <span class="ident">day</span>: <span class="ident">u32</span>,
     <span class="ident">client_sender</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">futures::channel::mpsc::Sender</span><span class="op">&lt;</span><span class="ident">RequestMessage</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CommandResponse</span><span class="op">&lt;</span><span class="ident">UpdateResponse</span><span class="op">&gt;</span>, <span class="kw">super</span><span class="ident">::Error</span><span class="op">&gt;</span> {
+) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CommandResponse</span><span class="op">&lt;</span><span class="ident">UpdateResponse</span><span class="op">&gt;</span>, <span class="ident"><span class="kw">super</span>::Error</span><span class="op">&gt;</span> {
     <span class="kw">let</span> (<span class="ident">sender</span>, <span class="ident">receiver</span>) <span class="op">=</span> <span class="ident">futures::channel::oneshot::channel</span>();
-    <span class="kw">super</span><span class="ident">::send_epp_client_request</span>(
+    <span class="ident"><span class="kw">super</span>::send_epp_client_request</span>(
         <span class="ident">client_sender</span>,
         <span class="ident">RequestMessage::VerisignSync</span>(<span class="ident">Box::new</span>(<span class="ident">VerisignSyncRequest</span> {
             <span class="ident">name</span>: <span class="ident">domain</span>.<span class="ident">to_string</span>(),
@@ -1451,15 +1451,15 @@
 <span class="doccomment">/// * `client_sender` - Reference to the tokio channel into the client</span>
 <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">renew</span>(
     <span class="ident">domain</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    <span class="ident">add_period</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">super</span><span class="ident">::Period</span><span class="op">&gt;</span>,
+    <span class="ident">add_period</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::Period</span><span class="op">&gt;</span>,
     <span class="ident">cur_expiry_date</span>: <span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span>,
     <span class="ident">fee_agreement</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">fee::FeeAgreement</span><span class="op">&gt;</span>,
     <span class="ident">donuts_fee_agreement</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">fee::DonutsFeeData</span><span class="op">&gt;</span>,
-    <span class="ident">isnic_payment</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">super</span><span class="ident">::isnic::PaymentInfo</span><span class="op">&gt;</span>,
+    <span class="ident">isnic_payment</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::isnic::PaymentInfo</span><span class="op">&gt;</span>,
     <span class="ident">client_sender</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">futures::channel::mpsc::Sender</span><span class="op">&lt;</span><span class="ident">RequestMessage</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CommandResponse</span><span class="op">&lt;</span><span class="ident">RenewResponse</span><span class="op">&gt;</span>, <span class="kw">super</span><span class="ident">::Error</span><span class="op">&gt;</span> {
+) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CommandResponse</span><span class="op">&lt;</span><span class="ident">RenewResponse</span><span class="op">&gt;</span>, <span class="ident"><span class="kw">super</span>::Error</span><span class="op">&gt;</span> {
     <span class="kw">let</span> (<span class="ident">sender</span>, <span class="ident">receiver</span>) <span class="op">=</span> <span class="ident">futures::channel::oneshot::channel</span>();
-    <span class="kw">super</span><span class="ident">::send_epp_client_request</span>(
+    <span class="ident"><span class="kw">super</span>::send_epp_client_request</span>(
         <span class="ident">client_sender</span>,
         <span class="ident">RequestMessage::DomainRenew</span>(<span class="ident">Box::new</span>(<span class="ident">RenewRequest</span> {
             <span class="ident">name</span>: <span class="ident">domain</span>.<span class="ident">to_string</span>(),
@@ -1485,9 +1485,9 @@
     <span class="ident">domain</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
     <span class="ident">auth_info</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
     <span class="ident">client_sender</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">futures::channel::mpsc::Sender</span><span class="op">&lt;</span><span class="ident">RequestMessage</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CommandResponse</span><span class="op">&lt;</span><span class="ident">TransferResponse</span><span class="op">&gt;</span>, <span class="kw">super</span><span class="ident">::Error</span><span class="op">&gt;</span> {
+) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CommandResponse</span><span class="op">&lt;</span><span class="ident">TransferResponse</span><span class="op">&gt;</span>, <span class="ident"><span class="kw">super</span>::Error</span><span class="op">&gt;</span> {
     <span class="kw">let</span> (<span class="ident">sender</span>, <span class="ident">receiver</span>) <span class="op">=</span> <span class="ident">futures::channel::oneshot::channel</span>();
-    <span class="kw">super</span><span class="ident">::send_epp_client_request</span>(
+    <span class="ident"><span class="kw">super</span>::send_epp_client_request</span>(
         <span class="ident">client_sender</span>,
         <span class="ident">RequestMessage::DomainTransferQuery</span>(<span class="ident">Box::new</span>(<span class="ident">TransferQueryRequest</span> {
             <span class="ident">name</span>: <span class="ident">domain</span>.<span class="ident">to_string</span>(),
@@ -1508,15 +1508,15 @@
 <span class="doccomment">/// * `client_sender` - Reference to the tokio channel into the client</span>
 <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">transfer_request</span>(
     <span class="ident">domain</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    <span class="ident">add_period</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">super</span><span class="ident">::Period</span><span class="op">&gt;</span>,
+    <span class="ident">add_period</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::Period</span><span class="op">&gt;</span>,
     <span class="ident">auth_info</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
     <span class="ident">fee_agreement</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">fee::FeeAgreement</span><span class="op">&gt;</span>,
     <span class="ident">donuts_fee_agreement</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">fee::DonutsFeeData</span><span class="op">&gt;</span>,
-    <span class="ident">eurid_data</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">super</span><span class="ident">::eurid::DomainTransfer</span><span class="op">&gt;</span>,
+    <span class="ident">eurid_data</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::eurid::DomainTransfer</span><span class="op">&gt;</span>,
     <span class="ident">client_sender</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">futures::channel::mpsc::Sender</span><span class="op">&lt;</span><span class="ident">RequestMessage</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CommandResponse</span><span class="op">&lt;</span><span class="ident">TransferResponse</span><span class="op">&gt;</span>, <span class="kw">super</span><span class="ident">::Error</span><span class="op">&gt;</span> {
+) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CommandResponse</span><span class="op">&lt;</span><span class="ident">TransferResponse</span><span class="op">&gt;</span>, <span class="ident"><span class="kw">super</span>::Error</span><span class="op">&gt;</span> {
     <span class="kw">let</span> (<span class="ident">sender</span>, <span class="ident">receiver</span>) <span class="op">=</span> <span class="ident">futures::channel::oneshot::channel</span>();
-    <span class="kw">super</span><span class="ident">::send_epp_client_request</span>(
+    <span class="ident"><span class="kw">super</span>::send_epp_client_request</span>(
         <span class="ident">client_sender</span>,
         <span class="ident">RequestMessage::DomainTransferRequest</span>(<span class="ident">Box::new</span>(<span class="ident">TransferRequestRequest</span> {
             <span class="ident">name</span>: <span class="ident">domain</span>.<span class="ident">to_string</span>(),
@@ -1542,9 +1542,9 @@
     <span class="ident">domain</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
     <span class="ident">auth_info</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
     <span class="ident">client_sender</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">futures::channel::mpsc::Sender</span><span class="op">&lt;</span><span class="ident">RequestMessage</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CommandResponse</span><span class="op">&lt;</span><span class="ident">TransferResponse</span><span class="op">&gt;</span>, <span class="kw">super</span><span class="ident">::Error</span><span class="op">&gt;</span> {
+) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CommandResponse</span><span class="op">&lt;</span><span class="ident">TransferResponse</span><span class="op">&gt;</span>, <span class="ident"><span class="kw">super</span>::Error</span><span class="op">&gt;</span> {
     <span class="kw">let</span> (<span class="ident">sender</span>, <span class="ident">receiver</span>) <span class="op">=</span> <span class="ident">futures::channel::oneshot::channel</span>();
-    <span class="kw">super</span><span class="ident">::send_epp_client_request</span>(
+    <span class="ident"><span class="kw">super</span>::send_epp_client_request</span>(
         <span class="ident">client_sender</span>,
         <span class="ident">RequestMessage::DomainTransferCancel</span>(<span class="ident">Box::new</span>(<span class="ident">TransferAcceptRejectRequest</span> {
             <span class="ident">name</span>: <span class="ident">domain</span>.<span class="ident">to_string</span>(),
@@ -1566,9 +1566,9 @@
     <span class="ident">domain</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
     <span class="ident">auth_info</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
     <span class="ident">client_sender</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">futures::channel::mpsc::Sender</span><span class="op">&lt;</span><span class="ident">RequestMessage</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CommandResponse</span><span class="op">&lt;</span><span class="ident">TransferResponse</span><span class="op">&gt;</span>, <span class="kw">super</span><span class="ident">::Error</span><span class="op">&gt;</span> {
+) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CommandResponse</span><span class="op">&lt;</span><span class="ident">TransferResponse</span><span class="op">&gt;</span>, <span class="ident"><span class="kw">super</span>::Error</span><span class="op">&gt;</span> {
     <span class="kw">let</span> (<span class="ident">sender</span>, <span class="ident">receiver</span>) <span class="op">=</span> <span class="ident">futures::channel::oneshot::channel</span>();
-    <span class="kw">super</span><span class="ident">::send_epp_client_request</span>(
+    <span class="ident"><span class="kw">super</span>::send_epp_client_request</span>(
         <span class="ident">client_sender</span>,
         <span class="ident">RequestMessage::DomainTransferAccept</span>(<span class="ident">Box::new</span>(<span class="ident">TransferAcceptRejectRequest</span> {
             <span class="ident">name</span>: <span class="ident">domain</span>.<span class="ident">to_string</span>(),
@@ -1590,9 +1590,9 @@
     <span class="ident">domain</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
     <span class="ident">auth_info</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
     <span class="ident">client_sender</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">futures::channel::mpsc::Sender</span><span class="op">&lt;</span><span class="ident">RequestMessage</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CommandResponse</span><span class="op">&lt;</span><span class="ident">TransferResponse</span><span class="op">&gt;</span>, <span class="kw">super</span><span class="ident">::Error</span><span class="op">&gt;</span> {
+) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CommandResponse</span><span class="op">&lt;</span><span class="ident">TransferResponse</span><span class="op">&gt;</span>, <span class="ident"><span class="kw">super</span>::Error</span><span class="op">&gt;</span> {
     <span class="kw">let</span> (<span class="ident">sender</span>, <span class="ident">receiver</span>) <span class="op">=</span> <span class="ident">futures::channel::oneshot::channel</span>();
-    <span class="kw">super</span><span class="ident">::send_epp_client_request</span>(
+    <span class="ident"><span class="kw">super</span>::send_epp_client_request</span>(
         <span class="ident">client_sender</span>,
         <span class="ident">RequestMessage::DomainTransferReject</span>(<span class="ident">Box::new</span>(<span class="ident">TransferAcceptRejectRequest</span> {
             <span class="ident">name</span>: <span class="ident">domain</span>.<span class="ident">to_string</span>(),

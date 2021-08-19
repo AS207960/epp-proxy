@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src&#x2F;client&#x2F;epp&#x2F;eurid.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>eurid.rs - source</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../../epp_proxy/index.html'><div class='logo-container rust-logo'><img src='https:&#x2F;&#x2F;as207960.net&#x2F;img&#x2F;logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input"name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src&#x2F;client&#x2F;epp&#x2F;eurid.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>eurid.rs - source</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../../epp_proxy/index.html'><div class='logo-container rust-logo'><img src='https:&#x2F;&#x2F;as207960.net&#x2F;img&#x2F;logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
 <span id="2">   2</span>
 <span id="3">   3</span>
 <span id="4">   4</span>
@@ -1511,23 +1511,23 @@
 </pre><pre class="rust">
 <span class="doccomment">//! EPP commands relating to EURid extensions</span>
 
-<span class="kw">use</span> <span class="kw">super</span>::<span class="kw">super</span><span class="ident">::eurid</span>::{
+<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::eurid</span>::{
     <span class="ident">is_entity_natural_person</span>, <span class="ident">ContactExtension</span>, <span class="ident">ContactExtensionUpdate</span>, <span class="ident">ContactType</span>,
     <span class="ident">DNSQualityRequest</span>, <span class="ident">DNSQualityResponse</span>, <span class="ident">DNSSECEligibilityRequest</span>, <span class="ident">DNSSECEligibilityResponse</span>,
     <span class="ident">DomainAuthInfo</span>, <span class="ident">DomainCheck</span>, <span class="ident">DomainCreate</span>, <span class="ident">DomainDelete</span>, <span class="ident">DomainInfo</span>, <span class="ident">DomainInfoRequest</span>,
     <span class="ident">DomainRenewInfo</span>, <span class="ident">DomainTransfer</span>, <span class="ident">DomainTransferInfo</span>, <span class="ident">DomainUpdate</span>, <span class="ident">HitPointsRequest</span>,
     <span class="ident">HitPointsResponse</span>, <span class="ident">Idn</span>, <span class="ident">PollResponse</span>, <span class="ident">RegistrationLimitRequest</span>, <span class="ident">RegistrationLimitResponse</span>,
 };
-<span class="kw">use</span> <span class="kw">super</span>::<span class="kw">super</span>::{<span class="ident">proto</span>, <span class="ident">Error</span>, <span class="ident">Response</span>};
-<span class="kw">use</span> <span class="kw">super</span><span class="ident">::router::HandleReqReturn</span>;
-<span class="kw">use</span> <span class="kw">super</span><span class="ident">::ServerFeatures</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span></span>::{<span class="ident">proto</span>, <span class="ident">Error</span>, <span class="ident">Response</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::router::HandleReqReturn</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::ServerFeatures</span>;
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">eurid_ext_to_entity</span>(
     <span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">proto::eurid::EURIDContactInfo</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">super</span>::<span class="kw">super</span><span class="ident">::contact::EntityType</span> {
+) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::contact::EntityType</span> {
     <span class="kw">match</span> <span class="ident">from</span>.<span class="ident">natural_person</span> {
-        <span class="bool-val">true</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">super</span>::<span class="kw">super</span><span class="ident">::contact::EntityType::OtherIndividual</span>,
-        <span class="bool-val">false</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">super</span>::<span class="kw">super</span><span class="ident">::contact::EntityType::Unknown</span>,
+        <span class="bool-val">true</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::contact::EntityType::OtherIndividual</span>,
+        <span class="bool-val">false</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::contact::EntityType::Unknown</span>,
     }
 }
 
@@ -1558,7 +1558,7 @@
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">contact_info_from_extension</span>(
     <span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">ContactExtension</span>,
-    <span class="ident">entity_type</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">super</span>::<span class="kw">super</span><span class="ident">::contact::EntityType</span><span class="op">&gt;</span>,
+    <span class="ident">entity_type</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::contact::EntityType</span><span class="op">&gt;</span>,
 ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">proto::eurid::EURIDContactInfo</span> {
     <span class="kw">use</span> <span class="ident">proto::eurid::EURIDContactType</span>;
     <span class="ident">proto::eurid::EURIDContactInfo</span> {
@@ -1579,7 +1579,7 @@
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">contact_info_update_from_extension</span>(
     <span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ContactExtensionUpdate</span><span class="op">&gt;</span>,
-    <span class="ident">entity_type</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">super</span>::<span class="kw">super</span><span class="ident">::contact::EntityType</span><span class="op">&gt;</span>,
+    <span class="ident">entity_type</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::contact::EntityType</span><span class="op">&gt;</span>,
 ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">proto::eurid::EURIDContactUpdate</span> {
     <span class="ident">proto::eurid::EURIDContactUpdate</span> {
         <span class="ident">change</span>: <span class="ident">proto::eurid::EURIDContactUpdateInfo</span> {
@@ -2100,12 +2100,12 @@
     &lt;/trID&gt;
   &lt;/response&gt;
 &lt;/epp&gt;&quot;#</span>;
-        <span class="kw">let</span> <span class="ident">res</span>: <span class="kw">super</span><span class="ident">::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">res</span>: <span class="ident"><span class="kw">super</span>::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">res</span>.<span class="ident">message</span> {
-            <span class="kw">super</span><span class="ident">::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
+            <span class="ident"><span class="kw">super</span>::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
             <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
         };
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="kw">super</span><span class="ident">::handle_hit_points_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::handle_hit_points_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>();
         <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">hit_points</span>, <span class="number">0</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">max_hit_points</span>, <span class="number">2000</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">blocked_until</span>.<span class="ident">is_none</span>(), <span class="bool-val">true</span>);
@@ -2134,12 +2134,12 @@
   &lt;/response&gt;
 &lt;/epp&gt;
 &quot;#</span>;
-        <span class="kw">let</span> <span class="ident">res</span>: <span class="kw">super</span><span class="ident">::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">res</span>: <span class="ident"><span class="kw">super</span>::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">res</span>.<span class="ident">message</span> {
-            <span class="kw">super</span><span class="ident">::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
+            <span class="ident"><span class="kw">super</span>::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
             <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
         };
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="kw">super</span><span class="ident">::handle_hit_points_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::handle_hit_points_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>();
         <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">hit_points</span>, <span class="number">6</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">max_hit_points</span>, <span class="number">5</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">blocked_until</span>.<span class="ident">is_some</span>(), <span class="bool-val">true</span>);
@@ -2166,12 +2166,12 @@
     &lt;/trID&gt;
   &lt;/response&gt;
 &lt;/epp&gt;&quot;#</span>;
-        <span class="kw">let</span> <span class="ident">res</span>: <span class="kw">super</span><span class="ident">::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">res</span>: <span class="ident"><span class="kw">super</span>::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">res</span>.<span class="ident">message</span> {
-            <span class="kw">super</span><span class="ident">::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
+            <span class="ident"><span class="kw">super</span>::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
             <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
         };
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="kw">super</span><span class="ident">::handle_registration_limits_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::handle_registration_limits_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>();
         <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">monthly_registrations</span>, <span class="number">0</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">max_monthly_registrations</span>.<span class="ident">unwrap</span>(), <span class="number">1000</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">limited_until</span>.<span class="ident">is_none</span>(), <span class="bool-val">true</span>);
@@ -2197,12 +2197,12 @@
     &lt;/trID&gt;
   &lt;/response&gt;
 &lt;/epp&gt;&quot;#</span>;
-        <span class="kw">let</span> <span class="ident">res</span>: <span class="kw">super</span><span class="ident">::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">res</span>: <span class="ident"><span class="kw">super</span>::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">res</span>.<span class="ident">message</span> {
-            <span class="kw">super</span><span class="ident">::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
+            <span class="ident"><span class="kw">super</span>::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
             <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
         };
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="kw">super</span><span class="ident">::handle_registration_limits_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::handle_registration_limits_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>();
         <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">monthly_registrations</span>, <span class="number">0</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">max_monthly_registrations</span>.<span class="ident">is_none</span>(), <span class="bool-val">true</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">limited_until</span>.<span class="ident">is_none</span>(), <span class="bool-val">true</span>);
@@ -2230,12 +2230,12 @@
     &lt;/trID&gt;
   &lt;/response&gt;
 &lt;/epp&gt;&quot;#</span>;
-        <span class="kw">let</span> <span class="ident">res</span>: <span class="kw">super</span><span class="ident">::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">res</span>: <span class="ident"><span class="kw">super</span>::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">res</span>.<span class="ident">message</span> {
-            <span class="kw">super</span><span class="ident">::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
+            <span class="ident"><span class="kw">super</span>::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
             <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
         };
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="kw">super</span><span class="ident">::handle_registration_limits_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::handle_registration_limits_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>();
         <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">monthly_registrations</span>, <span class="number">1</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">max_monthly_registrations</span>.<span class="ident">unwrap</span>(), <span class="number">1</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">limited_until</span>.<span class="ident">is_some</span>(), <span class="bool-val">true</span>);
@@ -2265,12 +2265,12 @@
   &lt;/response&gt;
 &lt;/epp&gt;
 &quot;#</span>;
-        <span class="kw">let</span> <span class="ident">res</span>: <span class="kw">super</span><span class="ident">::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">res</span>: <span class="ident"><span class="kw">super</span>::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">res</span>.<span class="ident">message</span> {
-            <span class="kw">super</span><span class="ident">::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
+            <span class="ident"><span class="kw">super</span>::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
             <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
         };
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="kw">super</span><span class="ident">::handle_dnssec_eligibility_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::handle_dnssec_eligibility_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>();
         <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">eligible</span>, <span class="bool-val">true</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">message</span>, <span class="string">&quot;Eligible for DNSSEC discount&quot;</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">code</span>, <span class="number">1001</span>);
@@ -2308,12 +2308,12 @@
     &lt;/trID&gt;
   &lt;/response&gt;
 &lt;/epp&gt;&quot;#</span>;
-        <span class="kw">let</span> <span class="ident">res</span>: <span class="kw">super</span><span class="ident">::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">res</span>: <span class="ident"><span class="kw">super</span>::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">res</span>.<span class="ident">message</span> {
-            <span class="kw">super</span><span class="ident">::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
+            <span class="ident"><span class="kw">super</span>::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
             <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
         };
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="kw">super</span><span class="ident">::handle_dnssec_eligibility_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::handle_dnssec_eligibility_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>();
         <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">eligible</span>, <span class="bool-val">false</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">message</span>, <span class="string">&quot;Not eligible for DNSSEC discount&quot;</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">code</span>, <span class="number">2000</span>);
@@ -2344,12 +2344,12 @@
     &lt;/trID&gt;
   &lt;/response&gt;
 &lt;/epp&gt;&quot;#</span>;
-        <span class="kw">let</span> <span class="ident">res</span>: <span class="kw">super</span><span class="ident">::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">res</span>: <span class="ident"><span class="kw">super</span>::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">res</span>.<span class="ident">message</span> {
-            <span class="kw">super</span><span class="ident">::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
+            <span class="ident"><span class="kw">super</span>::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
             <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
         };
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="kw">super</span><span class="ident">::handle_dns_quality_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::handle_dns_quality_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>();
         <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">check_time</span>.<span class="ident">is_some</span>(), <span class="bool-val">true</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">score</span>, <span class="string">&quot;10000&quot;</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">idn</span>.<span class="ident">is_none</span>(), <span class="bool-val">true</span>);
@@ -2401,15 +2401,15 @@
     &lt;/trID&gt;
   &lt;/response&gt;
 &lt;/epp&gt;&quot;#</span>;
-        <span class="kw">let</span> <span class="ident">res</span>: <span class="kw">super</span><span class="ident">::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">res</span>: <span class="ident"><span class="kw">super</span>::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">res</span>.<span class="ident">message</span> {
-            <span class="kw">super</span><span class="ident">::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
+            <span class="ident"><span class="kw">super</span>::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
             <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
         };
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="kw">super</span>::<span class="kw">super</span><span class="ident">::contact::handle_info_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::contact::handle_info_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">eurid_extension</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">eurid_contact_extension</span>.<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">entity_type</span>, <span class="kw">super</span>::<span class="kw">super</span><span class="ident">::contact::EntityType::Unknown</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">eurid_extension</span>.<span class="ident">contact_type</span>, <span class="kw">super</span><span class="ident">::ContactType::Tech</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">entity_type</span>, <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::contact::EntityType::Unknown</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">eurid_extension</span>.<span class="ident">contact_type</span>, <span class="ident"><span class="kw">super</span>::ContactType::Tech</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">eurid_extension</span>.<span class="ident">language</span>, <span class="string">&quot;en&quot;</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">eurid_extension</span>.<span class="ident">citizenship_country</span>.<span class="ident">is_none</span>(), <span class="bool-val">true</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">eurid_extension</span>.<span class="ident">whois_email</span>.<span class="ident">is_none</span>(), <span class="bool-val">true</span>);
@@ -2461,18 +2461,18 @@
     &lt;/trID&gt;
   &lt;/response&gt;
 &lt;/epp&gt;&quot;#</span>;
-        <span class="kw">let</span> <span class="ident">res</span>: <span class="kw">super</span><span class="ident">::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">res</span>: <span class="ident"><span class="kw">super</span>::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">res</span>.<span class="ident">message</span> {
-            <span class="kw">super</span><span class="ident">::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
+            <span class="ident"><span class="kw">super</span>::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
             <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
         };
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="kw">super</span>::<span class="kw">super</span><span class="ident">::contact::handle_info_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::contact::handle_info_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">eurid_extension</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">eurid_contact_extension</span>.<span class="ident">unwrap</span>();
         <span class="macro">assert_eq!</span>(
             <span class="ident">data</span>.<span class="ident">entity_type</span>,
-            <span class="kw">super</span>::<span class="kw">super</span><span class="ident">::contact::EntityType::OtherIndividual</span>
+            <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::contact::EntityType::OtherIndividual</span>
         );
-        <span class="macro">assert_eq!</span>(<span class="ident">eurid_extension</span>.<span class="ident">contact_type</span>, <span class="kw">super</span><span class="ident">::ContactType::Registrant</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">eurid_extension</span>.<span class="ident">contact_type</span>, <span class="ident"><span class="kw">super</span>::ContactType::Registrant</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">eurid_extension</span>.<span class="ident">language</span>, <span class="string">&quot;en&quot;</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">eurid_extension</span>.<span class="ident">citizenship_country</span>.<span class="ident">is_none</span>(), <span class="bool-val">true</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">eurid_extension</span>.<span class="ident">whois_email</span>.<span class="ident">is_none</span>(), <span class="bool-val">true</span>);
@@ -2528,15 +2528,15 @@
     &lt;/trID&gt;
   &lt;/response&gt;
 &lt;/epp&gt;&quot;#</span>;
-        <span class="kw">let</span> <span class="ident">res</span>: <span class="kw">super</span><span class="ident">::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">res</span>: <span class="ident"><span class="kw">super</span>::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">res</span>.<span class="ident">message</span> {
-            <span class="kw">super</span><span class="ident">::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
+            <span class="ident"><span class="kw">super</span>::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
             <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
         };
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="kw">super</span>::<span class="kw">super</span><span class="ident">::contact::handle_info_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::contact::handle_info_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">eurid_extension</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">eurid_contact_extension</span>.<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">entity_type</span>, <span class="kw">super</span>::<span class="kw">super</span><span class="ident">::contact::EntityType::Unknown</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">eurid_extension</span>.<span class="ident">contact_type</span>, <span class="kw">super</span><span class="ident">::ContactType::Registrant</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">entity_type</span>, <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::contact::EntityType::Unknown</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">eurid_extension</span>.<span class="ident">contact_type</span>, <span class="ident"><span class="kw">super</span>::ContactType::Registrant</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">eurid_extension</span>.<span class="ident">language</span>, <span class="string">&quot;en&quot;</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">eurid_extension</span>.<span class="ident">citizenship_country</span>.<span class="ident">is_none</span>(), <span class="bool-val">true</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">eurid_extension</span>.<span class="ident">whois_email</span>.<span class="ident">is_none</span>(), <span class="bool-val">true</span>);
@@ -2588,18 +2588,18 @@
     &lt;/trID&gt;
   &lt;/response&gt;
 &lt;/epp&gt;&quot;#</span>;
-        <span class="kw">let</span> <span class="ident">res</span>: <span class="kw">super</span><span class="ident">::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">res</span>: <span class="ident"><span class="kw">super</span>::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">res</span>.<span class="ident">message</span> {
-            <span class="kw">super</span><span class="ident">::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
+            <span class="ident"><span class="kw">super</span>::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
             <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
         };
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="kw">super</span>::<span class="kw">super</span><span class="ident">::contact::handle_info_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::contact::handle_info_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">eurid_extension</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">eurid_contact_extension</span>.<span class="ident">unwrap</span>();
         <span class="macro">assert_eq!</span>(
             <span class="ident">data</span>.<span class="ident">entity_type</span>,
-            <span class="kw">super</span>::<span class="kw">super</span><span class="ident">::contact::EntityType::OtherIndividual</span>
+            <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::contact::EntityType::OtherIndividual</span>
         );
-        <span class="macro">assert_eq!</span>(<span class="ident">eurid_extension</span>.<span class="ident">contact_type</span>, <span class="kw">super</span><span class="ident">::ContactType::Reseller</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">eurid_extension</span>.<span class="ident">contact_type</span>, <span class="ident"><span class="kw">super</span>::ContactType::Reseller</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">eurid_extension</span>.<span class="ident">language</span>, <span class="string">&quot;en&quot;</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">eurid_extension</span>.<span class="ident">citizenship_country</span>.<span class="ident">is_none</span>(), <span class="bool-val">true</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">eurid_extension</span>.<span class="ident">whois_email</span>.<span class="ident">is_none</span>(), <span class="bool-val">true</span>);
@@ -2637,12 +2637,12 @@
     &lt;/trID&gt;
   &lt;/response&gt;
 &lt;/epp&gt;&quot;#</span>;
-        <span class="kw">let</span> <span class="ident">res</span>: <span class="kw">super</span><span class="ident">::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">res</span>: <span class="ident"><span class="kw">super</span>::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">res</span>.<span class="ident">message</span> {
-            <span class="kw">super</span><span class="ident">::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
+            <span class="ident"><span class="kw">super</span>::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
             <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
         };
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="kw">super</span>::<span class="kw">super</span><span class="ident">::domain::handle_check_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::domain::handle_check_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">eurid_extension</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">eurid_check</span>.<span class="ident">unwrap</span>();
         <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">avail</span>, <span class="bool-val">false</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">reason</span>.<span class="ident">unwrap</span>(), <span class="string">&quot;registered&quot;</span>);
@@ -2650,7 +2650,7 @@
         <span class="macro">assert_eq!</span>(<span class="ident">eurid_extension</span>.<span class="ident">status</span>.<span class="ident">len</span>(), <span class="number">1</span>);
         <span class="macro">assert_eq!</span>(
             <span class="ident">eurid_extension</span>.<span class="ident">status</span>[<span class="number">0</span>],
-            <span class="kw">super</span>::<span class="kw">super</span><span class="ident">::domain::Status::ServerTransferProhibited</span>
+            <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::domain::Status::ServerTransferProhibited</span>
         );
     }
 
@@ -2685,12 +2685,12 @@
     &lt;/trID&gt;
   &lt;/response&gt;
 &lt;/epp&gt;&quot;#</span>;
-        <span class="kw">let</span> <span class="ident">res</span>: <span class="kw">super</span><span class="ident">::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">res</span>: <span class="ident"><span class="kw">super</span>::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">res</span>.<span class="ident">message</span> {
-            <span class="kw">super</span><span class="ident">::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
+            <span class="ident"><span class="kw">super</span>::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
             <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
         };
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="kw">super</span>::<span class="kw">super</span><span class="ident">::domain::handle_check_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::domain::handle_check_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">idn</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">eurid_idn</span>.<span class="ident">unwrap</span>();
         <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">avail</span>, <span class="bool-val">false</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">reason</span>.<span class="ident">unwrap</span>(), <span class="string">&quot;registered&quot;</span>);
@@ -2754,12 +2754,12 @@
     &lt;/trID&gt;
   &lt;/response&gt;
 &lt;/epp&gt;&quot;#</span>;
-        <span class="kw">let</span> <span class="ident">res</span>: <span class="kw">super</span><span class="ident">::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">res</span>: <span class="ident"><span class="kw">super</span>::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">res</span>.<span class="ident">message</span> {
-            <span class="kw">super</span><span class="ident">::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
+            <span class="ident"><span class="kw">super</span>::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
             <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
         };
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="kw">super</span>::<span class="kw">super</span><span class="ident">::domain::handle_info_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::domain::handle_info_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">eurid_data</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">eurid_data</span>.<span class="ident">unwrap</span>();
         <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">name</span>, <span class="string">&quot;somedomain.eu&quot;</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">eurid_data</span>.<span class="ident">on_hold</span>, <span class="bool-val">false</span>);
@@ -2844,17 +2844,17 @@
     &lt;/trID&gt;
   &lt;/response&gt;
 &lt;/epp&gt;&quot;#</span>;
-        <span class="kw">let</span> <span class="ident">res</span>: <span class="kw">super</span><span class="ident">::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">res</span>: <span class="ident"><span class="kw">super</span>::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">res</span>.<span class="ident">message</span> {
-            <span class="kw">super</span><span class="ident">::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
+            <span class="ident"><span class="kw">super</span>::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
             <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
         };
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="kw">super</span>::<span class="kw">super</span><span class="ident">::domain::handle_info_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::domain::handle_info_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">eurid_data</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">eurid_data</span>.<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">eurid_idn</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">eurid_idn</span>.<span class="ident">unwrap</span>();
         <span class="kw">for</span> <span class="ident">ns</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">data</span>.<span class="ident">nameservers</span> {
             <span class="kw">match</span> <span class="ident">ns</span> {
-                <span class="kw">super</span>::<span class="kw">super</span><span class="ident">::domain::InfoNameserver::HostAndAddress</span> {
+                <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::domain::InfoNameserver::HostAndAddress</span> {
                     <span class="ident">addresses</span>: <span class="kw">_</span>,
                     <span class="ident">host</span>: <span class="kw">_</span>,
                     <span class="ident">eurid_idn</span>,
@@ -2906,12 +2906,12 @@
     &lt;/trID&gt;
   &lt;/response&gt;
 &lt;/epp&gt;&quot;#</span>;
-        <span class="kw">let</span> <span class="ident">res</span>: <span class="kw">super</span><span class="ident">::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">res</span>: <span class="ident"><span class="kw">super</span>::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">res</span>.<span class="ident">message</span> {
-            <span class="kw">super</span><span class="ident">::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
+            <span class="ident"><span class="kw">super</span>::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
             <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
         };
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="kw">super</span>::<span class="kw">super</span><span class="ident">::domain::handle_renew_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::domain::handle_renew_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">eurid_data</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">data</span>.<span class="ident">eurid_data</span>.<span class="ident">unwrap</span>();
         <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">data</span>.<span class="ident">eurid_idn</span>.<span class="ident">is_none</span>(), <span class="bool-val">true</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">data</span>.<span class="ident">name</span>, <span class="string">&quot;somedomain.eu&quot;</span>);
@@ -2943,12 +2943,12 @@
     &lt;/trID&gt;
   &lt;/response&gt;
 &lt;/epp&gt;&quot;#</span>;
-        <span class="kw">let</span> <span class="ident">res</span>: <span class="kw">super</span><span class="ident">::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">res</span>: <span class="ident"><span class="kw">super</span>::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">res</span>.<span class="ident">message</span> {
-            <span class="kw">super</span><span class="ident">::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
+            <span class="ident"><span class="kw">super</span>::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
             <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
         };
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="kw">super</span>::<span class="kw">super</span><span class="ident">::domain::handle_renew_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::domain::handle_renew_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">eurid_data</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">data</span>.<span class="ident">eurid_data</span>.<span class="ident">unwrap</span>();
         <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">data</span>.<span class="ident">eurid_idn</span>.<span class="ident">is_none</span>(), <span class="bool-val">true</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">data</span>.<span class="ident">name</span>, <span class="string">&quot;somedomain.eu&quot;</span>);
@@ -2998,12 +2998,12 @@
     &lt;/trID&gt;
   &lt;/response&gt;
 &lt;/epp&gt;&quot;#</span>;
-        <span class="kw">let</span> <span class="ident">res</span>: <span class="kw">super</span><span class="ident">::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">res</span>: <span class="ident"><span class="kw">super</span>::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">res</span>.<span class="ident">message</span> {
-            <span class="kw">super</span><span class="ident">::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
+            <span class="ident"><span class="kw">super</span>::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
             <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
         };
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="kw">super</span>::<span class="kw">super</span><span class="ident">::domain::handle_transfer_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::domain::handle_transfer_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">eurid_data</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">data</span>.<span class="ident">eurid_data</span>.<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">eurid_idn</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">data</span>.<span class="ident">eurid_idn</span>.<span class="ident">unwrap</span>();
         <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">data</span>.<span class="ident">name</span>, <span class="string">&quot;вмкйршаудхыийведйкгг.ею&quot;</span>);
