@@ -224,6 +224,14 @@ pub struct EPPIgnoredField {
 }
 
 #[derive(Debug, Deserialize)]
+pub struct EPPIgnoredAttribute {
+    #[serde(rename = "$attr:attribute-name")]
+    pub attribute_name: String,
+    #[serde(rename = "$value")]
+    pub message: String,
+}
+
+#[derive(Debug, Deserialize)]
 pub struct EPPHostIgnored {
     #[serde(rename = "$attr:host-name")]
     pub host_name: String,

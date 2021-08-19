@@ -679,6 +679,8 @@ pub enum EPPResponseExtensionType {
     NominetContactExtInfo(nominet::EPPContactInfo),
     #[serde(rename = "{http://www.nominet.org.uk/epp/xml/std-warning-1.1}ignored-field")]
     NominetIgnoredField(nominet::EPPIgnoredField),
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/std-warning-1.1}ignored-attribute")]
+    NominetIgnoredAttribute(nominet::EPPIgnoredAttribute),
     #[serde(rename = "{http://www.nominet.org.uk/epp/xml/std-warning-1.1}postalInfo-ignored")]
     NominetPostalInfoIgnored(nominet::EPPPostalInfoIgnored),
     #[serde(rename = "{http://www.nominet.org.uk/epp/xml/std-warning-1.1}truncated-field")]
