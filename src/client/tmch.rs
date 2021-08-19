@@ -45,7 +45,7 @@ pub enum DocumentClass {
 #[derive(Debug)]
 pub enum FileType {
     Jpg,
-    Pdf
+    Pdf,
 }
 
 #[derive(Debug)]

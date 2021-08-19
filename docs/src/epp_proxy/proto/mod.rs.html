@@ -1,6 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/proto/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings"></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
-<link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../epp_proxy/index.html'><div class='logo-container'><img src='https://as207960.net/img/logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img src="../../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img src="../../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src&#x2F;proto&#x2F;mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../epp_proxy/index.html'><div class='logo-container rust-logo'><img src='https:&#x2F;&#x2F;as207960.net&#x2F;img&#x2F;logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input"name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
 <span id="2">   2</span>
 <span id="3">   3</span>
 <span id="4">   4</span>
@@ -1122,6 +1120,28 @@
 <span id="1120">1120</span>
 <span id="1121">1121</span>
 <span id="1122">1122</span>
+<span id="1123">1123</span>
+<span id="1124">1124</span>
+<span id="1125">1125</span>
+<span id="1126">1126</span>
+<span id="1127">1127</span>
+<span id="1128">1128</span>
+<span id="1129">1129</span>
+<span id="1130">1130</span>
+<span id="1131">1131</span>
+<span id="1132">1132</span>
+<span id="1133">1133</span>
+<span id="1134">1134</span>
+<span id="1135">1135</span>
+<span id="1136">1136</span>
+<span id="1137">1137</span>
+<span id="1138">1138</span>
+<span id="1139">1139</span>
+<span id="1140">1140</span>
+<span id="1141">1141</span>
+<span id="1142">1142</span>
+<span id="1143">1143</span>
+<span id="1144">1144</span>
 </pre><pre class="rust">
 <span class="doccomment">//! Serde structs for serialisation and deserialisation of EPP XML messages</span>
 <span class="doccomment">//! (these are insane, stay away if you value your sanity)</span>
@@ -1141,11 +1161,13 @@
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">launch</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">login_sec</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">maintenance</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">mark</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">nominet</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">qualified_lawyer</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">rgp</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">secdns</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">switch</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">tmch</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">traficom</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">united_tld</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">verisign</span>;
@@ -1241,6 +1263,10 @@
         <span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;{http://www.nominet.org.uk/epp/xml/contact-nom-ext-1.0}contact-nom-ext:update&quot;</span>
     )]</span>
     <span class="ident">NominetContactExtUpdate</span>(<span class="ident">nominet::EPPContactInfo</span>),
+    <span class="attribute">#[<span class="ident">serde</span>(
+        <span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;{http://www.nominet.org.uk/epp/xml/nom-data-quality-1.0}nom-data-quality:update&quot;</span>
+    )]</span>
+    <span class="ident">NominetDataQualityUpdate</span>(<span class="ident">nominet::EPPDataQualityUpdate</span>),
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;{urn:ietf:params:xml:ns:rgp-1.0}rgp:update&quot;</span>)]</span>
     <span class="ident">EPPRGPUpdate</span>(<span class="ident">rgp::EPPRGPUpdate</span>),
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;{urn:ietf:params:xml:ns:secDNS-1.1}secDNS:create&quot;</span>)]</span>
@@ -1726,6 +1752,10 @@
     <span class="ident">NominetDomainFailData</span>(<span class="ident">nominet::EPPDomainFailData</span>),
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;{http://www.nominet.org.uk/epp/xml/std-notifications-1.2}trnData&quot;</span>)]</span>
     <span class="ident">NominetTransferData</span>(<span class="ident">nominet::EPPTransferData</span>),
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;{http://www.nominet.org.uk/epp/xml/std-handshake-1.0}hanData&quot;</span>)]</span>
+    <span class="ident">NominetHandshakeData</span>(<span class="ident">nominet::EPPHandshakeData</span>),
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;{http://www.nominet.org.uk/epp/xml/std-release-1.0}releasePending&quot;</span>)]</span>
+    <span class="ident">NominetReleasePending</span>(<span class="ident">String</span>),
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;{http://www.eurid.eu/xml/epp/registrarFinance-1.0}infData&quot;</span>)]</span>
     <span class="ident">EURIDRegistrarFinanceData</span>(<span class="ident">eurid::EURIDRegistrarFinanceInfoData</span>),
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;{http://www.eurid.eu/xml/epp/registrarHitPoints-1.0}infData&quot;</span>)]</span>
@@ -1798,6 +1828,8 @@
     <span class="ident">NominetPostalInfoIgnored</span>(<span class="ident">nominet::EPPPostalInfoIgnored</span>),
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;{http://www.nominet.org.uk/epp/xml/std-warning-1.1}truncated-field&quot;</span>)]</span>
     <span class="ident">NominetTruncatedField</span>(<span class="ident">nominet::EPPTruncatedField</span>),
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;{http://www.nominet.org.uk/epp/xml/std-warning-1.1}host-ignored&quot;</span>)]</span>
+    <span class="ident">NominetHostIgnored</span>(<span class="ident">nominet::EPPHostIgnored</span>),
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;{http://www.nominet.org.uk/epp/xml/nom-data-quality-1.1}infData&quot;</span>)]</span>
     <span class="ident">NominetDataQuality</span>(<span class="ident">nominet::EPPDataQualityInfo</span>),
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;{http://www.verisign.com/epp/whoisInf-1.0}whoisInfData&quot;</span>)]</span>
@@ -2004,6 +2036,16 @@
     <span class="ident">Contact</span>(<span class="ident">contact::EPPContactUpdate</span>),
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;{urn:ietf:params:xml:ns:domain-1.0}domain:update&quot;</span>)]</span>
     <span class="ident">Domain</span>(<span class="ident">domain::EPPDomainUpdate</span>),
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;{http://www.nominet.org.uk/epp/xml/std-handshake-1.0}handshake:accept&quot;</span>)]</span>
+    <span class="ident">NominetHandshakeAccept</span>(<span class="ident">nominet::EPPHandshakeAccept</span>),
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;{http://www.nominet.org.uk/epp/xml/std-handshake-1.0}handshake:reject&quot;</span>)]</span>
+    <span class="ident">NominetHandshakeReject</span>(<span class="ident">nominet::EPPHandshakeReject</span>),
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;{http://www.nominet.org.uk/epp/xml/std-release-1.0}release:release&quot;</span>)]</span>
+    <span class="ident">NominetRelease</span>(<span class="ident">nominet::EPPRelease</span>),
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;{http://www.nominet.org.uk/epp/xml/std-locks-1.0}lock:lock&quot;</span>)]</span>
+    <span class="ident">NominetLock</span>(<span class="ident">nominet::EPPLock</span>),
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;{http://www.nominet.org.uk/epp/xml/std-locks-1.0}lock:unlock&quot;</span>)]</span>
+    <span class="ident">NominetUnlock</span>(<span class="ident">nominet::EPPLock</span>),
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>
@@ -2246,4 +2288,6 @@
     }
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="epp_proxy" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div><script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script></body></html>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="epp_proxy" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
+    <script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script>
+</body></html>

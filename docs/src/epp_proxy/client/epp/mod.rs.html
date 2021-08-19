@@ -1,6 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/client/epp/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled ><script id="default-settings"></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg">
-<link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../../epp_proxy/index.html'><div class='logo-container'><img src='https://as207960.net/img/logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img src="../../../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../../settings.html" title="settings"><img src="../../../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src&#x2F;client&#x2F;epp&#x2F;mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../../epp_proxy/index.html'><div class='logo-container rust-logo'><img src='https:&#x2F;&#x2F;as207960.net&#x2F;img&#x2F;logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input"name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
 <span id="2">   2</span>
 <span id="3">   3</span>
 <span id="4">   4</span>
@@ -1151,98 +1149,14 @@
 <span id="1149">1149</span>
 <span id="1150">1150</span>
 <span id="1151">1151</span>
-<span id="1152">1152</span>
-<span id="1153">1153</span>
-<span id="1154">1154</span>
-<span id="1155">1155</span>
-<span id="1156">1156</span>
-<span id="1157">1157</span>
-<span id="1158">1158</span>
-<span id="1159">1159</span>
-<span id="1160">1160</span>
-<span id="1161">1161</span>
-<span id="1162">1162</span>
-<span id="1163">1163</span>
-<span id="1164">1164</span>
-<span id="1165">1165</span>
-<span id="1166">1166</span>
-<span id="1167">1167</span>
-<span id="1168">1168</span>
-<span id="1169">1169</span>
-<span id="1170">1170</span>
-<span id="1171">1171</span>
-<span id="1172">1172</span>
-<span id="1173">1173</span>
-<span id="1174">1174</span>
-<span id="1175">1175</span>
-<span id="1176">1176</span>
-<span id="1177">1177</span>
-<span id="1178">1178</span>
-<span id="1179">1179</span>
-<span id="1180">1180</span>
-<span id="1181">1181</span>
-<span id="1182">1182</span>
-<span id="1183">1183</span>
-<span id="1184">1184</span>
-<span id="1185">1185</span>
-<span id="1186">1186</span>
-<span id="1187">1187</span>
-<span id="1188">1188</span>
-<span id="1189">1189</span>
-<span id="1190">1190</span>
-<span id="1191">1191</span>
-<span id="1192">1192</span>
-<span id="1193">1193</span>
-<span id="1194">1194</span>
-<span id="1195">1195</span>
-<span id="1196">1196</span>
-<span id="1197">1197</span>
-<span id="1198">1198</span>
-<span id="1199">1199</span>
-<span id="1200">1200</span>
-<span id="1201">1201</span>
-<span id="1202">1202</span>
-<span id="1203">1203</span>
-<span id="1204">1204</span>
-<span id="1205">1205</span>
-<span id="1206">1206</span>
-<span id="1207">1207</span>
-<span id="1208">1208</span>
-<span id="1209">1209</span>
-<span id="1210">1210</span>
-<span id="1211">1211</span>
-<span id="1212">1212</span>
-<span id="1213">1213</span>
-<span id="1214">1214</span>
-<span id="1215">1215</span>
-<span id="1216">1216</span>
-<span id="1217">1217</span>
-<span id="1218">1218</span>
-<span id="1219">1219</span>
-<span id="1220">1220</span>
-<span id="1221">1221</span>
-<span id="1222">1222</span>
-<span id="1223">1223</span>
-<span id="1224">1224</span>
-<span id="1225">1225</span>
-<span id="1226">1226</span>
-<span id="1227">1227</span>
-<span id="1228">1228</span>
-<span id="1229">1229</span>
-<span id="1230">1230</span>
-<span id="1231">1231</span>
 </pre><pre class="rust">
-<span class="kw">use</span> <span class="kw">super</span>::{
-    <span class="ident">router</span> <span class="kw">as</span> <span class="ident">outer_router</span>, <span class="ident">ClientCertConf</span>, <span class="ident">LogoutRequest</span>, <span class="ident">RequestMessage</span>, <span class="ident">ServerFeatures</span>,
-};
+<span class="kw">use</span> <span class="kw">super</span><span class="ident">::Client</span>;
+<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">router</span> <span class="kw">as</span> <span class="ident">outer_router</span>, <span class="ident">LogoutRequest</span>, <span class="ident">RequestMessage</span>};
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::proto</span>;
 <span class="kw">use</span> <span class="ident">chrono::prelude</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">foreign_types_shared::ForeignType</span>;
 <span class="kw">use</span> <span class="ident">futures::future::FutureExt</span>;
 <span class="kw">use</span> <span class="ident">futures::stream::StreamExt</span>;
 <span class="kw">use</span> <span class="ident">futures::SinkExt</span>;
-<span class="kw">use</span> <span class="ident">tokio::io::AsyncWriteExt</span>;
-<span class="kw">use</span> <span class="ident">tokio::net::TcpStream</span>;
 
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">balance</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">contact</span>;
@@ -1253,6 +1167,7 @@
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">isnic</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">launch</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">maintenance</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">mark</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">nominet</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">poll</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">rgp</span>;
@@ -1274,31 +1189,168 @@
     <span class="prelude-val">Ok</span>(<span class="ident">message</span>)
 }
 
+<span class="kw">fn</span> <span class="ident">send_msg</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span><span class="ident">proto::EPPMessage</span>, <span class="ident">host</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, ()<span class="op">&gt;</span> {
+    <span class="kw">let</span> <span class="ident">encoded_msg</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">xml_serde::to_string</span>(<span class="ident">data</span>) {
+        <span class="prelude-val">Ok</span>(<span class="ident">m</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">m</span>,
+        <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="macro">error!</span>(<span class="string">&quot;Error serialising message for {}: {}&quot;</span>, <span class="ident">host</span>, <span class="ident">err</span>);
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(());
+        }
+    };
+    <span class="prelude-val">Ok</span>(<span class="ident">encoded_msg</span>)
+}
+
+<span class="doccomment">/// Features supported by the server</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ServerFeatures</span> {
+    <span class="doccomment">/// For naughty servers</span>
+    <span class="ident">errata</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="ident">language</span>: <span class="ident">String</span>,
+    <span class="doccomment">/// RFC 5731 support</span>
+    <span class="ident">domain_supported</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// RFC 5732 support</span>
+    <span class="ident">host_supported</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// RFC 5733 support</span>
+    <span class="ident">contact_supported</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// RFC 8590 support</span>
+    <span class="ident">change_poll_supported</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// RFC 3915 support</span>
+    <span class="ident">rgp_supported</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// RFC 5910 support</span>
+    <span class="ident">secdns_supported</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// http://www.nominet.org.uk/epp/xml/std-notifications-1.2 support</span>
+    <span class="ident">nominet_notifications</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// http://www.nominet.org.uk/epp/xml/nom-tag-1.0 support</span>
+    <span class="ident">nominet_tag_list</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// http://www.nominet.org.uk/epp/xml/contact-nom-ext-1.0 support</span>
+    <span class="ident">nominet_contact_ext</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// http://www.nominet.org.uk/epp/xml/nom-data-quality-1.1 support</span>
+    <span class="ident">nominet_data_quality</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// http://www.nominet.org.uk/epp/xml/std-handshake-1.0 support</span>
+    <span class="ident">nominet_release</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// http://www.nominet.org.uk/epp/xml/std-release-1.0 support</span>
+    <span class="ident">nominet_handshake</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// https://www.nic.ch/epp/balance-1.0 support</span>
+    <span class="ident">switch_balance</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// http://www.verisign.com/epp/balance-1.0 support</span>
+    <span class="ident">verisign_balance</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// http://www.unitedtld.com/epp/finance-1.0 support</span>
+    <span class="ident">unitedtld_balance</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// http://www.unitedtld.com/epp/charge-1.0 support</span>
+    <span class="ident">unitedtld_charge</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// http://www.verisign.com/epp/lowbalance-poll-1.0 support</span>
+    <span class="ident">verisign_low_balance</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// http://www.verisign.com/epp/whoisInf-1.0 support</span>
+    <span class="ident">verisign_whois_info</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// http://xmlns.corenic.net/epp/mark-ext-1.0 support</span>
+    <span class="ident">corenic_mark</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// urn:ietf:params:xml:ns:nsset-1.2 support (NOT AN ACTUAL IETF NAMESPACE)</span>
+    <span class="ident">nsset_supported</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// RFC 8748 support</span>
+    <span class="ident">fee_supported</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// RFC 8334 support</span>
+    <span class="ident">launch_supported</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// urn:ietf:params:xml:ns:fee-0.11 support</span>
+    <span class="ident">fee_011_supported</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// urn:ietf:params:xml:ns:fee-0.9 support</span>
+    <span class="ident">fee_09_supported</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// urn:ietf:params:xml:ns:fee-0.8 support</span>
+    <span class="ident">fee_08_supported</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// urn:ietf:params:xml:ns:fee-0.7 support</span>
+    <span class="ident">fee_07_supported</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// urn:ietf:params:xml:ns:fee-0.5 support</span>
+    <span class="ident">fee_05_supported</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// urn:ietf:params:xml:ns:epp:unhandled-namespaces-1.0 support</span>
+    <span class="ident">unhandled_ns_supported</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// urn:ietf:params:xml:ns:epp:eai-0.2 support</span>
+    <span class="ident">eai_supported</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// urn:ietf:params:xml:ns:epp:maintenance-0.3 support</span>
+    <span class="ident">maintenance_supported</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// RFC8807 support</span>
+    <span class="ident">login_sec_supported</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// http://www.eurid.eu/xml/epp/contact-ext-1.3 support</span>
+    <span class="ident">eurid_contact_support</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// http://www.eurid.eu/xml/epp/domain-ext-2.4 support</span>
+    <span class="ident">eurid_domain_support</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// http://www.eurid.eu/xml/epp/dnsQuality-2.0 support</span>
+    <span class="ident">eurid_dns_quality_support</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// http://www.eurid.eu/xml/epp/dnssecEligibility-1.0 support</span>
+    <span class="ident">eurid_dnssec_eligibility_support</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// http://www.eurid.eu/xml/epp/homoglyph-1.0 support</span>
+    <span class="ident">eurid_homoglyph_supported</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// http://www.eurid.eu/xml/epp/authInfo-1.1 support</span>
+    <span class="ident">eurid_auth_info_supported</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// http://www.eurid.eu/xml/epp/idn-1.0 support</span>
+    <span class="ident">eurid_idn_supported</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// http://www.eurid.eu/xml/epp/registrarFinance-1.0 support</span>
+    <span class="ident">eurid_finance_supported</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// http://www.eurid.eu/xml/epp/registrarHitPoints-1.0 support</span>
+    <span class="ident">eurid_hit_points_supported</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// http://www.eurid.eu/xml/epp/registrationLimit-1.1 support</span>
+    <span class="ident">eurid_registration_limit_supported</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// http://www.eurid.eu/xml/epp/poll-1.2 support</span>
+    <span class="ident">eurid_poll_supported</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// urn:ietf:params:xml:ns:qualifiedLawyer-1.0 support</span>
+    <span class="ident">qualified_lawyer_supported</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// http://www.verisign.com/epp/sync-1.0 support</span>
+    <span class="ident">verisign_sync_supported</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// urn:is.isnic:xml:ns:is-ext-domain-1.0 support</span>
+    <span class="ident">isnic_domain_supported</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// urn:is.isnic:xml:ns:is-ext-host-1.0 support</span>
+    <span class="ident">isnic_host_supported</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// urn:is.isnic:xml:ns:is-ext-contact-1.0 support</span>
+    <span class="ident">isnic_contact_supported</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// urn:is.isnic:xml:ns:is-ext-list-1.0 support</span>
+    <span class="ident">isnic_list_supported</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// urn:is.isnic:xml:ns:is-ext-account-1.0 support</span>
+    <span class="ident">isnic_account_supported</span>: <span class="ident">bool</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">ServerFeatures</span> {
+    <span class="kw">fn</span> <span class="ident">has_erratum</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">errata</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span> <span class="op">=</span><span class="op">=</span> <span class="ident">name</span>,
+            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
+        }
+    }
+}
+
 <span class="doccomment">/// Main client struct for the EEP client</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EPPClient</span> {
     <span class="ident">log_dir</span>: <span class="ident">std::path::PathBuf</span>,
     <span class="ident">host</span>: <span class="ident">String</span>,
-    <span class="ident">hostname</span>: <span class="ident">String</span>,
     <span class="ident">tag</span>: <span class="ident">String</span>,
     <span class="ident">password</span>: <span class="ident">String</span>,
     <span class="ident">new_password</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="ident">tls_context</span>: <span class="ident">openssl::ssl::SslContext</span>,
     <span class="ident">server_id</span>: <span class="ident">String</span>,
     <span class="ident">pipelining</span>: <span class="ident">bool</span>,
     <span class="ident">is_awaiting_response</span>: <span class="ident">bool</span>,
     <span class="ident">is_closing</span>: <span class="ident">bool</span>,
     <span class="doccomment">/// Is the EPP server in a state to receive and process commands</span>
     <span class="ident">ready</span>: <span class="ident">bool</span>,
-    <span class="ident">router</span>: <span class="ident">outer_router::Router</span><span class="op">&lt;</span><span class="ident">router::Router</span><span class="op">&gt;</span>,
+    <span class="ident">router</span>: <span class="ident">outer_router::Router</span><span class="op">&lt;</span><span class="ident">router::Router</span>, <span class="ident">ServerFeatures</span><span class="op">&gt;</span>,
     <span class="doccomment">/// What features does the server support</span>
     <span class="ident">features</span>: <span class="ident">ServerFeatures</span>,
     <span class="ident">nominet_tag_list_subordinate</span>: <span class="ident">bool</span>,
     <span class="ident">nominet_tag_list_subordinate_client</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">futures::channel::mpsc::Sender</span><span class="op">&lt;</span><span class="ident">RequestMessage</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">tls_client</span>: <span class="kw">super</span><span class="ident">::epp_like::tls_client::TLSClient</span>,
 }
 
-<span class="macro">lazy_static!</span> {
-    <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">TLS_CONNECT_LOCK</span>: <span class="ident">tokio::sync::Semaphore</span> <span class="op">=</span> <span class="ident">tokio::sync::Semaphore::new</span>(<span class="number">1</span>);
+<span class="kw">impl</span> <span class="kw">super</span><span class="ident">::Client</span> <span class="kw">for</span> <span class="ident">EPPClient</span> {
+    <span class="comment">// Starts up the EPP client and returns the sending end of a tokio channel to inject</span>
+    <span class="comment">// commands into the client to be processed</span>
+    <span class="kw">fn</span> <span class="ident">start</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">futures::channel::mpsc::Sender</span><span class="op">&lt;</span><span class="ident">RequestMessage</span><span class="op">&gt;</span> {
+        <span class="macro">info!</span>(<span class="string">&quot;EPP Client for {} starting...&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">host</span>);
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">nominet_tag_list_subordinate</span> {
+            <span class="macro">info!</span>(<span class="string">&quot;This is a Nominet Tag list subordinate client&quot;</span>);
+        }
+        <span class="kw">let</span> (<span class="ident">sender</span>, <span class="ident">receiver</span>) <span class="op">=</span> <span class="ident">futures::channel::mpsc::channel</span>::<span class="op">&lt;</span><span class="ident">RequestMessage</span><span class="op">&gt;</span>(<span class="number">16</span>);
+        <span class="ident">tokio::spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
+            <span class="self">self</span>.<span class="ident">_main_loop</span>(<span class="ident">receiver</span>).<span class="kw">await</span>;
+        });
+        <span class="ident">sender</span>
+    }
 }
 
 <span class="kw">impl</span> <span class="ident">EPPClient</span> {
@@ -1306,114 +1358,18 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Arguments</span>
     <span class="doccomment">/// * `conf` - Configuration to use for this client</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">C</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">S</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ClientCertConf</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>(
-        <span class="ident">conf</span>: <span class="kw">super</span><span class="ident">::ClientConf</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">C</span>, <span class="ident">S</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">C</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>(
+        <span class="ident">conf</span>: <span class="kw">super</span><span class="ident">::ClientConf</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">C</span><span class="op">&gt;</span>,
         <span class="ident">pkcs11_engine</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">crate</span><span class="ident">::P11Engine</span><span class="op">&gt;</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::io::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">context_builder</span> <span class="op">=</span>
-            <span class="ident">openssl::ssl::SslContext::builder</span>(<span class="ident">openssl::ssl::SslMethod::tls_client</span>())<span class="question-mark">?</span>;
-        <span class="ident">context_builder</span>.<span class="ident">set_min_proto_version</span>(<span class="prelude-val">Some</span>(<span class="ident">openssl::ssl::SslVersion::TLS1_2</span>))<span class="question-mark">?</span>;
-
-        <span class="kw">if</span> <span class="ident">conf</span>.<span class="ident">danger_accept_invalid_certs</span> {
-            <span class="ident">context_builder</span>.<span class="ident">set_verify</span>(<span class="ident">openssl::ssl::SslVerifyMode::NONE</span>);
-        } <span class="kw">else</span> {
-            <span class="ident">context_builder</span>.<span class="ident">set_verify</span>(<span class="ident">openssl::ssl::SslVerifyMode::PEER</span>);
-        }
-
-        <span class="kw">let</span> <span class="ident">hostname</span> <span class="op">=</span> <span class="ident">conf</span>
-            .<span class="ident">host</span>
-            .<span class="ident">rsplitn</span>(<span class="number">2</span>, <span class="string">&#39;:&#39;</span>)
-            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()
-            .<span class="ident">pop</span>()
-            .<span class="ident">unwrap</span>()
-            .<span class="ident">to_string</span>();
-
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cert_store</span> <span class="op">=</span> <span class="ident">openssl::x509::store::X509StoreBuilder::new</span>()<span class="question-mark">?</span>;
-        <span class="kw">if</span> <span class="ident">conf</span>.<span class="ident">root_certs</span>.<span class="ident">is_empty</span>() {
-            <span class="ident">cert_store</span>.<span class="ident">set_default_paths</span>()<span class="question-mark">?</span>;
-        } <span class="kw">else</span> {
-            <span class="kw">for</span> <span class="ident">root_cert_path</span> <span class="kw">in</span> <span class="ident">conf</span>.<span class="ident">root_certs</span>.<span class="ident">iter</span>() {
-                <span class="kw">let</span> <span class="ident">root_cert_bytes</span> <span class="op">=</span> <span class="ident">tokio::fs::read</span>(<span class="ident">root_cert_path</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-                <span class="kw">let</span> <span class="ident">root_cert</span> <span class="op">=</span> <span class="ident">openssl::x509::X509::from_pem</span>(<span class="kw-2">&amp;</span><span class="ident">root_cert_bytes</span>)<span class="question-mark">?</span>;
-                <span class="ident">cert_store</span>.<span class="ident">add_cert</span>(<span class="ident">root_cert</span>)<span class="question-mark">?</span>;
-            }
-        }
-        <span class="kw">let</span> <span class="ident">cert_store</span> <span class="op">=</span> <span class="ident">cert_store</span>.<span class="ident">build</span>();
-        <span class="ident">context_builder</span>.<span class="ident">set_cert_store</span>(<span class="ident">cert_store</span>);
-
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">conf</span>.<span class="ident">danger_accept_invalid_hostname</span> {
-            <span class="ident">context_builder</span>
-                .<span class="ident">verify_param_mut</span>()
-                .<span class="ident">set_hostflags</span>(<span class="ident">openssl::x509::verify::X509CheckFlags::NO_PARTIAL_WILDCARDS</span>);
-            <span class="ident">context_builder</span>.<span class="ident">verify_param_mut</span>().<span class="ident">set_host</span>(<span class="kw-2">&amp;</span><span class="ident">hostname</span>)<span class="question-mark">?</span>;
-        }
-
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">priv_key</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">client_cert</span>) <span class="op">=</span> <span class="ident">conf</span>.<span class="ident">client_cert</span>.<span class="ident">into</span>() {
-            <span class="kw">match</span> <span class="ident">client_cert</span> {
-                <span class="ident">ClientCertConf::PKCS12</span>(<span class="ident">pkcs12_file</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                    <span class="kw">let</span> <span class="ident">pkcs</span> <span class="op">=</span> <span class="ident">tokio::fs::read</span>(<span class="ident">pkcs12_file</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-                    <span class="kw">let</span> <span class="ident">identity</span> <span class="op">=</span> <span class="ident">openssl::pkcs12::Pkcs12::from_der</span>(<span class="kw-2">&amp;</span><span class="ident">pkcs</span>)<span class="question-mark">?</span>.<span class="ident">parse</span>(<span class="string">&quot;&quot;</span>)<span class="question-mark">?</span>;
-                    <span class="ident">context_builder</span>.<span class="ident">set_certificate</span>(<span class="kw-2">&amp;</span><span class="ident">identity</span>.<span class="ident">cert</span>)<span class="question-mark">?</span>;
-                    <span class="ident">context_builder</span>.<span class="ident">set_private_key</span>(<span class="kw-2">&amp;</span><span class="ident">identity</span>.<span class="ident">pkey</span>)<span class="question-mark">?</span>;
-                    <span class="kw">for</span> <span class="ident">cert</span> <span class="kw">in</span> <span class="ident">identity</span>.<span class="ident">chain</span>.<span class="ident">into_iter</span>().<span class="ident">flatten</span>() {
-                        <span class="ident">context_builder</span>.<span class="ident">add_extra_chain_cert</span>(<span class="ident">cert</span>)<span class="question-mark">?</span>;
-                    }
-                }
-                <span class="ident">ClientCertConf::PKCS11</span> { <span class="ident">key_id</span>, <span class="ident">cert_chain</span> } <span class="op">=</span><span class="op">&gt;</span> {
-                    <span class="ident">context_builder</span>.<span class="ident">set_certificate_chain_file</span>(<span class="ident">cert_chain</span>)<span class="question-mark">?</span>;
-                    <span class="ident">priv_key</span>.<span class="ident">replace</span>(<span class="ident">key_id</span>);
-                }
-            }
-        }
-
-        <span class="kw">let</span> <span class="ident">context</span> <span class="op">=</span> <span class="ident">context_builder</span>.<span class="ident">build</span>();
-
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">key_id</span>) <span class="op">=</span> <span class="ident">priv_key</span> {
-            <span class="kw">let</span> <span class="ident">pkcs11_engine</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">pkcs11_engine</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">e</span>,
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
-                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">std::io::Error::new</span>(
-                        <span class="ident">std::io::ErrorKind::Other</span>,
-                        <span class="string">&quot;PKCS#11 engine required to used PKCS#11 keys&quot;</span>,
-                    ));
-                }
-            };
-
-            <span class="macro">info!</span>(<span class="string">&quot;Using PKCS#11 key ID {} for {} &quot;</span>, <span class="ident">key_id</span>, <span class="ident">hostname</span>);
-            <span class="kw">let</span> <span class="ident">engine_key_id</span> <span class="op">=</span> <span class="ident">std::ffi::CString::new</span>(<span class="ident">key_id</span>).<span class="ident">unwrap</span>();
-            <span class="kw">let</span> <span class="ident">ctx</span> <span class="op">=</span> <span class="ident">context</span>.<span class="ident">clone</span>();
-            <span class="kw">let</span> <span class="ident">h</span> <span class="op">=</span> <span class="ident">hostname</span>.<span class="ident">clone</span>();
-            <span class="comment">// This sometimes takes absolutely forever to run, so throw it in a thread type thing.</span>
-            <span class="ident">tokio::task::spawn_blocking</span>(<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-                <span class="kw">unsafe</span> {
-                    <span class="macro">trace!</span>(<span class="string">&quot;Loading OpenSSL UI for {}&quot;</span>, <span class="ident">h</span>);
-                    <span class="kw">let</span> <span class="ident">ui</span> <span class="op">=</span> <span class="kw">crate</span><span class="ident">::cvt_p</span>(<span class="ident">openssl_sys::UI_OpenSSL</span>())<span class="question-mark">?</span>;
-                    <span class="macro">trace!</span>(<span class="string">&quot;Loading private key for for {}&quot;</span>, <span class="ident">h</span>);
-                    <span class="kw">let</span> <span class="ident">priv_key</span> <span class="op">=</span> <span class="kw">crate</span><span class="ident">::cvt_p</span>(<span class="ident">openssl_sys::ENGINE_load_private_key</span>(
-                        <span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">pkcs11_engine</span>.<span class="ident">claim</span>(),
-                        <span class="ident">engine_key_id</span>.<span class="ident">as_ptr</span>(),
-                        <span class="ident">ui</span>,
-                        <span class="ident">std::ptr::null_mut</span>(),
-                    ))<span class="question-mark">?</span>;
-                    <span class="macro">trace!</span>(<span class="string">&quot;Setting private key for for {}&quot;</span>, <span class="ident">h</span>);
-                    <span class="ident">openssl_sys::SSL_CTX_use_PrivateKey</span>(<span class="ident">ctx</span>.<span class="ident">as_ptr</span>(), <span class="ident">priv_key</span>);
-                    <span class="macro">trace!</span>(<span class="string">&quot;Freeing private key for {}&quot;</span>, <span class="ident">h</span>);
-                    <span class="ident">openssl_sys::EVP_PKEY_free</span>(<span class="ident">priv_key</span>);
-                    <span class="prelude-val">Ok</span>(())
-                }
-            })
-            .<span class="kw">await</span><span class="question-mark">?</span><span class="question-mark">?</span>;
-        }
+        <span class="kw">let</span> <span class="ident">tls_client</span> <span class="op">=</span>
+            <span class="kw">super</span><span class="ident">::epp_like::tls_client::TLSClient::new</span>((<span class="kw-2">&amp;</span><span class="ident">conf</span>).<span class="ident">into</span>(), <span class="ident">pkcs11_engine</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
             <span class="ident">log_dir</span>: <span class="ident">conf</span>.<span class="ident">log_dir</span>,
             <span class="ident">host</span>: <span class="ident">conf</span>.<span class="ident">host</span>.<span class="ident">to_string</span>(),
-            <span class="ident">hostname</span>,
             <span class="ident">tag</span>: <span class="ident">conf</span>.<span class="ident">tag</span>.<span class="ident">to_string</span>(),
             <span class="ident">password</span>: <span class="ident">conf</span>.<span class="ident">password</span>.<span class="ident">to_string</span>(),
-            <span class="ident">tls_context</span>: <span class="ident">context</span>,
             <span class="ident">new_password</span>: <span class="ident">conf</span>.<span class="ident">new_password</span>.<span class="ident">into</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">to_string</span>()),
             <span class="ident">pipelining</span>: <span class="ident">conf</span>.<span class="ident">pipelining</span>,
             <span class="ident">features</span>: <span class="ident">ServerFeatures</span> {
@@ -1427,21 +1383,8 @@
             <span class="ident">nominet_tag_list_subordinate_client</span>: <span class="prelude-val">None</span>,
             <span class="ident">ready</span>: <span class="bool-val">false</span>,
             <span class="ident">router</span>: <span class="ident">outer_router::Router::default</span>(),
+            <span class="ident">tls_client</span>,
         })
-    }
-
-    <span class="comment">// Starts up the EPP server and returns the sending end of a tokio channel to inject</span>
-    <span class="comment">// commands into the client to be processed</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">start</span>(<span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">futures::channel::mpsc::Sender</span><span class="op">&lt;</span><span class="ident">RequestMessage</span><span class="op">&gt;</span> {
-        <span class="macro">info!</span>(<span class="string">&quot;EPP Client for {} starting...&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">host</span>);
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">nominet_tag_list_subordinate</span> {
-            <span class="macro">info!</span>(<span class="string">&quot;This is a Nominet Tag list subordinate client&quot;</span>);
-        }
-        <span class="kw">let</span> (<span class="ident">sender</span>, <span class="ident">receiver</span>) <span class="op">=</span> <span class="ident">futures::channel::mpsc::channel</span>::<span class="op">&lt;</span><span class="ident">RequestMessage</span><span class="op">&gt;</span>(<span class="number">16</span>);
-        <span class="ident">tokio::spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
-            <span class="self">self</span>.<span class="ident">_main_loop</span>(<span class="ident">receiver</span>).<span class="kw">await</span>;
-        });
-        <span class="ident">sender</span>
     }
 
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">_main_loop</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">receiver</span>: <span class="ident">futures::channel::mpsc::Receiver</span><span class="op">&lt;</span><span class="ident">RequestMessage</span><span class="op">&gt;</span>) {
@@ -1451,15 +1394,15 @@
             <span class="self">self</span>.<span class="ident">is_awaiting_response</span> <span class="op">=</span> <span class="bool-val">false</span>;
 
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sock</span> <span class="op">=</span> {
-                <span class="macro">trace!</span>(<span class="string">&quot;Getting connection for {}&quot;</span>, <span class="self">self</span>.<span class="ident">hostname</span>);
-                <span class="kw">let</span> <span class="ident">connect_fut</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">_connect</span>().<span class="ident">fuse</span>();
+                <span class="macro">trace!</span>(<span class="string">&quot;Getting connection for {}&quot;</span>, <span class="self">self</span>.<span class="ident">host</span>);
+                <span class="kw">let</span> <span class="ident">connect_fut</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tls_client</span>.<span class="ident">connect</span>().<span class="ident">fuse</span>();
                 <span class="macro">futures::pin_mut!</span>(<span class="ident">connect_fut</span>);
 
                 <span class="kw">loop</span> {
                     <span class="macro">futures::select!</span> {
                         <span class="ident">x</span> <span class="op">=</span> <span class="ident">receiver</span>.<span class="ident">next</span>() <span class="op">=</span><span class="op">&gt;</span> {
                             <span class="kw">match</span> <span class="ident">x</span> {
-                                <span class="prelude-val">Some</span>(<span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">outer_router::Router</span>::<span class="op">&lt;</span><span class="ident">router::Router</span><span class="op">&gt;</span><span class="ident">::reject_request</span>(<span class="ident">x</span>),
+                                <span class="prelude-val">Some</span>(<span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">outer_router::Router</span>::<span class="op">&lt;</span><span class="ident">router::Router</span>, <span class="ident">ServerFeatures</span><span class="op">&gt;</span><span class="ident">::reject_request</span>(<span class="ident">x</span>),
                                 <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
                                     <span class="macro">info!</span>(<span class="string">&quot;All senders for {} dropped, exiting...&quot;</span>, <span class="self">self</span>.<span class="ident">host</span>);
                                     <span class="kw">return</span>
@@ -1472,18 +1415,18 @@
                     }
                 }
             };
-            <span class="macro">trace!</span>(<span class="string">&quot;Got connection for {}&quot;</span>, <span class="self">self</span>.<span class="ident">hostname</span>);
+            <span class="macro">trace!</span>(<span class="string">&quot;Got connection for {}&quot;</span>, <span class="self">self</span>.<span class="ident">host</span>);
 
             {
                 <span class="kw">let</span> <span class="ident">exit_str</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;All senders for {} dropped, exiting...&quot;</span>, <span class="self">self</span>.<span class="ident">host</span>);
-                <span class="macro">trace!</span>(<span class="string">&quot;Setting up connection to {}&quot;</span>, <span class="self">self</span>.<span class="ident">hostname</span>);
+                <span class="macro">trace!</span>(<span class="string">&quot;Setting up connection to {}&quot;</span>, <span class="self">self</span>.<span class="ident">host</span>);
                 <span class="kw">let</span> <span class="ident">setup_fut</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">_setup_connection</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sock</span>).<span class="ident">fuse</span>();
                 <span class="macro">futures::pin_mut!</span>(<span class="ident">setup_fut</span>);
                 <span class="kw">match</span> <span class="kw">loop</span> {
                     <span class="macro">futures::select!</span> {
                         <span class="ident">x</span> <span class="op">=</span> <span class="ident">receiver</span>.<span class="ident">next</span>() <span class="op">=</span><span class="op">&gt;</span> {
                             <span class="kw">match</span> <span class="ident">x</span> {
-                                <span class="prelude-val">Some</span>(<span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">outer_router::Router</span>::<span class="op">&lt;</span><span class="ident">router::Router</span><span class="op">&gt;</span><span class="ident">::reject_request</span>(<span class="ident">x</span>),
+                                <span class="prelude-val">Some</span>(<span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">outer_router::Router</span>::<span class="op">&lt;</span><span class="ident">router::Router</span>, <span class="ident">ServerFeatures</span><span class="op">&gt;</span><span class="ident">::reject_request</span>(<span class="ident">x</span>),
                                 <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
                                     <span class="macro">info!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">exit_str</span>);
                                     <span class="kw">return</span>
@@ -1506,7 +1449,7 @@
                     }
                 }
             }
-            <span class="macro">trace!</span>(<span class="string">&quot;Connection setup to {}&quot;</span>, <span class="self">self</span>.<span class="ident">hostname</span>);
+            <span class="macro">trace!</span>(<span class="string">&quot;Connection setup to {}&quot;</span>, <span class="self">self</span>.<span class="ident">host</span>);
 
             <span class="kw">let</span> (<span class="ident">sock_read</span>, <span class="kw-2">mut</span> <span class="ident">sock_write</span>) <span class="op">=</span> <span class="ident">tokio::io::split</span>(<span class="ident">sock</span>);
             <span class="kw">let</span> <span class="ident">msg_receiver</span> <span class="op">=</span> <span class="kw">super</span><span class="ident">::epp_like::ClientReceiver</span> {
@@ -1518,7 +1461,7 @@
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">message_channel</span> <span class="op">=</span> <span class="ident">msg_receiver</span>.<span class="ident">run</span>().<span class="ident">fuse</span>();
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">keepalive_interval</span> <span class="op">=</span> <span class="ident">tokio::time::interval</span>(<span class="ident">tokio::time::Duration::new</span>(<span class="number">120</span>, <span class="number">0</span>));
 
-            <span class="macro">trace!</span>(<span class="string">&quot;Entering event loop for {}&quot;</span>, <span class="self">self</span>.<span class="ident">hostname</span>);
+            <span class="macro">trace!</span>(<span class="string">&quot;Entering event loop for {}&quot;</span>, <span class="self">self</span>.<span class="ident">host</span>);
             <span class="kw">loop</span> {
                 <span class="kw">if</span> <span class="self">self</span>.<span class="ident">pipelining</span> <span class="op">|</span><span class="op">|</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">is_awaiting_response</span> {
                     <span class="macro">futures::select!</span> {
@@ -1612,7 +1555,9 @@
             <span class="ident">message</span>: <span class="ident">proto::EPPMessageType::Hello</span> {},
         };
         <span class="self">self</span>.<span class="ident">is_awaiting_response</span> <span class="op">=</span> <span class="bool-val">true</span>;
-        <span class="kw">let</span> <span class="ident">receiver</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">_send_msg</span>(<span class="kw-2">&amp;</span><span class="ident">message</span>, <span class="ident">sock_write</span>).<span class="ident">fuse</span>();
+        <span class="kw">let</span> <span class="ident">receiver</span> <span class="op">=</span>
+            <span class="kw">super</span><span class="ident">::epp_like::send_msg</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">host</span>, <span class="ident">sock_write</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">log_dir</span>, <span class="ident">send_msg</span>, <span class="kw-2">&amp;</span><span class="ident">message</span>)
+                .<span class="ident">fuse</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">delay</span> <span class="op">=</span> <span class="ident">Box::pin</span>(<span class="ident">tokio::time::sleep</span>(<span class="ident">tokio::time::Duration::new</span>(<span class="number">15</span>, <span class="number">0</span>)).<span class="ident">fuse</span>());
         <span class="macro">futures::pin_mut!</span>(<span class="ident">receiver</span>);
         <span class="kw">let</span> <span class="ident">resp</span> <span class="op">=</span> <span class="macro">futures::select!</span> {
@@ -1763,7 +1708,7 @@
 
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">_setup_connection</span>(
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">sock</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">tokio_openssl::SslStream</span><span class="op">&lt;</span><span class="ident">TcpStream</span><span class="op">&gt;</span>,
+        <span class="ident">sock</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw">super</span><span class="ident">::epp_like::tls_client::TLSConnection</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">bool</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw">super</span><span class="ident">::epp_like::recv_msg</span>(<span class="ident">sock</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">host</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">log_dir</span>, <span class="ident">recv_msg</span>).<span class="kw">await</span> {
             <span class="prelude-val">Ok</span>(<span class="ident">m</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">m</span>,
@@ -1859,6 +1804,12 @@
         <span class="self">self</span>.<span class="ident">features</span>.<span class="ident">nominet_data_quality</span> <span class="op">=</span> <span class="ident">greeting</span>
             .<span class="ident">service_menu</span>
             .<span class="ident">supports_ext</span>(<span class="string">&quot;http://www.nominet.org.uk/epp/xml/nom-data-quality-1.1&quot;</span>);
+        <span class="self">self</span>.<span class="ident">features</span>.<span class="ident">nominet_handshake</span> <span class="op">=</span> <span class="ident">greeting</span>
+            .<span class="ident">service_menu</span>
+            .<span class="ident">supports_ext</span>(<span class="string">&quot;http://www.nominet.org.uk/epp/xml/std-handshake-1.0&quot;</span>);
+        <span class="self">self</span>.<span class="ident">features</span>.<span class="ident">nominet_release</span> <span class="op">=</span> <span class="ident">greeting</span>
+            .<span class="ident">service_menu</span>
+            .<span class="ident">supports_ext</span>(<span class="string">&quot;http://www.nominet.org.uk/epp/xml/std-release-1.0&quot;</span>);
         <span class="self">self</span>.<span class="ident">features</span>.<span class="ident">switch_balance</span> <span class="op">=</span> <span class="ident">greeting</span>
             .<span class="ident">service_menu</span>
             .<span class="ident">supports_ext</span>(<span class="string">&quot;https://www.nic.ch/epp/balance-1.0&quot;</span>);
@@ -1971,7 +1922,10 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">_login</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">sock</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">tokio_openssl::SslStream</span><span class="op">&lt;</span><span class="ident">TcpStream</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), ()<span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">_login</span>(
+        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="ident">sock</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw">super</span><span class="ident">::epp_like::tls_client::TLSConnection</span>,
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), ()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">objects</span> <span class="op">=</span> <span class="macro">vec!</span>[];
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ext_objects</span> <span class="op">=</span> <span class="macro">vec!</span>[];
 
@@ -2007,6 +1961,12 @@
             <span class="kw">if</span> <span class="self">self</span>.<span class="ident">features</span>.<span class="ident">nominet_data_quality</span> {
                 <span class="ident">ext_objects</span>
                     .<span class="ident">push</span>(<span class="string">&quot;http://www.nominet.org.uk/epp/xml/nom-data-quality-1.1&quot;</span>.<span class="ident">to_string</span>())
+            }
+            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">features</span>.<span class="ident">nominet_handshake</span> {
+                <span class="ident">ext_objects</span>.<span class="ident">push</span>(<span class="string">&quot;http://www.nominet.org.uk/epp/xml/std-handshake-1.0&quot;</span>.<span class="ident">to_string</span>())
+            }
+            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">features</span>.<span class="ident">nominet_release</span> {
+                <span class="ident">ext_objects</span>.<span class="ident">push</span>(<span class="string">&quot;http://www.nominet.org.uk/epp/xml/std-release-1.0&quot;</span>.<span class="ident">to_string</span>())
             }
             <span class="kw">if</span> <span class="self">self</span>.<span class="ident">features</span>.<span class="ident">switch_balance</span> {
                 <span class="ident">ext_objects</span>.<span class="ident">push</span>(<span class="string">&quot;https://www.nic.ch/epp/balance-1.0&quot;</span>.<span class="ident">to_string</span>())
@@ -2102,12 +2062,10 @@
             <span class="kw">if</span> <span class="self">self</span>.<span class="ident">features</span>.<span class="ident">nominet_tag_list</span> {
                 <span class="kw">let</span> <span class="ident">new_client</span> <span class="op">=</span> <span class="self">Self</span> {
                     <span class="ident">host</span>: <span class="self">self</span>.<span class="ident">host</span>.<span class="ident">clone</span>(),
-                    <span class="ident">hostname</span>: <span class="self">self</span>.<span class="ident">hostname</span>.<span class="ident">clone</span>(),
                     <span class="ident">tag</span>: <span class="self">self</span>.<span class="ident">tag</span>.<span class="ident">clone</span>(),
                     <span class="ident">password</span>: <span class="self">self</span>.<span class="ident">password</span>.<span class="ident">clone</span>(),
                     <span class="ident">nominet_tag_list_subordinate</span>: <span class="bool-val">true</span>,
                     <span class="ident">log_dir</span>: <span class="self">self</span>.<span class="ident">log_dir</span>.<span class="ident">clone</span>(),
-                    <span class="ident">tls_context</span>: <span class="self">self</span>.<span class="ident">tls_context</span>.<span class="ident">clone</span>(),
                     <span class="ident">new_password</span>: <span class="prelude-val">None</span>,
                     <span class="ident">pipelining</span>: <span class="self">self</span>.<span class="ident">pipelining</span>,
                     <span class="ident">features</span>: <span class="ident">ServerFeatures</span> {
@@ -2120,8 +2078,9 @@
                     <span class="ident">nominet_tag_list_subordinate_client</span>: <span class="prelude-val">None</span>,
                     <span class="ident">ready</span>: <span class="bool-val">false</span>,
                     <span class="ident">router</span>: <span class="ident">outer_router::Router::default</span>(),
+                    <span class="ident">tls_client</span>: <span class="self">self</span>.<span class="ident">tls_client</span>.<span class="ident">clone</span>(),
                 };
-                <span class="self">self</span>.<span class="ident">nominet_tag_list_subordinate_client</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">new_client</span>.<span class="ident">start</span>());
+                <span class="self">self</span>.<span class="ident">nominet_tag_list_subordinate_client</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Box::new</span>(<span class="ident">new_client</span>).<span class="ident">start</span>());
             }
         }
 
@@ -2160,7 +2119,7 @@
         <span class="ident">new_password</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
         <span class="ident">objects</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
         <span class="ident">ext_objects</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-        <span class="ident">sock</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">tokio_openssl::SslStream</span><span class="op">&lt;</span><span class="ident">TcpStream</span><span class="op">&gt;</span>,
+        <span class="ident">sock</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw">super</span><span class="ident">::epp_like::tls_client::TLSConnection</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">bool</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">command</span> <span class="op">=</span> <span class="ident">proto::EPPLogin</span> {
             <span class="ident">client_id</span>: <span class="self">self</span>.<span class="ident">tag</span>.<span class="ident">clone</span>(),
@@ -2306,155 +2265,20 @@
         <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="ident">proto::EPPMessage</span> {
             <span class="ident">message</span>: <span class="ident">proto::EPPMessageType::Command</span>(<span class="ident">Box::new</span>(<span class="ident">command</span>)),
         };
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">_send_msg</span>(<span class="kw-2">&amp;</span><span class="ident">message</span>, <span class="ident">sock</span>).<span class="kw">await</span> {
+        <span class="kw">match</span> <span class="kw">super</span><span class="ident">::epp_like::send_msg</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">host</span>, <span class="ident">sock</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">log_dir</span>, <span class="ident">send_msg</span>, <span class="kw-2">&amp;</span><span class="ident">message</span>).<span class="kw">await</span> {
             <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">message_id</span>),
             <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(()),
         }
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">_send_msg</span><span class="op">&lt;</span><span class="ident">W</span>: <span class="ident">std::marker::Unpin</span> <span class="op">+</span> <span class="ident">tokio::io::AsyncWrite</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">message</span>: <span class="kw-2">&amp;</span><span class="ident">proto::EPPMessage</span>,
-        <span class="ident">sock</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">W</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), ()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">encoded_msg</span> <span class="op">=</span> <span class="ident">xml_serde::to_string</span>(<span class="ident">message</span>).<span class="ident">unwrap</span>();
-        <span class="macro">debug!</span>(
-            <span class="string">&quot;Sending EPP message to {} with contents: {}&quot;</span>,
-            <span class="self">self</span>.<span class="ident">hostname</span>, <span class="ident">encoded_msg</span>
-        );
-        <span class="kw">let</span> <span class="ident">msg_bytes</span> <span class="op">=</span> <span class="ident">encoded_msg</span>.<span class="ident">as_bytes</span>();
-        <span class="kw">let</span> <span class="ident">msg_len</span> <span class="op">=</span> <span class="ident">msg_bytes</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="number">4</span>;
-        <span class="kw">match</span> <span class="ident">sock</span>.<span class="ident">write_u32</span>(<span class="ident">msg_len</span> <span class="kw">as</span> <span class="ident">u32</span>).<span class="kw">await</span> {
-            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {}
-            <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="macro">error!</span>(<span class="string">&quot;Error writing data unit length to {}: {}&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">host</span>, <span class="ident">err</span>);
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(());
-            }
-        };
-        <span class="kw">match</span> <span class="ident">sock</span>.<span class="ident">write</span>(<span class="ident">msg_bytes</span>).<span class="kw">await</span> {
-            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {}
-            <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="macro">error!</span>(<span class="string">&quot;Error writing data unit to {}: {}&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">host</span>, <span class="ident">err</span>);
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(());
-            }
-        }
-        <span class="kw">match</span> <span class="kw">super</span><span class="ident">::epp_like::write_msg_log</span>(<span class="kw-2">&amp;</span><span class="ident">encoded_msg</span>, <span class="string">&quot;send&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">log_dir</span>).<span class="kw">await</span> {
-            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {}
-            <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="macro">error!</span>(<span class="string">&quot;Failed writing sent message to message log: {}&quot;</span>, <span class="ident">e</span>);
-            }
-        }
-        <span class="prelude-val">Ok</span>(())
-    }
-
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">_close</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">sock</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">tokio_openssl::SslStream</span><span class="op">&lt;</span><span class="ident">TcpStream</span><span class="op">&gt;</span>) {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">_close</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">sock</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw">super</span><span class="ident">::epp_like::tls_client::TLSConnection</span>) {
         <span class="self">self</span>.<span class="ident">router</span>.<span class="ident">drain</span>();
-        <span class="kw">match</span> <span class="ident">sock</span>.<span class="ident">shutdown</span>().<span class="kw">await</span> {
-            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="macro">info!</span>(<span class="string">&quot;Connection to {} closed&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">host</span>);
-            }
-            <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="macro">error!</span>(
-                    <span class="string">&quot;Error closing connection to {}: {}, dropping anyway&quot;</span>,
-                    <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">host</span>, <span class="ident">err</span>
-                );
-            }
-        }
-    }
-
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">_connect</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">tokio_openssl::SslStream</span><span class="op">&lt;</span><span class="ident">TcpStream</span><span class="op">&gt;</span> {
-        <span class="kw">loop</span> {
-            <span class="kw">match</span> <span class="self">self</span>.<span class="ident">_try_connect</span>().<span class="kw">await</span> {
-                <span class="prelude-val">Ok</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                    <span class="macro">info!</span>(<span class="string">&quot;Successfully connected to {}&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">host</span>);
-                    <span class="kw">return</span> <span class="ident">s</span>;
-                }
-                <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                    <span class="ident">tokio::time::sleep</span>(<span class="ident">tokio::time::Duration::new</span>(<span class="number">5</span>, <span class="number">0</span>)).<span class="kw">await</span>;
-                }
-            }
-        }
-    }
-
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">_try_connect</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">tokio_openssl::SslStream</span><span class="op">&lt;</span><span class="ident">TcpStream</span><span class="op">&gt;</span>, ()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">addr</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">tokio::net::lookup_host</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">host</span>).<span class="kw">await</span> {
-            <span class="prelude-val">Ok</span>(<span class="kw-2">mut</span> <span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">s</span>.<span class="ident">next</span>() {
-                <span class="prelude-val">Some</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>,
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
-                    <span class="macro">error!</span>(<span class="string">&quot;Resolving {} returned no records&quot;</span>, <span class="self">self</span>.<span class="ident">host</span>);
-                    <span class="kw">return</span> <span class="prelude-val">Err</span>(());
-                }
-            },
-            <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="macro">error!</span>(<span class="string">&quot;Failed to resolve {}: {}&quot;</span>, <span class="self">self</span>.<span class="ident">host</span>, <span class="ident">err</span>);
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(());
-            }
-        };
-
-        <span class="comment">// Many servers &lt;drop the connection if no TLS data is sent within ~10 seconds.</span>
-        <span class="comment">// We therefore have to make sure only one thread at a time connects TLS otherwise a thread</span>
-        <span class="comment">// could open a TCP stream and then wait a while for another thread to negotiate TLS</span>
-        <span class="comment">// (it shouldn&#39;t be blocking because async, but sometimes it is), by which time the server</span>
-        <span class="comment">// has dropped the connection and it all has to start again.</span>
-        <span class="comment">//</span>
-        <span class="comment">// Please don&#39;t ask how this happens&gt;, or how I found out, just don&#39;t try and fix this.</span>
-        <span class="macro">trace!</span>(<span class="string">&quot;Getting connect lock for {}&quot;</span>, <span class="self">self</span>.<span class="ident">hostname</span>);
-        <span class="kw">let</span> <span class="ident">lock</span> <span class="op">=</span> <span class="ident">TLS_CONNECT_LOCK</span>.<span class="ident">acquire</span>().<span class="kw">await</span>.<span class="ident">unwrap</span>();
-        <span class="macro">trace!</span>(<span class="string">&quot;Setting up TLS stream for {}&quot;</span>, <span class="self">self</span>.<span class="ident">hostname</span>);
-
-        <span class="macro">trace!</span>(<span class="string">&quot;Opening TCP connection to {}&quot;</span>, <span class="self">self</span>.<span class="ident">hostname</span>);
-        <span class="kw">let</span> <span class="ident">socket</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">tokio::net::TcpStream::connect</span>(<span class="kw-2">&amp;</span><span class="ident">addr</span>).<span class="kw">await</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>,
-            <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="macro">error!</span>(<span class="string">&quot;Unable to connect to {}: {}&quot;</span>, <span class="self">self</span>.<span class="ident">host</span>, <span class="ident">err</span>);
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(());
-            }
-        };
-
-        <span class="macro">trace!</span>(<span class="string">&quot;Creating TLS context for {}&quot;</span>, <span class="self">self</span>.<span class="ident">hostname</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cx</span> <span class="op">=</span> <span class="kw">match</span> (<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::io::Result</span><span class="op">&lt;</span><span class="ident">tokio_openssl::SslStream</span><span class="op">&lt;</span><span class="ident">TcpStream</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ssl</span> <span class="op">=</span> <span class="ident">openssl::ssl::Ssl::new</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">tls_context</span>)<span class="question-mark">?</span>;
-            <span class="ident">ssl</span>.<span class="ident">set_hostname</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">hostname</span>)<span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="ident">cx</span> <span class="op">=</span> <span class="ident">tokio_openssl::SslStream::new</span>(<span class="ident">ssl</span>, <span class="ident">socket</span>)<span class="question-mark">?</span>;
-            <span class="prelude-val">Ok</span>(<span class="ident">cx</span>)
-        })() {
-            <span class="prelude-val">Ok</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Box::pin</span>(<span class="ident">s</span>),
-            <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="macro">error!</span>(<span class="string">&quot;Unable to create TLS context: {}&quot;</span>, <span class="ident">err</span>);
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(());
-            }
-        };
-        <span class="comment">// I know this is disgusting, but OpenSSL isn&#39;t actually async compatible when using</span>
-        <span class="comment">// a HSM.</span>
-        <span class="macro">trace!</span>(<span class="string">&quot;Negotiating TLS connection to {}&quot;</span>, <span class="self">self</span>.<span class="ident">hostname</span>);
-        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">tokio::task::spawn_blocking</span>(
-            <span class="kw">move</span> <span class="op">|</span><span class="op">|</span> <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">tokio_openssl::SslStream</span><span class="op">&lt;</span><span class="ident">TcpStream</span><span class="op">&gt;</span>, <span class="ident">openssl::ssl::Error</span><span class="op">&gt;</span> {
-                <span class="ident">futures::executor::block_on</span>(<span class="ident">std::pin::Pin::as_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">cx</span>).<span class="ident">connect</span>())<span class="question-mark">?</span>;
-                <span class="prelude-val">Ok</span>(<span class="kw-2">*</span><span class="ident">std::pin::Pin::into_inner</span>(<span class="ident">cx</span>))
-            },
-        )
-        .<span class="kw">await</span>
-        {
-            <span class="prelude-val">Ok</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">s</span> {
-                <span class="prelude-val">Ok</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">c</span>),
-                <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                    <span class="macro">error!</span>(<span class="string">&quot;Unable to start TLS session to {}: {}&quot;</span>, <span class="self">self</span>.<span class="ident">host</span>, <span class="ident">err</span>);
-                    <span class="kw">return</span> <span class="prelude-val">Err</span>(());
-                }
-            },
-            <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="macro">error!</span>(<span class="string">&quot;Unable to start TLS session to {}: {}&quot;</span>, <span class="self">self</span>.<span class="ident">host</span>, <span class="ident">err</span>);
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(());
-            }
-        };
-        <span class="macro">trace!</span>(<span class="string">&quot;Dropping connect lock for {}&quot;</span>, <span class="self">self</span>.<span class="ident">hostname</span>);
-        <span class="ident">std::mem::drop</span>(<span class="ident">lock</span>);
-        <span class="ident">res</span>
+        <span class="ident">sock</span>.<span class="ident">close</span>().<span class="kw">await</span>
     }
 }
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_logout</span>(
-    <span class="ident">_client</span>: <span class="kw-2">&amp;</span><span class="kw">super</span><span class="ident">::ServerFeatures</span>,
+    <span class="ident">_client</span>: <span class="kw-2">&amp;</span><span class="ident">ServerFeatures</span>,
     <span class="ident">_req</span>: <span class="kw-2">&amp;</span><span class="ident">LogoutRequest</span>,
 ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">router::HandleReqReturn</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="prelude-val">Ok</span>((<span class="ident">proto::EPPCommandType::Logout</span> {}, <span class="prelude-val">None</span>))
@@ -2463,5 +2287,21 @@
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_logout_response</span>(<span class="ident">_response</span>: <span class="ident">proto::EPPResponse</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">super</span><span class="ident">::Response</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="kw">super</span><span class="ident">::Response::Ok</span>(())
 }
+
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">proto::EPPTransferStatus</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw">super</span><span class="ident">::TransferStatus</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">proto::EPPTransferStatus</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+        <span class="kw">use</span> <span class="ident">proto::EPPTransferStatus</span>;
+        <span class="kw">match</span> <span class="ident">from</span> {
+            <span class="ident">EPPTransferStatus::ClientApproved</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">super</span><span class="ident">::TransferStatus::ClientApproved</span>,
+            <span class="ident">EPPTransferStatus::ClientCancelled</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">super</span><span class="ident">::TransferStatus::ClientCancelled</span>,
+            <span class="ident">EPPTransferStatus::ClientRejected</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">super</span><span class="ident">::TransferStatus::ClientRejected</span>,
+            <span class="ident">EPPTransferStatus::Pending</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">super</span><span class="ident">::TransferStatus::Pending</span>,
+            <span class="ident">EPPTransferStatus::ServerApproved</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">super</span><span class="ident">::TransferStatus::ServerApproved</span>,
+            <span class="ident">EPPTransferStatus::ServerCancelled</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">super</span><span class="ident">::TransferStatus::ServerCancelled</span>,
+        }
+    }
+}
 </pre></div>
-</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="epp_proxy" data-search-index-js="../../../../search-index.js" data-search-js="../../../../search.js"></div><script src="../../../../main.js"></script><script src="../../../../source-script.js"></script><script src="../../../../source-files.js"></script></body></html>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="epp_proxy" data-search-index-js="../../../../search-index.js" data-search-js="../../../../search.js"></div>
+    <script src="../../../../main.js"></script><script src="../../../../source-script.js"></script><script src="../../../../source-files.js"></script>
+</body></html>

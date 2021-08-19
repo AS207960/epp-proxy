@@ -141,27 +141,29 @@ impl From<client::mark::Mark> for epp_proto::marks::Mark {
                     })
                 }
                 client::mark::Mark::TreatyOrStatute(m) => {
-                    epp_proto::marks::mark::Mark::TreatyOrStatute(epp_proto::marks::TreatyOrStatute {
-                        id: m.id,
-                        mark_name: m.mark_name,
-                        holders: m.holders.into_iter().map(Into::into).collect(),
-                        contacts: m.contacts.into_iter().map(Into::into).collect(),
-                        protections: m
-                            .protections
-                            .into_iter()
-                            .map(|p| epp_proto::marks::Protection {
-                                country_code: p.country_code,
-                                region: p.region,
-                                ruling: p.ruling,
-                            })
-                            .collect(),
-                        labels: m.labels,
-                        goods_and_services: m.goods_and_services,
-                        reference_number: m.reference_number,
-                        protection_date: super::utils::chrono_to_proto(Some(m.protection_date)),
-                        title: m.title,
-                        execution_date: super::utils::chrono_to_proto(Some(m.execution_date)),
-                    })
+                    epp_proto::marks::mark::Mark::TreatyOrStatute(
+                        epp_proto::marks::TreatyOrStatute {
+                            id: m.id,
+                            mark_name: m.mark_name,
+                            holders: m.holders.into_iter().map(Into::into).collect(),
+                            contacts: m.contacts.into_iter().map(Into::into).collect(),
+                            protections: m
+                                .protections
+                                .into_iter()
+                                .map(|p| epp_proto::marks::Protection {
+                                    country_code: p.country_code,
+                                    region: p.region,
+                                    ruling: p.ruling,
+                                })
+                                .collect(),
+                            labels: m.labels,
+                            goods_and_services: m.goods_and_services,
+                            reference_number: m.reference_number,
+                            protection_date: super::utils::chrono_to_proto(Some(m.protection_date)),
+                            title: m.title,
+                            execution_date: super::utils::chrono_to_proto(Some(m.execution_date)),
+                        },
+                    )
                 }
                 client::mark::Mark::Court(m) => {
                     epp_proto::marks::mark::Mark::Court(epp_proto::marks::Court {
@@ -200,8 +202,12 @@ impl TryFrom<epp_proto::marks::Holder> for client::mark::Holder {
             entitlement: match epp_proto::marks::Entitlement::from_i32(from.entitlement) {
                 None => client::mark::Entitlement::Owner,
                 Some(epp_proto::marks::Entitlement::Owner) => client::mark::Entitlement::Owner,
-                Some(epp_proto::marks::Entitlement::Licensee) => client::mark::Entitlement::Licensee,
-                Some(epp_proto::marks::Entitlement::Assignee) => client::mark::Entitlement::Assignee,
+                Some(epp_proto::marks::Entitlement::Licensee) => {
+                    client::mark::Entitlement::Licensee
+                }
+                Some(epp_proto::marks::Entitlement::Assignee) => {
+                    client::mark::Entitlement::Assignee
+                }
             },
         })
     }

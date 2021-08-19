@@ -1,1 +1,1 @@
-initSidebarItems({"fn":[["handle_tag_list",""],["handle_tag_list_response",""]]});
+initSidebarItems({"fn":[["handle_accept",""],["handle_contact_validate",""],["handle_contact_validate_response",""],["handle_handshake_response",""],["handle_lock",""],["handle_lock_response",""],["handle_reject",""],["handle_release",""],["handle_release_response",""],["handle_tag_list",""],["handle_tag_list_response",""],["handle_unlock",""]]});

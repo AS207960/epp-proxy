@@ -366,29 +366,27 @@ impl TryFrom<&Period> for tmch_proto::TMCHPeriod {
 pub fn handle_mark_info_response(response: tmch_proto::TMCHResponse) -> Response<MarkInfoResponse> {
     match response.data {
         Some(value) => match value.value {
-            tmch_proto::TMCHResultDataValue::TMCHInfo(msg) => {
-                match (msg.pou_status, msg.mark) {
-                    (Some(pou_status), Some(_mark)) => Response::Ok(MarkInfoResponse {
-                        id: msg.id,
-                        status: msg.status.into(),
-                        pou_status: pou_status.into(),
-                        labels: msg.labels.into_iter().map(Into::into).collect(),
-                        variations: msg
-                            .variations
-                            .into_iter()
-                            .map(|v| v.labels)
-                            .flatten()
-                            .map(Into::into)
-                            .collect(),
-                        creation_date: msg.creation_date,
-                        update_date: msg.update_date,
-                        expiry_date: msg.expiry_date,
-                        pou_expiry_date: msg.pou_expiry_date,
-                        correct_before: msg.correct_before,
-                    }),
-                    _ => Err(Error::ServerInternal),
-                }
-            }
+            tmch_proto::TMCHResultDataValue::TMCHInfo(msg) => match (msg.pou_status, msg.mark) {
+                (Some(pou_status), Some(_mark)) => Response::Ok(MarkInfoResponse {
+                    id: msg.id,
+                    status: msg.status.into(),
+                    pou_status: pou_status.into(),
+                    labels: msg.labels.into_iter().map(Into::into).collect(),
+                    variations: msg
+                        .variations
+                        .into_iter()
+                        .map(|v| v.labels)
+                        .flatten()
+                        .map(Into::into)
+                        .collect(),
+                    creation_date: msg.creation_date,
+                    update_date: msg.update_date,
+                    expiry_date: msg.expiry_date,
+                    pou_expiry_date: msg.pou_expiry_date,
+                    correct_before: msg.correct_before,
+                }),
+                _ => Err(Error::ServerInternal),
+            },
             _ => Err(Error::ServerInternal),
         },
         None => Err(Error::ServerInternal),
@@ -406,21 +404,19 @@ pub fn handle_mark_smd_info_response(
 ) -> Response<MarkSMDInfoResponse> {
     match response.data {
         Some(value) => match value.value {
-            tmch_proto::TMCHResultDataValue::TMCHInfo(msg) => {
-                match (msg.signed_mark, msg.smd_id) {
-                    (Some(smd), Some(smd_id)) => {
-                        let smd = SMDInfo { signed_mark: smd };
+            tmch_proto::TMCHResultDataValue::TMCHInfo(msg) => match (msg.signed_mark, msg.smd_id) {
+                (Some(smd), Some(smd_id)) => {
+                    let smd = SMDInfo { signed_mark: smd };
 
-                        Response::Ok(MarkSMDInfoResponse {
-                            id: msg.id,
-                            status: msg.status.into(),
-                            smd_id,
-                            smd: xml_serde::to_string(&smd).unwrap(),
-                        })
-                    }
-                    _ => Err(Error::ServerInternal),
+                    Response::Ok(MarkSMDInfoResponse {
+                        id: msg.id,
+                        status: msg.status.into(),
+                        smd_id,
+                        smd: xml_serde::to_string(&smd).unwrap(),
+                    })
                 }
-            }
+                _ => Err(Error::ServerInternal),
+            },
             _ => Err(Error::ServerInternal),
         },
         None => Err(Error::ServerInternal),
@@ -454,17 +450,15 @@ pub fn handle_mark_file_info_response(
 ) -> Response<MarkSMDInfoResponse> {
     match response.data {
         Some(value) => match value.value {
-            tmch_proto::TMCHResultDataValue::TMCHInfo(msg) => {
-                match (msg.enc_file, msg.smd_id) {
-                    (Some(smd), Some(smd_id)) => Response::Ok(MarkSMDInfoResponse {
-                        id: msg.id,
-                        status: msg.status.into(),
-                        smd_id,
-                        smd,
-                    }),
-                    _ => Err(Error::ServerInternal),
-                }
-            }
+            tmch_proto::TMCHResultDataValue::TMCHInfo(msg) => match (msg.enc_file, msg.smd_id) {
+                (Some(smd), Some(smd_id)) => Response::Ok(MarkSMDInfoResponse {
+                    id: msg.id,
+                    status: msg.status.into(),
+                    smd_id,
+                    smd,
+                }),
+                _ => Err(Error::ServerInternal),
+            },
             _ => Err(Error::ServerInternal),
         },
         None => Err(Error::ServerInternal),
@@ -713,13 +707,11 @@ pub fn handle_transfer(_client: &(), req: &TransferRequest) -> HandleReqReturn<T
 pub fn handle_transfer_response(response: tmch_proto::TMCHResponse) -> Response<TransferResponse> {
     match response.data {
         Some(value) => match value.value {
-            tmch_proto::TMCHResultDataValue::TMCHTransfer(msg) => {
-                Response::Ok(TransferResponse {
-                    id: msg.id,
-                    transfer_date: msg.transfer_date,
-                    balance: msg.balance.into(),
-                })
-            }
+            tmch_proto::TMCHResultDataValue::TMCHTransfer(msg) => Response::Ok(TransferResponse {
+                id: msg.id,
+                transfer_date: msg.transfer_date,
+                balance: msg.balance.into(),
+            }),
             _ => Err(Error::ServerInternal),
         },
         None => Err(Error::ServerInternal),
