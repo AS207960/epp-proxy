@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src&#x2F;client&#x2F;epp&#x2F;poll.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>poll.rs - source</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../../epp_proxy/index.html'><div class='logo-container rust-logo'><img src='https:&#x2F;&#x2F;as207960.net&#x2F;img&#x2F;logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input"name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src&#x2F;client&#x2F;epp&#x2F;poll.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>poll.rs - source</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../../epp_proxy/index.html'><div class='logo-container rust-logo'><img src='https:&#x2F;&#x2F;as207960.net&#x2F;img&#x2F;logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
 <span id="2">   2</span>
 <span id="3">   3</span>
 <span id="4">   4</span>
@@ -1576,13 +1576,13 @@
 
 <span class="kw">use</span> <span class="ident">chrono::prelude</span>::<span class="kw-2">*</span>;
 
-<span class="kw">use</span> <span class="kw">super</span>::<span class="kw">super</span><span class="ident">::poll</span>::{
+<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::poll</span>::{
     <span class="ident">ChangeCaseId</span>, <span class="ident">ChangeCaseIdType</span>, <span class="ident">ChangeData</span>, <span class="ident">ChangeOperation</span>, <span class="ident">ChangeOperationType</span>, <span class="ident">ChangeState</span>,
     <span class="ident">PollAckRequest</span>, <span class="ident">PollAckResponse</span>, <span class="ident">PollData</span>, <span class="ident">PollRequest</span>, <span class="ident">PollResponse</span>,
 };
-<span class="kw">use</span> <span class="kw">super</span>::<span class="kw">super</span>::{<span class="ident">proto</span>, <span class="ident">Error</span>, <span class="ident">Response</span>};
-<span class="kw">use</span> <span class="kw">super</span><span class="ident">::router::HandleReqReturn</span>;
-<span class="kw">use</span> <span class="kw">super</span><span class="ident">::ServerFeatures</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span></span>::{<span class="ident">proto</span>, <span class="ident">Error</span>, <span class="ident">Response</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::router::HandleReqReturn</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::ServerFeatures</span>;
 
 <span class="kw">fn</span> <span class="ident">change_data_from_response</span>(
     <span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">proto::EPPResponseExtension</span><span class="op">&gt;</span>,
@@ -1857,15 +1857,15 @@
     &lt;/trID&gt;
   &lt;/response&gt;
 &lt;/epp&gt;&quot;#</span>;
-        <span class="kw">let</span> <span class="ident">res</span>: <span class="kw">super</span><span class="ident">::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">res</span>: <span class="ident"><span class="kw">super</span>::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">res</span>.<span class="ident">message</span> {
-            <span class="kw">super</span><span class="ident">::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
+            <span class="ident"><span class="kw">super</span>::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
             <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
         };
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="kw">super</span><span class="ident">::handle_poll_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::handle_poll_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>().<span class="ident">unwrap</span>();
         <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">message</span>, <span class="string">&quot;Domain transfer completed successfully&quot;</span>);
         <span class="kw">match</span> <span class="ident">data</span>.<span class="ident">data</span> {
-            <span class="kw">super</span><span class="ident">::PollData::DomainTransferData</span> {
+            <span class="ident"><span class="kw">super</span>::PollData::DomainTransferData</span> {
                 <span class="ident">data</span>: <span class="kw">_</span>,
                 <span class="ident">change_data</span>: <span class="prelude-val">None</span>,
             } <span class="op">=</span><span class="op">&gt;</span> {}
@@ -1913,20 +1913,20 @@
     &lt;/trID&gt;
   &lt;/response&gt;
 &lt;/epp&gt;&quot;#</span>;
-        <span class="kw">let</span> <span class="ident">res</span>: <span class="kw">super</span><span class="ident">::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">res</span>: <span class="ident"><span class="kw">super</span>::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">res</span>.<span class="ident">message</span> {
-            <span class="kw">super</span><span class="ident">::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
+            <span class="ident"><span class="kw">super</span>::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
             <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
         };
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="kw">super</span><span class="ident">::handle_poll_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::handle_poll_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>().<span class="ident">unwrap</span>();
         <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">message</span>, <span class="string">&quot;&quot;</span>);
         <span class="kw">match</span> <span class="ident">data</span>.<span class="ident">data</span> {
-            <span class="kw">super</span><span class="ident">::PollData::DomainInfoData</span> { <span class="ident">data</span>, <span class="ident">change_data</span> } <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident"><span class="kw">super</span>::PollData::DomainInfoData</span> { <span class="ident">data</span>, <span class="ident">change_data</span> } <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="kw">let</span> <span class="ident">change_data</span> <span class="op">=</span> <span class="ident">change_data</span>.<span class="ident">unwrap</span>();
-                <span class="macro">assert_eq!</span>(<span class="ident">change_data</span>.<span class="ident">state</span>, <span class="kw">super</span><span class="ident">::ChangeState::After</span>);
+                <span class="macro">assert_eq!</span>(<span class="ident">change_data</span>.<span class="ident">state</span>, <span class="ident"><span class="kw">super</span>::ChangeState::After</span>);
                 <span class="macro">assert_eq!</span>(
                     <span class="ident">change_data</span>.<span class="ident">operation</span>.<span class="ident">op_type</span>,
-                    <span class="kw">super</span><span class="ident">::ChangeOperationType::Delete</span>
+                    <span class="ident"><span class="kw">super</span>::ChangeOperationType::Delete</span>
                 );
                 <span class="macro">assert_eq!</span>(<span class="ident">change_data</span>.<span class="ident">who</span>, <span class="string">&quot;SWITCH manual delete&quot;</span>);
                 <span class="macro">assert_eq!</span>(<span class="ident">change_data</span>.<span class="ident">reason</span>.<span class="ident">unwrap</span>(), <span class="string">&quot;domain name abuse&quot;</span>);
@@ -1987,20 +1987,20 @@
         &lt;/trID&gt;
     &lt;/response&gt;
 &lt;/epp&gt;&quot;#</span>;
-        <span class="kw">let</span> <span class="ident">res</span>: <span class="kw">super</span><span class="ident">::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">res</span>: <span class="ident"><span class="kw">super</span>::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">res</span>.<span class="ident">message</span> {
-            <span class="kw">super</span><span class="ident">::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
+            <span class="ident"><span class="kw">super</span>::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
             <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
         };
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="kw">super</span><span class="ident">::handle_poll_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::handle_poll_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>().<span class="ident">unwrap</span>();
         <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">message</span>, <span class="string">&quot;&quot;</span>);
         <span class="kw">match</span> <span class="ident">data</span>.<span class="ident">data</span> {
-            <span class="kw">super</span><span class="ident">::PollData::DomainInfoData</span> { <span class="ident">data</span>, <span class="ident">change_data</span> } <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident"><span class="kw">super</span>::PollData::DomainInfoData</span> { <span class="ident">data</span>, <span class="ident">change_data</span> } <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="kw">let</span> <span class="ident">change_data</span> <span class="op">=</span> <span class="ident">change_data</span>.<span class="ident">unwrap</span>();
-                <span class="macro">assert_eq!</span>(<span class="ident">change_data</span>.<span class="ident">state</span>, <span class="kw">super</span><span class="ident">::ChangeState::After</span>);
+                <span class="macro">assert_eq!</span>(<span class="ident">change_data</span>.<span class="ident">state</span>, <span class="ident"><span class="kw">super</span>::ChangeState::After</span>);
                 <span class="macro">assert_eq!</span>(
                     <span class="ident">change_data</span>.<span class="ident">operation</span>.<span class="ident">op_type</span>,
-                    <span class="kw">super</span><span class="ident">::ChangeOperationType::Update</span>
+                    <span class="ident"><span class="kw">super</span>::ChangeOperationType::Update</span>
                 );
                 <span class="macro">assert_eq!</span>(<span class="ident">change_data</span>.<span class="ident">who</span>, <span class="string">&quot;SWITCH CDS: see https://www.nic.ch/cds/&quot;</span>);
                 <span class="macro">assert_eq!</span>(<span class="ident">change_data</span>.<span class="ident">reason</span>.<span class="ident">unwrap</span>(), <span class="string">&quot;DNSSEC initialized&quot;</span>);
@@ -2047,20 +2047,20 @@
         &lt;/trID&gt;
     &lt;/response&gt;
 &lt;/epp&gt;&quot;#</span>;
-        <span class="kw">let</span> <span class="ident">res</span>: <span class="kw">super</span><span class="ident">::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">res</span>: <span class="ident"><span class="kw">super</span>::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">res</span>.<span class="ident">message</span> {
-            <span class="kw">super</span><span class="ident">::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
+            <span class="ident"><span class="kw">super</span>::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
             <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
         };
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="kw">super</span><span class="ident">::handle_poll_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::handle_poll_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>().<span class="ident">unwrap</span>();
         <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">message</span>, <span class="string">&quot;&quot;</span>);
         <span class="kw">match</span> <span class="ident">data</span>.<span class="ident">data</span> {
-            <span class="kw">super</span><span class="ident">::PollData::DomainInfoData</span> { <span class="ident">data</span>, <span class="ident">change_data</span> } <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident"><span class="kw">super</span>::PollData::DomainInfoData</span> { <span class="ident">data</span>, <span class="ident">change_data</span> } <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="kw">let</span> <span class="ident">change_data</span> <span class="op">=</span> <span class="ident">change_data</span>.<span class="ident">unwrap</span>();
-                <span class="macro">assert_eq!</span>(<span class="ident">change_data</span>.<span class="ident">state</span>, <span class="kw">super</span><span class="ident">::ChangeState::After</span>);
+                <span class="macro">assert_eq!</span>(<span class="ident">change_data</span>.<span class="ident">state</span>, <span class="ident"><span class="kw">super</span>::ChangeState::After</span>);
                 <span class="macro">assert_eq!</span>(
                     <span class="ident">change_data</span>.<span class="ident">operation</span>.<span class="ident">op_type</span>,
-                    <span class="kw">super</span><span class="ident">::ChangeOperationType::Update</span>
+                    <span class="ident"><span class="kw">super</span>::ChangeOperationType::Update</span>
                 );
                 <span class="macro">assert_eq!</span>(<span class="ident">change_data</span>.<span class="ident">who</span>, <span class="string">&quot;SWITCH CDS: see https://www.nic.ch/cds/&quot;</span>);
                 <span class="macro">assert_eq!</span>(<span class="ident">change_data</span>.<span class="ident">reason</span>.<span class="ident">unwrap</span>(), <span class="string">&quot;DNSSEC deactivated&quot;</span>);
@@ -2119,15 +2119,15 @@
     &lt;/trID&gt;
   &lt;/response&gt;
 &lt;/epp&gt;&quot;#</span>;
-        <span class="kw">let</span> <span class="ident">res</span>: <span class="kw">super</span><span class="ident">::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">res</span>: <span class="ident"><span class="kw">super</span>::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">res</span>.<span class="ident">message</span> {
-            <span class="kw">super</span><span class="ident">::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
+            <span class="ident"><span class="kw">super</span>::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
             <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
         };
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="kw">super</span><span class="ident">::handle_poll_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::handle_poll_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>().<span class="ident">unwrap</span>();
         <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">message</span>, <span class="string">&quot;Account Details Change Notification&quot;</span>);
         <span class="kw">match</span> <span class="ident">data</span>.<span class="ident">data</span> {
-            <span class="kw">super</span><span class="ident">::PollData::ContactInfoData</span> { <span class="ident">data</span>, <span class="ident">change_data</span> } <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident"><span class="kw">super</span>::PollData::ContactInfoData</span> { <span class="ident">data</span>, <span class="ident">change_data</span> } <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="macro">assert_eq!</span>(<span class="ident">change_data</span>.<span class="ident">is_none</span>(), <span class="bool-val">true</span>);
                 <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">id</span>, <span class="string">&quot;CMyContactID&quot;</span>);
             }
@@ -2160,15 +2160,15 @@
      &lt;/trID&gt;
    &lt;/response&gt;
 &lt;/epp&gt;&quot;#</span>;
-        <span class="kw">let</span> <span class="ident">res</span>: <span class="kw">super</span><span class="ident">::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">res</span>: <span class="ident"><span class="kw">super</span>::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">res</span>.<span class="ident">message</span> {
-            <span class="kw">super</span><span class="ident">::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
+            <span class="ident"><span class="kw">super</span>::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
             <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
         };
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="kw">super</span><span class="ident">::handle_poll_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::handle_poll_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>().<span class="ident">unwrap</span>();
         <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">message</span>, <span class="string">&quot;Domain name Cancellation Notification&quot;</span>);
         <span class="kw">match</span> <span class="ident">data</span>.<span class="ident">data</span> {
-            <span class="kw">super</span><span class="ident">::PollData::NominetDomainCancelData</span> {
+            <span class="ident"><span class="kw">super</span>::PollData::NominetDomainCancelData</span> {
                 <span class="ident">data</span>: <span class="ident">canc_data</span>,
                 <span class="ident">change_data</span>: <span class="prelude-val">None</span>,
             } <span class="op">=</span><span class="op">&gt;</span> {
@@ -2213,15 +2213,15 @@
     &lt;/trID&gt;
   &lt;/response&gt;
 &lt;/epp&gt;&quot;#</span>;
-        <span class="kw">let</span> <span class="ident">res</span>: <span class="kw">super</span><span class="ident">::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">res</span>: <span class="ident"><span class="kw">super</span>::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">res</span>.<span class="ident">message</span> {
-            <span class="kw">super</span><span class="ident">::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
+            <span class="ident"><span class="kw">super</span>::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
             <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
         };
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="kw">super</span><span class="ident">::handle_poll_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::handle_poll_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>().<span class="ident">unwrap</span>();
         <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">message</span>, <span class="string">&quot;Domains Released Notification&quot;</span>);
         <span class="kw">match</span> <span class="ident">data</span>.<span class="ident">data</span> {
-            <span class="kw">super</span><span class="ident">::PollData::NominetDomainReleaseData</span> {
+            <span class="ident"><span class="kw">super</span>::PollData::NominetDomainReleaseData</span> {
                 <span class="ident">data</span>: <span class="ident">reslease_data</span>,
                 <span class="ident">change_data</span>: <span class="prelude-val">None</span>,
             } <span class="op">=</span><span class="op">&gt;</span> {
@@ -2303,15 +2303,15 @@
      &lt;/trID&gt;
    &lt;/response&gt;
 &lt;/epp&gt;&quot;#</span>;
-        <span class="kw">let</span> <span class="ident">res</span>: <span class="kw">super</span><span class="ident">::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">res</span>: <span class="ident"><span class="kw">super</span>::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">res</span>.<span class="ident">message</span> {
-            <span class="kw">super</span><span class="ident">::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
+            <span class="ident"><span class="kw">super</span>::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
             <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
         };
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="kw">super</span><span class="ident">::handle_poll_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::handle_poll_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>().<span class="ident">unwrap</span>();
         <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">message</span>, <span class="string">&quot;Registrar Change Authorisation Request&quot;</span>);
         <span class="kw">match</span> <span class="ident">data</span>.<span class="ident">data</span> {
-            <span class="kw">super</span><span class="ident">::PollData::NominetDomainRegistrarChangeData</span> {
+            <span class="ident"><span class="kw">super</span>::PollData::NominetDomainRegistrarChangeData</span> {
                 <span class="ident">data</span>: <span class="ident">rc_data</span>,
                 <span class="ident">change_data</span>: <span class="prelude-val">None</span>,
             } <span class="op">=</span><span class="op">&gt;</span> {
@@ -2358,15 +2358,15 @@
     &lt;/trID&gt;
   &lt;/response&gt;
 &lt;/epp&gt;&quot;#</span>;
-        <span class="kw">let</span> <span class="ident">res</span>: <span class="kw">super</span><span class="ident">::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">res</span>: <span class="ident"><span class="kw">super</span>::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">res</span>.<span class="ident">message</span> {
-            <span class="kw">super</span><span class="ident">::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
+            <span class="ident"><span class="kw">super</span>::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
             <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
         };
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="kw">super</span><span class="ident">::handle_poll_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::handle_poll_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>().<span class="ident">unwrap</span>();
         <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">message</span>, <span class="string">&quot;Host cancellation notification&quot;</span>);
         <span class="kw">match</span> <span class="ident">data</span>.<span class="ident">data</span> {
-            <span class="kw">super</span><span class="ident">::PollData::NominetHostCancelData</span> {
+            <span class="ident"><span class="kw">super</span>::PollData::NominetHostCancelData</span> {
                 <span class="ident">data</span>: <span class="ident">hc_data</span>,
                 <span class="ident">change_data</span>: <span class="prelude-val">None</span>,
             } <span class="op">=</span><span class="op">&gt;</span> {
@@ -2429,18 +2429,18 @@
     &lt;/trID&gt;
   &lt;/response&gt;
 &lt;/epp&gt;&quot;#</span>;
-        <span class="kw">let</span> <span class="ident">res</span>: <span class="kw">super</span><span class="ident">::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">res</span>: <span class="ident"><span class="kw">super</span>::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">res</span>.<span class="ident">message</span> {
-            <span class="kw">super</span><span class="ident">::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
+            <span class="ident"><span class="kw">super</span>::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
             <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
         };
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="kw">super</span><span class="ident">::handle_poll_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::handle_poll_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>().<span class="ident">unwrap</span>();
         <span class="macro">assert_eq!</span>(
             <span class="ident">data</span>.<span class="ident">message</span>,
             <span class="string">&quot;Data Quality - {{Workflow type}} process commenced notification&quot;</span>
         );
         <span class="kw">match</span> <span class="ident">data</span>.<span class="ident">data</span> {
-            <span class="kw">super</span><span class="ident">::PollData::NominetProcessData</span> {
+            <span class="ident"><span class="kw">super</span>::PollData::NominetProcessData</span> {
                 <span class="ident">data</span>: <span class="ident">p_data</span>,
                 <span class="ident">change_data</span>: <span class="prelude-val">None</span>,
             } <span class="op">=</span><span class="op">&gt;</span> {
@@ -2503,15 +2503,15 @@
     &lt;/trID&gt;
   &lt;/response&gt;
 &lt;/epp&gt;&quot;#</span>;
-        <span class="kw">let</span> <span class="ident">res</span>: <span class="kw">super</span><span class="ident">::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">res</span>: <span class="ident"><span class="kw">super</span>::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">res</span>.<span class="ident">message</span> {
-            <span class="kw">super</span><span class="ident">::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
+            <span class="ident"><span class="kw">super</span>::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
             <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
         };
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="kw">super</span><span class="ident">::handle_poll_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::handle_poll_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>().<span class="ident">unwrap</span>();
         <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">message</span>, <span class="string">&quot;DQ Workflow process lifted notification&quot;</span>);
         <span class="kw">match</span> <span class="ident">data</span>.<span class="ident">data</span> {
-            <span class="kw">super</span><span class="ident">::PollData::NominetProcessData</span> {
+            <span class="ident"><span class="kw">super</span>::PollData::NominetProcessData</span> {
                 <span class="ident">data</span>: <span class="ident">p_data</span>,
                 <span class="ident">change_data</span>: <span class="prelude-val">None</span>,
             } <span class="op">=</span><span class="op">&gt;</span> {
@@ -2552,15 +2552,15 @@
         &lt;/trID&gt;
     &lt;/response&gt;
 &lt;/epp&gt;&quot;#</span>;
-        <span class="kw">let</span> <span class="ident">res</span>: <span class="kw">super</span><span class="ident">::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">res</span>: <span class="ident"><span class="kw">super</span>::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">res</span>.<span class="ident">message</span> {
-            <span class="kw">super</span><span class="ident">::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
+            <span class="ident"><span class="kw">super</span>::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
             <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
         };
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="kw">super</span><span class="ident">::handle_poll_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::handle_poll_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>().<span class="ident">unwrap</span>();
         <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">message</span>, <span class="string">&quot;Domains Suspended Notification&quot;</span>);
         <span class="kw">match</span> <span class="ident">data</span>.<span class="ident">data</span> {
-            <span class="kw">super</span><span class="ident">::PollData::NominetSuspendData</span> {
+            <span class="ident"><span class="kw">super</span>::PollData::NominetSuspendData</span> {
                 <span class="ident">data</span>: <span class="ident">sus_data</span>,
                 <span class="ident">change_data</span>: <span class="prelude-val">None</span>,
             } <span class="op">=</span><span class="op">&gt;</span> {
@@ -2597,15 +2597,15 @@
      &lt;/trID&gt;
    &lt;/response&gt;
  &lt;/epp&gt;&quot;#</span>;
-        <span class="kw">let</span> <span class="ident">res</span>: <span class="kw">super</span><span class="ident">::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">res</span>: <span class="ident"><span class="kw">super</span>::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">res</span>.<span class="ident">message</span> {
-            <span class="kw">super</span><span class="ident">::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
+            <span class="ident"><span class="kw">super</span>::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
             <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
         };
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="kw">super</span><span class="ident">::handle_poll_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::handle_poll_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>().<span class="ident">unwrap</span>();
         <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">message</span>, <span class="string">&quot;Referral Accepted Notification&quot;</span>);
         <span class="kw">match</span> <span class="ident">data</span>.<span class="ident">data</span> {
-            <span class="kw">super</span><span class="ident">::PollData::DomainCreateData</span> {
+            <span class="ident"><span class="kw">super</span>::PollData::DomainCreateData</span> {
                 <span class="ident">data</span>: <span class="ident">create_data</span>,
                 <span class="ident">change_data</span>: <span class="prelude-val">None</span>,
             } <span class="op">=</span><span class="op">&gt;</span> {
@@ -2640,15 +2640,15 @@
      &lt;/trID&gt;
    &lt;/response&gt;
  &lt;/epp&gt;&quot;#</span>;
-        <span class="kw">let</span> <span class="ident">res</span>: <span class="kw">super</span><span class="ident">::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">res</span>: <span class="ident"><span class="kw">super</span>::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">res</span>.<span class="ident">message</span> {
-            <span class="kw">super</span><span class="ident">::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
+            <span class="ident"><span class="kw">super</span>::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
             <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
         };
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="kw">super</span><span class="ident">::handle_poll_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::handle_poll_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>().<span class="ident">unwrap</span>();
         <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">message</span>, <span class="string">&quot;Referral Rejected Notification&quot;</span>);
         <span class="kw">match</span> <span class="ident">data</span>.<span class="ident">data</span> {
-            <span class="kw">super</span><span class="ident">::PollData::NominetDomainFailData</span> {
+            <span class="ident"><span class="kw">super</span>::PollData::NominetDomainFailData</span> {
                 <span class="ident">data</span>: <span class="ident">fail_data</span>,
                 <span class="ident">change_data</span>: <span class="prelude-val">None</span>,
             } <span class="op">=</span><span class="op">&gt;</span> {
@@ -2713,15 +2713,15 @@
     &lt;/trID&gt;
   &lt;/response&gt;
 &lt;/epp&gt;&quot;#</span>;
-        <span class="kw">let</span> <span class="ident">res</span>: <span class="kw">super</span><span class="ident">::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">res</span>: <span class="ident"><span class="kw">super</span>::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">res</span>.<span class="ident">message</span> {
-            <span class="kw">super</span><span class="ident">::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
+            <span class="ident"><span class="kw">super</span>::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
             <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
         };
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="kw">super</span><span class="ident">::handle_poll_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::handle_poll_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>().<span class="ident">unwrap</span>();
         <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">message</span>, <span class="string">&quot;Registrant Transfer Notification&quot;</span>);
         <span class="kw">match</span> <span class="ident">data</span>.<span class="ident">data</span> {
-            <span class="kw">super</span><span class="ident">::PollData::NominetRegistrantTransferData</span> {
+            <span class="ident"><span class="kw">super</span>::PollData::NominetRegistrantTransferData</span> {
                 <span class="ident">data</span>: <span class="ident">trn_data</span>,
                 <span class="ident">change_data</span>: <span class="prelude-val">None</span>,
             } <span class="op">=</span><span class="op">&gt;</span> {
@@ -2761,22 +2761,22 @@
         &lt;/trID&gt;
     &lt;/response&gt;
 &lt;/epp&gt;&quot;#</span>;
-        <span class="kw">let</span> <span class="ident">res</span>: <span class="kw">super</span><span class="ident">::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">res</span>: <span class="ident"><span class="kw">super</span>::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">res</span>.<span class="ident">message</span> {
-            <span class="kw">super</span><span class="ident">::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
+            <span class="ident"><span class="kw">super</span>::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
             <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
         };
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="kw">super</span><span class="ident">::handle_poll_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::handle_poll_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>().<span class="ident">unwrap</span>();
         <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">message</span>, <span class="string">&quot;&quot;</span>);
         <span class="kw">match</span> <span class="ident">data</span>.<span class="ident">data</span> {
-            <span class="kw">super</span><span class="ident">::PollData::DomainTransferData</span> {
+            <span class="ident"><span class="kw">super</span>::PollData::DomainTransferData</span> {
                 <span class="ident">data</span>: <span class="ident">trn_data</span>,
                 <span class="ident">change_data</span>: <span class="prelude-val">None</span>,
             } <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="macro">assert_eq!</span>(<span class="ident">trn_data</span>.<span class="ident">data</span>.<span class="ident">name</span>, <span class="string">&quot;example.uk.com&quot;</span>);
                 <span class="macro">assert_eq!</span>(
                     <span class="ident">trn_data</span>.<span class="ident">data</span>.<span class="ident">status</span>,
-                    <span class="kw">super</span>::<span class="kw">super</span><span class="ident">::TransferStatus::ClientApproved</span>
+                    <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::TransferStatus::ClientApproved</span>
                 );
                 <span class="macro">assert_eq!</span>(<span class="ident">trn_data</span>.<span class="ident">data</span>.<span class="ident">requested_client_id</span>, <span class="string">&quot;H12345&quot;</span>);
                 <span class="macro">assert_eq!</span>(<span class="ident">trn_data</span>.<span class="ident">data</span>.<span class="ident">act_client_id</span>, <span class="string">&quot;H54321&quot;</span>);
@@ -2811,20 +2811,20 @@
         &lt;/trID&gt;
     &lt;/response&gt;
 &lt;/epp&gt;&quot;#</span>;
-        <span class="kw">let</span> <span class="ident">res</span>: <span class="kw">super</span><span class="ident">::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">res</span>: <span class="ident"><span class="kw">super</span>::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">res</span>.<span class="ident">message</span> {
-            <span class="kw">super</span><span class="ident">::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
+            <span class="ident"><span class="kw">super</span>::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
             <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
         };
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="kw">super</span><span class="ident">::handle_poll_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::handle_poll_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>().<span class="ident">unwrap</span>();
         <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">message</span>, <span class="string">&quot;&quot;</span>);
         <span class="kw">match</span> <span class="ident">data</span>.<span class="ident">data</span> {
-            <span class="kw">super</span><span class="ident">::PollData::DomainTransferData</span> {
+            <span class="ident"><span class="kw">super</span>::PollData::DomainTransferData</span> {
                 <span class="ident">data</span>: <span class="ident">trn_data</span>,
                 <span class="ident">change_data</span>: <span class="prelude-val">None</span>,
             } <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="macro">assert_eq!</span>(<span class="ident">trn_data</span>.<span class="ident">data</span>.<span class="ident">name</span>, <span class="string">&quot;example.uk.com&quot;</span>);
-                <span class="macro">assert_eq!</span>(<span class="ident">trn_data</span>.<span class="ident">data</span>.<span class="ident">status</span>, <span class="kw">super</span>::<span class="kw">super</span><span class="ident">::TransferStatus::Pending</span>);
+                <span class="macro">assert_eq!</span>(<span class="ident">trn_data</span>.<span class="ident">data</span>.<span class="ident">status</span>, <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::TransferStatus::Pending</span>);
                 <span class="macro">assert_eq!</span>(<span class="ident">trn_data</span>.<span class="ident">data</span>.<span class="ident">requested_client_id</span>, <span class="string">&quot;H12345&quot;</span>);
                 <span class="macro">assert_eq!</span>(<span class="ident">trn_data</span>.<span class="ident">data</span>.<span class="ident">act_client_id</span>, <span class="string">&quot;H54321&quot;</span>);
             }
@@ -2861,20 +2861,20 @@
     &lt;/trID&gt;
   &lt;/response&gt;
 &lt;/epp&gt;&quot;#</span>;
-        <span class="kw">let</span> <span class="ident">res</span>: <span class="kw">super</span><span class="ident">::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">res</span>: <span class="ident"><span class="kw">super</span>::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">res</span>.<span class="ident">message</span> {
-            <span class="kw">super</span><span class="ident">::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
+            <span class="ident"><span class="kw">super</span>::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
             <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
         };
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="kw">super</span><span class="ident">::handle_poll_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::handle_poll_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>().<span class="ident">unwrap</span>();
         <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">message</span>, <span class="string">&quot;Low Account Balance&quot;</span>);
         <span class="kw">match</span> <span class="ident">data</span>.<span class="ident">data</span> {
-            <span class="kw">super</span><span class="ident">::PollData::VerisignLowBalanceData</span>(<span class="ident">bal_data</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident"><span class="kw">super</span>::PollData::VerisignLowBalanceData</span>(<span class="ident">bal_data</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="macro">assert_eq!</span>(<span class="ident">bal_data</span>.<span class="ident">registrar_name</span>, <span class="string">&quot;Test Registar&quot;</span>);
                 <span class="macro">assert_eq!</span>(<span class="ident">bal_data</span>.<span class="ident">credit_limit</span>, <span class="string">&quot;1000&quot;</span>);
                 <span class="macro">assert_eq!</span>(
                     <span class="ident">bal_data</span>.<span class="ident">credit_threshold</span>,
-                    <span class="kw">super</span>::<span class="kw">super</span><span class="ident">::verisign::CreditThreshold::Percentage</span>(<span class="number">10</span>)
+                    <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::verisign::CreditThreshold::Percentage</span>(<span class="number">10</span>)
                 );
                 <span class="macro">assert_eq!</span>(<span class="ident">bal_data</span>.<span class="ident">available_credit</span>, <span class="string">&quot;80&quot;</span>);
             }
@@ -2906,15 +2906,15 @@
    &lt;/trID&gt;
  &lt;/response&gt;
 &lt;/epp&gt;&quot;#</span>;
-        <span class="kw">let</span> <span class="ident">res</span>: <span class="kw">super</span><span class="ident">::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">res</span>: <span class="ident"><span class="kw">super</span>::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">res</span>.<span class="ident">message</span> {
-            <span class="kw">super</span><span class="ident">::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
+            <span class="ident"><span class="kw">super</span>::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
             <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
         };
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="kw">super</span><span class="ident">::handle_poll_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::handle_poll_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>().<span class="ident">unwrap</span>();
         <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">message</span>, <span class="string">&quot;DOMAIN_RENEWAL_SUCCESSFUL&quot;</span>);
         <span class="kw">match</span> <span class="ident">data</span>.<span class="ident">data</span> {
-            <span class="kw">super</span><span class="ident">::PollData::DomainRenewData</span> {
+            <span class="ident"><span class="kw">super</span>::PollData::DomainRenewData</span> {
                 <span class="ident">data</span>: <span class="ident">ren_data</span>,
                 <span class="ident">change_data</span>: <span class="prelude-val">None</span>,
             } <span class="op">=</span><span class="op">&gt;</span> {
@@ -2953,15 +2953,15 @@
     &lt;/trID&gt;
   &lt;/response&gt;
 &lt;/epp&gt;&quot;#</span>;
-        <span class="kw">let</span> <span class="ident">res</span>: <span class="kw">super</span><span class="ident">::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">res</span>: <span class="ident"><span class="kw">super</span>::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">res</span>.<span class="ident">message</span> {
-            <span class="kw">super</span><span class="ident">::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
+            <span class="ident"><span class="kw">super</span>::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
             <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
         };
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="kw">super</span><span class="ident">::handle_poll_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::handle_poll_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>().<span class="ident">unwrap</span>();
         <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">message</span>, <span class="string">&quot;DOMAIN_RESTORE_FAILED&quot;</span>);
         <span class="kw">match</span> <span class="ident">data</span>.<span class="ident">data</span> {
-            <span class="kw">super</span><span class="ident">::PollData::DomainPanData</span> {
+            <span class="ident"><span class="kw">super</span>::PollData::DomainPanData</span> {
                 <span class="ident">data</span>: <span class="ident">pan_data</span>,
                 <span class="ident">change_data</span>: <span class="prelude-val">None</span>,
             } <span class="op">=</span><span class="op">&gt;</span> {
@@ -3011,18 +3011,18 @@
   &lt;/response&gt;
 &lt;/epp&gt;
 &quot;#</span>;
-        <span class="kw">let</span> <span class="ident">res</span>: <span class="kw">super</span><span class="ident">::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">res</span>: <span class="ident"><span class="kw">super</span>::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">res</span>.<span class="ident">message</span> {
-            <span class="kw">super</span><span class="ident">::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
+            <span class="ident"><span class="kw">super</span>::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
             <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
         };
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="kw">super</span><span class="ident">::handle_poll_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::handle_poll_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>().<span class="ident">unwrap</span>();
         <span class="macro">assert_eq!</span>(
             <span class="ident">data</span>.<span class="ident">message</span>,
             <span class="string">&quot;Suspended domain name: abcabc-1573042768420.eu&quot;</span>
         );
         <span class="kw">match</span> <span class="ident">data</span>.<span class="ident">data</span> {
-            <span class="kw">super</span><span class="ident">::PollData::EURIDPoll</span>(<span class="ident">data</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident"><span class="kw">super</span>::PollData::EURIDPoll</span>(<span class="ident">data</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">context</span>, <span class="string">&quot;LEGAL&quot;</span>);
                 <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">object_type</span>, <span class="string">&quot;DOMAIN&quot;</span>);
                 <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">object</span>, <span class="string">&quot;abcabc-1573042768420.eu&quot;</span>);
@@ -3065,18 +3065,18 @@
     &lt;/trID&gt;
   &lt;/response&gt;
 &lt;/epp&gt;&quot;#</span>;
-        <span class="kw">let</span> <span class="ident">res</span>: <span class="kw">super</span><span class="ident">::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">res</span>: <span class="ident"><span class="kw">super</span>::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">res</span>.<span class="ident">message</span> {
-            <span class="kw">super</span><span class="ident">::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
+            <span class="ident"><span class="kw">super</span>::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
             <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
         };
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="kw">super</span><span class="ident">::handle_poll_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::handle_poll_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>().<span class="ident">unwrap</span>();
         <span class="macro">assert_eq!</span>(
             <span class="ident">data</span>.<span class="ident">message</span>,
             <span class="string">&quot;Domain name quarantined: abcabc-1573042778986.eu&quot;</span>
         );
         <span class="kw">match</span> <span class="ident">data</span>.<span class="ident">data</span> {
-            <span class="kw">super</span><span class="ident">::PollData::EURIDPoll</span>(<span class="ident">data</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident"><span class="kw">super</span>::PollData::EURIDPoll</span>(<span class="ident">data</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">context</span>, <span class="string">&quot;DOMAIN&quot;</span>);
                 <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">object_type</span>, <span class="string">&quot;DOMAIN&quot;</span>);
                 <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">object</span>, <span class="string">&quot;abcabc-1573042778986.eu&quot;</span>);
@@ -3119,15 +3119,15 @@
     &lt;/trID&gt;
   &lt;/response&gt;
 &lt;/epp&gt;&quot;#</span>;
-        <span class="kw">let</span> <span class="ident">res</span>: <span class="kw">super</span><span class="ident">::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">res</span>: <span class="ident"><span class="kw">super</span>::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">res</span>.<span class="ident">message</span> {
-            <span class="kw">super</span><span class="ident">::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
+            <span class="ident"><span class="kw">super</span>::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
             <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
         };
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="kw">super</span><span class="ident">::handle_poll_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::handle_poll_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>().<span class="ident">unwrap</span>();
         <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">message</span>, <span class="string">&quot;Watermark level reached: 7&quot;</span>);
         <span class="kw">match</span> <span class="ident">data</span>.<span class="ident">data</span> {
-            <span class="kw">super</span><span class="ident">::PollData::EURIDPoll</span>(<span class="ident">data</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident"><span class="kw">super</span>::PollData::EURIDPoll</span>(<span class="ident">data</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">context</span>, <span class="string">&quot;REGISTRATION_LIMIT&quot;</span>);
                 <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">object_type</span>, <span class="string">&quot;WATERMARK&quot;</span>);
                 <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">object</span>, <span class="string">&quot;7&quot;</span>);
