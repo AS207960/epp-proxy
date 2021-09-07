@@ -252,11 +252,11 @@ impl TLSClient {
                     futures::executor::block_on(std::pin::Pin::as_mut(&mut cx).connect())?;
                     Ok(*std::pin::Pin::into_inner(cx))
                 },
-            ).await
+            )
+            .await
         } else {
             Ok(std::pin::Pin::new(&mut cx).connect().await.map(|_| cx))
-        }
-        {
+        } {
             Ok(s) => match s {
                 Ok(c) => Ok(c),
                 Err(err) => {
