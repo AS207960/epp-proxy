@@ -323,8 +323,11 @@
 <span id="323">323</span>
 <span id="324">324</span>
 <span id="325">325</span>
-</pre><pre class="rust">
-<span class="kw">use</span> <span class="ident">foreign_types_shared::ForeignType</span>;
+<span id="326">326</span>
+<span id="327">327</span>
+<span id="328">328</span>
+<span id="329">329</span>
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">foreign_types_shared::ForeignType</span>;
 <span class="kw">use</span> <span class="ident">tokio::io::AsyncWriteExt</span>;
 <span class="kw">use</span> <span class="ident">tokio::net::TcpStream</span>;
 
@@ -562,7 +565,7 @@
             <span class="kw">let</span> <span class="ident">cx</span> <span class="op">=</span> <span class="ident">tokio_openssl::SslStream::new</span>(<span class="ident">ssl</span>, <span class="ident">socket</span>)<span class="question-mark">?</span>;
             <span class="prelude-val">Ok</span>(<span class="ident">cx</span>)
         })() {
-            <span class="prelude-val">Ok</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Box::pin</span>(<span class="ident">s</span>),
+            <span class="prelude-val">Ok</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>,
             <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="macro">error!</span>(<span class="string">&quot;Unable to create TLS context: {}&quot;</span>, <span class="ident">err</span>);
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(());
@@ -571,14 +574,18 @@
         <span class="comment">// I know this is disgusting, but OpenSSL isn&#39;t actually async compatible when using</span>
         <span class="comment">// a HSM.</span>
         <span class="macro">trace!</span>(<span class="string">&quot;Negotiating TLS connection to {}&quot;</span>, <span class="self">self</span>.<span class="ident">hostname</span>);
-        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">tokio::task::spawn_blocking</span>(
-            <span class="kw">move</span> <span class="op">|</span><span class="op">|</span> <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">tokio_openssl::SslStream</span><span class="op">&lt;</span><span class="ident">TcpStream</span><span class="op">&gt;</span>, <span class="ident">openssl::ssl::Error</span><span class="op">&gt;</span> {
-                <span class="ident">futures::executor::block_on</span>(<span class="ident">std::pin::Pin::as_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">cx</span>).<span class="ident">connect</span>())<span class="question-mark">?</span>;
-                <span class="prelude-val">Ok</span>(<span class="kw-2">*</span><span class="ident">std::pin::Pin::into_inner</span>(<span class="ident">cx</span>))
-            },
-        )
-        .<span class="kw">await</span>
-        {
+        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">should_lock</span> {
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cx</span> <span class="op">=</span> <span class="ident">Box::pin</span>(<span class="ident">cx</span>);
+            <span class="ident">tokio::task::spawn_blocking</span>(
+                <span class="kw">move</span> <span class="op">|</span><span class="op">|</span> <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">tokio_openssl::SslStream</span><span class="op">&lt;</span><span class="ident">TcpStream</span><span class="op">&gt;</span>, <span class="ident">openssl::ssl::Error</span><span class="op">&gt;</span> {
+                    <span class="ident">futures::executor::block_on</span>(<span class="ident">std::pin::Pin::as_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">cx</span>).<span class="ident">connect</span>())<span class="question-mark">?</span>;
+                    <span class="prelude-val">Ok</span>(<span class="kw-2">*</span><span class="ident">std::pin::Pin::into_inner</span>(<span class="ident">cx</span>))
+                },
+            )
+            .<span class="kw">await</span>
+        } <span class="kw">else</span> {
+            <span class="prelude-val">Ok</span>(<span class="ident">std::pin::Pin::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">cx</span>).<span class="ident">connect</span>().<span class="kw">await</span>.<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">cx</span>))
+        } {
             <span class="prelude-val">Ok</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">s</span> {
                 <span class="prelude-val">Ok</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">c</span>),
                 <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> {
@@ -649,7 +656,7 @@
         <span class="ident">std::pin::Pin::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">socket</span>).<span class="ident">poll_shutdown</span>(<span class="ident">cx</span>)
     }
 }
-</pre></div>
+</code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="epp_proxy" data-search-index-js="../../../../search-index.js" data-search-js="../../../../search.js"></div>
     <script src="../../../../main.js"></script><script src="../../../../source-script.js"></script><script src="../../../../source-files.js"></script>
 </body></html>
