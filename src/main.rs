@@ -538,13 +538,12 @@ struct AuthService<T> {
     oauth_client: rust_keycloak::oauth::OAuthClient,
 }
 
-impl<T, B> tower_service::Service<http::Request<B>> for AuthService<T>
+impl<T> tower_service::Service<http::Request<tonic::transport::Body>> for AuthService<T>
 where
-    T: tower_service::Service<http::Request<B>> + Send + Clone + 'static,
+    T: tower_service::Service<http::Request<tonic::transport::Body>> + Send + Clone + 'static,
     T::Future: Send + 'static,
     T::Error: 'static,
     T::Response: From<http::response::Response<tonic::body::BoxBody>> + 'static,
-    B: tonic::codegen::HttpBody + Send + Sync + 'static,
 {
     type Response = T::Response;
     type Error = T::Error;
@@ -557,7 +556,7 @@ where
         self.inner.poll_ready(cx).map_err(Into::into)
     }
 
-    fn call(&mut self, req: http::Request<B>) -> Self::Future {
+    fn call(&mut self, req: http::Request<tonic::transport::Body>) -> Self::Future {
         let headers = req.headers().to_owned();
         let client = self.oauth_client.clone();
         let mut inner = self.inner.clone();
@@ -602,7 +601,7 @@ where
                         parts.headers.insert("grpc-message", v);
                     }
 
-                    Ok(http::Response::from_parts(parts, tonic::body::BoxBody::empty()).into())
+                    Ok(http::Response::from_parts(parts, tonic::body::empty_body()).into())
                 }
             }
         })

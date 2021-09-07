@@ -24,9 +24,9 @@ time = "0.1"
 uuid = { version = "0.8", features = ["v4"] }
 hex = "0.4"
 regex = "1"
-tonic = { version = "0.4", features = ["transport", "tls"] }
-prost = "0.7"
-prost-types = "0.7"
+tonic = { version = "0.5", features = ["transport", "tls"] }
+prost = "0.8"
+prost-types = "0.8"
 clap = "2.33"
 base64 = "0.12"
 xml_serde = { git = "https://github.com/as207960/xml-serde", rev = "9fc66f9f5f5927c01b874b17c3e0839169785dff" }
@@ -42,7 +42,7 @@ lazy_static = "1"
 paste = "1"
 
 [build-dependencies]
-tonic-build = "0.4"
+tonic-build = "0.5"
 built = { version = "0.4", features = ["git2"] }
 
 [patch.crates-io]

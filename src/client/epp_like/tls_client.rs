@@ -236,7 +236,7 @@ impl TLSClient {
             let cx = tokio_openssl::SslStream::new(ssl, socket)?;
             Ok(cx)
         })() {
-            Ok(s) => Box::pin(s),
+            Ok(s) => s,
             Err(err) => {
                 error!("Unable to create TLS context: {}", err);
                 return Err(());
@@ -245,13 +245,17 @@ impl TLSClient {
         // I know this is disgusting, but OpenSSL isn't actually async compatible when using
         // a HSM.
         trace!("Negotiating TLS connection to {}", self.hostname);
-        let res = match tokio::task::spawn_blocking(
-            move || -> Result<tokio_openssl::SslStream<TcpStream>, openssl::ssl::Error> {
-                futures::executor::block_on(std::pin::Pin::as_mut(&mut cx).connect())?;
-                Ok(*std::pin::Pin::into_inner(cx))
-            },
-        )
-        .await
+        let res = match if self.should_lock {
+            let mut cx = Box::pin(cx);
+            tokio::task::spawn_blocking(
+                move || -> Result<tokio_openssl::SslStream<TcpStream>, openssl::ssl::Error> {
+                    futures::executor::block_on(std::pin::Pin::as_mut(&mut cx).connect())?;
+                    Ok(*std::pin::Pin::into_inner(cx))
+                },
+            ).await
+        } else {
+            Ok(std::pin::Pin::new(&mut cx).connect().await.map(|_| cx))
+        }
         {
             Ok(s) => match s {
                 Ok(c) => Ok(c),
