@@ -198,7 +198,8 @@ impl super::Client for EPPClient {
         let (sender, receiver) = futures::channel::mpsc::channel::<RequestMessage>(16);
 
         if let Some(nominet_dac_client) = self.nominet_dac_client.take() {
-            self.nominet_dac_subordinate_client.replace(Box::new(nominet_dac_client).start());
+            self.nominet_dac_subordinate_client
+                .replace(Box::new(nominet_dac_client).start());
         }
 
         tokio::spawn(async move {
@@ -219,10 +220,13 @@ impl EPPClient {
         pkcs11_engine: Option<crate::P11Engine>,
     ) -> std::io::Result<Self> {
         let nominet_dac_client = match conf.nominet_dac.as_ref().map(|nominet_dac_conf| {
-            super::nominet_dac::DACClient::new(nominet_dac_conf.real_time, nominet_dac_conf.time_delay)
+            super::nominet_dac::DACClient::new(
+                nominet_dac_conf.real_time,
+                nominet_dac_conf.time_delay,
+            )
         }) {
             Some(c) => Some(c.await?),
-            None => None
+            None => None,
         };
 
         let tls_client =
@@ -445,7 +449,11 @@ impl EPPClient {
         req: outer_router::RequestMessage,
         sock_write: &mut W,
     ) -> Result<(), ()> {
-        match (req, self.nominet_tag_list_subordinate, &mut self.nominet_dac_subordinate_client) {
+        match (
+            req,
+            self.nominet_tag_list_subordinate,
+            &mut self.nominet_dac_subordinate_client,
+        ) {
             (outer_router::RequestMessage::NominetTagList(t), false, _) => {
                 let client = match &mut self.nominet_tag_list_subordinate_client {
                     Some(c) => c,
@@ -462,18 +470,16 @@ impl EPPClient {
                     }
                 }
             }
-            (outer_router::RequestMessage::DomainCheck(t), _, Some(dac_client)) => {
-                match dac_client
-                    .send(outer_router::RequestMessage::DomainCheck(t))
-                    .await
-                {
-                    Ok(_) => Ok(()),
-                    Err(e) => {
-                        warn!("Failed to send to subordinate DAC server: {}", e);
-                        Err(())
-                    }
+            (outer_router::RequestMessage::DomainCheck(t), _, Some(dac_client)) => match dac_client
+                .send(outer_router::RequestMessage::DomainCheck(t))
+                .await
+            {
+                Ok(_) => Ok(()),
+                Err(e) => {
+                    warn!("Failed to send to subordinate DAC server: {}", e);
+                    Err(())
                 }
-            }
+            },
             (outer_router::RequestMessage::DACDomain(t), _, Some(dac_client)) => {
                 match dac_client
                     .send(outer_router::RequestMessage::DACDomain(t))
@@ -548,7 +554,7 @@ impl EPPClient {
                                 return Err(());
                             }
                         }
-                    },
+                    }
                     None => {}
                 };
                 self.is_closing = true;

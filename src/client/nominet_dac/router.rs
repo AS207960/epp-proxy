@@ -8,7 +8,7 @@ pub type HandleReqReturn<T> = Result<(super::proto::DACRequest, DACEnv), Respons
 pub enum DACEnv {
     RealTime,
     TimeDelay,
-    Both
+    Both,
 }
 
 impl From<super::super::dac::DACEnv> for DACEnv {
@@ -108,7 +108,7 @@ macro_rules! router {
                             transaction_id: None,
                         }));
                     },
-                    super::proto::DACResponse::AUB(b) => {
+                    super::proto::DACResponse::Aub(b) => {
                         let _ = return_path.send(Err(Error::Err(format!("Acceptable usage block, please try again in {} seconds", b.delay))));
                     },
                     _ => {
@@ -171,7 +171,7 @@ macro_rules! router {
                             transaction_id: None,
                         }));
                     },
-                    super::proto::DACResponse::AUB(b) => {
+                    super::proto::DACResponse::Aub(b) => {
                         let _ = return_path.send(Err(Error::Err(format!("Acceptable usage block, please try again in {} seconds", b.delay))));
                     },
                     _ => {
@@ -200,7 +200,7 @@ macro_rules! router {
                             transaction_id: None,
                         }));
                     },
-                    super::proto::DACResponse::AUB(b) => {
+                    super::proto::DACResponse::Aub(b) => {
                         let _ = return_path.send(Err(Error::Err(format!("Acceptable usage block, please try again in {} seconds", b.delay))));
                     },
                     _ => {
@@ -229,7 +229,7 @@ macro_rules! router {
                             transaction_id: None,
                         }));
                     },
-                    super::proto::DACResponse::AUB(b) => {
+                    super::proto::DACResponse::Aub(b) => {
                         let _ = return_path.send(Err(Error::Err(format!("Acceptable usage block, please try again in {} seconds", b.delay))));
                     },
                     _ => {

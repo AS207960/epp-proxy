@@ -8,11 +8,12 @@ use futures::future::FutureExt;
 
 pub mod epp;
 pub mod epp_like;
-pub mod tmch_client;
 pub mod nominet_dac;
+pub mod tmch_client;
 
 pub mod balance;
 pub mod contact;
+pub mod dac;
 pub mod domain;
 pub mod eurid;
 pub mod fee;
@@ -28,7 +29,6 @@ pub mod router;
 pub mod tmch;
 pub mod traficom;
 pub mod verisign;
-pub mod dac;
 
 pub use router::{CommandResponse, RequestMessage, RequestSender, Response, Sender};
 

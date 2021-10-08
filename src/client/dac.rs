@@ -1,4 +1,4 @@
-use super::{Sender, RequestMessage, CommandResponse};
+use super::{CommandResponse, RequestMessage, Sender};
 use chrono::prelude::*;
 
 #[derive(Debug, Clone, Copy)]
@@ -19,7 +19,7 @@ pub enum DomainState {
     Registered,
     Available,
     NotWithinRegistry,
-    RulesPrevent
+    RulesPrevent,
 }
 
 #[derive(Debug)]
@@ -27,7 +27,7 @@ pub enum DomainStatus {
     Unknown,
     RegisteredUntilExpiry,
     RenewalRequired,
-    NoLongerRequired
+    NoLongerRequired,
 }
 
 #[derive(Debug)]
@@ -38,7 +38,7 @@ pub struct DACDomainResponse {
     pub created: Date<Utc>,
     pub expiry: Date<Utc>,
     pub status: DomainStatus,
-    pub tag: String
+    pub tag: String,
 }
 
 #[derive(Debug)]
@@ -50,7 +50,7 @@ pub struct DACUsageRequest {
 #[derive(Debug)]
 pub struct DACUsageResponse {
     pub usage_60: u64,
-    pub usage_24: u64
+    pub usage_24: u64,
 }
 
 /// Get the DAC data for a domain

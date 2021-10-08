@@ -468,7 +468,7 @@ async fn main() {
             nominet_dac: config.nominet_dac.as_ref().map(|d| client::NominetDACConf {
                 real_time: &d.real_time,
                 time_delay: &d.time_delay,
-            })
+            }),
         };
         let epp_client = match match config.server_type {
             ConfigServerType::Epp => {

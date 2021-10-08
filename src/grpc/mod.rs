@@ -7,6 +7,7 @@ use futures::sink::SinkExt;
 use super::client;
 
 mod contact;
+mod dac;
 mod domain;
 mod eurid;
 mod fee;
@@ -18,7 +19,6 @@ mod mark;
 mod nominet;
 mod rgp;
 mod tmch;
-mod dac;
 mod utils;
 
 pub mod epp_proto {
@@ -243,7 +243,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                 req.eurid_data.map(Into::into),
                 &mut sender,
             )
-                .await?,
+            .await?,
         );
 
         let mut reply: epp_proto::domain::DomainInfoReply = res.into();
@@ -279,24 +279,24 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                                 Ok(client::host::Address {
                                     address: addr.address.clone(),
                                     ip_version:
-                                    match epp_proto::common::ip_address::IpVersion::from_i32(
-                                        addr.r#type,
-                                    ) {
-                                        Some(
-                                            epp_proto::common::ip_address::IpVersion::IPv4,
-                                        ) => client::host::AddressVersion::IPv4,
-                                        Some(
-                                            epp_proto::common::ip_address::IpVersion::IPv6,
-                                        ) => client::host::AddressVersion::IPv6,
-                                        None
-                                        | Some(
-                                            epp_proto::common::ip_address::IpVersion::Unknown,
-                                        ) => {
-                                            return Err(tonic::Status::invalid_argument(
-                                                "unknown IP address version",
-                                            ));
-                                        }
-                                    },
+                                        match epp_proto::common::ip_address::IpVersion::from_i32(
+                                            addr.r#type,
+                                        ) {
+                                            Some(
+                                                epp_proto::common::ip_address::IpVersion::IPv4,
+                                            ) => client::host::AddressVersion::IPv4,
+                                            Some(
+                                                epp_proto::common::ip_address::IpVersion::IPv6,
+                                            ) => client::host::AddressVersion::IPv6,
+                                            None
+                                            | Some(
+                                                epp_proto::common::ip_address::IpVersion::Unknown,
+                                            ) => {
+                                                return Err(tonic::Status::invalid_argument(
+                                                    "unknown IP address version",
+                                                ));
+                                            }
+                                        },
                                 })
                             })
                             .collect::<Result<Vec<client::host::Address>, tonic::Status>>()?,
@@ -383,7 +383,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                 },
                 &mut sender,
             )
-                .await?,
+            .await?,
         );
 
         let mut reply: epp_proto::domain::DomainCreateReply = res.into();
@@ -414,7 +414,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                 request.eurid_data.and_then(Into::into),
                 &mut sender,
             )
-                .await?,
+            .await?,
         );
 
         let reply = epp_proto::domain::DomainDeleteReply {
@@ -455,24 +455,24 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                                 Ok(client::host::Address {
                                     address: addr.address.clone(),
                                     ip_version:
-                                    match epp_proto::common::ip_address::IpVersion::from_i32(
-                                        addr.r#type,
-                                    ) {
-                                        Some(
-                                            epp_proto::common::ip_address::IpVersion::IPv4,
-                                        ) => client::host::AddressVersion::IPv4,
-                                        Some(
-                                            epp_proto::common::ip_address::IpVersion::IPv6,
-                                        ) => client::host::AddressVersion::IPv6,
-                                        None
-                                        | Some(
-                                            epp_proto::common::ip_address::IpVersion::Unknown,
-                                        ) => {
-                                            return Err(tonic::Status::invalid_argument(
-                                                "unknown IP address version",
-                                            ));
-                                        }
-                                    },
+                                        match epp_proto::common::ip_address::IpVersion::from_i32(
+                                            addr.r#type,
+                                        ) {
+                                            Some(
+                                                epp_proto::common::ip_address::IpVersion::IPv4,
+                                            ) => client::host::AddressVersion::IPv4,
+                                            Some(
+                                                epp_proto::common::ip_address::IpVersion::IPv6,
+                                            ) => client::host::AddressVersion::IPv6,
+                                            None
+                                            | Some(
+                                                epp_proto::common::ip_address::IpVersion::Unknown,
+                                            ) => {
+                                                return Err(tonic::Status::invalid_argument(
+                                                    "unknown IP address version",
+                                                ));
+                                            }
+                                        },
                                 })
                             })
                             .collect::<Result<Vec<client::host::Address>, tonic::Status>>()?,
@@ -487,7 +487,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         };
         let map_param = |p: epp_proto::domain::domain_update_request::Param,
                          l: &mut Vec<client::domain::UpdateObject>|
-                         -> Result<(), tonic::Status> {
+         -> Result<(), tonic::Status> {
             match p.param {
                 Some(epp_proto::domain::domain_update_request::param::Param::Contact(c)) => {
                     l.push(client::domain::UpdateObject::Contact(
@@ -629,7 +629,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                 },
                 &mut sender,
             )
-                .await?,
+            .await?,
         );
 
         let mut reply: epp_proto::domain::DomainUpdateReply = res.into();
@@ -687,7 +687,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                 request.isnic_payment.and_then(Into::into),
                 &mut sender,
             )
-                .await?,
+            .await?,
         );
 
         let mut reply: epp_proto::domain::DomainRenewReply = res.into();
@@ -736,7 +736,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                 request.eurid_data.map(Into::into),
                 &mut sender,
             )
-                .await?,
+            .await?,
         );
 
         let mut reply: epp_proto::domain::DomainTransferReply = res.into();
@@ -818,7 +818,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                     .map_or(Ok(None), |v| v.map(Some))?,
                 &mut sender,
             )
-                .await?,
+            .await?,
         );
 
         let reply = epp_proto::rgp::RestoreReply {
@@ -907,7 +907,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                 request.isnic_info.map(Into::into),
                 &mut sender,
             )
-                .await?,
+            .await?,
         );
 
         let reply = epp_proto::host::HostCreateReply {
@@ -1004,7 +1004,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                 request.isnic_info.map(Into::into),
                 &mut sender,
             )
-                .await?,
+            .await?,
         );
 
         let reply = epp_proto::host::HostUpdateReply {
@@ -1091,7 +1091,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                 },
                 &mut sender,
             )
-                .await?,
+            .await?,
         );
 
         let reply = epp_proto::contact::ContactCreateReply {
@@ -1165,7 +1165,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                 },
                 &mut sender,
             )
-                .await?,
+            .await?,
         );
 
         let reply = epp_proto::contact::ContactUpdateReply {
@@ -1703,7 +1703,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                 &request.lock_type,
                 &mut sender,
             )
-                .await?,
+            .await?,
         );
 
         let reply = epp_proto::nominet::LockReply {
@@ -1746,7 +1746,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                 &request.lock_type,
                 &mut sender,
             )
-                .await?,
+            .await?,
         );
 
         let reply = epp_proto::nominet::LockReply {
@@ -1769,7 +1769,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                 request.registrant.as_deref(),
                 &mut sender,
             )
-                .await?,
+            .await?,
         );
 
         let mut reply: epp_proto::nominet::HandshakeReply = resp.into();
@@ -1828,7 +1828,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                 },
                 &mut sender,
             )
-                .await?,
+            .await?,
         );
 
         let reply = epp_proto::nominet::ReleaseReply {
@@ -1890,7 +1890,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                 request.variations,
                 &mut sender,
             )
-                .await?,
+            .await?,
         );
 
         let mut reply: epp_proto::tmch::MarkCreateResponse = res.into();
@@ -2017,7 +2017,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                 request.update_cases.into_iter().map(Into::into).collect(),
                 &mut sender,
             )
-                .await?,
+            .await?,
         );
 
         let mut reply: epp_proto::tmch::MarkUpdateResponse = res.into();
@@ -2047,7 +2047,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                 request.add_period.map(Into::into),
                 &mut sender,
             )
-                .await?,
+            .await?,
         );
 
         let mut reply: epp_proto::tmch::MarkRenewResponse = res.into();
@@ -2095,18 +2095,20 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let request = request.into_inner();
         let mut sender = client_by_id(&self.client_router, &request.registry_name)?;
         let (res, _) = utils::map_command_response(
-            client::dac::domain(&request.name, match dac::env_from_i32(request.environment) {
-                Some(e) => e,
-                None => {
-                    return Err(tonic::Status::invalid_argument(
-                        "unknown environment",
-                    ));
-                }
-            }, &mut sender).await?,
+            client::dac::domain(
+                &request.name,
+                match dac::env_from_i32(request.environment) {
+                    Some(e) => e,
+                    None => {
+                        return Err(tonic::Status::invalid_argument("unknown environment"));
+                    }
+                },
+                &mut sender,
+            )
+            .await?,
         );
 
-        let mut reply: epp_proto::dac::DomainResponse = res.into();
-
+        let reply: epp_proto::dac::DomainResponse = res.into();
         Ok(tonic::Response::new(reply))
     }
 
@@ -2117,18 +2119,19 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let request = request.into_inner();
         let mut sender = client_by_id(&self.client_router, &request.registry_name)?;
         let (res, _) = utils::map_command_response(
-            client::dac::usage(match dac::env_from_i32(request.environment) {
-                Some(e) => e,
-                None => {
-                    return Err(tonic::Status::invalid_argument(
-                        "unknown environment",
-                    ));
-                }
-            }, &mut sender).await?,
+            client::dac::usage(
+                match dac::env_from_i32(request.environment) {
+                    Some(e) => e,
+                    None => {
+                        return Err(tonic::Status::invalid_argument("unknown environment"));
+                    }
+                },
+                &mut sender,
+            )
+            .await?,
         );
 
-        let mut reply: epp_proto::dac::UsageResponse = res.into();
-
+        let reply: epp_proto::dac::UsageResponse = res.into();
         Ok(tonic::Response::new(reply))
     }
 
@@ -2139,18 +2142,19 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let request = request.into_inner();
         let mut sender = client_by_id(&self.client_router, &request.registry_name)?;
         let (res, _) = utils::map_command_response(
-            client::dac::limits(match dac::env_from_i32(request.environment) {
-                Some(e) => e,
-                None => {
-                    return Err(tonic::Status::invalid_argument(
-                        "unknown environment",
-                    ));
-                }
-            }, &mut sender).await?,
+            client::dac::limits(
+                match dac::env_from_i32(request.environment) {
+                    Some(e) => e,
+                    None => {
+                        return Err(tonic::Status::invalid_argument("unknown environment"));
+                    }
+                },
+                &mut sender,
+            )
+            .await?,
         );
 
-        let mut reply: epp_proto::dac::UsageResponse = res.into();
-
+        let reply: epp_proto::dac::UsageResponse = res.into();
         Ok(tonic::Response::new(reply))
     }
 }

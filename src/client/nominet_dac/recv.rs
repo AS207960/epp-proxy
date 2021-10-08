@@ -1,9 +1,9 @@
-use tokio::io::AsyncBufReadExt;
-use futures::SinkExt;
 use chrono::prelude::*;
+use futures::SinkExt;
+use tokio::io::AsyncBufReadExt;
 
 fn decode_line(data: &str, host: &str) -> Result<super::proto::DACResponse, ()> {
-    let mut parts = data.split(",").collect::<Vec<_>>();
+    let mut parts = data.split(',').collect::<Vec<_>>();
     if parts.len() < 2 {
         error!("Invalid syntax from {}: expected at least two parts", host);
         Err(())
@@ -15,7 +15,10 @@ fn decode_line(data: &str, host: &str) -> Result<super::proto::DACResponse, ()> 
         match registered {
             "C" => {
                 if parts.len() != 4 {
-                    error!("Invalid syntax from {}: expected at 6 parts for a usage response", host);
+                    error!(
+                        "Invalid syntax from {}: expected at 6 parts for a usage response",
+                        host
+                    );
                     Err(())
                 } else {
                     let limit_60_const = parts.pop().unwrap();
@@ -57,10 +60,13 @@ fn decode_line(data: &str, host: &str) -> Result<super::proto::DACResponse, ()> 
                         }
                     }
                 }
-            },
+            }
             "B" => {
                 if parts.len() != 1 {
-                    error!("Invalid syntax from {}: expected 3 parts for an AUB response", host);
+                    error!(
+                        "Invalid syntax from {}: expected 3 parts for an AUB response",
+                        host
+                    );
                     Err(())
                 } else {
                     let delay = parts.pop().unwrap();
@@ -71,16 +77,16 @@ fn decode_line(data: &str, host: &str) -> Result<super::proto::DACResponse, ()> 
                             return Err(());
                         }
                     };
-                    Ok(super::proto::DACResponse::AUB(super::proto::AUB {
+                    Ok(super::proto::DACResponse::Aub(super::proto::Aub {
                         domain: domain.to_string(),
-                        delay
+                        delay,
                     }))
                 }
-            },
+            }
             "I" => {
                 error!("Invalid syntax error received from {}", host);
                 Err(())
-            },
+            }
             r => {
                 match parts.len() {
                     0 => {
@@ -93,19 +99,21 @@ fn decode_line(data: &str, host: &str) -> Result<super::proto::DACResponse, ()> 
                             }
                         };
 
-                        Ok(super::proto::DACResponse::DomainRT(super::proto::DomainRT {
-                            domain: domain.to_string(),
-                            registered,
-                            detagged: false,
-                            created: Utc.ymd(1970, 1, 1),
-                            expiry: Utc.ymd(1970, 1, 1),
-                            tag: String::default()
-                        }))
-                    },
+                        Ok(super::proto::DACResponse::DomainRT(
+                            super::proto::DomainRT {
+                                domain: domain.to_string(),
+                                registered,
+                                detagged: false,
+                                created: Utc.ymd(1970, 1, 1),
+                                expiry: Utc.ymd(1970, 1, 1),
+                                tag: String::default(),
+                            },
+                        ))
+                    }
                     4 => {
                         let detagged = parts.pop().unwrap();
                         let created = parts.pop().unwrap();
-                        let expiry= parts.pop().unwrap();
+                        let expiry = parts.pop().unwrap();
                         let tag = parts.pop().unwrap();
 
                         let registered = match r {
@@ -141,20 +149,22 @@ fn decode_line(data: &str, host: &str) -> Result<super::proto::DACResponse, ()> 
                         let created = chrono::Date::from_utc(created, chrono::offset::Utc);
                         let expiry = chrono::Date::from_utc(expiry, chrono::offset::Utc);
 
-                        Ok(super::proto::DACResponse::DomainRT(super::proto::DomainRT {
-                            domain: domain.to_string(),
-                            registered,
-                            detagged,
-                            created,
-                            expiry,
-                            tag: tag.to_string()
-                        }))
-                    },
+                        Ok(super::proto::DACResponse::DomainRT(
+                            super::proto::DomainRT {
+                                domain: domain.to_string(),
+                                registered,
+                                detagged,
+                                created,
+                                expiry,
+                                tag: tag.to_string(),
+                            },
+                        ))
+                    }
                     6 => {
                         let detagged = parts.pop().unwrap();
                         let suspended = parts.pop().unwrap();
                         let created = parts.pop().unwrap();
-                        let expiry= parts.pop().unwrap();
+                        let expiry = parts.pop().unwrap();
                         let status = parts.pop().unwrap();
                         let tag = parts.pop().unwrap();
 
@@ -211,17 +221,19 @@ fn decode_line(data: &str, host: &str) -> Result<super::proto::DACResponse, ()> 
                             }
                         };
 
-                        Ok(super::proto::DACResponse::DomainTD(super::proto::DomainTD {
-                            domain: domain.to_string(),
-                            registered,
-                            detagged,
-                            suspended,
-                            created,
-                            expiry,
-                            status,
-                            tag: tag.to_string()
-                        }))
-                    },
+                        Ok(super::proto::DACResponse::DomainTD(
+                            super::proto::DomainTD {
+                                domain: domain.to_string(),
+                                registered,
+                                detagged,
+                                suspended,
+                                created,
+                                expiry,
+                                status,
+                                tag: tag.to_string(),
+                            },
+                        ))
+                    }
                     _ => {
                         error!("Invalid syntax from {}: expected 2, 6 or 8 parts for a domain response", host);
                         Err(())
@@ -230,7 +242,6 @@ fn decode_line(data: &str, host: &str) -> Result<super::proto::DACResponse, ()> 
             }
         }
     }
-
 }
 
 async fn recv_msg<R: std::marker::Unpin + tokio::io::AsyncBufRead>(
@@ -241,7 +252,7 @@ async fn recv_msg<R: std::marker::Unpin + tokio::io::AsyncBufRead>(
         Ok(Some(l)) => l,
         Ok(None) => {
             warn!("{} has closed the connection", host);
-            return Err(true)
+            return Err(true);
         }
         Err(err) => {
             return Err(match err.kind() {
@@ -269,11 +280,13 @@ pub(super) struct ClientReceiver<R: std::marker::Unpin + tokio::io::AsyncBufRead
     pub reader: R,
 }
 
-impl<R: 'static + std::marker::Unpin + tokio::io::AsyncBufRead + std::marker::Send> ClientReceiver<R>
+impl<R: 'static + std::marker::Unpin + tokio::io::AsyncBufRead + std::marker::Send>
+    ClientReceiver<R>
 {
     /// Starts the tokio task, and returns the receiving end of the channel to read messages from.
     pub fn run(self) -> futures::channel::mpsc::Receiver<Result<super::proto::DACResponse, bool>> {
-        let (mut sender, receiver) = futures::channel::mpsc::channel::<Result<super::proto::DACResponse, bool>>(16);
+        let (mut sender, receiver) =
+            futures::channel::mpsc::channel::<Result<super::proto::DACResponse, bool>>(16);
         tokio::spawn(async move {
             let mut lines = self.reader.lines();
             loop {

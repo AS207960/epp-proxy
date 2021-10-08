@@ -160,8 +160,7 @@
 <span id="160">160</span>
 <span id="161">161</span>
 <span id="162">162</span>
-</pre><pre class="rust">
-<span class="doccomment">//! # Async/await EPP client.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! # Async/await EPP client.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! Messages should be injected into the server using the helper functions in subordinate modules such as</span>
 <span class="doccomment">//! [`contact`], [`host`], and [`domain`].</span>
@@ -323,7 +322,7 @@
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Client</span> {
     <span class="kw">fn</span> <span class="ident">start</span>(<span class="self">self</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">futures::channel::mpsc::Sender</span><span class="op">&lt;</span><span class="ident">RequestMessage</span><span class="op">&gt;</span>;
 }
-</pre></div>
+</code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="epp_proxy" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
     <script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script>
 </body></html>

@@ -3,8 +3,8 @@ use futures::future::FutureExt;
 use futures::stream::StreamExt;
 use tokio::io::AsyncWriteExt;
 
-mod recv;
 pub(self) mod proto;
+mod recv;
 pub(self) mod router;
 
 #[derive(Debug)]
@@ -19,7 +19,10 @@ impl super::Client for DACClient {
     // Starts up the DAC client and returns the sending end of a tokio channel to inject
     // commands into the client to be processed
     fn start(mut self: Box<Self>) -> futures::channel::mpsc::Sender<RequestMessage> {
-        info!("DAC Client for {} and {} starting...", &self.rt_host, &self.td_host);
+        info!(
+            "DAC Client for {} and {} starting...",
+            &self.rt_host, &self.td_host
+        );
         let (sender, receiver) = futures::channel::mpsc::channel::<RequestMessage>(16);
         tokio::spawn(async move {
             self._main_loop(receiver).await;
@@ -49,7 +52,11 @@ impl DACClient {
             self.is_closing = false;
 
             let (rt_sock, td_sock) = {
-                trace!("Getting connection for {} and {}", self.rt_host, self.td_host);
+                trace!(
+                    "Getting connection for {} and {}",
+                    self.rt_host,
+                    self.td_host
+                );
                 let connect_fut = self._connect().fuse();
                 futures::pin_mut!(connect_fut);
 
@@ -160,19 +167,13 @@ impl DACClient {
         match self.router.handle_request(&(), req) {
             Some(((command, env), _)) => {
                 if env == router::DACEnv::RealTime || env == router::DACEnv::Both {
-                    match self
-                        ._send_command(command.clone(), rt_sock_write)
-                        .await
-                    {
+                    match self._send_command(command.clone(), rt_sock_write).await {
                         Ok(_) => {}
                         Err(_) => return Err(()),
                     }
                 }
                 if env == router::DACEnv::TimeDelay || env == router::DACEnv::Both {
-                    match self
-                        ._send_command(command, td_sock_write)
-                        .await
-                    {
+                    match self._send_command(command, td_sock_write).await {
                         Ok(_) => {}
                         Err(_) => return Err(()),
                     }
@@ -183,9 +184,7 @@ impl DACClient {
         }
     }
 
-    async fn _send_command<
-        W: std::marker::Unpin + tokio::io::AsyncWrite,
-    >(
+    async fn _send_command<W: std::marker::Unpin + tokio::io::AsyncWrite>(
         &self,
         command: proto::DACRequest,
         sock: &mut W,
@@ -193,15 +192,15 @@ impl DACClient {
         let data: Vec<u8> = command.into();
         match sock.write_all(&data).await {
             Ok(_) => Ok(()),
-            Err(_) => Err(())
+            Err(_) => Err(()),
         }
     }
 
     fn _get_cmd_line_from_response(res: &proto::DACResponse) -> String {
-         match res {
+        match res {
             proto::DACResponse::DomainRT(rt) => rt.domain.clone(),
             proto::DACResponse::DomainTD(td) => td.domain.clone(),
-            proto::DACResponse::AUB(aub) => aub.domain.clone(),
+            proto::DACResponse::Aub(aub) => aub.domain.clone(),
             proto::DACResponse::Usage(_) => "#usage".to_string(),
             proto::DACResponse::Limits(_) => "#limits".to_string(),
         }
@@ -210,7 +209,7 @@ impl DACClient {
     async fn _handle_rt_response(&mut self, res: proto::DACResponse) -> Result<bool, ()> {
         let command_id = match self.router.inner.command_map.remove(&router::DACKey {
             env: router::DACEnv::RealTime,
-            cmd: Self::_get_cmd_line_from_response(&res)
+            cmd: Self::_get_cmd_line_from_response(&res),
         }) {
             Some(c) => c,
             None => {
@@ -229,7 +228,7 @@ impl DACClient {
     async fn _handle_td_response(&mut self, res: proto::DACResponse) -> Result<bool, ()> {
         let command_id = match self.router.inner.command_map.remove(&router::DACKey {
             env: router::DACEnv::TimeDelay,
-            cmd: Self::_get_cmd_line_from_response(&res)
+            cmd: Self::_get_cmd_line_from_response(&res),
         }) {
             Some(c) => c,
             None => {
@@ -265,7 +264,10 @@ impl DACClient {
         loop {
             match self._try_connect().await {
                 Ok(s) => {
-                    info!("Successfully connected to {} and {}", &self.rt_host, self.td_host);
+                    info!(
+                        "Successfully connected to {} and {}",
+                        &self.rt_host, self.td_host
+                    );
                     return s;
                 }
                 Err(_) => {
