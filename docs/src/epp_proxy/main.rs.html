@@ -614,6 +614,17 @@
 <span id="614">614</span>
 <span id="615">615</span>
 <span id="616">616</span>
+<span id="617">617</span>
+<span id="618">618</span>
+<span id="619">619</span>
+<span id="620">620</span>
+<span id="621">621</span>
+<span id="622">622</span>
+<span id="623">623</span>
+<span id="624">624</span>
+<span id="625">625</span>
+<span id="626">626</span>
+<span id="627">627</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">recursion_limit</span> <span class="op">=</span> <span class="string">&quot;1024&quot;</span>]</span>
 <span class="attribute">#![<span class="ident">warn</span>(<span class="ident">missing_docs</span>)]</span>
 <span class="attribute">#![<span class="ident">doc</span>(<span class="ident">html_logo_url</span> <span class="op">=</span> <span class="string">&quot;https://as207960.net/img/logo.png&quot;</span>)]</span>
@@ -684,6 +695,12 @@
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Deserialize</span>)]</span>
+<span class="kw">struct</span> <span class="ident">NominetDACConfig</span> {
+    <span class="ident">real_time</span>: <span class="ident">String</span>,
+    <span class="ident">time_delay</span>: <span class="ident">String</span>,
+}
+
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Deserialize</span>)]</span>
 <span class="kw">struct</span> <span class="ident">ConfigFile</span> {
     <span class="doccomment">/// Unique registry ID</span>
     <span class="ident">id</span>: <span class="ident">String</span>,
@@ -712,6 +729,7 @@
     <span class="ident">pipelining</span>: <span class="ident">bool</span>,
     <span class="doccomment">/// For naughty servers</span>
     <span class="ident">errata</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="ident">nominet_dac</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NominetDACConfig</span><span class="op">&gt;</span>,
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Deserialize</span>)]</span>
@@ -1074,6 +1092,10 @@
             <span class="ident">new_password</span>: <span class="ident">config</span>.<span class="ident">new_password</span>.<span class="ident">as_deref</span>(),
             <span class="ident">pipelining</span>: <span class="ident">config</span>.<span class="ident">pipelining</span>,
             <span class="ident">errata</span>: <span class="ident">config</span>.<span class="ident">errata</span>.<span class="ident">clone</span>(),
+            <span class="ident">nominet_dac</span>: <span class="ident">config</span>.<span class="ident">nominet_dac</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">client::NominetDACConf</span> {
+                <span class="ident">real_time</span>: <span class="kw-2">&amp;</span><span class="ident">d</span>.<span class="ident">real_time</span>,
+                <span class="ident">time_delay</span>: <span class="kw-2">&amp;</span><span class="ident">d</span>.<span class="ident">time_delay</span>,
+            }),
         };
         <span class="kw">let</span> <span class="ident">epp_client</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw">match</span> <span class="ident">config</span>.<span class="ident">server_type</span> {
             <span class="ident">ConfigServerType::Epp</span> <span class="op">=</span><span class="op">&gt;</span> {

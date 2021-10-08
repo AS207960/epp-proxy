@@ -540,7 +540,7 @@
         <span class="comment">// (it shouldn&#39;t be blocking because async, but sometimes it is), by which time the server</span>
         <span class="comment">// has dropped the connection and it all has to start again.</span>
         <span class="comment">//</span>
-        <span class="comment">// Please don&#39;t ask how this happens&gt;, or how I found out, just don&#39;t try and fix this.</span>
+        <span class="comment">// Please don&#39;t ask how this happens, or how I found out, just don&#39;t try and fix this.</span>
         <span class="macro">trace!</span>(<span class="string">&quot;Getting connect lock for {}&quot;</span>, <span class="self">self</span>.<span class="ident">hostname</span>);
         <span class="kw">let</span> <span class="ident">lock</span> <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">should_lock</span> <span class="op">|</span><span class="op">|</span> <span class="ident">TLS_CONNECT_LOCK</span>.<span class="ident">available_permits</span>() <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
             <span class="prelude-val">Some</span>(<span class="ident">TLS_CONNECT_LOCK</span>.<span class="ident">acquire</span>().<span class="kw">await</span>.<span class="ident">unwrap</span>())
