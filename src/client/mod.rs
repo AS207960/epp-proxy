@@ -9,6 +9,7 @@ use futures::future::FutureExt;
 pub mod epp;
 pub mod epp_like;
 pub mod tmch_client;
+pub mod nominet_dac;
 
 pub mod balance;
 pub mod contact;
@@ -27,6 +28,7 @@ pub mod router;
 pub mod tmch;
 pub mod traficom;
 pub mod verisign;
+pub mod dac;
 
 pub use router::{CommandResponse, RequestMessage, RequestSender, Response, Sender};
 
@@ -38,6 +40,11 @@ pub enum ClientCertConf<'a> {
         key_id: &'a str,
         cert_chain: &'a str,
     },
+}
+
+pub struct NominetDACConf<'a> {
+    pub real_time: &'a str,
+    pub time_delay: &'a str,
 }
 
 pub struct ClientConf<'a, C: Into<Option<&'a str>>> {
@@ -62,6 +69,7 @@ pub struct ClientConf<'a, C: Into<Option<&'a str>>> {
     pub pipelining: bool,
     /// Errata of this server
     pub errata: Option<String>,
+    pub nominet_dac: Option<NominetDACConf<'a>>,
 }
 
 async fn send_epp_client_request<R>(

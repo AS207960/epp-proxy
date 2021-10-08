@@ -68,6 +68,12 @@ enum ClientCertConfig {
 }
 
 #[derive(Debug, Deserialize)]
+struct NominetDACConfig {
+    real_time: String,
+    time_delay: String,
+}
+
+#[derive(Debug, Deserialize)]
 struct ConfigFile {
     /// Unique registry ID
     id: String,
@@ -96,6 +102,7 @@ struct ConfigFile {
     pipelining: bool,
     /// For naughty servers
     errata: Option<String>,
+    nominet_dac: Option<NominetDACConfig>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -458,6 +465,10 @@ async fn main() {
             new_password: config.new_password.as_deref(),
             pipelining: config.pipelining,
             errata: config.errata.clone(),
+            nominet_dac: config.nominet_dac.as_ref().map(|d| client::NominetDACConf {
+                real_time: &d.real_time,
+                time_delay: &d.time_delay,
+            })
         };
         let epp_client = match match config.server_type {
             ConfigServerType::Epp => {

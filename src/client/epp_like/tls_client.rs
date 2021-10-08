@@ -211,7 +211,7 @@ impl TLSClient {
         // (it shouldn't be blocking because async, but sometimes it is), by which time the server
         // has dropped the connection and it all has to start again.
         //
-        // Please don't ask how this happens>, or how I found out, just don't try and fix this.
+        // Please don't ask how this happens, or how I found out, just don't try and fix this.
         trace!("Getting connect lock for {}", self.hostname);
         let lock = if self.should_lock || TLS_CONNECT_LOCK.available_permits() == 0 {
             Some(TLS_CONNECT_LOCK.acquire().await.unwrap())

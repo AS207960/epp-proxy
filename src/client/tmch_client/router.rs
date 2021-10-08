@@ -31,7 +31,7 @@ macro_rules! router {
                             server: response.transaction_id.server_transaction_id.to_owned(),
                         };
                         match $res_handle(response) {
-                            Ok(r) =>  return_path.send(Ok(router::CommandResponse {
+                            Ok(r) => return_path.send(Ok(router::CommandResponse {
                                 response: r,
                                 extra_values: vec![],
                                 transaction_id: Some(trans_id),
@@ -111,5 +111,8 @@ router!(
     TMCHTransferInitiate,   super::mark::handle_transfer_initiate,     super::mark::handle_transfer_initiate_response;
     TMCHTransfer,           super::mark::handle_transfer,              super::mark::handle_transfer_response;
     TMCHTrexActivate,       super::trex::handle_trex_activate,         super::trex::handle_trex_activate_response;
-    TMCHTrexRenew,          super::trex::handle_trex_renew,            super::trex::handle_trex_renew_response
+    TMCHTrexRenew,          super::trex::handle_trex_renew,            super::trex::handle_trex_renew_response;
+    DACDomain,              request_nop,                               response_nop;
+    DACUsage,               request_nop,                               response_nop;
+    DACLimits,              request_nop,                               response_nop
 );

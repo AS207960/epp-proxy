@@ -36,7 +36,7 @@ macro_rules! router {
         #[derive(Default, Debug)]
         pub struct Router<I: InnerRouter<T>, T> {
             _marker: std::marker::PhantomData<T>,
-            inner: Box<I>,
+            pub inner: Box<I>,
             $($n: HashMap<uuid::Uuid, Sender<$res>>,)*
         }
 
@@ -165,5 +165,8 @@ router!(
     TMCHTransferInitiate,   super::tmch::TransferInitiateRequest,       super::tmch::TransferInitiateResponse;
     TMCHTransfer,           super::tmch::TransferRequest,               super::tmch::TransferResponse;
     TMCHTrexActivate,       super::tmch::TrexActivateRequest,           super::tmch::TrexActivateResponse;
-    TMCHTrexRenew,          super::tmch::TrexRenewRequest,              super::tmch::TrexRenewResponse
+    TMCHTrexRenew,          super::tmch::TrexRenewRequest,              super::tmch::TrexRenewResponse;
+    DACDomain,              super::dac::DACDomainRequest,               super::dac::DACDomainResponse;
+    DACUsage,               super::dac::DACUsageRequest,                super::dac::DACUsageResponse;
+    DACLimits,              super::dac::DACUsageRequest,                super::dac::DACUsageResponse
 );

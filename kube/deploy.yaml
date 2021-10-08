@@ -51,6 +51,8 @@ spec:
         - name: priv-keys
           secret:
             secretName: epp-proxy-priv
+      nodeSelector:
+          "kubernetes.io/hostname": "kubes2.fsn1.as207960.net"
       containers:
         - name: epp-proxy
           image: as207960/epp-proxy:(version)
@@ -69,7 +71,7 @@ spec:
               name: priv-keys
           env:
             - name: RUST_LOG
-              value: info,epp_proxy=trace
+              value: info
           envFrom:
             - configMapRef:
                 name: epp-proxy-conf

@@ -87,7 +87,7 @@ pub(super) async fn recv_msg<T, R: std::marker::Unpin + tokio::io::AsyncRead>(
     root: &std::path::Path,
     decode_fn: fn(data: String, host: &str) -> Result<T, ()>,
 ) -> Result<T, bool> {
-    let data = super::epp_like::recv_length_msg(sock, host, root).await?;
+    let data = recv_length_msg(sock, host, root).await?;
     let msg = decode_fn(data, host).map_err(|_| false)?;
     Ok(msg)
 }

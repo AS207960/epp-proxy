@@ -118,5 +118,8 @@ router!(
     TMCHTransferInitiate,   request_nop,                              response_nop;
     TMCHTransfer,           request_nop,                              response_nop;
     TMCHTrexActivate,       request_nop,                              response_nop;
-    TMCHTrexRenew,          request_nop,                              response_nop
+    TMCHTrexRenew,          request_nop,                              response_nop;
+    DACDomain,              request_nop,                              response_nop;
+    DACUsage,               request_nop,                              response_nop;
+    DACLimits,              request_nop,                              response_nop
 );

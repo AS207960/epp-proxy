@@ -12,6 +12,7 @@ import "traficom.proto";
 import "maintenance.proto";
 import "eurid.proto";
 import "tmch.proto";
+import "dac.proto";
 import "common.proto";
 
 service EPPProxy {
@@ -69,6 +70,9 @@ service EPPProxy {
     rpc TMCHMarkRenew            (tmch.MarkRenewRequest)                    returns (tmch.MarkRenewResponse);
     rpc TMCHMarkTransferInitiate (tmch.MarkTransferInitiateRequest)         returns (tmch.MarkTransferInitiateResponse);
     rpc TMCHMarkTransfer         (tmch.MarkTransferRequest)                 returns (tmch.MarkTransferResponse);
+    rpc DACDomain                (dac.DomainRequest)                        returns (dac.DomainResponse);
+    rpc DACUsage                 (dac.UsageRequest)                         returns (dac.UsageResponse);
+    rpc DACLimits                (dac.UsageRequest)                         returns (dac.UsageResponse);
 }
 
 message RegistryInfo {
