@@ -11,7 +11,9 @@ pub enum DACRequest {
 impl From<DACRequest> for Vec<u8> {
     fn from(from: DACRequest) -> Vec<u8> {
         match from {
-            DACRequest::Domain(d) => return [d.trim_start_matches('#').as_bytes(), &[0xd, 0xa]].concat(),
+            DACRequest::Domain(d) => {
+                return [d.trim_start_matches('#').as_bytes(), &[0xd, 0xa]].concat()
+            }
             DACRequest::Usage => b"#usage\r\n".to_vec(),
             DACRequest::Limits => b"#limits\r\n".to_vec(),
             DACRequest::Exit => b"#exit\r\n".to_vec(),
