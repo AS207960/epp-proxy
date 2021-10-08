@@ -175,8 +175,6 @@ pub struct EPPClient {
     pipelining: bool,
     is_awaiting_response: bool,
     is_closing: bool,
-    /// Is the EPP server in a state to receive and process commands
-    ready: bool,
     router: outer_router::Router<router::Router, ServerFeatures>,
     /// What features does the server support
     features: ServerFeatures,
@@ -250,7 +248,6 @@ impl EPPClient {
             nominet_tag_list_subordinate_client: None,
             nominet_dac_subordinate_client: None,
             nominet_dac_client,
-            ready: false,
             router: outer_router::Router::default(),
             tls_client,
         })
@@ -830,6 +827,15 @@ impl EPPClient {
         self.features.eurid_dns_quality_support = greeting
             .service_menu
             .supports("http://www.eurid.eu/xml/epp/dnsQuality-2.0");
+        self.features.eurid_poll_supported = greeting
+            .service_menu
+            .supports_ext("http://www.eurid.eu/xml/epp/poll-1.2");
+        self.features.eurid_idn_supported = greeting
+            .service_menu
+            .supports_ext("http://www.eurid.eu/xml/epp/idn-1.0");
+        self.features.eurid_homoglyph_supported = greeting
+            .service_menu
+            .supports_ext("http://www.eurid.eu/xml/epp/homoglyph-1.0");
         self.features.qualified_lawyer_supported = greeting
             .service_menu
             .supports_ext("urn:ietf:params:xml:ns:qualifiedLawyer-1.0");
@@ -848,6 +854,9 @@ impl EPPClient {
         self.features.isnic_account_supported = greeting
             .service_menu
             .supports_ext("urn:is.isnic:xml:ns:is-ext-account-1.0");
+        self.features.isnic_list_supported = greeting
+            .service_menu
+            .supports("urn:is.isnic:xml:ns:is-ext-list-1.0");
 
         if !(self.features.contact_supported
             | self.features.domain_supported
@@ -980,6 +989,15 @@ impl EPPClient {
             if self.features.eurid_contact_support {
                 ext_objects.push("http://www.eurid.eu/xml/epp/domain-ext-2.4".to_string())
             }
+            if self.features.eurid_poll_supported {
+                ext_objects.push("http://www.eurid.eu/xml/epp/poll-1.2".to_string())
+            }
+            if self.features.eurid_homoglyph_supported {
+                ext_objects.push("http://www.eurid.eu/xml/epp/homoglyph-1.0".to_string())
+            }
+            if self.features.eurid_idn_supported {
+                ext_objects.push("http://www.eurid.eu/xml/epp/idn-1.0".to_string())
+            }
             if self.features.qualified_lawyer_supported {
                 ext_objects.push("urn:ietf:params:xml:ns:qualifiedLawyer-1.0".to_string())
             }
@@ -997,6 +1015,9 @@ impl EPPClient {
             }
             if self.features.isnic_account_supported {
                 ext_objects.push("urn:is.isnic:xml:ns:is-ext-account-1.0".to_string())
+            }
+            if self.features.isnic_list_supported {
+                objects.push("urn:is.isnic:xml:ns:is-ext-list-1.0".to_string())
             }
             if self.features.nominet_tag_list {
                 let new_client = Self {
@@ -1017,7 +1038,6 @@ impl EPPClient {
                     nominet_tag_list_subordinate_client: None,
                     nominet_dac_subordinate_client: None,
                     nominet_dac_client: None,
-                    ready: false,
                     router: outer_router::Router::default(),
                     tls_client: self.tls_client.clone(),
                 };

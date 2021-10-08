@@ -43,8 +43,6 @@ pub struct TMCHClient {
     pipelining: bool,
     is_awaiting_response: bool,
     is_closing: bool,
-    /// Is the TMCH server in a state to receive and process commands
-    ready: bool,
     router: outer_router::Router<router::Router, ()>,
     tls_client: super::epp_like::tls_client::TLSClient,
 }
@@ -83,7 +81,6 @@ impl TMCHClient {
             server_id: String::new(),
             is_awaiting_response: false,
             is_closing: false,
-            ready: false,
             router: outer_router::Router::default(),
             tls_client,
         })
