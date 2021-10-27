@@ -1289,10 +1289,10 @@
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::proto::EPPServiceExtension</span>;
 
-<span class="kw">fn</span> <span class="ident">recv_msg</span>(<span class="ident">data</span>: <span class="ident">String</span>, <span class="ident">host</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">proto::EPPMessage</span>, ()<span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">recv_msg</span>(<span class="ident">data</span>: <span class="ident">String</span>, <span class="ident">host</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">proto::EPPMessage</span>, ()<span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">message</span>: <span class="ident">proto::EPPMessage</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">xml_serde::from_str</span>(<span class="kw-2">&amp;</span><span class="ident">data</span>) {
-        <span class="prelude-val">Ok</span>(<span class="ident">m</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">m</span>,
-        <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Ok</span>(<span class="ident">m</span>) =&gt; <span class="ident">m</span>,
+        <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; {
             <span class="macro">error!</span>(<span class="string">&quot;Invalid XML from {}: {}&quot;</span>, <span class="ident">host</span>, <span class="ident">err</span>);
             <span class="kw">return</span> <span class="prelude-val">Err</span>(());
         }
@@ -1301,10 +1301,10 @@
     <span class="prelude-val">Ok</span>(<span class="ident">message</span>)
 }
 
-<span class="kw">fn</span> <span class="ident">send_msg</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span><span class="ident">proto::EPPMessage</span>, <span class="ident">host</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, ()<span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">send_msg</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span><span class="ident">proto::EPPMessage</span>, <span class="ident">host</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, ()<span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">encoded_msg</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">xml_serde::to_string</span>(<span class="ident">data</span>) {
-        <span class="prelude-val">Ok</span>(<span class="ident">m</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">m</span>,
-        <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Ok</span>(<span class="ident">m</span>) =&gt; <span class="ident">m</span>,
+        <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; {
             <span class="macro">error!</span>(<span class="string">&quot;Error serialising message for {}: {}&quot;</span>, <span class="ident">host</span>, <span class="ident">err</span>);
             <span class="kw">return</span> <span class="prelude-val">Err</span>(());
         }
@@ -1419,10 +1419,10 @@
 }
 
 <span class="kw">impl</span> <span class="ident">ServerFeatures</span> {
-    <span class="kw">fn</span> <span class="ident">has_erratum</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">has_erratum</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">errata</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span> <span class="op">=</span><span class="op">=</span> <span class="ident">name</span>,
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
+            <span class="prelude-val">Some</span>(<span class="ident">s</span>) =&gt; <span class="ident">s</span> <span class="op">==</span> <span class="ident">name</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="bool-val">false</span>,
         }
     }
 }
@@ -1452,7 +1452,7 @@
 <span class="kw">impl</span> <span class="ident"><span class="kw">super</span>::Client</span> <span class="kw">for</span> <span class="ident">EPPClient</span> {
     <span class="comment">// Starts up the EPP client and returns the sending end of a tokio channel to inject</span>
     <span class="comment">// commands into the client to be processed</span>
-    <span class="kw">fn</span> <span class="ident">start</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">futures::channel::mpsc::Sender</span><span class="op">&lt;</span><span class="ident">RequestMessage</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">start</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>) -&gt; <span class="ident">futures::channel::mpsc::Sender</span><span class="op">&lt;</span><span class="ident">RequestMessage</span><span class="op">&gt;</span> {
         <span class="macro">info!</span>(<span class="string">&quot;EPP Client for {} starting...&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">host</span>);
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">nominet_tag_list_subordinate</span> {
             <span class="macro">info!</span>(<span class="string">&quot;This is a Nominet Tag list subordinate client&quot;</span>);
@@ -1480,15 +1480,15 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">C</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>(
         <span class="ident">conf</span>: <span class="ident"><span class="kw">super</span>::ClientConf</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">C</span><span class="op">&gt;</span>,
         <span class="ident">pkcs11_engine</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::P11Engine</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::io::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">std::io::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">nominet_dac_client</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">conf</span>.<span class="ident">nominet_dac</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">nominet_dac_conf</span><span class="op">|</span> {
             <span class="ident"><span class="kw">super</span>::nominet_dac::DACClient::new</span>(
                 <span class="ident">nominet_dac_conf</span>.<span class="ident">real_time</span>,
                 <span class="ident">nominet_dac_conf</span>.<span class="ident">time_delay</span>,
             )
         }) {
-            <span class="prelude-val">Some</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">c</span>.<span class="kw">await</span><span class="question-mark">?</span>),
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="prelude-val">Some</span>(<span class="ident">c</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">c</span>.<span class="kw">await</span><span class="question-mark">?</span>),
+            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
         };
 
         <span class="kw">let</span> <span class="ident">tls_client</span> <span class="op">=</span>
@@ -1530,16 +1530,16 @@
 
                 <span class="kw">loop</span> {
                     <span class="macro">futures::select!</span> {
-                        <span class="ident">x</span> <span class="op">=</span> <span class="ident">receiver</span>.<span class="ident">next</span>() <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="ident">x</span> <span class="op">=</span> <span class="ident">receiver</span>.<span class="ident">next</span>() =&gt; {
                             <span class="kw">match</span> <span class="ident">x</span> {
-                                <span class="prelude-val">Some</span>(<span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">outer_router::Router</span>::<span class="op">&lt;</span><span class="ident">router::Router</span>, <span class="ident">ServerFeatures</span><span class="op">&gt;</span><span class="ident">::reject_request</span>(<span class="ident">x</span>),
-                                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+                                <span class="prelude-val">Some</span>(<span class="ident">x</span>) =&gt; <span class="ident">outer_router::Router</span>::<span class="op">&lt;</span><span class="ident">router::Router</span>, <span class="ident">ServerFeatures</span><span class="op">&gt;</span><span class="ident">::reject_request</span>(<span class="ident">x</span>),
+                                <span class="prelude-val">None</span> =&gt; {
                                     <span class="macro">info!</span>(<span class="string">&quot;All senders for {} dropped, exiting...&quot;</span>, <span class="self">self</span>.<span class="ident">host</span>);
                                     <span class="kw">return</span>
                                 }
                             };
                         }
-                        <span class="ident">s</span> <span class="op">=</span> <span class="ident">connect_fut</span> <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="ident">s</span> <span class="op">=</span> <span class="ident">connect_fut</span> =&gt; {
                             <span class="kw">break</span> <span class="ident">s</span>;
                         }
                     }
@@ -1554,22 +1554,22 @@
                 <span class="macro">futures::pin_mut!</span>(<span class="ident">setup_fut</span>);
                 <span class="kw">match</span> <span class="kw">loop</span> {
                     <span class="macro">futures::select!</span> {
-                        <span class="ident">x</span> <span class="op">=</span> <span class="ident">receiver</span>.<span class="ident">next</span>() <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="ident">x</span> <span class="op">=</span> <span class="ident">receiver</span>.<span class="ident">next</span>() =&gt; {
                             <span class="kw">match</span> <span class="ident">x</span> {
-                                <span class="prelude-val">Some</span>(<span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">outer_router::Router</span>::<span class="op">&lt;</span><span class="ident">router::Router</span>, <span class="ident">ServerFeatures</span><span class="op">&gt;</span><span class="ident">::reject_request</span>(<span class="ident">x</span>),
-                                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+                                <span class="prelude-val">Some</span>(<span class="ident">x</span>) =&gt; <span class="ident">outer_router::Router</span>::<span class="op">&lt;</span><span class="ident">router::Router</span>, <span class="ident">ServerFeatures</span><span class="op">&gt;</span><span class="ident">::reject_request</span>(<span class="ident">x</span>),
+                                <span class="prelude-val">None</span> =&gt; {
                                     <span class="macro">info!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">exit_str</span>);
                                     <span class="kw">return</span>
                                 }
                             };
                         }
-                        <span class="ident">s</span> <span class="op">=</span> <span class="ident">setup_fut</span> <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="ident">s</span> <span class="op">=</span> <span class="ident">setup_fut</span> =&gt; {
                             <span class="kw">break</span> <span class="ident">s</span>;
                         }
                     }
                 } {
-                    <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {}
-                    <span class="prelude-val">Err</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {}
+                    <span class="prelude-val">Err</span>(<span class="ident">r</span>) =&gt; {
                         <span class="kw">if</span> <span class="ident">r</span> {
                             <span class="kw">break</span>;
                         } <span class="kw">else</span> {
@@ -1595,45 +1595,45 @@
             <span class="kw">loop</span> {
                 <span class="kw">if</span> <span class="self">self</span>.<span class="ident">pipelining</span> <span class="op">|</span><span class="op">|</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">is_awaiting_response</span> {
                     <span class="macro">futures::select!</span> {
-                        <span class="ident">r</span> <span class="op">=</span> <span class="ident">receiver</span>.<span class="ident">next</span>() <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="ident">r</span> <span class="op">=</span> <span class="ident">receiver</span>.<span class="ident">next</span>() =&gt; {
                             <span class="kw">match</span> <span class="ident">r</span> {
-                                <span class="prelude-val">Some</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">_handle_request</span>(<span class="ident">r</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sock_write</span>).<span class="kw">await</span> {
-                                    <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {},
-                                    <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                                <span class="prelude-val">Some</span>(<span class="ident">r</span>) =&gt; <span class="kw">match</span> <span class="self">self</span>.<span class="ident">_handle_request</span>(<span class="ident">r</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sock_write</span>).<span class="kw">await</span> {
+                                    <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {},
+                                    <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; {
                                         <span class="ident">tokio::time::sleep</span>(<span class="ident">tokio::time::Duration::new</span>(<span class="number">5</span>, <span class="number">0</span>)).<span class="kw">await</span>;
                                         <span class="kw">break</span>;
                                     }
                                 },
-                                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+                                <span class="prelude-val">None</span> =&gt; {
                                     <span class="macro">info!</span>(<span class="string">&quot;All senders for {} dropped, exiting...&quot;</span>, <span class="self">self</span>.<span class="ident">host</span>);
                                     <span class="kw">return</span>
                                 }
                             };
                         }
-                        <span class="ident">m</span> <span class="op">=</span> <span class="ident">message_channel</span>.<span class="ident">next</span>() <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="ident">m</span> <span class="op">=</span> <span class="ident">message_channel</span>.<span class="ident">next</span>() =&gt; {
                             <span class="kw">match</span> <span class="ident">m</span> {
-                                <span class="prelude-val">Some</span>(<span class="ident">m</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">m</span> {
-                                    <span class="prelude-val">Ok</span>(<span class="ident">m</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">_handle_response</span>(<span class="ident">m</span>).<span class="kw">await</span> {
-                                        <span class="prelude-val">Ok</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">if</span> <span class="ident">c</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">is_closing</span> {
+                                <span class="prelude-val">Some</span>(<span class="ident">m</span>) =&gt; <span class="kw">match</span> <span class="ident">m</span> {
+                                    <span class="prelude-val">Ok</span>(<span class="ident">m</span>) =&gt; <span class="kw">match</span> <span class="self">self</span>.<span class="ident">_handle_response</span>(<span class="ident">m</span>).<span class="kw">await</span> {
+                                        <span class="prelude-val">Ok</span>(<span class="ident">c</span>) =&gt; <span class="kw">if</span> <span class="ident">c</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">is_closing</span> {
                                             <span class="macro">info!</span>(<span class="string">&quot;Closing connection to {}...&quot;</span>, <span class="self">self</span>.<span class="ident">host</span>);
                                             <span class="kw">return</span>
                                         },
-                                        <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">break</span>
+                                        <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="kw">break</span>
                                     },
-                                    <span class="prelude-val">Err</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">if</span> <span class="ident">c</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">is_closing</span> {
+                                    <span class="prelude-val">Err</span>(<span class="ident">c</span>) =&gt; <span class="kw">if</span> <span class="ident">c</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">is_closing</span> {
                                         <span class="macro">info!</span>(<span class="string">&quot;Closing connection to {}...&quot;</span>, <span class="self">self</span>.<span class="ident">host</span>);
                                         <span class="kw">return</span>
                                     } <span class="kw">else</span> {
                                         <span class="kw">break</span>
                                     }
                                 },
-                                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">break</span>
+                                <span class="prelude-val">None</span> =&gt; <span class="kw">break</span>
                             }
                         }
-                        <span class="kw">_</span> <span class="op">=</span> <span class="ident">keepalive_interval</span>.<span class="ident">tick</span>().<span class="ident">fuse</span>() <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="kw">_</span> <span class="op">=</span> <span class="ident">keepalive_interval</span>.<span class="ident">tick</span>().<span class="ident">fuse</span>() =&gt; {
                             <span class="kw">match</span> <span class="self">self</span>.<span class="ident">_send_keepalive</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sock_write</span>).<span class="kw">await</span> {
-                                <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {},
-                                <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                                <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {},
+                                <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; {
                                     <span class="kw">break</span>;
                                 }
                             }
@@ -1643,24 +1643,24 @@
                     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">delay</span> <span class="op">=</span>
                         <span class="ident">Box::pin</span>(<span class="ident">tokio::time::sleep</span>(<span class="ident">tokio::time::Duration::new</span>(<span class="number">15</span>, <span class="number">0</span>)).<span class="ident">fuse</span>());
                     <span class="kw">let</span> <span class="ident">resp</span> <span class="op">=</span> <span class="macro">futures::select!</span> {
-                        <span class="ident">r</span> <span class="op">=</span> <span class="ident">message_channel</span>.<span class="ident">next</span>() <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
-                        <span class="kw">_</span> <span class="op">=</span> <span class="ident">delay</span> <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="ident">r</span> <span class="op">=</span> <span class="ident">message_channel</span>.<span class="ident">next</span>() =&gt; <span class="ident">r</span>,
+                        <span class="kw">_</span> <span class="op">=</span> <span class="ident">delay</span> =&gt; {
                             <span class="macro">warn!</span>(<span class="string">&quot;Timeout awaiting response from {}&quot;</span>, <span class="self">self</span>.<span class="ident">host</span>);
                             <span class="kw">break</span>;
                         }
                     };
                     <span class="kw">match</span> <span class="ident">resp</span> {
-                        <span class="prelude-val">Some</span>(<span class="ident">m</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">m</span> {
-                            <span class="prelude-val">Ok</span>(<span class="ident">m</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">_handle_response</span>(<span class="ident">m</span>).<span class="kw">await</span> {
-                                <span class="prelude-val">Ok</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="prelude-val">Some</span>(<span class="ident">m</span>) =&gt; <span class="kw">match</span> <span class="ident">m</span> {
+                            <span class="prelude-val">Ok</span>(<span class="ident">m</span>) =&gt; <span class="kw">match</span> <span class="self">self</span>.<span class="ident">_handle_response</span>(<span class="ident">m</span>).<span class="kw">await</span> {
+                                <span class="prelude-val">Ok</span>(<span class="ident">c</span>) =&gt; {
                                     <span class="kw">if</span> <span class="ident">c</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">is_closing</span> {
                                         <span class="macro">info!</span>(<span class="string">&quot;Closing connection to {}...&quot;</span>, <span class="self">self</span>.<span class="ident">host</span>);
                                         <span class="kw">return</span>;
                                     }
                                 }
-                                <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">break</span>,
+                                <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="kw">break</span>,
                             },
-                            <span class="prelude-val">Err</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                            <span class="prelude-val">Err</span>(<span class="ident">c</span>) =&gt; {
                                 <span class="kw">if</span> <span class="ident">c</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">is_closing</span> {
                                     <span class="macro">info!</span>(<span class="string">&quot;Closing connection to {}...&quot;</span>, <span class="self">self</span>.<span class="ident">host</span>);
                                     <span class="kw">return</span>;
@@ -1669,7 +1669,7 @@
                                 }
                             }
                         },
-                        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">break</span>,
+                        <span class="prelude-val">None</span> =&gt; <span class="kw">break</span>,
                     }
                 }
             }
@@ -1680,7 +1680,7 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">_send_keepalive</span><span class="op">&lt;</span><span class="ident">W</span>: <span class="ident">std::marker::Unpin</span> <span class="op">+</span> <span class="ident">tokio::io::AsyncWrite</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">sock_write</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">W</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), ()<span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), ()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="ident">proto::EPPMessage</span> {
             <span class="ident">message</span>: <span class="ident">proto::EPPMessageType::Hello</span> {},
         };
@@ -1691,14 +1691,14 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">delay</span> <span class="op">=</span> <span class="ident">Box::pin</span>(<span class="ident">tokio::time::sleep</span>(<span class="ident">tokio::time::Duration::new</span>(<span class="number">15</span>, <span class="number">0</span>)).<span class="ident">fuse</span>());
         <span class="macro">futures::pin_mut!</span>(<span class="ident">receiver</span>);
         <span class="kw">let</span> <span class="ident">resp</span> <span class="op">=</span> <span class="macro">futures::select!</span> {
-            <span class="ident">r</span> <span class="op">=</span> <span class="ident">receiver</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
-            <span class="kw">_</span> <span class="op">=</span> <span class="ident">delay</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">r</span> <span class="op">=</span> <span class="ident">receiver</span> =&gt; <span class="ident">r</span>,
+            <span class="kw">_</span> <span class="op">=</span> <span class="ident">delay</span> =&gt; {
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(());
             }
         };
         <span class="kw">match</span> <span class="ident">resp</span> {
-            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(()),
-            <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Ok</span>(()),
+            <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; {
                 <span class="macro">error!</span>(<span class="string">&quot;Failed to send hello keepalive command&quot;</span>);
                 <span class="prelude-val">Err</span>(())
             }
@@ -1709,77 +1709,77 @@
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">req</span>: <span class="ident">outer_router::RequestMessage</span>,
         <span class="ident">sock_write</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">W</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), ()<span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), ()<span class="op">&gt;</span> {
         <span class="kw">match</span> (
             <span class="ident">req</span>,
             <span class="self">self</span>.<span class="ident">nominet_tag_list_subordinate</span>,
             <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">nominet_dac_subordinate_client</span>,
         ) {
-            (<span class="ident">outer_router::RequestMessage::NominetTagList</span>(<span class="ident">t</span>), <span class="bool-val">false</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            (<span class="ident">outer_router::RequestMessage::NominetTagList</span>(<span class="ident">t</span>), <span class="bool-val">false</span>, <span class="kw">_</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">nominet_tag_list_subordinate_client</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">c</span>,
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(()),
+                    <span class="prelude-val">Some</span>(<span class="ident">c</span>) =&gt; <span class="ident">c</span>,
+                    <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(()),
                 };
                 <span class="kw">match</span> <span class="ident">client</span>
                     .<span class="ident">send</span>(<span class="ident">outer_router::RequestMessage::NominetTagList</span>(<span class="ident">t</span>))
                     .<span class="kw">await</span>
                 {
-                    <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(()),
-                    <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Ok</span>(()),
+                    <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
                         <span class="macro">warn!</span>(<span class="string">&quot;Failed to send to subordinate server: {}&quot;</span>, <span class="ident">e</span>);
                         <span class="prelude-val">Err</span>(())
                     }
                 }
             }
-            (<span class="ident">outer_router::RequestMessage::DomainCheck</span>(<span class="ident">t</span>), <span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="ident">dac_client</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">dac_client</span>
+            (<span class="ident">outer_router::RequestMessage::DomainCheck</span>(<span class="ident">t</span>), <span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="ident">dac_client</span>)) =&gt; <span class="kw">match</span> <span class="ident">dac_client</span>
                 .<span class="ident">send</span>(<span class="ident">outer_router::RequestMessage::DomainCheck</span>(<span class="ident">t</span>))
                 .<span class="kw">await</span>
             {
-                <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(()),
-                <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Ok</span>(()),
+                <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
                     <span class="macro">warn!</span>(<span class="string">&quot;Failed to send to subordinate DAC server: {}&quot;</span>, <span class="ident">e</span>);
                     <span class="prelude-val">Err</span>(())
                 }
             },
-            (<span class="ident">outer_router::RequestMessage::DACDomain</span>(<span class="ident">t</span>), <span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="ident">dac_client</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            (<span class="ident">outer_router::RequestMessage::DACDomain</span>(<span class="ident">t</span>), <span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="ident">dac_client</span>)) =&gt; {
                 <span class="kw">match</span> <span class="ident">dac_client</span>
                     .<span class="ident">send</span>(<span class="ident">outer_router::RequestMessage::DACDomain</span>(<span class="ident">t</span>))
                     .<span class="kw">await</span>
                 {
-                    <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(()),
-                    <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Ok</span>(()),
+                    <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
                         <span class="macro">warn!</span>(<span class="string">&quot;Failed to send to subordinate DAC server: {}&quot;</span>, <span class="ident">e</span>);
                         <span class="prelude-val">Err</span>(())
                     }
                 }
             }
-            (<span class="ident">outer_router::RequestMessage::DACUsage</span>(<span class="ident">t</span>), <span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="ident">dac_client</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            (<span class="ident">outer_router::RequestMessage::DACUsage</span>(<span class="ident">t</span>), <span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="ident">dac_client</span>)) =&gt; {
                 <span class="kw">match</span> <span class="ident">dac_client</span>
                     .<span class="ident">send</span>(<span class="ident">outer_router::RequestMessage::DACUsage</span>(<span class="ident">t</span>))
                     .<span class="kw">await</span>
                 {
-                    <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(()),
-                    <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Ok</span>(()),
+                    <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
                         <span class="macro">warn!</span>(<span class="string">&quot;Failed to send to subordinate DAC server: {}&quot;</span>, <span class="ident">e</span>);
                         <span class="prelude-val">Err</span>(())
                     }
                 }
             }
-            (<span class="ident">outer_router::RequestMessage::DACLimits</span>(<span class="ident">t</span>), <span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="ident">dac_client</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            (<span class="ident">outer_router::RequestMessage::DACLimits</span>(<span class="ident">t</span>), <span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="ident">dac_client</span>)) =&gt; {
                 <span class="kw">match</span> <span class="ident">dac_client</span>
                     .<span class="ident">send</span>(<span class="ident">outer_router::RequestMessage::DACLimits</span>(<span class="ident">t</span>))
                     .<span class="kw">await</span>
                 {
-                    <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(()),
-                    <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Ok</span>(()),
+                    <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
                         <span class="macro">warn!</span>(<span class="string">&quot;Failed to send to subordinate DAC server: {}&quot;</span>, <span class="ident">e</span>);
                         <span class="prelude-val">Err</span>(())
                     }
                 }
             }
-            (<span class="ident">outer_router::RequestMessage::Logout</span>(<span class="ident">t</span>), <span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            (<span class="ident">outer_router::RequestMessage::Logout</span>(<span class="ident">t</span>), <span class="kw">_</span>, <span class="kw">_</span>) =&gt; {
                 <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">nominet_tag_list_subordinate_client</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">client</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="prelude-val">Some</span>(<span class="ident">client</span>) =&gt; {
                         <span class="kw">let</span> (<span class="ident">sender</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">futures::channel::oneshot::channel</span>();
                         <span class="kw">match</span> <span class="ident">client</span>
                             .<span class="ident">send</span>(<span class="ident">outer_router::RequestMessage::Logout</span>(<span class="ident">Box::new</span>(
@@ -1789,17 +1789,17 @@
                             )))
                             .<span class="kw">await</span>
                         {
-                            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {}
-                            <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {}
+                            <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
                                 <span class="macro">warn!</span>(<span class="string">&quot;Failed to send to subordinate server: {}&quot;</span>, <span class="ident">e</span>);
                                 <span class="kw">return</span> <span class="prelude-val">Err</span>(());
                             }
                         }
                     }
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {}
+                    <span class="prelude-val">None</span> =&gt; {}
                 };
                 <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">nominet_dac_subordinate_client</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">dac_client</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="prelude-val">Some</span>(<span class="ident">dac_client</span>) =&gt; {
                         <span class="kw">let</span> (<span class="ident">sender</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">futures::channel::oneshot::channel</span>();
                         <span class="kw">match</span> <span class="ident">dac_client</span>
                             .<span class="ident">send</span>(<span class="ident">outer_router::RequestMessage::Logout</span>(<span class="ident">Box::new</span>(
@@ -1809,53 +1809,53 @@
                             )))
                             .<span class="kw">await</span>
                         {
-                            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {}
-                            <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {}
+                            <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
                                 <span class="macro">warn!</span>(<span class="string">&quot;Failed to send to subordinate DAC server: {}&quot;</span>, <span class="ident">e</span>);
                                 <span class="kw">return</span> <span class="prelude-val">Err</span>(());
                             }
                         }
                     }
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {}
+                    <span class="prelude-val">None</span> =&gt; {}
                 };
                 <span class="self">self</span>.<span class="ident">is_closing</span> <span class="op">=</span> <span class="bool-val">true</span>;
                 <span class="kw">match</span> <span class="self">self</span>
                     .<span class="ident">router</span>
                     .<span class="ident">handle_request</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">features</span>, <span class="ident">outer_router::RequestMessage::Logout</span>(<span class="ident">t</span>))
                 {
-                    <span class="prelude-val">Some</span>(((<span class="ident">command</span>, <span class="ident">extension</span>), <span class="ident">command_id</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="prelude-val">Some</span>(((<span class="ident">command</span>, <span class="ident">extension</span>), <span class="ident">command_id</span>)) =&gt; {
                         <span class="self">self</span>.<span class="ident">is_awaiting_response</span> <span class="op">=</span> <span class="bool-val">true</span>;
                         <span class="kw">match</span> <span class="self">self</span>
                             .<span class="ident">_send_command</span>(<span class="ident">command</span>, <span class="ident">extension</span>, <span class="ident">sock_write</span>, <span class="ident">command_id</span>)
                             .<span class="kw">await</span>
                         {
-                            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(()),
-                            <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(()),
+                            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Ok</span>(()),
+                            <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(()),
                         }
                     }
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(()),
+                    <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Ok</span>(()),
                 }
             }
-            (<span class="ident">req</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">router</span>.<span class="ident">handle_request</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">features</span>, <span class="ident">req</span>) {
-                <span class="prelude-val">Some</span>(((<span class="ident">command</span>, <span class="ident">extension</span>), <span class="ident">command_id</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            (<span class="ident">req</span>, <span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="kw">match</span> <span class="self">self</span>.<span class="ident">router</span>.<span class="ident">handle_request</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">features</span>, <span class="ident">req</span>) {
+                <span class="prelude-val">Some</span>(((<span class="ident">command</span>, <span class="ident">extension</span>), <span class="ident">command_id</span>)) =&gt; {
                     <span class="self">self</span>.<span class="ident">is_awaiting_response</span> <span class="op">=</span> <span class="bool-val">true</span>;
                     <span class="kw">match</span> <span class="self">self</span>
                         .<span class="ident">_send_command</span>(<span class="ident">command</span>, <span class="ident">extension</span>, <span class="ident">sock_write</span>, <span class="ident">command_id</span>)
                         .<span class="kw">await</span>
                     {
-                        <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(()),
-                        <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(()),
+                        <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Ok</span>(()),
+                        <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(()),
                     }
                 }
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(()),
+                <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Ok</span>(()),
             },
         }
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">_handle_response</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">res</span>: <span class="ident">proto::EPPMessage</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, ()<span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">_handle_response</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">res</span>: <span class="ident">proto::EPPMessage</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, ()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">is_awaiting_response</span> <span class="op">=</span> <span class="bool-val">false</span>;
         <span class="kw">match</span> <span class="ident">res</span>.<span class="ident">message</span> {
-            <span class="ident">proto::EPPMessageType::Response</span>(<span class="ident">response</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">proto::EPPMessageType::Response</span>(<span class="ident">response</span>) =&gt; {
                 <span class="kw">if</span> <span class="op">!</span><span class="ident">response</span>.<span class="ident">is_success</span>() {
                     <span class="macro">warn!</span>(
                         <span class="string">&quot;Received failure result from {}: {}&quot;</span>,
@@ -1864,8 +1864,8 @@
                     );
                 }
                 <span class="kw">let</span> <span class="ident">transaction_id</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">response</span>.<span class="ident">transaction_id</span>.<span class="ident">client_transaction_id</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">i</span>,
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="prelude-val">Some</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>,
+                    <span class="prelude-val">None</span> =&gt; {
                         <span class="macro">error!</span>(
                             <span class="string">&quot;Received response without client transaction ID from {}&quot;</span>,
                             <span class="self">self</span>.<span class="ident">server_id</span>
@@ -1875,8 +1875,8 @@
                 };
                 <span class="kw">let</span> <span class="ident">is_closing</span> <span class="op">=</span> <span class="ident">response</span>.<span class="ident">is_closing</span>();
                 <span class="kw">let</span> <span class="ident">transaction_id</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">uuid::Uuid::parse_str</span>(<span class="ident">transaction_id</span>) {
-                    <span class="prelude-val">Ok</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">i</span>,
-                    <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="prelude-val">Ok</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>,
+                    <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
                         <span class="macro">error!</span>(
                             <span class="string">&quot;Received response with invalid transaction UUID from {}: {}&quot;</span>,
                             <span class="self">self</span>.<span class="ident">server_id</span>, <span class="ident">e</span>
@@ -1887,7 +1887,7 @@
                 <span class="self">self</span>.<span class="ident">router</span>.<span class="ident">handle_response</span>(<span class="kw-2">&amp;</span><span class="ident">transaction_id</span>, <span class="kw-2">*</span><span class="ident">response</span>);
                 <span class="prelude-val">Ok</span>(<span class="ident">is_closing</span>)
             }
-            <span class="ident">proto::EPPMessageType::Greeting</span>(<span class="ident">greeting</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">proto::EPPMessageType::Greeting</span>(<span class="ident">greeting</span>) =&gt; {
                 <span class="kw">if</span> (<span class="ident">greeting</span>.<span class="ident">server_date</span> <span class="op">-</span> <span class="ident">Utc::now</span>()).<span class="ident">num_minutes</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="number">5</span> {
                     <span class="macro">warn!</span>(
                         <span class="string">&quot;Local time out by more than 5 minutes from time reported by {}&quot;</span>,
@@ -1896,7 +1896,7 @@
                 }
                 <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>)
             }
-            <span class="ident">o</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">o</span> =&gt; {
                 <span class="macro">warn!</span>(
                     <span class="string">&quot;Received unexpected response from {}: {:?}&quot;</span>,
                     <span class="self">self</span>.<span class="ident">server_id</span>, <span class="ident">o</span>
@@ -1909,10 +1909,10 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">_setup_connection</span>(
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">sock</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="kw">super</span>::epp_like::tls_client::TLSConnection</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">bool</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">bool</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident"><span class="kw">super</span>::epp_like::recv_msg</span>(<span class="ident">sock</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">host</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">log_dir</span>, <span class="ident">recv_msg</span>).<span class="kw">await</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">m</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">m</span>,
-            <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Ok</span>(<span class="ident">m</span>) =&gt; <span class="ident">m</span>,
+            <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; {
                 <span class="macro">info!</span>(<span class="string">&quot;Restarting connection...&quot;</span>);
                 <span class="self">self</span>.<span class="ident">_close</span>(<span class="ident">sock</span>).<span class="kw">await</span>;
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="bool-val">false</span>);
@@ -1923,8 +1923,8 @@
             <span class="self">self</span>.<span class="ident">server_id</span> <span class="op">=</span> <span class="ident">greeting</span>.<span class="ident">server_id</span>.<span class="ident">clone</span>();
             <span class="macro">info!</span>(<span class="string">&quot;Connection open with: {}&quot;</span>, <span class="self">self</span>.<span class="ident">server_id</span>);
             <span class="kw">match</span> <span class="self">self</span>.<span class="ident">_process_greeting</span>(<span class="ident">greeting</span>).<span class="kw">await</span> {
-                <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {}
-                <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {}
+                <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; {
                     <span class="macro">info!</span>(<span class="string">&quot;Will not attempt to reopen connection&quot;</span>);
                     <span class="self">self</span>.<span class="ident">_close</span>(<span class="ident">sock</span>).<span class="kw">await</span>;
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="bool-val">true</span>);
@@ -1932,8 +1932,8 @@
             }
 
             <span class="kw">match</span> <span class="self">self</span>.<span class="ident">_login</span>(<span class="ident">sock</span>).<span class="kw">await</span> {
-                <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {}
-                <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {}
+                <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; {
                     <span class="macro">info!</span>(<span class="string">&quot;Restarting connection...&quot;</span>);
                     <span class="self">self</span>.<span class="ident">_close</span>(<span class="ident">sock</span>).<span class="kw">await</span>;
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="bool-val">false</span>);
@@ -1951,7 +1951,7 @@
         }
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">_process_greeting</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">greeting</span>: <span class="ident">proto::EPPGreeting</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), ()<span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">_process_greeting</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">greeting</span>: <span class="ident">proto::EPPGreeting</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), ()<span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="op">!</span><span class="ident">greeting</span>.<span class="ident">service_menu</span>.<span class="ident">versions</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="string">&quot;1.0&quot;</span>.<span class="ident">to_string</span>()) {
             <span class="macro">error!</span>(<span class="string">&quot;No common supported version with {}&quot;</span>, <span class="ident">greeting</span>.<span class="ident">server_id</span>);
             <span class="kw">return</span> <span class="prelude-val">Err</span>(());
@@ -2137,7 +2137,7 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">_login</span>(
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">sock</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="kw">super</span>::epp_like::tls_client::TLSConnection</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), ()<span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), ()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">objects</span> <span class="op">=</span> <span class="macro">vec!</span>[];
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ext_objects</span> <span class="op">=</span> <span class="macro">vec!</span>[];
 
@@ -2321,8 +2321,8 @@
                 )
                 .<span class="kw">await</span>
             {
-                <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>(()),
-                <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(()),
+                <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
                     <span class="kw">if</span> <span class="ident">e</span> {
                         <span class="kw">return</span> <span class="prelude-val">Err</span>(());
                     }
@@ -2333,8 +2333,8 @@
             .<span class="ident">_try_login</span>(<span class="self">self</span>.<span class="ident">password</span>.<span class="ident">clone</span>(), <span class="prelude-val">None</span>, <span class="ident">objects</span>, <span class="ident">ext_objects</span>, <span class="ident">sock</span>)
             .<span class="kw">await</span>
         {
-            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(()),
-            <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(()),
+            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Ok</span>(()),
+            <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(()),
         }
     }
 
@@ -2345,7 +2345,7 @@
         <span class="ident">objects</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
         <span class="ident">ext_objects</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
         <span class="ident">sock</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="kw">super</span>::epp_like::tls_client::TLSConnection</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">bool</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">bool</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">command</span> <span class="op">=</span> <span class="ident">proto::EPPLogin</span> {
             <span class="ident">client_id</span>: <span class="self">self</span>.<span class="ident">tag</span>.<span class="ident">clone</span>(),
             <span class="ident">password</span>: <span class="ident">String::new</span>(),
@@ -2383,8 +2383,8 @@
                             <span class="ident"><span class="kw">crate</span>::built_info::GIT_VERSION</span>.<span class="ident">unwrap_or</span>(<span class="string">&quot;unknown&quot;</span>)
                         )),
                         <span class="ident">os</span>: <span class="kw">match</span> (<span class="ident">sys_info::os_type</span>(), <span class="ident">sys_info::os_release</span>()) {
-                            (<span class="prelude-val">Ok</span>(<span class="ident">t</span>), <span class="prelude-val">Ok</span>(<span class="ident">r</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;{} {}&quot;</span>, <span class="ident">t</span>, <span class="ident">r</span>)),
-                            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+                            (<span class="prelude-val">Ok</span>(<span class="ident">t</span>), <span class="prelude-val">Ok</span>(<span class="ident">r</span>)) =&gt; <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;{} {}&quot;</span>, <span class="ident">t</span>, <span class="ident">r</span>)),
+                            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
                         },
                     }),
                 },
@@ -2400,26 +2400,26 @@
             .<span class="ident">_send_command</span>(<span class="ident">proto::EPPCommandType::Login</span>(<span class="ident">command</span>), <span class="ident">ext</span>, <span class="ident">sock</span>, <span class="prelude-val">None</span>)
             .<span class="kw">await</span>
         {
-            <span class="prelude-val">Ok</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">i</span>,
-            <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Ok</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>,
+            <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; {
                 <span class="macro">error!</span>(<span class="string">&quot;Failed to send login command&quot;</span>);
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="bool-val">true</span>);
             }
         };
         <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident"><span class="kw">super</span>::epp_like::recv_msg</span>(<span class="ident">sock</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">host</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">log_dir</span>, <span class="ident">recv_msg</span>).<span class="kw">await</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">msg</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">msg</span>,
-            <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Ok</span>(<span class="ident">msg</span>) =&gt; <span class="ident">msg</span>,
+            <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; {
                 <span class="macro">error!</span>(<span class="string">&quot;Failed to receive login response&quot;</span>);
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="bool-val">true</span>);
             }
         };
         <span class="kw">if</span> <span class="kw">let</span> <span class="ident">proto::EPPMessageType::Response</span>(<span class="ident">response</span>) <span class="op">=</span> <span class="ident">msg</span>.<span class="ident">message</span> {
             <span class="kw">let</span> <span class="ident">login_sec_info</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">response</span>.<span class="ident">extension</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">ext</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ext</span>.<span class="ident">value</span>.<span class="ident">iter</span>().<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">p</span> {
-                    <span class="ident">proto::EPPResponseExtensionType::EPPLoginSecurityData</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>),
-                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+                <span class="prelude-val">Some</span>(<span class="ident">ext</span>) =&gt; <span class="ident">ext</span>.<span class="ident">value</span>.<span class="ident">iter</span>().<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">p</span> {
+                    <span class="ident">proto::EPPResponseExtensionType::EPPLoginSecurityData</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">i</span>),
+                    <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
                 }),
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+                <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
             };
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">login_sec</span>) <span class="op">=</span> <span class="ident">login_sec_info</span> {
                 <span class="kw">for</span> <span class="ident">event</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">login_sec</span>.<span class="ident">events</span> {
@@ -2440,8 +2440,8 @@
                         <span class="ident">msg</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;, message: \&quot;{}\&quot;&quot;</span>, <span class="ident">event_msg</span>));
                     }
                     <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">event</span>.<span class="ident">level</span> {
-                        <span class="ident">proto::login_sec::EPPLoginSecurityEventLevel::Warning</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">warn!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">msg</span>),
-                        <span class="ident">proto::login_sec::EPPLoginSecurityEventLevel::Error</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">error!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">msg</span>),
+                        <span class="ident">proto::login_sec::EPPLoginSecurityEventLevel::Warning</span> =&gt; <span class="macro">warn!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">msg</span>),
+                        <span class="ident">proto::login_sec::EPPLoginSecurityEventLevel::Error</span> =&gt; <span class="macro">error!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">msg</span>),
                     }
                 }
             }
@@ -2475,10 +2475,10 @@
         <span class="ident">extension</span>: <span class="ident">E</span>,
         <span class="ident">sock</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">W</span>,
         <span class="ident">message_id</span>: <span class="ident">M</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">uuid::Uuid</span>, ()<span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">uuid::Uuid</span>, ()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">message_id</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">message_id</span>.<span class="ident">into</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">m</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">m</span>,
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">uuid::Uuid::new_v4</span>(),
+            <span class="prelude-val">Some</span>(<span class="ident">m</span>) =&gt; <span class="ident">m</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="ident">uuid::Uuid::new_v4</span>(),
         };
         <span class="kw">let</span> <span class="ident">command</span> <span class="op">=</span> <span class="ident">proto::EPPCommand</span> {
             <span class="ident">command</span>,
@@ -2491,8 +2491,8 @@
             <span class="ident">message</span>: <span class="ident">proto::EPPMessageType::Command</span>(<span class="ident">Box::new</span>(<span class="ident">command</span>)),
         };
         <span class="kw">match</span> <span class="ident"><span class="kw">super</span>::epp_like::send_msg</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">host</span>, <span class="ident">sock</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">log_dir</span>, <span class="ident">send_msg</span>, <span class="kw-2">&amp;</span><span class="ident">message</span>).<span class="kw">await</span> {
-            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">message_id</span>),
-            <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(()),
+            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">message_id</span>),
+            <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(()),
         }
     }
 
@@ -2505,24 +2505,24 @@
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_logout</span>(
     <span class="ident">_client</span>: <span class="kw-2">&amp;</span><span class="ident">ServerFeatures</span>,
     <span class="ident">_req</span>: <span class="kw-2">&amp;</span><span class="ident">LogoutRequest</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">router::HandleReqReturn</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+) -&gt; <span class="ident">router::HandleReqReturn</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="prelude-val">Ok</span>((<span class="ident">proto::EPPCommandType::Logout</span> {}, <span class="prelude-val">None</span>))
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_logout_response</span>(<span class="ident">_response</span>: <span class="ident">proto::EPPResponse</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">super</span>::Response</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_logout_response</span>(<span class="ident">_response</span>: <span class="ident">proto::EPPResponse</span>) -&gt; <span class="ident"><span class="kw">super</span>::Response</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="ident"><span class="kw">super</span>::Response::Ok</span>(())
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">proto::EPPTransferStatus</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident"><span class="kw">super</span>::TransferStatus</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">proto::EPPTransferStatus</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">proto::EPPTransferStatus</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">use</span> <span class="ident">proto::EPPTransferStatus</span>;
         <span class="kw">match</span> <span class="ident">from</span> {
-            <span class="ident">EPPTransferStatus::ClientApproved</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="kw">super</span>::TransferStatus::ClientApproved</span>,
-            <span class="ident">EPPTransferStatus::ClientCancelled</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="kw">super</span>::TransferStatus::ClientCancelled</span>,
-            <span class="ident">EPPTransferStatus::ClientRejected</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="kw">super</span>::TransferStatus::ClientRejected</span>,
-            <span class="ident">EPPTransferStatus::Pending</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="kw">super</span>::TransferStatus::Pending</span>,
-            <span class="ident">EPPTransferStatus::ServerApproved</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="kw">super</span>::TransferStatus::ServerApproved</span>,
-            <span class="ident">EPPTransferStatus::ServerCancelled</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="kw">super</span>::TransferStatus::ServerCancelled</span>,
+            <span class="ident">EPPTransferStatus::ClientApproved</span> =&gt; <span class="ident"><span class="kw">super</span>::TransferStatus::ClientApproved</span>,
+            <span class="ident">EPPTransferStatus::ClientCancelled</span> =&gt; <span class="ident"><span class="kw">super</span>::TransferStatus::ClientCancelled</span>,
+            <span class="ident">EPPTransferStatus::ClientRejected</span> =&gt; <span class="ident"><span class="kw">super</span>::TransferStatus::ClientRejected</span>,
+            <span class="ident">EPPTransferStatus::Pending</span> =&gt; <span class="ident"><span class="kw">super</span>::TransferStatus::Pending</span>,
+            <span class="ident">EPPTransferStatus::ServerApproved</span> =&gt; <span class="ident"><span class="kw">super</span>::TransferStatus::ServerApproved</span>,
+            <span class="ident">EPPTransferStatus::ServerCancelled</span> =&gt; <span class="ident"><span class="kw">super</span>::TransferStatus::ServerCancelled</span>,
         }
     }
 }

@@ -90,14 +90,14 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">DACRequest</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">DACRequest</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">DACRequest</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="ident">from</span> {
-            <span class="ident">DACRequest::Domain</span>(<span class="ident">d</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">DACRequest::Domain</span>(<span class="ident">d</span>) =&gt; {
                 <span class="kw">return</span> [<span class="ident">d</span>.<span class="ident">trim_start_matches</span>(<span class="string">&#39;#&#39;</span>).<span class="ident">as_bytes</span>(), <span class="kw-2">&amp;</span>[<span class="number">0xd</span>, <span class="number">0xa</span>]].<span class="ident">concat</span>()
             }
-            <span class="ident">DACRequest::Usage</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">b&quot;#usage\r\n&quot;</span>.<span class="ident">to_vec</span>(),
-            <span class="ident">DACRequest::Limits</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">b&quot;#limits\r\n&quot;</span>.<span class="ident">to_vec</span>(),
-            <span class="ident">DACRequest::Exit</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">b&quot;#exit\r\n&quot;</span>.<span class="ident">to_vec</span>(),
+            <span class="ident">DACRequest::Usage</span> =&gt; <span class="string">b&quot;#usage\r\n&quot;</span>.<span class="ident">to_vec</span>(),
+            <span class="ident">DACRequest::Limits</span> =&gt; <span class="string">b&quot;#limits\r\n&quot;</span>.<span class="ident">to_vec</span>(),
+            <span class="ident">DACRequest::Exit</span> =&gt; <span class="string">b&quot;#exit\r\n&quot;</span>.<span class="ident">to_vec</span>(),
         }
     }
 }

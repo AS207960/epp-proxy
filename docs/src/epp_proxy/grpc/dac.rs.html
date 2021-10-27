@@ -55,15 +55,15 @@
 <span id="55">55</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">client</span>, <span class="ident">epp_proto</span>};
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">env_from_i32</span>(<span class="ident">from</span>: <span class="ident">i32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">client::dac::DACEnv</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">env_from_i32</span>(<span class="ident">from</span>: <span class="ident">i32</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">client::dac::DACEnv</span><span class="op">&gt;</span> {
     <span class="ident">epp_proto::dac::Environment::from_i32</span>(<span class="ident">from</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">e</span> {
-        <span class="ident">epp_proto::dac::Environment::RealTime</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">client::dac::DACEnv::RealTime</span>,
-        <span class="ident">epp_proto::dac::Environment::TimeDelay</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">client::dac::DACEnv::TimeDelay</span>,
+        <span class="ident">epp_proto::dac::Environment::RealTime</span> =&gt; <span class="ident">client::dac::DACEnv::RealTime</span>,
+        <span class="ident">epp_proto::dac::Environment::TimeDelay</span> =&gt; <span class="ident">client::dac::DACEnv::TimeDelay</span>,
     })
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">client::dac::DACUsageResponse</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">epp_proto::dac::UsageResponse</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">res</span>: <span class="ident">client::dac::DACUsageResponse</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">res</span>: <span class="ident">client::dac::DACUsageResponse</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">epp_proto::dac::UsageResponse</span> {
             <span class="ident">usage_60</span>: <span class="ident">res</span>.<span class="ident">usage_60</span>,
             <span class="ident">usage_24</span>: <span class="ident">res</span>.<span class="ident">usage_24</span>,
@@ -72,19 +72,19 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">client::dac::DACDomainResponse</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">epp_proto::dac::DomainResponse</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">res</span>: <span class="ident">client::dac::DACDomainResponse</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">res</span>: <span class="ident">client::dac::DACDomainResponse</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">epp_proto::dac::DomainResponse</span> {
             <span class="ident">registration_state</span>: <span class="kw">match</span> <span class="ident">res</span>.<span class="ident">registration_state</span> {
-                <span class="ident">client::dac::DomainState::Registered</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">client::dac::DomainState::Registered</span> =&gt; {
                     <span class="ident">epp_proto::dac::DomainState::Registered</span>.<span class="ident">into</span>()
                 }
-                <span class="ident">client::dac::DomainState::Available</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">client::dac::DomainState::Available</span> =&gt; {
                     <span class="ident">epp_proto::dac::DomainState::Available</span>.<span class="ident">into</span>()
                 }
-                <span class="ident">client::dac::DomainState::NotWithinRegistry</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">client::dac::DomainState::NotWithinRegistry</span> =&gt; {
                     <span class="ident">epp_proto::dac::DomainState::NotWithinRegistry</span>.<span class="ident">into</span>()
                 }
-                <span class="ident">client::dac::DomainState::RulesPrevent</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">client::dac::DomainState::RulesPrevent</span> =&gt; {
                     <span class="ident">epp_proto::dac::DomainState::RulesPrevent</span>.<span class="ident">into</span>()
                 }
             },
@@ -92,14 +92,14 @@
             <span class="ident">created</span>: <span class="ident"><span class="kw">super</span>::utils::chrono_to_proto</span>(<span class="prelude-val">Some</span>(<span class="ident">res</span>.<span class="ident">created</span>.<span class="ident">and_hms</span>(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>))),
             <span class="ident">expiry</span>: <span class="ident"><span class="kw">super</span>::utils::chrono_to_proto</span>(<span class="prelude-val">Some</span>(<span class="ident">res</span>.<span class="ident">expiry</span>.<span class="ident">and_hms</span>(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>))),
             <span class="ident">status</span>: <span class="kw">match</span> <span class="ident">res</span>.<span class="ident">status</span> {
-                <span class="ident">client::dac::DomainStatus::Unknown</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">epp_proto::dac::DomainStatus::Unknown</span>.<span class="ident">into</span>(),
-                <span class="ident">client::dac::DomainStatus::RegisteredUntilExpiry</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">client::dac::DomainStatus::Unknown</span> =&gt; <span class="ident">epp_proto::dac::DomainStatus::Unknown</span>.<span class="ident">into</span>(),
+                <span class="ident">client::dac::DomainStatus::RegisteredUntilExpiry</span> =&gt; {
                     <span class="ident">epp_proto::dac::DomainStatus::RegisteredUntilExpiry</span>.<span class="ident">into</span>()
                 }
-                <span class="ident">client::dac::DomainStatus::RenewalRequired</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">client::dac::DomainStatus::RenewalRequired</span> =&gt; {
                     <span class="ident">epp_proto::dac::DomainStatus::RenewalRequired</span>.<span class="ident">into</span>()
                 }
-                <span class="ident">client::dac::DomainStatus::NoLongerRequired</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">client::dac::DomainStatus::NoLongerRequired</span> =&gt; {
                     <span class="ident">epp_proto::dac::DomainStatus::NoLongerRequired</span>.<span class="ident">into</span>()
                 }
             },

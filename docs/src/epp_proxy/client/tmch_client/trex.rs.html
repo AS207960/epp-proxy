@@ -127,7 +127,7 @@
 <span class="kw">use</span> <span class="ident">std::convert::TryInto</span>;
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">tmch_proto::trex::TrexInfo</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">TrexInfo</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">tmch_proto::trex::TrexInfo</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">tmch_proto::trex::TrexInfo</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">TrexInfo</span> {
             <span class="ident">enabled</span>: <span class="ident">from</span>.<span class="ident">enable</span>,
             <span class="ident">until</span>: <span class="ident">from</span>.<span class="ident">until</span>,
@@ -137,7 +137,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">tmch_proto::trex::TLDInfo</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">TrexTLD</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">tmch_proto::trex::TLDInfo</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">tmch_proto::trex::TLDInfo</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">TrexTLD</span> {
             <span class="ident">tld</span>: <span class="ident">from</span>.<span class="ident">tld</span>,
             <span class="ident">comment</span>: <span class="ident">from</span>.<span class="ident">comment</span>,
@@ -149,7 +149,7 @@
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_trex_activate</span>(
     <span class="ident">_client</span>: <span class="kw-2">&amp;</span>(),
     <span class="ident">req</span>: <span class="kw-2">&amp;</span><span class="ident">TrexActivateRequest</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HandleReqReturn</span><span class="op">&lt;</span><span class="ident">TrexActivateResponse</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">HandleReqReturn</span><span class="op">&lt;</span><span class="ident">TrexActivateResponse</span><span class="op">&gt;</span> {
     <span class="ident"><span class="kw">super</span>::mark::check_mark_id</span>(<span class="kw-2">&amp;</span><span class="ident">req</span>.<span class="ident">id</span>)<span class="question-mark">?</span>;
     <span class="kw">let</span> <span class="ident">command</span> <span class="op">=</span> <span class="ident">tmch_proto::TMCHUpdate</span> {
         <span class="ident">id</span>: <span class="ident">req</span>.<span class="ident">id</span>.<span class="ident">clone</span>(),
@@ -168,8 +168,8 @@
                         <span class="ident">claims_notify</span>: <span class="prelude-val">None</span>,
                         <span class="ident">trex_activate</span>: <span class="prelude-val">Some</span>(<span class="ident">tmch_proto::trex::Activate</span> {
                             <span class="ident">period</span>: <span class="kw">match</span> <span class="ident">l</span>.<span class="ident">period</span>.<span class="ident">as_ref</span>() {
-                                <span class="prelude-val">Some</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">r</span>.<span class="ident">try_into</span>().<span class="ident">map_err</span>(<span class="ident">Result::Err</span>)<span class="question-mark">?</span>),
-                                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+                                <span class="prelude-val">Some</span>(<span class="ident">r</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">r</span>.<span class="ident">try_into</span>().<span class="ident">map_err</span>(<span class="ident">Result::Err</span>)<span class="question-mark">?</span>),
+                                <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
                             },
                         }),
                         <span class="ident">trex_renew</span>: <span class="prelude-val">None</span>,
@@ -184,17 +184,17 @@
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_trex_activate_response</span>(
     <span class="ident">response</span>: <span class="ident">tmch_proto::TMCHResponse</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">TrexActivateResponse</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">TrexActivateResponse</span><span class="op">&gt;</span> {
     <span class="kw">match</span> <span class="ident">response</span>.<span class="ident">data</span> {
-        <span class="prelude-val">Some</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Response::Ok</span>(<span class="ident">TrexActivateResponse</span> {}),
+        <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
+        <span class="prelude-val">None</span> =&gt; <span class="ident">Response::Ok</span>(<span class="ident">TrexActivateResponse</span> {}),
     }
 }
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_trex_renew</span>(
     <span class="ident">_client</span>: <span class="kw-2">&amp;</span>(),
     <span class="ident">req</span>: <span class="kw-2">&amp;</span><span class="ident">TrexRenewRequest</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HandleReqReturn</span><span class="op">&lt;</span><span class="ident">TrexRenewResponse</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">HandleReqReturn</span><span class="op">&lt;</span><span class="ident">TrexRenewResponse</span><span class="op">&gt;</span> {
     <span class="ident"><span class="kw">super</span>::mark::check_mark_id</span>(<span class="kw-2">&amp;</span><span class="ident">req</span>.<span class="ident">id</span>)<span class="question-mark">?</span>;
     <span class="kw">let</span> <span class="ident">command</span> <span class="op">=</span> <span class="ident">tmch_proto::TMCHUpdate</span> {
         <span class="ident">id</span>: <span class="ident">req</span>.<span class="ident">id</span>.<span class="ident">clone</span>(),
@@ -215,8 +215,8 @@
                         <span class="ident">trex_renew</span>: <span class="prelude-val">Some</span>(<span class="ident">tmch_proto::trex::Renew</span> {
                             <span class="ident">current_expiry_date</span>: <span class="ident">l</span>.<span class="ident">current_expiry_date</span>,
                             <span class="ident">period</span>: <span class="kw">match</span> <span class="ident">l</span>.<span class="ident">period</span>.<span class="ident">as_ref</span>() {
-                                <span class="prelude-val">Some</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">r</span>.<span class="ident">try_into</span>().<span class="ident">map_err</span>(<span class="ident">Result::Err</span>)<span class="question-mark">?</span>),
-                                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+                                <span class="prelude-val">Some</span>(<span class="ident">r</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">r</span>.<span class="ident">try_into</span>().<span class="ident">map_err</span>(<span class="ident">Result::Err</span>)<span class="question-mark">?</span>),
+                                <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
                             },
                         }),
                     })
@@ -230,10 +230,10 @@
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_trex_renew_response</span>(
     <span class="ident">response</span>: <span class="ident">tmch_proto::TMCHResponse</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">TrexRenewResponse</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">TrexRenewResponse</span><span class="op">&gt;</span> {
     <span class="kw">match</span> <span class="ident">response</span>.<span class="ident">data</span> {
-        <span class="prelude-val">Some</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Response::Ok</span>(<span class="ident">TrexRenewResponse</span> {}),
+        <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
+        <span class="prelude-val">None</span> =&gt; <span class="ident">Response::Ok</span>(<span class="ident">TrexRenewResponse</span> {}),
     }
 }
 </code></pre></div>

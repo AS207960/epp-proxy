@@ -322,7 +322,7 @@
 <span class="kw">impl</span> <span class="ident"><span class="kw">super</span>::Client</span> <span class="kw">for</span> <span class="ident">DACClient</span> {
     <span class="comment">// Starts up the DAC client and returns the sending end of a tokio channel to inject</span>
     <span class="comment">// commands into the client to be processed</span>
-    <span class="kw">fn</span> <span class="ident">start</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">futures::channel::mpsc::Sender</span><span class="op">&lt;</span><span class="ident">RequestMessage</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">start</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>) -&gt; <span class="ident">futures::channel::mpsc::Sender</span><span class="op">&lt;</span><span class="ident">RequestMessage</span><span class="op">&gt;</span> {
         <span class="macro">info!</span>(
             <span class="string">&quot;DAC Client for {} and {} starting...&quot;</span>,
             <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">rt_host</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">td_host</span>
@@ -341,7 +341,7 @@
     <span class="doccomment">/// # Arguments</span>
     <span class="doccomment">/// * `rt_host` - Hostname and port of the real time server</span>
     <span class="doccomment">/// * `td_host` - Hostname and port of the time delay server</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">rt_host</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">td_host</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::io::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">rt_host</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">td_host</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">std::io::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
             <span class="ident">router</span>: <span class="ident">outer_router::Router::default</span>(),
             <span class="ident">is_closing</span>: <span class="bool-val">false</span>,
@@ -366,16 +366,16 @@
 
                 <span class="kw">loop</span> {
                     <span class="macro">futures::select!</span> {
-                        <span class="ident">x</span> <span class="op">=</span> <span class="ident">receiver</span>.<span class="ident">next</span>() <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="ident">x</span> <span class="op">=</span> <span class="ident">receiver</span>.<span class="ident">next</span>() =&gt; {
                             <span class="kw">match</span> <span class="ident">x</span> {
-                                <span class="prelude-val">Some</span>(<span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">outer_router::Router</span>::<span class="op">&lt;</span><span class="ident">router::Router</span>, ()<span class="op">&gt;</span><span class="ident">::reject_request</span>(<span class="ident">x</span>),
-                                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+                                <span class="prelude-val">Some</span>(<span class="ident">x</span>) =&gt; <span class="ident">outer_router::Router</span>::<span class="op">&lt;</span><span class="ident">router::Router</span>, ()<span class="op">&gt;</span><span class="ident">::reject_request</span>(<span class="ident">x</span>),
+                                <span class="prelude-val">None</span> =&gt; {
                                     <span class="macro">info!</span>(<span class="string">&quot;All senders for {}/{} dropped, exiting...&quot;</span>, <span class="self">self</span>.<span class="ident">rt_host</span>, <span class="self">self</span>.<span class="ident">td_host</span>);
                                     <span class="kw">return</span>
                                 }
                             };
                         }
-                        <span class="ident">s</span> <span class="op">=</span> <span class="ident">connect_fut</span> <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="ident">s</span> <span class="op">=</span> <span class="ident">connect_fut</span> =&gt; {
                             <span class="kw">break</span> <span class="ident">s</span>;
                         }
                     }
@@ -401,59 +401,59 @@
             <span class="macro">trace!</span>(<span class="string">&quot;Entering event loop for {}/{}&quot;</span>, <span class="self">self</span>.<span class="ident">rt_host</span>, <span class="self">self</span>.<span class="ident">td_host</span>);
             <span class="kw">loop</span> {
                 <span class="macro">futures::select!</span> {
-                    <span class="ident">r</span> <span class="op">=</span> <span class="ident">receiver</span>.<span class="ident">next</span>() <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident">r</span> <span class="op">=</span> <span class="ident">receiver</span>.<span class="ident">next</span>() =&gt; {
                         <span class="kw">match</span> <span class="ident">r</span> {
-                            <span class="prelude-val">Some</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">_handle_request</span>(<span class="ident">r</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">rt_sock_write</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">td_sock_write</span>).<span class="kw">await</span> {
-                                <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {},
-                                <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                            <span class="prelude-val">Some</span>(<span class="ident">r</span>) =&gt; <span class="kw">match</span> <span class="self">self</span>.<span class="ident">_handle_request</span>(<span class="ident">r</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">rt_sock_write</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">td_sock_write</span>).<span class="kw">await</span> {
+                                <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {},
+                                <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; {
                                     <span class="ident">tokio::time::sleep</span>(<span class="ident">tokio::time::Duration::new</span>(<span class="number">5</span>, <span class="number">0</span>)).<span class="kw">await</span>;
                                     <span class="kw">break</span>;
                                 }
                             },
-                            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+                            <span class="prelude-val">None</span> =&gt; {
                                 <span class="macro">info!</span>(<span class="string">&quot;All senders for {}/{} dropped, exiting...&quot;</span>, <span class="self">self</span>.<span class="ident">rt_host</span>, <span class="self">self</span>.<span class="ident">td_host</span>);
                                 <span class="kw">return</span>
                             }
                         };
                     }
-                    <span class="ident">m</span> <span class="op">=</span> <span class="ident">rt_message_channel</span>.<span class="ident">next</span>() <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident">m</span> <span class="op">=</span> <span class="ident">rt_message_channel</span>.<span class="ident">next</span>() =&gt; {
                         <span class="kw">match</span> <span class="ident">m</span> {
-                            <span class="prelude-val">Some</span>(<span class="ident">m</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">m</span> {
-                                <span class="prelude-val">Ok</span>(<span class="ident">m</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">_handle_rt_response</span>(<span class="ident">m</span>).<span class="kw">await</span> {
-                                    <span class="prelude-val">Ok</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">if</span> <span class="ident">c</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">is_closing</span> {
+                            <span class="prelude-val">Some</span>(<span class="ident">m</span>) =&gt; <span class="kw">match</span> <span class="ident">m</span> {
+                                <span class="prelude-val">Ok</span>(<span class="ident">m</span>) =&gt; <span class="kw">match</span> <span class="self">self</span>.<span class="ident">_handle_rt_response</span>(<span class="ident">m</span>).<span class="kw">await</span> {
+                                    <span class="prelude-val">Ok</span>(<span class="ident">c</span>) =&gt; <span class="kw">if</span> <span class="ident">c</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">is_closing</span> {
                                         <span class="macro">info!</span>(<span class="string">&quot;Closing connection to {}...&quot;</span>, <span class="self">self</span>.<span class="ident">rt_host</span>);
                                         <span class="kw">return</span>
                                     },
-                                    <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">break</span>
+                                    <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="kw">break</span>
                                 },
-                                <span class="prelude-val">Err</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">if</span> <span class="ident">c</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">is_closing</span> {
+                                <span class="prelude-val">Err</span>(<span class="ident">c</span>) =&gt; <span class="kw">if</span> <span class="ident">c</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">is_closing</span> {
                                     <span class="macro">info!</span>(<span class="string">&quot;Closing connection to {}...&quot;</span>, <span class="self">self</span>.<span class="ident">rt_host</span>);
                                     <span class="kw">return</span>
                                 } <span class="kw">else</span> {
                                     <span class="kw">break</span>
                                 }
                             },
-                            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">break</span>
+                            <span class="prelude-val">None</span> =&gt; <span class="kw">break</span>
                         }
                     }
-                    <span class="ident">m</span> <span class="op">=</span> <span class="ident">td_message_channel</span>.<span class="ident">next</span>() <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident">m</span> <span class="op">=</span> <span class="ident">td_message_channel</span>.<span class="ident">next</span>() =&gt; {
                         <span class="kw">match</span> <span class="ident">m</span> {
-                            <span class="prelude-val">Some</span>(<span class="ident">m</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">m</span> {
-                                <span class="prelude-val">Ok</span>(<span class="ident">m</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">_handle_td_response</span>(<span class="ident">m</span>).<span class="kw">await</span> {
-                                    <span class="prelude-val">Ok</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">if</span> <span class="ident">c</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">is_closing</span> {
+                            <span class="prelude-val">Some</span>(<span class="ident">m</span>) =&gt; <span class="kw">match</span> <span class="ident">m</span> {
+                                <span class="prelude-val">Ok</span>(<span class="ident">m</span>) =&gt; <span class="kw">match</span> <span class="self">self</span>.<span class="ident">_handle_td_response</span>(<span class="ident">m</span>).<span class="kw">await</span> {
+                                    <span class="prelude-val">Ok</span>(<span class="ident">c</span>) =&gt; <span class="kw">if</span> <span class="ident">c</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">is_closing</span> {
                                         <span class="macro">info!</span>(<span class="string">&quot;Closing connection to {}...&quot;</span>, <span class="self">self</span>.<span class="ident">td_host</span>);
                                         <span class="kw">return</span>
                                     },
-                                    <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">break</span>
+                                    <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="kw">break</span>
                                 },
-                                <span class="prelude-val">Err</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">if</span> <span class="ident">c</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">is_closing</span> {
+                                <span class="prelude-val">Err</span>(<span class="ident">c</span>) =&gt; <span class="kw">if</span> <span class="ident">c</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">is_closing</span> {
                                     <span class="macro">info!</span>(<span class="string">&quot;Closing connection to {}...&quot;</span>, <span class="self">self</span>.<span class="ident">td_host</span>);
                                     <span class="kw">return</span>
                                 } <span class="kw">else</span> {
                                     <span class="kw">break</span>
                                 }
                             },
-                            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">break</span>
+                            <span class="prelude-val">None</span> =&gt; <span class="kw">break</span>
                         }
                     }
                 }
@@ -467,24 +467,24 @@
         <span class="ident">req</span>: <span class="ident">outer_router::RequestMessage</span>,
         <span class="ident">rt_sock_write</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">W</span>,
         <span class="ident">td_sock_write</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">W</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), ()<span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), ()<span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">router</span>.<span class="ident">handle_request</span>(<span class="kw-2">&amp;</span>(), <span class="ident">req</span>) {
-            <span class="prelude-val">Some</span>(((<span class="ident">command</span>, <span class="ident">env</span>), <span class="kw">_</span>)) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="kw">if</span> <span class="ident">env</span> <span class="op">=</span><span class="op">=</span> <span class="ident">router::DACEnv::RealTime</span> <span class="op">|</span><span class="op">|</span> <span class="ident">env</span> <span class="op">=</span><span class="op">=</span> <span class="ident">router::DACEnv::Both</span> {
+            <span class="prelude-val">Some</span>(((<span class="ident">command</span>, <span class="ident">env</span>), <span class="kw">_</span>)) =&gt; {
+                <span class="kw">if</span> <span class="ident">env</span> <span class="op">==</span> <span class="ident">router::DACEnv::RealTime</span> <span class="op">|</span><span class="op">|</span> <span class="ident">env</span> <span class="op">==</span> <span class="ident">router::DACEnv::Both</span> {
                     <span class="kw">match</span> <span class="self">self</span>.<span class="ident">_send_command</span>(<span class="ident">command</span>.<span class="ident">clone</span>(), <span class="ident">rt_sock_write</span>).<span class="kw">await</span> {
-                        <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {}
-                        <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(()),
+                        <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {}
+                        <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(()),
                     }
                 }
-                <span class="kw">if</span> <span class="ident">env</span> <span class="op">=</span><span class="op">=</span> <span class="ident">router::DACEnv::TimeDelay</span> <span class="op">|</span><span class="op">|</span> <span class="ident">env</span> <span class="op">=</span><span class="op">=</span> <span class="ident">router::DACEnv::Both</span> {
+                <span class="kw">if</span> <span class="ident">env</span> <span class="op">==</span> <span class="ident">router::DACEnv::TimeDelay</span> <span class="op">|</span><span class="op">|</span> <span class="ident">env</span> <span class="op">==</span> <span class="ident">router::DACEnv::Both</span> {
                     <span class="kw">match</span> <span class="self">self</span>.<span class="ident">_send_command</span>(<span class="ident">command</span>, <span class="ident">td_sock_write</span>).<span class="kw">await</span> {
-                        <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {}
-                        <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(()),
+                        <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {}
+                        <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(()),
                     }
                 }
                 <span class="prelude-val">Ok</span>(())
             }
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(()),
+            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Ok</span>(()),
         }
     }
 
@@ -492,31 +492,31 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">command</span>: <span class="ident">proto::DACRequest</span>,
         <span class="ident">sock</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">W</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), ()<span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), ()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">data</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">command</span>.<span class="ident">into</span>();
         <span class="kw">match</span> <span class="ident">sock</span>.<span class="ident">write_all</span>(<span class="kw-2">&amp;</span><span class="ident">data</span>).<span class="kw">await</span> {
-            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(()),
-            <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(()),
+            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Ok</span>(()),
+            <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(()),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">_get_cmd_line_from_response</span>(<span class="ident">res</span>: <span class="kw-2">&amp;</span><span class="ident">proto::DACResponse</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+    <span class="kw">fn</span> <span class="ident">_get_cmd_line_from_response</span>(<span class="ident">res</span>: <span class="kw-2">&amp;</span><span class="ident">proto::DACResponse</span>) -&gt; <span class="ident">String</span> {
         <span class="kw">match</span> <span class="ident">res</span> {
-            <span class="ident">proto::DACResponse::DomainRT</span>(<span class="ident">rt</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">rt</span>.<span class="ident">domain</span>.<span class="ident">clone</span>(),
-            <span class="ident">proto::DACResponse::DomainTD</span>(<span class="ident">td</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">td</span>.<span class="ident">domain</span>.<span class="ident">clone</span>(),
-            <span class="ident">proto::DACResponse::Aub</span>(<span class="ident">aub</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">aub</span>.<span class="ident">domain</span>.<span class="ident">clone</span>(),
-            <span class="ident">proto::DACResponse::Usage</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;#usage&quot;</span>.<span class="ident">to_string</span>(),
-            <span class="ident">proto::DACResponse::Limits</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;#limits&quot;</span>.<span class="ident">to_string</span>(),
+            <span class="ident">proto::DACResponse::DomainRT</span>(<span class="ident">rt</span>) =&gt; <span class="ident">rt</span>.<span class="ident">domain</span>.<span class="ident">clone</span>(),
+            <span class="ident">proto::DACResponse::DomainTD</span>(<span class="ident">td</span>) =&gt; <span class="ident">td</span>.<span class="ident">domain</span>.<span class="ident">clone</span>(),
+            <span class="ident">proto::DACResponse::Aub</span>(<span class="ident">aub</span>) =&gt; <span class="ident">aub</span>.<span class="ident">domain</span>.<span class="ident">clone</span>(),
+            <span class="ident">proto::DACResponse::Usage</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;#usage&quot;</span>.<span class="ident">to_string</span>(),
+            <span class="ident">proto::DACResponse::Limits</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;#limits&quot;</span>.<span class="ident">to_string</span>(),
         }
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">_handle_rt_response</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">res</span>: <span class="ident">proto::DACResponse</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, ()<span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">_handle_rt_response</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">res</span>: <span class="ident">proto::DACResponse</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, ()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">command_id</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">router</span>.<span class="ident">inner</span>.<span class="ident">command_map</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="ident">router::DACKey</span> {
             <span class="ident">env</span>: <span class="ident">router::DACEnv::RealTime</span>,
             <span class="ident">cmd</span>: <span class="ident"><span class="self">Self</span>::_get_cmd_line_from_response</span>(<span class="kw-2">&amp;</span><span class="ident">res</span>),
         }) {
-            <span class="prelude-val">Some</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">c</span>,
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">c</span>) =&gt; <span class="ident">c</span>,
+            <span class="prelude-val">None</span> =&gt; {
                 <span class="macro">warn!</span>(
                     <span class="string">&quot;Received unexpected response from {}: {:?}&quot;</span>,
                     <span class="self">self</span>.<span class="ident">rt_host</span>, <span class="ident">res</span>
@@ -529,13 +529,13 @@
         <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>)
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">_handle_td_response</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">res</span>: <span class="ident">proto::DACResponse</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, ()<span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">_handle_td_response</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">res</span>: <span class="ident">proto::DACResponse</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, ()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">command_id</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">router</span>.<span class="ident">inner</span>.<span class="ident">command_map</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="ident">router::DACKey</span> {
             <span class="ident">env</span>: <span class="ident">router::DACEnv::TimeDelay</span>,
             <span class="ident">cmd</span>: <span class="ident"><span class="self">Self</span>::_get_cmd_line_from_response</span>(<span class="kw-2">&amp;</span><span class="ident">res</span>),
         }) {
-            <span class="prelude-val">Some</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">c</span>,
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">c</span>) =&gt; <span class="ident">c</span>,
+            <span class="prelude-val">None</span> =&gt; {
                 <span class="macro">warn!</span>(
                     <span class="string">&quot;Received unexpected response from {}: {:?}&quot;</span>,
                     <span class="self">self</span>.<span class="ident">td_host</span>, <span class="ident">res</span>
@@ -548,47 +548,47 @@
         <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>)
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">_lookup_host</span>(<span class="ident">host</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">std::net::SocketAddr</span>, ()<span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">_lookup_host</span>(<span class="ident">host</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">std::net::SocketAddr</span>, ()<span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="kw">match</span> <span class="ident">tokio::net::lookup_host</span>(<span class="ident">host</span>).<span class="kw">await</span> {
-            <span class="prelude-val">Ok</span>(<span class="kw-2">mut</span> <span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">s</span>.<span class="ident">next</span>() {
-                <span class="prelude-val">Some</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>,
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Ok</span>(<span class="kw-2">mut</span> <span class="ident">s</span>) =&gt; <span class="kw">match</span> <span class="ident">s</span>.<span class="ident">next</span>() {
+                <span class="prelude-val">Some</span>(<span class="ident">s</span>) =&gt; <span class="ident">s</span>,
+                <span class="prelude-val">None</span> =&gt; {
                     <span class="macro">error!</span>(<span class="string">&quot;Resolving {} returned no records&quot;</span>, <span class="ident">host</span>);
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(());
                 }
             },
-            <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; {
                 <span class="macro">error!</span>(<span class="string">&quot;Failed to resolve {}: {}&quot;</span>, <span class="ident">host</span>, <span class="ident">err</span>);
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(());
             }
         })
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">_connect</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">tokio::net::TcpStream</span>, <span class="ident">tokio::net::TcpStream</span>) {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">_connect</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="ident">tokio::net::TcpStream</span>, <span class="ident">tokio::net::TcpStream</span>) {
         <span class="kw">loop</span> {
             <span class="kw">match</span> <span class="self">self</span>.<span class="ident">_try_connect</span>().<span class="kw">await</span> {
-                <span class="prelude-val">Ok</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Ok</span>(<span class="ident">s</span>) =&gt; {
                     <span class="macro">info!</span>(
                         <span class="string">&quot;Successfully connected to {} and {}&quot;</span>,
                         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">rt_host</span>, <span class="self">self</span>.<span class="ident">td_host</span>
                     );
                     <span class="kw">return</span> <span class="ident">s</span>;
                 }
-                <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; {
                     <span class="ident">tokio::time::sleep</span>(<span class="ident">tokio::time::Duration::new</span>(<span class="number">5</span>, <span class="number">0</span>)).<span class="kw">await</span>;
                 }
             }
         }
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">_try_connect</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">tokio::net::TcpStream</span>, <span class="ident">tokio::net::TcpStream</span>), ()<span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">_try_connect</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">tokio::net::TcpStream</span>, <span class="ident">tokio::net::TcpStream</span>), ()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">rt_addr</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::_lookup_host</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">rt_host</span>).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">td_addr</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::_lookup_host</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">td_host</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="macro">trace!</span>(<span class="string">&quot;Opening TCP connection to {}&quot;</span>, <span class="self">self</span>.<span class="ident">rt_host</span>);
         <span class="kw">let</span> <span class="ident">rt_socket</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">tokio::net::TcpStream::connect</span>(<span class="kw-2">&amp;</span><span class="ident">rt_addr</span>).<span class="kw">await</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>,
-            <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Ok</span>(<span class="ident">s</span>) =&gt; <span class="ident">s</span>,
+            <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; {
                 <span class="macro">error!</span>(<span class="string">&quot;Unable to connect to {}: {}&quot;</span>, <span class="self">self</span>.<span class="ident">rt_host</span>, <span class="ident">err</span>);
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(());
             }
@@ -596,8 +596,8 @@
 
         <span class="macro">trace!</span>(<span class="string">&quot;Opening TCP connection to {}&quot;</span>, <span class="self">self</span>.<span class="ident">td_host</span>);
         <span class="kw">let</span> <span class="ident">td_socket</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">tokio::net::TcpStream::connect</span>(<span class="kw-2">&amp;</span><span class="ident">td_addr</span>).<span class="kw">await</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>,
-            <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Ok</span>(<span class="ident">s</span>) =&gt; <span class="ident">s</span>,
+            <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; {
                 <span class="macro">error!</span>(<span class="string">&quot;Unable to connect to {}: {}&quot;</span>, <span class="self">self</span>.<span class="ident">td_host</span>, <span class="ident">err</span>);
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(());
             }

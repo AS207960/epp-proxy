@@ -464,83 +464,83 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::ServerFeatures</span>;
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">proto::fee::EPPFeeCommand</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Command</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">proto::fee::EPPFeeCommand</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">proto::fee::EPPFeeCommand</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">match</span> <span class="ident">from</span> {
-            <span class="ident">proto::fee::EPPFeeCommand::Create</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Command::Create</span>,
-            <span class="ident">proto::fee::EPPFeeCommand::Renew</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Command::Renew</span>,
-            <span class="ident">proto::fee::EPPFeeCommand::Transfer</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Command::Transfer</span>,
-            <span class="ident">proto::fee::EPPFeeCommand::Delete</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Command::Delete</span>,
-            <span class="ident">proto::fee::EPPFeeCommand::Restore</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Command::Restore</span>,
+            <span class="ident">proto::fee::EPPFeeCommand::Create</span> =&gt; <span class="ident">Command::Create</span>,
+            <span class="ident">proto::fee::EPPFeeCommand::Renew</span> =&gt; <span class="ident">Command::Renew</span>,
+            <span class="ident">proto::fee::EPPFeeCommand::Transfer</span> =&gt; <span class="ident">Command::Transfer</span>,
+            <span class="ident">proto::fee::EPPFeeCommand::Delete</span> =&gt; <span class="ident">Command::Delete</span>,
+            <span class="ident">proto::fee::EPPFeeCommand::Restore</span> =&gt; <span class="ident">Command::Restore</span>,
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">proto::united_tld::EPPChargeCommand</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Command</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">proto::united_tld::EPPChargeCommand</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">proto::united_tld::EPPChargeCommand</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">match</span> <span class="ident">from</span> {
-            <span class="ident">proto::united_tld::EPPChargeCommand::Check</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Command::Check</span>,
-            <span class="ident">proto::united_tld::EPPChargeCommand::Create</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Command::Create</span>,
-            <span class="ident">proto::united_tld::EPPChargeCommand::Delete</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Command::Delete</span>,
-            <span class="ident">proto::united_tld::EPPChargeCommand::Info</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Command::Info</span>,
-            <span class="ident">proto::united_tld::EPPChargeCommand::Renew</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Command::Renew</span>,
-            <span class="ident">proto::united_tld::EPPChargeCommand::Transfer</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Command::Transfer</span>,
-            <span class="ident">proto::united_tld::EPPChargeCommand::Update</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Command::Update</span>,
-            <span class="ident">proto::united_tld::EPPChargeCommand::Custom</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Command::Custom</span>,
+            <span class="ident">proto::united_tld::EPPChargeCommand::Check</span> =&gt; <span class="ident">Command::Check</span>,
+            <span class="ident">proto::united_tld::EPPChargeCommand::Create</span> =&gt; <span class="ident">Command::Create</span>,
+            <span class="ident">proto::united_tld::EPPChargeCommand::Delete</span> =&gt; <span class="ident">Command::Delete</span>,
+            <span class="ident">proto::united_tld::EPPChargeCommand::Info</span> =&gt; <span class="ident">Command::Info</span>,
+            <span class="ident">proto::united_tld::EPPChargeCommand::Renew</span> =&gt; <span class="ident">Command::Renew</span>,
+            <span class="ident">proto::united_tld::EPPChargeCommand::Transfer</span> =&gt; <span class="ident">Command::Transfer</span>,
+            <span class="ident">proto::united_tld::EPPChargeCommand::Update</span> =&gt; <span class="ident">Command::Update</span>,
+            <span class="ident">proto::united_tld::EPPChargeCommand::Custom</span> =&gt; <span class="ident">Command::Custom</span>,
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Command</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">proto::fee::EPPFeeCommand</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">Command</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">Command</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">match</span> <span class="ident">from</span> {
-            <span class="ident">Command::Create</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">proto::fee::EPPFeeCommand::Create</span>),
-            <span class="ident">Command::Renew</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">proto::fee::EPPFeeCommand::Renew</span>),
-            <span class="ident">Command::Transfer</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">proto::fee::EPPFeeCommand::Transfer</span>),
-            <span class="ident">Command::Delete</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">proto::fee::EPPFeeCommand::Delete</span>),
-            <span class="ident">Command::Restore</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">proto::fee::EPPFeeCommand::Restore</span>),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="ident">Command::Create</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">proto::fee::EPPFeeCommand::Create</span>),
+            <span class="ident">Command::Renew</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">proto::fee::EPPFeeCommand::Renew</span>),
+            <span class="ident">Command::Transfer</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">proto::fee::EPPFeeCommand::Transfer</span>),
+            <span class="ident">Command::Delete</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">proto::fee::EPPFeeCommand::Delete</span>),
+            <span class="ident">Command::Restore</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">proto::fee::EPPFeeCommand::Restore</span>),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Command</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">proto::united_tld::EPPChargeCommand</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">Command</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">Command</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">match</span> <span class="ident">from</span> {
-            <span class="ident">Command::Create</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">proto::united_tld::EPPChargeCommand::Create</span>,
-            <span class="ident">Command::Renew</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">proto::united_tld::EPPChargeCommand::Renew</span>,
-            <span class="ident">Command::Transfer</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">proto::united_tld::EPPChargeCommand::Transfer</span>,
-            <span class="ident">Command::Delete</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">proto::united_tld::EPPChargeCommand::Delete</span>,
-            <span class="ident">Command::Restore</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">proto::united_tld::EPPChargeCommand::Update</span>,
-            <span class="ident">Command::Check</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">proto::united_tld::EPPChargeCommand::Check</span>,
-            <span class="ident">Command::Info</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">proto::united_tld::EPPChargeCommand::Info</span>,
-            <span class="ident">Command::Update</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">proto::united_tld::EPPChargeCommand::Update</span>,
-            <span class="ident">Command::Custom</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">proto::united_tld::EPPChargeCommand::Custom</span>,
+            <span class="ident">Command::Create</span> =&gt; <span class="ident">proto::united_tld::EPPChargeCommand::Create</span>,
+            <span class="ident">Command::Renew</span> =&gt; <span class="ident">proto::united_tld::EPPChargeCommand::Renew</span>,
+            <span class="ident">Command::Transfer</span> =&gt; <span class="ident">proto::united_tld::EPPChargeCommand::Transfer</span>,
+            <span class="ident">Command::Delete</span> =&gt; <span class="ident">proto::united_tld::EPPChargeCommand::Delete</span>,
+            <span class="ident">Command::Restore</span> =&gt; <span class="ident">proto::united_tld::EPPChargeCommand::Update</span>,
+            <span class="ident">Command::Check</span> =&gt; <span class="ident">proto::united_tld::EPPChargeCommand::Check</span>,
+            <span class="ident">Command::Info</span> =&gt; <span class="ident">proto::united_tld::EPPChargeCommand::Info</span>,
+            <span class="ident">Command::Update</span> =&gt; <span class="ident">proto::united_tld::EPPChargeCommand::Update</span>,
+            <span class="ident">Command::Custom</span> =&gt; <span class="ident">proto::united_tld::EPPChargeCommand::Custom</span>,
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">proto::fee::EPPFee10Applied</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Applied</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">proto::fee::EPPFee10Applied</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">proto::fee::EPPFee10Applied</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">match</span> <span class="ident">from</span> {
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Applied::Immediate</span>,
-            <span class="prelude-val">Some</span>(<span class="ident">proto::fee::EPPFee10Applied::Immediate</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Applied::Immediate</span>,
-            <span class="prelude-val">Some</span>(<span class="ident">proto::fee::EPPFee10Applied::Delayed</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Applied::Delayed</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="ident">Applied::Immediate</span>,
+            <span class="prelude-val">Some</span>(<span class="ident">proto::fee::EPPFee10Applied::Immediate</span>) =&gt; <span class="ident">Applied::Immediate</span>,
+            <span class="prelude-val">Some</span>(<span class="ident">proto::fee::EPPFee10Applied::Delayed</span>) =&gt; <span class="ident">Applied::Delayed</span>,
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Applied</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">proto::fee::EPPFee10Applied</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">Applied</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">Applied</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">match</span> <span class="ident">from</span> {
-            <span class="ident">Applied::Immediate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">proto::fee::EPPFee10Applied::Immediate</span>),
-            <span class="ident">Applied::Delayed</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">proto::fee::EPPFee10Applied::Delayed</span>),
-            <span class="ident">Applied::Unspecified</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="ident">Applied::Immediate</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">proto::fee::EPPFee10Applied::Immediate</span>),
+            <span class="ident">Applied::Delayed</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">proto::fee::EPPFee10Applied::Delayed</span>),
+            <span class="ident">Applied::Unspecified</span> =&gt; <span class="prelude-val">None</span>,
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">proto::fee::EPPFee05Fee</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Fee</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">proto::fee::EPPFee05Fee</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">proto::fee::EPPFee05Fee</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">Fee</span> {
             <span class="ident">value</span>: <span class="ident">from</span>.<span class="ident">value</span>.<span class="ident">to_owned</span>(),
             <span class="ident">description</span>: <span class="ident">from</span>.<span class="ident">description</span>.<span class="ident">to_owned</span>(),
@@ -552,7 +552,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">proto::fee::EPPFee08Fee</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Fee</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">proto::fee::EPPFee08Fee</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">proto::fee::EPPFee08Fee</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">Fee</span> {
             <span class="ident">value</span>: <span class="ident">from</span>.<span class="ident">value</span>.<span class="ident">to_owned</span>(),
             <span class="ident">description</span>: <span class="ident">from</span>.<span class="ident">description</span>.<span class="ident">to_owned</span>(),
@@ -564,7 +564,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">proto::fee::EPPFee011Fee</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Fee</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">proto::fee::EPPFee011Fee</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">proto::fee::EPPFee011Fee</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">Fee</span> {
             <span class="ident">value</span>: <span class="ident">from</span>.<span class="ident">value</span>.<span class="ident">to_owned</span>(),
             <span class="ident">description</span>: <span class="ident">from</span>.<span class="ident">description</span>.<span class="ident">to_owned</span>(),
@@ -576,7 +576,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Fee</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">proto::fee::EPPFee011Fee</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">Fee</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">Fee</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">proto::fee::EPPFee011Fee</span> {
             <span class="ident">value</span>: <span class="ident">from</span>.<span class="ident">value</span>.<span class="ident">to_owned</span>(),
             <span class="ident">description</span>: <span class="ident">from</span>.<span class="ident">description</span>.<span class="ident">to_owned</span>(),
@@ -588,7 +588,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">proto::fee::EPPFee10Fee</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Fee</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">proto::fee::EPPFee10Fee</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">proto::fee::EPPFee10Fee</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">Fee</span> {
             <span class="ident">value</span>: <span class="ident">from</span>.<span class="ident">value</span>.<span class="ident">to_owned</span>(),
             <span class="ident">description</span>: <span class="ident">from</span>.<span class="ident">description</span>.<span class="ident">to_owned</span>(),
@@ -600,7 +600,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Fee</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">proto::fee::EPPFee10Fee</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">Fee</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">Fee</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">proto::fee::EPPFee10Fee</span> {
             <span class="ident">value</span>: <span class="ident">from</span>.<span class="ident">value</span>.<span class="ident">to_owned</span>(),
             <span class="ident">description</span>: <span class="ident">from</span>.<span class="ident">description</span>.<span class="ident">to_owned</span>(),
@@ -612,7 +612,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">proto::fee::EPPFee011Credit</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Credit</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">proto::fee::EPPFee011Credit</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">proto::fee::EPPFee011Credit</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">Credit</span> {
             <span class="ident">value</span>: <span class="ident">from</span>.<span class="ident">value</span>.<span class="ident">to_owned</span>(),
             <span class="ident">description</span>: <span class="ident">from</span>.<span class="ident">description</span>.<span class="ident">to_owned</span>(),
@@ -621,7 +621,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">proto::fee::EPPFee10Credit</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Credit</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">proto::fee::EPPFee10Credit</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">proto::fee::EPPFee10Credit</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">Credit</span> {
             <span class="ident">value</span>: <span class="ident">from</span>.<span class="ident">value</span>.<span class="ident">to_owned</span>(),
             <span class="ident">description</span>: <span class="ident">from</span>.<span class="ident">description</span>.<span class="ident">to_owned</span>(),
@@ -630,7 +630,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">proto::fee::EPPFee05TransformData</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">FeeData</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="ident">proto::fee::EPPFee05TransformData</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="ident">proto::fee::EPPFee05TransformData</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">FeeData</span> {
             <span class="ident">period</span>: <span class="prelude-val">None</span>,
             <span class="ident">currency</span>: <span class="ident">f</span>.<span class="ident">currency</span>.<span class="ident">to_owned</span>(),
@@ -643,7 +643,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">proto::fee::EPPFee07TransformData</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">FeeData</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="ident">proto::fee::EPPFee07TransformData</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="ident">proto::fee::EPPFee07TransformData</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">FeeData</span> {
             <span class="ident">period</span>: <span class="prelude-val">None</span>,
             <span class="ident">currency</span>: <span class="ident">f</span>.<span class="ident">currency</span>.<span class="ident">to_owned</span>(),
@@ -656,7 +656,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">proto::fee::EPPFee08TransformData</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">FeeData</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="ident">proto::fee::EPPFee08TransformData</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="ident">proto::fee::EPPFee08TransformData</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">FeeData</span> {
             <span class="ident">period</span>: <span class="prelude-val">None</span>,
             <span class="ident">currency</span>: <span class="ident">f</span>.<span class="ident">currency</span>.<span class="ident">to_owned</span>(),
@@ -669,7 +669,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">proto::fee::EPPFee09TransformData</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">FeeData</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="ident">proto::fee::EPPFee09TransformData</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="ident">proto::fee::EPPFee09TransformData</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">FeeData</span> {
             <span class="ident">period</span>: <span class="prelude-val">None</span>,
             <span class="ident">currency</span>: <span class="ident">f</span>.<span class="ident">currency</span>.<span class="ident">to_owned</span>(),
@@ -682,7 +682,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">proto::fee::EPPFee011TransformData</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">FeeData</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="ident">proto::fee::EPPFee011TransformData</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="ident">proto::fee::EPPFee011TransformData</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">FeeData</span> {
             <span class="ident">period</span>: <span class="prelude-val">None</span>,
             <span class="ident">currency</span>: <span class="ident">f</span>.<span class="ident">currency</span>.<span class="ident">to_owned</span>(),
@@ -695,7 +695,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">proto::fee::EPPFee10TransformData</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">FeeData</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="ident">proto::fee::EPPFee10TransformData</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="ident">proto::fee::EPPFee10TransformData</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">FeeData</span> {
             <span class="ident">period</span>: <span class="prelude-val">None</span>,
             <span class="ident">currency</span>: <span class="ident">f</span>.<span class="ident">currency</span>.<span class="ident">to_owned</span>(),
@@ -708,7 +708,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">proto::fee::EPPFee07TransferData</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">FeeData</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="ident">proto::fee::EPPFee07TransferData</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="ident">proto::fee::EPPFee07TransferData</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">FeeData</span> {
             <span class="ident">period</span>: <span class="ident">f</span>.<span class="ident">period</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="ident">Into::into</span>),
             <span class="ident">currency</span>: <span class="ident">f</span>.<span class="ident">currency</span>.<span class="ident">to_owned</span>(),
@@ -721,7 +721,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">proto::fee::EPPFee08TransferData</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">FeeData</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="ident">proto::fee::EPPFee08TransferData</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="ident">proto::fee::EPPFee08TransferData</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">FeeData</span> {
             <span class="ident">period</span>: <span class="ident">f</span>.<span class="ident">period</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="ident">Into::into</span>),
             <span class="ident">currency</span>: <span class="ident">f</span>.<span class="ident">currency</span>.<span class="ident">to_owned</span>(),
@@ -734,7 +734,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">proto::fee::EPPFee09TransferData</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">FeeData</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="ident">proto::fee::EPPFee09TransferData</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="ident">proto::fee::EPPFee09TransferData</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">FeeData</span> {
             <span class="ident">period</span>: <span class="ident">f</span>.<span class="ident">period</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="ident">Into::into</span>),
             <span class="ident">currency</span>: <span class="ident">f</span>.<span class="ident">currency</span>.<span class="ident">to_owned</span>(),
@@ -747,7 +747,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">proto::fee::EPPFee05DeleteData</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">FeeData</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="ident">proto::fee::EPPFee05DeleteData</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="ident">proto::fee::EPPFee05DeleteData</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">FeeData</span> {
             <span class="ident">period</span>: <span class="prelude-val">None</span>,
             <span class="ident">currency</span>: <span class="ident">f</span>.<span class="ident">currency</span>.<span class="ident">to_owned</span>(),
@@ -760,7 +760,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">proto::fee::EPPFee07DeleteData</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">FeeData</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="ident">proto::fee::EPPFee07DeleteData</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="ident">proto::fee::EPPFee07DeleteData</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">FeeData</span> {
             <span class="ident">period</span>: <span class="prelude-val">None</span>,
             <span class="ident">currency</span>: <span class="ident">f</span>.<span class="ident">currency</span>.<span class="ident">to_owned</span>(),
@@ -773,7 +773,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">proto::fee::EPPFee08DeleteData</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">FeeData</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="ident">proto::fee::EPPFee08DeleteData</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="ident">proto::fee::EPPFee08DeleteData</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">FeeData</span> {
             <span class="ident">period</span>: <span class="prelude-val">None</span>,
             <span class="ident">currency</span>: <span class="ident">f</span>.<span class="ident">currency</span>.<span class="ident">to_owned</span>(),
@@ -786,7 +786,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">proto::fee::EPPFee09DeleteData</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">FeeData</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="ident">proto::fee::EPPFee09DeleteData</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="ident">proto::fee::EPPFee09DeleteData</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">FeeData</span> {
             <span class="ident">period</span>: <span class="prelude-val">None</span>,
             <span class="ident">currency</span>: <span class="ident">f</span>.<span class="ident">currency</span>.<span class="ident">to_owned</span>(),
@@ -799,7 +799,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">proto::united_tld::EPPChargeData</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">DonutsFeeData</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="ident">proto::united_tld::EPPChargeData</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="ident">proto::united_tld::EPPChargeData</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">DonutsFeeData</span> {
             <span class="ident">sets</span>: <span class="ident">f</span>.<span class="ident">sets</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="ident">Into::into</span>).<span class="ident">collect</span>(),
         }
@@ -807,7 +807,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">proto::united_tld::EPPChargeSet</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">DonutsFeeSet</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="ident">proto::united_tld::EPPChargeSet</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="ident">proto::united_tld::EPPChargeSet</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">DonutsFeeSet</span> {
             <span class="ident">fees</span>: <span class="ident">f</span>
                 .<span class="ident">amount</span>
@@ -820,9 +820,9 @@
                 .<span class="ident">collect</span>(),
             <span class="ident">fee_type</span>: <span class="ident">DonutsFeeType</span> {
                 <span class="ident">fee_type</span>: <span class="kw">match</span> <span class="ident">f</span>.<span class="ident">set_type</span>.<span class="ident">value</span> {
-                    <span class="ident">proto::united_tld::EPPChargeTypes::Fee</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">DonutsFeeTypes::Fee</span>,
-                    <span class="ident">proto::united_tld::EPPChargeTypes::Price</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">DonutsFeeTypes::Price</span>,
-                    <span class="ident">proto::united_tld::EPPChargeTypes::Custom</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">DonutsFeeTypes::Custom</span>,
+                    <span class="ident">proto::united_tld::EPPChargeTypes::Fee</span> =&gt; <span class="ident">DonutsFeeTypes::Fee</span>,
+                    <span class="ident">proto::united_tld::EPPChargeTypes::Price</span> =&gt; <span class="ident">DonutsFeeTypes::Price</span>,
+                    <span class="ident">proto::united_tld::EPPChargeTypes::Custom</span> =&gt; <span class="ident">DonutsFeeTypes::Custom</span>,
                 },
                 <span class="ident">name</span>: <span class="ident">f</span>.<span class="ident">set_type</span>.<span class="ident">name</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="ident">Into::into</span>),
             },
@@ -835,7 +835,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">proto::united_tld::EPPChargeCheckDatum</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">DonutsFeeData</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="ident">proto::united_tld::EPPChargeCheckDatum</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="ident">proto::united_tld::EPPChargeCheckDatum</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">DonutsFeeData</span> {
             <span class="ident">sets</span>: <span class="ident">f</span>.<span class="ident">sets</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="ident">Into::into</span>).<span class="ident">collect</span>(),
         }
@@ -843,7 +843,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">DonutsFeeData</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">proto::united_tld::EPPChargeData</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="ident">DonutsFeeData</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="ident">DonutsFeeData</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">proto::united_tld::EPPChargeData</span> {
             <span class="ident">sets</span>: <span class="ident">f</span>
                 .<span class="ident">sets</span>
@@ -855,9 +855,9 @@
                     },
                     <span class="ident">set_type</span>: <span class="ident">proto::united_tld::EPPChargeType</span> {
                         <span class="ident">value</span>: <span class="kw">match</span> <span class="ident">s</span>.<span class="ident">fee_type</span>.<span class="ident">fee_type</span> {
-                            <span class="ident">DonutsFeeTypes::Fee</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">proto::united_tld::EPPChargeTypes::Fee</span>,
-                            <span class="ident">DonutsFeeTypes::Price</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">proto::united_tld::EPPChargeTypes::Price</span>,
-                            <span class="ident">DonutsFeeTypes::Custom</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">proto::united_tld::EPPChargeTypes::Custom</span>,
+                            <span class="ident">DonutsFeeTypes::Fee</span> =&gt; <span class="ident">proto::united_tld::EPPChargeTypes::Fee</span>,
+                            <span class="ident">DonutsFeeTypes::Price</span> =&gt; <span class="ident">proto::united_tld::EPPChargeTypes::Price</span>,
+                            <span class="ident">DonutsFeeTypes::Custom</span> =&gt; <span class="ident">proto::united_tld::EPPChargeTypes::Custom</span>,
                         },
                         <span class="ident">name</span>: <span class="ident">s</span>.<span class="ident">fee_type</span>.<span class="ident">name</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="ident">Into::into</span>),
                     },
@@ -877,7 +877,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">FeeAgreement</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">proto::fee::EPPFee011Agreement</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="ident">FeeAgreement</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="ident">FeeAgreement</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">proto::fee::EPPFee011Agreement</span> {
             <span class="ident">currency</span>: <span class="ident">f</span>.<span class="ident">currency</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="ident">Into::into</span>),
             <span class="ident">fee</span>: <span class="ident">f</span>.<span class="ident">fees</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="ident">Into::into</span>).<span class="ident">collect</span>(),
@@ -886,7 +886,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">FeeAgreement</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">proto::fee::EPPFee10Agreement</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="ident">FeeAgreement</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="ident">FeeAgreement</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">proto::fee::EPPFee10Agreement</span> {
             <span class="ident">currency</span>: <span class="ident">f</span>.<span class="ident">currency</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="ident">Into::into</span>),
             <span class="ident">fee</span>: <span class="ident">f</span>.<span class="ident">fees</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="ident">Into::into</span>).<span class="ident">collect</span>(),
@@ -898,7 +898,7 @@
     <span class="ident">client</span>: <span class="kw-2">&amp;</span><span class="ident">ServerFeatures</span>,
     <span class="ident">agreement</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DonutsFeeData</span><span class="op">&gt;</span>,
     <span class="ident">exts</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::proto::EPPCommandExtensionType</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::router::Response</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::router::Response</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">agreement</span>) <span class="op">=</span> <span class="ident">agreement</span> {
         <span class="kw">if</span> <span class="ident">client</span>.<span class="ident">unitedtld_charge</span> {
             <span class="ident">exts</span>.<span class="ident">push</span>(

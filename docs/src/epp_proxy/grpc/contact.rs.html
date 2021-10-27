@@ -482,173 +482,173 @@
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::client</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::epp_proto</span>;
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">entity_type_from_i32</span>(<span class="ident">from</span>: <span class="ident">i32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">client::contact::EntityType</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">entity_type_from_i32</span>(<span class="ident">from</span>: <span class="ident">i32</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">client::contact::EntityType</span><span class="op">&gt;</span> {
     <span class="kw">match</span> <span class="ident">epp_proto::contact::EntityType::from_i32</span>(<span class="ident">from</span>) {
-        <span class="prelude-val">Some</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">e</span> {
-            <span class="ident">epp_proto::contact::EntityType::UkLimitedCompany</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Some</span>(<span class="ident">e</span>) =&gt; <span class="kw">match</span> <span class="ident">e</span> {
+            <span class="ident">epp_proto::contact::EntityType::UkLimitedCompany</span> =&gt; {
                 <span class="prelude-val">Some</span>(<span class="ident">client::contact::EntityType::UkLimitedCompany</span>)
             }
-            <span class="ident">epp_proto::contact::EntityType::UkPublicLimitedCompany</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">epp_proto::contact::EntityType::UkPublicLimitedCompany</span> =&gt; {
                 <span class="prelude-val">Some</span>(<span class="ident">client::contact::EntityType::UkPublicLimitedCompany</span>)
             }
-            <span class="ident">epp_proto::contact::EntityType::UkPartnership</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">epp_proto::contact::EntityType::UkPartnership</span> =&gt; {
                 <span class="prelude-val">Some</span>(<span class="ident">client::contact::EntityType::UkPartnership</span>)
             }
-            <span class="ident">epp_proto::contact::EntityType::UkSoleTrader</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">epp_proto::contact::EntityType::UkSoleTrader</span> =&gt; {
                 <span class="prelude-val">Some</span>(<span class="ident">client::contact::EntityType::UkSoleTrader</span>)
             }
-            <span class="ident">epp_proto::contact::EntityType::UkLimitedLiabilityPartnership</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">epp_proto::contact::EntityType::UkLimitedLiabilityPartnership</span> =&gt; {
                 <span class="prelude-val">Some</span>(<span class="ident">client::contact::EntityType::UkLimitedLiabilityPartnership</span>)
             }
-            <span class="ident">epp_proto::contact::EntityType::UkIndustrialProvidentRegisteredCompany</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">epp_proto::contact::EntityType::UkIndustrialProvidentRegisteredCompany</span> =&gt; {
                 <span class="prelude-val">Some</span>(<span class="ident">client::contact::EntityType::UkIndustrialProvidentRegisteredCompany</span>)
             }
-            <span class="ident">epp_proto::contact::EntityType::UkIndividual</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">epp_proto::contact::EntityType::UkIndividual</span> =&gt; {
                 <span class="prelude-val">Some</span>(<span class="ident">client::contact::EntityType::UkIndividual</span>)
             }
-            <span class="ident">epp_proto::contact::EntityType::UkSchool</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">client::contact::EntityType::UkSchool</span>),
-            <span class="ident">epp_proto::contact::EntityType::UkRegisteredCharity</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">epp_proto::contact::EntityType::UkSchool</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">client::contact::EntityType::UkSchool</span>),
+            <span class="ident">epp_proto::contact::EntityType::UkRegisteredCharity</span> =&gt; {
                 <span class="prelude-val">Some</span>(<span class="ident">client::contact::EntityType::UkRegisteredCharity</span>)
             }
-            <span class="ident">epp_proto::contact::EntityType::UkGovernmentBody</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">epp_proto::contact::EntityType::UkGovernmentBody</span> =&gt; {
                 <span class="prelude-val">Some</span>(<span class="ident">client::contact::EntityType::UkGovernmentBody</span>)
             }
-            <span class="ident">epp_proto::contact::EntityType::UkCorporationByRoyalCharter</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">epp_proto::contact::EntityType::UkCorporationByRoyalCharter</span> =&gt; {
                 <span class="prelude-val">Some</span>(<span class="ident">client::contact::EntityType::UkCorporationByRoyalCharter</span>)
             }
-            <span class="ident">epp_proto::contact::EntityType::UkStatutoryBody</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">epp_proto::contact::EntityType::UkStatutoryBody</span> =&gt; {
                 <span class="prelude-val">Some</span>(<span class="ident">client::contact::EntityType::UkStatutoryBody</span>)
             }
-            <span class="ident">epp_proto::contact::EntityType::UkPoliticalParty</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">epp_proto::contact::EntityType::UkPoliticalParty</span> =&gt; {
                 <span class="prelude-val">Some</span>(<span class="ident">client::contact::EntityType::UkPoliticalParty</span>)
             }
-            <span class="ident">epp_proto::contact::EntityType::OtherUkEntity</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">epp_proto::contact::EntityType::OtherUkEntity</span> =&gt; {
                 <span class="prelude-val">Some</span>(<span class="ident">client::contact::EntityType::OtherUkEntity</span>)
             }
-            <span class="ident">epp_proto::contact::EntityType::FinnishIndividual</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">epp_proto::contact::EntityType::FinnishIndividual</span> =&gt; {
                 <span class="prelude-val">Some</span>(<span class="ident">client::contact::EntityType::FinnishIndividual</span>)
             }
-            <span class="ident">epp_proto::contact::EntityType::FinnishCompany</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">epp_proto::contact::EntityType::FinnishCompany</span> =&gt; {
                 <span class="prelude-val">Some</span>(<span class="ident">client::contact::EntityType::FinnishCompany</span>)
             }
-            <span class="ident">epp_proto::contact::EntityType::FinnishAssociation</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">epp_proto::contact::EntityType::FinnishAssociation</span> =&gt; {
                 <span class="prelude-val">Some</span>(<span class="ident">client::contact::EntityType::FinnishAssociation</span>)
             }
-            <span class="ident">epp_proto::contact::EntityType::FinnishInstitution</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">epp_proto::contact::EntityType::FinnishInstitution</span> =&gt; {
                 <span class="prelude-val">Some</span>(<span class="ident">client::contact::EntityType::FinnishInstitution</span>)
             }
-            <span class="ident">epp_proto::contact::EntityType::FinnishPoliticalParty</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">epp_proto::contact::EntityType::FinnishPoliticalParty</span> =&gt; {
                 <span class="prelude-val">Some</span>(<span class="ident">client::contact::EntityType::FinnishPoliticalParty</span>)
             }
-            <span class="ident">epp_proto::contact::EntityType::FinnishMunicipality</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">epp_proto::contact::EntityType::FinnishMunicipality</span> =&gt; {
                 <span class="prelude-val">Some</span>(<span class="ident">client::contact::EntityType::FinnishMunicipality</span>)
             }
-            <span class="ident">epp_proto::contact::EntityType::FinnishGovernment</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">epp_proto::contact::EntityType::FinnishGovernment</span> =&gt; {
                 <span class="prelude-val">Some</span>(<span class="ident">client::contact::EntityType::FinnishGovernment</span>)
             }
-            <span class="ident">epp_proto::contact::EntityType::FinnishPublicCommunity</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">epp_proto::contact::EntityType::FinnishPublicCommunity</span> =&gt; {
                 <span class="prelude-val">Some</span>(<span class="ident">client::contact::EntityType::FinnishPublicCommunity</span>)
             }
-            <span class="ident">epp_proto::contact::EntityType::OtherIndividual</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">epp_proto::contact::EntityType::OtherIndividual</span> =&gt; {
                 <span class="prelude-val">Some</span>(<span class="ident">client::contact::EntityType::OtherIndividual</span>)
             }
-            <span class="ident">epp_proto::contact::EntityType::OtherCompany</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">epp_proto::contact::EntityType::OtherCompany</span> =&gt; {
                 <span class="prelude-val">Some</span>(<span class="ident">client::contact::EntityType::OtherCompany</span>)
             }
-            <span class="ident">epp_proto::contact::EntityType::OtherAssociation</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">epp_proto::contact::EntityType::OtherAssociation</span> =&gt; {
                 <span class="prelude-val">Some</span>(<span class="ident">client::contact::EntityType::OtherAssociation</span>)
             }
-            <span class="ident">epp_proto::contact::EntityType::OtherInstitution</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">epp_proto::contact::EntityType::OtherInstitution</span> =&gt; {
                 <span class="prelude-val">Some</span>(<span class="ident">client::contact::EntityType::OtherInstitution</span>)
             }
-            <span class="ident">epp_proto::contact::EntityType::OtherPoliticalParty</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">epp_proto::contact::EntityType::OtherPoliticalParty</span> =&gt; {
                 <span class="prelude-val">Some</span>(<span class="ident">client::contact::EntityType::OtherPoliticalParty</span>)
             }
-            <span class="ident">epp_proto::contact::EntityType::OtherMunicipality</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">epp_proto::contact::EntityType::OtherMunicipality</span> =&gt; {
                 <span class="prelude-val">Some</span>(<span class="ident">client::contact::EntityType::OtherMunicipality</span>)
             }
-            <span class="ident">epp_proto::contact::EntityType::OtherGovernment</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">epp_proto::contact::EntityType::OtherGovernment</span> =&gt; {
                 <span class="prelude-val">Some</span>(<span class="ident">client::contact::EntityType::OtherGovernment</span>)
             }
-            <span class="ident">epp_proto::contact::EntityType::OtherPublicCommunity</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">epp_proto::contact::EntityType::OtherPublicCommunity</span> =&gt; {
                 <span class="prelude-val">Some</span>(<span class="ident">client::contact::EntityType::OtherPublicCommunity</span>)
             }
-            <span class="ident">epp_proto::contact::EntityType::UnknownEntity</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">epp_proto::contact::EntityType::UnknownEntity</span> =&gt; {
                 <span class="prelude-val">Some</span>(<span class="ident">client::contact::EntityType::Unknown</span>)
             }
-            <span class="ident">epp_proto::contact::EntityType::NotSet</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="ident">epp_proto::contact::EntityType::NotSet</span> =&gt; <span class="prelude-val">None</span>,
         },
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+        <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
     }
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">disclosure_type_from_i32</span>(<span class="ident">from</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">client::contact::DisclosureType</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">disclosure_type_from_i32</span>(<span class="ident">from</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">client::contact::DisclosureType</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">out</span> <span class="op">=</span> <span class="macro">vec!</span>[];
     <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="ident">from</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">e</span>) <span class="op">=</span> <span class="ident">epp_proto::contact::DisclosureType::from_i32</span>(<span class="ident">i</span>) {
             <span class="ident">out</span>.<span class="ident">push</span>(<span class="kw">match</span> <span class="ident">e</span> {
-                <span class="ident">epp_proto::contact::DisclosureType::LocalName</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">epp_proto::contact::DisclosureType::LocalName</span> =&gt; {
                     <span class="ident">client::contact::DisclosureType::LocalName</span>
                 }
-                <span class="ident">epp_proto::contact::DisclosureType::InternationalisedName</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">epp_proto::contact::DisclosureType::InternationalisedName</span> =&gt; {
                     <span class="ident">client::contact::DisclosureType::InternationalisedName</span>
                 }
-                <span class="ident">epp_proto::contact::DisclosureType::LocalOrganisation</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">epp_proto::contact::DisclosureType::LocalOrganisation</span> =&gt; {
                     <span class="ident">client::contact::DisclosureType::LocalOrganisation</span>
                 }
-                <span class="ident">epp_proto::contact::DisclosureType::InternationalisedOrganisation</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">epp_proto::contact::DisclosureType::InternationalisedOrganisation</span> =&gt; {
                     <span class="ident">client::contact::DisclosureType::InternationalisedOrganisation</span>
                 }
-                <span class="ident">epp_proto::contact::DisclosureType::LocalAddress</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">epp_proto::contact::DisclosureType::LocalAddress</span> =&gt; {
                     <span class="ident">client::contact::DisclosureType::LocalAddress</span>
                 }
-                <span class="ident">epp_proto::contact::DisclosureType::InternationalisedAddress</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">epp_proto::contact::DisclosureType::InternationalisedAddress</span> =&gt; {
                     <span class="ident">client::contact::DisclosureType::InternationalisedAddress</span>
                 }
-                <span class="ident">epp_proto::contact::DisclosureType::Voice</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">client::contact::DisclosureType::Voice</span>,
-                <span class="ident">epp_proto::contact::DisclosureType::Fax</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">client::contact::DisclosureType::Fax</span>,
-                <span class="ident">epp_proto::contact::DisclosureType::Email</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">client::contact::DisclosureType::Email</span>,
+                <span class="ident">epp_proto::contact::DisclosureType::Voice</span> =&gt; <span class="ident">client::contact::DisclosureType::Voice</span>,
+                <span class="ident">epp_proto::contact::DisclosureType::Fax</span> =&gt; <span class="ident">client::contact::DisclosureType::Fax</span>,
+                <span class="ident">epp_proto::contact::DisclosureType::Email</span> =&gt; <span class="ident">client::contact::DisclosureType::Email</span>,
             })
         }
     }
     <span class="ident">out</span>
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">contact_status_from_i32</span>(<span class="ident">from</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">client::contact::Status</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">contact_status_from_i32</span>(<span class="ident">from</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">client::contact::Status</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">out</span> <span class="op">=</span> <span class="macro">vec!</span>[];
     <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="ident">from</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">e</span>) <span class="op">=</span> <span class="ident">epp_proto::contact::ContactStatus::from_i32</span>(<span class="ident">i</span>) {
             <span class="ident">out</span>.<span class="ident">push</span>(<span class="kw">match</span> <span class="ident">e</span> {
-                <span class="ident">epp_proto::contact::ContactStatus::ClientDeleteProhibited</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">epp_proto::contact::ContactStatus::ClientDeleteProhibited</span> =&gt; {
                     <span class="ident">client::contact::Status::ClientDeleteProhibited</span>
                 }
-                <span class="ident">epp_proto::contact::ContactStatus::ClientTransferProhibited</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">epp_proto::contact::ContactStatus::ClientTransferProhibited</span> =&gt; {
                     <span class="ident">client::contact::Status::ClientTransferProhibited</span>
                 }
-                <span class="ident">epp_proto::contact::ContactStatus::ClientUpdateProhibited</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">epp_proto::contact::ContactStatus::ClientUpdateProhibited</span> =&gt; {
                     <span class="ident">client::contact::Status::ClientUpdateProhibited</span>
                 }
-                <span class="ident">epp_proto::contact::ContactStatus::Linked</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">client::contact::Status::Linked</span>,
-                <span class="ident">epp_proto::contact::ContactStatus::Ok</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">client::contact::Status::Ok</span>,
-                <span class="ident">epp_proto::contact::ContactStatus::PendingCreate</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">epp_proto::contact::ContactStatus::Linked</span> =&gt; <span class="ident">client::contact::Status::Linked</span>,
+                <span class="ident">epp_proto::contact::ContactStatus::Ok</span> =&gt; <span class="ident">client::contact::Status::Ok</span>,
+                <span class="ident">epp_proto::contact::ContactStatus::PendingCreate</span> =&gt; {
                     <span class="ident">client::contact::Status::PendingCreate</span>
                 }
-                <span class="ident">epp_proto::contact::ContactStatus::PendingDelete</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">epp_proto::contact::ContactStatus::PendingDelete</span> =&gt; {
                     <span class="ident">client::contact::Status::PendingDelete</span>
                 }
-                <span class="ident">epp_proto::contact::ContactStatus::PendingTransfer</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">epp_proto::contact::ContactStatus::PendingTransfer</span> =&gt; {
                     <span class="ident">client::contact::Status::PendingTransfer</span>
                 }
-                <span class="ident">epp_proto::contact::ContactStatus::PendingUpdate</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">epp_proto::contact::ContactStatus::PendingUpdate</span> =&gt; {
                     <span class="ident">client::contact::Status::PendingUpdate</span>
                 }
-                <span class="ident">epp_proto::contact::ContactStatus::ServerDeleteProhibited</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">epp_proto::contact::ContactStatus::ServerDeleteProhibited</span> =&gt; {
                     <span class="ident">client::contact::Status::ServerDeleteProhibited</span>
                 }
-                <span class="ident">epp_proto::contact::ContactStatus::ServerTransferProhibited</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">epp_proto::contact::ContactStatus::ServerTransferProhibited</span> =&gt; {
                     <span class="ident">client::contact::Status::ServerTransferProhibited</span>
                 }
-                <span class="ident">epp_proto::contact::ContactStatus::ServerUpdateProhibited</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">epp_proto::contact::ContactStatus::ServerUpdateProhibited</span> =&gt; {
                     <span class="ident">client::contact::Status::ServerUpdateProhibited</span>
                 }
             })
@@ -660,7 +660,7 @@
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">client::contact::QualifiedLawyerInfo</span><span class="op">&gt;</span>
     <span class="kw">for</span> <span class="ident">epp_proto::contact::qualified_lawyer::QualifiedLawyer</span>
 {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">client::contact::QualifiedLawyerInfo</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">client::contact::QualifiedLawyerInfo</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">epp_proto::contact::qualified_lawyer::QualifiedLawyer</span> {
             <span class="ident">accreditation_id</span>: <span class="ident">from</span>.<span class="ident">accreditation_id</span>,
             <span class="ident">accreditation_body</span>: <span class="ident">from</span>.<span class="ident">accreditation_body</span>,
@@ -674,7 +674,7 @@
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">epp_proto::contact::qualified_lawyer::QualifiedLawyer</span><span class="op">&gt;</span>
     <span class="kw">for</span> <span class="ident">client::contact::QualifiedLawyerInfo</span>
 {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">epp_proto::contact::qualified_lawyer::QualifiedLawyer</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">epp_proto::contact::qualified_lawyer::QualifiedLawyer</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">client::contact::QualifiedLawyerInfo</span> {
             <span class="ident">accreditation_id</span>: <span class="ident">from</span>.<span class="ident">accreditation_id</span>,
             <span class="ident">accreditation_body</span>: <span class="ident">from</span>.<span class="ident">accreditation_body</span>,
@@ -686,7 +686,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">client::contact::TransferResponse</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">epp_proto::contact::ContactTransferReply</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">res</span>: <span class="ident">client::contact::TransferResponse</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">res</span>: <span class="ident">client::contact::TransferResponse</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">epp_proto::contact::ContactTransferReply</span> {
             <span class="ident">pending</span>: <span class="ident">res</span>.<span class="ident">pending</span>,
             <span class="ident">status</span>: <span class="ident"><span class="kw">super</span>::utils::i32_from_transfer_status</span>(<span class="ident">res</span>.<span class="ident">data</span>.<span class="ident">status</span>),
@@ -700,7 +700,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">client::contact::PanData</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">epp_proto::contact::ContactPanReply</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">res</span>: <span class="ident">client::contact::PanData</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">res</span>: <span class="ident">client::contact::PanData</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">epp_proto::contact::ContactPanReply</span> {
             <span class="ident">id</span>: <span class="ident">res</span>.<span class="ident">id</span>,
             <span class="ident">result</span>: <span class="ident">res</span>.<span class="ident">result</span>,
@@ -712,7 +712,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">client::contact::InfoResponse</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">epp_proto::contact::ContactInfoReply</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">res</span>: <span class="ident">client::contact::InfoResponse</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">res</span>: <span class="ident">client::contact::InfoResponse</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">map_addr</span> <span class="op">=</span> <span class="op">|</span><span class="ident">a</span>: <span class="ident">client::contact::Address</span><span class="op">|</span> <span class="ident">epp_proto::contact::PostalAddress</span> {
             <span class="ident">name</span>: <span class="ident">a</span>.<span class="ident">name</span>,
             <span class="ident">organisation</span>: <span class="ident">a</span>.<span class="ident">organisation</span>,
@@ -732,38 +732,38 @@
                 .<span class="ident">statuses</span>
                 .<span class="ident">into_iter</span>()
                 .<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">s</span> {
-                    <span class="ident">client::contact::Status::ClientDeleteProhibited</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident">client::contact::Status::ClientDeleteProhibited</span> =&gt; {
                         <span class="ident">epp_proto::contact::ContactStatus::ClientDeleteProhibited</span>.<span class="ident">into</span>()
                     }
-                    <span class="ident">client::contact::Status::ClientTransferProhibited</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident">client::contact::Status::ClientTransferProhibited</span> =&gt; {
                         <span class="ident">epp_proto::contact::ContactStatus::ClientTransferProhibited</span>.<span class="ident">into</span>()
                     }
-                    <span class="ident">client::contact::Status::ClientUpdateProhibited</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident">client::contact::Status::ClientUpdateProhibited</span> =&gt; {
                         <span class="ident">epp_proto::contact::ContactStatus::ClientUpdateProhibited</span>.<span class="ident">into</span>()
                     }
-                    <span class="ident">client::contact::Status::Linked</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident">client::contact::Status::Linked</span> =&gt; {
                         <span class="ident">epp_proto::contact::ContactStatus::Linked</span>.<span class="ident">into</span>()
                     }
-                    <span class="ident">client::contact::Status::Ok</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">epp_proto::contact::ContactStatus::Ok</span>.<span class="ident">into</span>(),
-                    <span class="ident">client::contact::Status::PendingCreate</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident">client::contact::Status::Ok</span> =&gt; <span class="ident">epp_proto::contact::ContactStatus::Ok</span>.<span class="ident">into</span>(),
+                    <span class="ident">client::contact::Status::PendingCreate</span> =&gt; {
                         <span class="ident">epp_proto::contact::ContactStatus::PendingCreate</span>.<span class="ident">into</span>()
                     }
-                    <span class="ident">client::contact::Status::PendingDelete</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident">client::contact::Status::PendingDelete</span> =&gt; {
                         <span class="ident">epp_proto::contact::ContactStatus::PendingDelete</span>.<span class="ident">into</span>()
                     }
-                    <span class="ident">client::contact::Status::PendingTransfer</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident">client::contact::Status::PendingTransfer</span> =&gt; {
                         <span class="ident">epp_proto::contact::ContactStatus::PendingTransfer</span>.<span class="ident">into</span>()
                     }
-                    <span class="ident">client::contact::Status::PendingUpdate</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident">client::contact::Status::PendingUpdate</span> =&gt; {
                         <span class="ident">epp_proto::contact::ContactStatus::PendingUpdate</span>.<span class="ident">into</span>()
                     }
-                    <span class="ident">client::contact::Status::ServerDeleteProhibited</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident">client::contact::Status::ServerDeleteProhibited</span> =&gt; {
                         <span class="ident">epp_proto::contact::ContactStatus::ServerDeleteProhibited</span>.<span class="ident">into</span>()
                     }
-                    <span class="ident">client::contact::Status::ServerTransferProhibited</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident">client::contact::Status::ServerTransferProhibited</span> =&gt; {
                         <span class="ident">epp_proto::contact::ContactStatus::ServerTransferProhibited</span>.<span class="ident">into</span>()
                     }
-                    <span class="ident">client::contact::Status::ServerUpdateProhibited</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident">client::contact::Status::ServerUpdateProhibited</span> =&gt; {
                         <span class="ident">epp_proto::contact::ContactStatus::ServerUpdateProhibited</span>.<span class="ident">into</span>()
                     }
                 })
@@ -780,97 +780,97 @@
             <span class="ident">last_updated_date</span>: <span class="ident"><span class="kw">super</span>::utils::chrono_to_proto</span>(<span class="ident">res</span>.<span class="ident">last_updated_date</span>),
             <span class="ident">last_transfer_date</span>: <span class="ident"><span class="kw">super</span>::utils::chrono_to_proto</span>(<span class="ident">res</span>.<span class="ident">last_transfer_date</span>),
             <span class="ident">entity_type</span>: <span class="kw">match</span> <span class="ident">res</span>.<span class="ident">entity_type</span> {
-                <span class="ident">client::contact::EntityType::UkLimitedCompany</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">client::contact::EntityType::UkLimitedCompany</span> =&gt; {
                     <span class="ident">epp_proto::contact::EntityType::UkLimitedCompany</span>.<span class="ident">into</span>()
                 }
-                <span class="ident">client::contact::EntityType::UkPublicLimitedCompany</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">client::contact::EntityType::UkPublicLimitedCompany</span> =&gt; {
                     <span class="ident">epp_proto::contact::EntityType::UkLimitedCompany</span>.<span class="ident">into</span>()
                 }
-                <span class="ident">client::contact::EntityType::UkPartnership</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">client::contact::EntityType::UkPartnership</span> =&gt; {
                     <span class="ident">epp_proto::contact::EntityType::UkPartnership</span>.<span class="ident">into</span>()
                 }
-                <span class="ident">client::contact::EntityType::UkSoleTrader</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">client::contact::EntityType::UkSoleTrader</span> =&gt; {
                     <span class="ident">epp_proto::contact::EntityType::UkSoleTrader</span>.<span class="ident">into</span>()
                 }
-                <span class="ident">client::contact::EntityType::UkLimitedLiabilityPartnership</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">client::contact::EntityType::UkLimitedLiabilityPartnership</span> =&gt; {
                     <span class="ident">epp_proto::contact::EntityType::UkLimitedLiabilityPartnership</span>.<span class="ident">into</span>()
                 }
-                <span class="ident">client::contact::EntityType::UkIndustrialProvidentRegisteredCompany</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">client::contact::EntityType::UkIndustrialProvidentRegisteredCompany</span> =&gt; {
                     <span class="ident">epp_proto::contact::EntityType::UkIndustrialProvidentRegisteredCompany</span>.<span class="ident">into</span>()
                 }
-                <span class="ident">client::contact::EntityType::UkIndividual</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">client::contact::EntityType::UkIndividual</span> =&gt; {
                     <span class="ident">epp_proto::contact::EntityType::UkIndividual</span>.<span class="ident">into</span>()
                 }
-                <span class="ident">client::contact::EntityType::UkSchool</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">client::contact::EntityType::UkSchool</span> =&gt; {
                     <span class="ident">epp_proto::contact::EntityType::UkSchool</span>.<span class="ident">into</span>()
                 }
-                <span class="ident">client::contact::EntityType::UkRegisteredCharity</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">client::contact::EntityType::UkRegisteredCharity</span> =&gt; {
                     <span class="ident">epp_proto::contact::EntityType::UkRegisteredCharity</span>.<span class="ident">into</span>()
                 }
-                <span class="ident">client::contact::EntityType::UkGovernmentBody</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">client::contact::EntityType::UkGovernmentBody</span> =&gt; {
                     <span class="ident">epp_proto::contact::EntityType::UkGovernmentBody</span>.<span class="ident">into</span>()
                 }
-                <span class="ident">client::contact::EntityType::UkCorporationByRoyalCharter</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">client::contact::EntityType::UkCorporationByRoyalCharter</span> =&gt; {
                     <span class="ident">epp_proto::contact::EntityType::UkCorporationByRoyalCharter</span>.<span class="ident">into</span>()
                 }
-                <span class="ident">client::contact::EntityType::UkStatutoryBody</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">client::contact::EntityType::UkStatutoryBody</span> =&gt; {
                     <span class="ident">epp_proto::contact::EntityType::UkStatutoryBody</span>.<span class="ident">into</span>()
                 }
-                <span class="ident">client::contact::EntityType::UkPoliticalParty</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">client::contact::EntityType::UkPoliticalParty</span> =&gt; {
                     <span class="ident">epp_proto::contact::EntityType::UkPoliticalParty</span>.<span class="ident">into</span>()
                 }
-                <span class="ident">client::contact::EntityType::OtherUkEntity</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">client::contact::EntityType::OtherUkEntity</span> =&gt; {
                     <span class="ident">epp_proto::contact::EntityType::OtherUkEntity</span>.<span class="ident">into</span>()
                 }
-                <span class="ident">client::contact::EntityType::FinnishIndividual</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">client::contact::EntityType::FinnishIndividual</span> =&gt; {
                     <span class="ident">epp_proto::contact::EntityType::FinnishIndividual</span>.<span class="ident">into</span>()
                 }
-                <span class="ident">client::contact::EntityType::FinnishCompany</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">client::contact::EntityType::FinnishCompany</span> =&gt; {
                     <span class="ident">epp_proto::contact::EntityType::FinnishCompany</span>.<span class="ident">into</span>()
                 }
-                <span class="ident">client::contact::EntityType::FinnishAssociation</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">client::contact::EntityType::FinnishAssociation</span> =&gt; {
                     <span class="ident">epp_proto::contact::EntityType::FinnishAssociation</span>.<span class="ident">into</span>()
                 }
-                <span class="ident">client::contact::EntityType::FinnishInstitution</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">client::contact::EntityType::FinnishInstitution</span> =&gt; {
                     <span class="ident">epp_proto::contact::EntityType::FinnishInstitution</span>.<span class="ident">into</span>()
                 }
-                <span class="ident">client::contact::EntityType::FinnishPoliticalParty</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">client::contact::EntityType::FinnishPoliticalParty</span> =&gt; {
                     <span class="ident">epp_proto::contact::EntityType::FinnishPoliticalParty</span>.<span class="ident">into</span>()
                 }
-                <span class="ident">client::contact::EntityType::FinnishMunicipality</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">client::contact::EntityType::FinnishMunicipality</span> =&gt; {
                     <span class="ident">epp_proto::contact::EntityType::FinnishMunicipality</span>.<span class="ident">into</span>()
                 }
-                <span class="ident">client::contact::EntityType::FinnishGovernment</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">client::contact::EntityType::FinnishGovernment</span> =&gt; {
                     <span class="ident">epp_proto::contact::EntityType::FinnishGovernment</span>.<span class="ident">into</span>()
                 }
-                <span class="ident">client::contact::EntityType::FinnishPublicCommunity</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">client::contact::EntityType::FinnishPublicCommunity</span> =&gt; {
                     <span class="ident">epp_proto::contact::EntityType::FinnishPublicCommunity</span>.<span class="ident">into</span>()
                 }
-                <span class="ident">client::contact::EntityType::OtherIndividual</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">client::contact::EntityType::OtherIndividual</span> =&gt; {
                     <span class="ident">epp_proto::contact::EntityType::OtherIndividual</span>.<span class="ident">into</span>()
                 }
-                <span class="ident">client::contact::EntityType::OtherCompany</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">client::contact::EntityType::OtherCompany</span> =&gt; {
                     <span class="ident">epp_proto::contact::EntityType::OtherCompany</span>.<span class="ident">into</span>()
                 }
-                <span class="ident">client::contact::EntityType::OtherAssociation</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">client::contact::EntityType::OtherAssociation</span> =&gt; {
                     <span class="ident">epp_proto::contact::EntityType::OtherAssociation</span>.<span class="ident">into</span>()
                 }
-                <span class="ident">client::contact::EntityType::OtherInstitution</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">client::contact::EntityType::OtherInstitution</span> =&gt; {
                     <span class="ident">epp_proto::contact::EntityType::OtherInstitution</span>.<span class="ident">into</span>()
                 }
-                <span class="ident">client::contact::EntityType::OtherPoliticalParty</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">client::contact::EntityType::OtherPoliticalParty</span> =&gt; {
                     <span class="ident">epp_proto::contact::EntityType::OtherPoliticalParty</span>.<span class="ident">into</span>()
                 }
-                <span class="ident">client::contact::EntityType::OtherMunicipality</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">client::contact::EntityType::OtherMunicipality</span> =&gt; {
                     <span class="ident">epp_proto::contact::EntityType::OtherMunicipality</span>.<span class="ident">into</span>()
                 }
-                <span class="ident">client::contact::EntityType::OtherGovernment</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">client::contact::EntityType::OtherGovernment</span> =&gt; {
                     <span class="ident">epp_proto::contact::EntityType::OtherGovernment</span>.<span class="ident">into</span>()
                 }
-                <span class="ident">client::contact::EntityType::OtherPublicCommunity</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">client::contact::EntityType::OtherPublicCommunity</span> =&gt; {
                     <span class="ident">epp_proto::contact::EntityType::OtherPublicCommunity</span>.<span class="ident">into</span>()
                 }
-                <span class="ident">client::contact::EntityType::Unknown</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">client::contact::EntityType::Unknown</span> =&gt; {
                     <span class="ident">epp_proto::contact::EntityType::UnknownEntity</span>.<span class="ident">into</span>()
                 }
             },
@@ -880,31 +880,31 @@
                 .<span class="ident">disclosure</span>
                 .<span class="ident">into_iter</span>()
                 .<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">d</span> {
-                    <span class="ident">client::contact::DisclosureType::LocalName</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident">client::contact::DisclosureType::LocalName</span> =&gt; {
                         <span class="ident">epp_proto::contact::DisclosureType::LocalName</span>.<span class="ident">into</span>()
                     }
-                    <span class="ident">client::contact::DisclosureType::InternationalisedName</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident">client::contact::DisclosureType::InternationalisedName</span> =&gt; {
                         <span class="ident">epp_proto::contact::DisclosureType::InternationalisedName</span>.<span class="ident">into</span>()
                     }
-                    <span class="ident">client::contact::DisclosureType::LocalOrganisation</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident">client::contact::DisclosureType::LocalOrganisation</span> =&gt; {
                         <span class="ident">epp_proto::contact::DisclosureType::LocalOrganisation</span>.<span class="ident">into</span>()
                     }
-                    <span class="ident">client::contact::DisclosureType::InternationalisedOrganisation</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident">client::contact::DisclosureType::InternationalisedOrganisation</span> =&gt; {
                         <span class="ident">epp_proto::contact::DisclosureType::InternationalisedOrganisation</span>.<span class="ident">into</span>()
                     }
-                    <span class="ident">client::contact::DisclosureType::LocalAddress</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident">client::contact::DisclosureType::LocalAddress</span> =&gt; {
                         <span class="ident">epp_proto::contact::DisclosureType::LocalAddress</span>.<span class="ident">into</span>()
                     }
-                    <span class="ident">client::contact::DisclosureType::InternationalisedAddress</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident">client::contact::DisclosureType::InternationalisedAddress</span> =&gt; {
                         <span class="ident">epp_proto::contact::DisclosureType::InternationalisedAddress</span>.<span class="ident">into</span>()
                     }
-                    <span class="ident">client::contact::DisclosureType::Voice</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident">client::contact::DisclosureType::Voice</span> =&gt; {
                         <span class="ident">epp_proto::contact::DisclosureType::Voice</span>.<span class="ident">into</span>()
                     }
-                    <span class="ident">client::contact::DisclosureType::Fax</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident">client::contact::DisclosureType::Fax</span> =&gt; {
                         <span class="ident">epp_proto::contact::DisclosureType::Fax</span>.<span class="ident">into</span>()
                     }
-                    <span class="ident">client::contact::DisclosureType::Email</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident">client::contact::DisclosureType::Email</span> =&gt; {
                         <span class="ident">epp_proto::contact::DisclosureType::Email</span>.<span class="ident">into</span>()
                     }
                 })
@@ -913,10 +913,10 @@
             <span class="ident">nominet_data_quality</span>: <span class="ident">res</span>.<span class="ident">nominet_data_quality</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">q</span><span class="op">|</span> {
                 <span class="ident">epp_proto::nominet_ext::DataQuality</span> {
                     <span class="ident">status</span>: <span class="kw">match</span> <span class="ident">q</span>.<span class="ident">status</span> {
-                        <span class="ident">client::nominet::DataQualityStatus::Invalid</span> <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="ident">client::nominet::DataQualityStatus::Invalid</span> =&gt; {
                             <span class="ident">epp_proto::nominet_ext::DataQualityStatus::Invalid</span>.<span class="ident">into</span>()
                         }
-                        <span class="ident">client::nominet::DataQualityStatus::Valid</span> <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="ident">client::nominet::DataQualityStatus::Valid</span> =&gt; {
                             <span class="ident">epp_proto::nominet_ext::DataQualityStatus::Valid</span>.<span class="ident">into</span>()
                         }
                     },
@@ -934,19 +934,19 @@
                     .<span class="ident">statuses</span>
                     .<span class="ident">into_iter</span>()
                     .<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">s</span> {
-                        <span class="ident">client::isnic::ContactStatus::Ok</span> <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="ident">client::isnic::ContactStatus::Ok</span> =&gt; {
                             <span class="ident">epp_proto::isnic::ContactStatus::Ok</span>.<span class="ident">into</span>()
                         }
-                        <span class="ident">client::isnic::ContactStatus::OkUnconfirmed</span> <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="ident">client::isnic::ContactStatus::OkUnconfirmed</span> =&gt; {
                             <span class="ident">epp_proto::isnic::ContactStatus::OkUnconfirmed</span>.<span class="ident">into</span>()
                         }
-                        <span class="ident">client::isnic::ContactStatus::PendingCreate</span> <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="ident">client::isnic::ContactStatus::PendingCreate</span> =&gt; {
                             <span class="ident">epp_proto::isnic::ContactStatus::PendingCreate</span>.<span class="ident">into</span>()
                         }
-                        <span class="ident">client::isnic::ContactStatus::ServerExpired</span> <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="ident">client::isnic::ContactStatus::ServerExpired</span> =&gt; {
                             <span class="ident">epp_proto::isnic::ContactStatus::ServerExpired</span>.<span class="ident">into</span>()
                         }
-                        <span class="ident">client::isnic::ContactStatus::ServerSuspended</span> <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="ident">client::isnic::ContactStatus::ServerSuspended</span> =&gt; {
                             <span class="ident">epp_proto::isnic::ContactStatus::ServerSuspended</span>.<span class="ident">into</span>()
                         }
                     })

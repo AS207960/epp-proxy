@@ -171,17 +171,17 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::epp_proto</span>;
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">client::balance::BalanceResponse</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">epp_proto::BalanceReply</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">res</span>: <span class="ident">client::balance::BalanceResponse</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">res</span>: <span class="ident">client::balance::BalanceResponse</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">epp_proto::BalanceReply</span> {
             <span class="ident">balance</span>: <span class="ident">res</span>.<span class="ident">balance</span>,
             <span class="ident">currency</span>: <span class="ident">res</span>.<span class="ident">currency</span>,
             <span class="ident">available_credit</span>: <span class="ident">res</span>.<span class="ident">available_credit</span>,
             <span class="ident">credit_limit</span>: <span class="ident">res</span>.<span class="ident">credit_limit</span>,
             <span class="ident">credit_threshold</span>: <span class="ident">res</span>.<span class="ident">credit_threshold</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">t</span> {
-                <span class="ident">client::balance::CreditThreshold::Fixed</span>(<span class="ident">f</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">client::balance::CreditThreshold::Fixed</span>(<span class="ident">f</span>) =&gt; {
                     <span class="ident">epp_proto::balance_reply::CreditThreshold::FixedCreditThreshold</span>(<span class="ident">f</span>)
                 }
-                <span class="ident">client::balance::CreditThreshold::Percentage</span>(<span class="ident">p</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">client::balance::CreditThreshold::Percentage</span>(<span class="ident">p</span>) =&gt; {
                     <span class="ident">epp_proto::balance_reply::CreditThreshold::PercentageCreditThreshold</span>(<span class="ident">p</span>.<span class="ident">into</span>())
                 }
             }),
@@ -193,7 +193,7 @@
 <span class="doccomment">/// Helper function to convert chrono times to protobuf well-known type times</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">chrono_to_proto</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">chrono::TimeZone</span><span class="op">&gt;</span>(
     <span class="ident">time</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">chrono::DateTime</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">prost_types::Timestamp</span><span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">prost_types::Timestamp</span><span class="op">&gt;</span> {
     <span class="ident">time</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">prost_types::Timestamp</span> {
         <span class="ident">seconds</span>: <span class="ident">t</span>.<span class="ident">timestamp</span>(),
         <span class="ident">nanos</span>: <span class="ident">t</span>.<span class="ident">timestamp_subsec_nanos</span>() <span class="kw">as</span> <span class="ident">i32</span>,
@@ -202,65 +202,65 @@
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">proto_to_chrono</span>(
     <span class="ident">time</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">prost_types::Timestamp</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">chrono::DateTime</span><span class="op">&lt;</span><span class="ident">chrono::Utc</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">chrono::DateTime</span><span class="op">&lt;</span><span class="ident">chrono::Utc</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="kw">use</span> <span class="ident">chrono::offset::TimeZone</span>;
     <span class="kw">match</span> <span class="ident">time</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">t</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">chrono::Utc</span>
+        <span class="prelude-val">Some</span>(<span class="ident">t</span>) =&gt; <span class="ident">chrono::Utc</span>
             .<span class="ident">timestamp_opt</span>(<span class="ident">t</span>.<span class="ident">seconds</span>, <span class="ident">t</span>.<span class="ident">nanos</span> <span class="kw">as</span> <span class="ident">u32</span>)
             .<span class="ident">single</span>(),
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+        <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">client::Error</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">tonic::Status</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">client::Error</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">client::Error</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">match</span> <span class="ident">err</span> {
-            <span class="ident">client::Error::Err</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">tonic::Status::invalid_argument</span>(<span class="ident">s</span>),
-            <span class="ident">client::Error::NotReady</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">tonic::Status::unavailable</span>(<span class="string">&quot;not yet ready&quot;</span>),
-            <span class="ident">client::Error::Unsupported</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">client::Error::Err</span>(<span class="ident">s</span>) =&gt; <span class="ident">tonic::Status::invalid_argument</span>(<span class="ident">s</span>),
+            <span class="ident">client::Error::NotReady</span> =&gt; <span class="ident">tonic::Status::unavailable</span>(<span class="string">&quot;not yet ready&quot;</span>),
+            <span class="ident">client::Error::Unsupported</span> =&gt; {
                 <span class="ident">tonic::Status::unimplemented</span>(<span class="string">&quot;unsupported operation for registrar&quot;</span>)
             }
-            <span class="ident">client::Error::Timeout</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">client::Error::Timeout</span> =&gt; {
                 <span class="ident">tonic::Status::deadline_exceeded</span>(<span class="string">&quot;registrar didn&#39;t respond in time&quot;</span>)
             }
-            <span class="ident">client::Error::ServerInternal</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">tonic::Status::internal</span>(<span class="string">&quot;internal server error&quot;</span>),
+            <span class="ident">client::Error::ServerInternal</span> =&gt; <span class="ident">tonic::Status::internal</span>(<span class="string">&quot;internal server error&quot;</span>),
         }
     }
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">i32_from_transfer_status</span>(<span class="ident">from</span>: <span class="ident">client::TransferStatus</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">i32</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">i32_from_transfer_status</span>(<span class="ident">from</span>: <span class="ident">client::TransferStatus</span>) -&gt; <span class="ident">i32</span> {
     <span class="kw">match</span> <span class="ident">from</span> {
-        <span class="ident">client::TransferStatus::ClientApproved</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">client::TransferStatus::ClientApproved</span> =&gt; {
             <span class="ident">epp_proto::common::TransferStatus::ClientApproved</span>.<span class="ident">into</span>()
         }
-        <span class="ident">client::TransferStatus::ClientCancelled</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">client::TransferStatus::ClientCancelled</span> =&gt; {
             <span class="ident">epp_proto::common::TransferStatus::ClientCancelled</span>.<span class="ident">into</span>()
         }
-        <span class="ident">client::TransferStatus::ClientRejected</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">client::TransferStatus::ClientRejected</span> =&gt; {
             <span class="ident">epp_proto::common::TransferStatus::ClientRejected</span>.<span class="ident">into</span>()
         }
-        <span class="ident">client::TransferStatus::Pending</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">epp_proto::common::TransferStatus::Pending</span>.<span class="ident">into</span>(),
-        <span class="ident">client::TransferStatus::ServerApproved</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">client::TransferStatus::Pending</span> =&gt; <span class="ident">epp_proto::common::TransferStatus::Pending</span>.<span class="ident">into</span>(),
+        <span class="ident">client::TransferStatus::ServerApproved</span> =&gt; {
             <span class="ident">epp_proto::common::TransferStatus::ServerApproved</span>.<span class="ident">into</span>()
         }
-        <span class="ident">client::TransferStatus::ServerCancelled</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">client::TransferStatus::ServerCancelled</span> =&gt; {
             <span class="ident">epp_proto::common::TransferStatus::ServerCancelled</span>.<span class="ident">into</span>()
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">client::verisign::LowBalanceData</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">epp_proto::BalanceReply</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">res</span>: <span class="ident">client::verisign::LowBalanceData</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">res</span>: <span class="ident">client::verisign::LowBalanceData</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">epp_proto::BalanceReply</span> {
             <span class="ident">balance</span>: <span class="ident">String::new</span>(),
             <span class="ident">currency</span>: <span class="ident">String::new</span>(),
             <span class="ident">available_credit</span>: <span class="prelude-val">Some</span>(<span class="ident">res</span>.<span class="ident">available_credit</span>),
             <span class="ident">credit_limit</span>: <span class="prelude-val">Some</span>(<span class="ident">res</span>.<span class="ident">credit_limit</span>),
             <span class="ident">credit_threshold</span>: <span class="prelude-val">Some</span>(<span class="kw">match</span> <span class="ident">res</span>.<span class="ident">credit_threshold</span> {
-                <span class="ident">client::verisign::CreditThreshold::Fixed</span>(<span class="ident">f</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">client::verisign::CreditThreshold::Fixed</span>(<span class="ident">f</span>) =&gt; {
                     <span class="ident">epp_proto::balance_reply::CreditThreshold::FixedCreditThreshold</span>(<span class="ident">f</span>)
                 }
-                <span class="ident">client::verisign::CreditThreshold::Percentage</span>(<span class="ident">p</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">client::verisign::CreditThreshold::Percentage</span>(<span class="ident">p</span>) =&gt; {
                     <span class="ident">epp_proto::balance_reply::CreditThreshold::PercentageCreditThreshold</span>(<span class="ident">p</span>.<span class="ident">into</span>())
                 }
             }),
@@ -271,7 +271,7 @@
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">map_command_response</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(
     <span class="ident">from</span>: <span class="ident">client::CommandResponse</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">T</span>, <span class="ident">epp_proto::common::CommandResponse</span>) {
+) -&gt; (<span class="ident">T</span>, <span class="ident">epp_proto::common::CommandResponse</span>) {
     (
         <span class="ident">from</span>.<span class="ident">response</span>,
         <span class="ident">epp_proto::common::CommandResponse</span> {
@@ -293,25 +293,25 @@
     )
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">period_unit_from_i32</span>(<span class="ident">from</span>: <span class="ident">i32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">client::PeriodUnit</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">period_unit_from_i32</span>(<span class="ident">from</span>: <span class="ident">i32</span>) -&gt; <span class="ident">client::PeriodUnit</span> {
     <span class="kw">match</span> <span class="ident">epp_proto::common::period::Unit::from_i32</span>(<span class="ident">from</span>) {
-        <span class="prelude-val">Some</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">e</span> {
-            <span class="ident">epp_proto::common::period::Unit::Months</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">client::PeriodUnit::Months</span>,
-            <span class="ident">epp_proto::common::period::Unit::Years</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">client::PeriodUnit::Years</span>,
+        <span class="prelude-val">Some</span>(<span class="ident">e</span>) =&gt; <span class="kw">match</span> <span class="ident">e</span> {
+            <span class="ident">epp_proto::common::period::Unit::Months</span> =&gt; <span class="ident">client::PeriodUnit::Months</span>,
+            <span class="ident">epp_proto::common::period::Unit::Years</span> =&gt; <span class="ident">client::PeriodUnit::Years</span>,
         },
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">client::PeriodUnit::Years</span>,
+        <span class="prelude-val">None</span> =&gt; <span class="ident">client::PeriodUnit::Years</span>,
     }
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">i32_from_period_unit</span>(<span class="ident">from</span>: <span class="ident">client::PeriodUnit</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">i32</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">i32_from_period_unit</span>(<span class="ident">from</span>: <span class="ident">client::PeriodUnit</span>) -&gt; <span class="ident">i32</span> {
     <span class="kw">match</span> <span class="ident">from</span> {
-        <span class="ident">client::PeriodUnit::Months</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">epp_proto::common::period::Unit::Months</span>.<span class="ident">into</span>(),
-        <span class="ident">client::PeriodUnit::Years</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">epp_proto::common::period::Unit::Years</span>.<span class="ident">into</span>(),
+        <span class="ident">client::PeriodUnit::Months</span> =&gt; <span class="ident">epp_proto::common::period::Unit::Months</span>.<span class="ident">into</span>(),
+        <span class="ident">client::PeriodUnit::Years</span> =&gt; <span class="ident">epp_proto::common::period::Unit::Years</span>.<span class="ident">into</span>(),
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">epp_proto::common::Period</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">client::Period</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">epp_proto::common::Period</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">epp_proto::common::Period</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">client::Period</span> {
             <span class="ident">unit</span>: <span class="ident">period_unit_from_i32</span>(<span class="ident">from</span>.<span class="ident">unit</span>),
             <span class="ident">value</span>: <span class="ident">from</span>.<span class="ident">value</span>,
@@ -320,7 +320,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">epp_proto::common::Phone</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">client::Phone</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">epp_proto::common::Phone</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">epp_proto::common::Phone</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">client::Phone</span> {
             <span class="ident">number</span>: <span class="ident">from</span>.<span class="ident">number</span>,
             <span class="ident">extension</span>: <span class="ident">from</span>.<span class="ident">extension</span>,
@@ -329,7 +329,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">client::Phone</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">epp_proto::common::Phone</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">client::Phone</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">client::Phone</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">epp_proto::common::Phone</span> {
             <span class="ident">number</span>: <span class="ident">from</span>.<span class="ident">number</span>,
             <span class="ident">extension</span>: <span class="ident">from</span>.<span class="ident">extension</span>,

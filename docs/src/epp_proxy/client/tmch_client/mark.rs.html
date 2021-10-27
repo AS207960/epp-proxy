@@ -731,7 +731,7 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client::tmch::CaseType</span>;
 <span class="kw">use</span> <span class="ident">std::convert</span>::{<span class="ident">TryFrom</span>, <span class="ident">TryInto</span>};
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">check_mark_id</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">check_mark_id</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="macro">lazy_static!</span> {
         <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">RE</span>: <span class="ident">regex::Regex</span> <span class="op">=</span> <span class="ident">regex::Regex::new</span>(<span class="string">&quot;\\d+-\\d+&quot;</span>).<span class="ident">unwrap</span>();
     }
@@ -742,7 +742,7 @@
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">check_case_id</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">check_case_id</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="macro">lazy_static!</span> {
         <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">RE</span>: <span class="ident">regex::Regex</span> <span class="op">=</span> <span class="ident">regex::Regex::new</span>(<span class="string">&quot;case-\\d+&quot;</span>).<span class="ident">unwrap</span>();
     }
@@ -754,7 +754,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">CreateLabel</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">tmch_proto::TMCHLabel</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">CreateLabel</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">CreateLabel</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">tmch_proto::TMCHLabel</span> {
             <span class="ident">label</span>: <span class="ident">from</span>.<span class="ident">label</span>.<span class="ident">to_string</span>(),
             <span class="ident">smd_inclusion</span>: <span class="prelude-val">Some</span>(<span class="ident">tmch_proto::TMCHNotify</span> {
@@ -772,26 +772,26 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Document</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">tmch_proto::TMCHDocument</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">Document</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">Document</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">tmch_proto::TMCHDocument</span> {
             <span class="ident">document_class</span>: <span class="kw">match</span> <span class="ident">from</span>.<span class="ident">class</span> {
-                <span class="ident">DocumentClass::AssigneeDeclaration</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">DocumentClass::AssigneeDeclaration</span> =&gt; {
                     <span class="ident">tmch_proto::TMCHDocumentClass::AssigneeDeclaration</span>
                 }
-                <span class="ident">DocumentClass::LicenseeDeclaration</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">DocumentClass::LicenseeDeclaration</span> =&gt; {
                     <span class="ident">tmch_proto::TMCHDocumentClass::LicenseeDeclaration</span>
                 }
-                <span class="ident">DocumentClass::DeclarationProofOfUseOneSample</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">DocumentClass::DeclarationProofOfUseOneSample</span> =&gt; {
                     <span class="ident">tmch_proto::TMCHDocumentClass::DeclarationProofOfUseOneSample</span>
                 }
-                <span class="ident">DocumentClass::OtherProofOfUse</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">tmch_proto::TMCHDocumentClass::OtherProofOfUse</span>,
-                <span class="ident">DocumentClass::CopyOfCourtOrder</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">tmch_proto::TMCHDocumentClass::CopyOfCourtOrder</span>,
-                <span class="ident">DocumentClass::Other</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">tmch_proto::TMCHDocumentClass::Other</span>,
+                <span class="ident">DocumentClass::OtherProofOfUse</span> =&gt; <span class="ident">tmch_proto::TMCHDocumentClass::OtherProofOfUse</span>,
+                <span class="ident">DocumentClass::CopyOfCourtOrder</span> =&gt; <span class="ident">tmch_proto::TMCHDocumentClass::CopyOfCourtOrder</span>,
+                <span class="ident">DocumentClass::Other</span> =&gt; <span class="ident">tmch_proto::TMCHDocumentClass::Other</span>,
             },
             <span class="ident">file_name</span>: <span class="prelude-val">Some</span>(<span class="ident">from</span>.<span class="ident">file_name</span>.<span class="ident">to_string</span>()),
             <span class="ident">file_type</span>: <span class="kw">match</span> <span class="ident">from</span>.<span class="ident">file_type</span> {
-                <span class="ident">FileType::Jpg</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">tmch_proto::TMCHFileType::Jpg</span>,
-                <span class="ident">FileType::Pdf</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">tmch_proto::TMCHFileType::Pdf</span>,
+                <span class="ident">FileType::Jpg</span> =&gt; <span class="ident">tmch_proto::TMCHFileType::Jpg</span>,
+                <span class="ident">FileType::Pdf</span> =&gt; <span class="ident">tmch_proto::TMCHFileType::Pdf</span>,
             },
             <span class="ident">file_content</span>: <span class="ident">base64::encode</span>(<span class="kw-2">&amp;</span><span class="ident">from</span>.<span class="ident">contents</span>),
         }
@@ -799,18 +799,18 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">CaseDocument</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">tmch_proto::TMCHCaseDocument</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">CaseDocument</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">CaseDocument</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">tmch_proto::TMCHCaseDocument</span> {
             <span class="ident">document_class</span>: <span class="kw">match</span> <span class="ident">from</span>.<span class="ident">class</span> {
-                <span class="ident">CaseDocumentClass::CourtDecision</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">CaseDocumentClass::CourtDecision</span> =&gt; {
                     <span class="ident">tmch_proto::TMCHCaseDocumentClass::CourtCaseDocument</span>
                 }
-                <span class="ident">CaseDocumentClass::Other</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">tmch_proto::TMCHCaseDocumentClass::Other</span>,
+                <span class="ident">CaseDocumentClass::Other</span> =&gt; <span class="ident">tmch_proto::TMCHCaseDocumentClass::Other</span>,
             },
             <span class="ident">file_name</span>: <span class="prelude-val">Some</span>(<span class="ident">from</span>.<span class="ident">file_name</span>.<span class="ident">to_string</span>()),
             <span class="ident">file_type</span>: <span class="kw">match</span> <span class="ident">from</span>.<span class="ident">file_type</span> {
-                <span class="ident">FileType::Jpg</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">tmch_proto::TMCHFileType::Jpg</span>,
-                <span class="ident">FileType::Pdf</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">tmch_proto::TMCHFileType::Pdf</span>,
+                <span class="ident">FileType::Jpg</span> =&gt; <span class="ident">tmch_proto::TMCHFileType::Jpg</span>,
+                <span class="ident">FileType::Pdf</span> =&gt; <span class="ident">tmch_proto::TMCHFileType::Pdf</span>,
             },
             <span class="ident">file_content</span>: <span class="ident">base64::encode</span>(<span class="kw-2">&amp;</span><span class="ident">from</span>.<span class="ident">contents</span>),
         }
@@ -818,7 +818,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">AddCase</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">tmch_proto::TMCHCase</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">AddCase</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">AddCase</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">tmch_proto::TMCHCase</span> {
             <span class="ident">id</span>: <span class="ident">from</span>.<span class="ident">id</span>.<span class="ident">to_string</span>(),
             <span class="ident">case_type</span>: <span class="prelude-val">None</span>,
@@ -835,7 +835,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">CaseType</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">tmch_proto::TMCHCaseType</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">CaseType</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">CaseType</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">match</span> <span class="ident">from</span> {
             <span class="ident">CaseType::Court</span> {
                 <span class="ident">decision_id</span>,
@@ -843,7 +843,7 @@
                 <span class="ident">regions</span>,
                 <span class="ident">court_name</span>,
                 <span class="ident">case_language</span>,
-            } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">tmch_proto::TMCHCaseType::Court</span>(<span class="ident">tmch_proto::TMCHCourt</span> {
+            } =&gt; <span class="ident">tmch_proto::TMCHCaseType::Court</span>(<span class="ident">tmch_proto::TMCHCourt</span> {
                 <span class="ident">reference</span>: <span class="ident">decision_id</span>.<span class="ident">to_string</span>(),
                 <span class="ident">country_code</span>: <span class="ident">country_code</span>.<span class="ident">to_string</span>(),
                 <span class="ident">regions</span>: <span class="ident">regions</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="ident">Into::into</span>).<span class="ident">collect</span>(),
@@ -854,7 +854,7 @@
                 <span class="ident">case_language</span>,
                 <span class="ident">case_id</span>,
                 <span class="ident">provider</span>,
-            } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">tmch_proto::TMCHCaseType::Udrp</span>(<span class="ident">tmch_proto::TMCHUdrp</span> {
+            } =&gt; <span class="ident">tmch_proto::TMCHCaseType::Udrp</span>(<span class="ident">tmch_proto::TMCHUdrp</span> {
                 <span class="ident">case_number</span>: <span class="ident">case_id</span>.<span class="ident">to_string</span>(),
                 <span class="ident">udrp_provider</span>: <span class="ident">provider</span>.<span class="ident">to_string</span>(),
                 <span class="ident">case_language</span>: <span class="ident">case_language</span>.<span class="ident">to_string</span>(),
@@ -863,7 +863,7 @@
     }
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_check</span>(<span class="ident">_client</span>: <span class="kw-2">&amp;</span>(), <span class="ident">req</span>: <span class="kw-2">&amp;</span><span class="ident">CheckRequest</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HandleReqReturn</span><span class="op">&lt;</span><span class="ident">CheckResponse</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_check</span>(<span class="ident">_client</span>: <span class="kw-2">&amp;</span>(), <span class="ident">req</span>: <span class="kw-2">&amp;</span><span class="ident">CheckRequest</span>) -&gt; <span class="ident">HandleReqReturn</span><span class="op">&lt;</span><span class="ident">CheckResponse</span><span class="op">&gt;</span> {
     <span class="ident">check_mark_id</span>(<span class="kw-2">&amp;</span><span class="ident">req</span>.<span class="ident">id</span>)<span class="question-mark">?</span>;
     <span class="kw">let</span> <span class="ident">command</span> <span class="op">=</span> <span class="ident">tmch_proto::TMCHCheck</span> {
         <span class="ident">id</span>: <span class="macro">vec!</span>[<span class="ident">req</span>.<span class="ident">id</span>.<span class="ident">to_string</span>()],
@@ -871,10 +871,10 @@
     <span class="prelude-val">Ok</span>(<span class="ident">tmch_proto::TMCHCommandType::Check</span>(<span class="ident">command</span>))
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_check_response</span>(<span class="ident">response</span>: <span class="ident">tmch_proto::TMCHResponse</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">CheckResponse</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_check_response</span>(<span class="ident">response</span>: <span class="ident">tmch_proto::TMCHResponse</span>) -&gt; <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">CheckResponse</span><span class="op">&gt;</span> {
     <span class="kw">match</span> <span class="ident">response</span>.<span class="ident">data</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">value</span>.<span class="ident">value</span> {
-            <span class="ident">tmch_proto::TMCHResultDataValue::TMCHCheck</span>(<span class="ident">msg</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Some</span>(<span class="ident">value</span>) =&gt; <span class="kw">match</span> <span class="ident">value</span>.<span class="ident">value</span> {
+            <span class="ident">tmch_proto::TMCHResultDataValue::TMCHCheck</span>(<span class="ident">msg</span>) =&gt; {
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">mark_check</span>) <span class="op">=</span> <span class="ident">msg</span>.<span class="ident">data</span>.<span class="ident">first</span>() {
                     <span class="ident">Response::Ok</span>(<span class="ident">CheckResponse</span> {
                         <span class="ident">avail</span>: <span class="ident">mark_check</span>.<span class="ident">id</span>.<span class="ident">available</span>,
@@ -884,18 +884,18 @@
                     <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>)
                 }
             }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
         },
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
+        <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
     }
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_create</span>(<span class="ident">_client</span>: <span class="kw-2">&amp;</span>(), <span class="ident">req</span>: <span class="kw-2">&amp;</span><span class="ident">CreateRequest</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HandleReqReturn</span><span class="op">&lt;</span><span class="ident">CreateResponse</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_create</span>(<span class="ident">_client</span>: <span class="kw-2">&amp;</span>(), <span class="ident">req</span>: <span class="kw-2">&amp;</span><span class="ident">CreateRequest</span>) -&gt; <span class="ident">HandleReqReturn</span><span class="op">&lt;</span><span class="ident">CreateResponse</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">command</span> <span class="op">=</span> <span class="ident">tmch_proto::TMCHCreate</span> {
         <span class="ident">mark</span>: <span class="prelude-val">Some</span>((<span class="kw-2">&amp;</span><span class="ident">req</span>.<span class="ident">mark</span>).<span class="ident">into</span>()),
         <span class="ident">period</span>: <span class="kw">match</span> <span class="ident">req</span>.<span class="ident">period</span>.<span class="ident">as_ref</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">r</span>.<span class="ident">try_into</span>().<span class="ident">map_err</span>(<span class="ident">Result::Err</span>)<span class="question-mark">?</span>),
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="prelude-val">Some</span>(<span class="ident">r</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">r</span>.<span class="ident">try_into</span>().<span class="ident">map_err</span>(<span class="ident">Result::Err</span>)<span class="question-mark">?</span>),
+            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
         },
         <span class="ident">documents</span>: <span class="ident">req</span>.<span class="ident">documents</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="ident">Into::into</span>).<span class="ident">collect</span>(),
         <span class="ident">labels</span>: <span class="ident">req</span>.<span class="ident">labels</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="ident">Into::into</span>).<span class="ident">collect</span>(),
@@ -920,21 +920,21 @@
     <span class="prelude-val">Ok</span>(<span class="ident">tmch_proto::TMCHCommandType::Create</span>(<span class="ident">Box::new</span>(<span class="ident">command</span>)))
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_create_response</span>(<span class="ident">response</span>: <span class="ident">tmch_proto::TMCHResponse</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">CreateResponse</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_create_response</span>(<span class="ident">response</span>: <span class="ident">tmch_proto::TMCHResponse</span>) -&gt; <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">CreateResponse</span><span class="op">&gt;</span> {
     <span class="kw">match</span> <span class="ident">response</span>.<span class="ident">data</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">value</span>.<span class="ident">value</span> {
-            <span class="ident">tmch_proto::TMCHResultDataValue::TMCHCreate</span>(<span class="ident">msg</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Response::Ok</span>(<span class="ident">CreateResponse</span> {
+        <span class="prelude-val">Some</span>(<span class="ident">value</span>) =&gt; <span class="kw">match</span> <span class="ident">value</span>.<span class="ident">value</span> {
+            <span class="ident">tmch_proto::TMCHResultDataValue::TMCHCreate</span>(<span class="ident">msg</span>) =&gt; <span class="ident">Response::Ok</span>(<span class="ident">CreateResponse</span> {
                 <span class="ident">id</span>: <span class="ident">msg</span>.<span class="ident">id</span>,
                 <span class="ident">created_date</span>: <span class="ident">msg</span>.<span class="ident">creation_date</span>,
                 <span class="ident">balance</span>: <span class="ident">msg</span>.<span class="ident">balance</span>.<span class="ident">into</span>(),
             }),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
         },
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
+        <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
     }
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_mark_info</span>(<span class="ident">_client</span>: <span class="kw-2">&amp;</span>(), <span class="ident">req</span>: <span class="kw-2">&amp;</span><span class="ident">MarkInfoRequest</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HandleReqReturn</span><span class="op">&lt;</span><span class="ident">MarkInfoResponse</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_mark_info</span>(<span class="ident">_client</span>: <span class="kw-2">&amp;</span>(), <span class="ident">req</span>: <span class="kw-2">&amp;</span><span class="ident">MarkInfoRequest</span>) -&gt; <span class="ident">HandleReqReturn</span><span class="op">&lt;</span><span class="ident">MarkInfoResponse</span><span class="op">&gt;</span> {
     <span class="ident">check_mark_id</span>(<span class="kw-2">&amp;</span><span class="ident">req</span>.<span class="ident">id</span>)<span class="question-mark">?</span>;
     <span class="kw">let</span> <span class="ident">command</span> <span class="op">=</span> <span class="ident">tmch_proto::TMCHInfo</span> {
         <span class="ident">id</span>: <span class="ident">req</span>.<span class="ident">id</span>.<span class="ident">to_string</span>(),
@@ -946,7 +946,7 @@
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_mark_smd_info</span>(
     <span class="ident">_client</span>: <span class="kw-2">&amp;</span>(),
     <span class="ident">req</span>: <span class="kw-2">&amp;</span><span class="ident">MarkSMDInfoRequest</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HandleReqReturn</span><span class="op">&lt;</span><span class="ident">MarkSMDInfoResponse</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">HandleReqReturn</span><span class="op">&lt;</span><span class="ident">MarkSMDInfoResponse</span><span class="op">&gt;</span> {
     <span class="ident">check_mark_id</span>(<span class="kw-2">&amp;</span><span class="ident">req</span>.<span class="ident">id</span>)<span class="question-mark">?</span>;
     <span class="kw">let</span> <span class="ident">command</span> <span class="op">=</span> <span class="ident">tmch_proto::TMCHInfo</span> {
         <span class="ident">id</span>: <span class="ident">req</span>.<span class="ident">id</span>.<span class="ident">to_string</span>(),
@@ -958,7 +958,7 @@
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_mark_encoded_smd_info</span>(
     <span class="ident">_client</span>: <span class="kw-2">&amp;</span>(),
     <span class="ident">req</span>: <span class="kw-2">&amp;</span><span class="ident">MarkSMDInfoRequest</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HandleReqReturn</span><span class="op">&lt;</span><span class="ident">MarkSMDInfoResponse</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">HandleReqReturn</span><span class="op">&lt;</span><span class="ident">MarkSMDInfoResponse</span><span class="op">&gt;</span> {
     <span class="ident">check_mark_id</span>(<span class="kw-2">&amp;</span><span class="ident">req</span>.<span class="ident">id</span>)<span class="question-mark">?</span>;
     <span class="kw">let</span> <span class="ident">command</span> <span class="op">=</span> <span class="ident">tmch_proto::TMCHInfo</span> {
         <span class="ident">id</span>: <span class="ident">req</span>.<span class="ident">id</span>.<span class="ident">to_string</span>(),
@@ -970,7 +970,7 @@
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_mark_file_info</span>(
     <span class="ident">_client</span>: <span class="kw-2">&amp;</span>(),
     <span class="ident">req</span>: <span class="kw-2">&amp;</span><span class="ident">MarkSMDInfoRequest</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HandleReqReturn</span><span class="op">&lt;</span><span class="ident">MarkSMDInfoResponse</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">HandleReqReturn</span><span class="op">&lt;</span><span class="ident">MarkSMDInfoResponse</span><span class="op">&gt;</span> {
     <span class="ident">check_mark_id</span>(<span class="kw-2">&amp;</span><span class="ident">req</span>.<span class="ident">id</span>)<span class="question-mark">?</span>;
     <span class="kw">let</span> <span class="ident">command</span> <span class="op">=</span> <span class="ident">tmch_proto::TMCHInfo</span> {
         <span class="ident">id</span>: <span class="ident">req</span>.<span class="ident">id</span>.<span class="ident">to_string</span>(),
@@ -980,16 +980,16 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">tmch_proto::TMCHStatus</span><span class="op">&lt;</span><span class="ident">tmch_proto::TMCHStatusType</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Status</span><span class="op">&lt;</span><span class="ident">MarkStatus</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">tmch_proto::TMCHStatus</span><span class="op">&lt;</span><span class="ident">tmch_proto::TMCHStatusType</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">tmch_proto::TMCHStatus</span><span class="op">&lt;</span><span class="ident">tmch_proto::TMCHStatusType</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">Status</span> {
             <span class="ident">status_type</span>: <span class="kw">match</span> <span class="ident">from</span>.<span class="ident">status</span> {
-                <span class="ident">tmch_proto::TMCHStatusType::New</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">MarkStatus::New</span>,
-                <span class="ident">tmch_proto::TMCHStatusType::Verified</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">MarkStatus::Verified</span>,
-                <span class="ident">tmch_proto::TMCHStatusType::Incorrect</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">MarkStatus::Incorrect</span>,
-                <span class="ident">tmch_proto::TMCHStatusType::Corrected</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">MarkStatus::Corrected</span>,
-                <span class="ident">tmch_proto::TMCHStatusType::Invalid</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">MarkStatus::Invalid</span>,
-                <span class="ident">tmch_proto::TMCHStatusType::Expired</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">MarkStatus::Expired</span>,
-                <span class="ident">tmch_proto::TMCHStatusType::Deactivated</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">MarkStatus::Deactivated</span>,
+                <span class="ident">tmch_proto::TMCHStatusType::New</span> =&gt; <span class="ident">MarkStatus::New</span>,
+                <span class="ident">tmch_proto::TMCHStatusType::Verified</span> =&gt; <span class="ident">MarkStatus::Verified</span>,
+                <span class="ident">tmch_proto::TMCHStatusType::Incorrect</span> =&gt; <span class="ident">MarkStatus::Incorrect</span>,
+                <span class="ident">tmch_proto::TMCHStatusType::Corrected</span> =&gt; <span class="ident">MarkStatus::Corrected</span>,
+                <span class="ident">tmch_proto::TMCHStatusType::Invalid</span> =&gt; <span class="ident">MarkStatus::Invalid</span>,
+                <span class="ident">tmch_proto::TMCHStatusType::Expired</span> =&gt; <span class="ident">MarkStatus::Expired</span>,
+                <span class="ident">tmch_proto::TMCHStatusType::Deactivated</span> =&gt; <span class="ident">MarkStatus::Deactivated</span>,
             },
             <span class="ident">message</span>: <span class="ident">from</span>.<span class="ident">message</span>,
         }
@@ -997,17 +997,17 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">tmch_proto::TMCHStatus</span><span class="op">&lt;</span><span class="ident">tmch_proto::TMCHPOUStatusType</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Status</span><span class="op">&lt;</span><span class="ident">MarkPOUStatus</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">tmch_proto::TMCHStatus</span><span class="op">&lt;</span><span class="ident">tmch_proto::TMCHPOUStatusType</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">tmch_proto::TMCHStatus</span><span class="op">&lt;</span><span class="ident">tmch_proto::TMCHPOUStatusType</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">Status</span> {
             <span class="ident">status_type</span>: <span class="kw">match</span> <span class="ident">from</span>.<span class="ident">status</span> {
-                <span class="ident">tmch_proto::TMCHPOUStatusType::NotSet</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">MarkPOUStatus::NotSet</span>,
-                <span class="ident">tmch_proto::TMCHPOUStatusType::NA</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">MarkPOUStatus::NA</span>,
-                <span class="ident">tmch_proto::TMCHPOUStatusType::New</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">MarkPOUStatus::New</span>,
-                <span class="ident">tmch_proto::TMCHPOUStatusType::Incorrect</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">MarkPOUStatus::Incorrect</span>,
-                <span class="ident">tmch_proto::TMCHPOUStatusType::Corrected</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">MarkPOUStatus::Corrected</span>,
-                <span class="ident">tmch_proto::TMCHPOUStatusType::Valid</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">MarkPOUStatus::Valid</span>,
-                <span class="ident">tmch_proto::TMCHPOUStatusType::Invalid</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">MarkPOUStatus::Invalid</span>,
-                <span class="ident">tmch_proto::TMCHPOUStatusType::Expired</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">MarkPOUStatus::Expired</span>,
+                <span class="ident">tmch_proto::TMCHPOUStatusType::NotSet</span> =&gt; <span class="ident">MarkPOUStatus::NotSet</span>,
+                <span class="ident">tmch_proto::TMCHPOUStatusType::NA</span> =&gt; <span class="ident">MarkPOUStatus::NA</span>,
+                <span class="ident">tmch_proto::TMCHPOUStatusType::New</span> =&gt; <span class="ident">MarkPOUStatus::New</span>,
+                <span class="ident">tmch_proto::TMCHPOUStatusType::Incorrect</span> =&gt; <span class="ident">MarkPOUStatus::Incorrect</span>,
+                <span class="ident">tmch_proto::TMCHPOUStatusType::Corrected</span> =&gt; <span class="ident">MarkPOUStatus::Corrected</span>,
+                <span class="ident">tmch_proto::TMCHPOUStatusType::Valid</span> =&gt; <span class="ident">MarkPOUStatus::Valid</span>,
+                <span class="ident">tmch_proto::TMCHPOUStatusType::Invalid</span> =&gt; <span class="ident">MarkPOUStatus::Invalid</span>,
+                <span class="ident">tmch_proto::TMCHPOUStatusType::Expired</span> =&gt; <span class="ident">MarkPOUStatus::Expired</span>,
             },
             <span class="ident">message</span>: <span class="ident">from</span>.<span class="ident">message</span>,
         }
@@ -1015,24 +1015,24 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">tmch_proto::trex::TLDStatus</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">TrexStatus</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">tmch_proto::trex::TLDStatus</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">tmch_proto::trex::TLDStatus</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">match</span> <span class="ident">from</span> {
-            <span class="ident">tmch_proto::trex::TLDStatus::NotProtectedRegistered</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">tmch_proto::trex::TLDStatus::NotProtectedRegistered</span> =&gt; {
                 <span class="ident">TrexStatus::NotProtectedRegistered</span>
             }
-            <span class="ident">tmch_proto::trex::TLDStatus::NotProtectedExempt</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">TrexStatus::NotProtectedExempt</span>,
-            <span class="ident">tmch_proto::trex::TLDStatus::NotProtectedOther</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">TrexStatus::NotProtectedOther</span>,
-            <span class="ident">tmch_proto::trex::TLDStatus::NotProtectedOverride</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">TrexStatus::NotProtectedOverride</span>,
-            <span class="ident">tmch_proto::trex::TLDStatus::Eligible</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">TrexStatus::Eligible</span>,
-            <span class="ident">tmch_proto::trex::TLDStatus::Protected</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">TrexStatus::Protected</span>,
-            <span class="ident">tmch_proto::trex::TLDStatus::Unavailable</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">TrexStatus::Unavailable</span>,
-            <span class="ident">tmch_proto::trex::TLDStatus::NoInfo</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">TrexStatus::NoInfo</span>,
+            <span class="ident">tmch_proto::trex::TLDStatus::NotProtectedExempt</span> =&gt; <span class="ident">TrexStatus::NotProtectedExempt</span>,
+            <span class="ident">tmch_proto::trex::TLDStatus::NotProtectedOther</span> =&gt; <span class="ident">TrexStatus::NotProtectedOther</span>,
+            <span class="ident">tmch_proto::trex::TLDStatus::NotProtectedOverride</span> =&gt; <span class="ident">TrexStatus::NotProtectedOverride</span>,
+            <span class="ident">tmch_proto::trex::TLDStatus::Eligible</span> =&gt; <span class="ident">TrexStatus::Eligible</span>,
+            <span class="ident">tmch_proto::trex::TLDStatus::Protected</span> =&gt; <span class="ident">TrexStatus::Protected</span>,
+            <span class="ident">tmch_proto::trex::TLDStatus::Unavailable</span> =&gt; <span class="ident">TrexStatus::Unavailable</span>,
+            <span class="ident">tmch_proto::trex::TLDStatus::NoInfo</span> =&gt; <span class="ident">TrexStatus::NoInfo</span>,
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">tmch_proto::TMCHInfoLabel</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">MarkLabel</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">tmch_proto::TMCHInfoLabel</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">tmch_proto::TMCHInfoLabel</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">MarkLabel</span> {
             <span class="ident">a_label</span>: <span class="ident">from</span>.<span class="ident">label</span>,
             <span class="ident">u_label</span>: <span class="ident">from</span>.<span class="ident">ulabel</span>,
@@ -1044,7 +1044,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">tmch_proto::variation::Label</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">MarkVariation</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">tmch_proto::variation::Label</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">tmch_proto::variation::Label</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">MarkVariation</span> {
             <span class="ident">a_label</span>: <span class="ident">from</span>.<span class="ident">a_label</span>.<span class="ident">clone</span>(),
             <span class="ident">u_label</span>: <span class="ident">from</span>.<span class="ident">u_label</span>.<span class="ident">unwrap_or</span>(<span class="ident">from</span>.<span class="ident">a_label</span>),
@@ -1055,7 +1055,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">tmch_proto::TMCHBalance</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BalanceData</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">tmch_proto::TMCHBalance</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">tmch_proto::TMCHBalance</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">BalanceData</span> {
             <span class="ident">value</span>: <span class="ident">from</span>.<span class="ident">amount</span>.<span class="ident">value</span>,
             <span class="ident">currency</span>: <span class="ident">from</span>.<span class="ident">amount</span>.<span class="ident">currency</span>,
@@ -1067,12 +1067,12 @@
 <span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Period</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">tmch_proto::TMCHPeriod</span> {
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">Error</span>;
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">Period</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">Period</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="ident">tmch_proto::TMCHPeriod</span> {
             <span class="ident">value</span>: <span class="ident">std::cmp::min</span>(<span class="number">99</span>, <span class="ident">std::cmp::max</span>(<span class="ident">from</span>.<span class="ident">value</span>, <span class="number">1</span>)),
             <span class="ident">unit</span>: <span class="kw">match</span> <span class="ident">from</span>.<span class="ident">unit</span> {
-                <span class="ident">PeriodUnit::Years</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">tmch_proto::TMCHPeriodUnit::Years</span>,
-                <span class="ident">PeriodUnit::Months</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">PeriodUnit::Years</span> =&gt; <span class="ident">tmch_proto::TMCHPeriodUnit::Years</span>,
+                <span class="ident">PeriodUnit::Months</span> =&gt; {
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Err</span>(
                         <span class="string">&quot;month based periods are not valid for TMCH&quot;</span>.<span class="ident">to_string</span>(),
                     ))
@@ -1082,11 +1082,11 @@
     }
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_mark_info_response</span>(<span class="ident">response</span>: <span class="ident">tmch_proto::TMCHResponse</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">MarkInfoResponse</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_mark_info_response</span>(<span class="ident">response</span>: <span class="ident">tmch_proto::TMCHResponse</span>) -&gt; <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">MarkInfoResponse</span><span class="op">&gt;</span> {
     <span class="kw">match</span> <span class="ident">response</span>.<span class="ident">data</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">value</span>.<span class="ident">value</span> {
-            <span class="ident">tmch_proto::TMCHResultDataValue::TMCHInfo</span>(<span class="ident">msg</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> (<span class="ident">msg</span>.<span class="ident">pou_status</span>, <span class="ident">msg</span>.<span class="ident">mark</span>) {
-                (<span class="prelude-val">Some</span>(<span class="ident">pou_status</span>), <span class="prelude-val">Some</span>(<span class="ident">_mark</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Response::Ok</span>(<span class="ident">MarkInfoResponse</span> {
+        <span class="prelude-val">Some</span>(<span class="ident">value</span>) =&gt; <span class="kw">match</span> <span class="ident">value</span>.<span class="ident">value</span> {
+            <span class="ident">tmch_proto::TMCHResultDataValue::TMCHInfo</span>(<span class="ident">msg</span>) =&gt; <span class="kw">match</span> (<span class="ident">msg</span>.<span class="ident">pou_status</span>, <span class="ident">msg</span>.<span class="ident">mark</span>) {
+                (<span class="prelude-val">Some</span>(<span class="ident">pou_status</span>), <span class="prelude-val">Some</span>(<span class="ident">_mark</span>)) =&gt; <span class="ident">Response::Ok</span>(<span class="ident">MarkInfoResponse</span> {
                     <span class="ident">id</span>: <span class="ident">msg</span>.<span class="ident">id</span>,
                     <span class="ident">status</span>: <span class="ident">msg</span>.<span class="ident">status</span>.<span class="ident">into</span>(),
                     <span class="ident">pou_status</span>: <span class="ident">pou_status</span>.<span class="ident">into</span>(),
@@ -1104,11 +1104,11 @@
                     <span class="ident">pou_expiry_date</span>: <span class="ident">msg</span>.<span class="ident">pou_expiry_date</span>,
                     <span class="ident">correct_before</span>: <span class="ident">msg</span>.<span class="ident">correct_before</span>,
                 }),
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
+                <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
             },
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
         },
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
+        <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
     }
 }
 
@@ -1120,11 +1120,11 @@
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_mark_smd_info_response</span>(
     <span class="ident">response</span>: <span class="ident">tmch_proto::TMCHResponse</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">MarkSMDInfoResponse</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">MarkSMDInfoResponse</span><span class="op">&gt;</span> {
     <span class="kw">match</span> <span class="ident">response</span>.<span class="ident">data</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">value</span>.<span class="ident">value</span> {
-            <span class="ident">tmch_proto::TMCHResultDataValue::TMCHInfo</span>(<span class="ident">msg</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> (<span class="ident">msg</span>.<span class="ident">signed_mark</span>, <span class="ident">msg</span>.<span class="ident">smd_id</span>) {
-                (<span class="prelude-val">Some</span>(<span class="ident">smd</span>), <span class="prelude-val">Some</span>(<span class="ident">smd_id</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Some</span>(<span class="ident">value</span>) =&gt; <span class="kw">match</span> <span class="ident">value</span>.<span class="ident">value</span> {
+            <span class="ident">tmch_proto::TMCHResultDataValue::TMCHInfo</span>(<span class="ident">msg</span>) =&gt; <span class="kw">match</span> (<span class="ident">msg</span>.<span class="ident">signed_mark</span>, <span class="ident">msg</span>.<span class="ident">smd_id</span>) {
+                (<span class="prelude-val">Some</span>(<span class="ident">smd</span>), <span class="prelude-val">Some</span>(<span class="ident">smd_id</span>)) =&gt; {
                     <span class="kw">let</span> <span class="ident">smd</span> <span class="op">=</span> <span class="ident">SMDInfo</span> { <span class="ident">signed_mark</span>: <span class="ident">smd</span> };
 
                     <span class="ident">Response::Ok</span>(<span class="ident">MarkSMDInfoResponse</span> {
@@ -1134,57 +1134,57 @@
                         <span class="ident">smd</span>: <span class="ident">xml_serde::to_string</span>(<span class="kw-2">&amp;</span><span class="ident">smd</span>).<span class="ident">unwrap</span>(),
                     })
                 }
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
+                <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
             },
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
         },
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
+        <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
     }
 }
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_mark_encoded_smd_info_response</span>(
     <span class="ident">response</span>: <span class="ident">tmch_proto::TMCHResponse</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">MarkSMDInfoResponse</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">MarkSMDInfoResponse</span><span class="op">&gt;</span> {
     <span class="kw">match</span> <span class="ident">response</span>.<span class="ident">data</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">value</span>.<span class="ident">value</span> {
-            <span class="ident">tmch_proto::TMCHResultDataValue::TMCHInfo</span>(<span class="ident">msg</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Some</span>(<span class="ident">value</span>) =&gt; <span class="kw">match</span> <span class="ident">value</span>.<span class="ident">value</span> {
+            <span class="ident">tmch_proto::TMCHResultDataValue::TMCHInfo</span>(<span class="ident">msg</span>) =&gt; {
                 <span class="kw">match</span> (<span class="ident">msg</span>.<span class="ident">encoded_signed_mark</span>, <span class="ident">msg</span>.<span class="ident">smd_id</span>) {
-                    (<span class="prelude-val">Some</span>(<span class="ident">smd</span>), <span class="prelude-val">Some</span>(<span class="ident">smd_id</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Response::Ok</span>(<span class="ident">MarkSMDInfoResponse</span> {
+                    (<span class="prelude-val">Some</span>(<span class="ident">smd</span>), <span class="prelude-val">Some</span>(<span class="ident">smd_id</span>)) =&gt; <span class="ident">Response::Ok</span>(<span class="ident">MarkSMDInfoResponse</span> {
                         <span class="ident">id</span>: <span class="ident">msg</span>.<span class="ident">id</span>,
                         <span class="ident">status</span>: <span class="ident">msg</span>.<span class="ident">status</span>.<span class="ident">into</span>(),
                         <span class="ident">smd_id</span>,
                         <span class="ident">smd</span>,
                     }),
-                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
+                    <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
                 }
             }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
         },
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
+        <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
     }
 }
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_mark_file_info_response</span>(
     <span class="ident">response</span>: <span class="ident">tmch_proto::TMCHResponse</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">MarkSMDInfoResponse</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">MarkSMDInfoResponse</span><span class="op">&gt;</span> {
     <span class="kw">match</span> <span class="ident">response</span>.<span class="ident">data</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">value</span>.<span class="ident">value</span> {
-            <span class="ident">tmch_proto::TMCHResultDataValue::TMCHInfo</span>(<span class="ident">msg</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> (<span class="ident">msg</span>.<span class="ident">enc_file</span>, <span class="ident">msg</span>.<span class="ident">smd_id</span>) {
-                (<span class="prelude-val">Some</span>(<span class="ident">smd</span>), <span class="prelude-val">Some</span>(<span class="ident">smd_id</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Response::Ok</span>(<span class="ident">MarkSMDInfoResponse</span> {
+        <span class="prelude-val">Some</span>(<span class="ident">value</span>) =&gt; <span class="kw">match</span> <span class="ident">value</span>.<span class="ident">value</span> {
+            <span class="ident">tmch_proto::TMCHResultDataValue::TMCHInfo</span>(<span class="ident">msg</span>) =&gt; <span class="kw">match</span> (<span class="ident">msg</span>.<span class="ident">enc_file</span>, <span class="ident">msg</span>.<span class="ident">smd_id</span>) {
+                (<span class="prelude-val">Some</span>(<span class="ident">smd</span>), <span class="prelude-val">Some</span>(<span class="ident">smd_id</span>)) =&gt; <span class="ident">Response::Ok</span>(<span class="ident">MarkSMDInfoResponse</span> {
                     <span class="ident">id</span>: <span class="ident">msg</span>.<span class="ident">id</span>,
                     <span class="ident">status</span>: <span class="ident">msg</span>.<span class="ident">status</span>.<span class="ident">into</span>(),
                     <span class="ident">smd_id</span>,
                     <span class="ident">smd</span>,
                 }),
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
+                <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
             },
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
         },
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
+        <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
     }
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_update</span>(<span class="ident">_client</span>: <span class="kw-2">&amp;</span>(), <span class="ident">req</span>: <span class="kw-2">&amp;</span><span class="ident">UpdateRequest</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HandleReqReturn</span><span class="op">&lt;</span><span class="ident">UpdateResponse</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_update</span>(<span class="ident">_client</span>: <span class="kw-2">&amp;</span>(), <span class="ident">req</span>: <span class="kw-2">&amp;</span><span class="ident">UpdateRequest</span>) -&gt; <span class="ident">HandleReqReturn</span><span class="op">&lt;</span><span class="ident">UpdateResponse</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">add_documents</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">tmch_proto::TMCHDocument</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[];
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">add_labels</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">tmch_proto::TMCHLabel</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[];
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">add_variations</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[];
@@ -1196,16 +1196,16 @@
 
     <span class="kw">for</span> <span class="ident">add</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">req</span>.<span class="ident">add</span> {
         <span class="kw">match</span> <span class="ident">add</span> {
-            <span class="ident">UpdateAdd::Document</span>(<span class="ident">d</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">UpdateAdd::Document</span>(<span class="ident">d</span>) =&gt; {
                 <span class="ident">add_documents</span>.<span class="ident">push</span>(<span class="ident">d</span>.<span class="ident">into</span>());
             }
-            <span class="ident">UpdateAdd::Label</span>(<span class="ident">d</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">UpdateAdd::Label</span>(<span class="ident">d</span>) =&gt; {
                 <span class="ident">add_labels</span>.<span class="ident">push</span>(<span class="ident">d</span>.<span class="ident">into</span>());
             }
-            <span class="ident">UpdateAdd::Variation</span>(<span class="ident">d</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">UpdateAdd::Variation</span>(<span class="ident">d</span>) =&gt; {
                 <span class="ident">add_variations</span>.<span class="ident">push</span>(<span class="ident">d</span>.<span class="ident">to_string</span>());
             }
-            <span class="ident">UpdateAdd::Case</span>(<span class="ident">d</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">UpdateAdd::Case</span>(<span class="ident">d</span>) =&gt; {
                 <span class="ident">check_case_id</span>(<span class="kw-2">&amp;</span><span class="ident">d</span>.<span class="ident">id</span>)<span class="question-mark">?</span>;
                 <span class="ident">add_cases</span>.<span class="ident">push</span>(<span class="ident">d</span>.<span class="ident">into</span>());
             }
@@ -1214,7 +1214,7 @@
 
     <span class="kw">for</span> <span class="ident">remove</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">req</span>.<span class="ident">remove</span> {
         <span class="kw">match</span> <span class="ident">remove</span> {
-            <span class="ident">UpdateRemove::Label</span>(<span class="ident">d</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">UpdateRemove::Label</span>(<span class="ident">d</span>) =&gt; {
                 <span class="ident">rem_labels</span>.<span class="ident">push</span>(<span class="ident">tmch_proto::TMCHLabel</span> {
                     <span class="ident">label</span>: <span class="ident">d</span>.<span class="ident">to_string</span>(),
                     <span class="ident">smd_inclusion</span>: <span class="prelude-val">None</span>,
@@ -1223,7 +1223,7 @@
                     <span class="ident">trex_renew</span>: <span class="prelude-val">None</span>,
                 });
             }
-            <span class="ident">UpdateRemove::Variation</span>(<span class="ident">d</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">UpdateRemove::Variation</span>(<span class="ident">d</span>) =&gt; {
                 <span class="ident">rem_variations</span>.<span class="ident">push</span>(<span class="ident">d</span>.<span class="ident">to_string</span>());
             }
         }
@@ -1236,10 +1236,10 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rem_case_labels</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">tmch_proto::TMCHCaseLabel</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[];
         <span class="kw">for</span> <span class="ident">case_add</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">case</span>.<span class="ident">add</span> {
             <span class="kw">match</span> <span class="ident">case_add</span> {
-                <span class="ident">CaseAdd::Document</span>(<span class="ident">d</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">CaseAdd::Document</span>(<span class="ident">d</span>) =&gt; {
                     <span class="ident">add_case_documents</span>.<span class="ident">push</span>(<span class="ident">d</span>.<span class="ident">into</span>());
                 }
-                <span class="ident">CaseAdd::Label</span>(<span class="ident">l</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">CaseAdd::Label</span>(<span class="ident">l</span>) =&gt; {
                     <span class="ident">add_case_labels</span>.<span class="ident">push</span>(<span class="ident">tmch_proto::TMCHCaseLabel</span> {
                         <span class="ident">label</span>: <span class="ident">l</span>.<span class="ident">to_string</span>(),
                     });
@@ -1248,7 +1248,7 @@
         }
         <span class="kw">for</span> <span class="ident">case_rem</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">case</span>.<span class="ident">remove</span> {
             <span class="kw">match</span> <span class="ident">case_rem</span> {
-                <span class="ident">CaseRemove::Label</span>(<span class="ident">l</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">CaseRemove::Label</span>(<span class="ident">l</span>) =&gt; {
                     <span class="ident">rem_case_labels</span>.<span class="ident">push</span>(<span class="ident">tmch_proto::TMCHCaseLabel</span> {
                         <span class="ident">label</span>: <span class="ident">l</span>.<span class="ident">to_string</span>(),
                     });
@@ -1348,44 +1348,44 @@
     <span class="prelude-val">Ok</span>(<span class="ident">tmch_proto::TMCHCommandType::Update</span>(<span class="ident">Box::new</span>(<span class="ident">command</span>)))
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_update_response</span>(<span class="ident">response</span>: <span class="ident">tmch_proto::TMCHResponse</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">UpdateResponse</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_update_response</span>(<span class="ident">response</span>: <span class="ident">tmch_proto::TMCHResponse</span>) -&gt; <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">UpdateResponse</span><span class="op">&gt;</span> {
     <span class="kw">match</span> <span class="ident">response</span>.<span class="ident">data</span> {
-        <span class="prelude-val">Some</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Response::Ok</span>(<span class="ident">UpdateResponse</span> {}),
+        <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
+        <span class="prelude-val">None</span> =&gt; <span class="ident">Response::Ok</span>(<span class="ident">UpdateResponse</span> {}),
     }
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_renew</span>(<span class="ident">_client</span>: <span class="kw-2">&amp;</span>(), <span class="ident">req</span>: <span class="kw-2">&amp;</span><span class="ident">RenewRequest</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HandleReqReturn</span><span class="op">&lt;</span><span class="ident">RenewResponse</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_renew</span>(<span class="ident">_client</span>: <span class="kw-2">&amp;</span>(), <span class="ident">req</span>: <span class="kw-2">&amp;</span><span class="ident">RenewRequest</span>) -&gt; <span class="ident">HandleReqReturn</span><span class="op">&lt;</span><span class="ident">RenewResponse</span><span class="op">&gt;</span> {
     <span class="ident">check_mark_id</span>(<span class="kw-2">&amp;</span><span class="ident">req</span>.<span class="ident">id</span>)<span class="question-mark">?</span>;
     <span class="kw">let</span> <span class="ident">command</span> <span class="op">=</span> <span class="ident">tmch_proto::TMCHRenew</span> {
         <span class="ident">id</span>: <span class="ident">req</span>.<span class="ident">id</span>.<span class="ident">to_string</span>(),
         <span class="ident">current_expiry_date</span>: <span class="ident">req</span>.<span class="ident">cur_expiry_date</span>.<span class="ident">date</span>(),
         <span class="ident">period</span>: <span class="kw">match</span> <span class="ident">req</span>.<span class="ident">add_period</span>.<span class="ident">as_ref</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">r</span>.<span class="ident">try_into</span>().<span class="ident">map_err</span>(<span class="ident">Result::Err</span>)<span class="question-mark">?</span>),
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="prelude-val">Some</span>(<span class="ident">r</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">r</span>.<span class="ident">try_into</span>().<span class="ident">map_err</span>(<span class="ident">Result::Err</span>)<span class="question-mark">?</span>),
+            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
         },
     };
     <span class="prelude-val">Ok</span>(<span class="ident">tmch_proto::TMCHCommandType::Renew</span>(<span class="ident">command</span>))
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_renew_response</span>(<span class="ident">response</span>: <span class="ident">tmch_proto::TMCHResponse</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">RenewResponse</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_renew_response</span>(<span class="ident">response</span>: <span class="ident">tmch_proto::TMCHResponse</span>) -&gt; <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">RenewResponse</span><span class="op">&gt;</span> {
     <span class="kw">match</span> <span class="ident">response</span>.<span class="ident">data</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">value</span>.<span class="ident">value</span> {
-            <span class="ident">tmch_proto::TMCHResultDataValue::TMCHRenew</span>(<span class="ident">msg</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Response::Ok</span>(<span class="ident">RenewResponse</span> {
+        <span class="prelude-val">Some</span>(<span class="ident">value</span>) =&gt; <span class="kw">match</span> <span class="ident">value</span>.<span class="ident">value</span> {
+            <span class="ident">tmch_proto::TMCHResultDataValue::TMCHRenew</span>(<span class="ident">msg</span>) =&gt; <span class="ident">Response::Ok</span>(<span class="ident">RenewResponse</span> {
                 <span class="ident">id</span>: <span class="ident">msg</span>.<span class="ident">id</span>,
                 <span class="ident">new_expiry_date</span>: <span class="ident">msg</span>.<span class="ident">expiry_date</span>,
                 <span class="ident">balance</span>: <span class="ident">msg</span>.<span class="ident">balance</span>.<span class="ident">into</span>(),
             }),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
         },
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
+        <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
     }
 }
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_transfer_initiate</span>(
     <span class="ident">_client</span>: <span class="kw-2">&amp;</span>(),
     <span class="ident">req</span>: <span class="kw-2">&amp;</span><span class="ident">TransferInitiateRequest</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HandleReqReturn</span><span class="op">&lt;</span><span class="ident">TransferInitiateResponse</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">HandleReqReturn</span><span class="op">&lt;</span><span class="ident">TransferInitiateResponse</span><span class="op">&gt;</span> {
     <span class="ident">check_mark_id</span>(<span class="kw-2">&amp;</span><span class="ident">req</span>.<span class="ident">id</span>)<span class="question-mark">?</span>;
     <span class="kw">let</span> <span class="ident">command</span> <span class="op">=</span> <span class="ident">tmch_proto::TMCHTransfer</span> {
         <span class="ident">id</span>: <span class="ident">req</span>.<span class="ident">id</span>.<span class="ident">to_string</span>(),
@@ -1397,23 +1397,23 @@
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_transfer_initiate_response</span>(
     <span class="ident">response</span>: <span class="ident">tmch_proto::TMCHResponse</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">TransferInitiateResponse</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">TransferInitiateResponse</span><span class="op">&gt;</span> {
     <span class="kw">match</span> <span class="ident">response</span>.<span class="ident">data</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">value</span>.<span class="ident">value</span> {
-            <span class="ident">tmch_proto::TMCHResultDataValue::TMCHInfo</span>(<span class="ident">msg</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">msg</span>.<span class="ident">auth_info</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">auth_info</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Response::Ok</span>(<span class="ident">TransferInitiateResponse</span> {
+        <span class="prelude-val">Some</span>(<span class="ident">value</span>) =&gt; <span class="kw">match</span> <span class="ident">value</span>.<span class="ident">value</span> {
+            <span class="ident">tmch_proto::TMCHResultDataValue::TMCHInfo</span>(<span class="ident">msg</span>) =&gt; <span class="kw">match</span> <span class="ident">msg</span>.<span class="ident">auth_info</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">auth_info</span>) =&gt; <span class="ident">Response::Ok</span>(<span class="ident">TransferInitiateResponse</span> {
                     <span class="ident">id</span>: <span class="ident">msg</span>.<span class="ident">id</span>,
                     <span class="ident">auth_info</span>,
                 }),
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
+                <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
             },
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
         },
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
+        <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
     }
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_transfer</span>(<span class="ident">_client</span>: <span class="kw-2">&amp;</span>(), <span class="ident">req</span>: <span class="kw-2">&amp;</span><span class="ident">TransferRequest</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HandleReqReturn</span><span class="op">&lt;</span><span class="ident">TransferResponse</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_transfer</span>(<span class="ident">_client</span>: <span class="kw-2">&amp;</span>(), <span class="ident">req</span>: <span class="kw-2">&amp;</span><span class="ident">TransferRequest</span>) -&gt; <span class="ident">HandleReqReturn</span><span class="op">&lt;</span><span class="ident">TransferResponse</span><span class="op">&gt;</span> {
     <span class="ident">check_mark_id</span>(<span class="kw-2">&amp;</span><span class="ident">req</span>.<span class="ident">id</span>)<span class="question-mark">?</span>;
     <span class="kw">let</span> <span class="ident">command</span> <span class="op">=</span> <span class="ident">tmch_proto::TMCHTransfer</span> {
         <span class="ident">id</span>: <span class="ident">req</span>.<span class="ident">id</span>.<span class="ident">to_string</span>(),
@@ -1423,17 +1423,17 @@
     <span class="prelude-val">Ok</span>(<span class="ident">tmch_proto::TMCHCommandType::Transfer</span>(<span class="ident">command</span>))
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_transfer_response</span>(<span class="ident">response</span>: <span class="ident">tmch_proto::TMCHResponse</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">TransferResponse</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_transfer_response</span>(<span class="ident">response</span>: <span class="ident">tmch_proto::TMCHResponse</span>) -&gt; <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">TransferResponse</span><span class="op">&gt;</span> {
     <span class="kw">match</span> <span class="ident">response</span>.<span class="ident">data</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">value</span>.<span class="ident">value</span> {
-            <span class="ident">tmch_proto::TMCHResultDataValue::TMCHTransfer</span>(<span class="ident">msg</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Response::Ok</span>(<span class="ident">TransferResponse</span> {
+        <span class="prelude-val">Some</span>(<span class="ident">value</span>) =&gt; <span class="kw">match</span> <span class="ident">value</span>.<span class="ident">value</span> {
+            <span class="ident">tmch_proto::TMCHResultDataValue::TMCHTransfer</span>(<span class="ident">msg</span>) =&gt; <span class="ident">Response::Ok</span>(<span class="ident">TransferResponse</span> {
                 <span class="ident">id</span>: <span class="ident">msg</span>.<span class="ident">id</span>,
                 <span class="ident">transfer_date</span>: <span class="ident">msg</span>.<span class="ident">transfer_date</span>,
                 <span class="ident">balance</span>: <span class="ident">msg</span>.<span class="ident">balance</span>.<span class="ident">into</span>(),
             }),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
         },
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
+        <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
     }
 }
 </code></pre></div>

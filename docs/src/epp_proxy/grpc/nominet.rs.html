@@ -108,7 +108,7 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::epp_proto</span>;
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">client::nominet::CancelData</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">epp_proto::nominet::DomainCancel</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">res</span>: <span class="ident">client::nominet::CancelData</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">res</span>: <span class="ident">client::nominet::CancelData</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">epp_proto::nominet::DomainCancel</span> {
             <span class="ident">name</span>: <span class="ident">res</span>.<span class="ident">domain_name</span>,
             <span class="ident">originator</span>: <span class="ident">res</span>.<span class="ident">originator</span>,
@@ -117,7 +117,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">client::nominet::ReleaseData</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">epp_proto::nominet::DomainRelease</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">res</span>: <span class="ident">client::nominet::ReleaseData</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">res</span>: <span class="ident">client::nominet::ReleaseData</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">epp_proto::nominet::DomainRelease</span> {
             <span class="ident">account_id</span>: <span class="ident">res</span>.<span class="ident">account_id</span>,
             <span class="ident">account_moved</span>: <span class="ident">res</span>.<span class="ident">account_moved</span>,
@@ -129,7 +129,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">client::nominet::RegistrarChangeData</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">epp_proto::nominet::DomainRegistrarChange</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">res</span>: <span class="ident">client::nominet::RegistrarChangeData</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">res</span>: <span class="ident">client::nominet::RegistrarChangeData</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">epp_proto::nominet::DomainRegistrarChange</span> {
             <span class="ident">originator</span>: <span class="ident">res</span>.<span class="ident">originator</span>,
             <span class="ident">registrar_tag</span>: <span class="ident">res</span>.<span class="ident">registrar_tag</span>,
@@ -141,7 +141,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">client::nominet::HostCancelData</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">epp_proto::nominet::HostCancel</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">res</span>: <span class="ident">client::nominet::HostCancelData</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">res</span>: <span class="ident">client::nominet::HostCancelData</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">epp_proto::nominet::HostCancel</span> {
             <span class="ident">host_objects</span>: <span class="ident">res</span>.<span class="ident">host_objects</span>,
             <span class="ident">domain_names</span>: <span class="ident">res</span>.<span class="ident">domain_names</span>,
@@ -150,13 +150,13 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">client::nominet::ProcessData</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">epp_proto::nominet::Process</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">res</span>: <span class="ident">client::nominet::ProcessData</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">res</span>: <span class="ident">client::nominet::ProcessData</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">epp_proto::nominet::Process</span> {
             <span class="ident">stage</span>: <span class="kw">match</span> <span class="ident">res</span>.<span class="ident">stage</span> {
-                <span class="ident">client::nominet::ProcessStage::Initial</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">client::nominet::ProcessStage::Initial</span> =&gt; {
                     <span class="ident">epp_proto::nominet::process::ProcessStage::Initial</span>.<span class="ident">into</span>()
                 }
-                <span class="ident">client::nominet::ProcessStage::Updated</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">client::nominet::ProcessStage::Updated</span> =&gt; {
                     <span class="ident">epp_proto::nominet::process::ProcessStage::Updated</span>.<span class="ident">into</span>()
                 }
             },
@@ -170,7 +170,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">client::nominet::SuspendData</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">epp_proto::nominet::Suspend</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">res</span>: <span class="ident">client::nominet::SuspendData</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">res</span>: <span class="ident">client::nominet::SuspendData</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">epp_proto::nominet::Suspend</span> {
             <span class="ident">reason</span>: <span class="ident">res</span>.<span class="ident">reason</span>,
             <span class="ident">cancel_date</span>: <span class="ident"><span class="kw">super</span>::utils::chrono_to_proto</span>(<span class="ident">res</span>.<span class="ident">cancel_date</span>),
@@ -180,7 +180,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">client::nominet::DomainFailData</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">epp_proto::nominet::DomainFail</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">res</span>: <span class="ident">client::nominet::DomainFailData</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">res</span>: <span class="ident">client::nominet::DomainFailData</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">epp_proto::nominet::DomainFail</span> {
             <span class="ident">domain</span>: <span class="ident">res</span>.<span class="ident">domain_name</span>,
             <span class="ident">reason</span>: <span class="ident">res</span>.<span class="ident">reason</span>,
@@ -189,7 +189,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">client::nominet::RegistrantTransferData</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">epp_proto::nominet::RegistrantTransfer</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">res</span>: <span class="ident">client::nominet::RegistrantTransferData</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">res</span>: <span class="ident">client::nominet::RegistrantTransferData</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">epp_proto::nominet::RegistrantTransfer</span> {
             <span class="ident">originator</span>: <span class="ident">res</span>.<span class="ident">originator</span>,
             <span class="ident">account_id</span>: <span class="ident">res</span>.<span class="ident">account_id</span>,
@@ -202,7 +202,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">client::nominet::HandshakeResponse</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">epp_proto::nominet::HandshakeReply</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">res</span>: <span class="ident">client::nominet::HandshakeResponse</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">res</span>: <span class="ident">client::nominet::HandshakeResponse</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">epp_proto::nominet::HandshakeReply</span> {
             <span class="ident">case_id</span>: <span class="ident">res</span>.<span class="ident">case_id</span>,
             <span class="ident">domains</span>: <span class="ident">res</span>.<span class="ident">domains</span>,

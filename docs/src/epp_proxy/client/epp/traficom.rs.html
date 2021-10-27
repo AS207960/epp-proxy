@@ -8,7 +8,7 @@
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::traficom::TrnData</span>;
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::proto::traficom::EPPObjTrnData</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">TrnData</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident"><span class="kw">super</span>::proto::traficom::EPPObjTrnData</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident"><span class="kw">super</span>::proto::traficom::EPPObjTrnData</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">TrnData</span> { <span class="ident">name</span>: <span class="ident">from</span>.<span class="ident">name</span> }
     }
 }

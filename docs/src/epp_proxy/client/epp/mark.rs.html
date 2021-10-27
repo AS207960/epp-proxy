@@ -250,9 +250,9 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span></span>::{<span class="ident">proto</span>, <span class="ident">Phone</span>};
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Mark</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">proto::mark::Mark</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">Mark</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">Mark</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">match</span> <span class="ident">from</span> {
-            <span class="ident">Mark::TradeMark</span>(<span class="ident">m</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">proto::mark::Mark::TradeMark</span>(<span class="ident">proto::mark::TradeMark</span> {
+            <span class="ident">Mark::TradeMark</span>(<span class="ident">m</span>) =&gt; <span class="ident">proto::mark::Mark::TradeMark</span>(<span class="ident">proto::mark::TradeMark</span> {
                 <span class="ident">id</span>: <span class="ident">m</span>.<span class="ident">id</span>.<span class="ident">to_string</span>(),
                 <span class="ident">mark_name</span>: <span class="ident">m</span>.<span class="ident">mark_name</span>.<span class="ident">to_string</span>(),
                 <span class="ident">holders</span>: <span class="ident">m</span>.<span class="ident">holders</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="ident">Into::into</span>).<span class="ident">collect</span>(),
@@ -267,7 +267,7 @@
                 <span class="ident">registration_date</span>: <span class="ident">m</span>.<span class="ident">registration_date</span>,
                 <span class="ident">expiry_date</span>: <span class="ident">m</span>.<span class="ident">expiry_date</span>,
             }),
-            <span class="ident">Mark::TreatyOrStatute</span>(<span class="ident">m</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Mark::TreatyOrStatute</span>(<span class="ident">m</span>) =&gt; {
                 <span class="ident">proto::mark::Mark::TreatyOrStatute</span>(<span class="ident">proto::mark::TreatyOrStatute</span> {
                     <span class="ident">id</span>: <span class="ident">m</span>.<span class="ident">id</span>.<span class="ident">to_string</span>(),
                     <span class="ident">mark_name</span>: <span class="ident">m</span>.<span class="ident">mark_name</span>.<span class="ident">to_string</span>(),
@@ -290,7 +290,7 @@
                     <span class="ident">execution_date</span>: <span class="ident">m</span>.<span class="ident">execution_date</span>,
                 })
             }
-            <span class="ident">Mark::Court</span>(<span class="ident">m</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">proto::mark::Mark::Court</span>(<span class="ident">proto::mark::Court</span> {
+            <span class="ident">Mark::Court</span>(<span class="ident">m</span>) =&gt; <span class="ident">proto::mark::Mark::Court</span>(<span class="ident">proto::mark::Court</span> {
                 <span class="ident">id</span>: <span class="ident">m</span>.<span class="ident">id</span>.<span class="ident">to_string</span>(),
                 <span class="ident">mark_name</span>: <span class="ident">m</span>.<span class="ident">mark_name</span>.<span class="ident">to_string</span>(),
                 <span class="ident">holders</span>: <span class="ident">m</span>.<span class="ident">holders</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="ident">Into::into</span>).<span class="ident">collect</span>(),
@@ -308,9 +308,9 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">proto::mark::Mark</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Mark</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">proto::mark::Mark</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">proto::mark::Mark</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">match</span> <span class="ident">from</span> {
-            <span class="ident">proto::mark::Mark::TradeMark</span>(<span class="ident">m</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Mark::TradeMark</span>(<span class="ident">TradeMark</span> {
+            <span class="ident">proto::mark::Mark::TradeMark</span>(<span class="ident">m</span>) =&gt; <span class="ident">Mark::TradeMark</span>(<span class="ident">TradeMark</span> {
                 <span class="ident">id</span>: <span class="ident">m</span>.<span class="ident">id</span>,
                 <span class="ident">mark_name</span>: <span class="ident">m</span>.<span class="ident">mark_name</span>,
                 <span class="ident">holders</span>: <span class="ident">m</span>.<span class="ident">holders</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">Into::into</span>).<span class="ident">collect</span>(),
@@ -325,7 +325,7 @@
                 <span class="ident">registration_date</span>: <span class="ident">m</span>.<span class="ident">registration_date</span>,
                 <span class="ident">expiry_date</span>: <span class="ident">m</span>.<span class="ident">expiry_date</span>,
             }),
-            <span class="ident">proto::mark::Mark::TreatyOrStatute</span>(<span class="ident">m</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Mark::TreatyOrStatute</span>(<span class="ident">TreatyOrStatute</span> {
+            <span class="ident">proto::mark::Mark::TreatyOrStatute</span>(<span class="ident">m</span>) =&gt; <span class="ident">Mark::TreatyOrStatute</span>(<span class="ident">TreatyOrStatute</span> {
                 <span class="ident">id</span>: <span class="ident">m</span>.<span class="ident">id</span>,
                 <span class="ident">mark_name</span>: <span class="ident">m</span>.<span class="ident">mark_name</span>,
                 <span class="ident">holders</span>: <span class="ident">m</span>.<span class="ident">holders</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">Into::into</span>).<span class="ident">collect</span>(),
@@ -346,7 +346,7 @@
                 <span class="ident">title</span>: <span class="ident">m</span>.<span class="ident">title</span>,
                 <span class="ident">execution_date</span>: <span class="ident">m</span>.<span class="ident">execution_date</span>,
             }),
-            <span class="ident">proto::mark::Mark::Court</span>(<span class="ident">m</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Mark::Court</span>(<span class="ident">Court</span> {
+            <span class="ident">proto::mark::Mark::Court</span>(<span class="ident">m</span>) =&gt; <span class="ident">Mark::Court</span>(<span class="ident">Court</span> {
                 <span class="ident">id</span>: <span class="ident">m</span>.<span class="ident">id</span>,
                 <span class="ident">mark_name</span>: <span class="ident">m</span>.<span class="ident">mark_name</span>,
                 <span class="ident">holders</span>: <span class="ident">m</span>.<span class="ident">holders</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">Into::into</span>).<span class="ident">collect</span>(),
@@ -364,7 +364,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Holder</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">proto::mark::Holder</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">Holder</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">Holder</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">proto::mark::Holder</span> {
             <span class="ident">name</span>: <span class="ident">from</span>.<span class="ident">name</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="ident">Into::into</span>),
             <span class="ident">organisation</span>: <span class="ident">from</span>.<span class="ident">organisation</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="ident">Into::into</span>),
@@ -373,16 +373,16 @@
             <span class="ident">fax</span>: <span class="ident">from</span>.<span class="ident">fax</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="ident">Into::into</span>),
             <span class="ident">email</span>: <span class="ident">from</span>.<span class="ident">email</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="ident">Into::into</span>),
             <span class="ident">entitlement</span>: <span class="kw">match</span> <span class="ident">from</span>.<span class="ident">entitlement</span> {
-                <span class="ident">Entitlement::Owner</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">proto::mark::Entitlement::Owner</span>,
-                <span class="ident">Entitlement::Assignee</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">proto::mark::Entitlement::Assignee</span>,
-                <span class="ident">Entitlement::Licensee</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">proto::mark::Entitlement::Licensee</span>,
+                <span class="ident">Entitlement::Owner</span> =&gt; <span class="ident">proto::mark::Entitlement::Owner</span>,
+                <span class="ident">Entitlement::Assignee</span> =&gt; <span class="ident">proto::mark::Entitlement::Assignee</span>,
+                <span class="ident">Entitlement::Licensee</span> =&gt; <span class="ident">proto::mark::Entitlement::Licensee</span>,
             },
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">proto::mark::Holder</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Holder</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">proto::mark::Holder</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">proto::mark::Holder</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">Holder</span> {
             <span class="ident">name</span>: <span class="ident">from</span>.<span class="ident">name</span>,
             <span class="ident">organisation</span>: <span class="ident">from</span>.<span class="ident">organisation</span>,
@@ -391,16 +391,16 @@
             <span class="ident">fax</span>: <span class="ident">from</span>.<span class="ident">fax</span>.<span class="ident">map</span>(<span class="ident">Into::into</span>),
             <span class="ident">email</span>: <span class="ident">from</span>.<span class="ident">email</span>,
             <span class="ident">entitlement</span>: <span class="kw">match</span> <span class="ident">from</span>.<span class="ident">entitlement</span> {
-                <span class="ident">proto::mark::Entitlement::Owner</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Entitlement::Owner</span>,
-                <span class="ident">proto::mark::Entitlement::Assignee</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Entitlement::Assignee</span>,
-                <span class="ident">proto::mark::Entitlement::Licensee</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Entitlement::Licensee</span>,
+                <span class="ident">proto::mark::Entitlement::Owner</span> =&gt; <span class="ident">Entitlement::Owner</span>,
+                <span class="ident">proto::mark::Entitlement::Assignee</span> =&gt; <span class="ident">Entitlement::Assignee</span>,
+                <span class="ident">proto::mark::Entitlement::Licensee</span> =&gt; <span class="ident">Entitlement::Licensee</span>,
             },
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Contact</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">proto::mark::Contact</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">Contact</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">Contact</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">proto::mark::Contact</span> {
             <span class="ident">name</span>: <span class="ident">from</span>.<span class="ident">name</span>.<span class="ident">to_owned</span>(),
             <span class="ident">organisation</span>: <span class="ident">from</span>.<span class="ident">organisation</span>.<span class="ident">to_owned</span>(),
@@ -409,16 +409,16 @@
             <span class="ident">fax</span>: <span class="ident">from</span>.<span class="ident">fax</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="ident">Into::into</span>),
             <span class="ident">email</span>: <span class="ident">from</span>.<span class="ident">email</span>.<span class="ident">to_owned</span>(),
             <span class="ident">contact_type</span>: <span class="kw">match</span> <span class="ident">from</span>.<span class="ident">contact_type</span> {
-                <span class="ident">ContactType::Owner</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">proto::mark::ContactType::Owner</span>,
-                <span class="ident">ContactType::Agent</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">proto::mark::ContactType::Agent</span>,
-                <span class="ident">ContactType::ThirdParty</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">proto::mark::ContactType::ThirdParty</span>,
+                <span class="ident">ContactType::Owner</span> =&gt; <span class="ident">proto::mark::ContactType::Owner</span>,
+                <span class="ident">ContactType::Agent</span> =&gt; <span class="ident">proto::mark::ContactType::Agent</span>,
+                <span class="ident">ContactType::ThirdParty</span> =&gt; <span class="ident">proto::mark::ContactType::ThirdParty</span>,
             },
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">proto::mark::Contact</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Contact</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">proto::mark::Contact</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">proto::mark::Contact</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">Contact</span> {
             <span class="ident">name</span>: <span class="ident">from</span>.<span class="ident">name</span>,
             <span class="ident">organisation</span>: <span class="ident">from</span>.<span class="ident">organisation</span>,
@@ -427,16 +427,16 @@
             <span class="ident">fax</span>: <span class="ident">from</span>.<span class="ident">fax</span>.<span class="ident">map</span>(<span class="ident">Into::into</span>),
             <span class="ident">email</span>: <span class="ident">from</span>.<span class="ident">email</span>,
             <span class="ident">contact_type</span>: <span class="kw">match</span> <span class="ident">from</span>.<span class="ident">contact_type</span> {
-                <span class="ident">proto::mark::ContactType::Owner</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ContactType::Owner</span>,
-                <span class="ident">proto::mark::ContactType::Agent</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ContactType::Agent</span>,
-                <span class="ident">proto::mark::ContactType::ThirdParty</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ContactType::ThirdParty</span>,
+                <span class="ident">proto::mark::ContactType::Owner</span> =&gt; <span class="ident">ContactType::Owner</span>,
+                <span class="ident">proto::mark::ContactType::Agent</span> =&gt; <span class="ident">ContactType::Agent</span>,
+                <span class="ident">proto::mark::ContactType::ThirdParty</span> =&gt; <span class="ident">ContactType::ThirdParty</span>,
             },
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Address</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">proto::mark::Address</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">Address</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">Address</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">streets</span> <span class="op">=</span> <span class="macro">vec!</span>[];
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">s</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">from</span>.<span class="ident">street_1</span> {
             <span class="ident">streets</span>.<span class="ident">push</span>(<span class="ident">s</span>.<span class="ident">to_string</span>());
@@ -458,7 +458,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">proto::mark::Address</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Address</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="kw-2">mut</span> <span class="ident">from</span>: <span class="ident">proto::mark::Address</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="kw-2">mut</span> <span class="ident">from</span>: <span class="ident">proto::mark::Address</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">Address</span> {
             <span class="ident">street_1</span>: <span class="ident">from</span>.<span class="ident">street</span>.<span class="ident">pop</span>(),
             <span class="ident">street_2</span>: <span class="ident">from</span>.<span class="ident">street</span>.<span class="ident">pop</span>(),
@@ -472,7 +472,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">proto::mark::Phone</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Phone</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">proto::mark::Phone</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">proto::mark::Phone</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">Phone</span> {
             <span class="ident">number</span>: <span class="ident">from</span>.<span class="ident">number</span>,
             <span class="ident">extension</span>: <span class="ident">from</span>.<span class="ident">extension</span>,
@@ -481,7 +481,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Phone</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">proto::mark::Phone</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">Phone</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">Phone</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">proto::mark::Phone</span> {
             <span class="ident">number</span>: <span class="ident">from</span>.<span class="ident">number</span>.<span class="ident">clone</span>(),
             <span class="ident">extension</span>: <span class="ident">from</span>.<span class="ident">extension</span>.<span class="ident">clone</span>(),

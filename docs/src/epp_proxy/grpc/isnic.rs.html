@@ -61,12 +61,12 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::epp_proto</span>;
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">epp_proto::isnic::PaymentInfo</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">client::isnic::PaymentInfo</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">epp_proto::isnic::PaymentInfo</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">epp_proto::isnic::PaymentInfo</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">from</span>.<span class="ident">payment_method</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">m</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">m</span> {
-            <span class="ident">epp_proto::isnic::payment_info::PaymentMethod::Prepaid</span>(<span class="ident">id</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">epp_proto::isnic::payment_info::PaymentMethod::Prepaid</span>(<span class="ident">id</span>) =&gt; {
                 <span class="ident">client::isnic::PaymentInfo::Prepaid</span>(<span class="ident">id</span>)
             }
-            <span class="ident">epp_proto::isnic::payment_info::PaymentMethod::Card</span>(<span class="ident">card</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">epp_proto::isnic::payment_info::PaymentMethod::Card</span>(<span class="ident">card</span>) =&gt; {
                 <span class="ident">client::isnic::PaymentInfo::Card</span> {
                     <span class="ident">id</span>: <span class="ident">card</span>.<span class="ident">id</span>,
                     <span class="ident">cvc</span>: <span class="ident">card</span>.<span class="ident">cvc</span>,
@@ -77,7 +77,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">epp_proto::isnic::HostInfo</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">client::isnic::HostInfo</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">epp_proto::isnic::HostInfo</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">epp_proto::isnic::HostInfo</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">client::isnic::HostInfo</span> {
             <span class="ident">zone_contact</span>: <span class="ident">from</span>.<span class="ident">zone_contact</span>,
         }
@@ -85,7 +85,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">epp_proto::isnic::DomainUpdate</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">client::isnic::DomainUpdate</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">epp_proto::isnic::DomainUpdate</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">epp_proto::isnic::DomainUpdate</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">client::isnic::DomainUpdate</span> {
             <span class="ident">remove_all_ns</span>: <span class="ident">from</span>.<span class="ident">remove_all_ns</span>,
             <span class="ident">new_master_ns</span>: <span class="ident">from</span>.<span class="ident">new_master_ns</span>,
@@ -94,7 +94,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">epp_proto::isnic::ContactCreate</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">client::isnic::ContactCreate</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">epp_proto::isnic::ContactCreate</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">epp_proto::isnic::ContactCreate</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">client::isnic::ContactCreate</span> {
             <span class="ident">mobile</span>: <span class="ident">from</span>.<span class="ident">mobile</span>.<span class="ident">map</span>(<span class="ident">Into::into</span>),
             <span class="ident">sid</span>: <span class="ident">from</span>.<span class="ident">sid</span>,
@@ -106,7 +106,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">epp_proto::isnic::ContactUpdate</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">client::isnic::ContactUpdate</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">epp_proto::isnic::ContactUpdate</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">epp_proto::isnic::ContactUpdate</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">client::isnic::ContactUpdate</span> {
             <span class="ident">mobile</span>: <span class="ident">from</span>.<span class="ident">mobile</span>.<span class="ident">map</span>(<span class="ident">Into::into</span>),
             <span class="ident">auto_update_from_national_registry</span>: <span class="ident">from</span>.<span class="ident">auto_update_from_national_registry</span>,

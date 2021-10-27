@@ -144,16 +144,16 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::ServerFeatures</span>;
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">proto::rgp::EPPRGPState</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RGPState</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">proto::rgp::EPPRGPState</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">proto::rgp::EPPRGPState</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">use</span> <span class="ident">proto::rgp::EPPRGPState</span>;
         <span class="kw">match</span> <span class="ident">from</span> {
-            <span class="ident">EPPRGPState::AddPeriod</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RGPState::AddPeriod</span>,
-            <span class="ident">EPPRGPState::AutoRenewPeriod</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RGPState::AutoRenewPeriod</span>,
-            <span class="ident">EPPRGPState::RenewPeriod</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RGPState::RenewPeriod</span>,
-            <span class="ident">EPPRGPState::TransferPeriod</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RGPState::TransferPeriod</span>,
-            <span class="ident">EPPRGPState::RedemptionPeriod</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RGPState::RedemptionPeriod</span>,
-            <span class="ident">EPPRGPState::PendingRestore</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RGPState::PendingRestore</span>,
-            <span class="ident">EPPRGPState::PendingDelete</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RGPState::PendingDelete</span>,
+            <span class="ident">EPPRGPState::AddPeriod</span> =&gt; <span class="ident">RGPState::AddPeriod</span>,
+            <span class="ident">EPPRGPState::AutoRenewPeriod</span> =&gt; <span class="ident">RGPState::AutoRenewPeriod</span>,
+            <span class="ident">EPPRGPState::RenewPeriod</span> =&gt; <span class="ident">RGPState::RenewPeriod</span>,
+            <span class="ident">EPPRGPState::TransferPeriod</span> =&gt; <span class="ident">RGPState::TransferPeriod</span>,
+            <span class="ident">EPPRGPState::RedemptionPeriod</span> =&gt; <span class="ident">RGPState::RedemptionPeriod</span>,
+            <span class="ident">EPPRGPState::PendingRestore</span> =&gt; <span class="ident">RGPState::PendingRestore</span>,
+            <span class="ident">EPPRGPState::PendingDelete</span> =&gt; <span class="ident">RGPState::PendingDelete</span>,
         }
     }
 }
@@ -161,7 +161,7 @@
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_restore</span>(
     <span class="ident">client</span>: <span class="kw-2">&amp;</span><span class="ident">ServerFeatures</span>,
     <span class="ident">req</span>: <span class="kw-2">&amp;</span><span class="ident">RestoreRequest</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HandleReqReturn</span><span class="op">&lt;</span><span class="ident">RestoreResponse</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">HandleReqReturn</span><span class="op">&lt;</span><span class="ident">RestoreResponse</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="op">!</span>(<span class="ident">client</span>.<span class="ident">rgp_supported</span> <span class="op">|</span><span class="op">|</span> <span class="ident">client</span>.<span class="ident">has_erratum</span>(<span class="string">&quot;traficom&quot;</span>)) {
         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">Err</span>(<span class="ident">Error::Unsupported</span>));
     }
@@ -201,28 +201,28 @@
     }
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_restore_response</span>(<span class="ident">response</span>: <span class="ident">proto::EPPResponse</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">RestoreResponse</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_restore_response</span>(<span class="ident">response</span>: <span class="ident">proto::EPPResponse</span>) -&gt; <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">RestoreResponse</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">fee_data</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">response</span>.<span class="ident">extension</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">ext</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Some</span>(<span class="ident">ext</span>) =&gt; {
             <span class="kw">let</span> <span class="ident">fee10</span> <span class="op">=</span> <span class="ident">ext</span>.<span class="ident">value</span>.<span class="ident">iter</span>().<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">p</span> {
-                <span class="ident">proto::EPPResponseExtensionType::EPPFee10UpdateData</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>),
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+                <span class="ident">proto::EPPResponseExtensionType::EPPFee10UpdateData</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">i</span>),
+                <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
             });
             <span class="kw">let</span> <span class="ident">fee09</span> <span class="op">=</span> <span class="ident">ext</span>.<span class="ident">value</span>.<span class="ident">iter</span>().<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">p</span> {
-                <span class="ident">proto::EPPResponseExtensionType::EPPFee09UpdateData</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>),
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+                <span class="ident">proto::EPPResponseExtensionType::EPPFee09UpdateData</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">i</span>),
+                <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
             });
             <span class="kw">let</span> <span class="ident">fee08</span> <span class="op">=</span> <span class="ident">ext</span>.<span class="ident">value</span>.<span class="ident">iter</span>().<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">p</span> {
-                <span class="ident">proto::EPPResponseExtensionType::EPPFee08UpdateData</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>),
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+                <span class="ident">proto::EPPResponseExtensionType::EPPFee08UpdateData</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">i</span>),
+                <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
             });
             <span class="kw">let</span> <span class="ident">fee07</span> <span class="op">=</span> <span class="ident">ext</span>.<span class="ident">value</span>.<span class="ident">iter</span>().<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">p</span> {
-                <span class="ident">proto::EPPResponseExtensionType::EPPFee07UpdateData</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>),
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+                <span class="ident">proto::EPPResponseExtensionType::EPPFee07UpdateData</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">i</span>),
+                <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
             });
             <span class="kw">let</span> <span class="ident">fee05</span> <span class="op">=</span> <span class="ident">ext</span>.<span class="ident">value</span>.<span class="ident">iter</span>().<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">p</span> {
-                <span class="ident">proto::EPPResponseExtensionType::EPPFee05UpdateData</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>),
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+                <span class="ident">proto::EPPResponseExtensionType::EPPFee05UpdateData</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">i</span>),
+                <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
             });
 
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">f</span>) <span class="op">=</span> <span class="ident">fee10</span> {
@@ -237,12 +237,12 @@
                 <span class="ident">fee05</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">into</span>())
             }
         }
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+        <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
     };
 
     <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">response</span>.<span class="ident">extension</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">value</span>.<span class="ident">value</span>.<span class="ident">first</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">proto::EPPResponseExtensionType::EPPRGPUpdate</span>(<span class="ident">rgp_info</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Some</span>(<span class="ident">value</span>) =&gt; <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">value</span>.<span class="ident">value</span>.<span class="ident">first</span>() {
+            <span class="prelude-val">Some</span>(<span class="ident">proto::EPPResponseExtensionType::EPPRGPUpdate</span>(<span class="ident">rgp_info</span>)) =&gt; {
                 <span class="ident">Response::Ok</span>(<span class="ident">RestoreResponse</span> {
                     <span class="ident">pending</span>: <span class="ident">response</span>.<span class="ident">is_pending</span>(),
                     <span class="ident">transaction_id</span>: <span class="ident">response</span>
@@ -253,7 +253,7 @@
                     <span class="ident">fee_data</span>,
                 })
             }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Response::Ok</span>(<span class="ident">RestoreResponse</span> {
+            <span class="kw">_</span> =&gt; <span class="ident">Response::Ok</span>(<span class="ident">RestoreResponse</span> {
                 <span class="ident">pending</span>: <span class="ident">response</span>.<span class="ident">is_pending</span>(),
                 <span class="ident">transaction_id</span>: <span class="ident">response</span>
                     .<span class="ident">transaction_id</span>
@@ -263,7 +263,7 @@
                 <span class="ident">fee_data</span>,
             }),
         },
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Response::Ok</span>(<span class="ident">RestoreResponse</span> {
+        <span class="prelude-val">None</span> =&gt; <span class="ident">Response::Ok</span>(<span class="ident">RestoreResponse</span> {
             <span class="ident">pending</span>: <span class="ident">response</span>.<span class="ident">is_pending</span>(),
             <span class="ident">transaction_id</span>: <span class="ident">response</span>
                 .<span class="ident">transaction_id</span>

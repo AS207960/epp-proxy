@@ -322,9 +322,9 @@
 <span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">epp_proto::marks::Mark</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">client::mark::Mark</span> {
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">tonic::Status</span>;
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">res</span>: <span class="ident">epp_proto::marks::Mark</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">res</span>: <span class="ident">epp_proto::marks::Mark</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="kw">match</span> <span class="ident">res</span>.<span class="ident">mark</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">epp_proto::marks::mark::Mark::Trademark</span>(<span class="ident">m</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">epp_proto::marks::mark::Mark::Trademark</span>(<span class="ident">m</span>)) =&gt; {
                 <span class="ident">client::mark::Mark::TradeMark</span>(<span class="ident">client::mark::TradeMark</span> {
                     <span class="ident">id</span>: <span class="ident">m</span>.<span class="ident">id</span>,
                     <span class="ident">mark_name</span>: <span class="ident">m</span>.<span class="ident">mark_name</span>,
@@ -346,8 +346,8 @@
                     <span class="ident">application_date</span>: <span class="ident"><span class="kw">super</span>::utils::proto_to_chrono</span>(<span class="ident">m</span>.<span class="ident">application_date</span>),
                     <span class="ident">registration_id</span>: <span class="ident">m</span>.<span class="ident">registration_id</span>,
                     <span class="ident">registration_date</span>: <span class="kw">match</span> <span class="ident"><span class="kw">super</span>::utils::proto_to_chrono</span>(<span class="ident">m</span>.<span class="ident">registration_date</span>) {
-                        <span class="prelude-val">Some</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
-                        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="prelude-val">Some</span>(<span class="ident">r</span>) =&gt; <span class="ident">r</span>,
+                        <span class="prelude-val">None</span> =&gt; {
                             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">tonic::Status::invalid_argument</span>(
                                 <span class="string">&quot;registration_date must be specified&quot;</span>,
                             ))
@@ -356,7 +356,7 @@
                     <span class="ident">expiry_date</span>: <span class="ident"><span class="kw">super</span>::utils::proto_to_chrono</span>(<span class="ident">m</span>.<span class="ident">expiry_date</span>),
                 })
             }
-            <span class="prelude-val">Some</span>(<span class="ident">epp_proto::marks::mark::Mark::TreatyOrStatute</span>(<span class="ident">m</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">epp_proto::marks::mark::Mark::TreatyOrStatute</span>(<span class="ident">m</span>)) =&gt; {
                 <span class="ident">client::mark::Mark::TreatyOrStatute</span>(<span class="ident">client::mark::TreatyOrStatute</span> {
                     <span class="ident">id</span>: <span class="ident">m</span>.<span class="ident">id</span>,
                     <span class="ident">mark_name</span>: <span class="ident">m</span>.<span class="ident">mark_name</span>,
@@ -383,8 +383,8 @@
                     <span class="ident">goods_and_services</span>: <span class="ident">m</span>.<span class="ident">goods_and_services</span>,
                     <span class="ident">reference_number</span>: <span class="ident">m</span>.<span class="ident">reference_number</span>,
                     <span class="ident">protection_date</span>: <span class="kw">match</span> <span class="ident"><span class="kw">super</span>::utils::proto_to_chrono</span>(<span class="ident">m</span>.<span class="ident">protection_date</span>) {
-                        <span class="prelude-val">Some</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
-                        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="prelude-val">Some</span>(<span class="ident">r</span>) =&gt; <span class="ident">r</span>,
+                        <span class="prelude-val">None</span> =&gt; {
                             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">tonic::Status::invalid_argument</span>(
                                 <span class="string">&quot;protection_date must be specified&quot;</span>,
                             ))
@@ -392,8 +392,8 @@
                     },
                     <span class="ident">title</span>: <span class="ident">m</span>.<span class="ident">title</span>,
                     <span class="ident">execution_date</span>: <span class="kw">match</span> <span class="ident"><span class="kw">super</span>::utils::proto_to_chrono</span>(<span class="ident">m</span>.<span class="ident">execution_date</span>) {
-                        <span class="prelude-val">Some</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
-                        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="prelude-val">Some</span>(<span class="ident">r</span>) =&gt; <span class="ident">r</span>,
+                        <span class="prelude-val">None</span> =&gt; {
                             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">tonic::Status::invalid_argument</span>(
                                 <span class="string">&quot;execution_date must be specified&quot;</span>,
                             ))
@@ -401,7 +401,7 @@
                     },
                 })
             }
-            <span class="prelude-val">Some</span>(<span class="ident">epp_proto::marks::mark::Mark::Court</span>(<span class="ident">m</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">epp_proto::marks::mark::Mark::Court</span>(<span class="ident">m</span>)) =&gt; {
                 <span class="ident">client::mark::Mark::Court</span>(<span class="ident">client::mark::Court</span> {
                     <span class="ident">id</span>: <span class="ident">m</span>.<span class="ident">id</span>,
                     <span class="ident">mark_name</span>: <span class="ident">m</span>.<span class="ident">mark_name</span>,
@@ -419,8 +419,8 @@
                     <span class="ident">goods_and_services</span>: <span class="ident">m</span>.<span class="ident">goods_and_services</span>,
                     <span class="ident">reference_number</span>: <span class="ident">m</span>.<span class="ident">reference_number</span>,
                     <span class="ident">protection_date</span>: <span class="kw">match</span> <span class="ident"><span class="kw">super</span>::utils::proto_to_chrono</span>(<span class="ident">m</span>.<span class="ident">protection_date</span>) {
-                        <span class="prelude-val">Some</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
-                        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="prelude-val">Some</span>(<span class="ident">r</span>) =&gt; <span class="ident">r</span>,
+                        <span class="prelude-val">None</span> =&gt; {
                             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">tonic::Status::invalid_argument</span>(
                                 <span class="string">&quot;protection_date must be specified&quot;</span>,
                             ))
@@ -431,16 +431,16 @@
                     <span class="ident">court_name</span>: <span class="ident">m</span>.<span class="ident">court_name</span>,
                 })
             }
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">tonic::Status::invalid_argument</span>(<span class="string">&quot;mark must be specified&quot;</span>)),
+            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">tonic::Status::invalid_argument</span>(<span class="string">&quot;mark must be specified&quot;</span>)),
         })
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">client::mark::Mark</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">epp_proto::marks::Mark</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">res</span>: <span class="ident">client::mark::Mark</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">res</span>: <span class="ident">client::mark::Mark</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">epp_proto::marks::Mark</span> {
             <span class="ident">mark</span>: <span class="prelude-val">Some</span>(<span class="kw">match</span> <span class="ident">res</span> {
-                <span class="ident">client::mark::Mark::TradeMark</span>(<span class="ident">m</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">client::mark::Mark::TradeMark</span>(<span class="ident">m</span>) =&gt; {
                     <span class="ident">epp_proto::marks::mark::Mark::Trademark</span>(<span class="ident">epp_proto::marks::TradeMark</span> {
                         <span class="ident">id</span>: <span class="ident">m</span>.<span class="ident">id</span>,
                         <span class="ident">mark_name</span>: <span class="ident">m</span>.<span class="ident">mark_name</span>,
@@ -457,7 +457,7 @@
                         <span class="ident">expiry_date</span>: <span class="ident"><span class="kw">super</span>::utils::chrono_to_proto</span>(<span class="ident">m</span>.<span class="ident">expiry_date</span>),
                     })
                 }
-                <span class="ident">client::mark::Mark::TreatyOrStatute</span>(<span class="ident">m</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">client::mark::Mark::TreatyOrStatute</span>(<span class="ident">m</span>) =&gt; {
                     <span class="ident">epp_proto::marks::mark::Mark::TreatyOrStatute</span>(
                         <span class="ident">epp_proto::marks::TreatyOrStatute</span> {
                             <span class="ident">id</span>: <span class="ident">m</span>.<span class="ident">id</span>,
@@ -482,7 +482,7 @@
                         },
                     )
                 }
-                <span class="ident">client::mark::Mark::Court</span>(<span class="ident">m</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">client::mark::Mark::Court</span>(<span class="ident">m</span>) =&gt; {
                     <span class="ident">epp_proto::marks::mark::Mark::Court</span>(<span class="ident">epp_proto::marks::Court</span> {
                         <span class="ident">id</span>: <span class="ident">m</span>.<span class="ident">id</span>,
                         <span class="ident">mark_name</span>: <span class="ident">m</span>.<span class="ident">mark_name</span>,
@@ -505,24 +505,24 @@
 <span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">epp_proto::marks::Holder</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">client::mark::Holder</span> {
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">tonic::Status</span>;
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">from</span>: <span class="ident">epp_proto::marks::Holder</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">from</span>: <span class="ident">epp_proto::marks::Holder</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="ident">client::mark::Holder</span> {
             <span class="ident">name</span>: <span class="ident">from</span>.<span class="ident">name</span>,
             <span class="ident">organisation</span>: <span class="ident">from</span>.<span class="ident">organisation</span>,
             <span class="ident">address</span>: <span class="kw">match</span> <span class="ident">from</span>.<span class="ident">address</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">a</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">a</span>.<span class="ident">into</span>(),
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">tonic::Status::invalid_argument</span>(<span class="string">&quot;address must be specified&quot;</span>)),
+                <span class="prelude-val">Some</span>(<span class="ident">a</span>) =&gt; <span class="ident">a</span>.<span class="ident">into</span>(),
+                <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">tonic::Status::invalid_argument</span>(<span class="string">&quot;address must be specified&quot;</span>)),
             },
             <span class="ident">voice</span>: <span class="ident">from</span>.<span class="ident">voice</span>.<span class="ident">map</span>(<span class="ident">Into::into</span>),
             <span class="ident">fax</span>: <span class="ident">from</span>.<span class="ident">fax</span>.<span class="ident">map</span>(<span class="ident">Into::into</span>),
             <span class="ident">email</span>: <span class="ident">from</span>.<span class="ident">email</span>,
             <span class="ident">entitlement</span>: <span class="kw">match</span> <span class="ident">epp_proto::marks::Entitlement::from_i32</span>(<span class="ident">from</span>.<span class="ident">entitlement</span>) {
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">client::mark::Entitlement::Owner</span>,
-                <span class="prelude-val">Some</span>(<span class="ident">epp_proto::marks::Entitlement::Owner</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">client::mark::Entitlement::Owner</span>,
-                <span class="prelude-val">Some</span>(<span class="ident">epp_proto::marks::Entitlement::Licensee</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">None</span> =&gt; <span class="ident">client::mark::Entitlement::Owner</span>,
+                <span class="prelude-val">Some</span>(<span class="ident">epp_proto::marks::Entitlement::Owner</span>) =&gt; <span class="ident">client::mark::Entitlement::Owner</span>,
+                <span class="prelude-val">Some</span>(<span class="ident">epp_proto::marks::Entitlement::Licensee</span>) =&gt; {
                     <span class="ident">client::mark::Entitlement::Licensee</span>
                 }
-                <span class="prelude-val">Some</span>(<span class="ident">epp_proto::marks::Entitlement::Assignee</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">epp_proto::marks::Entitlement::Assignee</span>) =&gt; {
                     <span class="ident">client::mark::Entitlement::Assignee</span>
                 }
             },
@@ -531,7 +531,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">client::mark::Holder</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">epp_proto::marks::Holder</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">client::mark::Holder</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">client::mark::Holder</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">epp_proto::marks::Holder</span> {
             <span class="ident">name</span>: <span class="ident">from</span>.<span class="ident">name</span>,
             <span class="ident">organisation</span>: <span class="ident">from</span>.<span class="ident">organisation</span>,
@@ -540,11 +540,11 @@
             <span class="ident">fax</span>: <span class="ident">from</span>.<span class="ident">fax</span>.<span class="ident">map</span>(<span class="ident">Into::into</span>),
             <span class="ident">email</span>: <span class="ident">from</span>.<span class="ident">email</span>,
             <span class="ident">entitlement</span>: <span class="kw">match</span> <span class="ident">from</span>.<span class="ident">entitlement</span> {
-                <span class="ident">client::mark::Entitlement::Owner</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">epp_proto::marks::Entitlement::Owner</span>.<span class="ident">into</span>(),
-                <span class="ident">client::mark::Entitlement::Licensee</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">client::mark::Entitlement::Owner</span> =&gt; <span class="ident">epp_proto::marks::Entitlement::Owner</span>.<span class="ident">into</span>(),
+                <span class="ident">client::mark::Entitlement::Licensee</span> =&gt; {
                     <span class="ident">epp_proto::marks::Entitlement::Licensee</span>.<span class="ident">into</span>()
                 }
-                <span class="ident">client::mark::Entitlement::Assignee</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">client::mark::Entitlement::Assignee</span> =&gt; {
                     <span class="ident">epp_proto::marks::Entitlement::Assignee</span>.<span class="ident">into</span>()
                 }
             },
@@ -555,27 +555,27 @@
 <span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">epp_proto::marks::Contact</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">client::mark::Contact</span> {
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">tonic::Status</span>;
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">from</span>: <span class="ident">epp_proto::marks::Contact</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">from</span>: <span class="ident">epp_proto::marks::Contact</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="ident">client::mark::Contact</span> {
             <span class="ident">name</span>: <span class="ident">from</span>.<span class="ident">name</span>,
             <span class="ident">organisation</span>: <span class="ident">from</span>.<span class="ident">organisation</span>,
             <span class="ident">address</span>: <span class="kw">match</span> <span class="ident">from</span>.<span class="ident">address</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">a</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">a</span>.<span class="ident">into</span>(),
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">tonic::Status::invalid_argument</span>(<span class="string">&quot;address must be specified&quot;</span>)),
+                <span class="prelude-val">Some</span>(<span class="ident">a</span>) =&gt; <span class="ident">a</span>.<span class="ident">into</span>(),
+                <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">tonic::Status::invalid_argument</span>(<span class="string">&quot;address must be specified&quot;</span>)),
             },
             <span class="ident">voice</span>: <span class="kw">match</span> <span class="ident">from</span>.<span class="ident">voice</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">v</span>.<span class="ident">into</span>(),
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">tonic::Status::invalid_argument</span>(<span class="string">&quot;voice must be specified&quot;</span>)),
+                <span class="prelude-val">Some</span>(<span class="ident">v</span>) =&gt; <span class="ident">v</span>.<span class="ident">into</span>(),
+                <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">tonic::Status::invalid_argument</span>(<span class="string">&quot;voice must be specified&quot;</span>)),
             },
             <span class="ident">fax</span>: <span class="ident">from</span>.<span class="ident">fax</span>.<span class="ident">map</span>(<span class="ident">Into::into</span>),
             <span class="ident">email</span>: <span class="ident">from</span>.<span class="ident">email</span>,
             <span class="ident">contact_type</span>: <span class="kw">match</span> <span class="ident">epp_proto::marks::ContactType::from_i32</span>(<span class="ident">from</span>.<span class="ident">contact_type</span>) {
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">client::mark::ContactType::Owner</span>,
-                <span class="prelude-val">Some</span>(<span class="ident">epp_proto::marks::ContactType::OwnerContact</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">None</span> =&gt; <span class="ident">client::mark::ContactType::Owner</span>,
+                <span class="prelude-val">Some</span>(<span class="ident">epp_proto::marks::ContactType::OwnerContact</span>) =&gt; {
                     <span class="ident">client::mark::ContactType::Owner</span>
                 }
-                <span class="prelude-val">Some</span>(<span class="ident">epp_proto::marks::ContactType::Agent</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">client::mark::ContactType::Agent</span>,
-                <span class="prelude-val">Some</span>(<span class="ident">epp_proto::marks::ContactType::ThirdParty</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">epp_proto::marks::ContactType::Agent</span>) =&gt; <span class="ident">client::mark::ContactType::Agent</span>,
+                <span class="prelude-val">Some</span>(<span class="ident">epp_proto::marks::ContactType::ThirdParty</span>) =&gt; {
                     <span class="ident">client::mark::ContactType::ThirdParty</span>
                 }
             },
@@ -584,7 +584,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">client::mark::Contact</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">epp_proto::marks::Contact</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">client::mark::Contact</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">client::mark::Contact</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">epp_proto::marks::Contact</span> {
             <span class="ident">name</span>: <span class="ident">from</span>.<span class="ident">name</span>,
             <span class="ident">organisation</span>: <span class="ident">from</span>.<span class="ident">organisation</span>,
@@ -593,11 +593,11 @@
             <span class="ident">fax</span>: <span class="ident">from</span>.<span class="ident">fax</span>.<span class="ident">map</span>(<span class="ident">Into::into</span>),
             <span class="ident">email</span>: <span class="ident">from</span>.<span class="ident">email</span>,
             <span class="ident">contact_type</span>: <span class="kw">match</span> <span class="ident">from</span>.<span class="ident">contact_type</span> {
-                <span class="ident">client::mark::ContactType::Owner</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">client::mark::ContactType::Owner</span> =&gt; {
                     <span class="ident">epp_proto::marks::ContactType::OwnerContact</span>.<span class="ident">into</span>()
                 }
-                <span class="ident">client::mark::ContactType::Agent</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">epp_proto::marks::ContactType::Agent</span>.<span class="ident">into</span>(),
-                <span class="ident">client::mark::ContactType::ThirdParty</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">client::mark::ContactType::Agent</span> =&gt; <span class="ident">epp_proto::marks::ContactType::Agent</span>.<span class="ident">into</span>(),
+                <span class="ident">client::mark::ContactType::ThirdParty</span> =&gt; {
                     <span class="ident">epp_proto::marks::ContactType::ThirdParty</span>.<span class="ident">into</span>()
                 }
             },
@@ -606,7 +606,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">epp_proto::marks::Address</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">client::mark::Address</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">epp_proto::marks::Address</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">epp_proto::marks::Address</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">client::mark::Address</span> {
             <span class="ident">street_1</span>: <span class="ident">from</span>.<span class="ident">street1</span>,
             <span class="ident">street_2</span>: <span class="ident">from</span>.<span class="ident">street2</span>,
@@ -620,7 +620,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">client::mark::Address</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">epp_proto::marks::Address</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">client::mark::Address</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">client::mark::Address</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">epp_proto::marks::Address</span> {
             <span class="ident">street1</span>: <span class="ident">from</span>.<span class="ident">street_1</span>,
             <span class="ident">street2</span>: <span class="ident">from</span>.<span class="ident">street_2</span>,

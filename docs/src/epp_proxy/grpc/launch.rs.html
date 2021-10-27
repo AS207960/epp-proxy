@@ -225,25 +225,25 @@
 <span class="kw">use</span> <span class="ident">std::convert::TryFrom</span>;
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">epp_proto::launch::Phase</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">client::launch::LaunchPhase</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">epp_proto::launch::Phase</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">epp_proto::launch::Phase</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">client::launch::LaunchPhase</span> {
             <span class="ident">phase_type</span>: <span class="kw">match</span> <span class="ident">epp_proto::launch::phase::PhaseType::from_i32</span>(<span class="ident">from</span>.<span class="ident">phase_type</span>) {
-                <span class="prelude-val">Some</span>(<span class="ident">p</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">p</span> {
-                    <span class="ident">epp_proto::launch::phase::PhaseType::Open</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">client::launch::PhaseType::Open</span>,
-                    <span class="ident">epp_proto::launch::phase::PhaseType::Sunrise</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">p</span>) =&gt; <span class="kw">match</span> <span class="ident">p</span> {
+                    <span class="ident">epp_proto::launch::phase::PhaseType::Open</span> =&gt; <span class="ident">client::launch::PhaseType::Open</span>,
+                    <span class="ident">epp_proto::launch::phase::PhaseType::Sunrise</span> =&gt; {
                         <span class="ident">client::launch::PhaseType::Sunrise</span>
                     }
-                    <span class="ident">epp_proto::launch::phase::PhaseType::Landrush</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident">epp_proto::launch::phase::PhaseType::Landrush</span> =&gt; {
                         <span class="ident">client::launch::PhaseType::Landrush</span>
                     }
-                    <span class="ident">epp_proto::launch::phase::PhaseType::Claims</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident">epp_proto::launch::phase::PhaseType::Claims</span> =&gt; {
                         <span class="ident">client::launch::PhaseType::Claims</span>
                     }
-                    <span class="ident">epp_proto::launch::phase::PhaseType::Custom</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident">epp_proto::launch::phase::PhaseType::Custom</span> =&gt; {
                         <span class="ident">client::launch::PhaseType::Custom</span>
                     }
                 },
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">client::launch::PhaseType::Custom</span>,
+                <span class="prelude-val">None</span> =&gt; <span class="ident">client::launch::PhaseType::Custom</span>,
             },
             <span class="ident">phase_name</span>: <span class="ident">from</span>.<span class="ident">phase_name</span>,
         }
@@ -251,20 +251,20 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">client::launch::LaunchPhase</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">epp_proto::launch::Phase</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">client::launch::LaunchPhase</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">client::launch::LaunchPhase</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">epp_proto::launch::Phase</span> {
             <span class="ident">phase_type</span>: <span class="kw">match</span> <span class="ident">from</span>.<span class="ident">phase_type</span> {
-                <span class="ident">client::launch::PhaseType::Open</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">epp_proto::launch::phase::PhaseType::Open</span>.<span class="ident">into</span>(),
-                <span class="ident">client::launch::PhaseType::Sunrise</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">client::launch::PhaseType::Open</span> =&gt; <span class="ident">epp_proto::launch::phase::PhaseType::Open</span>.<span class="ident">into</span>(),
+                <span class="ident">client::launch::PhaseType::Sunrise</span> =&gt; {
                     <span class="ident">epp_proto::launch::phase::PhaseType::Sunrise</span>.<span class="ident">into</span>()
                 }
-                <span class="ident">client::launch::PhaseType::Landrush</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">client::launch::PhaseType::Landrush</span> =&gt; {
                     <span class="ident">epp_proto::launch::phase::PhaseType::Landrush</span>.<span class="ident">into</span>()
                 }
-                <span class="ident">client::launch::PhaseType::Claims</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">client::launch::PhaseType::Claims</span> =&gt; {
                     <span class="ident">epp_proto::launch::phase::PhaseType::Claims</span>.<span class="ident">into</span>()
                 }
-                <span class="ident">client::launch::PhaseType::Custom</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">client::launch::PhaseType::Custom</span> =&gt; {
                     <span class="ident">epp_proto::launch::phase::PhaseType::Custom</span>.<span class="ident">into</span>()
                 }
             },
@@ -274,13 +274,13 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">epp_proto::launch::Phase</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">client::launch::LaunchClaimsCheck</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">epp_proto::launch::Phase</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">epp_proto::launch::Phase</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">client::launch::LaunchClaimsCheck</span> { <span class="ident">phase</span>: <span class="ident">from</span>.<span class="ident">into</span>() }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">client::launch::LaunchClaimKey</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">epp_proto::launch::ClaimsKey</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">client::launch::LaunchClaimKey</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">client::launch::LaunchClaimKey</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">epp_proto::launch::ClaimsKey</span> {
             <span class="ident">key</span>: <span class="ident">from</span>.<span class="ident">key</span>,
             <span class="ident">validator_id</span>: <span class="ident">from</span>.<span class="ident">validator_id</span>,
@@ -291,12 +291,12 @@
 <span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">epp_proto::launch::LaunchInfo</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">client::launch::LaunchInfo</span> {
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">tonic::Status</span>;
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">from</span>: <span class="ident">epp_proto::launch::LaunchInfo</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">from</span>: <span class="ident">epp_proto::launch::LaunchInfo</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="ident">client::launch::LaunchInfo</span> {
             <span class="ident">include_mark</span>: <span class="ident">from</span>.<span class="ident">include_mark</span>,
             <span class="ident">phase</span>: <span class="kw">match</span> <span class="ident">from</span>.<span class="ident">phase</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">p</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">p</span>.<span class="ident">into</span>(),
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">p</span>) =&gt; <span class="ident">p</span>.<span class="ident">into</span>(),
+                <span class="prelude-val">None</span> =&gt; {
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">tonic::Status::invalid_argument</span>(
                         <span class="string">&quot;Launch phase must be specified&quot;</span>,
                     ))
@@ -310,22 +310,22 @@
 <span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">epp_proto::launch::LaunchCreate</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">client::launch::LaunchCreate</span> {
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">tonic::Status</span>;
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">from</span>: <span class="ident">epp_proto::launch::LaunchCreate</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">from</span>: <span class="ident">epp_proto::launch::LaunchCreate</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="ident">client::launch::LaunchCreate</span> {
             <span class="ident">create_type</span>: <span class="kw">match</span> <span class="ident">epp_proto::launch::launch_create::CreateType::from_i32</span>(
                 <span class="ident">from</span>.<span class="ident">create_type</span>,
             ) {
-                <span class="prelude-val">Some</span>(<span class="ident">epp_proto::launch::launch_create::CreateType::Registration</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">epp_proto::launch::launch_create::CreateType::Registration</span>) =&gt; {
                     <span class="ident">client::launch::LaunchCreateType::Registration</span>
                 }
-                <span class="prelude-val">Some</span>(<span class="ident">epp_proto::launch::launch_create::CreateType::Application</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">epp_proto::launch::launch_create::CreateType::Application</span>) =&gt; {
                     <span class="ident">client::launch::LaunchCreateType::Application</span>
                 }
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">client::launch::LaunchCreateType::Registration</span>,
+                <span class="prelude-val">None</span> =&gt; <span class="ident">client::launch::LaunchCreateType::Registration</span>,
             },
             <span class="ident">phase</span>: <span class="kw">match</span> <span class="ident">from</span>.<span class="ident">phase</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">p</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">p</span>.<span class="ident">into</span>(),
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">p</span>) =&gt; <span class="ident">p</span>.<span class="ident">into</span>(),
+                <span class="prelude-val">None</span> =&gt; {
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">tonic::Status::invalid_argument</span>(
                         <span class="string">&quot;Launch phase must be specified&quot;</span>,
                     ))
@@ -349,16 +349,16 @@
                         <span class="ident">notice_id</span>: <span class="ident">n</span>.<span class="ident">notice_id</span>,
                         <span class="ident">validator</span>: <span class="ident">n</span>.<span class="ident">validator</span>,
                         <span class="ident">not_after</span>: <span class="kw">match</span> <span class="ident"><span class="kw">super</span>::utils::proto_to_chrono</span>(<span class="ident">n</span>.<span class="ident">not_after</span>) {
-                            <span class="prelude-val">Some</span>(<span class="ident">d</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">d</span>,
-                            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+                            <span class="prelude-val">Some</span>(<span class="ident">d</span>) =&gt; <span class="ident">d</span>,
+                            <span class="prelude-val">None</span> =&gt; {
                                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">tonic::Status::invalid_argument</span>(
                                     <span class="string">&quot;Date must be specified&quot;</span>,
                                 ))
                             }
                         },
                         <span class="ident">accepted_date</span>: <span class="kw">match</span> <span class="ident"><span class="kw">super</span>::utils::proto_to_chrono</span>(<span class="ident">n</span>.<span class="ident">accepted_after</span>) {
-                            <span class="prelude-val">Some</span>(<span class="ident">d</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">d</span>,
-                            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+                            <span class="prelude-val">Some</span>(<span class="ident">d</span>) =&gt; <span class="ident">d</span>,
+                            <span class="prelude-val">None</span> =&gt; {
                                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">tonic::Status::invalid_argument</span>(
                                     <span class="string">&quot;Date must be specified&quot;</span>,
                                 ))
@@ -382,11 +382,11 @@
 <span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">epp_proto::launch::LaunchData</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">client::launch::LaunchUpdate</span> {
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">tonic::Status</span>;
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">from</span>: <span class="ident">epp_proto::launch::LaunchData</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">from</span>: <span class="ident">epp_proto::launch::LaunchData</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="ident">client::launch::LaunchUpdate</span> {
             <span class="ident">phase</span>: <span class="kw">match</span> <span class="ident">from</span>.<span class="ident">phase</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">p</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">p</span>.<span class="ident">into</span>(),
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">p</span>) =&gt; <span class="ident">p</span>.<span class="ident">into</span>(),
+                <span class="prelude-val">None</span> =&gt; {
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">tonic::Status::invalid_argument</span>(
                         <span class="string">&quot;Launch phase must be specified&quot;</span>,
                     ))
@@ -398,31 +398,31 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">client::launch::LaunchInfoData</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">epp_proto::launch::LaunchInfoData</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">client::launch::LaunchInfoData</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">client::launch::LaunchInfoData</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">epp_proto::launch::LaunchInfoData</span> {
             <span class="ident">phase</span>: <span class="prelude-val">Some</span>(<span class="ident">from</span>.<span class="ident">phase</span>.<span class="ident">into</span>()),
             <span class="ident">application_id</span>: <span class="ident">from</span>.<span class="ident">application_id</span>,
             <span class="ident">status</span>: <span class="ident">from</span>.<span class="ident">status</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">epp_proto::launch::Status</span> {
                 <span class="ident">status_type</span>: <span class="kw">match</span> <span class="ident">s</span>.<span class="ident">status_type</span> {
-                    <span class="ident">client::launch::LaunchStatusType::PendingValidation</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident">client::launch::LaunchStatusType::PendingValidation</span> =&gt; {
                         <span class="ident">epp_proto::launch::StatusType::PendingValidation</span>.<span class="ident">into</span>()
                     }
-                    <span class="ident">client::launch::LaunchStatusType::Validated</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident">client::launch::LaunchStatusType::Validated</span> =&gt; {
                         <span class="ident">epp_proto::launch::StatusType::Validated</span>.<span class="ident">into</span>()
                     }
-                    <span class="ident">client::launch::LaunchStatusType::Invalid</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident">client::launch::LaunchStatusType::Invalid</span> =&gt; {
                         <span class="ident">epp_proto::launch::StatusType::Invalid</span>.<span class="ident">into</span>()
                     }
-                    <span class="ident">client::launch::LaunchStatusType::PendingAllocation</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident">client::launch::LaunchStatusType::PendingAllocation</span> =&gt; {
                         <span class="ident">epp_proto::launch::StatusType::PendingAllocation</span>.<span class="ident">into</span>()
                     }
-                    <span class="ident">client::launch::LaunchStatusType::Allocated</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident">client::launch::LaunchStatusType::Allocated</span> =&gt; {
                         <span class="ident">epp_proto::launch::StatusType::Allocated</span>.<span class="ident">into</span>()
                     }
-                    <span class="ident">client::launch::LaunchStatusType::Rejected</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident">client::launch::LaunchStatusType::Rejected</span> =&gt; {
                         <span class="ident">epp_proto::launch::StatusType::Rejected</span>.<span class="ident">into</span>()
                     }
-                    <span class="ident">client::launch::LaunchStatusType::Custom</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident">client::launch::LaunchStatusType::Custom</span> =&gt; {
                         <span class="ident">epp_proto::launch::StatusType::Custom</span>.<span class="ident">into</span>()
                     }
                 },
@@ -435,7 +435,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">client::launch::LaunchCreateData</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">epp_proto::launch::LaunchData</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">client::launch::LaunchCreateData</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">client::launch::LaunchCreateData</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">epp_proto::launch::LaunchData</span> {
             <span class="ident">phase</span>: <span class="prelude-val">Some</span>(<span class="ident">from</span>.<span class="ident">phase</span>.<span class="ident">into</span>()),
             <span class="ident">application_id</span>: <span class="ident">from</span>.<span class="ident">application_id</span>,

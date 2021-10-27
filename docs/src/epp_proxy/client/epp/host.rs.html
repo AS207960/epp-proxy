@@ -383,42 +383,42 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::ServerFeatures</span>;
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">proto::host::EPPHostStatusType</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Status</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">proto::host::EPPHostStatusType</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">proto::host::EPPHostStatusType</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">use</span> <span class="ident">proto::host::EPPHostStatusType</span>;
         <span class="kw">match</span> <span class="ident">from</span> {
-            <span class="ident">EPPHostStatusType::ClientDeleteProhibited</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Status::ClientDeleteProhibited</span>,
-            <span class="ident">EPPHostStatusType::ClientUpdateProhibited</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Status::ClientUpdateProhibited</span>,
-            <span class="ident">EPPHostStatusType::Linked</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Status::Linked</span>,
-            <span class="ident">EPPHostStatusType::Ok</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Status::Ok</span>,
-            <span class="ident">EPPHostStatusType::PendingCreate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Status::PendingCreate</span>,
-            <span class="ident">EPPHostStatusType::PendingDelete</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Status::PendingDelete</span>,
-            <span class="ident">EPPHostStatusType::PendingTransfer</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Status::PendingTransfer</span>,
-            <span class="ident">EPPHostStatusType::PendingUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Status::PendingUpdate</span>,
-            <span class="ident">EPPHostStatusType::ServerDeleteProhibited</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Status::ServerDeleteProhibited</span>,
-            <span class="ident">EPPHostStatusType::ServerUpdateProhibited</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Status::ServerUpdateProhibited</span>,
+            <span class="ident">EPPHostStatusType::ClientDeleteProhibited</span> =&gt; <span class="ident">Status::ClientDeleteProhibited</span>,
+            <span class="ident">EPPHostStatusType::ClientUpdateProhibited</span> =&gt; <span class="ident">Status::ClientUpdateProhibited</span>,
+            <span class="ident">EPPHostStatusType::Linked</span> =&gt; <span class="ident">Status::Linked</span>,
+            <span class="ident">EPPHostStatusType::Ok</span> =&gt; <span class="ident">Status::Ok</span>,
+            <span class="ident">EPPHostStatusType::PendingCreate</span> =&gt; <span class="ident">Status::PendingCreate</span>,
+            <span class="ident">EPPHostStatusType::PendingDelete</span> =&gt; <span class="ident">Status::PendingDelete</span>,
+            <span class="ident">EPPHostStatusType::PendingTransfer</span> =&gt; <span class="ident">Status::PendingTransfer</span>,
+            <span class="ident">EPPHostStatusType::PendingUpdate</span> =&gt; <span class="ident">Status::PendingUpdate</span>,
+            <span class="ident">EPPHostStatusType::ServerDeleteProhibited</span> =&gt; <span class="ident">Status::ServerDeleteProhibited</span>,
+            <span class="ident">EPPHostStatusType::ServerUpdateProhibited</span> =&gt; <span class="ident">Status::ServerUpdateProhibited</span>,
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Status</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">proto::host::EPPHostStatusType</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">Status</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">Status</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">use</span> <span class="ident">proto::host::EPPHostStatusType</span>;
         <span class="kw">match</span> <span class="ident">from</span> {
-            <span class="ident">Status::ClientDeleteProhibited</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EPPHostStatusType::ClientDeleteProhibited</span>,
-            <span class="ident">Status::ClientUpdateProhibited</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EPPHostStatusType::ClientUpdateProhibited</span>,
-            <span class="ident">Status::Linked</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EPPHostStatusType::Linked</span>,
-            <span class="ident">Status::Ok</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EPPHostStatusType::Ok</span>,
-            <span class="ident">Status::PendingCreate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EPPHostStatusType::PendingCreate</span>,
-            <span class="ident">Status::PendingDelete</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EPPHostStatusType::PendingDelete</span>,
-            <span class="ident">Status::PendingTransfer</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EPPHostStatusType::PendingTransfer</span>,
-            <span class="ident">Status::PendingUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EPPHostStatusType::PendingUpdate</span>,
-            <span class="ident">Status::ServerDeleteProhibited</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EPPHostStatusType::ServerDeleteProhibited</span>,
-            <span class="ident">Status::ServerUpdateProhibited</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EPPHostStatusType::ServerUpdateProhibited</span>,
+            <span class="ident">Status::ClientDeleteProhibited</span> =&gt; <span class="ident">EPPHostStatusType::ClientDeleteProhibited</span>,
+            <span class="ident">Status::ClientUpdateProhibited</span> =&gt; <span class="ident">EPPHostStatusType::ClientUpdateProhibited</span>,
+            <span class="ident">Status::Linked</span> =&gt; <span class="ident">EPPHostStatusType::Linked</span>,
+            <span class="ident">Status::Ok</span> =&gt; <span class="ident">EPPHostStatusType::Ok</span>,
+            <span class="ident">Status::PendingCreate</span> =&gt; <span class="ident">EPPHostStatusType::PendingCreate</span>,
+            <span class="ident">Status::PendingDelete</span> =&gt; <span class="ident">EPPHostStatusType::PendingDelete</span>,
+            <span class="ident">Status::PendingTransfer</span> =&gt; <span class="ident">EPPHostStatusType::PendingTransfer</span>,
+            <span class="ident">Status::PendingUpdate</span> =&gt; <span class="ident">EPPHostStatusType::PendingUpdate</span>,
+            <span class="ident">Status::ServerDeleteProhibited</span> =&gt; <span class="ident">EPPHostStatusType::ServerDeleteProhibited</span>,
+            <span class="ident">Status::ServerUpdateProhibited</span> =&gt; <span class="ident">EPPHostStatusType::ServerUpdateProhibited</span>,
         }
     }
 }
 
-<span class="kw">fn</span> <span class="ident">check_host</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">check_host</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="op">!</span><span class="ident">id</span>.<span class="ident">is_empty</span>() {
         <span class="prelude-val">Ok</span>(())
     } <span class="kw">else</span> {
@@ -428,7 +428,7 @@
     }
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_check</span>(<span class="ident">client</span>: <span class="kw-2">&amp;</span><span class="ident">ServerFeatures</span>, <span class="ident">req</span>: <span class="kw-2">&amp;</span><span class="ident">CheckRequest</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HandleReqReturn</span><span class="op">&lt;</span><span class="ident">CheckResponse</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_check</span>(<span class="ident">client</span>: <span class="kw-2">&amp;</span><span class="ident">ServerFeatures</span>, <span class="ident">req</span>: <span class="kw-2">&amp;</span><span class="ident">CheckRequest</span>) -&gt; <span class="ident">HandleReqReturn</span><span class="op">&lt;</span><span class="ident">CheckResponse</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="op">!</span>(<span class="ident">client</span>.<span class="ident">host_supported</span> <span class="op">|</span><span class="op">|</span> <span class="ident">client</span>.<span class="ident">nsset_supported</span>) {
         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">Err</span>(<span class="ident">Error::Unsupported</span>));
     }
@@ -441,16 +441,16 @@
     <span class="prelude-val">Ok</span>((
         <span class="ident">proto::EPPCommandType::Check</span>(<span class="ident">command</span>),
         <span class="kw">match</span> <span class="ident">ext</span>.<span class="ident">is_empty</span>() {
-            <span class="bool-val">true</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
-            <span class="bool-val">false</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">ext</span>),
+            <span class="bool-val">true</span> =&gt; <span class="prelude-val">None</span>,
+            <span class="bool-val">false</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">ext</span>),
         },
     ))
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_check_response</span>(<span class="ident">response</span>: <span class="ident">proto::EPPResponse</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">CheckResponse</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_check_response</span>(<span class="ident">response</span>: <span class="ident">proto::EPPResponse</span>) -&gt; <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">CheckResponse</span><span class="op">&gt;</span> {
     <span class="kw">match</span> <span class="ident">response</span>.<span class="ident">data</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">value</span>.<span class="ident">value</span> {
-            <span class="ident">proto::EPPResultDataValue::EPPHostCheckResult</span>(<span class="ident">host_check</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Some</span>(<span class="ident">value</span>) =&gt; <span class="kw">match</span> <span class="ident">value</span>.<span class="ident">value</span> {
+            <span class="ident">proto::EPPResultDataValue::EPPHostCheckResult</span>(<span class="ident">host_check</span>) =&gt; {
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">host_check</span>) <span class="op">=</span> <span class="ident">host_check</span>.<span class="ident">data</span>.<span class="ident">first</span>() {
                     <span class="ident">Response::Ok</span>(<span class="ident">CheckResponse</span> {
                         <span class="ident">avail</span>: <span class="ident">host_check</span>.<span class="ident">name</span>.<span class="ident">available</span>,
@@ -460,13 +460,13 @@
                     <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>)
                 }
             }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
         },
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
+        <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
     }
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_info</span>(<span class="ident">client</span>: <span class="kw-2">&amp;</span><span class="ident">ServerFeatures</span>, <span class="ident">req</span>: <span class="kw-2">&amp;</span><span class="ident">InfoRequest</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HandleReqReturn</span><span class="op">&lt;</span><span class="ident">InfoResponse</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_info</span>(<span class="ident">client</span>: <span class="kw-2">&amp;</span><span class="ident">ServerFeatures</span>, <span class="ident">req</span>: <span class="kw-2">&amp;</span><span class="ident">InfoRequest</span>) -&gt; <span class="ident">HandleReqReturn</span><span class="op">&lt;</span><span class="ident">InfoResponse</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="op">!</span>(<span class="ident">client</span>.<span class="ident">host_supported</span> <span class="op">|</span><span class="op">|</span> <span class="ident">client</span>.<span class="ident">nsset_supported</span>) {
         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">Err</span>(<span class="ident">Error::Unsupported</span>));
     }
@@ -479,16 +479,16 @@
     <span class="prelude-val">Ok</span>((
         <span class="ident">proto::EPPCommandType::Info</span>(<span class="ident">command</span>),
         <span class="kw">match</span> <span class="ident">ext</span>.<span class="ident">is_empty</span>() {
-            <span class="bool-val">true</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
-            <span class="bool-val">false</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">ext</span>),
+            <span class="bool-val">true</span> =&gt; <span class="prelude-val">None</span>,
+            <span class="bool-val">false</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">ext</span>),
         },
     ))
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_info_response</span>(<span class="ident">response</span>: <span class="ident">proto::EPPResponse</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">InfoResponse</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_info_response</span>(<span class="ident">response</span>: <span class="ident">proto::EPPResponse</span>) -&gt; <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">InfoResponse</span><span class="op">&gt;</span> {
     <span class="kw">match</span> <span class="ident">response</span>.<span class="ident">data</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">value</span>.<span class="ident">value</span> {
-            <span class="ident">proto::EPPResultDataValue::EPPHostInfoResult</span>(<span class="ident">host_info</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Response::Ok</span>(<span class="ident">InfoResponse</span> {
+        <span class="prelude-val">Some</span>(<span class="ident">value</span>) =&gt; <span class="kw">match</span> <span class="ident">value</span>.<span class="ident">value</span> {
+            <span class="ident">proto::EPPResultDataValue::EPPHostInfoResult</span>(<span class="ident">host_info</span>) =&gt; <span class="ident">Response::Ok</span>(<span class="ident">InfoResponse</span> {
                 <span class="ident">name</span>: <span class="ident">host_info</span>.<span class="ident">name</span>,
                 <span class="ident">registry_id</span>: <span class="ident">host_info</span>.<span class="ident">registry_id</span>.<span class="ident">unwrap_or_default</span>(),
                 <span class="ident">statuses</span>: <span class="ident">host_info</span>
@@ -502,8 +502,8 @@
                     .<span class="ident">map</span>(<span class="op">|</span><span class="ident">a</span><span class="op">|</span> <span class="ident">Address</span> {
                         <span class="ident">address</span>: <span class="ident">a</span>.<span class="ident">address</span>,
                         <span class="ident">ip_version</span>: <span class="kw">match</span> <span class="ident">a</span>.<span class="ident">ip_version</span> {
-                            <span class="ident">proto::host::EPPHostAddressVersion::IPv4</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">AddressVersion::IPv4</span>,
-                            <span class="ident">proto::host::EPPHostAddressVersion::IPv6</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">AddressVersion::IPv6</span>,
+                            <span class="ident">proto::host::EPPHostAddressVersion::IPv4</span> =&gt; <span class="ident">AddressVersion::IPv4</span>,
+                            <span class="ident">proto::host::EPPHostAddressVersion::IPv6</span> =&gt; <span class="ident">AddressVersion::IPv6</span>,
                         },
                     })
                     .<span class="ident">collect</span>(),
@@ -514,16 +514,16 @@
                 <span class="ident">last_updated_date</span>: <span class="ident">host_info</span>.<span class="ident">last_updated_date</span>,
                 <span class="ident">last_transfer_date</span>: <span class="ident">host_info</span>.<span class="ident">last_transfer_date</span>,
             }),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
         },
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
+        <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
     }
 }
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_create</span>(
     <span class="ident">client</span>: <span class="kw-2">&amp;</span><span class="ident">ServerFeatures</span>,
     <span class="ident">req</span>: <span class="kw-2">&amp;</span><span class="ident">CreateRequest</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HandleReqReturn</span><span class="op">&lt;</span><span class="ident">CreateResponse</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">HandleReqReturn</span><span class="op">&lt;</span><span class="ident">CreateResponse</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="op">!</span>(<span class="ident">client</span>.<span class="ident">host_supported</span> <span class="op">|</span><span class="op">|</span> <span class="ident">client</span>.<span class="ident">nsset_supported</span>) {
         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">Err</span>(<span class="ident">Error::Unsupported</span>));
     }
@@ -555,30 +555,30 @@
                         )));
                     },
                     <span class="ident">ip_version</span>: <span class="kw">match</span> <span class="ident">a</span>.<span class="ident">ip_version</span> {
-                        <span class="ident">AddressVersion::IPv4</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">proto::host::EPPHostAddressVersion::IPv4</span>,
-                        <span class="ident">AddressVersion::IPv6</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">proto::host::EPPHostAddressVersion::IPv6</span>,
+                        <span class="ident">AddressVersion::IPv4</span> =&gt; <span class="ident">proto::host::EPPHostAddressVersion::IPv4</span>,
+                        <span class="ident">AddressVersion::IPv6</span> =&gt; <span class="ident">proto::host::EPPHostAddressVersion::IPv6</span>,
                     },
                 })
             })
             .<span class="ident">collect</span>()
         {
-            <span class="prelude-val">Ok</span>(<span class="ident">a</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">a</span>,
-            <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>),
+            <span class="prelude-val">Ok</span>(<span class="ident">a</span>) =&gt; <span class="ident">a</span>,
+            <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>),
         },
     });
     <span class="prelude-val">Ok</span>((
         <span class="ident">proto::EPPCommandType::Create</span>(<span class="ident">command</span>),
         <span class="kw">match</span> <span class="ident">ext</span>.<span class="ident">is_empty</span>() {
-            <span class="bool-val">true</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
-            <span class="bool-val">false</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">ext</span>),
+            <span class="bool-val">true</span> =&gt; <span class="prelude-val">None</span>,
+            <span class="bool-val">false</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">ext</span>),
         },
     ))
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_create_response</span>(<span class="ident">response</span>: <span class="ident">proto::EPPResponse</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">CreateResponse</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_create_response</span>(<span class="ident">response</span>: <span class="ident">proto::EPPResponse</span>) -&gt; <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">CreateResponse</span><span class="op">&gt;</span> {
     <span class="kw">match</span> <span class="ident">response</span>.<span class="ident">data</span> {
-        <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">value</span>.<span class="ident">value</span> {
-            <span class="ident">proto::EPPResultDataValue::EPPHostCreateResult</span>(<span class="ident">host_create</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">value</span>) =&gt; <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">value</span>.<span class="ident">value</span> {
+            <span class="ident">proto::EPPResultDataValue::EPPHostCreateResult</span>(<span class="ident">host_create</span>) =&gt; {
                 <span class="ident">Response::Ok</span>(<span class="ident">CreateResponse</span> {
                     <span class="ident">name</span>: <span class="ident">host_create</span>.<span class="ident">name</span>.<span class="ident">clone</span>(),
                     <span class="ident">pending</span>: <span class="ident">response</span>.<span class="ident">is_pending</span>(),
@@ -589,9 +589,9 @@
                     <span class="ident">creation_date</span>: <span class="ident">host_create</span>.<span class="ident">creation_date</span>,
                 })
             }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
         },
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Response::Ok</span>(<span class="ident">CreateResponse</span> {
+        <span class="prelude-val">None</span> =&gt; <span class="ident">Response::Ok</span>(<span class="ident">CreateResponse</span> {
             <span class="ident">name</span>: <span class="string">&quot;&quot;</span>.<span class="ident">to_string</span>(),
             <span class="ident">pending</span>: <span class="ident">response</span>.<span class="ident">is_pending</span>(),
             <span class="ident">transaction_id</span>: <span class="ident">response</span>
@@ -606,7 +606,7 @@
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_delete</span>(
     <span class="ident">client</span>: <span class="kw-2">&amp;</span><span class="ident">ServerFeatures</span>,
     <span class="ident">req</span>: <span class="kw-2">&amp;</span><span class="ident">DeleteRequest</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HandleReqReturn</span><span class="op">&lt;</span><span class="ident">DeleteResponse</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">HandleReqReturn</span><span class="op">&lt;</span><span class="ident">DeleteResponse</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="op">!</span>(<span class="ident">client</span>.<span class="ident">host_supported</span> <span class="op">|</span><span class="op">|</span> <span class="ident">client</span>.<span class="ident">nsset_supported</span>) {
         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">Err</span>(<span class="ident">Error::Unsupported</span>));
     }
@@ -619,13 +619,13 @@
     <span class="prelude-val">Ok</span>((
         <span class="ident">proto::EPPCommandType::Delete</span>(<span class="ident">command</span>),
         <span class="kw">match</span> <span class="ident">ext</span>.<span class="ident">is_empty</span>() {
-            <span class="bool-val">true</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
-            <span class="bool-val">false</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">ext</span>),
+            <span class="bool-val">true</span> =&gt; <span class="prelude-val">None</span>,
+            <span class="bool-val">false</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">ext</span>),
         },
     ))
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_delete_response</span>(<span class="ident">response</span>: <span class="ident">proto::EPPResponse</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">DeleteResponse</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_delete_response</span>(<span class="ident">response</span>: <span class="ident">proto::EPPResponse</span>) -&gt; <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">DeleteResponse</span><span class="op">&gt;</span> {
     <span class="ident">Response::Ok</span>(<span class="ident">DeleteResponse</span> {
         <span class="ident">pending</span>: <span class="ident">response</span>.<span class="ident">is_pending</span>(),
         <span class="ident">transaction_id</span>: <span class="ident">response</span>
@@ -638,7 +638,7 @@
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_update</span>(
     <span class="ident">client</span>: <span class="kw-2">&amp;</span><span class="ident">ServerFeatures</span>,
     <span class="ident">req</span>: <span class="kw-2">&amp;</span><span class="ident">UpdateRequest</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HandleReqReturn</span><span class="op">&lt;</span><span class="ident">UpdateResponse</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">HandleReqReturn</span><span class="op">&lt;</span><span class="ident">UpdateResponse</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="op">!</span>(<span class="ident">client</span>.<span class="ident">host_supported</span> <span class="op">|</span><span class="op">|</span> <span class="ident">client</span>.<span class="ident">nsset_supported</span>) {
         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">Err</span>(<span class="ident">Error::Unsupported</span>));
     }
@@ -661,21 +661,21 @@
         )));
     }
     <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">req</span>.<span class="ident">new_name</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">n</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Some</span>(<span class="ident">n</span>) =&gt; {
             <span class="kw">if</span> <span class="ident">n</span>.<span class="ident">is_empty</span>() {
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">Err</span>(<span class="ident">Error::Err</span>(
                     <span class="string">&quot;new host name has a min length of 1&quot;</span>.<span class="ident">to_string</span>(),
                 )));
             }
         }
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {}
+        <span class="prelude-val">None</span> =&gt; {}
     }
 
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">adds</span> <span class="op">=</span> <span class="macro">vec!</span>[];
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rems</span> <span class="op">=</span> <span class="macro">vec!</span>[];
     <span class="kw">let</span> <span class="ident">map_obj</span> <span class="op">=</span> <span class="op">|</span><span class="ident">a</span>: <span class="kw-2">&amp;</span><span class="ident">UpdateObject</span><span class="op">|</span> {
         <span class="prelude-val">Ok</span>(<span class="kw">match</span> <span class="ident">a</span> {
-            <span class="ident">UpdateObject::Address</span>(<span class="ident">addr</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">UpdateObject::Address</span>(<span class="ident">addr</span>) =&gt; {
                 <span class="ident">proto::host::EPPHostUpdateParam::Address</span>(<span class="ident">proto::host::EPPHostAddress</span> {
                     <span class="ident">address</span>: <span class="kw">if</span> <span class="kw">let</span> <span class="number">3</span>..<span class="op">=</span><span class="number">45</span> <span class="op">=</span> <span class="ident">addr</span>.<span class="ident">address</span>.<span class="ident">len</span>() {
                         <span class="ident">addr</span>.<span class="ident">address</span>.<span class="ident">clone</span>()
@@ -685,12 +685,12 @@
                         )));
                     },
                     <span class="ident">ip_version</span>: <span class="kw">match</span> <span class="ident">addr</span>.<span class="ident">ip_version</span> {
-                        <span class="ident">AddressVersion::IPv4</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">proto::host::EPPHostAddressVersion::IPv4</span>,
-                        <span class="ident">AddressVersion::IPv6</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">proto::host::EPPHostAddressVersion::IPv6</span>,
+                        <span class="ident">AddressVersion::IPv4</span> =&gt; <span class="ident">proto::host::EPPHostAddressVersion::IPv4</span>,
+                        <span class="ident">AddressVersion::IPv6</span> =&gt; <span class="ident">proto::host::EPPHostAddressVersion::IPv6</span>,
                     },
                 })
             }
-            <span class="ident">UpdateObject::Status</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">UpdateObject::Status</span>(<span class="ident">s</span>) =&gt; {
                 <span class="ident">proto::host::EPPHostUpdateParam::Status</span>(<span class="ident">proto::host::EPPHostStatus</span> {
                     <span class="ident">status</span>: <span class="ident">s</span>.<span class="ident">into</span>(),
                 })
@@ -705,8 +705,8 @@
     }
 
     <span class="kw">let</span> <span class="ident">update_as_i32</span> <span class="op">=</span> <span class="op">|</span><span class="ident">u</span>: <span class="kw-2">&amp;</span><span class="ident">proto::host::EPPHostUpdateParam</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">u</span> {
-        <span class="ident">proto::host::EPPHostUpdateParam::Address</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="number">0</span>,
-        <span class="ident">proto::host::EPPHostUpdateParam::Status</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="number">1</span>,
+        <span class="ident">proto::host::EPPHostUpdateParam::Address</span>(<span class="kw">_</span>) =&gt; <span class="number">0</span>,
+        <span class="ident">proto::host::EPPHostUpdateParam::Status</span>(<span class="kw">_</span>) =&gt; <span class="number">1</span>,
     };
     <span class="ident">adds</span>.<span class="ident">sort_unstable_by_key</span>(<span class="ident">update_as_i32</span>);
     <span class="ident">rems</span>.<span class="ident">sort_unstable_by_key</span>(<span class="ident">update_as_i32</span>);
@@ -714,12 +714,12 @@
     <span class="kw">let</span> <span class="ident">command</span> <span class="op">=</span> <span class="ident">proto::EPPUpdate::Host</span>(<span class="ident">proto::host::EPPHostUpdate</span> {
         <span class="ident">name</span>: <span class="ident">req</span>.<span class="ident">name</span>.<span class="ident">clone</span>(),
         <span class="ident">add</span>: <span class="kw">match</span> <span class="ident">adds</span>.<span class="ident">len</span>() {
-            <span class="number">0</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">proto::host::EPPHostUpdateAdd</span> { <span class="ident">params</span>: <span class="ident">adds</span> }),
+            <span class="number">0</span> =&gt; <span class="prelude-val">None</span>,
+            <span class="kw">_</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">proto::host::EPPHostUpdateAdd</span> { <span class="ident">params</span>: <span class="ident">adds</span> }),
         },
         <span class="ident">remove</span>: <span class="kw">match</span> <span class="ident">rems</span>.<span class="ident">len</span>() {
-            <span class="number">0</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">proto::host::EPPHostUpdateRemove</span> { <span class="ident">params</span>: <span class="ident">rems</span> }),
+            <span class="number">0</span> =&gt; <span class="prelude-val">None</span>,
+            <span class="kw">_</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">proto::host::EPPHostUpdateRemove</span> { <span class="ident">params</span>: <span class="ident">rems</span> }),
         },
         <span class="ident">change</span>: <span class="ident">req</span>
             .<span class="ident">new_name</span>
@@ -729,13 +729,13 @@
     <span class="prelude-val">Ok</span>((
         <span class="ident">proto::EPPCommandType::Update</span>(<span class="ident">Box::new</span>(<span class="ident">command</span>)),
         <span class="kw">match</span> <span class="ident">ext</span>.<span class="ident">is_empty</span>() {
-            <span class="bool-val">true</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
-            <span class="bool-val">false</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">ext</span>),
+            <span class="bool-val">true</span> =&gt; <span class="prelude-val">None</span>,
+            <span class="bool-val">false</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">ext</span>),
         },
     ))
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_update_response</span>(<span class="ident">response</span>: <span class="ident">proto::EPPResponse</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">UpdateResponse</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_update_response</span>(<span class="ident">response</span>: <span class="ident">proto::EPPResponse</span>) -&gt; <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">UpdateResponse</span><span class="op">&gt;</span> {
     <span class="ident">Response::Ok</span>(<span class="ident">UpdateResponse</span> {
         <span class="ident">pending</span>: <span class="ident">response</span>.<span class="ident">is_pending</span>(),
         <span class="ident">transaction_id</span>: <span class="ident">response</span>
