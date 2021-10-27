@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["DACEnv",""],["DomainState",""],["DomainStatus",""]],"fn":[["domain","Get the DAC data for a domain"],["limits","Get the usage limits"],["usage","Get the used amount of the limits"]],"struct":[["DACDomainRequest",""],["DACDomainResponse",""],["DACUsageRequest",""],["DACUsageResponse",""]]});

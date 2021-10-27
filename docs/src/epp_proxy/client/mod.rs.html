@@ -160,6 +160,14 @@
 <span id="160">160</span>
 <span id="161">161</span>
 <span id="162">162</span>
+<span id="163">163</span>
+<span id="164">164</span>
+<span id="165">165</span>
+<span id="166">166</span>
+<span id="167">167</span>
+<span id="168">168</span>
+<span id="169">169</span>
+<span id="170">170</span>
 </pre><pre class="rust"><code><span class="doccomment">//! # Async/await EPP client.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! Messages should be injected into the server using the helper functions in subordinate modules such as</span>
@@ -170,10 +178,12 @@
 
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">epp</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">epp_like</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">nominet_dac</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">tmch_client</span>;
 
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">balance</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">contact</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">dac</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">domain</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">eurid</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">fee</span>;
@@ -202,6 +212,11 @@
     },
 }
 
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">NominetDACConf</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="ident">real_time</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
+    <span class="kw">pub</span> <span class="ident">time_delay</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
+}
+
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ClientConf</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">C</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="doccomment">/// The server connection string, in the form `domain:port`</span>
     <span class="kw">pub</span> <span class="ident">host</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
@@ -224,6 +239,7 @@
     <span class="kw">pub</span> <span class="ident">pipelining</span>: <span class="ident">bool</span>,
     <span class="doccomment">/// Errata of this server</span>
     <span class="kw">pub</span> <span class="ident">errata</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">nominet_dac</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NominetDACConf</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">send_epp_client_request</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(

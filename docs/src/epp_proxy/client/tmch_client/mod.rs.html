@@ -494,9 +494,6 @@
 <span id="494">494</span>
 <span id="495">495</span>
 <span id="496">496</span>
-<span id="497">497</span>
-<span id="498">498</span>
-<span id="499">499</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::proto::tmch</span> <span class="kw">as</span> <span class="ident">tmch_proto</span>;
 <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">router</span> <span class="kw">as</span> <span class="ident">outer_router</span>, <span class="ident">LogoutRequest</span>, <span class="ident">RequestMessage</span>};
 <span class="kw">use</span> <span class="ident">chrono::prelude</span>::<span class="kw-2">*</span>;
@@ -542,8 +539,6 @@
     <span class="ident">pipelining</span>: <span class="ident">bool</span>,
     <span class="ident">is_awaiting_response</span>: <span class="ident">bool</span>,
     <span class="ident">is_closing</span>: <span class="ident">bool</span>,
-    <span class="doccomment">/// Is the TMCH server in a state to receive and process commands</span>
-    <span class="ident">ready</span>: <span class="ident">bool</span>,
     <span class="ident">router</span>: <span class="ident">outer_router::Router</span><span class="op">&lt;</span><span class="ident">router::Router</span>, ()<span class="op">&gt;</span>,
     <span class="ident">tls_client</span>: <span class="ident"><span class="kw">super</span>::epp_like::tls_client::TLSClient</span>,
 }
@@ -582,7 +577,6 @@
             <span class="ident">server_id</span>: <span class="ident">String::new</span>(),
             <span class="ident">is_awaiting_response</span>: <span class="bool-val">false</span>,
             <span class="ident">is_closing</span>: <span class="bool-val">false</span>,
-            <span class="ident">ready</span>: <span class="bool-val">false</span>,
             <span class="ident">router</span>: <span class="ident">outer_router::Router::default</span>(),
             <span class="ident">tls_client</span>,
         })
