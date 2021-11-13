@@ -162,7 +162,10 @@ impl<
     }
 }
 
-pub(super) async fn make_tcp_socket(host: &str, source_addr: &Option<std::net::IpAddr>) -> Result<tokio::net::TcpStream, ()> {
+pub(super) async fn make_tcp_socket(
+    host: &str,
+    source_addr: &Option<std::net::IpAddr>,
+) -> Result<tokio::net::TcpStream, ()> {
     let addr = match tokio::net::lookup_host(host).await {
         Ok(mut s) => match s.next() {
             Some(s) => s,
@@ -193,7 +196,7 @@ pub(super) async fn make_tcp_socket(host: &str, source_addr: &Option<std::net::I
     };
 
     match socket.set_reuseaddr(true) {
-        Ok(()) => {},
+        Ok(()) => {}
         Err(err) => {
             error!("Unable to setup TCP socket for {}: {}", host, err);
             return Err(());
@@ -203,7 +206,7 @@ pub(super) async fn make_tcp_socket(host: &str, source_addr: &Option<std::net::I
     if let Some(bind_addr) = source_addr {
         trace!("Setting source address to {} for {}", bind_addr, host);
         match socket.bind(std::net::SocketAddr::new(bind_addr.to_owned(), 0)) {
-            Ok(()) => {},
+            Ok(()) => {}
             Err(err) => {
                 error!("Unable to setup TCP socket for {}: {}", host, err);
                 return Err(());
@@ -211,7 +214,7 @@ pub(super) async fn make_tcp_socket(host: &str, source_addr: &Option<std::net::I
         }
     }
 
-   Ok(match socket.connect(addr).await {
+    Ok(match socket.connect(addr).await {
         Ok(s) => s,
         Err(err) => {
             error!("Unable to connect to {}: {}", host, err);

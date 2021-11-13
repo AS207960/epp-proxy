@@ -38,7 +38,11 @@ impl DACClient {
     /// # Arguments
     /// * `rt_host` - Hostname and port of the real time server
     /// * `td_host` - Hostname and port of the time delay server
-    pub async fn new(rt_host: &str, td_host: &str, source_addr: Option<&std::net::IpAddr>) -> std::io::Result<Self> {
+    pub async fn new(
+        rt_host: &str,
+        td_host: &str,
+        source_addr: Option<&std::net::IpAddr>,
+    ) -> std::io::Result<Self> {
         Ok(Self {
             router: outer_router::Router::default(),
             is_closing: false,
