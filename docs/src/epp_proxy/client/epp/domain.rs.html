@@ -2375,76 +2375,76 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::ServerFeatures</span>;
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">proto::domain::EPPDomainStatusType</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Status</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">proto::domain::EPPDomainStatusType</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">proto::domain::EPPDomainStatusType</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">use</span> <span class="ident">proto::domain::EPPDomainStatusType</span>;
         <span class="kw">match</span> <span class="ident">from</span> {
-            <span class="ident">EPPDomainStatusType::ClientDeleteProhibited</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Status::ClientDeleteProhibited</span>,
-            <span class="ident">EPPDomainStatusType::ClientHold</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Status::ClientHold</span>,
-            <span class="ident">EPPDomainStatusType::ClientRenewProhibited</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Status::ClientRenewProhibited</span>,
-            <span class="ident">EPPDomainStatusType::ClientTransferProhibited</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Status::ClientTransferProhibited</span>,
-            <span class="ident">EPPDomainStatusType::ClientUpdateProhibited</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Status::ClientUpdateProhibited</span>,
-            <span class="ident">EPPDomainStatusType::Inactive</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Status::Inactive</span>,
-            <span class="ident">EPPDomainStatusType::Ok</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Status::Ok</span>,
-            <span class="ident">EPPDomainStatusType::Granted</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Status::Ok</span>,
-            <span class="ident">EPPDomainStatusType::PendingCreate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Status::PendingCreate</span>,
-            <span class="ident">EPPDomainStatusType::PendingDelete</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Status::PendingDelete</span>,
-            <span class="ident">EPPDomainStatusType::Terminated</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Status::PendingDelete</span>,
-            <span class="ident">EPPDomainStatusType::PendingRenew</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Status::PendingRenew</span>,
-            <span class="ident">EPPDomainStatusType::PendingTransfer</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Status::PendingTransfer</span>,
-            <span class="ident">EPPDomainStatusType::PendingUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Status::PendingUpdate</span>,
-            <span class="ident">EPPDomainStatusType::ServerDeleteProhibited</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Status::ServerDeleteProhibited</span>,
-            <span class="ident">EPPDomainStatusType::ServerHold</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Status::ServerHold</span>,
-            <span class="ident">EPPDomainStatusType::ServerRenewProhibited</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Status::ServerRenewProhibited</span>,
-            <span class="ident">EPPDomainStatusType::ServerTransferProhibited</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Status::ServerTransferProhibited</span>,
-            <span class="ident">EPPDomainStatusType::ServerUpdateProhibited</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Status::ServerUpdateProhibited</span>,
+            <span class="ident">EPPDomainStatusType::ClientDeleteProhibited</span> =&gt; <span class="ident">Status::ClientDeleteProhibited</span>,
+            <span class="ident">EPPDomainStatusType::ClientHold</span> =&gt; <span class="ident">Status::ClientHold</span>,
+            <span class="ident">EPPDomainStatusType::ClientRenewProhibited</span> =&gt; <span class="ident">Status::ClientRenewProhibited</span>,
+            <span class="ident">EPPDomainStatusType::ClientTransferProhibited</span> =&gt; <span class="ident">Status::ClientTransferProhibited</span>,
+            <span class="ident">EPPDomainStatusType::ClientUpdateProhibited</span> =&gt; <span class="ident">Status::ClientUpdateProhibited</span>,
+            <span class="ident">EPPDomainStatusType::Inactive</span> =&gt; <span class="ident">Status::Inactive</span>,
+            <span class="ident">EPPDomainStatusType::Ok</span> =&gt; <span class="ident">Status::Ok</span>,
+            <span class="ident">EPPDomainStatusType::Granted</span> =&gt; <span class="ident">Status::Ok</span>,
+            <span class="ident">EPPDomainStatusType::PendingCreate</span> =&gt; <span class="ident">Status::PendingCreate</span>,
+            <span class="ident">EPPDomainStatusType::PendingDelete</span> =&gt; <span class="ident">Status::PendingDelete</span>,
+            <span class="ident">EPPDomainStatusType::Terminated</span> =&gt; <span class="ident">Status::PendingDelete</span>,
+            <span class="ident">EPPDomainStatusType::PendingRenew</span> =&gt; <span class="ident">Status::PendingRenew</span>,
+            <span class="ident">EPPDomainStatusType::PendingTransfer</span> =&gt; <span class="ident">Status::PendingTransfer</span>,
+            <span class="ident">EPPDomainStatusType::PendingUpdate</span> =&gt; <span class="ident">Status::PendingUpdate</span>,
+            <span class="ident">EPPDomainStatusType::ServerDeleteProhibited</span> =&gt; <span class="ident">Status::ServerDeleteProhibited</span>,
+            <span class="ident">EPPDomainStatusType::ServerHold</span> =&gt; <span class="ident">Status::ServerHold</span>,
+            <span class="ident">EPPDomainStatusType::ServerRenewProhibited</span> =&gt; <span class="ident">Status::ServerRenewProhibited</span>,
+            <span class="ident">EPPDomainStatusType::ServerTransferProhibited</span> =&gt; <span class="ident">Status::ServerTransferProhibited</span>,
+            <span class="ident">EPPDomainStatusType::ServerUpdateProhibited</span> =&gt; <span class="ident">Status::ServerUpdateProhibited</span>,
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Status</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">proto::domain::EPPDomainStatusType</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">Status</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">Status</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">use</span> <span class="ident">proto::domain::EPPDomainStatusType</span>;
         <span class="kw">match</span> <span class="ident">from</span> {
-            <span class="ident">Status::ClientDeleteProhibited</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EPPDomainStatusType::ClientDeleteProhibited</span>,
-            <span class="ident">Status::ClientHold</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EPPDomainStatusType::ClientHold</span>,
-            <span class="ident">Status::ClientRenewProhibited</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EPPDomainStatusType::ClientRenewProhibited</span>,
-            <span class="ident">Status::ClientTransferProhibited</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EPPDomainStatusType::ClientTransferProhibited</span>,
-            <span class="ident">Status::ClientUpdateProhibited</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EPPDomainStatusType::ClientUpdateProhibited</span>,
-            <span class="ident">Status::Inactive</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EPPDomainStatusType::Inactive</span>,
-            <span class="ident">Status::Ok</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EPPDomainStatusType::Ok</span>,
-            <span class="ident">Status::PendingCreate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EPPDomainStatusType::PendingCreate</span>,
-            <span class="ident">Status::PendingDelete</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EPPDomainStatusType::PendingDelete</span>,
-            <span class="ident">Status::PendingRenew</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EPPDomainStatusType::PendingRenew</span>,
-            <span class="ident">Status::PendingTransfer</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EPPDomainStatusType::PendingTransfer</span>,
-            <span class="ident">Status::PendingUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EPPDomainStatusType::PendingUpdate</span>,
-            <span class="ident">Status::ServerDeleteProhibited</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EPPDomainStatusType::ServerDeleteProhibited</span>,
-            <span class="ident">Status::ServerHold</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EPPDomainStatusType::ServerHold</span>,
-            <span class="ident">Status::ServerRenewProhibited</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EPPDomainStatusType::ServerRenewProhibited</span>,
-            <span class="ident">Status::ServerTransferProhibited</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EPPDomainStatusType::ServerTransferProhibited</span>,
-            <span class="ident">Status::ServerUpdateProhibited</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EPPDomainStatusType::ServerUpdateProhibited</span>,
+            <span class="ident">Status::ClientDeleteProhibited</span> =&gt; <span class="ident">EPPDomainStatusType::ClientDeleteProhibited</span>,
+            <span class="ident">Status::ClientHold</span> =&gt; <span class="ident">EPPDomainStatusType::ClientHold</span>,
+            <span class="ident">Status::ClientRenewProhibited</span> =&gt; <span class="ident">EPPDomainStatusType::ClientRenewProhibited</span>,
+            <span class="ident">Status::ClientTransferProhibited</span> =&gt; <span class="ident">EPPDomainStatusType::ClientTransferProhibited</span>,
+            <span class="ident">Status::ClientUpdateProhibited</span> =&gt; <span class="ident">EPPDomainStatusType::ClientUpdateProhibited</span>,
+            <span class="ident">Status::Inactive</span> =&gt; <span class="ident">EPPDomainStatusType::Inactive</span>,
+            <span class="ident">Status::Ok</span> =&gt; <span class="ident">EPPDomainStatusType::Ok</span>,
+            <span class="ident">Status::PendingCreate</span> =&gt; <span class="ident">EPPDomainStatusType::PendingCreate</span>,
+            <span class="ident">Status::PendingDelete</span> =&gt; <span class="ident">EPPDomainStatusType::PendingDelete</span>,
+            <span class="ident">Status::PendingRenew</span> =&gt; <span class="ident">EPPDomainStatusType::PendingRenew</span>,
+            <span class="ident">Status::PendingTransfer</span> =&gt; <span class="ident">EPPDomainStatusType::PendingTransfer</span>,
+            <span class="ident">Status::PendingUpdate</span> =&gt; <span class="ident">EPPDomainStatusType::PendingUpdate</span>,
+            <span class="ident">Status::ServerDeleteProhibited</span> =&gt; <span class="ident">EPPDomainStatusType::ServerDeleteProhibited</span>,
+            <span class="ident">Status::ServerHold</span> =&gt; <span class="ident">EPPDomainStatusType::ServerHold</span>,
+            <span class="ident">Status::ServerRenewProhibited</span> =&gt; <span class="ident">EPPDomainStatusType::ServerRenewProhibited</span>,
+            <span class="ident">Status::ServerTransferProhibited</span> =&gt; <span class="ident">EPPDomainStatusType::ServerTransferProhibited</span>,
+            <span class="ident">Status::ServerUpdateProhibited</span> =&gt; <span class="ident">EPPDomainStatusType::ServerUpdateProhibited</span>,
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">InfoNameserver</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">proto::domain::EPPDomainInfoNameserver</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">InfoNameserver</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">InfoNameserver</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">match</span> <span class="ident">from</span> {
-            <span class="ident">InfoNameserver::HostOnly</span>(<span class="ident">h</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">InfoNameserver::HostOnly</span>(<span class="ident">h</span>) =&gt; {
                 <span class="ident">proto::domain::EPPDomainInfoNameserver::HostOnly</span>(<span class="ident">h</span>.<span class="ident">to_string</span>())
             }
             <span class="ident">InfoNameserver::HostAndAddress</span> {
                 <span class="ident">host</span>, <span class="ident">addresses</span>, ..
-            } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">proto::domain::EPPDomainInfoNameserver::HostAndAddress</span> {
+            } =&gt; <span class="ident">proto::domain::EPPDomainInfoNameserver::HostAndAddress</span> {
                 <span class="ident">host</span>: <span class="ident">host</span>.<span class="ident">to_string</span>(),
                 <span class="ident">addresses</span>: <span class="ident">addresses</span>
                     .<span class="ident">iter</span>()
                     .<span class="ident">map</span>(<span class="op">|</span><span class="ident">addr</span><span class="op">|</span> <span class="ident">proto::domain::EPPDomainInfoNameserverAddress</span> {
                         <span class="ident">address</span>: <span class="ident">addr</span>.<span class="ident">address</span>.<span class="ident">to_string</span>(),
                         <span class="ident">ip_version</span>: <span class="kw">match</span> <span class="ident">addr</span>.<span class="ident">ip_version</span> {
-                            <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::host::AddressVersion::IPv4</span> <span class="op">=</span><span class="op">&gt;</span> {
+                            <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::host::AddressVersion::IPv4</span> =&gt; {
                                 <span class="ident">proto::domain::EPPDomainInfoNameserverAddressVersion::IPv4</span>
                             }
-                            <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::host::AddressVersion::IPv6</span> <span class="op">=</span><span class="op">&gt;</span> {
+                            <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::host::AddressVersion::IPv6</span> =&gt; {
                                 <span class="ident">proto::domain::EPPDomainInfoNameserverAddressVersion::IPv6</span>
                             }
                         },
@@ -2456,11 +2456,11 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Period</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">proto::domain::EPPDomainPeriod</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">Period</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">Period</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">proto::domain::EPPDomainPeriod</span> {
             <span class="ident">unit</span>: <span class="kw">match</span> <span class="ident">from</span>.<span class="ident">unit</span> {
-                <span class="ident">PeriodUnit::Months</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">proto::domain::EPPDomainPeriodUnit::Months</span>,
-                <span class="ident">PeriodUnit::Years</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">proto::domain::EPPDomainPeriodUnit::Years</span>,
+                <span class="ident">PeriodUnit::Months</span> =&gt; <span class="ident">proto::domain::EPPDomainPeriodUnit::Months</span>,
+                <span class="ident">PeriodUnit::Years</span> =&gt; <span class="ident">proto::domain::EPPDomainPeriodUnit::Years</span>,
             },
             <span class="ident">value</span>: <span class="ident">std::cmp::min</span>(<span class="number">99</span>, <span class="ident">std::cmp::max</span>(<span class="ident">from</span>.<span class="ident">value</span>, <span class="number">1</span>)),
         }
@@ -2468,11 +2468,11 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">proto::domain::EPPDomainPeriod</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Period</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">proto::domain::EPPDomainPeriod</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">proto::domain::EPPDomainPeriod</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">Period</span> {
             <span class="ident">unit</span>: <span class="kw">match</span> <span class="ident">from</span>.<span class="ident">unit</span> {
-                <span class="ident">proto::domain::EPPDomainPeriodUnit::Years</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">PeriodUnit::Years</span>,
-                <span class="ident">proto::domain::EPPDomainPeriodUnit::Months</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">PeriodUnit::Months</span>,
+                <span class="ident">proto::domain::EPPDomainPeriodUnit::Years</span> =&gt; <span class="ident">PeriodUnit::Years</span>,
+                <span class="ident">proto::domain::EPPDomainPeriodUnit::Months</span> =&gt; <span class="ident">PeriodUnit::Months</span>,
             },
             <span class="ident">value</span>: <span class="ident">from</span>.<span class="ident">value</span>,
         }
@@ -2492,26 +2492,26 @@
             <span class="ident">proto::domain::EPPDomainInfoData</span>,
             <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">proto::EPPResponseExtension</span><span class="op">&gt;</span>,
         ),
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> (<span class="ident">domain_info</span>, <span class="ident">extension</span>) <span class="op">=</span> <span class="ident">from</span>;
         <span class="kw">let</span> <span class="ident">rgp_state</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">extension</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">ext</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">ext</span>.<span class="ident">value</span>.<span class="ident">iter</span>().<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">p</span> {
-                <span class="ident">proto::EPPResponseExtensionType::EPPRGPInfo</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>),
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="prelude-val">Some</span>(<span class="ident">ext</span>) =&gt; <span class="kw">match</span> <span class="ident">ext</span>.<span class="ident">value</span>.<span class="ident">iter</span>().<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">p</span> {
+                <span class="ident">proto::EPPResponseExtensionType::EPPRGPInfo</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">i</span>),
+                <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
             }) {
-                <span class="prelude-val">Some</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">e</span>.<span class="ident">state</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> (<span class="kw-2">&amp;</span><span class="ident">s</span>.<span class="ident">state</span>).<span class="ident">into</span>()).<span class="ident">collect</span>(),
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">vec!</span>[],
+                <span class="prelude-val">Some</span>(<span class="ident">e</span>) =&gt; <span class="ident">e</span>.<span class="ident">state</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> (<span class="kw-2">&amp;</span><span class="ident">s</span>.<span class="ident">state</span>).<span class="ident">into</span>()).<span class="ident">collect</span>(),
+                <span class="prelude-val">None</span> =&gt; <span class="macro">vec!</span>[],
             },
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">vec!</span>[],
+            <span class="prelude-val">None</span> =&gt; <span class="macro">vec!</span>[],
         };
 
         <span class="kw">let</span> <span class="ident">sec_dns</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">extension</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">ext</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">ext</span>
+            <span class="prelude-val">Some</span>(<span class="ident">ext</span>) =&gt; <span class="kw">match</span> <span class="ident">ext</span>
                 .<span class="ident">value</span>
                 .<span class="ident">iter</span>()
                 .<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">p</span> {
-                    <span class="ident">proto::EPPResponseExtensionType::EPPSecDNSInfo</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>),
-                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+                    <span class="ident">proto::EPPResponseExtensionType::EPPSecDNSInfo</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">i</span>),
+                    <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
                 })
                 .<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> {
                     <span class="prelude-val">Ok</span>(<span class="ident">SecDNSData</span> {
@@ -2551,59 +2551,59 @@
                         },
                     })
                 }) {
-                <span class="prelude-val">Some</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">i</span> {
-                    <span class="prelude-val">Ok</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>),
-                    <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>),
+                <span class="prelude-val">Some</span>(<span class="ident">i</span>) =&gt; <span class="kw">match</span> <span class="ident">i</span> {
+                    <span class="prelude-val">Ok</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">i</span>),
+                    <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>),
                 },
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+                <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
             },
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
         };
 
         <span class="kw">let</span> <span class="ident">launch_info</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">extension</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">ext</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ext</span>
+            <span class="prelude-val">Some</span>(<span class="ident">ext</span>) =&gt; <span class="ident">ext</span>
                 .<span class="ident">value</span>
                 .<span class="ident">iter</span>()
                 .<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">p</span> {
-                    <span class="ident">proto::EPPResponseExtensionType::EPPLaunchInfoData</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>),
-                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+                    <span class="ident">proto::EPPResponseExtensionType::EPPLaunchInfoData</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">i</span>),
+                    <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
                 })
                 .<span class="ident">map</span>(<span class="ident">launch::LaunchInfoData::from</span>),
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
         };
 
         <span class="kw">let</span> <span class="ident">donuts_fee_data</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">extension</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">ext</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">ext</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">charge</span> <span class="op">=</span> <span class="ident">ext</span>.<span class="ident">value</span>.<span class="ident">iter</span>().<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">p</span> {
-                    <span class="ident">proto::EPPResponseExtensionType::EPPDonutsChargeInfoData</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>),
-                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+                    <span class="ident">proto::EPPResponseExtensionType::EPPDonutsChargeInfoData</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">i</span>),
+                    <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
                 });
 
                 <span class="ident">charge</span>.<span class="ident">map</span>(<span class="ident">Into::into</span>)
             }
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
         };
 
         <span class="kw">let</span> <span class="ident">whois_info</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">extension</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">ext</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">ext</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">i</span> <span class="op">=</span> <span class="ident">ext</span>.<span class="ident">value</span>.<span class="ident">iter</span>().<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">p</span> {
-                    <span class="ident">proto::EPPResponseExtensionType::VerisignWhoisInfo</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>),
-                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+                    <span class="ident">proto::EPPResponseExtensionType::VerisignWhoisInfo</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">i</span>),
+                    <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
                 });
                 <span class="ident">i</span>.<span class="ident">map</span>(<span class="ident">Into::into</span>)
             }
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
         };
 
         <span class="kw">let</span> <span class="ident">isnic_info</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">extension</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">ext</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">ext</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">i</span> <span class="op">=</span> <span class="ident">ext</span>.<span class="ident">value</span>.<span class="ident">iter</span>().<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">p</span> {
-                    <span class="ident">proto::EPPResponseExtensionType::ISNICDomainInfo</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>),
-                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+                    <span class="ident">proto::EPPResponseExtensionType::ISNICDomainInfo</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">i</span>),
+                    <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
                 });
                 <span class="ident">i</span>.<span class="ident">map</span>(<span class="ident">Into::into</span>)
             }
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
         };
 
         <span class="prelude-val">Ok</span>(<span class="ident">InfoResponse</span> {
@@ -2625,18 +2625,18 @@
                 })
                 .<span class="ident">collect</span>(),
             <span class="ident">nameservers</span>: <span class="kw">match</span> <span class="ident">domain_info</span>.<span class="ident">nameservers</span> {
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">vec!</span>[],
-                <span class="prelude-val">Some</span>(<span class="ident">n</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">n</span>
+                <span class="prelude-val">None</span> =&gt; <span class="macro">vec!</span>[],
+                <span class="prelude-val">Some</span>(<span class="ident">n</span>) =&gt; <span class="ident">n</span>
                     .<span class="ident">servers</span>
                     .<span class="ident">into_iter</span>()
                     .<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="prelude-val">Ok</span>(<span class="kw">match</span> <span class="ident">s</span> {
-                        <span class="ident">proto::domain::EPPDomainInfoNameserver::HostOnly</span>(<span class="ident">h</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="ident">proto::domain::EPPDomainInfoNameserver::HostOnly</span>(<span class="ident">h</span>) =&gt; {
                             <span class="ident">InfoNameserver::HostOnly</span>(<span class="ident">h</span>)
                         }
                         <span class="ident">proto::domain::EPPDomainInfoNameserver::HostAndAddress</span> {
                             <span class="ident">host</span>,
                             <span class="ident">addresses</span>,
-                        } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">InfoNameserver::HostAndAddress</span> {
+                        } =&gt; <span class="ident">InfoNameserver::HostAndAddress</span> {
                             <span class="ident">eurid_idn</span>: <span class="ident"><span class="kw">super</span>::eurid::extract_eurid_idn_singular</span>(<span class="ident">extension</span>, <span class="ident">host</span>.<span class="ident">as_str</span>())<span class="question-mark">?</span>,
                             <span class="ident">host</span>,
                             <span class="ident">addresses</span>: <span class="ident">addresses</span>
@@ -2645,10 +2645,10 @@
                                     <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::host::Address</span> {
                                         <span class="ident">address</span>: <span class="ident">addr</span>.<span class="ident">address</span>,
                                         <span class="ident">ip_version</span>: <span class="kw">match</span> <span class="ident">addr</span>.<span class="ident">ip_version</span> {
-                                            <span class="ident">proto::domain::EPPDomainInfoNameserverAddressVersion::IPv4</span> <span class="op">=</span><span class="op">&gt;</span> {
+                                            <span class="ident">proto::domain::EPPDomainInfoNameserverAddressVersion::IPv4</span> =&gt; {
                                                 <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::host::AddressVersion::IPv4</span>
                                             }
-                                            <span class="ident">proto::domain::EPPDomainInfoNameserverAddressVersion::IPv6</span> <span class="op">=</span><span class="op">&gt;</span> {
+                                            <span class="ident">proto::domain::EPPDomainInfoNameserverAddressVersion::IPv6</span> =&gt; {
                                                 <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::host::AddressVersion::IPv6</span>
                                             }
                                         },
@@ -2669,8 +2669,8 @@
             <span class="ident">last_transfer_date</span>: <span class="ident">domain_info</span>.<span class="ident">last_transfer_date</span>,
             <span class="ident">rgp_state</span>,
             <span class="ident">auth_info</span>: <span class="kw">match</span> <span class="ident">domain_info</span>.<span class="ident">auth_info</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">a</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">a</span>.<span class="ident">password</span>,
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+                <span class="prelude-val">Some</span>(<span class="ident">a</span>) =&gt; <span class="ident">a</span>.<span class="ident">password</span>,
+                <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
             },
             <span class="ident">sec_dns</span>,
             <span class="ident">launch_info</span>,
@@ -2695,34 +2695,34 @@
             <span class="ident">proto::domain::EPPDomainTransferData</span>,
             <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">proto::EPPResponseExtension</span><span class="op">&gt;</span>,
         ),
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> (<span class="ident">domain_transfer</span>, <span class="ident">extension</span>) <span class="op">=</span> <span class="ident">from</span>;
 
         <span class="kw">let</span> <span class="ident">fee_data</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">extension</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">ext</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">ext</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">fee10</span> <span class="op">=</span> <span class="ident">ext</span>.<span class="ident">value</span>.<span class="ident">iter</span>().<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">p</span> {
-                    <span class="ident">proto::EPPResponseExtensionType::EPPFee10TransferData</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>),
-                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+                    <span class="ident">proto::EPPResponseExtensionType::EPPFee10TransferData</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">i</span>),
+                    <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
                 });
                 <span class="kw">let</span> <span class="ident">fee011</span> <span class="op">=</span> <span class="ident">ext</span>.<span class="ident">value</span>.<span class="ident">iter</span>().<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">p</span> {
-                    <span class="ident">proto::EPPResponseExtensionType::EPPFee011TransferData</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>),
-                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+                    <span class="ident">proto::EPPResponseExtensionType::EPPFee011TransferData</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">i</span>),
+                    <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
                 });
                 <span class="kw">let</span> <span class="ident">fee09</span> <span class="op">=</span> <span class="ident">ext</span>.<span class="ident">value</span>.<span class="ident">iter</span>().<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">p</span> {
-                    <span class="ident">proto::EPPResponseExtensionType::EPPFee09TransferData</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>),
-                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+                    <span class="ident">proto::EPPResponseExtensionType::EPPFee09TransferData</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">i</span>),
+                    <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
                 });
                 <span class="kw">let</span> <span class="ident">fee08</span> <span class="op">=</span> <span class="ident">ext</span>.<span class="ident">value</span>.<span class="ident">iter</span>().<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">p</span> {
-                    <span class="ident">proto::EPPResponseExtensionType::EPPFee08TransferData</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>),
-                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+                    <span class="ident">proto::EPPResponseExtensionType::EPPFee08TransferData</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">i</span>),
+                    <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
                 });
                 <span class="kw">let</span> <span class="ident">fee07</span> <span class="op">=</span> <span class="ident">ext</span>.<span class="ident">value</span>.<span class="ident">iter</span>().<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">p</span> {
-                    <span class="ident">proto::EPPResponseExtensionType::EPPFee07TransferData</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>),
-                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+                    <span class="ident">proto::EPPResponseExtensionType::EPPFee07TransferData</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">i</span>),
+                    <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
                 });
                 <span class="kw">let</span> <span class="ident">fee05</span> <span class="op">=</span> <span class="ident">ext</span>.<span class="ident">value</span>.<span class="ident">iter</span>().<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">p</span> {
-                    <span class="ident">proto::EPPResponseExtensionType::EPPFee05TransferData</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>),
-                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+                    <span class="ident">proto::EPPResponseExtensionType::EPPFee05TransferData</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">i</span>),
+                    <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
                 });
 
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">f</span>) <span class="op">=</span> <span class="ident">fee10</span> {
@@ -2739,19 +2739,19 @@
                     <span class="ident">fee05</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">into</span>())
                 }
             }
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
         };
 
         <span class="kw">let</span> <span class="ident">donuts_fee_data</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">extension</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">ext</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">ext</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">charge</span> <span class="op">=</span> <span class="ident">ext</span>.<span class="ident">value</span>.<span class="ident">iter</span>().<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">p</span> {
-                    <span class="ident">proto::EPPResponseExtensionType::EPPDonutsChargeTransferData</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>),
-                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+                    <span class="ident">proto::EPPResponseExtensionType::EPPDonutsChargeTransferData</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">i</span>),
+                    <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
                 });
 
                 <span class="ident">charge</span>.<span class="ident">map</span>(<span class="ident">Into::into</span>)
             }
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
         };
 
         <span class="prelude-val">Ok</span>(<span class="ident">TransferResponse</span> {
@@ -2786,34 +2786,34 @@
             <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">proto::domain::EPPDomainCreateData</span><span class="op">&gt;</span>,
             <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">proto::EPPResponseExtension</span><span class="op">&gt;</span>,
         ),
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> (<span class="ident">domain_create</span>, <span class="ident">extension</span>) <span class="op">=</span> <span class="ident">from</span>;
 
         <span class="kw">let</span> <span class="ident">fee_data</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">extension</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">ext</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">ext</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">fee10</span> <span class="op">=</span> <span class="ident">ext</span>.<span class="ident">value</span>.<span class="ident">iter</span>().<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">p</span> {
-                    <span class="ident">proto::EPPResponseExtensionType::EPPFee10CreateData</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>),
-                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+                    <span class="ident">proto::EPPResponseExtensionType::EPPFee10CreateData</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">i</span>),
+                    <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
                 });
                 <span class="kw">let</span> <span class="ident">fee011</span> <span class="op">=</span> <span class="ident">ext</span>.<span class="ident">value</span>.<span class="ident">iter</span>().<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">p</span> {
-                    <span class="ident">proto::EPPResponseExtensionType::EPPFee011CreateData</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>),
-                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+                    <span class="ident">proto::EPPResponseExtensionType::EPPFee011CreateData</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">i</span>),
+                    <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
                 });
                 <span class="kw">let</span> <span class="ident">fee09</span> <span class="op">=</span> <span class="ident">ext</span>.<span class="ident">value</span>.<span class="ident">iter</span>().<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">p</span> {
-                    <span class="ident">proto::EPPResponseExtensionType::EPPFee09CreateData</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>),
-                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+                    <span class="ident">proto::EPPResponseExtensionType::EPPFee09CreateData</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">i</span>),
+                    <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
                 });
                 <span class="kw">let</span> <span class="ident">fee08</span> <span class="op">=</span> <span class="ident">ext</span>.<span class="ident">value</span>.<span class="ident">iter</span>().<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">p</span> {
-                    <span class="ident">proto::EPPResponseExtensionType::EPPFee08CreateData</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>),
-                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+                    <span class="ident">proto::EPPResponseExtensionType::EPPFee08CreateData</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">i</span>),
+                    <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
                 });
                 <span class="kw">let</span> <span class="ident">fee07</span> <span class="op">=</span> <span class="ident">ext</span>.<span class="ident">value</span>.<span class="ident">iter</span>().<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">p</span> {
-                    <span class="ident">proto::EPPResponseExtensionType::EPPFee07CreateData</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>),
-                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+                    <span class="ident">proto::EPPResponseExtensionType::EPPFee07CreateData</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">i</span>),
+                    <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
                 });
                 <span class="kw">let</span> <span class="ident">fee05</span> <span class="op">=</span> <span class="ident">ext</span>.<span class="ident">value</span>.<span class="ident">iter</span>().<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">p</span> {
-                    <span class="ident">proto::EPPResponseExtensionType::EPPFee05CreateData</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>),
-                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+                    <span class="ident">proto::EPPResponseExtensionType::EPPFee05CreateData</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">i</span>),
+                    <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
                 });
 
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">f</span>) <span class="op">=</span> <span class="ident">fee10</span> {
@@ -2830,35 +2830,35 @@
                     <span class="ident">fee05</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">into</span>())
                 }
             }
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
         };
 
         <span class="kw">let</span> <span class="ident">launch_create</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">extension</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">ext</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ext</span>
+            <span class="prelude-val">Some</span>(<span class="ident">ext</span>) =&gt; <span class="ident">ext</span>
                 .<span class="ident">value</span>
                 .<span class="ident">iter</span>()
                 .<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">p</span> {
-                    <span class="ident">proto::EPPResponseExtensionType::EPPLaunchCreateData</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>),
-                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+                    <span class="ident">proto::EPPResponseExtensionType::EPPLaunchCreateData</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">i</span>),
+                    <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
                 })
                 .<span class="ident">map</span>(<span class="ident">launch::LaunchCreateData::from</span>),
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
         };
 
         <span class="kw">let</span> <span class="ident">donuts_fee_data</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">extension</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">ext</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">ext</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">charge</span> <span class="op">=</span> <span class="ident">ext</span>.<span class="ident">value</span>.<span class="ident">iter</span>().<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">p</span> {
-                    <span class="ident">proto::EPPResponseExtensionType::EPPDonutsChargeCreateData</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>),
-                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+                    <span class="ident">proto::EPPResponseExtensionType::EPPDonutsChargeCreateData</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">i</span>),
+                    <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
                 });
 
                 <span class="ident">charge</span>.<span class="ident">map</span>(<span class="ident">Into::into</span>)
             }
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
         };
 
         <span class="kw">match</span> <span class="ident">domain_create</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">domain_create</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">CreateResponse</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">domain_create</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">CreateResponse</span> {
                 <span class="ident">pending</span>: <span class="bool-val">false</span>,
                 <span class="ident">data</span>: <span class="ident">CreateData</span> {
                     <span class="ident">eurid_idn</span>: <span class="ident"><span class="kw">super</span>::eurid::extract_eurid_idn_singular</span>(
@@ -2873,7 +2873,7 @@
                 <span class="ident">donuts_fee_data</span>,
                 <span class="ident">launch_create</span>,
             }),
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">CreateResponse</span> {
+            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">CreateResponse</span> {
                 <span class="ident">pending</span>: <span class="bool-val">false</span>,
                 <span class="ident">data</span>: <span class="ident">CreateData</span> {
                     <span class="ident">eurid_idn</span>: <span class="ident"><span class="kw">super</span>::eurid::extract_eurid_idn_singular</span>(<span class="ident">extension</span>, <span class="prelude-val">None</span>)<span class="question-mark">?</span>,
@@ -2902,34 +2902,34 @@
             <span class="ident">proto::domain::EPPDomainRenewData</span>,
             <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">proto::EPPResponseExtension</span><span class="op">&gt;</span>,
         ),
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> (<span class="ident">domain_renew</span>, <span class="ident">extension</span>) <span class="op">=</span> <span class="ident">from</span>;
 
         <span class="kw">let</span> <span class="ident">fee_data</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">extension</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">ext</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">ext</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">fee10</span> <span class="op">=</span> <span class="ident">ext</span>.<span class="ident">value</span>.<span class="ident">iter</span>().<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">p</span> {
-                    <span class="ident">proto::EPPResponseExtensionType::EPPFee10RenewData</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>),
-                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+                    <span class="ident">proto::EPPResponseExtensionType::EPPFee10RenewData</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">i</span>),
+                    <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
                 });
                 <span class="kw">let</span> <span class="ident">fee011</span> <span class="op">=</span> <span class="ident">ext</span>.<span class="ident">value</span>.<span class="ident">iter</span>().<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">p</span> {
-                    <span class="ident">proto::EPPResponseExtensionType::EPPFee011RenewData</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>),
-                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+                    <span class="ident">proto::EPPResponseExtensionType::EPPFee011RenewData</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">i</span>),
+                    <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
                 });
                 <span class="kw">let</span> <span class="ident">fee09</span> <span class="op">=</span> <span class="ident">ext</span>.<span class="ident">value</span>.<span class="ident">iter</span>().<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">p</span> {
-                    <span class="ident">proto::EPPResponseExtensionType::EPPFee09RenewData</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>),
-                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+                    <span class="ident">proto::EPPResponseExtensionType::EPPFee09RenewData</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">i</span>),
+                    <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
                 });
                 <span class="kw">let</span> <span class="ident">fee08</span> <span class="op">=</span> <span class="ident">ext</span>.<span class="ident">value</span>.<span class="ident">iter</span>().<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">p</span> {
-                    <span class="ident">proto::EPPResponseExtensionType::EPPFee08RenewData</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>),
-                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+                    <span class="ident">proto::EPPResponseExtensionType::EPPFee08RenewData</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">i</span>),
+                    <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
                 });
                 <span class="kw">let</span> <span class="ident">fee07</span> <span class="op">=</span> <span class="ident">ext</span>.<span class="ident">value</span>.<span class="ident">iter</span>().<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">p</span> {
-                    <span class="ident">proto::EPPResponseExtensionType::EPPFee07RenewData</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>),
-                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+                    <span class="ident">proto::EPPResponseExtensionType::EPPFee07RenewData</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">i</span>),
+                    <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
                 });
                 <span class="kw">let</span> <span class="ident">fee05</span> <span class="op">=</span> <span class="ident">ext</span>.<span class="ident">value</span>.<span class="ident">iter</span>().<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">p</span> {
-                    <span class="ident">proto::EPPResponseExtensionType::EPPFee05RenewData</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>),
-                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+                    <span class="ident">proto::EPPResponseExtensionType::EPPFee05RenewData</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">i</span>),
+                    <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
                 });
 
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">f</span>) <span class="op">=</span> <span class="ident">fee10</span> {
@@ -2946,19 +2946,19 @@
                     <span class="ident">fee05</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">into</span>())
                 }
             }
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
         };
 
         <span class="kw">let</span> <span class="ident">donuts_fee_data</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">extension</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">ext</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">ext</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">charge</span> <span class="op">=</span> <span class="ident">ext</span>.<span class="ident">value</span>.<span class="ident">iter</span>().<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">p</span> {
-                    <span class="ident">proto::EPPResponseExtensionType::EPPDonutsChargeRenewData</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>),
-                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+                    <span class="ident">proto::EPPResponseExtensionType::EPPDonutsChargeRenewData</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">i</span>),
+                    <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
                 });
 
                 <span class="ident">charge</span>.<span class="ident">map</span>(<span class="ident">Into::into</span>)
             }
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
         };
 
         <span class="prelude-val">Ok</span>(<span class="ident">RenewResponse</span> {
@@ -2979,7 +2979,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">proto::domain::EPPDomainPanData</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">PanData</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">proto::domain::EPPDomainPanData</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">proto::domain::EPPDomainPanData</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">PanData</span> {
             <span class="ident">name</span>: <span class="ident">from</span>.<span class="ident">name</span>.<span class="ident">domain</span>.<span class="ident">clone</span>(),
             <span class="ident">result</span>: <span class="ident">from</span>.<span class="ident">name</span>.<span class="ident">result</span>,
@@ -2990,7 +2990,7 @@
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">check_domain</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">check_domain</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="op">!</span><span class="ident">id</span>.<span class="ident">is_empty</span>() {
         <span class="prelude-val">Ok</span>(())
     } <span class="kw">else</span> {
@@ -3000,7 +3000,7 @@
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">check_pass</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">check_pass</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="kw">let</span> <span class="number">6</span>..<span class="op">=</span><span class="number">16</span> <span class="op">=</span> <span class="ident">id</span>.<span class="ident">len</span>() {
         <span class="prelude-val">Ok</span>(())
     } <span class="kw">else</span> {
@@ -3010,7 +3010,7 @@
     }
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_check</span>(<span class="ident">client</span>: <span class="kw-2">&amp;</span><span class="ident">ServerFeatures</span>, <span class="ident">req</span>: <span class="kw-2">&amp;</span><span class="ident">CheckRequest</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HandleReqReturn</span><span class="op">&lt;</span><span class="ident">CheckResponse</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_check</span>(<span class="ident">client</span>: <span class="kw-2">&amp;</span><span class="ident">ServerFeatures</span>, <span class="ident">req</span>: <span class="kw-2">&amp;</span><span class="ident">CheckRequest</span>) -&gt; <span class="ident">HandleReqReturn</span><span class="op">&lt;</span><span class="ident">CheckResponse</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="op">!</span><span class="ident">client</span>.<span class="ident">domain_supported</span> {
         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">Err</span>(<span class="ident">Error::Unsupported</span>));
     }
@@ -3032,8 +3032,8 @@
                         .<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> {
                             <span class="prelude-val">Ok</span>(<span class="ident">proto::fee::EPPFee10CheckCommand</span> {
                                 <span class="ident">name</span>: <span class="kw">match</span> (<span class="kw-2">&amp;</span><span class="ident">c</span>.<span class="ident">command</span>).<span class="ident">into</span>() {
-                                    <span class="prelude-val">Some</span>(<span class="ident">n</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">n</span>,
-                                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">Err</span>(<span class="ident">Error::Unsupported</span>)),
+                                    <span class="prelude-val">Some</span>(<span class="ident">n</span>) =&gt; <span class="ident">n</span>,
+                                    <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">Err</span>(<span class="ident">Error::Unsupported</span>)),
                                 },
                                 <span class="ident">period</span>: <span class="ident">c</span>.<span class="ident">period</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="ident">Into::into</span>),
                             })
@@ -3050,8 +3050,8 @@
                         <span class="ident">proto::fee::EPPFee011Check</span> {
                             <span class="ident">currency</span>: <span class="ident">fee_check</span>.<span class="ident">currency</span>.<span class="ident">to_owned</span>(),
                             <span class="ident">command</span>: <span class="kw">match</span> (<span class="kw-2">&amp;</span><span class="ident">c</span>.<span class="ident">command</span>).<span class="ident">into</span>() {
-                                <span class="prelude-val">Some</span>(<span class="ident">n</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">n</span>,
-                                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">Err</span>(<span class="ident">Error::Unsupported</span>)),
+                                <span class="prelude-val">Some</span>(<span class="ident">n</span>) =&gt; <span class="ident">n</span>,
+                                <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">Err</span>(<span class="ident">Error::Unsupported</span>)),
                             },
                             <span class="ident">period</span>: <span class="ident">c</span>.<span class="ident">period</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="ident">Into::into</span>),
                         },
@@ -3074,8 +3074,8 @@
                                 },
                                 <span class="ident">currency</span>: <span class="ident">fee_check</span>.<span class="ident">currency</span>.<span class="ident">to_owned</span>(),
                                 <span class="ident">command</span>: <span class="kw">match</span> (<span class="kw-2">&amp;</span><span class="ident">c</span>.<span class="ident">command</span>).<span class="ident">into</span>() {
-                                    <span class="prelude-val">Some</span>(<span class="ident">n</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">n</span>,
-                                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">Err</span>(<span class="ident">Error::Unsupported</span>)),
+                                    <span class="prelude-val">Some</span>(<span class="ident">n</span>) =&gt; <span class="ident">n</span>,
+                                    <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">Err</span>(<span class="ident">Error::Unsupported</span>)),
                                 },
                                 <span class="ident">period</span>: <span class="ident">c</span>.<span class="ident">period</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="ident">Into::into</span>),
                             })
@@ -3094,8 +3094,8 @@
                                 <span class="ident">name</span>: <span class="ident">req</span>.<span class="ident">name</span>.<span class="ident">to_owned</span>(),
                                 <span class="ident">currency</span>: <span class="ident">fee_check</span>.<span class="ident">currency</span>.<span class="ident">to_owned</span>(),
                                 <span class="ident">command</span>: <span class="kw">match</span> (<span class="kw-2">&amp;</span><span class="ident">c</span>.<span class="ident">command</span>).<span class="ident">into</span>() {
-                                    <span class="prelude-val">Some</span>(<span class="ident">n</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">n</span>,
-                                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">Err</span>(<span class="ident">Error::Unsupported</span>)),
+                                    <span class="prelude-val">Some</span>(<span class="ident">n</span>) =&gt; <span class="ident">n</span>,
+                                    <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">Err</span>(<span class="ident">Error::Unsupported</span>)),
                                 },
                                 <span class="ident">period</span>: <span class="ident">c</span>.<span class="ident">period</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="ident">Into::into</span>),
                             })
@@ -3114,8 +3114,8 @@
                                 <span class="ident">name</span>: <span class="ident">req</span>.<span class="ident">name</span>.<span class="ident">to_owned</span>(),
                                 <span class="ident">currency</span>: <span class="ident">fee_check</span>.<span class="ident">currency</span>.<span class="ident">to_owned</span>(),
                                 <span class="ident">command</span>: <span class="kw">match</span> (<span class="kw-2">&amp;</span><span class="ident">c</span>.<span class="ident">command</span>).<span class="ident">into</span>() {
-                                    <span class="prelude-val">Some</span>(<span class="ident">n</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">n</span>,
-                                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">Err</span>(<span class="ident">Error::Unsupported</span>)),
+                                    <span class="prelude-val">Some</span>(<span class="ident">n</span>) =&gt; <span class="ident">n</span>,
+                                    <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">Err</span>(<span class="ident">Error::Unsupported</span>)),
                                 },
                                 <span class="ident">period</span>: <span class="ident">c</span>.<span class="ident">period</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="ident">Into::into</span>),
                             })
@@ -3134,8 +3134,8 @@
                                 <span class="ident">name</span>: <span class="ident">req</span>.<span class="ident">name</span>.<span class="ident">to_owned</span>(),
                                 <span class="ident">currency</span>: <span class="ident">fee_check</span>.<span class="ident">currency</span>.<span class="ident">to_owned</span>(),
                                 <span class="ident">command</span>: <span class="kw">match</span> (<span class="kw-2">&amp;</span><span class="ident">c</span>.<span class="ident">command</span>).<span class="ident">into</span>() {
-                                    <span class="prelude-val">Some</span>(<span class="ident">n</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">n</span>,
-                                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">Err</span>(<span class="ident">Error::Unsupported</span>)),
+                                    <span class="prelude-val">Some</span>(<span class="ident">n</span>) =&gt; <span class="ident">n</span>,
+                                    <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">Err</span>(<span class="ident">Error::Unsupported</span>)),
                                 },
                                 <span class="ident">period</span>: <span class="ident">c</span>.<span class="ident">period</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="ident">Into::into</span>),
                             })
@@ -3161,44 +3161,44 @@
     <span class="prelude-val">Ok</span>((
         <span class="ident">proto::EPPCommandType::Check</span>(<span class="ident">command</span>),
         <span class="kw">match</span> <span class="ident">ext</span>.<span class="ident">is_empty</span>() {
-            <span class="bool-val">true</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
-            <span class="bool-val">false</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">ext</span>),
+            <span class="bool-val">true</span> =&gt; <span class="prelude-val">None</span>,
+            <span class="bool-val">false</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">ext</span>),
         },
     ))
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_check_response</span>(<span class="ident">response</span>: <span class="ident">proto::EPPResponse</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">CheckResponse</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_check_response</span>(<span class="ident">response</span>: <span class="ident">proto::EPPResponse</span>) -&gt; <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">CheckResponse</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">fee_check</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">response</span>.<span class="ident">extension</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">ext</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Some</span>(<span class="ident">ext</span>) =&gt; {
             <span class="kw">let</span> <span class="ident">fee10</span> <span class="op">=</span> <span class="ident">ext</span>.<span class="ident">value</span>.<span class="ident">iter</span>().<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">p</span> {
-                <span class="ident">proto::EPPResponseExtensionType::EPPFee10CheckData</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>),
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+                <span class="ident">proto::EPPResponseExtensionType::EPPFee10CheckData</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">i</span>),
+                <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
             });
             <span class="kw">let</span> <span class="ident">fee011</span> <span class="op">=</span> <span class="ident">ext</span>.<span class="ident">value</span>.<span class="ident">iter</span>().<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">p</span> {
-                <span class="ident">proto::EPPResponseExtensionType::EPPFee011CheckData</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>),
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+                <span class="ident">proto::EPPResponseExtensionType::EPPFee011CheckData</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">i</span>),
+                <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
             });
             <span class="kw">let</span> <span class="ident">fee09</span> <span class="op">=</span> <span class="ident">ext</span>.<span class="ident">value</span>.<span class="ident">iter</span>().<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">p</span> {
-                <span class="ident">proto::EPPResponseExtensionType::EPPFee09CheckData</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>),
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+                <span class="ident">proto::EPPResponseExtensionType::EPPFee09CheckData</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">i</span>),
+                <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
             });
             <span class="kw">let</span> <span class="ident">fee08</span> <span class="op">=</span> <span class="ident">ext</span>.<span class="ident">value</span>.<span class="ident">iter</span>().<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">p</span> {
-                <span class="ident">proto::EPPResponseExtensionType::EPPFee08CheckData</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>),
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+                <span class="ident">proto::EPPResponseExtensionType::EPPFee08CheckData</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">i</span>),
+                <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
             });
             <span class="kw">let</span> <span class="ident">fee07</span> <span class="op">=</span> <span class="ident">ext</span>.<span class="ident">value</span>.<span class="ident">iter</span>().<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">p</span> {
-                <span class="ident">proto::EPPResponseExtensionType::EPPFee07CheckData</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>),
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+                <span class="ident">proto::EPPResponseExtensionType::EPPFee07CheckData</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">i</span>),
+                <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
             });
             <span class="kw">let</span> <span class="ident">fee05</span> <span class="op">=</span> <span class="ident">ext</span>.<span class="ident">value</span>.<span class="ident">iter</span>().<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">p</span> {
-                <span class="ident">proto::EPPResponseExtensionType::EPPFee05CheckData</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>),
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+                <span class="ident">proto::EPPResponseExtensionType::EPPFee05CheckData</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">i</span>),
+                <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
             });
 
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">f</span>) <span class="op">=</span> <span class="ident">fee10</span> {
                 <span class="kw">let</span> <span class="ident">d</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">f</span>.<span class="ident">objects</span>.<span class="ident">get</span>(<span class="number">0</span>) {
-                    <span class="prelude-val">Some</span>(<span class="ident">o</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">o</span>,
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
+                    <span class="prelude-val">Some</span>(<span class="ident">o</span>) =&gt; <span class="ident">o</span>,
+                    <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
                 };
                 <span class="prelude-val">Some</span>(<span class="ident">fee::FeeCheckData</span> {
                     <span class="ident">available</span>: <span class="ident">d</span>.<span class="ident">available</span>,
@@ -3220,8 +3220,8 @@
                 })
             } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">f</span>) <span class="op">=</span> <span class="ident">fee011</span> {
                 <span class="kw">let</span> <span class="ident">d</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">f</span>.<span class="ident">objects</span>.<span class="ident">get</span>(<span class="number">0</span>) {
-                    <span class="prelude-val">Some</span>(<span class="ident">o</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">o</span>,
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
+                    <span class="prelude-val">Some</span>(<span class="ident">o</span>) =&gt; <span class="ident">o</span>,
+                    <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
                 };
                 <span class="prelude-val">Some</span>(<span class="ident">fee::FeeCheckData</span> {
                     <span class="ident">available</span>: <span class="ident">d</span>.<span class="ident">available</span>,
@@ -3319,32 +3319,32 @@
                 })
             }
         }
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+        <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
     };
 
     <span class="kw">let</span> <span class="ident">donuts_fee_check</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">response</span>.<span class="ident">extension</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">ext</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Some</span>(<span class="ident">ext</span>) =&gt; {
             <span class="kw">let</span> <span class="ident">charge</span> <span class="op">=</span> <span class="ident">ext</span>.<span class="ident">value</span>.<span class="ident">iter</span>().<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">p</span> {
-                <span class="ident">proto::EPPResponseExtensionType::EPPDonutsChargeCheckData</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>),
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+                <span class="ident">proto::EPPResponseExtensionType::EPPDonutsChargeCheckData</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">i</span>),
+                <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
             });
 
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">c</span>) <span class="op">=</span> <span class="ident">charge</span> {
                 <span class="kw">let</span> <span class="ident">d</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">c</span>.<span class="ident">domains</span>.<span class="ident">get</span>(<span class="number">0</span>) {
-                    <span class="prelude-val">Some</span>(<span class="ident">o</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">o</span>,
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
+                    <span class="prelude-val">Some</span>(<span class="ident">o</span>) =&gt; <span class="ident">o</span>,
+                    <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
                 };
                 <span class="prelude-val">Some</span>(<span class="ident">d</span>.<span class="ident">into</span>())
             } <span class="kw">else</span> {
                 <span class="prelude-val">None</span>
             }
         }
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+        <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
     };
 
     <span class="kw">match</span> <span class="ident">response</span>.<span class="ident">data</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">value</span>.<span class="ident">value</span> {
-            <span class="ident">proto::EPPResultDataValue::EPPDomainCheckResult</span>(<span class="ident">domain_check</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Some</span>(<span class="ident">value</span>) =&gt; <span class="kw">match</span> <span class="ident">value</span>.<span class="ident">value</span> {
+            <span class="ident">proto::EPPResultDataValue::EPPDomainCheckResult</span>(<span class="ident">domain_check</span>) =&gt; {
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">domain_check</span>) <span class="op">=</span> <span class="ident">domain_check</span>.<span class="ident">data</span>.<span class="ident">first</span>() {
                     <span class="ident">Response::Ok</span>(<span class="ident">CheckResponse</span> {
                         <span class="ident">eurid_idn</span>: <span class="ident"><span class="kw">super</span>::eurid::extract_eurid_idn_singular</span>(
@@ -3363,16 +3363,16 @@
                     <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>)
                 }
             }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
         },
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
+        <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
     }
 }
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_claims_check</span>(
     <span class="ident">client</span>: <span class="kw-2">&amp;</span><span class="ident">ServerFeatures</span>,
     <span class="ident">req</span>: <span class="kw-2">&amp;</span><span class="ident">ClaimsCheckRequest</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HandleReqReturn</span><span class="op">&lt;</span><span class="ident">ClaimsCheckResponse</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">HandleReqReturn</span><span class="op">&lt;</span><span class="ident">ClaimsCheckResponse</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="op">!</span><span class="ident">client</span>.<span class="ident">launch_supported</span> {
         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">Err</span>(<span class="ident">Error::Unsupported</span>));
     }
@@ -3389,8 +3389,8 @@
     <span class="prelude-val">Ok</span>((
         <span class="ident">proto::EPPCommandType::Check</span>(<span class="ident">command</span>),
         <span class="kw">match</span> <span class="ident">ext</span>.<span class="ident">is_empty</span>() {
-            <span class="bool-val">true</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
-            <span class="bool-val">false</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">ext</span>),
+            <span class="bool-val">true</span> =&gt; <span class="prelude-val">None</span>,
+            <span class="bool-val">false</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">ext</span>),
         },
     ))
 }
@@ -3398,7 +3398,7 @@
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_trademark_check</span>(
     <span class="ident">client</span>: <span class="kw-2">&amp;</span><span class="ident">ServerFeatures</span>,
     <span class="ident">req</span>: <span class="kw-2">&amp;</span><span class="ident">TrademarkCheckRequest</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HandleReqReturn</span><span class="op">&lt;</span><span class="ident">ClaimsCheckResponse</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">HandleReqReturn</span><span class="op">&lt;</span><span class="ident">ClaimsCheckResponse</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="op">!</span><span class="ident">client</span>.<span class="ident">launch_supported</span> {
         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">Err</span>(<span class="ident">Error::Unsupported</span>));
     }
@@ -3415,18 +3415,18 @@
     <span class="prelude-val">Ok</span>((
         <span class="ident">proto::EPPCommandType::Check</span>(<span class="ident">command</span>),
         <span class="kw">match</span> <span class="ident">ext</span>.<span class="ident">is_empty</span>() {
-            <span class="bool-val">true</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
-            <span class="bool-val">false</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">ext</span>),
+            <span class="bool-val">true</span> =&gt; <span class="prelude-val">None</span>,
+            <span class="bool-val">false</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">ext</span>),
         },
     ))
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_claims_check_response</span>(<span class="ident">response</span>: <span class="ident">proto::EPPResponse</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">ClaimsCheckResponse</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_claims_check_response</span>(<span class="ident">response</span>: <span class="ident">proto::EPPResponse</span>) -&gt; <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">ClaimsCheckResponse</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">claims_check</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">response</span>.<span class="ident">extension</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">ext</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Some</span>(<span class="ident">ext</span>) =&gt; {
             <span class="kw">let</span> <span class="ident">claims</span> <span class="op">=</span> <span class="ident">ext</span>.<span class="ident">value</span>.<span class="ident">iter</span>().<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">p</span> {
-                <span class="ident">proto::EPPResponseExtensionType::EPPLaunchCheckData</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>),
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+                <span class="ident">proto::EPPResponseExtensionType::EPPLaunchCheckData</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">i</span>),
+                <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
             });
 
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">c</span>) <span class="op">=</span> <span class="ident">claims</span> {
@@ -3438,19 +3438,19 @@
                 <span class="prelude-val">None</span>
             }
         }
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+        <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
     };
 
     <span class="kw">match</span> <span class="ident">response</span>.<span class="ident">data</span> {
-        <span class="prelude-val">Some</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">claims_check</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Response::Ok</span>(<span class="ident">c</span>),
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
+        <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
+        <span class="prelude-val">None</span> =&gt; <span class="kw">match</span> <span class="ident">claims_check</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">c</span>) =&gt; <span class="ident">Response::Ok</span>(<span class="ident">c</span>),
+            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
         },
     }
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_info</span>(<span class="ident">client</span>: <span class="kw-2">&amp;</span><span class="ident">ServerFeatures</span>, <span class="ident">req</span>: <span class="kw-2">&amp;</span><span class="ident">InfoRequest</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HandleReqReturn</span><span class="op">&lt;</span><span class="ident">InfoResponse</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_info</span>(<span class="ident">client</span>: <span class="kw-2">&amp;</span><span class="ident">ServerFeatures</span>, <span class="ident">req</span>: <span class="kw-2">&amp;</span><span class="ident">InfoRequest</span>) -&gt; <span class="ident">HandleReqReturn</span><span class="op">&lt;</span><span class="ident">InfoResponse</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="op">!</span><span class="ident">client</span>.<span class="ident">domain_supported</span> {
         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">Err</span>(<span class="ident">Error::Unsupported</span>));
     }
@@ -3459,10 +3459,10 @@
         <span class="ident">name</span>: <span class="ident">proto::domain::EPPDomainInfoName</span> {
             <span class="ident">name</span>: <span class="ident">req</span>.<span class="ident">name</span>.<span class="ident">clone</span>(),
             <span class="ident">hosts</span>: <span class="ident">req</span>.<span class="ident">hosts</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">h</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">h</span> {
-                <span class="ident">InfoHost::All</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">proto::domain::EPPDomainInfoHosts::All</span>,
-                <span class="ident">InfoHost::Delegated</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">proto::domain::EPPDomainInfoHosts::Delegated</span>,
-                <span class="ident">InfoHost::Subordinate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">proto::domain::EPPDomainInfoHosts::Subordinate</span>,
-                <span class="ident">InfoHost::None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">proto::domain::EPPDomainInfoHosts::None</span>,
+                <span class="ident">InfoHost::All</span> =&gt; <span class="ident">proto::domain::EPPDomainInfoHosts::All</span>,
+                <span class="ident">InfoHost::Delegated</span> =&gt; <span class="ident">proto::domain::EPPDomainInfoHosts::Delegated</span>,
+                <span class="ident">InfoHost::Subordinate</span> =&gt; <span class="ident">proto::domain::EPPDomainInfoHosts::Subordinate</span>,
+                <span class="ident">InfoHost::None</span> =&gt; <span class="ident">proto::domain::EPPDomainInfoHosts::None</span>,
             }),
         },
         <span class="ident">auth_info</span>: <span class="ident">req</span>
@@ -3504,28 +3504,28 @@
     <span class="prelude-val">Ok</span>((
         <span class="ident">proto::EPPCommandType::Info</span>(<span class="ident">command</span>),
         <span class="kw">match</span> <span class="ident">exts</span>.<span class="ident">is_empty</span>() {
-            <span class="bool-val">true</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
-            <span class="bool-val">false</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">exts</span>),
+            <span class="bool-val">true</span> =&gt; <span class="prelude-val">None</span>,
+            <span class="bool-val">false</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">exts</span>),
         },
     ))
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_info_response</span>(<span class="ident">response</span>: <span class="ident">proto::EPPResponse</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">InfoResponse</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_info_response</span>(<span class="ident">response</span>: <span class="ident">proto::EPPResponse</span>) -&gt; <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">InfoResponse</span><span class="op">&gt;</span> {
     <span class="kw">match</span> <span class="ident">response</span>.<span class="ident">data</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">value</span>.<span class="ident">value</span> {
-            <span class="ident">proto::EPPResultDataValue::EPPDomainInfoResult</span>(<span class="ident">domain_info</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Some</span>(<span class="ident">value</span>) =&gt; <span class="kw">match</span> <span class="ident">value</span>.<span class="ident">value</span> {
+            <span class="ident">proto::EPPResultDataValue::EPPDomainInfoResult</span>(<span class="ident">domain_info</span>) =&gt; {
                 (<span class="kw-2">*</span><span class="ident">domain_info</span>, <span class="kw-2">&amp;</span><span class="ident">response</span>.<span class="ident">extension</span>).<span class="ident">try_into</span>()
             }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
         },
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
+        <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
     }
 }
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_create</span>(
     <span class="ident">client</span>: <span class="kw-2">&amp;</span><span class="ident">ServerFeatures</span>,
     <span class="ident">req</span>: <span class="kw-2">&amp;</span><span class="ident">CreateRequest</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HandleReqReturn</span><span class="op">&lt;</span><span class="ident">CreateResponse</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">HandleReqReturn</span><span class="op">&lt;</span><span class="ident">CreateResponse</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="op">!</span><span class="ident">client</span>.<span class="ident">domain_supported</span> {
         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">Err</span>(<span class="ident">Error::Unsupported</span>));
     }
@@ -3540,11 +3540,11 @@
 
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">exts</span> <span class="op">=</span> <span class="macro">vec!</span>[];
     <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">req</span>.<span class="ident">sec_dns</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">sec_dns</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Some</span>(<span class="ident">sec_dns</span>) =&gt; {
             <span class="kw">if</span> <span class="ident">client</span>.<span class="ident">secdns_supported</span> <span class="op">|</span><span class="op">|</span> <span class="ident">client</span>.<span class="ident">has_erratum</span>(<span class="string">&quot;pir&quot;</span>) {
                 <span class="ident">exts</span>.<span class="ident">push</span>(<span class="ident">proto::EPPCommandExtensionType::EPPSecDNSCreate</span>(
                     <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">sec_dns</span>.<span class="ident">data</span> {
-                        <span class="ident">SecDNSDataType::DSData</span>(<span class="ident">ds_data</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">proto::secdns::EPPSecDNSData</span> {
+                        <span class="ident">SecDNSDataType::DSData</span>(<span class="ident">ds_data</span>) =&gt; <span class="ident">proto::secdns::EPPSecDNSData</span> {
                             <span class="ident">max_signature_life</span>: <span class="ident">sec_dns</span>.<span class="ident">max_sig_life</span>,
                             <span class="ident">key_data</span>: <span class="macro">vec!</span>[],
                             <span class="ident">ds_data</span>: <span class="ident">ds_data</span>
@@ -3565,7 +3565,7 @@
                                 })
                                 .<span class="ident">collect</span>(),
                         },
-                        <span class="ident">SecDNSDataType::KeyData</span>(<span class="ident">key_data</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">proto::secdns::EPPSecDNSData</span> {
+                        <span class="ident">SecDNSDataType::KeyData</span>(<span class="ident">key_data</span>) =&gt; <span class="ident">proto::secdns::EPPSecDNSData</span> {
                             <span class="ident">max_signature_life</span>: <span class="ident">sec_dns</span>.<span class="ident">max_sig_life</span>,
                             <span class="ident">ds_data</span>: <span class="macro">vec!</span>[],
                             <span class="ident">key_data</span>: <span class="ident">key_data</span>
@@ -3584,7 +3584,7 @@
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">Err</span>(<span class="ident">Error::Unsupported</span>));
             }
         }
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {}
+        <span class="prelude-val">None</span> =&gt; {}
     }
 
     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">launch_create</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">req</span>.<span class="ident">launch_create</span> {
@@ -3644,14 +3644,14 @@
     }
 
     <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">req</span>.<span class="ident">isnic_payment</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Some</span>(<span class="ident">e</span>) =&gt; {
             <span class="kw">if</span> <span class="ident">client</span>.<span class="ident">isnic_domain_supported</span> {
                 <span class="ident">exts</span>.<span class="ident">push</span>(<span class="ident">proto::EPPCommandExtensionType::ISNICDomainCreate</span>(<span class="ident">e</span>.<span class="ident">into</span>()))
             } <span class="kw">else</span> {
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">Err</span>(<span class="ident">Error::Unsupported</span>));
             }
         }
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">None</span> =&gt; {
             <span class="kw">if</span> <span class="ident">client</span>.<span class="ident">isnic_domain_supported</span> {
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">Err</span>(<span class="ident">Error::Err</span>(
                     <span class="string">&quot;payment extension required for ISNIC&quot;</span>.<span class="ident">to_string</span>(),
@@ -3671,8 +3671,8 @@
         <span class="ident">name</span>: <span class="ident">req</span>.<span class="ident">name</span>.<span class="ident">clone</span>(),
         <span class="ident">period</span>: <span class="ident">req</span>.<span class="ident">period</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">p</span>.<span class="ident">into</span>()),
         <span class="ident">nameservers</span>: <span class="kw">match</span> <span class="ident">req</span>.<span class="ident">nameservers</span>.<span class="ident">len</span>() {
-            <span class="number">0</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">proto::domain::EPPDomainInfoNameservers</span> {
+            <span class="number">0</span> =&gt; <span class="prelude-val">None</span>,
+            <span class="kw">_</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">proto::domain::EPPDomainInfoNameservers</span> {
                 <span class="ident">servers</span>: <span class="ident">req</span>.<span class="ident">nameservers</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">n</span><span class="op">|</span> <span class="ident">n</span>.<span class="ident">into</span>()).<span class="ident">collect</span>(),
             }),
         },
@@ -3699,25 +3699,25 @@
     <span class="prelude-val">Ok</span>((
         <span class="ident">proto::EPPCommandType::Create</span>(<span class="ident">command</span>),
         <span class="kw">match</span> <span class="ident">exts</span>.<span class="ident">len</span>() {
-            <span class="number">0</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">exts</span>),
+            <span class="number">0</span> =&gt; <span class="prelude-val">None</span>,
+            <span class="kw">_</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">exts</span>),
         },
     ))
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_create_response</span>(<span class="ident">response</span>: <span class="ident">proto::EPPResponse</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">CreateResponse</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_create_response</span>(<span class="ident">response</span>: <span class="ident">proto::EPPResponse</span>) -&gt; <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">CreateResponse</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">pending</span> <span class="op">=</span> <span class="ident">response</span>.<span class="ident">is_pending</span>();
     <span class="kw">match</span> <span class="ident">response</span>.<span class="ident">data</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">value</span>.<span class="ident">value</span> {
-            <span class="ident">proto::EPPResultDataValue::EPPDomainCreateResult</span>(<span class="ident">domain_create</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Some</span>(<span class="ident">value</span>) =&gt; <span class="kw">match</span> <span class="ident">value</span>.<span class="ident">value</span> {
+            <span class="ident">proto::EPPResultDataValue::EPPDomainCreateResult</span>(<span class="ident">domain_create</span>) =&gt; {
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">res</span>: <span class="ident">CreateResponse</span> <span class="op">=</span>
                     (<span class="prelude-val">Some</span>(<span class="ident">domain_create</span>), <span class="kw-2">&amp;</span><span class="ident">response</span>.<span class="ident">extension</span>).<span class="ident">try_into</span>()<span class="question-mark">?</span>;
                 <span class="ident">res</span>.<span class="ident">pending</span> <span class="op">=</span> <span class="ident">pending</span>;
                 <span class="prelude-val">Ok</span>(<span class="ident">res</span>)
             }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
         },
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">None</span> =&gt; {
             <span class="kw">if</span> <span class="ident">response</span>.<span class="ident">is_pending</span>() {
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">res</span>: <span class="ident">CreateResponse</span> <span class="op">=</span> (<span class="prelude-val">None</span>, <span class="kw-2">&amp;</span><span class="ident">response</span>.<span class="ident">extension</span>).<span class="ident">try_into</span>()<span class="question-mark">?</span>;
                 <span class="ident">res</span>.<span class="ident">pending</span> <span class="op">=</span> <span class="ident">response</span>.<span class="ident">is_pending</span>();
@@ -3732,7 +3732,7 @@
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_delete</span>(
     <span class="ident">client</span>: <span class="kw-2">&amp;</span><span class="ident">ServerFeatures</span>,
     <span class="ident">req</span>: <span class="kw-2">&amp;</span><span class="ident">DeleteRequest</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HandleReqReturn</span><span class="op">&lt;</span><span class="ident">DeleteResponse</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">HandleReqReturn</span><span class="op">&lt;</span><span class="ident">DeleteResponse</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="op">!</span><span class="ident">client</span>.<span class="ident">domain_supported</span> {
         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">Err</span>(<span class="ident">Error::Unsupported</span>));
     }
@@ -3768,34 +3768,34 @@
     <span class="prelude-val">Ok</span>((
         <span class="ident">proto::EPPCommandType::Delete</span>(<span class="ident">command</span>),
         <span class="kw">match</span> <span class="ident">ext</span>.<span class="ident">len</span>() {
-            <span class="number">0</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">ext</span>),
+            <span class="number">0</span> =&gt; <span class="prelude-val">None</span>,
+            <span class="kw">_</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">ext</span>),
         },
     ))
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_delete_response</span>(<span class="ident">response</span>: <span class="ident">proto::EPPResponse</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">DeleteResponse</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_delete_response</span>(<span class="ident">response</span>: <span class="ident">proto::EPPResponse</span>) -&gt; <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">DeleteResponse</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">fee_data</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">response</span>.<span class="ident">extension</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">ext</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Some</span>(<span class="ident">ext</span>) =&gt; {
             <span class="kw">let</span> <span class="ident">fee10</span> <span class="op">=</span> <span class="ident">ext</span>.<span class="ident">value</span>.<span class="ident">iter</span>().<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">p</span> {
-                <span class="ident">proto::EPPResponseExtensionType::EPPFee10DeleteData</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>),
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+                <span class="ident">proto::EPPResponseExtensionType::EPPFee10DeleteData</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">i</span>),
+                <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
             });
             <span class="kw">let</span> <span class="ident">fee09</span> <span class="op">=</span> <span class="ident">ext</span>.<span class="ident">value</span>.<span class="ident">iter</span>().<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">p</span> {
-                <span class="ident">proto::EPPResponseExtensionType::EPPFee09DeleteData</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>),
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+                <span class="ident">proto::EPPResponseExtensionType::EPPFee09DeleteData</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">i</span>),
+                <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
             });
             <span class="kw">let</span> <span class="ident">fee08</span> <span class="op">=</span> <span class="ident">ext</span>.<span class="ident">value</span>.<span class="ident">iter</span>().<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">p</span> {
-                <span class="ident">proto::EPPResponseExtensionType::EPPFee08DeleteData</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>),
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+                <span class="ident">proto::EPPResponseExtensionType::EPPFee08DeleteData</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">i</span>),
+                <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
             });
             <span class="kw">let</span> <span class="ident">fee07</span> <span class="op">=</span> <span class="ident">ext</span>.<span class="ident">value</span>.<span class="ident">iter</span>().<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">p</span> {
-                <span class="ident">proto::EPPResponseExtensionType::EPPFee07DeleteData</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>),
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+                <span class="ident">proto::EPPResponseExtensionType::EPPFee07DeleteData</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">i</span>),
+                <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
             });
             <span class="kw">let</span> <span class="ident">fee05</span> <span class="op">=</span> <span class="ident">ext</span>.<span class="ident">value</span>.<span class="ident">iter</span>().<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">p</span> {
-                <span class="ident">proto::EPPResponseExtensionType::EPPFee05DeleteData</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>),
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+                <span class="ident">proto::EPPResponseExtensionType::EPPFee05DeleteData</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">i</span>),
+                <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
             });
 
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">f</span>) <span class="op">=</span> <span class="ident">fee10</span> {
@@ -3810,7 +3810,7 @@
                 <span class="ident">fee05</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">into</span>())
             }
         }
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+        <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
     };
 
     <span class="ident">Response::Ok</span>(<span class="ident">DeleteResponse</span> {
@@ -3823,7 +3823,7 @@
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_update</span>(
     <span class="ident">client</span>: <span class="kw-2">&amp;</span><span class="ident">ServerFeatures</span>,
     <span class="ident">req</span>: <span class="kw-2">&amp;</span><span class="ident">UpdateRequest</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HandleReqReturn</span><span class="op">&lt;</span><span class="ident">UpdateResponse</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">HandleReqReturn</span><span class="op">&lt;</span><span class="ident">UpdateResponse</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="op">!</span><span class="ident">client</span>.<span class="ident">domain_supported</span> {
         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">Err</span>(<span class="ident">Error::Unsupported</span>));
     }
@@ -3845,13 +3845,13 @@
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rem_ns</span> <span class="op">=</span> <span class="macro">vec!</span>[];
     <span class="kw">for</span> <span class="ident">add</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">req</span>.<span class="ident">add</span> {
         <span class="kw">match</span> <span class="ident">add</span> {
-            <span class="ident">UpdateObject::Status</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">adds</span>.<span class="ident">push</span>(<span class="ident">proto::domain::EPPDomainUpdateParam::Status</span>(
+            <span class="ident">UpdateObject::Status</span>(<span class="ident">s</span>) =&gt; <span class="ident">adds</span>.<span class="ident">push</span>(<span class="ident">proto::domain::EPPDomainUpdateParam::Status</span>(
                 <span class="ident">proto::domain::EPPDomainStatus</span> {
                     <span class="ident">status</span>: <span class="ident">s</span>.<span class="ident">into</span>(),
                     <span class="ident">message</span>: <span class="prelude-val">None</span>,
                 },
             )),
-            <span class="ident">UpdateObject::Contact</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">UpdateObject::Contact</span>(<span class="ident">c</span>) =&gt; {
                 <span class="ident"><span class="kw">super</span>::contact::check_id</span>(<span class="kw-2">&amp;</span><span class="ident">c</span>.<span class="ident">contact_id</span>)<span class="question-mark">?</span>;
                 <span class="ident">adds</span>.<span class="ident">push</span>(<span class="ident">proto::domain::EPPDomainUpdateParam::Contact</span>(
                     <span class="ident">proto::domain::EPPDomainInfoContact</span> {
@@ -3860,18 +3860,18 @@
                     },
                 ))
             }
-            <span class="ident">UpdateObject::Nameserver</span>(<span class="ident">n</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">add_ns</span>.<span class="ident">push</span>(<span class="ident">n</span>.<span class="ident">into</span>()),
+            <span class="ident">UpdateObject::Nameserver</span>(<span class="ident">n</span>) =&gt; <span class="ident">add_ns</span>.<span class="ident">push</span>(<span class="ident">n</span>.<span class="ident">into</span>()),
         }
     }
     <span class="kw">for</span> <span class="ident">rem</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">req</span>.<span class="ident">remove</span> {
         <span class="kw">match</span> <span class="ident">rem</span> {
-            <span class="ident">UpdateObject::Status</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">rems</span>.<span class="ident">push</span>(<span class="ident">proto::domain::EPPDomainUpdateParam::Status</span>(
+            <span class="ident">UpdateObject::Status</span>(<span class="ident">s</span>) =&gt; <span class="ident">rems</span>.<span class="ident">push</span>(<span class="ident">proto::domain::EPPDomainUpdateParam::Status</span>(
                 <span class="ident">proto::domain::EPPDomainStatus</span> {
                     <span class="ident">status</span>: <span class="ident">s</span>.<span class="ident">into</span>(),
                     <span class="ident">message</span>: <span class="prelude-val">None</span>,
                 },
             )),
-            <span class="ident">UpdateObject::Contact</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">UpdateObject::Contact</span>(<span class="ident">c</span>) =&gt; {
                 <span class="ident"><span class="kw">super</span>::contact::check_id</span>(<span class="kw-2">&amp;</span><span class="ident">c</span>.<span class="ident">contact_id</span>)<span class="question-mark">?</span>;
                 <span class="ident">rems</span>.<span class="ident">push</span>(<span class="ident">proto::domain::EPPDomainUpdateParam::Contact</span>(
                     <span class="ident">proto::domain::EPPDomainInfoContact</span> {
@@ -3880,7 +3880,7 @@
                     },
                 ))
             }
-            <span class="ident">UpdateObject::Nameserver</span>(<span class="ident">n</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">rem_ns</span>.<span class="ident">push</span>(<span class="ident">n</span>.<span class="ident">into</span>()),
+            <span class="ident">UpdateObject::Nameserver</span>(<span class="ident">n</span>) =&gt; <span class="ident">rem_ns</span>.<span class="ident">push</span>(<span class="ident">n</span>.<span class="ident">into</span>()),
         }
     }
     <span class="kw">if</span> <span class="op">!</span><span class="ident">add_ns</span>.<span class="ident">is_empty</span>() {
@@ -3895,9 +3895,9 @@
     }
 
     <span class="kw">let</span> <span class="ident">update_as_i32</span> <span class="op">=</span> <span class="op">|</span><span class="ident">u</span>: <span class="kw-2">&amp;</span><span class="ident">proto::domain::EPPDomainUpdateParam</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">u</span> {
-        <span class="ident">proto::domain::EPPDomainUpdateParam::Nameserver</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="number">0</span>,
-        <span class="ident">proto::domain::EPPDomainUpdateParam::Contact</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="number">1</span>,
-        <span class="ident">proto::domain::EPPDomainUpdateParam::Status</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="number">2</span>,
+        <span class="ident">proto::domain::EPPDomainUpdateParam::Nameserver</span>(<span class="kw">_</span>) =&gt; <span class="number">0</span>,
+        <span class="ident">proto::domain::EPPDomainUpdateParam::Contact</span>(<span class="kw">_</span>) =&gt; <span class="number">1</span>,
+        <span class="ident">proto::domain::EPPDomainUpdateParam::Status</span>(<span class="kw">_</span>) =&gt; <span class="number">2</span>,
     };
     <span class="ident">adds</span>.<span class="ident">sort_unstable_by_key</span>(<span class="ident">update_as_i32</span>);
     <span class="ident">rems</span>.<span class="ident">sort_unstable_by_key</span>(<span class="ident">update_as_i32</span>);
@@ -3905,17 +3905,17 @@
     <span class="kw">let</span> <span class="ident">is_not_change</span> <span class="op">=</span> <span class="ident">req</span>.<span class="ident">new_registrant</span>.<span class="ident">is_none</span>() <span class="op">&amp;&amp;</span> <span class="ident">req</span>.<span class="ident">new_auth_info</span>.<span class="ident">is_none</span>();
 
     <span class="kw">let</span> <span class="ident">is_not_isnic_change</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">req</span>.<span class="ident">isnic_info</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="op">!</span><span class="ident">e</span>.<span class="ident">remove_all_ns</span> <span class="op">&amp;&amp;</span> <span class="ident">e</span>.<span class="ident">new_master_ns</span>.<span class="ident">is_empty</span>(),
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
+        <span class="prelude-val">Some</span>(<span class="ident">e</span>) =&gt; <span class="op">!</span><span class="ident">e</span>.<span class="ident">remove_all_ns</span> <span class="op">&amp;&amp;</span> <span class="ident">e</span>.<span class="ident">new_master_ns</span>.<span class="ident">is_empty</span>(),
+        <span class="prelude-val">None</span> =&gt; <span class="bool-val">true</span>,
     };
     <span class="kw">let</span> <span class="ident">is_not_eurid_change</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">req</span>.<span class="ident">eurid_data</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Some</span>(<span class="ident">e</span>) =&gt; {
             <span class="ident">e</span>.<span class="ident">remove_on_site</span>.<span class="ident">is_none</span>()
                 <span class="op">&amp;&amp;</span> <span class="ident">e</span>.<span class="ident">remove_reseller</span>.<span class="ident">is_none</span>()
                 <span class="op">&amp;&amp;</span> <span class="ident">e</span>.<span class="ident">add_reseller</span>.<span class="ident">is_none</span>()
                 <span class="op">&amp;&amp;</span> <span class="ident">e</span>.<span class="ident">add_on_site</span>.<span class="ident">is_none</span>()
         }
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
+        <span class="prelude-val">None</span> =&gt; <span class="bool-val">true</span>,
     };
 
     <span class="kw">if</span> <span class="ident">req</span>.<span class="ident">add</span>.<span class="ident">is_empty</span>()
@@ -3932,13 +3932,13 @@
 
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">exts</span> <span class="op">=</span> <span class="macro">vec!</span>[];
     <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">req</span>.<span class="ident">sec_dns</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">sec_dns</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Some</span>(<span class="ident">sec_dns</span>) =&gt; {
             <span class="kw">if</span> <span class="ident">client</span>.<span class="ident">secdns_supported</span> <span class="op">|</span><span class="op">|</span> <span class="ident">client</span>.<span class="ident">has_erratum</span>(<span class="string">&quot;pir&quot;</span>) {
                 <span class="ident">exts</span>.<span class="ident">push</span>(<span class="ident">proto::EPPCommandExtensionType::EPPSecDNSUpdate</span>(
                     <span class="ident">proto::secdns::EPPSecDNSUpdate</span> {
                         <span class="ident">urgent</span>: <span class="ident">sec_dns</span>.<span class="ident">urgent</span>,
                         <span class="ident">add</span>: <span class="ident">sec_dns</span>.<span class="ident">add</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">a</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">a</span> {
-                            <span class="ident">SecDNSDataType::DSData</span>(<span class="ident">ds_data</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">proto::secdns::EPPSecDNSUpdateAdd</span> {
+                            <span class="ident">SecDNSDataType::DSData</span>(<span class="ident">ds_data</span>) =&gt; <span class="ident">proto::secdns::EPPSecDNSUpdateAdd</span> {
                                 <span class="ident">key_data</span>: <span class="macro">vec!</span>[],
                                 <span class="ident">ds_data</span>: <span class="ident">ds_data</span>
                                     .<span class="ident">iter</span>()
@@ -3958,7 +3958,7 @@
                                     })
                                     .<span class="ident">collect</span>(),
                             },
-                            <span class="ident">SecDNSDataType::KeyData</span>(<span class="ident">key_data</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                            <span class="ident">SecDNSDataType::KeyData</span>(<span class="ident">key_data</span>) =&gt; {
                                 <span class="ident">proto::secdns::EPPSecDNSUpdateAdd</span> {
                                     <span class="ident">ds_data</span>: <span class="macro">vec!</span>[],
                                     <span class="ident">key_data</span>: <span class="ident">key_data</span>
@@ -3974,13 +3974,13 @@
                             }
                         }),
                         <span class="ident">remove</span>: <span class="ident">sec_dns</span>.<span class="ident">remove</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">r</span> {
-                            <span class="ident">UpdateSecDNSRemove::All</span>(<span class="ident">a</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">proto::secdns::EPPSecDNSUpdateRemove</span> {
+                            <span class="ident">UpdateSecDNSRemove::All</span>(<span class="ident">a</span>) =&gt; <span class="ident">proto::secdns::EPPSecDNSUpdateRemove</span> {
                                 <span class="ident">all</span>: <span class="prelude-val">Some</span>(<span class="kw-2">*</span><span class="ident">a</span>),
                                 <span class="ident">ds_data</span>: <span class="macro">vec!</span>[],
                                 <span class="ident">key_data</span>: <span class="macro">vec!</span>[],
                             },
-                            <span class="ident">UpdateSecDNSRemove::Data</span>(<span class="ident">d</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">d</span> {
-                                <span class="ident">SecDNSDataType::DSData</span>(<span class="ident">ds_data</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                            <span class="ident">UpdateSecDNSRemove::Data</span>(<span class="ident">d</span>) =&gt; <span class="kw">match</span> <span class="ident">d</span> {
+                                <span class="ident">SecDNSDataType::DSData</span>(<span class="ident">ds_data</span>) =&gt; {
                                     <span class="ident">proto::secdns::EPPSecDNSUpdateRemove</span> {
                                         <span class="ident">all</span>: <span class="prelude-val">None</span>,
                                         <span class="ident">key_data</span>: <span class="macro">vec!</span>[],
@@ -3996,7 +3996,7 @@
                                             .<span class="ident">collect</span>(),
                                     }
                                 }
-                                <span class="ident">SecDNSDataType::KeyData</span>(<span class="ident">key_data</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                                <span class="ident">SecDNSDataType::KeyData</span>(<span class="ident">key_data</span>) =&gt; {
                                     <span class="ident">proto::secdns::EPPSecDNSUpdateRemove</span> {
                                         <span class="ident">all</span>: <span class="prelude-val">None</span>,
                                         <span class="ident">ds_data</span>: <span class="macro">vec!</span>[],
@@ -4024,7 +4024,7 @@
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">Err</span>(<span class="ident">Error::Unsupported</span>));
             }
         }
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {}
+        <span class="prelude-val">None</span> =&gt; {}
     }
 
     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">fee_agreement</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">req</span>.<span class="ident">fee_agreement</span> {
@@ -4113,8 +4113,8 @@
     <span class="prelude-val">Ok</span>((
         <span class="ident">proto::EPPCommandType::Update</span>(<span class="ident">Box::new</span>(<span class="ident">command</span>)),
         <span class="kw">match</span> <span class="ident">exts</span>.<span class="ident">len</span>() {
-            <span class="number">0</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">exts</span>),
+            <span class="number">0</span> =&gt; <span class="prelude-val">None</span>,
+            <span class="kw">_</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">exts</span>),
         },
     ))
 }
@@ -4122,7 +4122,7 @@
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_verisign_sync</span>(
     <span class="ident">client</span>: <span class="kw-2">&amp;</span><span class="ident">ServerFeatures</span>,
     <span class="ident">req</span>: <span class="kw-2">&amp;</span><span class="ident">VerisignSyncRequest</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HandleReqReturn</span><span class="op">&lt;</span><span class="ident">UpdateResponse</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">HandleReqReturn</span><span class="op">&lt;</span><span class="ident">UpdateResponse</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="op">!</span><span class="ident">client</span>.<span class="ident">domain_supported</span> {
         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">Err</span>(<span class="ident">Error::Unsupported</span>));
     }
@@ -4156,34 +4156,34 @@
     <span class="prelude-val">Ok</span>((
         <span class="ident">proto::EPPCommandType::Update</span>(<span class="ident">Box::new</span>(<span class="ident">command</span>)),
         <span class="kw">match</span> <span class="ident">exts</span>.<span class="ident">len</span>() {
-            <span class="number">0</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">exts</span>),
+            <span class="number">0</span> =&gt; <span class="prelude-val">None</span>,
+            <span class="kw">_</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">exts</span>),
         },
     ))
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_update_response</span>(<span class="ident">response</span>: <span class="ident">proto::EPPResponse</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">UpdateResponse</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_update_response</span>(<span class="ident">response</span>: <span class="ident">proto::EPPResponse</span>) -&gt; <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">UpdateResponse</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">fee_data</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">response</span>.<span class="ident">extension</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">ext</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Some</span>(<span class="ident">ext</span>) =&gt; {
             <span class="kw">let</span> <span class="ident">fee10</span> <span class="op">=</span> <span class="ident">ext</span>.<span class="ident">value</span>.<span class="ident">iter</span>().<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">p</span> {
-                <span class="ident">proto::EPPResponseExtensionType::EPPFee10UpdateData</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>),
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+                <span class="ident">proto::EPPResponseExtensionType::EPPFee10UpdateData</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">i</span>),
+                <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
             });
             <span class="kw">let</span> <span class="ident">fee09</span> <span class="op">=</span> <span class="ident">ext</span>.<span class="ident">value</span>.<span class="ident">iter</span>().<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">p</span> {
-                <span class="ident">proto::EPPResponseExtensionType::EPPFee09UpdateData</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>),
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+                <span class="ident">proto::EPPResponseExtensionType::EPPFee09UpdateData</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">i</span>),
+                <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
             });
             <span class="kw">let</span> <span class="ident">fee08</span> <span class="op">=</span> <span class="ident">ext</span>.<span class="ident">value</span>.<span class="ident">iter</span>().<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">p</span> {
-                <span class="ident">proto::EPPResponseExtensionType::EPPFee08UpdateData</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>),
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+                <span class="ident">proto::EPPResponseExtensionType::EPPFee08UpdateData</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">i</span>),
+                <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
             });
             <span class="kw">let</span> <span class="ident">fee07</span> <span class="op">=</span> <span class="ident">ext</span>.<span class="ident">value</span>.<span class="ident">iter</span>().<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">p</span> {
-                <span class="ident">proto::EPPResponseExtensionType::EPPFee07UpdateData</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>),
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+                <span class="ident">proto::EPPResponseExtensionType::EPPFee07UpdateData</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">i</span>),
+                <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
             });
             <span class="kw">let</span> <span class="ident">fee05</span> <span class="op">=</span> <span class="ident">ext</span>.<span class="ident">value</span>.<span class="ident">iter</span>().<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">p</span> {
-                <span class="ident">proto::EPPResponseExtensionType::EPPFee05UpdateData</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>),
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+                <span class="ident">proto::EPPResponseExtensionType::EPPFee05UpdateData</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">i</span>),
+                <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
             });
 
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">f</span>) <span class="op">=</span> <span class="ident">fee10</span> {
@@ -4198,19 +4198,19 @@
                 <span class="ident">fee05</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">into</span>())
             }
         }
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+        <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
     };
 
     <span class="kw">let</span> <span class="ident">donuts_fee_data</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">response</span>.<span class="ident">extension</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">ext</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Some</span>(<span class="ident">ext</span>) =&gt; {
             <span class="kw">let</span> <span class="ident">charge</span> <span class="op">=</span> <span class="ident">ext</span>.<span class="ident">value</span>.<span class="ident">iter</span>().<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">p</span> {
-                <span class="ident">proto::EPPResponseExtensionType::EPPDonutsChargeUpdateData</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>),
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+                <span class="ident">proto::EPPResponseExtensionType::EPPDonutsChargeUpdateData</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">i</span>),
+                <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
             });
 
             <span class="ident">charge</span>.<span class="ident">map</span>(<span class="ident">Into::into</span>)
         }
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+        <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
     };
 
     <span class="ident">Response::Ok</span>(<span class="ident">UpdateResponse</span> {
@@ -4220,7 +4220,7 @@
     })
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_renew</span>(<span class="ident">client</span>: <span class="kw-2">&amp;</span><span class="ident">ServerFeatures</span>, <span class="ident">req</span>: <span class="kw-2">&amp;</span><span class="ident">RenewRequest</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HandleReqReturn</span><span class="op">&lt;</span><span class="ident">RenewResponse</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_renew</span>(<span class="ident">client</span>: <span class="kw-2">&amp;</span><span class="ident">ServerFeatures</span>, <span class="ident">req</span>: <span class="kw-2">&amp;</span><span class="ident">RenewRequest</span>) -&gt; <span class="ident">HandleReqReturn</span><span class="op">&lt;</span><span class="ident">RenewResponse</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="op">!</span><span class="ident">client</span>.<span class="ident">domain_supported</span> {
         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">Err</span>(<span class="ident">Error::Unsupported</span>));
     }
@@ -4247,14 +4247,14 @@
     }
 
     <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">req</span>.<span class="ident">isnic_payment</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Some</span>(<span class="ident">e</span>) =&gt; {
             <span class="kw">if</span> <span class="ident">client</span>.<span class="ident">isnic_domain_supported</span> {
                 <span class="ident">ext</span>.<span class="ident">push</span>(<span class="ident">proto::EPPCommandExtensionType::ISNICDomainRenew</span>(<span class="ident">e</span>.<span class="ident">into</span>()))
             } <span class="kw">else</span> {
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">Err</span>(<span class="ident">Error::Unsupported</span>));
             }
         }
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">None</span> =&gt; {
             <span class="kw">if</span> <span class="ident">client</span>.<span class="ident">isnic_domain_supported</span> {
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">Err</span>(<span class="ident">Error::Err</span>(
                     <span class="string">&quot;payment extension required for ISNIC&quot;</span>.<span class="ident">to_string</span>(),
@@ -4269,31 +4269,31 @@
     <span class="prelude-val">Ok</span>((
         <span class="ident">proto::EPPCommandType::Renew</span>(<span class="ident">command</span>),
         <span class="kw">match</span> <span class="ident">ext</span>.<span class="ident">is_empty</span>() {
-            <span class="bool-val">true</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
-            <span class="bool-val">false</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">ext</span>),
+            <span class="bool-val">true</span> =&gt; <span class="prelude-val">None</span>,
+            <span class="bool-val">false</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">ext</span>),
         },
     ))
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_renew_response</span>(<span class="ident">response</span>: <span class="ident">proto::EPPResponse</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">RenewResponse</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_renew_response</span>(<span class="ident">response</span>: <span class="ident">proto::EPPResponse</span>) -&gt; <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">RenewResponse</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">pending</span> <span class="op">=</span> <span class="ident">response</span>.<span class="ident">is_pending</span>();
     <span class="kw">match</span> <span class="ident">response</span>.<span class="ident">data</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">value</span>.<span class="ident">value</span> {
-            <span class="ident">proto::EPPResultDataValue::EPPDomainRenewResult</span>(<span class="ident">domain_renew</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Some</span>(<span class="ident">value</span>) =&gt; <span class="kw">match</span> <span class="ident">value</span>.<span class="ident">value</span> {
+            <span class="ident">proto::EPPResultDataValue::EPPDomainRenewResult</span>(<span class="ident">domain_renew</span>) =&gt; {
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">res</span>: <span class="ident">RenewResponse</span> <span class="op">=</span> (<span class="ident">domain_renew</span>, <span class="kw-2">&amp;</span><span class="ident">response</span>.<span class="ident">extension</span>).<span class="ident">try_into</span>()<span class="question-mark">?</span>;
                 <span class="ident">res</span>.<span class="ident">pending</span> <span class="op">=</span> <span class="ident">pending</span>;
                 <span class="prelude-val">Ok</span>(<span class="ident">res</span>)
             }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
         },
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
+        <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
     }
 }
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_transfer_query</span>(
     <span class="ident">client</span>: <span class="kw-2">&amp;</span><span class="ident">ServerFeatures</span>,
     <span class="ident">req</span>: <span class="kw-2">&amp;</span><span class="ident">TransferQueryRequest</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HandleReqReturn</span><span class="op">&lt;</span><span class="ident">TransferResponse</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">HandleReqReturn</span><span class="op">&lt;</span><span class="ident">TransferResponse</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="op">!</span><span class="ident">client</span>.<span class="ident">domain_supported</span> {
         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">Err</span>(<span class="ident">Error::Unsupported</span>));
     }
@@ -4325,8 +4325,8 @@
     <span class="prelude-val">Ok</span>((
         <span class="ident">proto::EPPCommandType::Transfer</span>(<span class="ident">command</span>),
         <span class="kw">match</span> <span class="ident">ext</span>.<span class="ident">is_empty</span>() {
-            <span class="bool-val">true</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
-            <span class="bool-val">false</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">ext</span>),
+            <span class="bool-val">true</span> =&gt; <span class="prelude-val">None</span>,
+            <span class="bool-val">false</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">ext</span>),
         },
     ))
 }
@@ -4334,7 +4334,7 @@
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_transfer_request</span>(
     <span class="ident">client</span>: <span class="kw-2">&amp;</span><span class="ident">ServerFeatures</span>,
     <span class="ident">req</span>: <span class="kw-2">&amp;</span><span class="ident">TransferRequestRequest</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HandleReqReturn</span><span class="op">&lt;</span><span class="ident">TransferResponse</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">HandleReqReturn</span><span class="op">&lt;</span><span class="ident">TransferResponse</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="op">!</span><span class="ident">client</span>.<span class="ident">domain_supported</span> {
         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">Err</span>(<span class="ident">Error::Unsupported</span>));
     }
@@ -4389,8 +4389,8 @@
     <span class="prelude-val">Ok</span>((
         <span class="ident">proto::EPPCommandType::Transfer</span>(<span class="ident">command</span>),
         <span class="kw">match</span> <span class="ident">ext</span>.<span class="ident">is_empty</span>() {
-            <span class="bool-val">true</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
-            <span class="bool-val">false</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">ext</span>),
+            <span class="bool-val">true</span> =&gt; <span class="prelude-val">None</span>,
+            <span class="bool-val">false</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">ext</span>),
         },
     ))
 }
@@ -4398,7 +4398,7 @@
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_transfer_cancel</span>(
     <span class="ident">client</span>: <span class="kw-2">&amp;</span><span class="ident">ServerFeatures</span>,
     <span class="ident">req</span>: <span class="kw-2">&amp;</span><span class="ident">TransferAcceptRejectRequest</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HandleReqReturn</span><span class="op">&lt;</span><span class="ident">TransferResponse</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">HandleReqReturn</span><span class="op">&lt;</span><span class="ident">TransferResponse</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="op">!</span><span class="ident">client</span>.<span class="ident">domain_supported</span> {
         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">Err</span>(<span class="ident">Error::Unsupported</span>));
     }
@@ -4435,8 +4435,8 @@
     <span class="prelude-val">Ok</span>((
         <span class="ident">proto::EPPCommandType::Transfer</span>(<span class="ident">command</span>),
         <span class="kw">match</span> <span class="ident">ext</span>.<span class="ident">is_empty</span>() {
-            <span class="bool-val">true</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
-            <span class="bool-val">false</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">ext</span>),
+            <span class="bool-val">true</span> =&gt; <span class="prelude-val">None</span>,
+            <span class="bool-val">false</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">ext</span>),
         },
     ))
 }
@@ -4444,7 +4444,7 @@
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_transfer_accept</span>(
     <span class="ident">client</span>: <span class="kw-2">&amp;</span><span class="ident">ServerFeatures</span>,
     <span class="ident">req</span>: <span class="kw-2">&amp;</span><span class="ident">TransferAcceptRejectRequest</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HandleReqReturn</span><span class="op">&lt;</span><span class="ident">TransferResponse</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">HandleReqReturn</span><span class="op">&lt;</span><span class="ident">TransferResponse</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="op">!</span><span class="ident">client</span>.<span class="ident">domain_supported</span> {
         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">Err</span>(<span class="ident">Error::Unsupported</span>));
     }
@@ -4481,8 +4481,8 @@
     <span class="prelude-val">Ok</span>((
         <span class="ident">proto::EPPCommandType::Transfer</span>(<span class="ident">command</span>),
         <span class="kw">match</span> <span class="ident">ext</span>.<span class="ident">is_empty</span>() {
-            <span class="bool-val">true</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
-            <span class="bool-val">false</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">ext</span>),
+            <span class="bool-val">true</span> =&gt; <span class="prelude-val">None</span>,
+            <span class="bool-val">false</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">ext</span>),
         },
     ))
 }
@@ -4490,7 +4490,7 @@
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_transfer_reject</span>(
     <span class="ident">client</span>: <span class="kw-2">&amp;</span><span class="ident">ServerFeatures</span>,
     <span class="ident">req</span>: <span class="kw-2">&amp;</span><span class="ident">TransferAcceptRejectRequest</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HandleReqReturn</span><span class="op">&lt;</span><span class="ident">TransferResponse</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">HandleReqReturn</span><span class="op">&lt;</span><span class="ident">TransferResponse</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="op">!</span><span class="ident">client</span>.<span class="ident">domain_supported</span> {
         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">Err</span>(<span class="ident">Error::Unsupported</span>));
     }
@@ -4528,25 +4528,25 @@
     <span class="prelude-val">Ok</span>((
         <span class="ident">proto::EPPCommandType::Transfer</span>(<span class="ident">command</span>),
         <span class="kw">match</span> <span class="ident">ext</span>.<span class="ident">is_empty</span>() {
-            <span class="bool-val">true</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
-            <span class="bool-val">false</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">ext</span>),
+            <span class="bool-val">true</span> =&gt; <span class="prelude-val">None</span>,
+            <span class="bool-val">false</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">ext</span>),
         },
     ))
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_transfer_response</span>(<span class="ident">response</span>: <span class="ident">proto::EPPResponse</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">TransferResponse</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_transfer_response</span>(<span class="ident">response</span>: <span class="ident">proto::EPPResponse</span>) -&gt; <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">TransferResponse</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">pending</span> <span class="op">=</span> <span class="ident">response</span>.<span class="ident">is_pending</span>();
     <span class="kw">match</span> <span class="ident">response</span>.<span class="ident">data</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">value</span>.<span class="ident">value</span> {
-            <span class="ident">proto::EPPResultDataValue::EPPDomainTransferResult</span>(<span class="ident">domain_transfer</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Some</span>(<span class="ident">value</span>) =&gt; <span class="kw">match</span> <span class="ident">value</span>.<span class="ident">value</span> {
+            <span class="ident">proto::EPPResultDataValue::EPPDomainTransferResult</span>(<span class="ident">domain_transfer</span>) =&gt; {
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">res</span>: <span class="ident">TransferResponse</span> <span class="op">=</span>
                     (<span class="ident">domain_transfer</span>, <span class="kw-2">&amp;</span><span class="ident">response</span>.<span class="ident">extension</span>).<span class="ident">try_into</span>()<span class="question-mark">?</span>;
                 <span class="ident">res</span>.<span class="ident">pending</span> <span class="op">=</span> <span class="ident">pending</span>;
                 <span class="prelude-val">Ok</span>(<span class="ident">res</span>)
             }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
         },
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
+        <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
     }
 }
 
@@ -4584,8 +4584,8 @@
 &lt;/epp&gt;&quot;#</span>;
         <span class="kw">let</span> <span class="ident">res</span>: <span class="ident"><span class="kw">super</span>::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">res</span>.<span class="ident">message</span> {
-            <span class="ident"><span class="kw">super</span>::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
+            <span class="ident"><span class="kw">super</span>::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) =&gt; <span class="ident">r</span>,
+            <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
         };
         <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::handle_claims_check_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>();
         <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">exists</span>, <span class="bool-val">true</span>);
@@ -4650,8 +4650,8 @@
 &lt;/epp&gt;&quot;#</span>;
         <span class="kw">let</span> <span class="ident">res</span>: <span class="ident"><span class="kw">super</span>::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">res</span>.<span class="ident">message</span> {
-            <span class="ident"><span class="kw">super</span>::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
+            <span class="ident"><span class="kw">super</span>::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) =&gt; <span class="ident">r</span>,
+            <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
         };
         <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::handle_info_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>();
         <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">name</span>, <span class="string">&quot;domain.example&quot;</span>);
@@ -4703,8 +4703,8 @@
 &lt;/epp&gt;&quot;#</span>;
         <span class="kw">let</span> <span class="ident">res</span>: <span class="ident"><span class="kw">super</span>::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">res</span>.<span class="ident">message</span> {
-            <span class="ident"><span class="kw">super</span>::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
+            <span class="ident"><span class="kw">super</span>::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) =&gt; <span class="ident">r</span>,
+            <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
         };
         <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::handle_create_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>();
         <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">pending</span>, <span class="bool-val">true</span>);

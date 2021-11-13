@@ -107,49 +107,49 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::epp_proto</span>;
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">client::maintenance::InfoResponse</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">epp_proto::maintenance::MaintenanceInfoReply</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">client::maintenance::InfoResponse</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">client::maintenance::InfoResponse</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">epp_proto::maintenance::MaintenanceInfoReply</span> {
             <span class="ident">id</span>: <span class="ident">from</span>.<span class="ident">id</span>,
             <span class="ident">name</span>: <span class="ident">from</span>.<span class="ident">name</span>,
             <span class="ident">item_type</span>: <span class="ident">from</span>.<span class="ident">item_type</span>,
             <span class="ident">poll_type</span>: <span class="kw">match</span> <span class="ident">from</span>.<span class="ident">poll_type</span> {
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">epp_proto::maintenance::PollType::NotSet</span>.<span class="ident">into</span>(),
-                <span class="prelude-val">Some</span>(<span class="ident">client::maintenance::PollType::Create</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">None</span> =&gt; <span class="ident">epp_proto::maintenance::PollType::NotSet</span>.<span class="ident">into</span>(),
+                <span class="prelude-val">Some</span>(<span class="ident">client::maintenance::PollType::Create</span>) =&gt; {
                     <span class="ident">epp_proto::maintenance::PollType::Create</span>.<span class="ident">into</span>()
                 }
-                <span class="prelude-val">Some</span>(<span class="ident">client::maintenance::PollType::Update</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">client::maintenance::PollType::Update</span>) =&gt; {
                     <span class="ident">epp_proto::maintenance::PollType::Update</span>.<span class="ident">into</span>()
                 }
-                <span class="prelude-val">Some</span>(<span class="ident">client::maintenance::PollType::Delete</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">client::maintenance::PollType::Delete</span>) =&gt; {
                     <span class="ident">epp_proto::maintenance::PollType::Delete</span>.<span class="ident">into</span>()
                 }
-                <span class="prelude-val">Some</span>(<span class="ident">client::maintenance::PollType::Courtesy</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">client::maintenance::PollType::Courtesy</span>) =&gt; {
                     <span class="ident">epp_proto::maintenance::PollType::Courtesy</span>.<span class="ident">into</span>()
                 }
-                <span class="prelude-val">Some</span>(<span class="ident">client::maintenance::PollType::End</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">client::maintenance::PollType::End</span>) =&gt; {
                     <span class="ident">epp_proto::maintenance::PollType::End</span>.<span class="ident">into</span>()
                 }
             },
             <span class="ident">environment</span>: <span class="kw">match</span> <span class="ident">from</span>.<span class="ident">environment</span> {
-                <span class="ident">client::maintenance::Environment::Production</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">client::maintenance::Environment::Production</span> =&gt; {
                     <span class="ident">epp_proto::maintenance::Environment::Production</span>.<span class="ident">into</span>()
                 }
-                <span class="ident">client::maintenance::Environment::Ote</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">client::maintenance::Environment::Ote</span> =&gt; {
                     <span class="ident">epp_proto::maintenance::Environment::Ote</span>.<span class="ident">into</span>()
                 }
-                <span class="ident">client::maintenance::Environment::Staging</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">client::maintenance::Environment::Staging</span> =&gt; {
                     <span class="ident">epp_proto::maintenance::Environment::Staging</span>.<span class="ident">into</span>()
                 }
-                <span class="ident">client::maintenance::Environment::Development</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">client::maintenance::Environment::Development</span> =&gt; {
                     <span class="ident">epp_proto::maintenance::Environment::Development</span>.<span class="ident">into</span>()
                 }
-                <span class="ident">client::maintenance::Environment::Custom</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">client::maintenance::Environment::Custom</span>(<span class="kw">_</span>) =&gt; {
                     <span class="ident">epp_proto::maintenance::Environment::Custom</span>.<span class="ident">into</span>()
                 }
             },
             <span class="ident">environment_name</span>: <span class="kw">match</span> <span class="ident">from</span>.<span class="ident">environment</span> {
-                <span class="ident">client::maintenance::Environment::Custom</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">e</span>),
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+                <span class="ident">client::maintenance::Environment::Custom</span>(<span class="ident">e</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">e</span>),
+                <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
             },
             <span class="ident">systems</span>: <span class="ident">from</span>
                 .<span class="ident">systems</span>
@@ -158,13 +158,13 @@
                     <span class="ident">name</span>: <span class="ident">s</span>.<span class="ident">name</span>,
                     <span class="ident">host</span>: <span class="ident">s</span>.<span class="ident">host</span>,
                     <span class="ident">impact</span>: <span class="kw">match</span> <span class="ident">s</span>.<span class="ident">impact</span> {
-                        <span class="ident">client::maintenance::Impact::Full</span> <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="ident">client::maintenance::Impact::Full</span> =&gt; {
                             <span class="ident">epp_proto::maintenance::Impact::Full</span>.<span class="ident">into</span>()
                         }
-                        <span class="ident">client::maintenance::Impact::Partial</span> <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="ident">client::maintenance::Impact::Partial</span> =&gt; {
                             <span class="ident">epp_proto::maintenance::Impact::Partial</span>.<span class="ident">into</span>()
                         }
-                        <span class="ident">client::maintenance::Impact::None</span> <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="ident">client::maintenance::Impact::None</span> =&gt; {
                             <span class="ident">epp_proto::maintenance::Impact::None</span>.<span class="ident">into</span>()
                         }
                     },
@@ -175,10 +175,10 @@
             <span class="ident">created</span>: <span class="ident"><span class="kw">super</span>::utils::chrono_to_proto</span>(<span class="prelude-val">Some</span>(<span class="ident">from</span>.<span class="ident">created</span>)),
             <span class="ident">updated</span>: <span class="ident"><span class="kw">super</span>::utils::chrono_to_proto</span>(<span class="ident">from</span>.<span class="ident">updated</span>),
             <span class="ident">reason</span>: <span class="kw">match</span> <span class="ident">from</span>.<span class="ident">reason</span> {
-                <span class="ident">client::maintenance::Reason::Planned</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">client::maintenance::Reason::Planned</span> =&gt; {
                     <span class="ident">epp_proto::maintenance::Reason::Planned</span>.<span class="ident">into</span>()
                 }
-                <span class="ident">client::maintenance::Reason::Emergency</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">client::maintenance::Reason::Emergency</span> =&gt; {
                     <span class="ident">epp_proto::maintenance::Reason::Emergency</span>.<span class="ident">into</span>()
                 }
             },
@@ -188,10 +188,10 @@
                 .<span class="ident">into_iter</span>()
                 .<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">epp_proto::maintenance::Description</span> {
                     <span class="ident">description</span>: <span class="prelude-val">Some</span>(<span class="kw">match</span> <span class="ident">d</span> {
-                        <span class="ident">client::maintenance::Description::Plain</span>(<span class="ident">p</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="ident">client::maintenance::Description::Plain</span>(<span class="ident">p</span>) =&gt; {
                             <span class="ident">epp_proto::maintenance::description::Description::Plain</span>(<span class="ident">p</span>)
                         }
-                        <span class="ident">client::maintenance::Description::Html</span>(<span class="ident">p</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="ident">client::maintenance::Description::Html</span>(<span class="ident">p</span>) =&gt; {
                             <span class="ident">epp_proto::maintenance::description::Description::Html</span>(<span class="ident">p</span>)
                         }
                     }),

@@ -345,43 +345,43 @@
 <span class="comment">//     })</span>
 <span class="comment">// }</span>
 
-<span class="kw">fn</span> <span class="ident">i32_from_mark_status</span>(<span class="ident">from</span>: <span class="ident">client::tmch::MarkStatus</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">i32</span> {
+<span class="kw">fn</span> <span class="ident">i32_from_mark_status</span>(<span class="ident">from</span>: <span class="ident">client::tmch::MarkStatus</span>) -&gt; <span class="ident">i32</span> {
     <span class="kw">match</span> <span class="ident">from</span> {
-        <span class="ident">client::tmch::MarkStatus::New</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">epp_proto::tmch::MarkStatusType::New</span>.<span class="ident">into</span>(),
-        <span class="ident">client::tmch::MarkStatus::Verified</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">epp_proto::tmch::MarkStatusType::Verified</span>.<span class="ident">into</span>(),
-        <span class="ident">client::tmch::MarkStatus::Incorrect</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">epp_proto::tmch::MarkStatusType::Incorrect</span>.<span class="ident">into</span>(),
-        <span class="ident">client::tmch::MarkStatus::Corrected</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">epp_proto::tmch::MarkStatusType::Corrected</span>.<span class="ident">into</span>(),
-        <span class="ident">client::tmch::MarkStatus::Invalid</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">epp_proto::tmch::MarkStatusType::Invalid</span>.<span class="ident">into</span>(),
-        <span class="ident">client::tmch::MarkStatus::Expired</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">epp_proto::tmch::MarkStatusType::Expired</span>.<span class="ident">into</span>(),
-        <span class="ident">client::tmch::MarkStatus::Deactivated</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">client::tmch::MarkStatus::New</span> =&gt; <span class="ident">epp_proto::tmch::MarkStatusType::New</span>.<span class="ident">into</span>(),
+        <span class="ident">client::tmch::MarkStatus::Verified</span> =&gt; <span class="ident">epp_proto::tmch::MarkStatusType::Verified</span>.<span class="ident">into</span>(),
+        <span class="ident">client::tmch::MarkStatus::Incorrect</span> =&gt; <span class="ident">epp_proto::tmch::MarkStatusType::Incorrect</span>.<span class="ident">into</span>(),
+        <span class="ident">client::tmch::MarkStatus::Corrected</span> =&gt; <span class="ident">epp_proto::tmch::MarkStatusType::Corrected</span>.<span class="ident">into</span>(),
+        <span class="ident">client::tmch::MarkStatus::Invalid</span> =&gt; <span class="ident">epp_proto::tmch::MarkStatusType::Invalid</span>.<span class="ident">into</span>(),
+        <span class="ident">client::tmch::MarkStatus::Expired</span> =&gt; <span class="ident">epp_proto::tmch::MarkStatusType::Expired</span>.<span class="ident">into</span>(),
+        <span class="ident">client::tmch::MarkStatus::Deactivated</span> =&gt; {
             <span class="ident">epp_proto::tmch::MarkStatusType::Deactivated</span>.<span class="ident">into</span>()
         }
     }
 }
 
-<span class="kw">fn</span> <span class="ident">i32_from_mark_pou_status</span>(<span class="ident">from</span>: <span class="ident">client::tmch::MarkPOUStatus</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">i32</span> {
+<span class="kw">fn</span> <span class="ident">i32_from_mark_pou_status</span>(<span class="ident">from</span>: <span class="ident">client::tmch::MarkPOUStatus</span>) -&gt; <span class="ident">i32</span> {
     <span class="kw">match</span> <span class="ident">from</span> {
-        <span class="ident">client::tmch::MarkPOUStatus::NotSet</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">epp_proto::tmch::MarkPouStatusType::PouNotSet</span>.<span class="ident">into</span>(),
-        <span class="ident">client::tmch::MarkPOUStatus::Valid</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">epp_proto::tmch::MarkPouStatusType::PouValid</span>.<span class="ident">into</span>(),
-        <span class="ident">client::tmch::MarkPOUStatus::Invalid</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">client::tmch::MarkPOUStatus::NotSet</span> =&gt; <span class="ident">epp_proto::tmch::MarkPouStatusType::PouNotSet</span>.<span class="ident">into</span>(),
+        <span class="ident">client::tmch::MarkPOUStatus::Valid</span> =&gt; <span class="ident">epp_proto::tmch::MarkPouStatusType::PouValid</span>.<span class="ident">into</span>(),
+        <span class="ident">client::tmch::MarkPOUStatus::Invalid</span> =&gt; {
             <span class="ident">epp_proto::tmch::MarkPouStatusType::PouInvalid</span>.<span class="ident">into</span>()
         }
-        <span class="ident">client::tmch::MarkPOUStatus::Expired</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">client::tmch::MarkPOUStatus::Expired</span> =&gt; {
             <span class="ident">epp_proto::tmch::MarkPouStatusType::PouExpired</span>.<span class="ident">into</span>()
         }
-        <span class="ident">client::tmch::MarkPOUStatus::NA</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">epp_proto::tmch::MarkPouStatusType::Pouna</span>.<span class="ident">into</span>(),
-        <span class="ident">client::tmch::MarkPOUStatus::New</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">epp_proto::tmch::MarkPouStatusType::PouNew</span>.<span class="ident">into</span>(),
-        <span class="ident">client::tmch::MarkPOUStatus::Incorrect</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">client::tmch::MarkPOUStatus::NA</span> =&gt; <span class="ident">epp_proto::tmch::MarkPouStatusType::Pouna</span>.<span class="ident">into</span>(),
+        <span class="ident">client::tmch::MarkPOUStatus::New</span> =&gt; <span class="ident">epp_proto::tmch::MarkPouStatusType::PouNew</span>.<span class="ident">into</span>(),
+        <span class="ident">client::tmch::MarkPOUStatus::Incorrect</span> =&gt; {
             <span class="ident">epp_proto::tmch::MarkPouStatusType::PouIncorrect</span>.<span class="ident">into</span>()
         }
-        <span class="ident">client::tmch::MarkPOUStatus::Corrected</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">client::tmch::MarkPOUStatus::Corrected</span> =&gt; {
             <span class="ident">epp_proto::tmch::MarkPouStatusType::PouCorrected</span>.<span class="ident">into</span>()
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">client::tmch::MarkLabel</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">epp_proto::tmch::MarkLabel</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">res</span>: <span class="ident">client::tmch::MarkLabel</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">res</span>: <span class="ident">client::tmch::MarkLabel</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">epp_proto::tmch::MarkLabel</span> {
             <span class="ident">a_label</span>: <span class="ident">res</span>.<span class="ident">a_label</span>,
             <span class="ident">u_label</span>: <span class="ident">res</span>.<span class="ident">u_label</span>,
@@ -392,7 +392,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">client::tmch::MarkVariation</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">epp_proto::tmch::MarkVariation</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">res</span>: <span class="ident">client::tmch::MarkVariation</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">res</span>: <span class="ident">client::tmch::MarkVariation</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">epp_proto::tmch::MarkVariation</span> {
             <span class="ident">a_label</span>: <span class="ident">res</span>.<span class="ident">a_label</span>,
             <span class="ident">u_label</span>: <span class="ident">res</span>.<span class="ident">u_label</span>,
@@ -403,7 +403,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">client::tmch::Status</span><span class="op">&lt;</span><span class="ident">client::tmch::MarkStatus</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">epp_proto::tmch::MarkStatus</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">res</span>: <span class="ident">client::tmch::Status</span><span class="op">&lt;</span><span class="ident">client::tmch::MarkStatus</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">res</span>: <span class="ident">client::tmch::Status</span><span class="op">&lt;</span><span class="ident">client::tmch::MarkStatus</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">epp_proto::tmch::MarkStatus</span> {
             <span class="ident">status_type</span>: <span class="ident">i32_from_mark_status</span>(<span class="ident">res</span>.<span class="ident">status_type</span>),
             <span class="ident">message</span>: <span class="ident">res</span>.<span class="ident">message</span>,
@@ -412,7 +412,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">client::tmch::Status</span><span class="op">&lt;</span><span class="ident">client::tmch::MarkPOUStatus</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">epp_proto::tmch::MarkPouStatus</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">res</span>: <span class="ident">client::tmch::Status</span><span class="op">&lt;</span><span class="ident">client::tmch::MarkPOUStatus</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">res</span>: <span class="ident">client::tmch::Status</span><span class="op">&lt;</span><span class="ident">client::tmch::MarkPOUStatus</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">epp_proto::tmch::MarkPouStatus</span> {
             <span class="ident">status_type</span>: <span class="ident">i32_from_mark_pou_status</span>(<span class="ident">res</span>.<span class="ident">status_type</span>),
             <span class="ident">message</span>: <span class="ident">res</span>.<span class="ident">message</span>,
@@ -421,7 +421,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">client::tmch::MarkInfoResponse</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">epp_proto::tmch::MarkInfoResponse</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">res</span>: <span class="ident">client::tmch::MarkInfoResponse</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">res</span>: <span class="ident">client::tmch::MarkInfoResponse</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">epp_proto::tmch::MarkInfoResponse</span> {
             <span class="ident">id</span>: <span class="ident">res</span>.<span class="ident">id</span>,
             <span class="ident">status</span>: <span class="prelude-val">Some</span>(<span class="ident">res</span>.<span class="ident">status</span>.<span class="ident">into</span>()),
@@ -439,7 +439,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">client::tmch::MarkSMDInfoResponse</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">epp_proto::tmch::MarkSmdInfoResponse</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">res</span>: <span class="ident">client::tmch::MarkSMDInfoResponse</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">res</span>: <span class="ident">client::tmch::MarkSMDInfoResponse</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">epp_proto::tmch::MarkSmdInfoResponse</span> {
             <span class="ident">id</span>: <span class="ident">res</span>.<span class="ident">id</span>,
             <span class="ident">status</span>: <span class="prelude-val">Some</span>(<span class="ident">res</span>.<span class="ident">status</span>.<span class="ident">into</span>()),
@@ -451,7 +451,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">client::tmch::BalanceData</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">epp_proto::tmch::BalanceData</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">res</span>: <span class="ident">client::tmch::BalanceData</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">res</span>: <span class="ident">client::tmch::BalanceData</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">epp_proto::tmch::BalanceData</span> {
             <span class="ident">value</span>: <span class="ident">res</span>.<span class="ident">value</span>,
             <span class="ident">currency</span>: <span class="ident">res</span>.<span class="ident">currency</span>,
@@ -461,32 +461,32 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">epp_proto::tmch::Document</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">client::tmch::Document</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">res</span>: <span class="ident">epp_proto::tmch::Document</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">res</span>: <span class="ident">epp_proto::tmch::Document</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">client::tmch::Document</span> {
             <span class="ident">class</span>: <span class="kw">match</span> <span class="ident">epp_proto::tmch::DocumentClass::from_i32</span>(<span class="ident">res</span>.<span class="ident">document_class</span>) {
-                <span class="prelude-val">Some</span>(<span class="ident">epp_proto::tmch::DocumentClass::Other</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">client::tmch::DocumentClass::Other</span>,
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">client::tmch::DocumentClass::Other</span>,
-                <span class="prelude-val">Some</span>(<span class="ident">epp_proto::tmch::DocumentClass::LicenseeDeclaration</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">epp_proto::tmch::DocumentClass::Other</span>) =&gt; <span class="ident">client::tmch::DocumentClass::Other</span>,
+                <span class="prelude-val">None</span> =&gt; <span class="ident">client::tmch::DocumentClass::Other</span>,
+                <span class="prelude-val">Some</span>(<span class="ident">epp_proto::tmch::DocumentClass::LicenseeDeclaration</span>) =&gt; {
                     <span class="ident">client::tmch::DocumentClass::LicenseeDeclaration</span>
                 }
-                <span class="prelude-val">Some</span>(<span class="ident">epp_proto::tmch::DocumentClass::AssigneeDeclaration</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">epp_proto::tmch::DocumentClass::AssigneeDeclaration</span>) =&gt; {
                     <span class="ident">client::tmch::DocumentClass::AssigneeDeclaration</span>
                 }
-                <span class="prelude-val">Some</span>(<span class="ident">epp_proto::tmch::DocumentClass::DeclarationProofOfUseOneSample</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">epp_proto::tmch::DocumentClass::DeclarationProofOfUseOneSample</span>) =&gt; {
                     <span class="ident">client::tmch::DocumentClass::DeclarationProofOfUseOneSample</span>
                 }
-                <span class="prelude-val">Some</span>(<span class="ident">epp_proto::tmch::DocumentClass::OtherProofOfUse</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">epp_proto::tmch::DocumentClass::OtherProofOfUse</span>) =&gt; {
                     <span class="ident">client::tmch::DocumentClass::OtherProofOfUse</span>
                 }
-                <span class="prelude-val">Some</span>(<span class="ident">epp_proto::tmch::DocumentClass::CopyOfCourtOrder</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">epp_proto::tmch::DocumentClass::CopyOfCourtOrder</span>) =&gt; {
                     <span class="ident">client::tmch::DocumentClass::CopyOfCourtOrder</span>
                 }
             },
             <span class="ident">file_name</span>: <span class="ident">res</span>.<span class="ident">file_name</span>,
             <span class="ident">file_type</span>: <span class="kw">match</span> <span class="ident">epp_proto::tmch::FileType::from_i32</span>(<span class="ident">res</span>.<span class="ident">file_type</span>) {
-                <span class="prelude-val">Some</span>(<span class="ident">epp_proto::tmch::FileType::Pdf</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">client::tmch::FileType::Pdf</span>,
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">client::tmch::FileType::Pdf</span>,
-                <span class="prelude-val">Some</span>(<span class="ident">epp_proto::tmch::FileType::Jpg</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">client::tmch::FileType::Jpg</span>,
+                <span class="prelude-val">Some</span>(<span class="ident">epp_proto::tmch::FileType::Pdf</span>) =&gt; <span class="ident">client::tmch::FileType::Pdf</span>,
+                <span class="prelude-val">None</span> =&gt; <span class="ident">client::tmch::FileType::Pdf</span>,
+                <span class="prelude-val">Some</span>(<span class="ident">epp_proto::tmch::FileType::Jpg</span>) =&gt; <span class="ident">client::tmch::FileType::Jpg</span>,
             },
             <span class="ident">contents</span>: <span class="ident">res</span>.<span class="ident">contents</span>,
         }
@@ -494,22 +494,22 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">epp_proto::tmch::CaseDocument</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">client::tmch::CaseDocument</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">res</span>: <span class="ident">epp_proto::tmch::CaseDocument</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">res</span>: <span class="ident">epp_proto::tmch::CaseDocument</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">client::tmch::CaseDocument</span> {
             <span class="ident">class</span>: <span class="kw">match</span> <span class="ident">epp_proto::tmch::CourtDocumentClass::from_i32</span>(<span class="ident">res</span>.<span class="ident">document_class</span>) {
-                <span class="prelude-val">Some</span>(<span class="ident">epp_proto::tmch::CourtDocumentClass::CourtOther</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">epp_proto::tmch::CourtDocumentClass::CourtOther</span>) =&gt; {
                     <span class="ident">client::tmch::CaseDocumentClass::Other</span>
                 }
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">client::tmch::CaseDocumentClass::Other</span>,
-                <span class="prelude-val">Some</span>(<span class="ident">epp_proto::tmch::CourtDocumentClass::CourtDecision</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">None</span> =&gt; <span class="ident">client::tmch::CaseDocumentClass::Other</span>,
+                <span class="prelude-val">Some</span>(<span class="ident">epp_proto::tmch::CourtDocumentClass::CourtDecision</span>) =&gt; {
                     <span class="ident">client::tmch::CaseDocumentClass::CourtDecision</span>
                 }
             },
             <span class="ident">file_name</span>: <span class="ident">res</span>.<span class="ident">file_name</span>,
             <span class="ident">file_type</span>: <span class="kw">match</span> <span class="ident">epp_proto::tmch::FileType::from_i32</span>(<span class="ident">res</span>.<span class="ident">file_type</span>) {
-                <span class="prelude-val">Some</span>(<span class="ident">epp_proto::tmch::FileType::Pdf</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">client::tmch::FileType::Pdf</span>,
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">client::tmch::FileType::Pdf</span>,
-                <span class="prelude-val">Some</span>(<span class="ident">epp_proto::tmch::FileType::Jpg</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">client::tmch::FileType::Jpg</span>,
+                <span class="prelude-val">Some</span>(<span class="ident">epp_proto::tmch::FileType::Pdf</span>) =&gt; <span class="ident">client::tmch::FileType::Pdf</span>,
+                <span class="prelude-val">None</span> =&gt; <span class="ident">client::tmch::FileType::Pdf</span>,
+                <span class="prelude-val">Some</span>(<span class="ident">epp_proto::tmch::FileType::Jpg</span>) =&gt; <span class="ident">client::tmch::FileType::Jpg</span>,
             },
             <span class="ident">contents</span>: <span class="ident">res</span>.<span class="ident">contents</span>,
         }
@@ -517,7 +517,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">epp_proto::tmch::CreateLabel</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">client::tmch::CreateLabel</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">res</span>: <span class="ident">epp_proto::tmch::CreateLabel</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">res</span>: <span class="ident">epp_proto::tmch::CreateLabel</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">client::tmch::CreateLabel</span> {
             <span class="ident">label</span>: <span class="ident">res</span>.<span class="ident">label</span>,
             <span class="ident">smd_inclusion</span>: <span class="ident">res</span>.<span class="ident">smd_inclusion</span>,
@@ -527,7 +527,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">client::tmch::CheckResponse</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">epp_proto::tmch::MarkCheckResponse</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">res</span>: <span class="ident">client::tmch::CheckResponse</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">res</span>: <span class="ident">client::tmch::CheckResponse</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">epp_proto::tmch::MarkCheckResponse</span> {
             <span class="ident">available</span>: <span class="ident">res</span>.<span class="ident">avail</span>,
             <span class="ident">reason</span>: <span class="ident">res</span>.<span class="ident">reason</span>,
@@ -537,7 +537,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">client::tmch::CreateResponse</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">epp_proto::tmch::MarkCreateResponse</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">res</span>: <span class="ident">client::tmch::CreateResponse</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">res</span>: <span class="ident">client::tmch::CreateResponse</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">epp_proto::tmch::MarkCreateResponse</span> {
             <span class="ident">id</span>: <span class="ident">res</span>.<span class="ident">id</span>,
             <span class="ident">created_date</span>: <span class="ident"><span class="kw">super</span>::utils::chrono_to_proto</span>(<span class="prelude-val">Some</span>(<span class="ident">res</span>.<span class="ident">created_date</span>)),
@@ -550,7 +550,7 @@
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">client::tmch::TransferInitiateResponse</span><span class="op">&gt;</span>
     <span class="kw">for</span> <span class="ident">epp_proto::tmch::MarkTransferInitiateResponse</span>
 {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">res</span>: <span class="ident">client::tmch::TransferInitiateResponse</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">res</span>: <span class="ident">client::tmch::TransferInitiateResponse</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">epp_proto::tmch::MarkTransferInitiateResponse</span> {
             <span class="ident">id</span>: <span class="ident">res</span>.<span class="ident">id</span>,
             <span class="ident">auth_info</span>: <span class="ident">res</span>.<span class="ident">auth_info</span>,
@@ -560,7 +560,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">client::tmch::TransferResponse</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">epp_proto::tmch::MarkTransferResponse</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">res</span>: <span class="ident">client::tmch::TransferResponse</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">res</span>: <span class="ident">client::tmch::TransferResponse</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">epp_proto::tmch::MarkTransferResponse</span> {
             <span class="ident">id</span>: <span class="ident">res</span>.<span class="ident">id</span>,
             <span class="ident">transfer_date</span>: <span class="ident"><span class="kw">super</span>::utils::chrono_to_proto</span>(<span class="ident">res</span>.<span class="ident">transfer_date</span>),
@@ -571,7 +571,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">client::tmch::RenewResponse</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">epp_proto::tmch::MarkRenewResponse</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">res</span>: <span class="ident">client::tmch::RenewResponse</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">res</span>: <span class="ident">client::tmch::RenewResponse</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">epp_proto::tmch::MarkRenewResponse</span> {
             <span class="ident">id</span>: <span class="ident">res</span>.<span class="ident">id</span>,
             <span class="ident">new_expiry_date</span>: <span class="ident"><span class="kw">super</span>::utils::chrono_to_proto</span>(<span class="ident">res</span>.<span class="ident">new_expiry_date</span>),
@@ -582,7 +582,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">client::tmch::UpdateResponse</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">epp_proto::tmch::MarkUpdateResponse</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">_res</span>: <span class="ident">client::tmch::UpdateResponse</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">_res</span>: <span class="ident">client::tmch::UpdateResponse</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">epp_proto::tmch::MarkUpdateResponse</span> { <span class="ident">cmd_resp</span>: <span class="prelude-val">None</span> }
     }
 }
@@ -590,17 +590,17 @@
 <span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">epp_proto::tmch::AddCase</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">client::tmch::AddCase</span> {
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">tonic::Status</span>;
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">from</span>: <span class="ident">epp_proto::tmch::AddCase</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">from</span>: <span class="ident">epp_proto::tmch::AddCase</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="ident">client::tmch::AddCase</span> {
             <span class="ident">id</span>: <span class="ident">from</span>.<span class="ident">id</span>,
             <span class="ident">case</span>: <span class="kw">match</span> <span class="ident">from</span>.<span class="ident">case</span> {
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">tonic::Status::invalid_argument</span>(<span class="string">&quot;case must be specified&quot;</span>)),
-                <span class="prelude-val">Some</span>(<span class="ident">epp_proto::tmch::add_case::Case::Udrp</span>(<span class="ident">u</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">client::tmch::CaseType::Udrp</span> {
+                <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">tonic::Status::invalid_argument</span>(<span class="string">&quot;case must be specified&quot;</span>)),
+                <span class="prelude-val">Some</span>(<span class="ident">epp_proto::tmch::add_case::Case::Udrp</span>(<span class="ident">u</span>)) =&gt; <span class="ident">client::tmch::CaseType::Udrp</span> {
                     <span class="ident">case_id</span>: <span class="ident">u</span>.<span class="ident">case_id</span>,
                     <span class="ident">provider</span>: <span class="ident">u</span>.<span class="ident">provider</span>,
                     <span class="ident">case_language</span>: <span class="ident">u</span>.<span class="ident">case_language</span>,
                 },
-                <span class="prelude-val">Some</span>(<span class="ident">epp_proto::tmch::add_case::Case::Court</span>(<span class="ident">c</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">client::tmch::CaseType::Court</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">epp_proto::tmch::add_case::Case::Court</span>(<span class="ident">c</span>)) =&gt; <span class="ident">client::tmch::CaseType::Court</span> {
                     <span class="ident">decision_id</span>: <span class="ident">c</span>.<span class="ident">decision_id</span>,
                     <span class="ident">court_name</span>: <span class="ident">c</span>.<span class="ident">court_name</span>,
                     <span class="ident">country_code</span>: <span class="ident">c</span>.<span class="ident">country_code</span>,
@@ -615,7 +615,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">epp_proto::tmch::CaseUpdate</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">client::tmch::CaseUpdate</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">epp_proto::tmch::CaseUpdate</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">epp_proto::tmch::CaseUpdate</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">client::tmch::CaseUpdate</span> {
             <span class="ident">id</span>: <span class="ident">from</span>.<span class="ident">id</span>,
             <span class="ident">add</span>: <span class="ident">from</span>
@@ -623,8 +623,8 @@
                 .<span class="ident">into_iter</span>()
                 .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">a</span><span class="op">|</span> <span class="ident">a</span>.<span class="ident">update</span>)
                 .<span class="ident">map</span>(<span class="op">|</span><span class="ident">u</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">u</span> {
-                    <span class="ident">epp_proto::tmch::case_add::Update::Label</span>(<span class="ident">l</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">client::tmch::CaseAdd::Label</span>(<span class="ident">l</span>),
-                    <span class="ident">epp_proto::tmch::case_add::Update::Document</span>(<span class="ident">d</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident">epp_proto::tmch::case_add::Update::Label</span>(<span class="ident">l</span>) =&gt; <span class="ident">client::tmch::CaseAdd::Label</span>(<span class="ident">l</span>),
+                    <span class="ident">epp_proto::tmch::case_add::Update::Document</span>(<span class="ident">d</span>) =&gt; {
                         <span class="ident">client::tmch::CaseAdd::Document</span>(<span class="ident">d</span>.<span class="ident">into</span>())
                     }
                 })
@@ -634,18 +634,18 @@
                 .<span class="ident">into_iter</span>()
                 .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">a</span><span class="op">|</span> <span class="ident">a</span>.<span class="ident">update</span>)
                 .<span class="ident">map</span>(<span class="op">|</span><span class="ident">u</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">u</span> {
-                    <span class="ident">epp_proto::tmch::case_remove::Update::Label</span>(<span class="ident">l</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident">epp_proto::tmch::case_remove::Update::Label</span>(<span class="ident">l</span>) =&gt; {
                         <span class="ident">client::tmch::CaseRemove::Label</span>(<span class="ident">l</span>)
                     }
                 })
                 .<span class="ident">collect</span>(),
             <span class="ident">new_case</span>: <span class="ident">from</span>.<span class="ident">new_case</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">c</span> {
-                <span class="ident">epp_proto::tmch::case_update::NewCase::NewUdrp</span>(<span class="ident">u</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">client::tmch::CaseType::Udrp</span> {
+                <span class="ident">epp_proto::tmch::case_update::NewCase::NewUdrp</span>(<span class="ident">u</span>) =&gt; <span class="ident">client::tmch::CaseType::Udrp</span> {
                     <span class="ident">case_id</span>: <span class="ident">u</span>.<span class="ident">case_id</span>,
                     <span class="ident">provider</span>: <span class="ident">u</span>.<span class="ident">provider</span>,
                     <span class="ident">case_language</span>: <span class="ident">u</span>.<span class="ident">case_language</span>,
                 },
-                <span class="ident">epp_proto::tmch::case_update::NewCase::NewCourt</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">epp_proto::tmch::case_update::NewCase::NewCourt</span>(<span class="ident">c</span>) =&gt; {
                     <span class="ident">client::tmch::CaseType::Court</span> {
                         <span class="ident">decision_id</span>: <span class="ident">c</span>.<span class="ident">decision_id</span>,
                         <span class="ident">court_name</span>: <span class="ident">c</span>.<span class="ident">court_name</span>,

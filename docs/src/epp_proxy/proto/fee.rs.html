@@ -843,7 +843,7 @@
     <span class="kw">pub</span> <span class="ident">period</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::domain::EPPDomainPeriod</span><span class="op">&gt;</span>,
 }
 
-<span class="kw">fn</span> <span class="ident">default_as_name</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+<span class="kw">fn</span> <span class="ident">default_as_name</span>() -&gt; <span class="ident">String</span> {
     <span class="string">&quot;name&quot;</span>.<span class="ident">to_string</span>()
 }
 
@@ -1293,11 +1293,11 @@
     <span class="kw">pub</span> <span class="ident">credit_limit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
 }
 
-<span class="kw">fn</span> <span class="ident">default_as_true</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+<span class="kw">fn</span> <span class="ident">default_as_true</span>() -&gt; <span class="ident">bool</span> {
     <span class="bool-val">true</span>
 }
 
-<span class="kw">fn</span> <span class="ident">default_as_false</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+<span class="kw">fn</span> <span class="ident">default_as_false</span>() -&gt; <span class="ident">bool</span> {
     <span class="bool-val">false</span>
 }
 
@@ -1396,7 +1396,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">EPPFee10Applied</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
         <span class="ident">EPPFee10Applied::Immediate</span>
     }
 }

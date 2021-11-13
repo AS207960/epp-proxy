@@ -246,22 +246,22 @@
     <span class="ident">client_sender</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">futures::channel::mpsc::Sender</span><span class="op">&lt;</span><span class="ident">RequestMessage</span><span class="op">&gt;</span>,
     <span class="ident">req</span>: <span class="ident">RequestMessage</span>,
     <span class="ident">receiver</span>: <span class="ident">futures::channel::oneshot::Receiver</span><span class="op">&lt;</span><span class="ident">Response</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
     <span class="kw">match</span> <span class="ident">client_sender</span>.<span class="ident">try_send</span>(<span class="ident">req</span>) {
-        <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {}
-        <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
+        <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {}
+        <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
     }
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">receiver</span> <span class="op">=</span> <span class="ident">receiver</span>.<span class="ident">fuse</span>();
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">delay</span> <span class="op">=</span> <span class="ident">Box::pin</span>(<span class="ident">tokio::time::sleep</span>(<span class="ident">tokio::time::Duration::new</span>(<span class="number">60</span>, <span class="number">0</span>)).<span class="ident">fuse</span>());
     <span class="kw">let</span> <span class="ident">resp</span> <span class="op">=</span> <span class="macro">futures::select!</span> {
-        <span class="ident">r</span> <span class="op">=</span> <span class="ident">receiver</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
-        <span class="kw">_</span> <span class="op">=</span> <span class="ident">delay</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">r</span> <span class="op">=</span> <span class="ident">receiver</span> =&gt; <span class="ident">r</span>,
+        <span class="kw">_</span> <span class="op">=</span> <span class="ident">delay</span> =&gt; {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Timeout</span>);
         }
     };
     <span class="kw">match</span> <span class="ident">resp</span> {
-        <span class="prelude-val">Ok</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
-        <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
+        <span class="prelude-val">Ok</span>(<span class="ident">r</span>) =&gt; <span class="ident">r</span>,
+        <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
     }
 }
 
@@ -323,7 +323,7 @@
 <span class="doccomment">/// * `client_sender` - Reference to the tokio channel into the client</span>
 <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">logout</span>(
     <span class="kw-2">mut</span> <span class="ident">client_sender</span>: <span class="ident">futures::channel::mpsc::Sender</span><span class="op">&lt;</span><span class="ident">RequestMessage</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CommandResponse</span><span class="op">&lt;</span>()<span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CommandResponse</span><span class="op">&lt;</span>()<span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
     <span class="kw">let</span> (<span class="ident">sender</span>, <span class="ident">receiver</span>) <span class="op">=</span> <span class="ident">futures::channel::oneshot::channel</span>();
     <span class="ident">send_epp_client_request</span>(
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">client_sender</span>,
@@ -336,7 +336,7 @@
 }
 
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Client</span> {
-    <span class="kw">fn</span> <span class="ident">start</span>(<span class="self">self</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">futures::channel::mpsc::Sender</span><span class="op">&lt;</span><span class="ident">RequestMessage</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">start</span>(<span class="self">self</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>) -&gt; <span class="ident">futures::channel::mpsc::Sender</span><span class="op">&lt;</span><span class="ident">RequestMessage</span><span class="op">&gt;</span>;
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="epp_proxy" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>

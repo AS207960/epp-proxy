@@ -255,39 +255,39 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::epp_proto</span>;
 <span class="kw">use</span> <span class="ident">std::convert::TryFrom</span>;
 
-<span class="kw">fn</span> <span class="ident">fee_command_from_i32</span>(<span class="ident">from</span>: <span class="ident">i32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">client::fee::Command</span> {
+<span class="kw">fn</span> <span class="ident">fee_command_from_i32</span>(<span class="ident">from</span>: <span class="ident">i32</span>) -&gt; <span class="ident">client::fee::Command</span> {
     <span class="kw">match</span> <span class="ident">epp_proto::fee::Command::from_i32</span>(<span class="ident">from</span>) {
-        <span class="prelude-val">Some</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">e</span> {
-            <span class="ident">epp_proto::fee::Command::Create</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">client::fee::Command::Create</span>,
-            <span class="ident">epp_proto::fee::Command::Renew</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">client::fee::Command::Renew</span>,
-            <span class="ident">epp_proto::fee::Command::Transfer</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">client::fee::Command::Transfer</span>,
-            <span class="ident">epp_proto::fee::Command::Delete</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">client::fee::Command::Delete</span>,
-            <span class="ident">epp_proto::fee::Command::Restore</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">client::fee::Command::Restore</span>,
-            <span class="ident">epp_proto::fee::Command::Update</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">client::fee::Command::Update</span>,
-            <span class="ident">epp_proto::fee::Command::Check</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">client::fee::Command::Check</span>,
-            <span class="ident">epp_proto::fee::Command::Info</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">client::fee::Command::Info</span>,
-            <span class="ident">epp_proto::fee::Command::Custom</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">client::fee::Command::Custom</span>,
+        <span class="prelude-val">Some</span>(<span class="ident">e</span>) =&gt; <span class="kw">match</span> <span class="ident">e</span> {
+            <span class="ident">epp_proto::fee::Command::Create</span> =&gt; <span class="ident">client::fee::Command::Create</span>,
+            <span class="ident">epp_proto::fee::Command::Renew</span> =&gt; <span class="ident">client::fee::Command::Renew</span>,
+            <span class="ident">epp_proto::fee::Command::Transfer</span> =&gt; <span class="ident">client::fee::Command::Transfer</span>,
+            <span class="ident">epp_proto::fee::Command::Delete</span> =&gt; <span class="ident">client::fee::Command::Delete</span>,
+            <span class="ident">epp_proto::fee::Command::Restore</span> =&gt; <span class="ident">client::fee::Command::Restore</span>,
+            <span class="ident">epp_proto::fee::Command::Update</span> =&gt; <span class="ident">client::fee::Command::Update</span>,
+            <span class="ident">epp_proto::fee::Command::Check</span> =&gt; <span class="ident">client::fee::Command::Check</span>,
+            <span class="ident">epp_proto::fee::Command::Info</span> =&gt; <span class="ident">client::fee::Command::Info</span>,
+            <span class="ident">epp_proto::fee::Command::Custom</span> =&gt; <span class="ident">client::fee::Command::Custom</span>,
         },
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">client::fee::Command::Create</span>,
+        <span class="prelude-val">None</span> =&gt; <span class="ident">client::fee::Command::Create</span>,
     }
 }
 
-<span class="kw">fn</span> <span class="ident">i32_from_fee_command</span>(<span class="ident">from</span>: <span class="ident">client::fee::Command</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">i32</span> {
+<span class="kw">fn</span> <span class="ident">i32_from_fee_command</span>(<span class="ident">from</span>: <span class="ident">client::fee::Command</span>) -&gt; <span class="ident">i32</span> {
     <span class="kw">match</span> <span class="ident">from</span> {
-        <span class="ident">client::fee::Command::Create</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">epp_proto::fee::Command::Create</span>.<span class="ident">into</span>(),
-        <span class="ident">client::fee::Command::Renew</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">epp_proto::fee::Command::Renew</span>.<span class="ident">into</span>(),
-        <span class="ident">client::fee::Command::Transfer</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">epp_proto::fee::Command::Transfer</span>.<span class="ident">into</span>(),
-        <span class="ident">client::fee::Command::Delete</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">epp_proto::fee::Command::Delete</span>.<span class="ident">into</span>(),
-        <span class="ident">client::fee::Command::Restore</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">epp_proto::fee::Command::Restore</span>.<span class="ident">into</span>(),
-        <span class="ident">client::fee::Command::Update</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">epp_proto::fee::Command::Update</span>.<span class="ident">into</span>(),
-        <span class="ident">client::fee::Command::Check</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">epp_proto::fee::Command::Check</span>.<span class="ident">into</span>(),
-        <span class="ident">client::fee::Command::Info</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">epp_proto::fee::Command::Info</span>.<span class="ident">into</span>(),
-        <span class="ident">client::fee::Command::Custom</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">epp_proto::fee::Command::Custom</span>.<span class="ident">into</span>(),
+        <span class="ident">client::fee::Command::Create</span> =&gt; <span class="ident">epp_proto::fee::Command::Create</span>.<span class="ident">into</span>(),
+        <span class="ident">client::fee::Command::Renew</span> =&gt; <span class="ident">epp_proto::fee::Command::Renew</span>.<span class="ident">into</span>(),
+        <span class="ident">client::fee::Command::Transfer</span> =&gt; <span class="ident">epp_proto::fee::Command::Transfer</span>.<span class="ident">into</span>(),
+        <span class="ident">client::fee::Command::Delete</span> =&gt; <span class="ident">epp_proto::fee::Command::Delete</span>.<span class="ident">into</span>(),
+        <span class="ident">client::fee::Command::Restore</span> =&gt; <span class="ident">epp_proto::fee::Command::Restore</span>.<span class="ident">into</span>(),
+        <span class="ident">client::fee::Command::Update</span> =&gt; <span class="ident">epp_proto::fee::Command::Update</span>.<span class="ident">into</span>(),
+        <span class="ident">client::fee::Command::Check</span> =&gt; <span class="ident">epp_proto::fee::Command::Check</span>.<span class="ident">into</span>(),
+        <span class="ident">client::fee::Command::Info</span> =&gt; <span class="ident">epp_proto::fee::Command::Info</span>.<span class="ident">into</span>(),
+        <span class="ident">client::fee::Command::Custom</span> =&gt; <span class="ident">epp_proto::fee::Command::Custom</span>.<span class="ident">into</span>(),
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">epp_proto::fee::FeeCheck</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">client::fee::FeeCheck</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">epp_proto::fee::FeeCheck</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">epp_proto::fee::FeeCheck</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">client::fee::FeeCheck</span> {
             <span class="ident">currency</span>: <span class="ident">from</span>.<span class="ident">currency</span>,
             <span class="ident">commands</span>: <span class="ident">from</span>
@@ -306,7 +306,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">client::fee::FeeCheckData</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">epp_proto::fee::FeeCheckData</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">client::fee::FeeCheckData</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">client::fee::FeeCheckData</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">epp_proto::fee::FeeCheckData</span> {
             <span class="ident">available</span>: <span class="ident">from</span>.<span class="ident">available</span>,
             <span class="ident">commands</span>: <span class="ident">from</span>
@@ -332,7 +332,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">client::fee::FeeData</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">epp_proto::fee::FeeData</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">client::fee::FeeData</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">client::fee::FeeData</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">epp_proto::fee::FeeData</span> {
             <span class="ident">period</span>: <span class="ident">from</span>.<span class="ident">period</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">epp_proto::common::Period</span> {
                 <span class="ident">unit</span>: <span class="ident"><span class="kw">super</span>::utils::i32_from_period_unit</span>(<span class="ident">p</span>.<span class="ident">unit</span>),
@@ -348,23 +348,23 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">client::fee::Fee</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">epp_proto::fee::Fee</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">client::fee::Fee</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">client::fee::Fee</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">epp_proto::fee::Fee</span> {
             <span class="ident">value</span>: <span class="ident">from</span>.<span class="ident">value</span>,
             <span class="ident">description</span>: <span class="ident">from</span>.<span class="ident">description</span>,
             <span class="ident">refundable</span>: <span class="ident">from</span>.<span class="ident">refundable</span>,
             <span class="ident">grace_period</span>: <span class="ident">from</span>.<span class="ident">grace_period</span>,
             <span class="ident">applied</span>: <span class="kw">match</span> <span class="ident">from</span>.<span class="ident">applied</span> {
-                <span class="ident">client::fee::Applied::Immediate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">epp_proto::fee::Applied::Immediate</span>.<span class="ident">into</span>(),
-                <span class="ident">client::fee::Applied::Delayed</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">epp_proto::fee::Applied::Delayed</span>.<span class="ident">into</span>(),
-                <span class="ident">client::fee::Applied::Unspecified</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">epp_proto::fee::Applied::Unspecified</span>.<span class="ident">into</span>(),
+                <span class="ident">client::fee::Applied::Immediate</span> =&gt; <span class="ident">epp_proto::fee::Applied::Immediate</span>.<span class="ident">into</span>(),
+                <span class="ident">client::fee::Applied::Delayed</span> =&gt; <span class="ident">epp_proto::fee::Applied::Delayed</span>.<span class="ident">into</span>(),
+                <span class="ident">client::fee::Applied::Unspecified</span> =&gt; <span class="ident">epp_proto::fee::Applied::Unspecified</span>.<span class="ident">into</span>(),
             },
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">client::fee::Credit</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">epp_proto::fee::Credit</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">client::fee::Credit</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">client::fee::Credit</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">epp_proto::fee::Credit</span> {
             <span class="ident">value</span>: <span class="ident">from</span>.<span class="ident">value</span>,
             <span class="ident">description</span>: <span class="ident">from</span>.<span class="ident">description</span>,
@@ -373,7 +373,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">client::fee::DonutsFeeData</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">epp_proto::fee::DonutsFeeData</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">client::fee::DonutsFeeData</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">client::fee::DonutsFeeData</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">epp_proto::fee::DonutsFeeData</span> {
             <span class="ident">fees</span>: <span class="ident">from</span>
                 .<span class="ident">sets</span>
@@ -385,13 +385,13 @@
                     }),
                     <span class="ident">fee_type</span>: <span class="prelude-val">Some</span>(<span class="ident">epp_proto::fee::DonutsFeeType</span> {
                         <span class="ident">fee_type</span>: <span class="kw">match</span> <span class="ident">f</span>.<span class="ident">fee_type</span>.<span class="ident">fee_type</span> {
-                            <span class="ident">client::fee::DonutsFeeTypes::Fee</span> <span class="op">=</span><span class="op">&gt;</span> {
+                            <span class="ident">client::fee::DonutsFeeTypes::Fee</span> =&gt; {
                                 <span class="ident">epp_proto::fee::donuts_fee_type::FeeTypes::Fee</span>.<span class="ident">into</span>()
                             }
-                            <span class="ident">client::fee::DonutsFeeTypes::Price</span> <span class="op">=</span><span class="op">&gt;</span> {
+                            <span class="ident">client::fee::DonutsFeeTypes::Price</span> =&gt; {
                                 <span class="ident">epp_proto::fee::donuts_fee_type::FeeTypes::Price</span>.<span class="ident">into</span>()
                             }
-                            <span class="ident">client::fee::DonutsFeeTypes::Custom</span> <span class="op">=</span><span class="op">&gt;</span> {
+                            <span class="ident">client::fee::DonutsFeeTypes::Custom</span> =&gt; {
                                 <span class="ident">epp_proto::fee::donuts_fee_type::FeeTypes::Custom</span>.<span class="ident">into</span>()
                             }
                         },
@@ -415,7 +415,7 @@
 <span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">epp_proto::fee::DonutsFeeData</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">client::fee::DonutsFeeData</span> {
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">tonic::Status</span>;
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">from</span>: <span class="ident">epp_proto::fee::DonutsFeeData</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">from</span>: <span class="ident">epp_proto::fee::DonutsFeeData</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="ident">client::fee::DonutsFeeData</span> {
             <span class="ident">sets</span>: <span class="ident">from</span>
                 .<span class="ident">fees</span>
@@ -423,31 +423,31 @@
                 .<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> {
                     <span class="prelude-val">Ok</span>(<span class="ident">client::fee::DonutsFeeSet</span> {
                         <span class="ident">category</span>: <span class="kw">match</span> <span class="ident">f</span>.<span class="ident">category</span> {
-                            <span class="prelude-val">Some</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">client::fee::DonutsCategory</span> {
+                            <span class="prelude-val">Some</span>(<span class="ident">c</span>) =&gt; <span class="ident">client::fee::DonutsCategory</span> {
                                 <span class="ident">name</span>: <span class="ident">c</span>.<span class="ident">name</span>,
                                 <span class="ident">category</span>: <span class="ident">c</span>.<span class="ident">value</span>,
                             },
-                            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+                            <span class="prelude-val">None</span> =&gt; {
                                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">tonic::Status::invalid_argument</span>(
                                     <span class="string">&quot;Category must be specified&quot;</span>,
                                 ))
                             }
                         },
                         <span class="ident">fee_type</span>: <span class="kw">match</span> <span class="ident">f</span>.<span class="ident">fee_type</span> {
-                            <span class="prelude-val">Some</span>(<span class="ident">f</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">client::fee::DonutsFeeType</span> {
+                            <span class="prelude-val">Some</span>(<span class="ident">f</span>) =&gt; <span class="ident">client::fee::DonutsFeeType</span> {
                                 <span class="ident">fee_type</span>: <span class="kw">match</span> <span class="ident">epp_proto::fee::donuts_fee_type::FeeTypes::from_i32</span>(
                                     <span class="ident">f</span>.<span class="ident">fee_type</span>,
                                 ) {
-                                    <span class="prelude-val">Some</span>(<span class="ident">epp_proto::fee::donuts_fee_type::FeeTypes::Fee</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                                    <span class="prelude-val">Some</span>(<span class="ident">epp_proto::fee::donuts_fee_type::FeeTypes::Fee</span>) =&gt; {
                                         <span class="ident">client::fee::DonutsFeeTypes::Fee</span>
                                     }
-                                    <span class="prelude-val">Some</span>(<span class="ident">epp_proto::fee::donuts_fee_type::FeeTypes::Price</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                                    <span class="prelude-val">Some</span>(<span class="ident">epp_proto::fee::donuts_fee_type::FeeTypes::Price</span>) =&gt; {
                                         <span class="ident">client::fee::DonutsFeeTypes::Price</span>
                                     }
-                                    <span class="prelude-val">Some</span>(<span class="ident">epp_proto::fee::donuts_fee_type::FeeTypes::Custom</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                                    <span class="prelude-val">Some</span>(<span class="ident">epp_proto::fee::donuts_fee_type::FeeTypes::Custom</span>) =&gt; {
                                         <span class="ident">client::fee::DonutsFeeTypes::Custom</span>
                                     }
-                                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+                                    <span class="prelude-val">None</span> =&gt; {
                                         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">tonic::Status::invalid_argument</span>(
                                             <span class="string">&quot;Unknown fee type&quot;</span>,
                                         ))
@@ -455,7 +455,7 @@
                                 },
                                 <span class="ident">name</span>: <span class="ident">f</span>.<span class="ident">name</span>,
                             },
-                            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+                            <span class="prelude-val">None</span> =&gt; {
                                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">tonic::Status::invalid_argument</span>(
                                     <span class="string">&quot;Fee type must be specified&quot;</span>,
                                 ))
@@ -478,7 +478,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">epp_proto::fee::FeeAgreement</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">client::fee::FeeAgreement</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">epp_proto::fee::FeeAgreement</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">epp_proto::fee::FeeAgreement</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">client::fee::FeeAgreement</span> {
             <span class="ident">currency</span>: <span class="ident">from</span>.<span class="ident">currency</span>,
             <span class="ident">fees</span>: <span class="ident">from</span>
@@ -490,14 +490,14 @@
                     <span class="ident">refundable</span>: <span class="ident">f</span>.<span class="ident">refundable</span>,
                     <span class="ident">grace_period</span>: <span class="ident">f</span>.<span class="ident">grace_period</span>,
                     <span class="ident">applied</span>: <span class="kw">match</span> <span class="ident">epp_proto::fee::Applied::from_i32</span>(<span class="ident">f</span>.<span class="ident">applied</span>) {
-                        <span class="prelude-val">Some</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">e</span> {
-                            <span class="ident">epp_proto::fee::Applied::Immediate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">client::fee::Applied::Immediate</span>,
-                            <span class="ident">epp_proto::fee::Applied::Delayed</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">client::fee::Applied::Delayed</span>,
-                            <span class="ident">epp_proto::fee::Applied::Unspecified</span> <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="prelude-val">Some</span>(<span class="ident">e</span>) =&gt; <span class="kw">match</span> <span class="ident">e</span> {
+                            <span class="ident">epp_proto::fee::Applied::Immediate</span> =&gt; <span class="ident">client::fee::Applied::Immediate</span>,
+                            <span class="ident">epp_proto::fee::Applied::Delayed</span> =&gt; <span class="ident">client::fee::Applied::Delayed</span>,
+                            <span class="ident">epp_proto::fee::Applied::Unspecified</span> =&gt; {
                                 <span class="ident">client::fee::Applied::Unspecified</span>
                             }
                         },
-                        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">client::fee::Applied::Unspecified</span>,
+                        <span class="prelude-val">None</span> =&gt; <span class="ident">client::fee::Applied::Unspecified</span>,
                     },
                 })
                 .<span class="ident">collect</span>(),

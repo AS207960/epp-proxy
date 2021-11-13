@@ -346,94 +346,94 @@
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::client</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::epp_proto</span>;
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">domain_status_from_i32</span>(<span class="ident">from</span>: <span class="ident">i32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">client::domain::Status</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">domain_status_from_i32</span>(<span class="ident">from</span>: <span class="ident">i32</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">client::domain::Status</span><span class="op">&gt;</span> {
     <span class="ident">epp_proto::domain::DomainStatus::from_i32</span>(<span class="ident">from</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">e</span> {
-        <span class="ident">epp_proto::domain::DomainStatus::ClientDeleteProhibited</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">epp_proto::domain::DomainStatus::ClientDeleteProhibited</span> =&gt; {
             <span class="ident">client::domain::Status::ClientDeleteProhibited</span>
         }
-        <span class="ident">epp_proto::domain::DomainStatus::ClientHold</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">client::domain::Status::ClientHold</span>,
-        <span class="ident">epp_proto::domain::DomainStatus::ClientRenewProhibited</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">epp_proto::domain::DomainStatus::ClientHold</span> =&gt; <span class="ident">client::domain::Status::ClientHold</span>,
+        <span class="ident">epp_proto::domain::DomainStatus::ClientRenewProhibited</span> =&gt; {
             <span class="ident">client::domain::Status::ClientRenewProhibited</span>
         }
-        <span class="ident">epp_proto::domain::DomainStatus::ClientTransferProhibited</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">epp_proto::domain::DomainStatus::ClientTransferProhibited</span> =&gt; {
             <span class="ident">client::domain::Status::ClientTransferProhibited</span>
         }
-        <span class="ident">epp_proto::domain::DomainStatus::ClientUpdateProhibited</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">epp_proto::domain::DomainStatus::ClientUpdateProhibited</span> =&gt; {
             <span class="ident">client::domain::Status::ClientUpdateProhibited</span>
         }
-        <span class="ident">epp_proto::domain::DomainStatus::Inactive</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">client::domain::Status::Inactive</span>,
-        <span class="ident">epp_proto::domain::DomainStatus::Ok</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">client::domain::Status::Ok</span>,
-        <span class="ident">epp_proto::domain::DomainStatus::PendingCreate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">client::domain::Status::PendingCreate</span>,
-        <span class="ident">epp_proto::domain::DomainStatus::PendingDelete</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">client::domain::Status::PendingDelete</span>,
-        <span class="ident">epp_proto::domain::DomainStatus::PendingRenew</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">client::domain::Status::PendingRenew</span>,
-        <span class="ident">epp_proto::domain::DomainStatus::PendingTransfer</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">client::domain::Status::PendingTransfer</span>,
-        <span class="ident">epp_proto::domain::DomainStatus::PendingUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">client::domain::Status::PendingUpdate</span>,
-        <span class="ident">epp_proto::domain::DomainStatus::ServerDeleteProhibited</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">epp_proto::domain::DomainStatus::Inactive</span> =&gt; <span class="ident">client::domain::Status::Inactive</span>,
+        <span class="ident">epp_proto::domain::DomainStatus::Ok</span> =&gt; <span class="ident">client::domain::Status::Ok</span>,
+        <span class="ident">epp_proto::domain::DomainStatus::PendingCreate</span> =&gt; <span class="ident">client::domain::Status::PendingCreate</span>,
+        <span class="ident">epp_proto::domain::DomainStatus::PendingDelete</span> =&gt; <span class="ident">client::domain::Status::PendingDelete</span>,
+        <span class="ident">epp_proto::domain::DomainStatus::PendingRenew</span> =&gt; <span class="ident">client::domain::Status::PendingRenew</span>,
+        <span class="ident">epp_proto::domain::DomainStatus::PendingTransfer</span> =&gt; <span class="ident">client::domain::Status::PendingTransfer</span>,
+        <span class="ident">epp_proto::domain::DomainStatus::PendingUpdate</span> =&gt; <span class="ident">client::domain::Status::PendingUpdate</span>,
+        <span class="ident">epp_proto::domain::DomainStatus::ServerDeleteProhibited</span> =&gt; {
             <span class="ident">client::domain::Status::ServerDeleteProhibited</span>
         }
-        <span class="ident">epp_proto::domain::DomainStatus::ServerHold</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">client::domain::Status::ServerHold</span>,
-        <span class="ident">epp_proto::domain::DomainStatus::ServerRenewProhibited</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">epp_proto::domain::DomainStatus::ServerHold</span> =&gt; <span class="ident">client::domain::Status::ServerHold</span>,
+        <span class="ident">epp_proto::domain::DomainStatus::ServerRenewProhibited</span> =&gt; {
             <span class="ident">client::domain::Status::ServerRenewProhibited</span>
         }
-        <span class="ident">epp_proto::domain::DomainStatus::ServerTransferProhibited</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">epp_proto::domain::DomainStatus::ServerTransferProhibited</span> =&gt; {
             <span class="ident">client::domain::Status::ServerTransferProhibited</span>
         }
-        <span class="ident">epp_proto::domain::DomainStatus::ServerUpdateProhibited</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">epp_proto::domain::DomainStatus::ServerUpdateProhibited</span> =&gt; {
             <span class="ident">client::domain::Status::ServerUpdateProhibited</span>
         }
     })
 }
 
-<span class="kw">fn</span> <span class="ident">i32_from_domain_status</span>(<span class="ident">from</span>: <span class="ident">client::domain::Status</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">i32</span> {
+<span class="kw">fn</span> <span class="ident">i32_from_domain_status</span>(<span class="ident">from</span>: <span class="ident">client::domain::Status</span>) -&gt; <span class="ident">i32</span> {
     <span class="kw">match</span> <span class="ident">from</span> {
-        <span class="ident">client::domain::Status::ClientDeleteProhibited</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">client::domain::Status::ClientDeleteProhibited</span> =&gt; {
             <span class="ident">epp_proto::domain::DomainStatus::ClientDeleteProhibited</span>.<span class="ident">into</span>()
         }
-        <span class="ident">client::domain::Status::ClientHold</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">epp_proto::domain::DomainStatus::ClientHold</span>.<span class="ident">into</span>(),
-        <span class="ident">client::domain::Status::ClientRenewProhibited</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">client::domain::Status::ClientHold</span> =&gt; <span class="ident">epp_proto::domain::DomainStatus::ClientHold</span>.<span class="ident">into</span>(),
+        <span class="ident">client::domain::Status::ClientRenewProhibited</span> =&gt; {
             <span class="ident">epp_proto::domain::DomainStatus::ClientRenewProhibited</span>.<span class="ident">into</span>()
         }
-        <span class="ident">client::domain::Status::ClientTransferProhibited</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">client::domain::Status::ClientTransferProhibited</span> =&gt; {
             <span class="ident">epp_proto::domain::DomainStatus::ClientTransferProhibited</span>.<span class="ident">into</span>()
         }
-        <span class="ident">client::domain::Status::ClientUpdateProhibited</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">client::domain::Status::ClientUpdateProhibited</span> =&gt; {
             <span class="ident">epp_proto::domain::DomainStatus::ClientUpdateProhibited</span>.<span class="ident">into</span>()
         }
-        <span class="ident">client::domain::Status::Inactive</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">epp_proto::domain::DomainStatus::Inactive</span>.<span class="ident">into</span>(),
-        <span class="ident">client::domain::Status::Ok</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">epp_proto::domain::DomainStatus::Ok</span>.<span class="ident">into</span>(),
-        <span class="ident">client::domain::Status::PendingCreate</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">client::domain::Status::Inactive</span> =&gt; <span class="ident">epp_proto::domain::DomainStatus::Inactive</span>.<span class="ident">into</span>(),
+        <span class="ident">client::domain::Status::Ok</span> =&gt; <span class="ident">epp_proto::domain::DomainStatus::Ok</span>.<span class="ident">into</span>(),
+        <span class="ident">client::domain::Status::PendingCreate</span> =&gt; {
             <span class="ident">epp_proto::domain::DomainStatus::PendingCreate</span>.<span class="ident">into</span>()
         }
-        <span class="ident">client::domain::Status::PendingDelete</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">client::domain::Status::PendingDelete</span> =&gt; {
             <span class="ident">epp_proto::domain::DomainStatus::PendingDelete</span>.<span class="ident">into</span>()
         }
-        <span class="ident">client::domain::Status::PendingRenew</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">client::domain::Status::PendingRenew</span> =&gt; {
             <span class="ident">epp_proto::domain::DomainStatus::PendingRenew</span>.<span class="ident">into</span>()
         }
-        <span class="ident">client::domain::Status::PendingTransfer</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">client::domain::Status::PendingTransfer</span> =&gt; {
             <span class="ident">epp_proto::domain::DomainStatus::PendingTransfer</span>.<span class="ident">into</span>()
         }
-        <span class="ident">client::domain::Status::PendingUpdate</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">client::domain::Status::PendingUpdate</span> =&gt; {
             <span class="ident">epp_proto::domain::DomainStatus::PendingUpdate</span>.<span class="ident">into</span>()
         }
-        <span class="ident">client::domain::Status::ServerDeleteProhibited</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">client::domain::Status::ServerDeleteProhibited</span> =&gt; {
             <span class="ident">epp_proto::domain::DomainStatus::ServerDeleteProhibited</span>.<span class="ident">into</span>()
         }
-        <span class="ident">client::domain::Status::ServerHold</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">epp_proto::domain::DomainStatus::ServerHold</span>.<span class="ident">into</span>(),
-        <span class="ident">client::domain::Status::ServerRenewProhibited</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">client::domain::Status::ServerHold</span> =&gt; <span class="ident">epp_proto::domain::DomainStatus::ServerHold</span>.<span class="ident">into</span>(),
+        <span class="ident">client::domain::Status::ServerRenewProhibited</span> =&gt; {
             <span class="ident">epp_proto::domain::DomainStatus::ServerRenewProhibited</span>.<span class="ident">into</span>()
         }
-        <span class="ident">client::domain::Status::ServerTransferProhibited</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">client::domain::Status::ServerTransferProhibited</span> =&gt; {
             <span class="ident">epp_proto::domain::DomainStatus::ServerTransferProhibited</span>.<span class="ident">into</span>()
         }
-        <span class="ident">client::domain::Status::ServerUpdateProhibited</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">client::domain::Status::ServerUpdateProhibited</span> =&gt; {
             <span class="ident">epp_proto::domain::DomainStatus::ServerUpdateProhibited</span>.<span class="ident">into</span>()
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">client::domain::CheckResponse</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">epp_proto::domain::DomainCheckReply</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">res</span>: <span class="ident">client::domain::CheckResponse</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">res</span>: <span class="ident">client::domain::CheckResponse</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">epp_proto::domain::DomainCheckReply</span> {
             <span class="ident">available</span>: <span class="ident">res</span>.<span class="ident">avail</span>,
             <span class="ident">reason</span>: <span class="ident">res</span>.<span class="ident">reason</span>,
@@ -451,7 +451,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">client::domain::InfoResponse</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">epp_proto::domain::DomainInfoReply</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">res</span>: <span class="ident">client::domain::InfoResponse</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">res</span>: <span class="ident">client::domain::InfoResponse</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">epp_proto::domain::DomainInfoReply</span> {
             <span class="ident">name</span>: <span class="ident">res</span>.<span class="ident">name</span>,
             <span class="ident">registry_id</span>: <span class="ident">res</span>.<span class="ident">registry_id</span>,
@@ -473,7 +473,7 @@
                 .<span class="ident">nameservers</span>
                 .<span class="ident">into_iter</span>()
                 .<span class="ident">map</span>(<span class="op">|</span><span class="ident">n</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">n</span> {
-                    <span class="ident">client::domain::InfoNameserver::HostOnly</span>(<span class="ident">h</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">epp_proto::domain::NameServer</span> {
+                    <span class="ident">client::domain::InfoNameserver::HostOnly</span>(<span class="ident">h</span>) =&gt; <span class="ident">epp_proto::domain::NameServer</span> {
                         <span class="ident">server</span>: <span class="prelude-val">Some</span>(<span class="ident">epp_proto::domain::name_server::Server::HostObj</span>(<span class="ident">h</span>)),
                         <span class="ident">addresses</span>: <span class="macro">vec!</span>[],
                         <span class="ident">eurid_idn</span>: <span class="prelude-val">None</span>,
@@ -482,17 +482,17 @@
                         <span class="ident">host</span>,
                         <span class="ident">addresses</span>,
                         <span class="ident">eurid_idn</span>,
-                    } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">epp_proto::domain::NameServer</span> {
+                    } =&gt; <span class="ident">epp_proto::domain::NameServer</span> {
                         <span class="ident">server</span>: <span class="prelude-val">Some</span>(<span class="ident">epp_proto::domain::name_server::Server::HostName</span>(<span class="ident">host</span>)),
                         <span class="ident">addresses</span>: <span class="ident">addresses</span>
                             .<span class="ident">iter</span>()
                             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">addr</span><span class="op">|</span> <span class="ident">epp_proto::common::IpAddress</span> {
                                 <span class="ident">address</span>: <span class="ident">addr</span>.<span class="ident">address</span>.<span class="ident">clone</span>(),
                                 <span class="ident">r#type</span>: <span class="kw">match</span> <span class="ident">addr</span>.<span class="ident">ip_version</span> {
-                                    <span class="ident">client::host::AddressVersion::IPv4</span> <span class="op">=</span><span class="op">&gt;</span> {
+                                    <span class="ident">client::host::AddressVersion::IPv4</span> =&gt; {
                                         <span class="ident">epp_proto::common::ip_address::IpVersion::IPv4</span>.<span class="ident">into</span>()
                                     }
-                                    <span class="ident">client::host::AddressVersion::IPv6</span> <span class="op">=</span><span class="op">&gt;</span> {
+                                    <span class="ident">client::host::AddressVersion::IPv6</span> =&gt; {
                                         <span class="ident">epp_proto::common::ip_address::IpVersion::IPv6</span>.<span class="ident">into</span>()
                                     }
                                 },
@@ -520,7 +520,7 @@
             <span class="ident">sec_dns</span>: <span class="ident">res</span>.<span class="ident">sec_dns</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">sec_dns</span><span class="op">|</span> <span class="ident">epp_proto::domain::SecDnsData</span> {
                 <span class="ident">max_sig_life</span>: <span class="ident">sec_dns</span>.<span class="ident">max_sig_life</span>,
                 <span class="ident">data</span>: <span class="prelude-val">Some</span>(<span class="kw">match</span> <span class="ident">sec_dns</span>.<span class="ident">data</span> {
-                    <span class="ident">client::domain::SecDNSDataType::DSData</span>(<span class="ident">ds_data</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident">client::domain::SecDNSDataType::DSData</span>(<span class="ident">ds_data</span>) =&gt; {
                         <span class="ident">epp_proto::domain::sec_dns_data::Data::DsData</span>(
                             <span class="ident">epp_proto::domain::SecDnsdsData</span> {
                                 <span class="ident">data</span>: <span class="ident">ds_data</span>
@@ -543,7 +543,7 @@
                             },
                         )
                     }
-                    <span class="ident">client::domain::SecDNSDataType::KeyData</span>(<span class="ident">key_data</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident">client::domain::SecDNSDataType::KeyData</span>(<span class="ident">key_data</span>) =&gt; {
                         <span class="ident">epp_proto::domain::sec_dns_data::Data::KeyData</span>(
                             <span class="ident">epp_proto::domain::SecDnsKeyData</span> {
                                 <span class="ident">data</span>: <span class="ident">key_data</span>
@@ -594,7 +594,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">client::domain::CreateResponse</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">epp_proto::domain::DomainCreateReply</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">res</span>: <span class="ident">client::domain::CreateResponse</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">res</span>: <span class="ident">client::domain::CreateResponse</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">epp_proto::domain::DomainCreateReply</span> {
             <span class="ident">name</span>: <span class="ident">res</span>.<span class="ident">data</span>.<span class="ident">name</span>,
             <span class="ident">pending</span>: <span class="ident">res</span>.<span class="ident">pending</span>,
@@ -611,7 +611,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">client::domain::RenewResponse</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">epp_proto::domain::DomainRenewReply</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">res</span>: <span class="ident">client::domain::RenewResponse</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">res</span>: <span class="ident">client::domain::RenewResponse</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">epp_proto::domain::DomainRenewReply</span> {
             <span class="ident">name</span>: <span class="ident">res</span>.<span class="ident">data</span>.<span class="ident">name</span>,
             <span class="ident">pending</span>: <span class="ident">res</span>.<span class="ident">pending</span>,
@@ -632,7 +632,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">client::domain::TransferResponse</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">epp_proto::domain::DomainTransferReply</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">res</span>: <span class="ident">client::domain::TransferResponse</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">res</span>: <span class="ident">client::domain::TransferResponse</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">epp_proto::domain::DomainTransferReply</span> {
             <span class="ident">pending</span>: <span class="ident">res</span>.<span class="ident">pending</span>,
             <span class="ident">name</span>: <span class="ident">res</span>.<span class="ident">data</span>.<span class="ident">name</span>,
@@ -666,7 +666,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">client::domain::PanData</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">epp_proto::domain::DomainPanReply</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">res</span>: <span class="ident">client::domain::PanData</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">res</span>: <span class="ident">client::domain::PanData</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">epp_proto::domain::DomainPanReply</span> {
             <span class="ident">name</span>: <span class="ident">res</span>.<span class="ident">name</span>,
             <span class="ident">result</span>: <span class="ident">res</span>.<span class="ident">result</span>,
@@ -678,7 +678,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">client::domain::UpdateResponse</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">epp_proto::domain::DomainUpdateReply</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">res</span>: <span class="ident">client::domain::UpdateResponse</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">res</span>: <span class="ident">client::domain::UpdateResponse</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">epp_proto::domain::DomainUpdateReply</span> {
             <span class="ident">pending</span>: <span class="ident">res</span>.<span class="ident">pending</span>,
             <span class="ident">fee_data</span>: <span class="ident">res</span>.<span class="ident">fee_data</span>.<span class="ident">map</span>(<span class="ident">Into::into</span>),

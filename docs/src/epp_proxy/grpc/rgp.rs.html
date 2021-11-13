@@ -18,18 +18,18 @@
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::client</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::epp_proto</span>;
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">i32_from_restore_status</span>(<span class="ident">from</span>: <span class="ident">client::rgp::RGPState</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">i32</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">i32_from_restore_status</span>(<span class="ident">from</span>: <span class="ident">client::rgp::RGPState</span>) -&gt; <span class="ident">i32</span> {
     <span class="kw">match</span> <span class="ident">from</span> {
-        <span class="ident">client::rgp::RGPState::Unknown</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">epp_proto::rgp::RgpState::Unknown</span>.<span class="ident">into</span>(),
-        <span class="ident">client::rgp::RGPState::AddPeriod</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">epp_proto::rgp::RgpState::AddPeriod</span>.<span class="ident">into</span>(),
-        <span class="ident">client::rgp::RGPState::AutoRenewPeriod</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">epp_proto::rgp::RgpState::AutoRenewPeriod</span>.<span class="ident">into</span>(),
-        <span class="ident">client::rgp::RGPState::RenewPeriod</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">epp_proto::rgp::RgpState::RenewPeriod</span>.<span class="ident">into</span>(),
-        <span class="ident">client::rgp::RGPState::TransferPeriod</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">epp_proto::rgp::RgpState::TransferPeriod</span>.<span class="ident">into</span>(),
-        <span class="ident">client::rgp::RGPState::RedemptionPeriod</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">client::rgp::RGPState::Unknown</span> =&gt; <span class="ident">epp_proto::rgp::RgpState::Unknown</span>.<span class="ident">into</span>(),
+        <span class="ident">client::rgp::RGPState::AddPeriod</span> =&gt; <span class="ident">epp_proto::rgp::RgpState::AddPeriod</span>.<span class="ident">into</span>(),
+        <span class="ident">client::rgp::RGPState::AutoRenewPeriod</span> =&gt; <span class="ident">epp_proto::rgp::RgpState::AutoRenewPeriod</span>.<span class="ident">into</span>(),
+        <span class="ident">client::rgp::RGPState::RenewPeriod</span> =&gt; <span class="ident">epp_proto::rgp::RgpState::RenewPeriod</span>.<span class="ident">into</span>(),
+        <span class="ident">client::rgp::RGPState::TransferPeriod</span> =&gt; <span class="ident">epp_proto::rgp::RgpState::TransferPeriod</span>.<span class="ident">into</span>(),
+        <span class="ident">client::rgp::RGPState::RedemptionPeriod</span> =&gt; {
             <span class="ident">epp_proto::rgp::RgpState::RedemptionPeriod</span>.<span class="ident">into</span>()
         }
-        <span class="ident">client::rgp::RGPState::PendingRestore</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">epp_proto::rgp::RgpState::PendingRestore</span>.<span class="ident">into</span>(),
-        <span class="ident">client::rgp::RGPState::PendingDelete</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">epp_proto::rgp::RgpState::PendingDelete</span>.<span class="ident">into</span>(),
+        <span class="ident">client::rgp::RGPState::PendingRestore</span> =&gt; <span class="ident">epp_proto::rgp::RgpState::PendingRestore</span>.<span class="ident">into</span>(),
+        <span class="ident">client::rgp::RGPState::PendingDelete</span> =&gt; <span class="ident">epp_proto::rgp::RgpState::PendingDelete</span>.<span class="ident">into</span>(),
     }
 }
 </code></pre></div>

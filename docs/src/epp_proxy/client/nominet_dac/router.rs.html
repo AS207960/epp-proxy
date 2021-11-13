@@ -323,10 +323,10 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::dac::DACEnv</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">DACEnv</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::dac::DACEnv</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::dac::DACEnv</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">match</span> <span class="ident">from</span> {
-            <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::dac::DACEnv::RealTime</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">DACEnv::RealTime</span>,
-            <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::dac::DACEnv::TimeDelay</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">DACEnv::TimeDelay</span>,
+            <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::dac::DACEnv::RealTime</span> =&gt; <span class="ident">DACEnv::RealTime</span>,
+            <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::dac::DACEnv::TimeDelay</span> =&gt; <span class="ident">DACEnv::TimeDelay</span>,
         }
     }
 }
@@ -338,7 +338,7 @@
 }
 
 <span class="macro">macro_rules!</span> <span class="ident">router</span> {
-    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">n</span>:<span class="ident">ident</span>);<span class="kw-2">*</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">n</span>:<span class="ident">ident</span>);<span class="kw-2">*</span>) =&gt; {
         <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>, <span class="ident">Debug</span>)]</span>
         <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Router</span> {
             <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">command_map</span>: <span class="ident">std::collections::HashMap</span><span class="op">&lt;</span><span class="ident">DACKey</span>, <span class="ident">uuid::Uuid</span><span class="op">&gt;</span>
@@ -348,7 +348,7 @@
             <span class="kw">type</span> <span class="ident">Request</span> <span class="op">=</span> (<span class="ident"><span class="kw">super</span>::proto::DACRequest</span>, <span class="ident">DACEnv</span>);
             <span class="kw">type</span> <span class="ident">Response</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::proto::DACResponse</span>;
 
-            <span class="kw">fn</span> <span class="ident">Logout_request</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">_client</span>: <span class="kw-2">&amp;</span>(), <span class="ident">_req</span>: <span class="kw-2">&amp;</span><span class="ident">router::LogoutRequest</span>, <span class="ident">command_id</span>: <span class="ident">uuid::Uuid</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HandleReqReturn</span><span class="op">&lt;</span><span class="ident">router::LogoutResponse</span><span class="op">&gt;</span> {
+            <span class="kw">fn</span> <span class="ident">Logout_request</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">_client</span>: <span class="kw-2">&amp;</span>(), <span class="ident">_req</span>: <span class="kw-2">&amp;</span><span class="ident">router::LogoutRequest</span>, <span class="ident">command_id</span>: <span class="ident">uuid::Uuid</span>) -&gt; <span class="ident">HandleReqReturn</span><span class="op">&lt;</span><span class="ident">router::LogoutResponse</span><span class="op">&gt;</span> {
                 <span class="self">self</span>.<span class="ident">command_map</span>.<span class="ident">insert</span>(<span class="ident">DACKey</span> {
                     <span class="ident">env</span>: <span class="ident">DACEnv::Both</span>,
                     <span class="ident">cmd</span>: <span class="string">&quot;#exit&quot;</span>.<span class="ident">to_string</span>(),
@@ -364,7 +364,7 @@
                 }));
             }
 
-            <span class="kw">fn</span> <span class="ident">DomainCheck_request</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">_client</span>: <span class="kw-2">&amp;</span>(), <span class="ident">req</span>: <span class="kw-2">&amp;</span><span class="ident">router::DomainCheckRequest</span>, <span class="ident">command_id</span>: <span class="ident">uuid::Uuid</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HandleReqReturn</span><span class="op">&lt;</span><span class="ident">router::DomainCheckResponse</span><span class="op">&gt;</span> {
+            <span class="kw">fn</span> <span class="ident">DomainCheck_request</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">_client</span>: <span class="kw-2">&amp;</span>(), <span class="ident">req</span>: <span class="kw-2">&amp;</span><span class="ident">router::DomainCheckRequest</span>, <span class="ident">command_id</span>: <span class="ident">uuid::Uuid</span>) -&gt; <span class="ident">HandleReqReturn</span><span class="op">&lt;</span><span class="ident">router::DomainCheckResponse</span><span class="op">&gt;</span> {
                 <span class="kw">if</span> <span class="ident">req</span>.<span class="ident">fee_check</span>.<span class="ident">is_some</span>() {
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">Err</span>(<span class="ident">Error::Unsupported</span>));
                 }
@@ -381,7 +381,7 @@
 
             <span class="kw">fn</span> <span class="ident">DomainCheck_response</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">return_path</span>: <span class="ident">router::Sender</span><span class="op">&lt;</span><span class="ident">router::DomainCheckResponse</span><span class="op">&gt;</span>, <span class="ident">response</span>: <span class="ident"><span class="self">Self</span>::Response</span>) {
                 <span class="kw">match</span> <span class="ident">response</span> {
-                    <span class="ident"><span class="kw">super</span>::proto::DACResponse::DomainRT</span>(<span class="ident">d</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident"><span class="kw">super</span>::proto::DACResponse::DomainRT</span>(<span class="ident">d</span>) =&gt; {
                         <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">return_path</span>.<span class="ident">send</span>(<span class="prelude-val">Ok</span>(<span class="ident">router::CommandResponse</span> {
                             <span class="ident">response</span>: <span class="ident">router::DomainCheckResponse</span> {
                                 <span class="ident">avail</span>: <span class="op">!</span><span class="ident">d</span>.<span class="ident">registered</span>,
@@ -395,20 +395,20 @@
                             <span class="ident">transaction_id</span>: <span class="prelude-val">None</span>,
                         }));
                     },
-                    <span class="ident"><span class="kw">super</span>::proto::DACResponse::DomainTD</span>(<span class="ident">d</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident"><span class="kw">super</span>::proto::DACResponse::DomainTD</span>(<span class="ident">d</span>) =&gt; {
                         <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">return_path</span>.<span class="ident">send</span>(<span class="prelude-val">Ok</span>(<span class="ident">router::CommandResponse</span> {
                             <span class="ident">response</span>: <span class="ident">router::DomainCheckResponse</span> {
                                 <span class="ident">avail</span>: <span class="kw">match</span> <span class="ident">d</span>.<span class="ident">registered</span> {
-                                    <span class="ident"><span class="kw">super</span>::proto::DomainRegistered::Registered</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
-                                    <span class="ident"><span class="kw">super</span>::proto::DomainRegistered::Available</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-                                    <span class="ident"><span class="kw">super</span>::proto::DomainRegistered::NotWithinRegistry</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
-                                    <span class="ident"><span class="kw">super</span>::proto::DomainRegistered::RulesPrevent</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
+                                    <span class="ident"><span class="kw">super</span>::proto::DomainRegistered::Registered</span> =&gt; <span class="bool-val">false</span>,
+                                    <span class="ident"><span class="kw">super</span>::proto::DomainRegistered::Available</span> =&gt; <span class="bool-val">true</span>,
+                                    <span class="ident"><span class="kw">super</span>::proto::DomainRegistered::NotWithinRegistry</span> =&gt; <span class="bool-val">false</span>,
+                                    <span class="ident"><span class="kw">super</span>::proto::DomainRegistered::RulesPrevent</span> =&gt; <span class="bool-val">false</span>,
                                 },
                                 <span class="ident">reason</span>: <span class="kw">match</span> <span class="ident">d</span>.<span class="ident">registered</span> {
-                                    <span class="ident"><span class="kw">super</span>::proto::DomainRegistered::Registered</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="string">&quot;already registered&quot;</span>.<span class="ident">to_string</span>()),
-                                    <span class="ident"><span class="kw">super</span>::proto::DomainRegistered::Available</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
-                                    <span class="ident"><span class="kw">super</span>::proto::DomainRegistered::NotWithinRegistry</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="string">&quot;not within this registry&quot;</span>.<span class="ident">to_string</span>()),
-                                    <span class="ident"><span class="kw">super</span>::proto::DomainRegistered::RulesPrevent</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="string">&quot;rules prevent registration&quot;</span>.<span class="ident">to_string</span>()),
+                                    <span class="ident"><span class="kw">super</span>::proto::DomainRegistered::Registered</span> =&gt; <span class="prelude-val">Some</span>(<span class="string">&quot;already registered&quot;</span>.<span class="ident">to_string</span>()),
+                                    <span class="ident"><span class="kw">super</span>::proto::DomainRegistered::Available</span> =&gt; <span class="prelude-val">None</span>,
+                                    <span class="ident"><span class="kw">super</span>::proto::DomainRegistered::NotWithinRegistry</span> =&gt; <span class="prelude-val">Some</span>(<span class="string">&quot;not within this registry&quot;</span>.<span class="ident">to_string</span>()),
+                                    <span class="ident"><span class="kw">super</span>::proto::DomainRegistered::RulesPrevent</span> =&gt; <span class="prelude-val">Some</span>(<span class="string">&quot;rules prevent registration&quot;</span>.<span class="ident">to_string</span>()),
                                 },
                                 <span class="ident">fee_check</span>: <span class="prelude-val">None</span>,
                                 <span class="ident">donuts_fee_check</span>: <span class="prelude-val">None</span>,
@@ -419,16 +419,16 @@
                             <span class="ident">transaction_id</span>: <span class="prelude-val">None</span>,
                         }));
                     },
-                    <span class="ident"><span class="kw">super</span>::proto::DACResponse::Aub</span>(<span class="ident">b</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident"><span class="kw">super</span>::proto::DACResponse::Aub</span>(<span class="ident">b</span>) =&gt; {
                         <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">return_path</span>.<span class="ident">send</span>(<span class="prelude-val">Err</span>(<span class="ident">Error::Err</span>(<span class="macro">format!</span>(<span class="string">&quot;Acceptable usage block, please try again in {} seconds&quot;</span>, <span class="ident">b</span>.<span class="ident">delay</span>))));
                     },
-                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="kw">_</span> =&gt; {
                         <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">return_path</span>.<span class="ident">send</span>(<span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>));
                     },
                 }
             }
 
-            <span class="kw">fn</span> <span class="ident">DACDomain_request</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">_client</span>: <span class="kw-2">&amp;</span>(), <span class="ident">req</span>: <span class="kw-2">&amp;</span><span class="ident">router::DACDomainRequest</span>, <span class="ident">command_id</span>: <span class="ident">uuid::Uuid</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HandleReqReturn</span><span class="op">&lt;</span><span class="ident">router::DACDomainResponse</span><span class="op">&gt;</span> {
+            <span class="kw">fn</span> <span class="ident">DACDomain_request</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">_client</span>: <span class="kw-2">&amp;</span>(), <span class="ident">req</span>: <span class="kw-2">&amp;</span><span class="ident">router::DACDomainRequest</span>, <span class="ident">command_id</span>: <span class="ident">uuid::Uuid</span>) -&gt; <span class="ident">HandleReqReturn</span><span class="op">&lt;</span><span class="ident">router::DACDomainResponse</span><span class="op">&gt;</span> {
                 <span class="self">self</span>.<span class="ident">command_map</span>.<span class="ident">insert</span>(<span class="ident">DACKey</span> {
                     <span class="ident">env</span>: <span class="ident">req</span>.<span class="ident">env</span>.<span class="ident">into</span>(),
                     <span class="ident">cmd</span>: <span class="ident">req</span>.<span class="ident">domain</span>.<span class="ident">clone</span>()
@@ -438,7 +438,7 @@
 
             <span class="kw">fn</span> <span class="ident">DACDomain_response</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">return_path</span>: <span class="ident">router::Sender</span><span class="op">&lt;</span><span class="ident">router::DACDomainResponse</span><span class="op">&gt;</span>, <span class="ident">response</span>: <span class="ident"><span class="self">Self</span>::Response</span>) {
                 <span class="kw">match</span> <span class="ident">response</span> {
-                    <span class="ident"><span class="kw">super</span>::proto::DACResponse::DomainRT</span>(<span class="ident">d</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident"><span class="kw">super</span>::proto::DACResponse::DomainRT</span>(<span class="ident">d</span>) =&gt; {
                         <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">return_path</span>.<span class="ident">send</span>(<span class="prelude-val">Ok</span>(<span class="ident">router::CommandResponse</span> {
                             <span class="ident">response</span>: <span class="ident">router::DACDomainResponse</span> {
                                 <span class="ident">registration_state</span>: <span class="kw">if</span> <span class="ident">d</span>.<span class="ident">registered</span> {
@@ -457,23 +457,23 @@
                             <span class="ident">transaction_id</span>: <span class="prelude-val">None</span>,
                         }));
                     },
-                    <span class="ident"><span class="kw">super</span>::proto::DACResponse::DomainTD</span>(<span class="ident">d</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident"><span class="kw">super</span>::proto::DACResponse::DomainTD</span>(<span class="ident">d</span>) =&gt; {
                         <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">return_path</span>.<span class="ident">send</span>(<span class="prelude-val">Ok</span>(<span class="ident">router::CommandResponse</span> {
                             <span class="ident">response</span>: <span class="ident">router::DACDomainResponse</span> {
                                 <span class="ident">registration_state</span>: <span class="kw">match</span> <span class="ident">d</span>.<span class="ident">registered</span> {
-                                    <span class="ident"><span class="kw">super</span>::proto::DomainRegistered::Registered</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::dac::DomainState::Registered</span>,
-                                    <span class="ident"><span class="kw">super</span>::proto::DomainRegistered::Available</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::dac::DomainState::Available</span>,
-                                    <span class="ident"><span class="kw">super</span>::proto::DomainRegistered::NotWithinRegistry</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::dac::DomainState::NotWithinRegistry</span>,
-                                    <span class="ident"><span class="kw">super</span>::proto::DomainRegistered::RulesPrevent</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::dac::DomainState::RulesPrevent</span>,
+                                    <span class="ident"><span class="kw">super</span>::proto::DomainRegistered::Registered</span> =&gt; <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::dac::DomainState::Registered</span>,
+                                    <span class="ident"><span class="kw">super</span>::proto::DomainRegistered::Available</span> =&gt; <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::dac::DomainState::Available</span>,
+                                    <span class="ident"><span class="kw">super</span>::proto::DomainRegistered::NotWithinRegistry</span> =&gt; <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::dac::DomainState::NotWithinRegistry</span>,
+                                    <span class="ident"><span class="kw">super</span>::proto::DomainRegistered::RulesPrevent</span> =&gt; <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::dac::DomainState::RulesPrevent</span>,
                                 },
                                 <span class="ident">detagged</span>: <span class="ident">d</span>.<span class="ident">detagged</span>,
                                 <span class="ident">created</span>: <span class="ident">d</span>.<span class="ident">created</span>,
                                 <span class="ident">expiry</span>: <span class="ident">d</span>.<span class="ident">expiry</span>,
                                 <span class="ident">status</span>: <span class="kw">match</span> <span class="ident">d</span>.<span class="ident">status</span> {
-                                    <span class="ident"><span class="kw">super</span>::proto::DomainStatus::Unknown</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::dac::DomainStatus::Unknown</span>,
-                                    <span class="ident"><span class="kw">super</span>::proto::DomainStatus::RegisteredUntilExpiry</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::dac::DomainStatus::RegisteredUntilExpiry</span>,
-                                    <span class="ident"><span class="kw">super</span>::proto::DomainStatus::RenewalRequired</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::dac::DomainStatus::RenewalRequired</span>,
-                                    <span class="ident"><span class="kw">super</span>::proto::DomainStatus::NoLongerRequired</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::dac::DomainStatus::NoLongerRequired</span>,
+                                    <span class="ident"><span class="kw">super</span>::proto::DomainStatus::Unknown</span> =&gt; <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::dac::DomainStatus::Unknown</span>,
+                                    <span class="ident"><span class="kw">super</span>::proto::DomainStatus::RegisteredUntilExpiry</span> =&gt; <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::dac::DomainStatus::RegisteredUntilExpiry</span>,
+                                    <span class="ident"><span class="kw">super</span>::proto::DomainStatus::RenewalRequired</span> =&gt; <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::dac::DomainStatus::RenewalRequired</span>,
+                                    <span class="ident"><span class="kw">super</span>::proto::DomainStatus::NoLongerRequired</span> =&gt; <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::dac::DomainStatus::NoLongerRequired</span>,
                                 },
                                 <span class="ident">suspended</span>: <span class="prelude-val">Some</span>(<span class="ident">d</span>.<span class="ident">suspended</span>),
                                 <span class="ident">tag</span>: <span class="ident">d</span>.<span class="ident">tag</span>,
@@ -482,16 +482,16 @@
                             <span class="ident">transaction_id</span>: <span class="prelude-val">None</span>,
                         }));
                     },
-                    <span class="ident"><span class="kw">super</span>::proto::DACResponse::Aub</span>(<span class="ident">b</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident"><span class="kw">super</span>::proto::DACResponse::Aub</span>(<span class="ident">b</span>) =&gt; {
                         <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">return_path</span>.<span class="ident">send</span>(<span class="prelude-val">Err</span>(<span class="ident">Error::Err</span>(<span class="macro">format!</span>(<span class="string">&quot;Acceptable usage block, please try again in {} seconds&quot;</span>, <span class="ident">b</span>.<span class="ident">delay</span>))));
                     },
-                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="kw">_</span> =&gt; {
                         <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">return_path</span>.<span class="ident">send</span>(<span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>));
                     },
                 }
             }
 
-            <span class="kw">fn</span> <span class="ident">DACUsage_request</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">_client</span>: <span class="kw-2">&amp;</span>(), <span class="ident">req</span>: <span class="kw-2">&amp;</span><span class="ident">router::DACUsageRequest</span>, <span class="ident">command_id</span>: <span class="ident">uuid::Uuid</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HandleReqReturn</span><span class="op">&lt;</span><span class="ident">router::DACUsageResponse</span><span class="op">&gt;</span> {
+            <span class="kw">fn</span> <span class="ident">DACUsage_request</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">_client</span>: <span class="kw-2">&amp;</span>(), <span class="ident">req</span>: <span class="kw-2">&amp;</span><span class="ident">router::DACUsageRequest</span>, <span class="ident">command_id</span>: <span class="ident">uuid::Uuid</span>) -&gt; <span class="ident">HandleReqReturn</span><span class="op">&lt;</span><span class="ident">router::DACUsageResponse</span><span class="op">&gt;</span> {
                 <span class="self">self</span>.<span class="ident">command_map</span>.<span class="ident">insert</span>(<span class="ident">DACKey</span> {
                     <span class="ident">env</span>: <span class="ident">req</span>.<span class="ident">env</span>.<span class="ident">into</span>(),
                     <span class="ident">cmd</span>: <span class="string">&quot;#usage&quot;</span>.<span class="ident">to_string</span>()
@@ -501,7 +501,7 @@
 
             <span class="kw">fn</span> <span class="ident">DACUsage_response</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">return_path</span>: <span class="ident">router::Sender</span><span class="op">&lt;</span><span class="ident">router::DACUsageResponse</span><span class="op">&gt;</span>, <span class="ident">response</span>: <span class="ident"><span class="self">Self</span>::Response</span>) {
                 <span class="kw">match</span> <span class="ident">response</span> {
-                    <span class="ident"><span class="kw">super</span>::proto::DACResponse::Usage</span>(<span class="ident">u</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident"><span class="kw">super</span>::proto::DACResponse::Usage</span>(<span class="ident">u</span>) =&gt; {
                         <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">return_path</span>.<span class="ident">send</span>(<span class="prelude-val">Ok</span>(<span class="ident">router::CommandResponse</span> {
                             <span class="ident">response</span>: <span class="ident">router::DACUsageResponse</span> {
                                 <span class="ident">usage_60</span>: <span class="ident">u</span>.<span class="ident">usage_60</span>,
@@ -511,16 +511,16 @@
                             <span class="ident">transaction_id</span>: <span class="prelude-val">None</span>,
                         }));
                     },
-                    <span class="ident"><span class="kw">super</span>::proto::DACResponse::Aub</span>(<span class="ident">b</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident"><span class="kw">super</span>::proto::DACResponse::Aub</span>(<span class="ident">b</span>) =&gt; {
                         <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">return_path</span>.<span class="ident">send</span>(<span class="prelude-val">Err</span>(<span class="ident">Error::Err</span>(<span class="macro">format!</span>(<span class="string">&quot;Acceptable usage block, please try again in {} seconds&quot;</span>, <span class="ident">b</span>.<span class="ident">delay</span>))));
                     },
-                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="kw">_</span> =&gt; {
                         <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">return_path</span>.<span class="ident">send</span>(<span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>));
                     },
                 }
             }
 
-            <span class="kw">fn</span> <span class="ident">DACLimits_request</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">_client</span>: <span class="kw-2">&amp;</span>(), <span class="ident">req</span>: <span class="kw-2">&amp;</span><span class="ident">router::DACLimitsRequest</span>, <span class="ident">command_id</span>: <span class="ident">uuid::Uuid</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HandleReqReturn</span><span class="op">&lt;</span><span class="ident">router::DACLimitsResponse</span><span class="op">&gt;</span> {
+            <span class="kw">fn</span> <span class="ident">DACLimits_request</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">_client</span>: <span class="kw-2">&amp;</span>(), <span class="ident">req</span>: <span class="kw-2">&amp;</span><span class="ident">router::DACLimitsRequest</span>, <span class="ident">command_id</span>: <span class="ident">uuid::Uuid</span>) -&gt; <span class="ident">HandleReqReturn</span><span class="op">&lt;</span><span class="ident">router::DACLimitsResponse</span><span class="op">&gt;</span> {
                 <span class="self">self</span>.<span class="ident">command_map</span>.<span class="ident">insert</span>(<span class="ident">DACKey</span> {
                     <span class="ident">env</span>: <span class="ident">req</span>.<span class="ident">env</span>.<span class="ident">into</span>(),
                     <span class="ident">cmd</span>: <span class="string">&quot;#limits&quot;</span>.<span class="ident">to_string</span>()
@@ -530,7 +530,7 @@
 
             <span class="kw">fn</span> <span class="ident">DACLimits_response</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">return_path</span>: <span class="ident">router::Sender</span><span class="op">&lt;</span><span class="ident">router::DACLimitsResponse</span><span class="op">&gt;</span>, <span class="ident">response</span>: <span class="ident"><span class="self">Self</span>::Response</span>) {
                 <span class="kw">match</span> <span class="ident">response</span> {
-                    <span class="ident"><span class="kw">super</span>::proto::DACResponse::Limits</span>(<span class="ident">u</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident"><span class="kw">super</span>::proto::DACResponse::Limits</span>(<span class="ident">u</span>) =&gt; {
                         <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">return_path</span>.<span class="ident">send</span>(<span class="prelude-val">Ok</span>(<span class="ident">router::CommandResponse</span> {
                             <span class="ident">response</span>: <span class="ident">router::DACLimitsResponse</span> {
                                 <span class="ident">usage_60</span>: <span class="ident">u</span>.<span class="ident">usage_60</span>,
@@ -540,17 +540,17 @@
                             <span class="ident">transaction_id</span>: <span class="prelude-val">None</span>,
                         }));
                     },
-                    <span class="ident"><span class="kw">super</span>::proto::DACResponse::Aub</span>(<span class="ident">b</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident"><span class="kw">super</span>::proto::DACResponse::Aub</span>(<span class="ident">b</span>) =&gt; {
                         <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">return_path</span>.<span class="ident">send</span>(<span class="prelude-val">Err</span>(<span class="ident">Error::Err</span>(<span class="macro">format!</span>(<span class="string">&quot;Acceptable usage block, please try again in {} seconds&quot;</span>, <span class="ident">b</span>.<span class="ident">delay</span>))));
                     },
-                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="kw">_</span> =&gt; {
                         <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">return_path</span>.<span class="ident">send</span>(<span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>));
                     },
                 }
             }
 
             <span class="macro">paste!</span> {
-                $(<span class="kw">fn</span> [<span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">n</span> <span class="ident">_request</span><span class="op">&gt;</span>](<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">_client</span>: <span class="kw-2">&amp;</span>(), <span class="ident">_req</span>: <span class="kw-2">&amp;</span><span class="ident">router</span>::[<span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">n</span> <span class="ident">Request</span><span class="op">&gt;</span>], <span class="ident">_command_id</span>: <span class="ident">uuid::Uuid</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HandleReqReturn</span><span class="op">&lt;</span><span class="ident">router</span>::[<span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">n</span> <span class="ident">Response</span><span class="op">&gt;</span>]<span class="op">&gt;</span> {
+                $(<span class="kw">fn</span> [<span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">n</span> <span class="ident">_request</span><span class="op">&gt;</span>](<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">_client</span>: <span class="kw-2">&amp;</span>(), <span class="ident">_req</span>: <span class="kw-2">&amp;</span><span class="ident">router</span>::[<span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">n</span> <span class="ident">Request</span><span class="op">&gt;</span>], <span class="ident">_command_id</span>: <span class="ident">uuid::Uuid</span>) -&gt; <span class="ident">HandleReqReturn</span><span class="op">&lt;</span><span class="ident">router</span>::[<span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">n</span> <span class="ident">Response</span><span class="op">&gt;</span>]<span class="op">&gt;</span> {
                     <span class="prelude-val">Err</span>(<span class="ident">Response::Err</span>(<span class="ident">Error::Unsupported</span>))
                 })<span class="op">*</span>
 

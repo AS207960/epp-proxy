@@ -1523,28 +1523,28 @@
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">eurid_ext_to_entity</span>(
     <span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">proto::eurid::EURIDContactInfo</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::contact::EntityType</span> {
+) -&gt; <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::contact::EntityType</span> {
     <span class="kw">match</span> <span class="ident">from</span>.<span class="ident">natural_person</span> {
-        <span class="bool-val">true</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::contact::EntityType::OtherIndividual</span>,
-        <span class="bool-val">false</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::contact::EntityType::Unknown</span>,
+        <span class="bool-val">true</span> =&gt; <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::contact::EntityType::OtherIndividual</span>,
+        <span class="bool-val">false</span> =&gt; <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::contact::EntityType::Unknown</span>,
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">proto::eurid::EURIDContactType</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ContactType</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">proto::eurid::EURIDContactType</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">proto::eurid::EURIDContactType</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">use</span> <span class="ident">proto::eurid::EURIDContactType</span>;
         <span class="kw">match</span> <span class="ident">from</span> {
-            <span class="ident">EURIDContactType::Billing</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ContactType::Billing</span>,
-            <span class="ident">EURIDContactType::Tech</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ContactType::Tech</span>,
-            <span class="ident">EURIDContactType::Registrant</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ContactType::Registrant</span>,
-            <span class="ident">EURIDContactType::OnSite</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ContactType::OnSite</span>,
-            <span class="ident">EURIDContactType::Reseller</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ContactType::Reseller</span>,
+            <span class="ident">EURIDContactType::Billing</span> =&gt; <span class="ident">ContactType::Billing</span>,
+            <span class="ident">EURIDContactType::Tech</span> =&gt; <span class="ident">ContactType::Tech</span>,
+            <span class="ident">EURIDContactType::Registrant</span> =&gt; <span class="ident">ContactType::Registrant</span>,
+            <span class="ident">EURIDContactType::OnSite</span> =&gt; <span class="ident">ContactType::OnSite</span>,
+            <span class="ident">EURIDContactType::Reseller</span> =&gt; <span class="ident">ContactType::Reseller</span>,
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">proto::eurid::EURIDContactInfo</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ContactExtension</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">proto::eurid::EURIDContactInfo</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">proto::eurid::EURIDContactInfo</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">ContactExtension</span> {
             <span class="ident">contact_type</span>: (<span class="kw-2">&amp;</span><span class="ident">from</span>.<span class="ident">contact_type</span>).<span class="ident">into</span>(),
             <span class="ident">whois_email</span>: <span class="ident">from</span>.<span class="ident">whois_email</span>.<span class="ident">as_deref</span>().<span class="ident">map</span>(<span class="ident">Into::into</span>),
@@ -1558,15 +1558,15 @@
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">contact_info_from_extension</span>(
     <span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">ContactExtension</span>,
     <span class="ident">entity_type</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::contact::EntityType</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">proto::eurid::EURIDContactInfo</span> {
+) -&gt; <span class="ident">proto::eurid::EURIDContactInfo</span> {
     <span class="kw">use</span> <span class="ident">proto::eurid::EURIDContactType</span>;
     <span class="ident">proto::eurid::EURIDContactInfo</span> {
         <span class="ident">contact_type</span>: <span class="kw">match</span> <span class="ident">from</span>.<span class="ident">contact_type</span> {
-            <span class="ident">ContactType::Billing</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EURIDContactType::Billing</span>,
-            <span class="ident">ContactType::Tech</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EURIDContactType::Tech</span>,
-            <span class="ident">ContactType::Registrant</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EURIDContactType::Registrant</span>,
-            <span class="ident">ContactType::OnSite</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EURIDContactType::OnSite</span>,
-            <span class="ident">ContactType::Reseller</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EURIDContactType::Reseller</span>,
+            <span class="ident">ContactType::Billing</span> =&gt; <span class="ident">EURIDContactType::Billing</span>,
+            <span class="ident">ContactType::Tech</span> =&gt; <span class="ident">EURIDContactType::Tech</span>,
+            <span class="ident">ContactType::Registrant</span> =&gt; <span class="ident">EURIDContactType::Registrant</span>,
+            <span class="ident">ContactType::OnSite</span> =&gt; <span class="ident">EURIDContactType::OnSite</span>,
+            <span class="ident">ContactType::Reseller</span> =&gt; <span class="ident">EURIDContactType::Reseller</span>,
         },
         <span class="ident">whois_email</span>: <span class="ident">from</span>.<span class="ident">whois_email</span>.<span class="ident">as_deref</span>().<span class="ident">map</span>(<span class="ident">Into::into</span>),
         <span class="ident">vat</span>: <span class="ident">from</span>.<span class="ident">vat</span>.<span class="ident">as_deref</span>().<span class="ident">map</span>(<span class="ident">Into::into</span>),
@@ -1579,7 +1579,7 @@
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">contact_info_update_from_extension</span>(
     <span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ContactExtensionUpdate</span><span class="op">&gt;</span>,
     <span class="ident">entity_type</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::contact::EntityType</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">proto::eurid::EURIDContactUpdate</span> {
+) -&gt; <span class="ident">proto::eurid::EURIDContactUpdate</span> {
     <span class="ident">proto::eurid::EURIDContactUpdate</span> {
         <span class="ident">change</span>: <span class="ident">proto::eurid::EURIDContactUpdateInfo</span> {
             <span class="ident">whois_email</span>: <span class="ident">from</span>
@@ -1600,7 +1600,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">proto::eurid::EURIDPollData</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">PollResponse</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">proto::eurid::EURIDPollData</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">proto::eurid::EURIDPollData</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">PollResponse</span> {
             <span class="ident">context</span>: <span class="ident">from</span>.<span class="ident">context</span>,
             <span class="ident">object_type</span>: <span class="ident">from</span>.<span class="ident">object_type</span>,
@@ -1614,20 +1614,20 @@
     }
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">extract_eurid_idn</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">proto::EPPResponseExtension</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Idn</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">extract_eurid_idn</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">proto::EPPResponseExtension</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Idn</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">eurid_ext_idn</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">from</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">e</span>
+        <span class="prelude-val">Some</span>(<span class="ident">e</span>) =&gt; <span class="kw">match</span> <span class="ident">e</span>
             .<span class="ident">value</span>
             .<span class="ident">iter</span>()
             .<span class="ident">find</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="macro">matches!</span>(<span class="ident">e</span>, <span class="ident">proto::EPPResponseExtensionType::EURIDIDNMapping</span>(<span class="kw">_</span>)))
         {
-            <span class="prelude-val">Some</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">e</span> {
-                <span class="ident">proto::EPPResponseExtensionType::EURIDIDNMapping</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">e</span>),
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
+            <span class="prelude-val">Some</span>(<span class="ident">e</span>) =&gt; <span class="kw">match</span> <span class="ident">e</span> {
+                <span class="ident">proto::EPPResponseExtensionType::EURIDIDNMapping</span>(<span class="ident">e</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">e</span>),
+                <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
             },
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
         },
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+        <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
     };
 
     <span class="ident">eurid_ext_idn</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> {
@@ -1644,55 +1644,55 @@
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">extract_eurid_idn_singular</span><span class="op">&lt;</span><span class="lifetime">&#39;o</span>, <span class="ident">O</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;o</span> <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>(
     <span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">proto::EPPResponseExtension</span><span class="op">&gt;</span>,
     <span class="ident">orig_name</span>: <span class="ident">O</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Idn</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Idn</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
     <span class="kw">match</span> <span class="ident">extract_eurid_idn</span>(<span class="ident">from</span>) {
-        <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> (<span class="ident">i</span>.<span class="ident">len</span>(), <span class="ident">orig_name</span>.<span class="ident">into</span>()) {
-            (<span class="number">1</span>, <span class="prelude-val">None</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">i</span>.<span class="ident">pop</span>().<span class="ident">unwrap</span>())),
-            (<span class="kw">_</span>, <span class="prelude-val">None</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
-            (<span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="ident">o</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">i</span>.<span class="ident">into_iter</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span>.<span class="ident">ace</span> <span class="op">=</span><span class="op">=</span> <span class="ident">o</span> <span class="op">|</span><span class="op">|</span> <span class="ident">i</span>.<span class="ident">unicode</span> <span class="op">=</span><span class="op">=</span> <span class="ident">o</span>)),
+        <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">i</span>) =&gt; <span class="kw">match</span> (<span class="ident">i</span>.<span class="ident">len</span>(), <span class="ident">orig_name</span>.<span class="ident">into</span>()) {
+            (<span class="number">1</span>, <span class="prelude-val">None</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">i</span>.<span class="ident">pop</span>().<span class="ident">unwrap</span>())),
+            (<span class="kw">_</span>, <span class="prelude-val">None</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
+            (<span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="ident">o</span>)) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">i</span>.<span class="ident">into_iter</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span>.<span class="ident">ace</span> <span class="op">==</span> <span class="ident">o</span> <span class="op">|</span><span class="op">|</span> <span class="ident">i</span>.<span class="ident">unicode</span> <span class="op">==</span> <span class="ident">o</span>)),
         },
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
+        <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
     }
 }
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">extract_eurid_domain_check_singular</span>(
     <span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">proto::EPPResponseExtension</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DomainCheck</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DomainCheck</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">eurid_ext_check</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">from</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">e</span>
+        <span class="prelude-val">Some</span>(<span class="ident">e</span>) =&gt; <span class="kw">match</span> <span class="ident">e</span>
             .<span class="ident">value</span>
             .<span class="ident">iter</span>()
             .<span class="ident">find</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="macro">matches!</span>(<span class="ident">e</span>, <span class="ident">proto::EPPResponseExtensionType::EURIDDomainCheckData</span>(<span class="kw">_</span>)))
         {
-            <span class="prelude-val">Some</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">e</span> {
-                <span class="ident">proto::EPPResponseExtensionType::EURIDDomainCheckData</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">e</span>),
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
+            <span class="prelude-val">Some</span>(<span class="ident">e</span>) =&gt; <span class="kw">match</span> <span class="ident">e</span> {
+                <span class="ident">proto::EPPResponseExtensionType::EURIDDomainCheckData</span>(<span class="ident">e</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">e</span>),
+                <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
             },
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
         },
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+        <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
     };
 
     <span class="kw">match</span> <span class="ident">eurid_ext_check</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Some</span>(<span class="ident">e</span>) =&gt; {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">e</span>.<span class="ident">domains</span>.<span class="ident">clone</span>();
             <span class="kw">match</span> <span class="ident">d</span>.<span class="ident">len</span>() {
-                <span class="number">1</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="number">1</span> =&gt; {
                     <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">d</span>.<span class="ident">pop</span>().<span class="ident">unwrap</span>();
                     <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">DomainCheck</span> {
                         <span class="ident">available_date</span>: <span class="ident">c</span>.<span class="ident">available_date</span>,
                         <span class="ident">status</span>: <span class="ident">c</span>.<span class="ident">status</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">status</span>.<span class="ident">into</span>()).<span class="ident">collect</span>(),
                     }))
                 }
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
+                <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
             }
         }
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
+        <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">DomainCreate</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">proto::eurid::EURIDDomainCreate</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">DomainCreate</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">DomainCreate</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">contacts</span> <span class="op">=</span> <span class="macro">vec!</span>[];
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">on_site</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">from</span>.<span class="ident">on_site</span> {
@@ -1718,7 +1718,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">DomainUpdate</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">proto::eurid::EURIDDomainUpdate</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">DomainUpdate</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">DomainUpdate</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">add_contacts</span> <span class="op">=</span> <span class="macro">vec!</span>[];
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rem_contacts</span> <span class="op">=</span> <span class="macro">vec!</span>[];
 
@@ -1750,16 +1750,16 @@
 
         <span class="ident">proto::eurid::EURIDDomainUpdate</span> {
             <span class="ident">add</span>: <span class="kw">match</span> <span class="ident">add_contacts</span>.<span class="ident">is_empty</span>() {
-                <span class="bool-val">true</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
-                <span class="bool-val">false</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">proto::eurid::EURIDDomainUpdateAddRemove</span> {
+                <span class="bool-val">true</span> =&gt; <span class="prelude-val">None</span>,
+                <span class="bool-val">false</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">proto::eurid::EURIDDomainUpdateAddRemove</span> {
                     <span class="ident">contacts</span>: <span class="ident">add_contacts</span>,
                     <span class="ident">nsgroups</span>: <span class="macro">vec!</span>[],
                     <span class="ident">keygroup</span>: <span class="prelude-val">None</span>,
                 }),
             },
             <span class="ident">remove</span>: <span class="kw">match</span> <span class="ident">rem_contacts</span>.<span class="ident">is_empty</span>() {
-                <span class="bool-val">true</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
-                <span class="bool-val">false</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">proto::eurid::EURIDDomainUpdateAddRemove</span> {
+                <span class="bool-val">true</span> =&gt; <span class="prelude-val">None</span>,
+                <span class="bool-val">false</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">proto::eurid::EURIDDomainUpdateAddRemove</span> {
                     <span class="ident">contacts</span>: <span class="ident">rem_contacts</span>,
                     <span class="ident">nsgroups</span>: <span class="macro">vec!</span>[],
                     <span class="ident">keygroup</span>: <span class="prelude-val">None</span>,
@@ -1770,20 +1770,20 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">DomainDelete</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">proto::eurid::EURIDDomainDelete</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">DomainDelete</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">DomainDelete</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">match</span> <span class="ident">from</span> {
-            <span class="ident">DomainDelete::Schedule</span>(<span class="ident">t</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">DomainDelete::Schedule</span>(<span class="ident">t</span>) =&gt; {
                 <span class="ident">proto::eurid::EURIDDomainDelete::Schedule</span>(<span class="ident">proto::eurid::EURIDDomainDeleteSchedule</span> {
                     <span class="ident">delete_date</span>: <span class="ident">t</span>.<span class="ident">to_owned</span>(),
                 })
             }
-            <span class="ident">DomainDelete::Cancel</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">proto::eurid::EURIDDomainDelete::Cancel</span> {},
+            <span class="ident">DomainDelete::Cancel</span> =&gt; <span class="ident">proto::eurid::EURIDDomainDelete::Cancel</span> {},
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">DomainTransfer</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">proto::eurid::EURIDDomainTransfer</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">DomainTransfer</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">DomainTransfer</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">contacts</span> <span class="op">=</span> <span class="macro">vec!</span>[
             <span class="ident">proto::eurid::EURIDDomainContact</span> {
                 <span class="ident">contact_type</span>: <span class="ident">proto::eurid::EURIDContactType::Registrant</span>,
@@ -1829,29 +1829,29 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">DomainInfoRequest</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">proto::eurid::EURIDAuthInfo</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">DomainInfoRequest</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">proto::eurid::EURIDAuthInfo</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">DomainInfoRequest</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">proto::eurid::EURIDAuthInfo</span><span class="op">&gt;</span> {
         <span class="ident">from</span>.<span class="ident">auth_info</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">a</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">a</span> {
-            <span class="ident">DomainAuthInfo::Request</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">proto::eurid::EURIDAuthInfo::Request</span> {},
-            <span class="ident">DomainAuthInfo::Cancel</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">proto::eurid::EURIDAuthInfo::Cancel</span> {},
+            <span class="ident">DomainAuthInfo::Request</span> =&gt; <span class="ident">proto::eurid::EURIDAuthInfo::Request</span> {},
+            <span class="ident">DomainAuthInfo::Cancel</span> =&gt; <span class="ident">proto::eurid::EURIDAuthInfo::Cancel</span> {},
         })
     }
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">extract_eurid_domain_info</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">proto::EPPResponseExtension</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DomainInfo</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">extract_eurid_domain_info</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">proto::EPPResponseExtension</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DomainInfo</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">eurid_ext_info</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">from</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">e</span>.<span class="ident">value</span>.<span class="ident">iter</span>().<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">e</span> {
-            <span class="ident">proto::EPPResponseExtensionType::EURIDDomainInfoData</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">e</span>),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+        <span class="prelude-val">Some</span>(<span class="ident">e</span>) =&gt; <span class="ident">e</span>.<span class="ident">value</span>.<span class="ident">iter</span>().<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">e</span> {
+            <span class="ident">proto::EPPResponseExtensionType::EURIDDomainInfoData</span>(<span class="ident">e</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">e</span>),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
         }),
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+        <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
     };
 
     <span class="kw">let</span> <span class="ident">eurid_auth_info</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">from</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">e</span>.<span class="ident">value</span>.<span class="ident">iter</span>().<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">e</span> {
-            <span class="ident">proto::EPPResponseExtensionType::EURIDAuthInfoData</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">e</span>),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+        <span class="prelude-val">Some</span>(<span class="ident">e</span>) =&gt; <span class="ident">e</span>.<span class="ident">value</span>.<span class="ident">iter</span>().<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">e</span> {
+            <span class="ident">proto::EPPResponseExtensionType::EURIDAuthInfoData</span>(<span class="ident">e</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">e</span>),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
         }),
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+        <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
     };
 
     <span class="ident">eurid_ext_info</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">DomainInfo</span> {
@@ -1868,12 +1868,12 @@
             .<span class="ident">as_deref</span>()
             .<span class="ident">map</span>(<span class="ident">Into::into</span>),
         <span class="ident">on_site</span>: <span class="ident">e</span>.<span class="ident">contacts</span>.<span class="ident">iter</span>().<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">c</span>.<span class="ident">contact_type</span> {
-            <span class="ident">proto::eurid::EURIDContactType::OnSite</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">c</span>.<span class="ident">contact_id</span>.<span class="ident">to_owned</span>()),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="ident">proto::eurid::EURIDContactType::OnSite</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">c</span>.<span class="ident">contact_id</span>.<span class="ident">to_owned</span>()),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
         }),
         <span class="ident">reseller</span>: <span class="ident">e</span>.<span class="ident">contacts</span>.<span class="ident">iter</span>().<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">c</span>.<span class="ident">contact_type</span> {
-            <span class="ident">proto::eurid::EURIDContactType::Reseller</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">c</span>.<span class="ident">contact_id</span>.<span class="ident">to_string</span>()),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="ident">proto::eurid::EURIDContactType::Reseller</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">c</span>.<span class="ident">contact_id</span>.<span class="ident">to_string</span>()),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
         }),
         <span class="ident">auth_info_valid_until</span>: <span class="ident">eurid_auth_info</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">a</span><span class="op">|</span> <span class="ident">a</span>.<span class="ident">valid_until</span>),
     })
@@ -1881,13 +1881,13 @@
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">extract_eurid_domain_transfer_info</span>(
     <span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">proto::EPPResponseExtension</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DomainTransferInfo</span><span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DomainTransferInfo</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">eurid_ext_info</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">from</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">e</span>.<span class="ident">value</span>.<span class="ident">iter</span>().<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">e</span> {
-            <span class="ident">proto::EPPResponseExtensionType::EURIDDomainTransferData</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">e</span>),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+        <span class="prelude-val">Some</span>(<span class="ident">e</span>) =&gt; <span class="ident">e</span>.<span class="ident">value</span>.<span class="ident">iter</span>().<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">e</span> {
+            <span class="ident">proto::EPPResponseExtensionType::EURIDDomainTransferData</span>(<span class="ident">e</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">e</span>),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
         }),
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+        <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
     };
 
     <span class="ident">eurid_ext_info</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">DomainTransferInfo</span> {
@@ -1895,24 +1895,24 @@
         <span class="ident">quarantined</span>: <span class="ident">e</span>.<span class="ident">quarantined</span>,
         <span class="ident">delayed</span>: <span class="ident">e</span>.<span class="ident">delayed</span>,
         <span class="ident">on_site</span>: <span class="ident">e</span>.<span class="ident">contacts</span>.<span class="ident">iter</span>().<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">c</span>.<span class="ident">contact_type</span> {
-            <span class="ident">proto::eurid::EURIDContactType::OnSite</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">c</span>.<span class="ident">contact_id</span>.<span class="ident">to_owned</span>()),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="ident">proto::eurid::EURIDContactType::OnSite</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">c</span>.<span class="ident">contact_id</span>.<span class="ident">to_owned</span>()),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
         }),
         <span class="ident">reseller</span>: <span class="ident">e</span>.<span class="ident">contacts</span>.<span class="ident">iter</span>().<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">c</span>.<span class="ident">contact_type</span> {
-            <span class="ident">proto::eurid::EURIDContactType::Reseller</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">c</span>.<span class="ident">contact_id</span>.<span class="ident">to_string</span>()),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="ident">proto::eurid::EURIDContactType::Reseller</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">c</span>.<span class="ident">contact_id</span>.<span class="ident">to_string</span>()),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
         }),
         <span class="ident">billing</span>: <span class="ident">e</span>
             .<span class="ident">contacts</span>
             .<span class="ident">iter</span>()
             .<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">c</span>.<span class="ident">contact_type</span> {
-                <span class="ident">proto::eurid::EURIDContactType::Billing</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">c</span>.<span class="ident">contact_id</span>.<span class="ident">to_string</span>()),
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+                <span class="ident">proto::eurid::EURIDContactType::Billing</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">c</span>.<span class="ident">contact_id</span>.<span class="ident">to_string</span>()),
+                <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
             })
             .<span class="ident">unwrap_or_default</span>(),
         <span class="ident">technical</span>: <span class="ident">e</span>.<span class="ident">contacts</span>.<span class="ident">iter</span>().<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">c</span>.<span class="ident">contact_type</span> {
-            <span class="ident">proto::eurid::EURIDContactType::Tech</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">c</span>.<span class="ident">contact_id</span>.<span class="ident">to_string</span>()),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="ident">proto::eurid::EURIDContactType::Tech</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">c</span>.<span class="ident">contact_id</span>.<span class="ident">to_string</span>()),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
         }),
         <span class="ident">registrant</span>: <span class="ident">e</span>.<span class="ident">registrant</span>.<span class="ident">to_string</span>(),
         <span class="ident">reason</span>: <span class="ident">e</span>.<span class="ident">reason</span>.<span class="ident">to_string</span>(),
@@ -1921,13 +1921,13 @@
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">extract_eurid_domain_renew_info</span>(
     <span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">proto::EPPResponseExtension</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DomainRenewInfo</span><span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DomainRenewInfo</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">eurid_ext_info</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">from</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">e</span>.<span class="ident">value</span>.<span class="ident">iter</span>().<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">e</span> {
-            <span class="ident">proto::EPPResponseExtensionType::EURIDDomainRenewData</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">e</span>),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+        <span class="prelude-val">Some</span>(<span class="ident">e</span>) =&gt; <span class="ident">e</span>.<span class="ident">value</span>.<span class="ident">iter</span>().<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">e</span> {
+            <span class="ident">proto::EPPResponseExtensionType::EURIDDomainRenewData</span>(<span class="ident">e</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">e</span>),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
         }),
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+        <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
     };
 
     <span class="ident">eurid_ext_info</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">DomainRenewInfo</span> {
@@ -1940,7 +1940,7 @@
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_hit_points</span>(
     <span class="ident">client</span>: <span class="kw-2">&amp;</span><span class="ident">ServerFeatures</span>,
     <span class="ident">_req</span>: <span class="kw-2">&amp;</span><span class="ident">HitPointsRequest</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HandleReqReturn</span><span class="op">&lt;</span><span class="ident">HitPointsResponse</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">HandleReqReturn</span><span class="op">&lt;</span><span class="ident">HitPointsResponse</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="ident">client</span>.<span class="ident">eurid_hit_points_supported</span> {
         <span class="prelude-val">Ok</span>((
             <span class="ident">proto::EPPCommandType::Info</span>(<span class="ident">proto::EPPInfo::EURIDRegistrarHitPoints</span> {}),
@@ -1951,26 +1951,26 @@
     }
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_hit_points_response</span>(<span class="ident">response</span>: <span class="ident">proto::EPPResponse</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">HitPointsResponse</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_hit_points_response</span>(<span class="ident">response</span>: <span class="ident">proto::EPPResponse</span>) -&gt; <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">HitPointsResponse</span><span class="op">&gt;</span> {
     <span class="kw">match</span> <span class="ident">response</span>.<span class="ident">data</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">value</span>.<span class="ident">value</span> {
-            <span class="ident">proto::EPPResultDataValue::EURIDRegistrarHitPointsData</span>(<span class="ident">hit_points</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Some</span>(<span class="ident">value</span>) =&gt; <span class="kw">match</span> <span class="ident">value</span>.<span class="ident">value</span> {
+            <span class="ident">proto::EPPResultDataValue::EURIDRegistrarHitPointsData</span>(<span class="ident">hit_points</span>) =&gt; {
                 <span class="ident">Response::Ok</span>(<span class="ident">HitPointsResponse</span> {
                     <span class="ident">hit_points</span>: <span class="ident">hit_points</span>.<span class="ident">hit_points</span>,
                     <span class="ident">max_hit_points</span>: <span class="ident">hit_points</span>.<span class="ident">max_hit_points</span>,
                     <span class="ident">blocked_until</span>: <span class="ident">hit_points</span>.<span class="ident">blocked_until</span>,
                 })
             }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
         },
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
+        <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
     }
 }
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_registration_limits</span>(
     <span class="ident">client</span>: <span class="kw-2">&amp;</span><span class="ident">ServerFeatures</span>,
     <span class="ident">_req</span>: <span class="kw-2">&amp;</span><span class="ident">RegistrationLimitRequest</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HandleReqReturn</span><span class="op">&lt;</span><span class="ident">RegistrationLimitResponse</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">HandleReqReturn</span><span class="op">&lt;</span><span class="ident">RegistrationLimitResponse</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="ident">client</span>.<span class="ident">eurid_registration_limit_supported</span> {
         <span class="prelude-val">Ok</span>((
             <span class="ident">proto::EPPCommandType::Info</span>(<span class="ident">proto::EPPInfo::EURIDRegistrationLimit</span> {}),
@@ -1983,26 +1983,26 @@
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_registration_limits_response</span>(
     <span class="ident">response</span>: <span class="ident">proto::EPPResponse</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">RegistrationLimitResponse</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">RegistrationLimitResponse</span><span class="op">&gt;</span> {
     <span class="kw">match</span> <span class="ident">response</span>.<span class="ident">data</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">value</span>.<span class="ident">value</span> {
-            <span class="ident">proto::EPPResultDataValue::EURIDRegistrationLimitData</span>(<span class="ident">registration_limit</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Some</span>(<span class="ident">value</span>) =&gt; <span class="kw">match</span> <span class="ident">value</span>.<span class="ident">value</span> {
+            <span class="ident">proto::EPPResultDataValue::EURIDRegistrationLimitData</span>(<span class="ident">registration_limit</span>) =&gt; {
                 <span class="ident">Response::Ok</span>(<span class="ident">RegistrationLimitResponse</span> {
                     <span class="ident">monthly_registrations</span>: <span class="ident">registration_limit</span>.<span class="ident">monthly_registrations</span>,
                     <span class="ident">max_monthly_registrations</span>: <span class="ident">registration_limit</span>.<span class="ident">max_monthly_registrations</span>,
                     <span class="ident">limited_until</span>: <span class="ident">registration_limit</span>.<span class="ident">limited_until</span>,
                 })
             }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
         },
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
+        <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
     }
 }
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_dnssec_eligibility</span>(
     <span class="ident">client</span>: <span class="kw-2">&amp;</span><span class="ident">ServerFeatures</span>,
     <span class="ident">req</span>: <span class="kw-2">&amp;</span><span class="ident">DNSSECEligibilityRequest</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HandleReqReturn</span><span class="op">&lt;</span><span class="ident">DNSSECEligibilityResponse</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">HandleReqReturn</span><span class="op">&lt;</span><span class="ident">DNSSECEligibilityResponse</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="ident">client</span>.<span class="ident">eurid_dnssec_eligibility_support</span> {
         <span class="prelude-val">Ok</span>((
             <span class="ident">proto::EPPCommandType::Info</span>(<span class="ident">proto::EPPInfo::EURIDDNSSECEligibilityInfo</span>(
@@ -2019,10 +2019,10 @@
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_dnssec_eligibility_response</span>(
     <span class="ident">response</span>: <span class="ident">proto::EPPResponse</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">DNSSECEligibilityResponse</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">DNSSECEligibilityResponse</span><span class="op">&gt;</span> {
     <span class="kw">match</span> <span class="ident">response</span>.<span class="ident">data</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">value</span>.<span class="ident">value</span> {
-            <span class="ident">proto::EPPResultDataValue::EURIDDNSSECEligibilityInfoData</span>(<span class="ident">dnssec_eligibility</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Some</span>(<span class="ident">value</span>) =&gt; <span class="kw">match</span> <span class="ident">value</span>.<span class="ident">value</span> {
+            <span class="ident">proto::EPPResultDataValue::EURIDDNSSECEligibilityInfoData</span>(<span class="ident">dnssec_eligibility</span>) =&gt; {
                 <span class="ident">Response::Ok</span>(<span class="ident">DNSSECEligibilityResponse</span> {
                     <span class="ident">eligible</span>: <span class="ident">dnssec_eligibility</span>.<span class="ident">eligible</span>,
                     <span class="ident">message</span>: <span class="ident">dnssec_eligibility</span>.<span class="ident">msg</span>,
@@ -2033,16 +2033,16 @@
                     )<span class="question-mark">?</span>,
                 })
             }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
         },
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
+        <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
     }
 }
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_dns_quality</span>(
     <span class="ident">client</span>: <span class="kw-2">&amp;</span><span class="ident">ServerFeatures</span>,
     <span class="ident">req</span>: <span class="kw-2">&amp;</span><span class="ident">DNSQualityRequest</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HandleReqReturn</span><span class="op">&lt;</span><span class="ident">DNSQualityResponse</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">HandleReqReturn</span><span class="op">&lt;</span><span class="ident">DNSQualityResponse</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="ident">client</span>.<span class="ident">eurid_dns_quality_support</span> {
         <span class="prelude-val">Ok</span>((
             <span class="ident">proto::EPPCommandType::Info</span>(<span class="ident">proto::EPPInfo::EURIDDNSQuality</span>(
@@ -2057,10 +2057,10 @@
     }
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_dns_quality_response</span>(<span class="ident">response</span>: <span class="ident">proto::EPPResponse</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">DNSQualityResponse</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_dns_quality_response</span>(<span class="ident">response</span>: <span class="ident">proto::EPPResponse</span>) -&gt; <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">DNSQualityResponse</span><span class="op">&gt;</span> {
     <span class="kw">match</span> <span class="ident">response</span>.<span class="ident">data</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">value</span>.<span class="ident">value</span> {
-            <span class="ident">proto::EPPResultDataValue::EURIDDNSQualityData</span>(<span class="ident">dns_quality</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Some</span>(<span class="ident">value</span>) =&gt; <span class="kw">match</span> <span class="ident">value</span>.<span class="ident">value</span> {
+            <span class="ident">proto::EPPResultDataValue::EURIDDNSQualityData</span>(<span class="ident">dns_quality</span>) =&gt; {
                 <span class="ident">Response::Ok</span>(<span class="ident">DNSQualityResponse</span> {
                     <span class="ident">check_time</span>: <span class="ident">dns_quality</span>.<span class="ident">check_time</span>,
                     <span class="ident">score</span>: <span class="ident">dns_quality</span>.<span class="ident">score</span>,
@@ -2070,9 +2070,9 @@
                     )<span class="question-mark">?</span>,
                 })
             }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
         },
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
+        <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
     }
 }
 
@@ -2101,8 +2101,8 @@
 &lt;/epp&gt;&quot;#</span>;
         <span class="kw">let</span> <span class="ident">res</span>: <span class="ident"><span class="kw">super</span>::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">res</span>.<span class="ident">message</span> {
-            <span class="ident"><span class="kw">super</span>::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
+            <span class="ident"><span class="kw">super</span>::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) =&gt; <span class="ident">r</span>,
+            <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
         };
         <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::handle_hit_points_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>();
         <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">hit_points</span>, <span class="number">0</span>);
@@ -2135,8 +2135,8 @@
 &quot;#</span>;
         <span class="kw">let</span> <span class="ident">res</span>: <span class="ident"><span class="kw">super</span>::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">res</span>.<span class="ident">message</span> {
-            <span class="ident"><span class="kw">super</span>::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
+            <span class="ident"><span class="kw">super</span>::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) =&gt; <span class="ident">r</span>,
+            <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
         };
         <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::handle_hit_points_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>();
         <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">hit_points</span>, <span class="number">6</span>);
@@ -2167,8 +2167,8 @@
 &lt;/epp&gt;&quot;#</span>;
         <span class="kw">let</span> <span class="ident">res</span>: <span class="ident"><span class="kw">super</span>::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">res</span>.<span class="ident">message</span> {
-            <span class="ident"><span class="kw">super</span>::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
+            <span class="ident"><span class="kw">super</span>::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) =&gt; <span class="ident">r</span>,
+            <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
         };
         <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::handle_registration_limits_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>();
         <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">monthly_registrations</span>, <span class="number">0</span>);
@@ -2198,8 +2198,8 @@
 &lt;/epp&gt;&quot;#</span>;
         <span class="kw">let</span> <span class="ident">res</span>: <span class="ident"><span class="kw">super</span>::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">res</span>.<span class="ident">message</span> {
-            <span class="ident"><span class="kw">super</span>::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
+            <span class="ident"><span class="kw">super</span>::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) =&gt; <span class="ident">r</span>,
+            <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
         };
         <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::handle_registration_limits_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>();
         <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">monthly_registrations</span>, <span class="number">0</span>);
@@ -2231,8 +2231,8 @@
 &lt;/epp&gt;&quot;#</span>;
         <span class="kw">let</span> <span class="ident">res</span>: <span class="ident"><span class="kw">super</span>::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">res</span>.<span class="ident">message</span> {
-            <span class="ident"><span class="kw">super</span>::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
+            <span class="ident"><span class="kw">super</span>::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) =&gt; <span class="ident">r</span>,
+            <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
         };
         <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::handle_registration_limits_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>();
         <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">monthly_registrations</span>, <span class="number">1</span>);
@@ -2266,8 +2266,8 @@
 &quot;#</span>;
         <span class="kw">let</span> <span class="ident">res</span>: <span class="ident"><span class="kw">super</span>::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">res</span>.<span class="ident">message</span> {
-            <span class="ident"><span class="kw">super</span>::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
+            <span class="ident"><span class="kw">super</span>::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) =&gt; <span class="ident">r</span>,
+            <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
         };
         <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::handle_dnssec_eligibility_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>();
         <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">eligible</span>, <span class="bool-val">true</span>);
@@ -2309,8 +2309,8 @@
 &lt;/epp&gt;&quot;#</span>;
         <span class="kw">let</span> <span class="ident">res</span>: <span class="ident"><span class="kw">super</span>::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">res</span>.<span class="ident">message</span> {
-            <span class="ident"><span class="kw">super</span>::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
+            <span class="ident"><span class="kw">super</span>::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) =&gt; <span class="ident">r</span>,
+            <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
         };
         <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::handle_dnssec_eligibility_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>();
         <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">eligible</span>, <span class="bool-val">false</span>);
@@ -2345,8 +2345,8 @@
 &lt;/epp&gt;&quot;#</span>;
         <span class="kw">let</span> <span class="ident">res</span>: <span class="ident"><span class="kw">super</span>::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">res</span>.<span class="ident">message</span> {
-            <span class="ident"><span class="kw">super</span>::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
+            <span class="ident"><span class="kw">super</span>::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) =&gt; <span class="ident">r</span>,
+            <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
         };
         <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::handle_dns_quality_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>();
         <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">check_time</span>.<span class="ident">is_some</span>(), <span class="bool-val">true</span>);
@@ -2402,8 +2402,8 @@
 &lt;/epp&gt;&quot;#</span>;
         <span class="kw">let</span> <span class="ident">res</span>: <span class="ident"><span class="kw">super</span>::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">res</span>.<span class="ident">message</span> {
-            <span class="ident"><span class="kw">super</span>::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
+            <span class="ident"><span class="kw">super</span>::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) =&gt; <span class="ident">r</span>,
+            <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
         };
         <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::contact::handle_info_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">eurid_extension</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">eurid_contact_extension</span>.<span class="ident">unwrap</span>();
@@ -2462,8 +2462,8 @@
 &lt;/epp&gt;&quot;#</span>;
         <span class="kw">let</span> <span class="ident">res</span>: <span class="ident"><span class="kw">super</span>::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">res</span>.<span class="ident">message</span> {
-            <span class="ident"><span class="kw">super</span>::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
+            <span class="ident"><span class="kw">super</span>::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) =&gt; <span class="ident">r</span>,
+            <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
         };
         <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::contact::handle_info_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">eurid_extension</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">eurid_contact_extension</span>.<span class="ident">unwrap</span>();
@@ -2529,8 +2529,8 @@
 &lt;/epp&gt;&quot;#</span>;
         <span class="kw">let</span> <span class="ident">res</span>: <span class="ident"><span class="kw">super</span>::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">res</span>.<span class="ident">message</span> {
-            <span class="ident"><span class="kw">super</span>::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
+            <span class="ident"><span class="kw">super</span>::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) =&gt; <span class="ident">r</span>,
+            <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
         };
         <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::contact::handle_info_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">eurid_extension</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">eurid_contact_extension</span>.<span class="ident">unwrap</span>();
@@ -2589,8 +2589,8 @@
 &lt;/epp&gt;&quot;#</span>;
         <span class="kw">let</span> <span class="ident">res</span>: <span class="ident"><span class="kw">super</span>::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">res</span>.<span class="ident">message</span> {
-            <span class="ident"><span class="kw">super</span>::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
+            <span class="ident"><span class="kw">super</span>::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) =&gt; <span class="ident">r</span>,
+            <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
         };
         <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::contact::handle_info_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">eurid_extension</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">eurid_contact_extension</span>.<span class="ident">unwrap</span>();
@@ -2638,8 +2638,8 @@
 &lt;/epp&gt;&quot;#</span>;
         <span class="kw">let</span> <span class="ident">res</span>: <span class="ident"><span class="kw">super</span>::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">res</span>.<span class="ident">message</span> {
-            <span class="ident"><span class="kw">super</span>::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
+            <span class="ident"><span class="kw">super</span>::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) =&gt; <span class="ident">r</span>,
+            <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
         };
         <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::domain::handle_check_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">eurid_extension</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">eurid_check</span>.<span class="ident">unwrap</span>();
@@ -2686,8 +2686,8 @@
 &lt;/epp&gt;&quot;#</span>;
         <span class="kw">let</span> <span class="ident">res</span>: <span class="ident"><span class="kw">super</span>::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">res</span>.<span class="ident">message</span> {
-            <span class="ident"><span class="kw">super</span>::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
+            <span class="ident"><span class="kw">super</span>::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) =&gt; <span class="ident">r</span>,
+            <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
         };
         <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::domain::handle_check_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">idn</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">eurid_idn</span>.<span class="ident">unwrap</span>();
@@ -2755,8 +2755,8 @@
 &lt;/epp&gt;&quot;#</span>;
         <span class="kw">let</span> <span class="ident">res</span>: <span class="ident"><span class="kw">super</span>::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">res</span>.<span class="ident">message</span> {
-            <span class="ident"><span class="kw">super</span>::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
+            <span class="ident"><span class="kw">super</span>::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) =&gt; <span class="ident">r</span>,
+            <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
         };
         <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::domain::handle_info_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">eurid_data</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">eurid_data</span>.<span class="ident">unwrap</span>();
@@ -2845,8 +2845,8 @@
 &lt;/epp&gt;&quot;#</span>;
         <span class="kw">let</span> <span class="ident">res</span>: <span class="ident"><span class="kw">super</span>::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">res</span>.<span class="ident">message</span> {
-            <span class="ident"><span class="kw">super</span>::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
+            <span class="ident"><span class="kw">super</span>::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) =&gt; <span class="ident">r</span>,
+            <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
         };
         <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::domain::handle_info_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">eurid_data</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">eurid_data</span>.<span class="ident">unwrap</span>();
@@ -2857,10 +2857,10 @@
                     <span class="ident">addresses</span>: <span class="kw">_</span>,
                     <span class="ident">host</span>: <span class="kw">_</span>,
                     <span class="ident">eurid_idn</span>,
-                } <span class="op">=</span><span class="op">&gt;</span> {
+                } =&gt; {
                     <span class="macro">assert_eq!</span>(<span class="ident">eurid_idn</span>.<span class="ident">is_some</span>(), <span class="bool-val">true</span>);
                 }
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
+                <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
             }
         }
         <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">name</span>, <span class="string">&quot;вмкйршаудхыийведйкгг.ею&quot;</span>);
@@ -2907,8 +2907,8 @@
 &lt;/epp&gt;&quot;#</span>;
         <span class="kw">let</span> <span class="ident">res</span>: <span class="ident"><span class="kw">super</span>::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">res</span>.<span class="ident">message</span> {
-            <span class="ident"><span class="kw">super</span>::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
+            <span class="ident"><span class="kw">super</span>::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) =&gt; <span class="ident">r</span>,
+            <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
         };
         <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::domain::handle_renew_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">eurid_data</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">data</span>.<span class="ident">eurid_data</span>.<span class="ident">unwrap</span>();
@@ -2944,8 +2944,8 @@
 &lt;/epp&gt;&quot;#</span>;
         <span class="kw">let</span> <span class="ident">res</span>: <span class="ident"><span class="kw">super</span>::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">res</span>.<span class="ident">message</span> {
-            <span class="ident"><span class="kw">super</span>::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
+            <span class="ident"><span class="kw">super</span>::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) =&gt; <span class="ident">r</span>,
+            <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
         };
         <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::domain::handle_renew_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">eurid_data</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">data</span>.<span class="ident">eurid_data</span>.<span class="ident">unwrap</span>();
@@ -2999,8 +2999,8 @@
 &lt;/epp&gt;&quot;#</span>;
         <span class="kw">let</span> <span class="ident">res</span>: <span class="ident"><span class="kw">super</span>::proto::EPPMessage</span> <span class="op">=</span> <span class="ident">xml_serde::from_str</span>(<span class="ident">XML_DATA</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">res</span>.<span class="ident">message</span> {
-            <span class="ident"><span class="kw">super</span>::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
+            <span class="ident"><span class="kw">super</span>::proto::EPPMessageType::Response</span>(<span class="ident">r</span>) =&gt; <span class="ident">r</span>,
+            <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
         };
         <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::domain::handle_transfer_response</span>(<span class="kw-2">*</span><span class="ident">res</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">eurid_data</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">data</span>.<span class="ident">eurid_data</span>.<span class="ident">unwrap</span>();

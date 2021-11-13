@@ -147,31 +147,31 @@
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::client</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::epp_proto</span>;
 
-<span class="kw">fn</span> <span class="ident">i32_from_eurid_contact_type</span>(<span class="ident">from</span>: <span class="ident">client::eurid::ContactType</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">i32</span> {
+<span class="kw">fn</span> <span class="ident">i32_from_eurid_contact_type</span>(<span class="ident">from</span>: <span class="ident">client::eurid::ContactType</span>) -&gt; <span class="ident">i32</span> {
     <span class="kw">match</span> <span class="ident">from</span> {
-        <span class="ident">client::eurid::ContactType::Registrant</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">epp_proto::eurid::ContactType::Registrant</span>.<span class="ident">into</span>(),
-        <span class="ident">client::eurid::ContactType::Tech</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">epp_proto::eurid::ContactType::Tech</span>.<span class="ident">into</span>(),
-        <span class="ident">client::eurid::ContactType::Billing</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">epp_proto::eurid::ContactType::Billing</span>.<span class="ident">into</span>(),
-        <span class="ident">client::eurid::ContactType::OnSite</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">epp_proto::eurid::ContactType::OnSite</span>.<span class="ident">into</span>(),
-        <span class="ident">client::eurid::ContactType::Reseller</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">epp_proto::eurid::ContactType::Reseller</span>.<span class="ident">into</span>(),
+        <span class="ident">client::eurid::ContactType::Registrant</span> =&gt; <span class="ident">epp_proto::eurid::ContactType::Registrant</span>.<span class="ident">into</span>(),
+        <span class="ident">client::eurid::ContactType::Tech</span> =&gt; <span class="ident">epp_proto::eurid::ContactType::Tech</span>.<span class="ident">into</span>(),
+        <span class="ident">client::eurid::ContactType::Billing</span> =&gt; <span class="ident">epp_proto::eurid::ContactType::Billing</span>.<span class="ident">into</span>(),
+        <span class="ident">client::eurid::ContactType::OnSite</span> =&gt; <span class="ident">epp_proto::eurid::ContactType::OnSite</span>.<span class="ident">into</span>(),
+        <span class="ident">client::eurid::ContactType::Reseller</span> =&gt; <span class="ident">epp_proto::eurid::ContactType::Reseller</span>.<span class="ident">into</span>(),
     }
 }
 
-<span class="kw">fn</span> <span class="ident">eurid_contact_type_from_i32</span>(<span class="ident">from</span>: <span class="ident">i32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">client::eurid::ContactType</span> {
+<span class="kw">fn</span> <span class="ident">eurid_contact_type_from_i32</span>(<span class="ident">from</span>: <span class="ident">i32</span>) -&gt; <span class="ident">client::eurid::ContactType</span> {
     <span class="kw">match</span> <span class="ident">epp_proto::eurid::ContactType::from_i32</span>(<span class="ident">from</span>) {
-        <span class="prelude-val">Some</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">e</span> {
-            <span class="ident">epp_proto::eurid::ContactType::Registrant</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">client::eurid::ContactType::Registrant</span>,
-            <span class="ident">epp_proto::eurid::ContactType::Tech</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">client::eurid::ContactType::Tech</span>,
-            <span class="ident">epp_proto::eurid::ContactType::Billing</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">client::eurid::ContactType::Billing</span>,
-            <span class="ident">epp_proto::eurid::ContactType::OnSite</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">client::eurid::ContactType::OnSite</span>,
-            <span class="ident">epp_proto::eurid::ContactType::Reseller</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">client::eurid::ContactType::Reseller</span>,
+        <span class="prelude-val">Some</span>(<span class="ident">e</span>) =&gt; <span class="kw">match</span> <span class="ident">e</span> {
+            <span class="ident">epp_proto::eurid::ContactType::Registrant</span> =&gt; <span class="ident">client::eurid::ContactType::Registrant</span>,
+            <span class="ident">epp_proto::eurid::ContactType::Tech</span> =&gt; <span class="ident">client::eurid::ContactType::Tech</span>,
+            <span class="ident">epp_proto::eurid::ContactType::Billing</span> =&gt; <span class="ident">client::eurid::ContactType::Billing</span>,
+            <span class="ident">epp_proto::eurid::ContactType::OnSite</span> =&gt; <span class="ident">client::eurid::ContactType::OnSite</span>,
+            <span class="ident">epp_proto::eurid::ContactType::Reseller</span> =&gt; <span class="ident">client::eurid::ContactType::Reseller</span>,
         },
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">client::eurid::ContactType::Registrant</span>,
+        <span class="prelude-val">None</span> =&gt; <span class="ident">client::eurid::ContactType::Registrant</span>,
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">client::eurid::Idn</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">epp_proto::eurid::Idn</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">client::eurid::Idn</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">client::eurid::Idn</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">epp_proto::eurid::Idn</span> {
             <span class="ident">ace</span>: <span class="ident">from</span>.<span class="ident">ace</span>,
             <span class="ident">unicode</span>: <span class="ident">from</span>.<span class="ident">unicode</span>,
@@ -180,7 +180,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">client::eurid::ContactExtension</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">epp_proto::eurid::ContactExtension</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">client::eurid::ContactExtension</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">client::eurid::ContactExtension</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">epp_proto::eurid::ContactExtension</span> {
             <span class="ident">contact_type</span>: <span class="ident">i32_from_eurid_contact_type</span>(<span class="ident">from</span>.<span class="ident">contact_type</span>),
             <span class="ident">citizenship_country</span>: <span class="ident">from</span>.<span class="ident">citizenship_country</span>,
@@ -192,7 +192,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">epp_proto::eurid::ContactExtension</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">client::eurid::ContactExtension</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">epp_proto::eurid::ContactExtension</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">epp_proto::eurid::ContactExtension</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">client::eurid::ContactExtension</span> {
             <span class="ident">contact_type</span>: <span class="ident">eurid_contact_type_from_i32</span>(<span class="ident">from</span>.<span class="ident">contact_type</span>),
             <span class="ident">citizenship_country</span>: <span class="ident">from</span>.<span class="ident">citizenship_country</span>,
@@ -204,7 +204,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">epp_proto::eurid::ContactUpdateExtension</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">client::eurid::ContactExtensionUpdate</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">epp_proto::eurid::ContactUpdateExtension</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">epp_proto::eurid::ContactUpdateExtension</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">client::eurid::ContactExtensionUpdate</span> {
             <span class="ident">citizenship_country</span>: <span class="ident">from</span>.<span class="ident">new_citizenship_country</span>,
             <span class="ident">vat</span>: <span class="ident">from</span>.<span class="ident">new_vat</span>,
@@ -215,7 +215,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">epp_proto::eurid::DomainCreateExtension</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">client::eurid::DomainCreate</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">epp_proto::eurid::DomainCreateExtension</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">epp_proto::eurid::DomainCreateExtension</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">client::eurid::DomainCreate</span> {
             <span class="ident">on_site</span>: <span class="ident">from</span>.<span class="ident">on_site</span>,
             <span class="ident">reseller</span>: <span class="ident">from</span>.<span class="ident">reseller</span>,
@@ -224,7 +224,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">epp_proto::eurid::DomainUpdateExtension</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">client::eurid::DomainUpdate</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">epp_proto::eurid::DomainUpdateExtension</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">epp_proto::eurid::DomainUpdateExtension</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">client::eurid::DomainUpdate</span> {
             <span class="ident">remove_on_site</span>: <span class="ident">from</span>.<span class="ident">remove_on_site</span>,
             <span class="ident">remove_reseller</span>: <span class="ident">from</span>.<span class="ident">remove_reseller</span>,
@@ -235,7 +235,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">epp_proto::eurid::DomainTransferExtension</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">client::eurid::DomainTransfer</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">epp_proto::eurid::DomainTransferExtension</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">epp_proto::eurid::DomainTransferExtension</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">client::eurid::DomainTransfer</span> {
             <span class="ident">on_site</span>: <span class="ident">from</span>.<span class="ident">on_site</span>,
             <span class="ident">reseller</span>: <span class="ident">from</span>.<span class="ident">reseller</span>,
@@ -247,28 +247,28 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">epp_proto::eurid::DomainDeleteExtension</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">client::eurid::DomainDelete</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">epp_proto::eurid::DomainDeleteExtension</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">epp_proto::eurid::DomainDeleteExtension</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">match</span> <span class="ident">from</span>.<span class="ident">delete</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">epp_proto::eurid::domain_delete_extension::Delete::Schedule</span>(<span class="ident">t</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">epp_proto::eurid::domain_delete_extension::Delete::Schedule</span>(<span class="ident">t</span>)) =&gt; {
                 <span class="ident"><span class="kw">super</span>::utils::proto_to_chrono</span>(<span class="prelude-val">Some</span>(<span class="ident">t</span>)).<span class="ident">map</span>(<span class="ident">client::eurid::DomainDelete::Schedule</span>)
             }
-            <span class="prelude-val">Some</span>(<span class="ident">epp_proto::eurid::domain_delete_extension::Delete::Cancel</span>(<span class="kw">_</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">epp_proto::eurid::domain_delete_extension::Delete::Cancel</span>(<span class="kw">_</span>)) =&gt; {
                 <span class="prelude-val">Some</span>(<span class="ident">client::eurid::DomainDelete::Cancel</span>)
             }
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">epp_proto::eurid::DomainInfoRequest</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">client::eurid::DomainInfoRequest</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">epp_proto::eurid::DomainInfoRequest</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">epp_proto::eurid::DomainInfoRequest</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">client::eurid::DomainInfoRequest</span> {
             <span class="ident">auth_info</span>: <span class="kw">match</span> <span class="ident">from</span>.<span class="ident">auth_info</span> {
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
-                <span class="prelude-val">Some</span>(<span class="ident">epp_proto::eurid::domain_info_request::AuthInfo::Request</span>(<span class="kw">_</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
+                <span class="prelude-val">Some</span>(<span class="ident">epp_proto::eurid::domain_info_request::AuthInfo::Request</span>(<span class="kw">_</span>)) =&gt; {
                     <span class="prelude-val">Some</span>(<span class="ident">client::eurid::DomainAuthInfo::Request</span>)
                 }
-                <span class="prelude-val">Some</span>(<span class="ident">epp_proto::eurid::domain_info_request::AuthInfo::Cancel</span>(<span class="kw">_</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">epp_proto::eurid::domain_info_request::AuthInfo::Cancel</span>(<span class="kw">_</span>)) =&gt; {
                     <span class="prelude-val">Some</span>(<span class="ident">client::eurid::DomainAuthInfo::Cancel</span>)
                 }
             },
@@ -277,7 +277,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">client::eurid::PollResponse</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">epp_proto::eurid::PollReply</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">client::eurid::PollResponse</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">client::eurid::PollResponse</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">epp_proto::eurid::PollReply</span> {
             <span class="ident">context</span>: <span class="ident">from</span>.<span class="ident">context</span>,
             <span class="ident">object_type</span>: <span class="ident">from</span>.<span class="ident">object_type</span>,
