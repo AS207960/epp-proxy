@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src&#x2F;client&#x2F;tmch_client&#x2F;mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../../epp_proxy/index.html'><div class='logo-container rust-logo'><img src='https:&#x2F;&#x2F;as207960.net&#x2F;img&#x2F;logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src&#x2F;client&#x2F;tmch_client&#x2F;mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../../epp_proxy/index.html'><div class='logo-container rust-logo'><img src='https:&#x2F;&#x2F;as207960.net&#x2F;img&#x2F;logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -582,7 +582,7 @@
         })
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">_main_loop</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">receiver</span>: <span class="ident">futures::channel::mpsc::Receiver</span><span class="op">&lt;</span><span class="ident">RequestMessage</span><span class="op">&gt;</span>) {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">_main_loop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">receiver</span>: <span class="ident">futures::channel::mpsc::Receiver</span><span class="op">&lt;</span><span class="ident">RequestMessage</span><span class="op">&gt;</span>) {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">receiver</span> <span class="op">=</span> <span class="ident">receiver</span>.<span class="ident">fuse</span>();
         <span class="kw">loop</span> {
             <span class="self">self</span>.<span class="ident">is_closing</span> <span class="op">=</span> <span class="bool-val">false</span>;
@@ -615,7 +615,7 @@
             {
                 <span class="kw">let</span> <span class="ident">exit_str</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;All senders for {} dropped, exiting...&quot;</span>, <span class="self">self</span>.<span class="ident">host</span>);
                 <span class="macro">trace!</span>(<span class="string">&quot;Setting up connection to {}&quot;</span>, <span class="self">self</span>.<span class="ident">host</span>);
-                <span class="kw">let</span> <span class="ident">setup_fut</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">_setup_connection</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sock</span>).<span class="ident">fuse</span>();
+                <span class="kw">let</span> <span class="ident">setup_fut</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">_setup_connection</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sock</span>).<span class="ident">fuse</span>();
                 <span class="macro">futures::pin_mut!</span>(<span class="ident">setup_fut</span>);
                 <span class="kw">match</span> <span class="kw">loop</span> {
                     <span class="macro">futures::select!</span> {
@@ -662,7 +662,7 @@
                     <span class="macro">futures::select!</span> {
                         <span class="ident">r</span> <span class="op">=</span> <span class="ident">receiver</span>.<span class="ident">next</span>() =&gt; {
                             <span class="kw">match</span> <span class="ident">r</span> {
-                                <span class="prelude-val">Some</span>(<span class="ident">r</span>) =&gt; <span class="kw">match</span> <span class="self">self</span>.<span class="ident">_handle_request</span>(<span class="ident">r</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sock_write</span>).<span class="kw">await</span> {
+                                <span class="prelude-val">Some</span>(<span class="ident">r</span>) =&gt; <span class="kw">match</span> <span class="self">self</span>.<span class="ident">_handle_request</span>(<span class="ident">r</span>, <span class="kw-2">&amp;mut</span> <span class="ident">sock_write</span>).<span class="kw">await</span> {
                                     <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {},
                                     <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; {
                                         <span class="ident">tokio::time::sleep</span>(<span class="ident">tokio::time::Duration::new</span>(<span class="number">5</span>, <span class="number">0</span>)).<span class="kw">await</span>;
@@ -696,7 +696,7 @@
                             }
                         }
                         <span class="kw">_</span> <span class="op">=</span> <span class="ident">keepalive_interval</span>.<span class="ident">tick</span>().<span class="ident">fuse</span>() =&gt; {
-                            <span class="kw">match</span> <span class="self">self</span>.<span class="ident">_send_keepalive</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sock_write</span>).<span class="kw">await</span> {
+                            <span class="kw">match</span> <span class="self">self</span>.<span class="ident">_send_keepalive</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sock_write</span>).<span class="kw">await</span> {
                                 <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {},
                                 <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; {
                                     <span class="kw">break</span>;
@@ -743,8 +743,8 @@
     }
 
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">_send_keepalive</span><span class="op">&lt;</span><span class="ident">W</span>: <span class="ident">std::marker::Unpin</span> <span class="op">+</span> <span class="ident">tokio::io::AsyncWrite</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">sock_write</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">W</span>,
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
+        <span class="ident">sock_write</span>: <span class="kw-2">&amp;mut</span> <span class="ident">W</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), ()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="ident">tmch_proto::TMCHMessage</span> {
             <span class="ident">message</span>: <span class="ident">tmch_proto::TMCHMessageType::Hello</span> {},
@@ -771,9 +771,9 @@
     }
 
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">_handle_request</span><span class="op">&lt;</span><span class="ident">W</span>: <span class="ident">std::marker::Unpin</span> <span class="op">+</span> <span class="ident">tokio::io::AsyncWrite</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
         <span class="ident">req</span>: <span class="ident">outer_router::RequestMessage</span>,
-        <span class="ident">sock_write</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">W</span>,
+        <span class="ident">sock_write</span>: <span class="kw-2">&amp;mut</span> <span class="ident">W</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), ()<span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="ident">outer_router::RequestMessage::Logout</span>(<span class="kw">_</span>) <span class="op">=</span> <span class="ident">req</span> {
             <span class="self">self</span>.<span class="ident">is_closing</span> <span class="op">=</span> <span class="bool-val">true</span>;
@@ -790,7 +790,7 @@
         }
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">_handle_response</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">res</span>: <span class="ident">tmch_proto::TMCHMessage</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, ()<span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">_handle_response</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">res</span>: <span class="ident">tmch_proto::TMCHMessage</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, ()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">is_awaiting_response</span> <span class="op">=</span> <span class="bool-val">false</span>;
         <span class="kw">match</span> <span class="ident">res</span>.<span class="ident">message</span> {
             <span class="ident">tmch_proto::TMCHMessageType::Response</span>(<span class="ident">response</span>) =&gt; {
@@ -839,8 +839,8 @@
     }
 
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">_setup_connection</span>(
-        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">sock</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="kw">super</span>::epp_like::tls_client::TLSConnection</span>,
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
+        <span class="ident">sock</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="kw">super</span>::epp_like::tls_client::TLSConnection</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">bool</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident"><span class="kw">super</span>::epp_like::recv_msg</span>(<span class="ident">sock</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">host</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">log_dir</span>, <span class="ident">recv_msg</span>).<span class="kw">await</span> {
             <span class="prelude-val">Ok</span>(<span class="ident">m</span>) =&gt; <span class="ident">m</span>,
@@ -883,7 +883,7 @@
         }
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">_process_greeting</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">greeting</span>: <span class="ident">tmch_proto::TMCHGreeting</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), ()<span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">_process_greeting</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">greeting</span>: <span class="ident">tmch_proto::TMCHGreeting</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), ()<span class="op">&gt;</span> {
         <span class="kw">if</span> (<span class="ident">greeting</span>.<span class="ident">server_date</span> <span class="op">-</span> <span class="ident">Utc::now</span>()).<span class="ident">num_minutes</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="number">5</span> {
             <span class="macro">warn!</span>(
                 <span class="string">&quot;Local time out by more than 5 minutes from time reported by {}&quot;</span>,
@@ -895,8 +895,8 @@
     }
 
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">_login</span>(
-        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">sock</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="kw">super</span>::epp_like::tls_client::TLSConnection</span>,
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
+        <span class="ident">sock</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="kw">super</span>::epp_like::tls_client::TLSConnection</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), ()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">command</span> <span class="op">=</span> <span class="ident">tmch_proto::TMCHLogin</span> {
             <span class="ident">client_id</span>: <span class="self">self</span>.<span class="ident">client_id</span>.<span class="ident">clone</span>(),
@@ -956,7 +956,7 @@
     <span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">command</span>: <span class="ident">tmch_proto::TMCHCommandType</span>,
-        <span class="ident">sock</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">W</span>,
+        <span class="ident">sock</span>: <span class="kw-2">&amp;mut</span> <span class="ident">W</span>,
         <span class="ident">message_id</span>: <span class="ident">M</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">uuid::Uuid</span>, ()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">message_id</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">message_id</span>.<span class="ident">into</span>() {
@@ -977,7 +977,7 @@
         }
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">_close</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">sock</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="kw">super</span>::epp_like::tls_client::TLSConnection</span>) {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">_close</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">sock</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="kw">super</span>::epp_like::tls_client::TLSConnection</span>) {
         <span class="self">self</span>.<span class="ident">router</span>.<span class="ident">drain</span>();
         <span class="ident">sock</span>.<span class="ident">close</span>().<span class="kw">await</span>
     }
