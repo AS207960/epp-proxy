@@ -221,6 +221,7 @@ impl EPPClient {
             super::nominet_dac::DACClient::new(
                 nominet_dac_conf.real_time,
                 nominet_dac_conf.time_delay,
+                conf.source_address,
             )
         }) {
             Some(c) => Some(c.await?),

@@ -161,3 +161,61 @@ impl<
         receiver
     }
 }
+
+pub(super) async fn make_tcp_socket(host: &str, source_addr: &Option<std::net::IpAddr>) -> Result<tokio::net::TcpStream, ()> {
+    let addr = match tokio::net::lookup_host(host).await {
+        Ok(mut s) => match s.next() {
+            Some(s) => s,
+            None => {
+                error!("Resolving {} returned no records", host);
+                return Err(());
+            }
+        },
+        Err(err) => {
+            error!("Failed to resolve {}: {}", host, err);
+            return Err(());
+        }
+    };
+
+    trace!("Setting up TCP socket for {}", host);
+    let socket = match if addr.is_ipv4() {
+        tokio::net::TcpSocket::new_v4()
+    } else if addr.is_ipv6() {
+        tokio::net::TcpSocket::new_v6()
+    } else {
+        unreachable!()
+    } {
+        Ok(s) => s,
+        Err(err) => {
+            error!("Unable to create TCP socket for {}: {}", host, err);
+            return Err(());
+        }
+    };
+
+    match socket.set_reuseaddr(true) {
+        Ok(()) => {},
+        Err(err) => {
+            error!("Unable to setup TCP socket for {}: {}", host, err);
+            return Err(());
+        }
+    }
+
+    if let Some(bind_addr) = source_addr {
+        trace!("Setting source address to {} for {}", bind_addr, host);
+        match socket.bind(std::net::SocketAddr::new(bind_addr.to_owned(), 0)) {
+            Ok(()) => {},
+            Err(err) => {
+                error!("Unable to setup TCP socket for {}: {}", host, err);
+                return Err(());
+            }
+        }
+    }
+
+   Ok(match socket.connect(addr).await {
+        Ok(s) => s,
+        Err(err) => {
+            error!("Unable to connect to {}: {}", host, err);
+            return Err(());
+        }
+    })
+}

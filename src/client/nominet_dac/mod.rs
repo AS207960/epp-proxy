@@ -11,6 +11,7 @@ pub(self) mod router;
 pub struct DACClient {
     router: outer_router::Router<router::Router, ()>,
     is_closing: bool,
+    source_addr: Option<std::net::IpAddr>,
     rt_host: String,
     td_host: String,
 }
@@ -37,12 +38,13 @@ impl DACClient {
     /// # Arguments
     /// * `rt_host` - Hostname and port of the real time server
     /// * `td_host` - Hostname and port of the time delay server
-    pub async fn new(rt_host: &str, td_host: &str) -> std::io::Result<Self> {
+    pub async fn new(rt_host: &str, td_host: &str, source_addr: Option<&std::net::IpAddr>) -> std::io::Result<Self> {
         Ok(Self {
             router: outer_router::Router::default(),
             is_closing: false,
             rt_host: rt_host.to_string(),
             td_host: td_host.to_string(),
+            source_addr: source_addr.map(|a| a.to_owned()),
         })
     }
 
@@ -244,22 +246,6 @@ impl DACClient {
         Ok(false)
     }
 
-    async fn _lookup_host(host: &str) -> Result<std::net::SocketAddr, ()> {
-        Ok(match tokio::net::lookup_host(host).await {
-            Ok(mut s) => match s.next() {
-                Some(s) => s,
-                None => {
-                    error!("Resolving {} returned no records", host);
-                    return Err(());
-                }
-            },
-            Err(err) => {
-                error!("Failed to resolve {}: {}", host, err);
-                return Err(());
-            }
-        })
-    }
-
     async fn _connect(&self) -> (tokio::net::TcpStream, tokio::net::TcpStream) {
         loop {
             match self._try_connect().await {
@@ -278,26 +264,11 @@ impl DACClient {
     }
 
     async fn _try_connect(&self) -> Result<(tokio::net::TcpStream, tokio::net::TcpStream), ()> {
-        let rt_addr = Self::_lookup_host(&self.rt_host).await?;
-        let td_addr = Self::_lookup_host(&self.td_host).await?;
-
         trace!("Opening TCP connection to {}", self.rt_host);
-        let rt_socket = match tokio::net::TcpStream::connect(&rt_addr).await {
-            Ok(s) => s,
-            Err(err) => {
-                error!("Unable to connect to {}: {}", self.rt_host, err);
-                return Err(());
-            }
-        };
+        let rt_socket = super::epp_like::make_tcp_socket(&self.rt_host, &self.source_addr).await?;
 
         trace!("Opening TCP connection to {}", self.td_host);
-        let td_socket = match tokio::net::TcpStream::connect(&td_addr).await {
-            Ok(s) => s,
-            Err(err) => {
-                error!("Unable to connect to {}: {}", self.td_host, err);
-                return Err(());
-            }
-        };
+        let td_socket = super::epp_like::make_tcp_socket(&self.td_host, &self.source_addr).await?;
 
         Ok((rt_socket, td_socket))
     }

@@ -82,6 +82,9 @@ struct ConfigFile {
     server_type: ConfigServerType,
     /// Server host in the form `domain:port`
     server: String,
+    /// Source address to bind to when connecting to the server
+    #[serde(default)]
+    source_address: Option<std::net::IpAddr>,
     /// Client ID to login to the server
     tag: String,
     /// Password to login to the server
@@ -448,6 +451,7 @@ async fn main() {
             host: &config.server,
             tag: &config.tag,
             password: &config.password,
+            source_address: config.source_address.as_ref(),
             log_dir,
             client_cert: match &config.client_cert {
                 Some(ClientCertConfig::PKCS12(s)) => Some(client::ClientCertConf::PKCS12(s)),

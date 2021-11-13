@@ -10,6 +10,8 @@ pub struct TLSConfig {
     /// The server connection string, in the form `domain:port`
     pub host: String,
     pub client_cert: Option<ClientCertConf>,
+    /// When specificed binds the socket to the given source IP address
+    pub source_addr: Option<std::net::IpAddr>,
     /// List of PEM file paths
     pub root_certs: Vec<String>,
     /// Accept invalid TLS certs
@@ -31,6 +33,7 @@ impl<'a, C: Into<Option<&'a str>>> From<&super::super::ClientConf<'a, C>> for TL
                     }
                 }
             }),
+            source_addr: conf.source_address.map(|a| a.to_owned()),
             root_certs: conf.root_certs.iter().map(|c| c.to_string()).collect(),
             danger_accept_invalid_certs: conf.danger_accept_invalid_certs,
             danger_accept_invalid_hostname: conf.danger_accept_invalid_hostname,
@@ -49,6 +52,7 @@ pub enum ClientCertConf {
 pub struct TLSClient {
     host: String,
     hostname: String,
+    source_addr: Option<std::net::IpAddr>,
     tls_context: openssl::ssl::SslContext,
     should_lock: bool,
 }
@@ -171,6 +175,7 @@ impl TLSClient {
         Ok(Self {
             host: conf.host.to_string(),
             hostname,
+            source_addr: conf.source_addr,
             tls_context: context,
             should_lock,
         })
@@ -191,20 +196,6 @@ impl TLSClient {
     }
 
     async fn _try_connect(&self) -> Result<TLSConnection, ()> {
-        let addr = match tokio::net::lookup_host(&self.host).await {
-            Ok(mut s) => match s.next() {
-                Some(s) => s,
-                None => {
-                    error!("Resolving {} returned no records", self.host);
-                    return Err(());
-                }
-            },
-            Err(err) => {
-                error!("Failed to resolve {}: {}", self.host, err);
-                return Err(());
-            }
-        };
-
         // Many servers drop the connection if no TLS data is sent within ~10 seconds.
         // We therefore have to make sure only one thread at a time connects TLS otherwise a thread
         // could open a TCP stream and then wait a while for another thread to negotiate TLS
@@ -221,13 +212,7 @@ impl TLSClient {
         trace!("Setting up TLS stream for {}", self.hostname);
 
         trace!("Opening TCP connection to {}", self.hostname);
-        let socket = match tokio::net::TcpStream::connect(&addr).await {
-            Ok(s) => s,
-            Err(err) => {
-                error!("Unable to connect to {}: {}", self.host, err);
-                return Err(());
-            }
-        };
+        let socket = super::make_tcp_socket(&self.host, &self.source_addr).await?;
 
         trace!("Creating TLS context for {}", self.hostname);
         let mut cx = match (move || -> std::io::Result<tokio_openssl::SslStream<TcpStream>> {
