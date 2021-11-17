@@ -1,6 +1,6 @@
 #![recursion_limit = "1024"]
 #![warn(missing_docs)]
-#![doc(html_logo_url = "https://as207960.net/img/logo.png")]
+#![doc(html_logo_url = "https://as207960.net/assets/img/logo.svg")]
 
 //! A proxy server for interacting with EPP servers over gRPC
 //!
