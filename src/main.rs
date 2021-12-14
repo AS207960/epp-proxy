@@ -230,11 +230,11 @@ struct AuthService<T> {
 }
 
 impl<T> tower_service::Service<http::Request<tonic::transport::Body>> for AuthService<T>
-    where
-        T: tower_service::Service<http::Request<tonic::transport::Body>> + Send + Clone + 'static,
-        T::Future: Send + 'static,
-        T::Error: 'static,
-        T::Response: From<http::response::Response<tonic::body::BoxBody>> + 'static,
+where
+    T: tower_service::Service<http::Request<tonic::transport::Body>> + Send + Clone + 'static,
+    T::Future: Send + 'static,
+    T::Error: 'static,
+    T::Response: From<http::response::Response<tonic::body::BoxBody>> + 'static,
 {
     type Response = T::Response;
     type Error = T::Error;
@@ -300,8 +300,8 @@ impl<T> tower_service::Service<http::Request<tonic::transport::Body>> for AuthSe
 }
 
 impl<T> tonic::transport::server::NamedService for AuthService<T>
-    where
-        T: tonic::transport::server::NamedService,
+where
+    T: tonic::transport::server::NamedService,
 {
     const NAME: &'static str = T::NAME;
 }

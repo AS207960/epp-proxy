@@ -51,7 +51,12 @@ pub struct TMCHClient {
 impl super::Client for TMCHClient {
     // Starts up the TMCH client and returns the sending end of a tokio channel to inject
     // commands into the client to be processed
-    fn start(mut self: Box<Self>) -> (futures::channel::mpsc::Sender<RequestMessage>, futures::channel::mpsc::UnboundedReceiver<outer_router::CommandTransactionID>) {
+    fn start(
+        mut self: Box<Self>,
+    ) -> (
+        futures::channel::mpsc::Sender<RequestMessage>,
+        futures::channel::mpsc::UnboundedReceiver<outer_router::CommandTransactionID>,
+    ) {
         info!("TMCH Client for {} starting...", &self.host);
         let (sender, receiver) = futures::channel::mpsc::channel::<RequestMessage>(16);
         let (ready_sender, ready_receiver) = futures::channel::mpsc::unbounded();
@@ -91,7 +96,9 @@ impl TMCHClient {
     async fn _main_loop(
         &mut self,
         receiver: futures::channel::mpsc::Receiver<RequestMessage>,
-        mut ready_sender: futures::channel::mpsc::UnboundedSender<outer_router::CommandTransactionID>
+        mut ready_sender: futures::channel::mpsc::UnboundedSender<
+            outer_router::CommandTransactionID,
+        >,
     ) {
         let mut receiver = receiver.fuse();
         loop {

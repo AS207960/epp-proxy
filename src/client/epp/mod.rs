@@ -1,11 +1,11 @@
 use super::Client;
 use super::{router as outer_router, BlankRequest, RequestMessage};
+use crate::client::router::CommandTransactionID;
 use crate::proto;
 use chrono::prelude::*;
 use futures::future::FutureExt;
 use futures::stream::StreamExt;
 use futures::SinkExt;
-use crate::client::router::CommandTransactionID;
 
 pub mod balance;
 pub mod contact;
@@ -190,7 +190,12 @@ pub struct EPPClient {
 impl super::Client for EPPClient {
     // Starts up the EPP client and returns the sending end of a tokio channel to inject
     // commands into the client to be processed
-    fn start(mut self: Box<Self>) -> (futures::channel::mpsc::Sender<RequestMessage>, futures::channel::mpsc::UnboundedReceiver<CommandTransactionID>) {
+    fn start(
+        mut self: Box<Self>,
+    ) -> (
+        futures::channel::mpsc::Sender<RequestMessage>,
+        futures::channel::mpsc::UnboundedReceiver<CommandTransactionID>,
+    ) {
         info!("EPP Client for {} starting...", &self.host);
         if self.nominet_tag_list_subordinate {
             info!("This is a Nominet Tag list subordinate client");
@@ -261,7 +266,7 @@ impl EPPClient {
     async fn _main_loop(
         &mut self,
         receiver: futures::channel::mpsc::Receiver<RequestMessage>,
-        mut ready_sender: futures::channel::mpsc::UnboundedSender<CommandTransactionID>
+        mut ready_sender: futures::channel::mpsc::UnboundedSender<CommandTransactionID>,
     ) {
         let mut receiver = receiver.fuse();
         loop {
@@ -432,17 +437,22 @@ impl EPPClient {
                 message: proto::EPPMessageType::Hello {},
             };
             self.is_awaiting_response = true;
-            let receiver =
-                super::epp_like::send_msg(&self.host, sock_write, &self.log_dir, send_msg, &message)
-                    .fuse();
+            let receiver = super::epp_like::send_msg(
+                &self.host,
+                sock_write,
+                &self.log_dir,
+                send_msg,
+                &message,
+            )
+            .fuse();
             let mut delay = Box::pin(tokio::time::sleep(tokio::time::Duration::new(15, 0)).fuse());
             futures::pin_mut!(receiver);
             let resp = futures::select! {
-            r = receiver => r,
-            _ = delay => {
-                return Err(());
-            }
-        };
+                r = receiver => r,
+                _ = delay => {
+                    return Err(());
+                }
+            };
             match resp {
                 Ok(_) => Ok(()),
                 Err(_) => {
@@ -549,9 +559,17 @@ impl EPPClient {
                     None => {}
                 };
                 let message = proto::EPPMessage {
-                    message: proto::EPPMessageType::Hello {}
+                    message: proto::EPPMessageType::Hello {},
                 };
-                match super::epp_like::send_msg(&self.host, sock_write, &self.log_dir, send_msg, &message).await {
+                match super::epp_like::send_msg(
+                    &self.host,
+                    sock_write,
+                    &self.log_dir,
+                    send_msg,
+                    &message,
+                )
+                .await
+                {
                     Ok(_) => Ok(()),
                     Err(_) => Err(()),
                 }
@@ -711,12 +729,10 @@ impl EPPClient {
             }
 
             match self._login(sock).await {
-                Ok(res) => {
-                    Ok(CommandTransactionID {
-                        client: res.client_transaction_id.unwrap_or_default(),
-                        server: res.server_transaction_id.unwrap_or_default(),
-                    })
-                }
+                Ok(res) => Ok(CommandTransactionID {
+                    client: res.client_transaction_id.unwrap_or_default(),
+                    server: res.server_transaction_id.unwrap_or_default(),
+                }),
                 Err(_) => {
                     info!("Restarting connection...");
                     self._close(sock).await;
@@ -1286,10 +1302,7 @@ impl EPPClient {
     }
 }
 
-pub fn handle_logout(
-    _client: &ServerFeatures,
-    _req: &BlankRequest,
-) -> router::HandleReqReturn<()> {
+pub fn handle_logout(_client: &ServerFeatures, _req: &BlankRequest) -> router::HandleReqReturn<()> {
     Ok((proto::EPPCommandType::Logout {}, None))
 }
 

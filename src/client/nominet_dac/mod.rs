@@ -1,7 +1,7 @@
 use super::{router as outer_router, RequestMessage};
 use futures::future::FutureExt;
-use futures::SinkExt;
 use futures::stream::StreamExt;
+use futures::SinkExt;
 use tokio::io::AsyncWriteExt;
 
 pub(self) mod proto;
@@ -20,7 +20,12 @@ pub struct DACClient {
 impl super::Client for DACClient {
     // Starts up the DAC client and returns the sending end of a tokio channel to inject
     // commands into the client to be processed
-    fn start(mut self: Box<Self>) -> (futures::channel::mpsc::Sender<RequestMessage>, futures::channel::mpsc::UnboundedReceiver<outer_router::CommandTransactionID>) {
+    fn start(
+        mut self: Box<Self>,
+    ) -> (
+        futures::channel::mpsc::Sender<RequestMessage>,
+        futures::channel::mpsc::UnboundedReceiver<outer_router::CommandTransactionID>,
+    ) {
         info!(
             "DAC Client for {} and {} starting...",
             &self.rt_host, &self.td_host
@@ -57,7 +62,9 @@ impl DACClient {
     async fn _main_loop(
         &mut self,
         receiver: futures::channel::mpsc::Receiver<RequestMessage>,
-        mut ready_sender: futures::channel::mpsc::UnboundedSender<outer_router::CommandTransactionID>
+        mut ready_sender: futures::channel::mpsc::UnboundedSender<
+            outer_router::CommandTransactionID,
+        >,
     ) {
         let mut receiver = receiver.fuse();
         loop {
@@ -90,10 +97,12 @@ impl DACClient {
                 }
             };
             trace!("Got connection for {} and {}", self.rt_host, self.td_host);
-            let _ = ready_sender.send(outer_router::CommandTransactionID {
-                client: "".to_string(),
-                server: "".to_string()
-            }).await;
+            let _ = ready_sender
+                .send(outer_router::CommandTransactionID {
+                    client: "".to_string(),
+                    server: "".to_string(),
+                })
+                .await;
 
             let (rt_sock_read, mut rt_sock_write) = tokio::io::split(td_sock);
             let (td_sock_read, mut td_sock_write) = tokio::io::split(rt_sock);

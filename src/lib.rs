@@ -264,7 +264,7 @@ pub async fn setup_pkcs11_engine(hsm_conf_file: Option<&str>) -> Option<P11Engin
                 }
             },
         )
-            .await
+        .await
         {
             Ok(e) => e,
             Err(e) => {
@@ -284,7 +284,12 @@ pub async fn setup_pkcs11_engine(hsm_conf_file: Option<&str>) -> Option<P11Engin
     }
 }
 
-pub async fn create_client(log_dir: std::path::PathBuf, config: &ConfigFile, pkcs11_engine: &Option<P11Engine>, keepalive: bool) -> Box<dyn client::Client> {
+pub async fn create_client(
+    log_dir: std::path::PathBuf,
+    config: &ConfigFile,
+    pkcs11_engine: &Option<P11Engine>,
+    keepalive: bool,
+) -> Box<dyn client::Client> {
     let client_conf = client::ClientConf {
         host: &config.server,
         tag: &config.tag,
@@ -314,11 +319,9 @@ pub async fn create_client(log_dir: std::path::PathBuf, config: &ConfigFile, pkc
         }),
     };
     match match config.server_type {
-        ConfigServerType::Epp => {
-            client::epp::EPPClient::new(client_conf, pkcs11_engine.clone())
-                .await
-                .map(|c| Box::new(c) as Box<dyn client::Client>)
-        }
+        ConfigServerType::Epp => client::epp::EPPClient::new(client_conf, pkcs11_engine.clone())
+            .await
+            .map(|c| Box::new(c) as Box<dyn client::Client>),
         ConfigServerType::Tmch => {
             client::tmch_client::TMCHClient::new(client_conf, pkcs11_engine.clone())
                 .await

@@ -170,5 +170,10 @@ pub async fn logout(
 }
 
 pub trait Client {
-    fn start(self: Box<Self>) -> (futures::channel::mpsc::Sender<RequestMessage>, futures::channel::mpsc::UnboundedReceiver<router::CommandTransactionID>);
+    fn start(
+        self: Box<Self>,
+    ) -> (
+        futures::channel::mpsc::Sender<RequestMessage>,
+        futures::channel::mpsc::UnboundedReceiver<router::CommandTransactionID>,
+    );
 }

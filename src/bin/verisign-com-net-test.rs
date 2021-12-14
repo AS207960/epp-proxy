@@ -127,29 +127,39 @@ async fn main() {
 
     info!("Finding available domain");
     // Using your OT&E1 account, perform a CHECK domain command until you find an available domain
-    info!("{:#?}", epp_proxy::client::domain::check(domain, None, None, &mut cmd_tx_1).await.unwrap());
+    info!(
+        "{:#?}",
+        epp_proxy::client::domain::check(domain, None, None, &mut cmd_tx_1)
+            .await
+            .unwrap()
+    );
 
     // Create a new domain name using the ADD domain command with your OT&E1 account logon, term of
     // registration should be 2 years
     info!("======");
     info!("Creating domain");
-    let domain_create_res = epp_proxy::client::domain::create(epp_proxy::client::domain::CreateInfo {
-        domain,
-        nameservers: vec![],
-        period: Some(epp_proxy::client::Period {
-            unit: epp_proxy::client::PeriodUnit::Years,
-            value: 2,
-        }),
-        auth_info: "test_auth1",
-        registrant: "UNUSED",
-        contacts: vec![],
-        donuts_fee_agreement: None,
-        eurid_data: None,
-        fee_agreement: None,
-        launch_create: None,
-        isnic_payment: None,
-        sec_dns: None,
-    }, &mut cmd_tx_1).await.unwrap();
+    let domain_create_res = epp_proxy::client::domain::create(
+        epp_proxy::client::domain::CreateInfo {
+            domain,
+            nameservers: vec![],
+            period: Some(epp_proxy::client::Period {
+                unit: epp_proxy::client::PeriodUnit::Years,
+                value: 2,
+            }),
+            auth_info: "test_auth1",
+            registrant: "UNUSED",
+            contacts: vec![],
+            donuts_fee_agreement: None,
+            eurid_data: None,
+            fee_agreement: None,
+            launch_create: None,
+            isnic_payment: None,
+            sec_dns: None,
+        },
+        &mut cmd_tx_1,
+    )
+    .await
+    .unwrap();
     info!("{:#?}", domain_create_res);
 
     // Create child nameserver 1 of the newly created domain using the ADD nameserver command with
@@ -157,56 +167,80 @@ async fn main() {
 
     info!("======");
     info!("Creating host 1");
-    info!("{:#?}", epp_proxy::client::host::create(
-        &format!("ns1.{}", domain),
-        vec![epp_proxy::client::host::Address {
-            address: "1.1.1.1".to_string(),
-            ip_version: epp_proxy::client::host::AddressVersion::IPv4,
-        }],
-        None,
-        &mut cmd_tx_1
-    ).await.unwrap());
+    info!(
+        "{:#?}",
+        epp_proxy::client::host::create(
+            &format!("ns1.{}", domain),
+            vec![epp_proxy::client::host::Address {
+                address: "1.1.1.1".to_string(),
+                ip_version: epp_proxy::client::host::AddressVersion::IPv4,
+            }],
+            None,
+            &mut cmd_tx_1
+        )
+        .await
+        .unwrap()
+    );
 
     // Create child name server 2 of the newly created domain using the ADD nameserver command with
     // your OT&E1 account logon
 
     info!("======");
     info!("Creating host 2");
-    info!("{:#?}", epp_proxy::client::host::create(
-        &format!("ns2.{}", domain),
-        vec![epp_proxy::client::host::Address {
-            address: "1.0.0.1".to_string(),
-            ip_version: epp_proxy::client::host::AddressVersion::IPv4,
-        }],
-        None,
-        &mut cmd_tx_1
-    ).await.unwrap());
+    info!(
+        "{:#?}",
+        epp_proxy::client::host::create(
+            &format!("ns2.{}", domain),
+            vec![epp_proxy::client::host::Address {
+                address: "1.0.0.1".to_string(),
+                ip_version: epp_proxy::client::host::AddressVersion::IPv4,
+            }],
+            None,
+            &mut cmd_tx_1
+        )
+        .await
+        .unwrap()
+    );
 
     // Update domain to attach the child nameservers to the newly created domain using the MOD
     // domain command with your OT&E1 account logon
 
     info!("======");
     info!("Adding hosts to domain");
-    info!("{:#?}", epp_proxy::client::domain::update(epp_proxy::client::domain::UpdateInfo {
-        domain,
-        add: vec![
-            epp_proxy::client::domain::UpdateObject::Nameserver(
-                epp_proxy::client::domain::InfoNameserver::HostOnly(format!("ns1.{}", domain))
-            ),
-            epp_proxy::client::domain::UpdateObject::Nameserver(
-                epp_proxy::client::domain::InfoNameserver::HostOnly(format!("ns2.{}", domain))
-            )
-        ],
-        remove: vec![],
-        new_auth_info: None,
-        new_registrant: None,
-        sec_dns: None,
-        launch_info: None,
-        fee_agreement: None,
-        donuts_fee_agreement: None,
-        isnic_info: None,
-        eurid_data: None
-    }, &mut cmd_tx_1).await.unwrap());
+    info!(
+        "{:#?}",
+        epp_proxy::client::domain::update(
+            epp_proxy::client::domain::UpdateInfo {
+                domain,
+                add: vec![
+                    epp_proxy::client::domain::UpdateObject::Nameserver(
+                        epp_proxy::client::domain::InfoNameserver::HostOnly(format!(
+                            "ns1.{}",
+                            domain
+                        ))
+                    ),
+                    epp_proxy::client::domain::UpdateObject::Nameserver(
+                        epp_proxy::client::domain::InfoNameserver::HostOnly(format!(
+                            "ns2.{}",
+                            domain
+                        ))
+                    )
+                ],
+                remove: vec![],
+                new_auth_info: None,
+                new_registrant: None,
+                sec_dns: None,
+                launch_info: None,
+                fee_agreement: None,
+                donuts_fee_agreement: None,
+                isnic_info: None,
+                eurid_data: None
+            },
+            &mut cmd_tx_1
+        )
+        .await
+        .unwrap()
+    );
 
     // Update the domain to add the domain client statuses of ClientHold, ClientUpdateProhibited,
     // ClientDeleteProhibited, and ClientTransferProhibited within one command using the MOD domain
@@ -214,31 +248,52 @@ async fn main() {
 
     info!("======");
     info!("Adding statuses to domain");
-    info!("{:#?}", epp_proxy::client::domain::update(epp_proxy::client::domain::UpdateInfo {
-        domain,
-        add: vec![
-            epp_proxy::client::domain::UpdateObject::Status(epp_proxy::client::domain::Status::ClientHold),
-            epp_proxy::client::domain::UpdateObject::Status(epp_proxy::client::domain::Status::ClientDeleteProhibited),
-            epp_proxy::client::domain::UpdateObject::Status(epp_proxy::client::domain::Status::ClientTransferProhibited),
-            epp_proxy::client::domain::UpdateObject::Status(epp_proxy::client::domain::Status::ClientUpdateProhibited),
-        ],
-        remove: vec![],
-        new_auth_info: None,
-        new_registrant: None,
-        sec_dns: None,
-        launch_info: None,
-        fee_agreement: None,
-        donuts_fee_agreement: None,
-        isnic_info: None,
-        eurid_data: None
-    }, &mut cmd_tx_1).await.unwrap());
+    info!(
+        "{:#?}",
+        epp_proxy::client::domain::update(
+            epp_proxy::client::domain::UpdateInfo {
+                domain,
+                add: vec![
+                    epp_proxy::client::domain::UpdateObject::Status(
+                        epp_proxy::client::domain::Status::ClientHold
+                    ),
+                    epp_proxy::client::domain::UpdateObject::Status(
+                        epp_proxy::client::domain::Status::ClientDeleteProhibited
+                    ),
+                    epp_proxy::client::domain::UpdateObject::Status(
+                        epp_proxy::client::domain::Status::ClientTransferProhibited
+                    ),
+                    epp_proxy::client::domain::UpdateObject::Status(
+                        epp_proxy::client::domain::Status::ClientUpdateProhibited
+                    ),
+                ],
+                remove: vec![],
+                new_auth_info: None,
+                new_registrant: None,
+                sec_dns: None,
+                launch_info: None,
+                fee_agreement: None,
+                donuts_fee_agreement: None,
+                isnic_info: None,
+                eurid_data: None
+            },
+            &mut cmd_tx_1
+        )
+        .await
+        .unwrap()
+    );
 
     // Perform an INFO on the domain to verify the update using the STATUS-FULL command with your
     // OT&E1 account logon
 
     info!("======");
     info!("Getting domain info");
-    info!("{:#?}", epp_proxy::client::domain::info(domain, None, None, None, None, &mut cmd_tx_1).await.unwrap());
+    info!(
+        "{:#?}",
+        epp_proxy::client::domain::info(domain, None, None, None, None, &mut cmd_tx_1)
+            .await
+            .unwrap()
+    );
 
     // UPDATE domain to remove domain client statuses of ClientHold, ClientUpdateProhibited,
     // ClientDeleteProhibited, and ClientTransferProhibited within one command using the MOD domain
@@ -246,76 +301,118 @@ async fn main() {
 
     info!("======");
     info!("Removing statuses from domain");
-    info!("{:#?}", epp_proxy::client::domain::update(epp_proxy::client::domain::UpdateInfo {
-        domain,
-        add: vec![],
-        remove: vec![
-            epp_proxy::client::domain::UpdateObject::Status(epp_proxy::client::domain::Status::ClientHold),
-            epp_proxy::client::domain::UpdateObject::Status(epp_proxy::client::domain::Status::ClientDeleteProhibited),
-            epp_proxy::client::domain::UpdateObject::Status(epp_proxy::client::domain::Status::ClientTransferProhibited),
-            epp_proxy::client::domain::UpdateObject::Status(epp_proxy::client::domain::Status::ClientUpdateProhibited),
-        ],
-        new_auth_info: None,
-        new_registrant: None,
-        sec_dns: None,
-        launch_info: None,
-        fee_agreement: None,
-        donuts_fee_agreement: None,
-        isnic_info: None,
-        eurid_data: None
-    }, &mut cmd_tx_1).await.unwrap());
+    info!(
+        "{:#?}",
+        epp_proxy::client::domain::update(
+            epp_proxy::client::domain::UpdateInfo {
+                domain,
+                add: vec![],
+                remove: vec![
+                    epp_proxy::client::domain::UpdateObject::Status(
+                        epp_proxy::client::domain::Status::ClientHold
+                    ),
+                    epp_proxy::client::domain::UpdateObject::Status(
+                        epp_proxy::client::domain::Status::ClientDeleteProhibited
+                    ),
+                    epp_proxy::client::domain::UpdateObject::Status(
+                        epp_proxy::client::domain::Status::ClientTransferProhibited
+                    ),
+                    epp_proxy::client::domain::UpdateObject::Status(
+                        epp_proxy::client::domain::Status::ClientUpdateProhibited
+                    ),
+                ],
+                new_auth_info: None,
+                new_registrant: None,
+                sec_dns: None,
+                launch_info: None,
+                fee_agreement: None,
+                donuts_fee_agreement: None,
+                isnic_info: None,
+                eurid_data: None
+            },
+            &mut cmd_tx_1
+        )
+        .await
+        .unwrap()
+    );
 
     // Perform an INFO on the domain to verify the update using the STATUS-FULL command with your
     // OT&E1 account logon
 
     info!("======");
     info!("Getting domain info");
-    info!("{:#?}", epp_proxy::client::domain::info(domain, None, None, None, None, &mut cmd_tx_1).await.unwrap());
+    info!(
+        "{:#?}",
+        epp_proxy::client::domain::info(domain, None, None, None, None, &mut cmd_tx_1)
+            .await
+            .unwrap()
+    );
 
     // Update the domain with <new Auth Info> AUTH INFO code using the MOD domain command with your
     // OT&E1 account logon
 
     info!("======");
     info!("Updating auth info");
-    info!("{:#?}", epp_proxy::client::domain::update(epp_proxy::client::domain::UpdateInfo {
-        domain,
-        add: vec![],
-        remove: vec![],
-        new_auth_info: Some("test_auth2"),
-        new_registrant: None,
-        sec_dns: None,
-        launch_info: None,
-        fee_agreement: None,
-        donuts_fee_agreement: None,
-        isnic_info: None,
-        eurid_data: None
-    }, &mut cmd_tx_1).await.unwrap());
+    info!(
+        "{:#?}",
+        epp_proxy::client::domain::update(
+            epp_proxy::client::domain::UpdateInfo {
+                domain,
+                add: vec![],
+                remove: vec![],
+                new_auth_info: Some("test_auth2"),
+                new_registrant: None,
+                sec_dns: None,
+                launch_info: None,
+                fee_agreement: None,
+                donuts_fee_agreement: None,
+                isnic_info: None,
+                eurid_data: None
+            },
+            &mut cmd_tx_1
+        )
+        .await
+        .unwrap()
+    );
 
     // Update the IP Address of child nameserver 1 of the newly created domain using the MOD
     // nameserver command with your OT&E1 account logon
 
     info!("======");
     info!("Updating host 1 IP address");
-    info!("{:#?}", epp_proxy::client::host::update(
-        &format!("ns1.{}", domain),
-        vec![epp_proxy::client::host::UpdateObject::Address(epp_proxy::client::host::Address {
-            address: "1.1.1.2".to_string(),
-            ip_version: epp_proxy::client::host::AddressVersion::IPv4,
-        })],
-        vec![epp_proxy::client::host::UpdateObject::Address(epp_proxy::client::host::Address {
-            address: "1.1.1.1".to_string(),
-            ip_version: epp_proxy::client::host::AddressVersion::IPv4,
-        })],
-        None,
-        None,
-        &mut cmd_tx_1
-    ).await.unwrap());
+    info!(
+        "{:#?}",
+        epp_proxy::client::host::update(
+            &format!("ns1.{}", domain),
+            vec![epp_proxy::client::host::UpdateObject::Address(
+                epp_proxy::client::host::Address {
+                    address: "1.1.1.2".to_string(),
+                    ip_version: epp_proxy::client::host::AddressVersion::IPv4,
+                }
+            )],
+            vec![epp_proxy::client::host::UpdateObject::Address(
+                epp_proxy::client::host::Address {
+                    address: "1.1.1.1".to_string(),
+                    ip_version: epp_proxy::client::host::AddressVersion::IPv4,
+                }
+            )],
+            None,
+            None,
+            &mut cmd_tx_1
+        )
+        .await
+        .unwrap()
+    );
 
     // Perform a HELLO command with your OT&E1 account logon
     let (sender, _) = futures::channel::oneshot::channel();
-    cmd_tx_1.try_send(epp_proxy::client::RequestMessage::Hello(Box::new(epp_proxy::client::BlankRequest {
-        return_path: sender
-    }))).unwrap();
+    cmd_tx_1
+        .try_send(epp_proxy::client::RequestMessage::Hello(Box::new(
+            epp_proxy::client::BlankRequest {
+                return_path: sender,
+            },
+        )))
+        .unwrap();
 
     // Renew your newly created domain for 2 years using the RENEW domain command with your OT&E1
     // account logon, term of renewal should be 2 years
@@ -332,8 +429,10 @@ async fn main() {
         None,
         None,
         None,
-        &mut cmd_tx_1
-    ).await.unwrap();
+        &mut cmd_tx_1,
+    )
+    .await
+    .unwrap();
     info!("{:#?}", renew_res);
 
     // Establish a second session using the EPP Login SESSION command with your OT&E2 account logon.
@@ -347,26 +446,61 @@ async fn main() {
 
     info!("======");
     info!("Getting domain info with auth");
-    info!("{:#?}", epp_proxy::client::domain::info(domain, Some("test_auth2"), None, None, None, &mut cmd_tx_2).await.unwrap());
+    info!(
+        "{:#?}",
+        epp_proxy::client::domain::info(
+            domain,
+            Some("test_auth2"),
+            None,
+            None,
+            None,
+            &mut cmd_tx_2
+        )
+        .await
+        .unwrap()
+    );
 
     // Initiate a Transfer domain request on the newly created domain using the TRANSFER-REQUEST
     // command with your OT&E2 account logon
 
     info!("======");
     info!("Requesting domain transfer");
-    info!("{:#?}", epp_proxy::client::domain::transfer_request(domain, None, "test_auth2", None, None, None, &mut cmd_tx_2).await.unwrap());
+    info!(
+        "{:#?}",
+        epp_proxy::client::domain::transfer_request(
+            domain,
+            None,
+            "test_auth2",
+            None,
+            None,
+            None,
+            &mut cmd_tx_2
+        )
+        .await
+        .unwrap()
+    );
 
     // Perform a TRANSFER-QUERY command using your OT&E2 account logon
 
     info!("======");
     info!("Querying transfer status");
-    info!("{:#?}", epp_proxy::client::domain::transfer_query(domain, Some("test_auth2"), &mut cmd_tx_2).await.unwrap());
+    info!(
+        "{:#?}",
+        epp_proxy::client::domain::transfer_query(domain, Some("test_auth2"), &mut cmd_tx_2)
+            .await
+            .unwrap()
+    );
 
     // Approve the transfer using the TRANSFER-APPROVE command with your OT&E1 account logon
 
     info!("======");
     info!("Accepting transfer request");
-    info!("{:#?}", epp_proxy::client::domain::transfer_accept(domain, None, &mut cmd_tx_1).await.unwrap());
+    info!(
+        "{:#?}",
+        epp_proxy::client::domain::transfer_accept(domain, None, &mut cmd_tx_1)
+            .await
+            .unwrap()
+    );
 
     // Perform a POLL-REQUEST command to check for messages in Poll Queue using your OT&E1 account
     // logon
@@ -380,39 +514,72 @@ async fn main() {
 
     info!("======");
     info!("Acknowledging message");
-    info!("{:#?}", epp_proxy::client::poll::poll_ack(&poll_msg.response.unwrap().id, &mut cmd_tx_1).await.unwrap());
+    info!(
+        "{:#?}",
+        epp_proxy::client::poll::poll_ack(&poll_msg.response.unwrap().id, &mut cmd_tx_1)
+            .await
+            .unwrap()
+    );
 
     // Initiate a Transfer domain request again on the newly created domain using the
     // TRANSFER-REQUEST command with your OT&E1 account logon
 
     info!("======");
     info!("Requesting domain transfer");
-    info!("{:#?}", epp_proxy::client::domain::transfer_request(domain, None, "test_auth2", None, None, None, &mut cmd_tx_1).await.unwrap());
+    info!(
+        "{:#?}",
+        epp_proxy::client::domain::transfer_request(
+            domain,
+            None,
+            "test_auth2",
+            None,
+            None,
+            None,
+            &mut cmd_tx_1
+        )
+        .await
+        .unwrap()
+    );
 
     // Perform a TRANSFER-QUERY command using your OT&E2 account logon
 
     info!("======");
     info!("Querying transfer status");
-    info!("{:#?}", epp_proxy::client::domain::transfer_query(domain, None, &mut cmd_tx_2).await.unwrap());
+    info!(
+        "{:#?}",
+        epp_proxy::client::domain::transfer_query(domain, None, &mut cmd_tx_2)
+            .await
+            .unwrap()
+    );
 
     // Reject the transfer of the newly created domain using the TRANSFER-REJECT command with your
     // OT&E2 account logon
 
     info!("======");
     info!("Rejecting transfer request");
-    info!("{:#?}", epp_proxy::client::domain::transfer_reject(domain, None, &mut cmd_tx_2).await.unwrap());
+    info!(
+        "{:#?}",
+        epp_proxy::client::domain::transfer_reject(domain, None, &mut cmd_tx_2)
+            .await
+            .unwrap()
+    );
 
     // Sync the domain to the 15th day of the next month using the SYNC domain command with your
     // OT&E2 account logon, the sync date should be 15
 
     info!("======");
     info!("Syncing domain");
-    info!("{:#?}", epp_proxy::client::domain::verisign_sync(
-        domain,
-        (renew_res.response.data.new_expiry_date.unwrap().month() % 12) + 1,
-        15,
-        &mut cmd_tx_2
-    ).await.unwrap());
+    info!(
+        "{:#?}",
+        epp_proxy::client::domain::verisign_sync(
+            domain,
+            (renew_res.response.data.new_expiry_date.unwrap().month() % 12) + 1,
+            15,
+            &mut cmd_tx_2
+        )
+        .await
+        .unwrap()
+    );
 
     epp_proxy::client::logout(cmd_tx_1).await.unwrap();
     let final_cmd = epp_proxy::client::logout(cmd_tx_2).await.unwrap();
