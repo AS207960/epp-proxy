@@ -121,5 +121,6 @@ router!(
     TMCHTrexRenew,          request_nop,                              response_nop;
     DACDomain,              request_nop,                              response_nop;
     DACUsage,               request_nop,                              response_nop;
-    DACLimits,              request_nop,                              response_nop
+    DACLimits,              request_nop,                              response_nop;
+    Hello,                  request_nop,                              response_nop
 );

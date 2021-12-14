@@ -72,6 +72,8 @@ pub struct ClientConf<'a, C: Into<Option<&'a str>>> {
     /// Errata of this server
     pub errata: Option<String>,
     pub nominet_dac: Option<NominetDACConf<'a>>,
+    /// Should the client send keepalive commands automatically
+    pub keepalive: bool,
 }
 
 async fn send_epp_client_request<R>(
@@ -145,7 +147,7 @@ pub struct Phone {
 }
 
 #[derive(Debug)]
-pub struct LogoutRequest {
+pub struct BlankRequest {
     pub return_path: Sender<()>,
 }
 
@@ -159,7 +161,7 @@ pub async fn logout(
     let (sender, receiver) = futures::channel::oneshot::channel();
     send_epp_client_request(
         &mut client_sender,
-        RequestMessage::Logout(Box::new(LogoutRequest {
+        RequestMessage::Logout(Box::new(BlankRequest {
             return_path: sender,
         })),
         receiver,

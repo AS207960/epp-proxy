@@ -1,6 +1,6 @@
 [package]
 name = "epp-proxy"
-version = "0.3.2"
+version = "0.3.3"
 authors = ["Q <q@misell.cymru>"]
 edition = "2018"
 
@@ -47,3 +47,15 @@ built = { version = "0.4", features = ["git2"] }
 
 [patch.crates-io]
 openssl-sys = { git = "https://github.com/AS207960/rust-openssl", rev = "3ea7e492d78b506689c8c31ee9427399ae4735e9" }
+
+[lib]
+name = "epp_proxy"
+path = "src/lib.rs"
+
+[[bin]]
+name = "epp-proxy"
+path = "src/main.rs"
+
+[[bin]]
+name = "verisign-com-net-test"
+path = "src/bin/verisign-com-net-test.rs"

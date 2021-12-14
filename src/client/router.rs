@@ -108,7 +108,8 @@ macro_rules! router {
 }
 
 router!(
-    Logout,                 super::LogoutRequest,                       ();
+    Hello,                  super::BlankRequest,                       ();
+    Logout,                 super::BlankRequest,                       ();
     Poll,                   super::poll::PollRequest,                   Option<super::poll::PollResponse>;
     PollAck,                super::poll::PollAckRequest,                super::poll::PollAckResponse;
     DomainCheck,            super::domain::CheckRequest,                super::domain::CheckResponse;

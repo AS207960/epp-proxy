@@ -307,5 +307,6 @@ router!(
     TMCHTransferInitiate;
     TMCHTransfer;
     TMCHTrexActivate;
-    TMCHTrexRenew
+    TMCHTrexRenew;
+    Hello
 );

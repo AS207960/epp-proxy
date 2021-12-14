@@ -1,5 +1,5 @@
 use super::Client;
-use super::{router as outer_router, LogoutRequest, RequestMessage};
+use super::{router as outer_router, BlankRequest, RequestMessage};
 use crate::proto;
 use chrono::prelude::*;
 use futures::future::FutureExt;
@@ -173,6 +173,7 @@ pub struct EPPClient {
     new_password: Option<String>,
     server_id: String,
     pipelining: bool,
+    keepalive: bool,
     is_awaiting_response: bool,
     is_closing: bool,
     router: outer_router::Router<router::Router, ServerFeatures>,
@@ -238,6 +239,7 @@ impl EPPClient {
             password: conf.password.to_string(),
             new_password: conf.new_password.into().map(|c| c.to_string()),
             pipelining: conf.pipelining,
+            keepalive: conf.keepalive,
             features: ServerFeatures {
                 errata: conf.errata,
                 ..Default::default()
@@ -418,27 +420,31 @@ impl EPPClient {
         &mut self,
         sock_write: &mut W,
     ) -> Result<(), ()> {
-        let message = proto::EPPMessage {
-            message: proto::EPPMessageType::Hello {},
-        };
-        self.is_awaiting_response = true;
-        let receiver =
-            super::epp_like::send_msg(&self.host, sock_write, &self.log_dir, send_msg, &message)
-                .fuse();
-        let mut delay = Box::pin(tokio::time::sleep(tokio::time::Duration::new(15, 0)).fuse());
-        futures::pin_mut!(receiver);
-        let resp = futures::select! {
+        if self.keepalive {
+            let message = proto::EPPMessage {
+                message: proto::EPPMessageType::Hello {},
+            };
+            self.is_awaiting_response = true;
+            let receiver =
+                super::epp_like::send_msg(&self.host, sock_write, &self.log_dir, send_msg, &message)
+                    .fuse();
+            let mut delay = Box::pin(tokio::time::sleep(tokio::time::Duration::new(15, 0)).fuse());
+            futures::pin_mut!(receiver);
+            let resp = futures::select! {
             r = receiver => r,
             _ = delay => {
                 return Err(());
             }
         };
-        match resp {
-            Ok(_) => Ok(()),
-            Err(_) => {
-                error!("Failed to send hello keepalive command");
-                Err(())
+            match resp {
+                Ok(_) => Ok(()),
+                Err(_) => {
+                    error!("Failed to send hello keepalive command");
+                    Err(())
+                }
             }
+        } else {
+            Ok(())
         }
     }
 
@@ -514,13 +520,42 @@ impl EPPClient {
                     }
                 }
             }
+            (outer_router::RequestMessage::Hello(_), _, _) => {
+                match &mut self.nominet_tag_list_subordinate_client {
+                    Some(client) => {
+                        let (sender, _) = futures::channel::oneshot::channel();
+                        match client
+                            .send(outer_router::RequestMessage::Hello(Box::new(
+                                BlankRequest {
+                                    return_path: sender,
+                                },
+                            )))
+                            .await
+                        {
+                            Ok(_) => {}
+                            Err(e) => {
+                                warn!("Failed to send to subordinate server: {}", e);
+                                return Err(());
+                            }
+                        }
+                    }
+                    None => {}
+                };
+                let message = proto::EPPMessage {
+                    message: proto::EPPMessageType::Hello {}
+                };
+                match super::epp_like::send_msg(&self.host, sock_write, &self.log_dir, send_msg, &message).await {
+                    Ok(_) => Ok(()),
+                    Err(_) => Err(()),
+                }
+            }
             (outer_router::RequestMessage::Logout(t), _, _) => {
                 match &mut self.nominet_tag_list_subordinate_client {
                     Some(client) => {
                         let (sender, _) = futures::channel::oneshot::channel();
                         match client
                             .send(outer_router::RequestMessage::Logout(Box::new(
-                                LogoutRequest {
+                                BlankRequest {
                                     return_path: sender,
                                 },
                             )))
@@ -540,7 +575,7 @@ impl EPPClient {
                         let (sender, _) = futures::channel::oneshot::channel();
                         match dac_client
                             .send(outer_router::RequestMessage::Logout(Box::new(
-                                LogoutRequest {
+                                BlankRequest {
                                     return_path: sender,
                                 },
                             )))
@@ -669,7 +704,9 @@ impl EPPClient {
             }
 
             match self._login(sock).await {
-                Ok(_) => {}
+                Ok(res) => {
+                    info!("Login transaction ID: {:#?}", res);
+                }
                 Err(_) => {
                     info!("Restarting connection...");
                     self._close(sock).await;
@@ -874,7 +911,7 @@ impl EPPClient {
     async fn _login(
         &mut self,
         sock: &mut super::epp_like::tls_client::TLSConnection,
-    ) -> Result<(), ()> {
+    ) -> Result<proto::EPPTransactionIdentifier, ()> {
         let mut objects = vec![];
         let mut ext_objects = vec![];
 
@@ -1029,6 +1066,7 @@ impl EPPClient {
                     log_dir: self.log_dir.clone(),
                     new_password: None,
                     pipelining: self.pipelining,
+                    keepalive: self.keepalive,
                     features: ServerFeatures {
                         errata: self.features.errata.clone(),
                         ..Default::default()
@@ -1058,7 +1096,7 @@ impl EPPClient {
                 )
                 .await
             {
-                Ok(_) => return Ok(()),
+                Ok(r) => return Ok(r),
                 Err(e) => {
                     if e {
                         return Err(());
@@ -1070,7 +1108,7 @@ impl EPPClient {
             ._try_login(self.password.clone(), None, objects, ext_objects, sock)
             .await
         {
-            Ok(_) => Ok(()),
+            Ok(r) => Ok(r),
             Err(_) => Err(()),
         }
     }
@@ -1082,7 +1120,7 @@ impl EPPClient {
         objects: Vec<String>,
         ext_objects: Vec<String>,
         sock: &mut super::epp_like::tls_client::TLSConnection,
-    ) -> Result<(), bool> {
+    ) -> Result<proto::EPPTransactionIdentifier, bool> {
         let mut command = proto::EPPLogin {
             client_id: self.tag.clone(),
             password: String::new(),
@@ -1191,7 +1229,7 @@ impl EPPClient {
                 Err(false)
             } else {
                 info!("Successfully logged into {}", self.server_id);
-                Ok(())
+                Ok(response.transaction_id)
             }
         } else {
             error!(
@@ -1241,7 +1279,7 @@ impl EPPClient {
 
 pub fn handle_logout(
     _client: &ServerFeatures,
-    _req: &LogoutRequest,
+    _req: &BlankRequest,
 ) -> router::HandleReqReturn<()> {
     Ok((proto::EPPCommandType::Logout {}, None))
 }

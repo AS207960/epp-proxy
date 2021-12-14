@@ -1,5 +1,5 @@
 use super::proto::tmch as tmch_proto;
-use super::{router as outer_router, LogoutRequest, RequestMessage};
+use super::{router as outer_router, BlankRequest, RequestMessage};
 use chrono::prelude::*;
 use futures::future::FutureExt;
 use futures::stream::StreamExt;
@@ -487,7 +487,7 @@ impl TMCHClient {
     }
 }
 
-pub fn handle_logout(_client: &(), _req: &LogoutRequest) -> router::HandleReqReturn<()> {
+pub fn handle_logout(_client: &(), _req: &BlankRequest) -> router::HandleReqReturn<()> {
     Ok(tmch_proto::TMCHCommandType::Logout {})
 }
 
