@@ -2,6 +2,7 @@
 extern crate log;
 
 use chrono::Datelike;
+use futures::StreamExt;
 
 #[tokio::main]
 async fn main() {
@@ -22,8 +23,8 @@ async fn main() {
         )
         .arg(
             clap::Arg::with_name("acct2")
-                .short("a1")
-                .long("account_1")
+                .short("a2")
+                .long("account_2")
                 .takes_value(true)
                 .required(true)
                 .help("Config file for the second account"),
@@ -118,7 +119,11 @@ async fn main() {
     let epp_client_2 = epp_proxy::create_client(log_dir_2, &conf_2, &pkcs11_engine, false).await;
 
     // Establish a session using the EPP Login SESSION command with your OT&E1 account
-    let mut cmd_tx_1 = epp_client_1.start();
+    let (mut cmd_tx_1, mut ready_rx_1) = epp_client_1.start();
+
+    info!("Awaiting client 1 to become ready...");
+    let login_trans_id = ready_rx_1.next().await.unwrap();
+    info!("Login transaction ID: {:#?}", login_trans_id);
 
     info!("Finding available domain");
     // Using your OT&E1 account, perform a CHECK domain command until you find an available domain
@@ -332,7 +337,10 @@ async fn main() {
     info!("{:#?}", renew_res);
 
     // Establish a second session using the EPP Login SESSION command with your OT&E2 account logon.
-    let mut cmd_tx_2 = epp_client_2.start();
+    let (mut cmd_tx_2, mut ready_rx_2) = epp_client_2.start();
+
+    info!("Awaiting client 2 to become ready...");
+    ready_rx_2.next().await.unwrap();
 
     // Perform an INFO on the newly created domain using the STATUS-FULL command with your OT&E2
     // account logon and the <new Auth Info> AUTH INFO code

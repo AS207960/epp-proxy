@@ -1,6 +1,8 @@
+cargo-features = ["strip"]
+
 [package]
 name = "epp-proxy"
-version = "0.3.3"
+version = "0.4.0"
 authors = ["Q <q@misell.cymru>"]
 edition = "2018"
 
@@ -59,3 +61,11 @@ path = "src/main.rs"
 [[bin]]
 name = "verisign-com-net-test"
 path = "src/bin/verisign-com-net-test.rs"
+
+[profile.release]
+strip = true
+opt-level = "z"
+lto = true
+panic = "abort"
+
+

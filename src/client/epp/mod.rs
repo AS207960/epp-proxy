@@ -5,6 +5,7 @@ use chrono::prelude::*;
 use futures::future::FutureExt;
 use futures::stream::StreamExt;
 use futures::SinkExt;
+use crate::client::router::CommandTransactionID;
 
 pub mod balance;
 pub mod contact;
@@ -189,23 +190,24 @@ pub struct EPPClient {
 impl super::Client for EPPClient {
     // Starts up the EPP client and returns the sending end of a tokio channel to inject
     // commands into the client to be processed
-    fn start(mut self: Box<Self>) -> futures::channel::mpsc::Sender<RequestMessage> {
+    fn start(mut self: Box<Self>) -> (futures::channel::mpsc::Sender<RequestMessage>, futures::channel::mpsc::UnboundedReceiver<CommandTransactionID>) {
         info!("EPP Client for {} starting...", &self.host);
         if self.nominet_tag_list_subordinate {
             info!("This is a Nominet Tag list subordinate client");
         }
         let (sender, receiver) = futures::channel::mpsc::channel::<RequestMessage>(16);
+        let (ready_sender, ready_receiver) = futures::channel::mpsc::unbounded();
 
         if let Some(nominet_dac_client) = self.nominet_dac_client.take() {
             self.nominet_dac_subordinate_client
-                .replace(Box::new(nominet_dac_client).start());
+                .replace(Box::new(nominet_dac_client).start().0);
         }
 
         tokio::spawn(async move {
-            self._main_loop(receiver).await;
+            self._main_loop(receiver, ready_sender).await;
         });
 
-        sender
+        (sender, ready_receiver)
     }
 }
 
@@ -256,7 +258,11 @@ impl EPPClient {
         })
     }
 
-    async fn _main_loop(&mut self, receiver: futures::channel::mpsc::Receiver<RequestMessage>) {
+    async fn _main_loop(
+        &mut self,
+        receiver: futures::channel::mpsc::Receiver<RequestMessage>,
+        mut ready_sender: futures::channel::mpsc::UnboundedSender<CommandTransactionID>
+    ) {
         let mut receiver = receiver.fuse();
         loop {
             self.is_closing = false;
@@ -286,7 +292,7 @@ impl EPPClient {
             };
             trace!("Got connection for {}", self.host);
 
-            {
+            let setup_res = {
                 let exit_str = format!("All senders for {} dropped, exiting...", self.host);
                 trace!("Setting up connection to {}", self.host);
                 let setup_fut = self._setup_connection(&mut sock).fuse();
@@ -307,7 +313,7 @@ impl EPPClient {
                         }
                     }
                 } {
-                    Ok(_) => {}
+                    Ok(s) => s,
                     Err(r) => {
                         if r {
                             break;
@@ -317,8 +323,9 @@ impl EPPClient {
                         }
                     }
                 }
-            }
+            };
             trace!("Connection setup to {}", self.host);
+            let _ = ready_sender.send(setup_res).await;
 
             let (sock_read, mut sock_write) = tokio::io::split(sock);
             let msg_receiver = super::epp_like::ClientReceiver {
@@ -681,7 +688,7 @@ impl EPPClient {
     async fn _setup_connection(
         &mut self,
         sock: &mut super::epp_like::tls_client::TLSConnection,
-    ) -> Result<(), bool> {
+    ) -> Result<CommandTransactionID, bool> {
         let msg = match super::epp_like::recv_msg(sock, &self.host, &self.log_dir, recv_msg).await {
             Ok(m) => m,
             Err(_) => {
@@ -705,15 +712,17 @@ impl EPPClient {
 
             match self._login(sock).await {
                 Ok(res) => {
-                    info!("Login transaction ID: {:#?}", res);
+                    Ok(CommandTransactionID {
+                        client: res.client_transaction_id.unwrap_or_default(),
+                        server: res.server_transaction_id.unwrap_or_default(),
+                    })
                 }
                 Err(_) => {
                     info!("Restarting connection...");
                     self._close(sock).await;
-                    return Err(false);
+                    Err(false)
                 }
             }
-            Ok(())
         } else {
             error!(
                 "Didn't receive greeting as first message from {}",
@@ -1080,7 +1089,7 @@ impl EPPClient {
                     router: outer_router::Router::default(),
                     tls_client: self.tls_client.clone(),
                 };
-                self.nominet_tag_list_subordinate_client = Some(Box::new(new_client).start());
+                self.nominet_tag_list_subordinate_client = Some(Box::new(new_client).start().0);
             }
         }
 

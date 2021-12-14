@@ -98,7 +98,7 @@ impl Router {
     }
 
     pub fn add_client(&mut self, epp_client: Box<dyn client::Client>, config: ConfigFile) {
-        let epp_client_sender = epp_client.start();
+        let epp_client_sender = epp_client.start().0;
 
         for zone in &config.zones {
             self.zone_to_client

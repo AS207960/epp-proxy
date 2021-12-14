@@ -3,6 +3,7 @@ use super::{router as outer_router, BlankRequest, RequestMessage};
 use chrono::prelude::*;
 use futures::future::FutureExt;
 use futures::stream::StreamExt;
+use futures::SinkExt;
 
 mod mark;
 mod poll;
@@ -50,13 +51,14 @@ pub struct TMCHClient {
 impl super::Client for TMCHClient {
     // Starts up the TMCH client and returns the sending end of a tokio channel to inject
     // commands into the client to be processed
-    fn start(mut self: Box<Self>) -> futures::channel::mpsc::Sender<RequestMessage> {
+    fn start(mut self: Box<Self>) -> (futures::channel::mpsc::Sender<RequestMessage>, futures::channel::mpsc::UnboundedReceiver<outer_router::CommandTransactionID>) {
         info!("TMCH Client for {} starting...", &self.host);
         let (sender, receiver) = futures::channel::mpsc::channel::<RequestMessage>(16);
+        let (ready_sender, ready_receiver) = futures::channel::mpsc::unbounded();
         tokio::spawn(async move {
-            self._main_loop(receiver).await;
+            self._main_loop(receiver, ready_sender).await;
         });
-        sender
+        (sender, ready_receiver)
     }
 }
 
@@ -86,7 +88,11 @@ impl TMCHClient {
         })
     }
 
-    async fn _main_loop(&mut self, receiver: futures::channel::mpsc::Receiver<RequestMessage>) {
+    async fn _main_loop(
+        &mut self,
+        receiver: futures::channel::mpsc::Receiver<RequestMessage>,
+        mut ready_sender: futures::channel::mpsc::UnboundedSender<outer_router::CommandTransactionID>
+    ) {
         let mut receiver = receiver.fuse();
         loop {
             self.is_closing = false;
@@ -116,7 +122,7 @@ impl TMCHClient {
             };
             trace!("Got connection for {}", self.host);
 
-            {
+            let setup_res = {
                 let exit_str = format!("All senders for {} dropped, exiting...", self.host);
                 trace!("Setting up connection to {}", self.host);
                 let setup_fut = self._setup_connection(&mut sock).fuse();
@@ -137,7 +143,7 @@ impl TMCHClient {
                         }
                     }
                 } {
-                    Ok(_) => {}
+                    Ok(s) => s,
                     Err(r) => {
                         if r {
                             break;
@@ -147,8 +153,9 @@ impl TMCHClient {
                         }
                     }
                 }
-            }
+            };
             trace!("Connection setup to {}", self.host);
+            let _ = ready_sender.send(setup_res).await;
 
             let (sock_read, mut sock_write) = tokio::io::split(sock);
             let msg_receiver = super::epp_like::ClientReceiver {
@@ -345,7 +352,7 @@ impl TMCHClient {
     async fn _setup_connection(
         &mut self,
         sock: &mut super::epp_like::tls_client::TLSConnection,
-    ) -> Result<(), bool> {
+    ) -> Result<outer_router::CommandTransactionID, bool> {
         let msg = match super::epp_like::recv_msg(sock, &self.host, &self.log_dir, recv_msg).await {
             Ok(m) => m,
             Err(_) => {
@@ -368,14 +375,16 @@ impl TMCHClient {
             }
 
             match self._login(sock).await {
-                Ok(_) => {}
+                Ok(res) => Ok(outer_router::CommandTransactionID {
+                    client: res.client_transaction_id.unwrap_or_default(),
+                    server: res.server_transaction_id,
+                }),
                 Err(_) => {
                     info!("Restarting connection...");
                     self._close(sock).await;
                     return Err(false);
                 }
             }
-            Ok(())
         } else {
             error!(
                 "Didn't receive greeting as first message from {}",
@@ -401,7 +410,7 @@ impl TMCHClient {
     async fn _login(
         &mut self,
         sock: &mut super::epp_like::tls_client::TLSConnection,
-    ) -> Result<(), ()> {
+    ) -> Result<tmch_proto::TMCHTransactionIdentifier, ()> {
         let command = tmch_proto::TMCHLogin {
             client_id: self.client_id.clone(),
             password: self.password.clone(),
@@ -443,7 +452,7 @@ impl TMCHClient {
                 Err(())
             } else {
                 info!("Successfully logged into {}", self.server_id);
-                Ok(())
+                Ok(response.transaction_id)
             }
         } else {
             error!(
