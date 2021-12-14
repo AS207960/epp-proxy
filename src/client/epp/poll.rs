@@ -1204,7 +1204,7 @@ mod poll_tests {
                 assert_eq!(trn_data.data.name, "example.uk.com");
                 assert_eq!(
                     trn_data.data.status,
-                    super::super::TransferStatus::ClientApproved
+                    super::super::super::TransferStatus::ClientApproved
                 );
                 assert_eq!(trn_data.data.requested_client_id, "H12345");
                 assert_eq!(trn_data.data.act_client_id, "H54321");
@@ -1252,7 +1252,7 @@ mod poll_tests {
                 change_data: None,
             } => {
                 assert_eq!(trn_data.data.name, "example.uk.com");
-                assert_eq!(trn_data.data.status, super::super::TransferStatus::Pending);
+                assert_eq!(trn_data.data.status, super::super::super::TransferStatus::Pending);
                 assert_eq!(trn_data.data.requested_client_id, "H12345");
                 assert_eq!(trn_data.data.act_client_id, "H54321");
             }
@@ -1302,7 +1302,7 @@ mod poll_tests {
                 assert_eq!(bal_data.credit_limit, "1000");
                 assert_eq!(
                     bal_data.credit_threshold,
-                    super::super::verisign::CreditThreshold::Percentage(10)
+                    super::super::super::verisign::CreditThreshold::Percentage(10)
                 );
                 assert_eq!(bal_data.available_credit, "80");
             }

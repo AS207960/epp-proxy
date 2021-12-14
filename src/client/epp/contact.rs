@@ -704,7 +704,7 @@ pub fn handle_create(
                 city: a.city.clone(),
                 province: a.province.clone(),
                 postal_code: if client.has_erratum("traficom") {
-                    a.postal_code.as_ref().map(|s| s.replace(" ", ""))
+                    a.postal_code.as_ref().map(|s| s.replace(' ', ""))
                 } else {
                     a.postal_code.clone()
                 },

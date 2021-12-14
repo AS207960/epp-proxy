@@ -389,7 +389,7 @@ impl TMCHClient {
                 Err(_) => {
                     info!("Restarting connection...");
                     self._close(sock).await;
-                    return Err(false);
+                    Err(false)
                 }
             }
         } else {

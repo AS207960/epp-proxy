@@ -897,7 +897,7 @@ mod eurid_tests {
         };
         let data = super::super::contact::handle_info_response(*res).unwrap();
         let eurid_extension = data.eurid_contact_extension.unwrap();
-        assert_eq!(data.entity_type, super::super::contact::EntityType::Unknown);
+        assert_eq!(data.entity_type, super::super::super::contact::EntityType::Unknown);
         assert_eq!(eurid_extension.contact_type, super::ContactType::Tech);
         assert_eq!(eurid_extension.language, "en");
         assert_eq!(eurid_extension.citizenship_country.is_none(), true);
@@ -959,7 +959,7 @@ mod eurid_tests {
         let eurid_extension = data.eurid_contact_extension.unwrap();
         assert_eq!(
             data.entity_type,
-            super::super::contact::EntityType::OtherIndividual
+            super::super::super::contact::EntityType::OtherIndividual
         );
         assert_eq!(eurid_extension.contact_type, super::ContactType::Registrant);
         assert_eq!(eurid_extension.language, "en");
@@ -1024,7 +1024,7 @@ mod eurid_tests {
         };
         let data = super::super::contact::handle_info_response(*res).unwrap();
         let eurid_extension = data.eurid_contact_extension.unwrap();
-        assert_eq!(data.entity_type, super::super::contact::EntityType::Unknown);
+        assert_eq!(data.entity_type, super::super::super::contact::EntityType::Unknown);
         assert_eq!(eurid_extension.contact_type, super::ContactType::Registrant);
         assert_eq!(eurid_extension.language, "en");
         assert_eq!(eurid_extension.citizenship_country.is_none(), true);
@@ -1086,7 +1086,7 @@ mod eurid_tests {
         let eurid_extension = data.eurid_contact_extension.unwrap();
         assert_eq!(
             data.entity_type,
-            super::super::contact::EntityType::OtherIndividual
+            super::super::super::contact::EntityType::OtherIndividual
         );
         assert_eq!(eurid_extension.contact_type, super::ContactType::Reseller);
         assert_eq!(eurid_extension.language, "en");
@@ -1139,7 +1139,7 @@ mod eurid_tests {
         assert_eq!(eurid_extension.status.len(), 1);
         assert_eq!(
             eurid_extension.status[0],
-            super::super::domain::Status::ServerTransferProhibited
+            super::super::super::domain::Status::ServerTransferProhibited
         );
     }
 
@@ -1343,7 +1343,7 @@ mod eurid_tests {
         let eurid_idn = data.eurid_idn.unwrap();
         for ns in &data.nameservers {
             match ns {
-                super::super::domain::InfoNameserver::HostAndAddress {
+                super::super::super::domain::InfoNameserver::HostAndAddress {
                     addresses: _,
                     host: _,
                     eurid_idn,
