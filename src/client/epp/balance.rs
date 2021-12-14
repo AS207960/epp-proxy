@@ -300,6 +300,6 @@ mod balance_tests {
         let data = super::handle_balance_response(*res).unwrap();
         assert_eq!(data.balance, "10000.00");
         assert_eq!(data.currency, "EUR");
-        assert_eq!(data.available_credit.is_none(), true);
+        assert!(data.available_credit.is_none());
     }
 }

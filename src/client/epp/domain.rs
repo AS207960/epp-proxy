@@ -2229,7 +2229,7 @@ mod domain_tests {
             _ => unreachable!(),
         };
         let data = super::handle_claims_check_response(*res).unwrap();
-        assert_eq!(data.exists, true);
+        assert!(data.exists);
         assert_eq!(data.claims_key.len(), 2);
         let claims_key_1 = data.claims_key.get(0).unwrap();
         let claims_key_2 = data.claims_key.get(1).unwrap();
@@ -2348,7 +2348,7 @@ mod domain_tests {
             _ => unreachable!(),
         };
         let data = super::handle_create_response(*res).unwrap();
-        assert_eq!(data.pending, true);
+        assert!(data.pending);
         let launch_create = data.launch_create.unwrap();
         assert_eq!(
             launch_create.phase.phase_type,

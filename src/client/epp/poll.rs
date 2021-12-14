@@ -432,7 +432,7 @@ mod poll_tests {
                 );
                 assert_eq!(change_data.who, "SWITCH CDS: see https://www.nic.ch/cds/");
                 assert_eq!(change_data.reason.unwrap(), "DNSSEC initialized");
-                assert_eq!(data.sec_dns.is_some(), true);
+                assert!(data.sec_dns.is_some());
             }
             _ => unreachable!(),
         }
@@ -492,7 +492,7 @@ mod poll_tests {
                 );
                 assert_eq!(change_data.who, "SWITCH CDS: see https://www.nic.ch/cds/");
                 assert_eq!(change_data.reason.unwrap(), "DNSSEC deactivated");
-                assert_eq!(data.sec_dns.is_none(), true);
+                assert!(data.sec_dns.is_none());
             }
             _ => unreachable!(),
         }
@@ -556,7 +556,7 @@ mod poll_tests {
         assert_eq!(data.message, "Account Details Change Notification");
         match data.data {
             super::PollData::ContactInfoData { data, change_data } => {
-                assert_eq!(change_data.is_none(), true);
+                assert!(change_data.is_none());
                 assert_eq!(data.id, "CMyContactID");
             }
             _ => unreachable!(),
@@ -654,7 +654,7 @@ mod poll_tests {
                 change_data: None,
             } => {
                 assert_eq!(reslease_data.account_id, "12345");
-                assert_eq!(reslease_data.account_moved, true);
+                assert!(reslease_data.account_moved);
                 assert_eq!(reslease_data.from, "EXAMPLE1-TAG");
                 assert_eq!(reslease_data.registrar_tag, "EXAMPLE2-TAG");
                 assert_eq!(reslease_data.domains.len(), 6);
@@ -1394,7 +1394,7 @@ mod poll_tests {
                 change_data: None,
             } => {
                 assert_eq!(pan_data.name, "example.com");
-                assert_eq!(pan_data.result, false);
+                assert!(!pan_data.result);
                 assert_eq!(
                     pan_data.server_transaction_id.unwrap(),
                     "33a2eb76-4295-43f1-a1f6-c757e8d1be41"
@@ -1458,7 +1458,7 @@ mod poll_tests {
                 assert_eq!(data.action, "SUSPENDED");
                 assert_eq!(data.code, 2110);
                 assert_eq!(data.detail.unwrap(), "A really good reason for suspending");
-                assert_eq!(data.registrar.is_none(), true);
+                assert!(data.registrar.is_none());
             }
             _ => unreachable!(),
         }
@@ -1511,8 +1511,8 @@ mod poll_tests {
                 assert_eq!(data.object_unicode.unwrap(), "abcabc-1573042778986.eu");
                 assert_eq!(data.action, "QUARANTINED");
                 assert_eq!(data.code, 1700);
-                assert_eq!(data.detail.is_none(), true);
-                assert_eq!(data.registrar.is_none(), true);
+                assert!(data.detail.is_none());
+                assert!(data.registrar.is_none());
             }
             _ => unreachable!(),
         }
@@ -1562,8 +1562,8 @@ mod poll_tests {
                 assert_eq!(data.object_unicode.unwrap(), "7");
                 assert_eq!(data.action, "REACHED");
                 assert_eq!(data.code, 2620);
-                assert_eq!(data.detail.is_none(), true);
-                assert_eq!(data.registrar.is_none(), true);
+                assert!(data.detail.is_none());
+                assert!(data.registrar.is_none());
             }
             _ => unreachable!(),
         }

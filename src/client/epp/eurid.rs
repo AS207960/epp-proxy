@@ -597,7 +597,7 @@ mod eurid_tests {
         let data = super::handle_hit_points_response(*res).unwrap();
         assert_eq!(data.hit_points, 0);
         assert_eq!(data.max_hit_points, 2000);
-        assert_eq!(data.blocked_until.is_none(), true);
+        assert!(data.blocked_until.is_none());
     }
 
     #[test]
@@ -631,7 +631,7 @@ mod eurid_tests {
         let data = super::handle_hit_points_response(*res).unwrap();
         assert_eq!(data.hit_points, 6);
         assert_eq!(data.max_hit_points, 5);
-        assert_eq!(data.blocked_until.is_some(), true);
+        assert!(data.blocked_until.is_some());
     }
 
     #[test]
@@ -663,7 +663,7 @@ mod eurid_tests {
         let data = super::handle_registration_limits_response(*res).unwrap();
         assert_eq!(data.monthly_registrations, 0);
         assert_eq!(data.max_monthly_registrations.unwrap(), 1000);
-        assert_eq!(data.limited_until.is_none(), true);
+        assert!(data.limited_until.is_none());
     }
 
     #[test]
@@ -693,8 +693,8 @@ mod eurid_tests {
         };
         let data = super::handle_registration_limits_response(*res).unwrap();
         assert_eq!(data.monthly_registrations, 0);
-        assert_eq!(data.max_monthly_registrations.is_none(), true);
-        assert_eq!(data.limited_until.is_none(), true);
+        assert!(data.max_monthly_registrations.is_none());
+        assert!(data.limited_until.is_none());
     }
 
     #[test]
@@ -727,7 +727,7 @@ mod eurid_tests {
         let data = super::handle_registration_limits_response(*res).unwrap();
         assert_eq!(data.monthly_registrations, 1);
         assert_eq!(data.max_monthly_registrations.unwrap(), 1);
-        assert_eq!(data.limited_until.is_some(), true);
+        assert!(data.limited_until.is_some());
     }
 
     #[test]
@@ -760,10 +760,10 @@ mod eurid_tests {
             _ => unreachable!(),
         };
         let data = super::handle_dnssec_eligibility_response(*res).unwrap();
-        assert_eq!(data.eligible, true);
+        assert!(data.eligible);
         assert_eq!(data.message, "Eligible for DNSSEC discount");
         assert_eq!(data.code, 1001);
-        assert_eq!(data.idn.is_none(), true);
+        assert!(data.idn.is_none());
     }
 
     #[test]
@@ -803,7 +803,7 @@ mod eurid_tests {
             _ => unreachable!(),
         };
         let data = super::handle_dnssec_eligibility_response(*res).unwrap();
-        assert_eq!(data.eligible, false);
+        assert!(!data.eligible);
         assert_eq!(data.message, "Not eligible for DNSSEC discount");
         assert_eq!(data.code, 2000);
         let idn = data.idn.unwrap();
@@ -839,9 +839,9 @@ mod eurid_tests {
             _ => unreachable!(),
         };
         let data = super::handle_dns_quality_response(*res).unwrap();
-        assert_eq!(data.check_time.is_some(), true);
+        assert!(data.check_time.is_some());
         assert_eq!(data.score, "10000");
-        assert_eq!(data.idn.is_none(), true);
+        assert!(data.idn.is_none());
     }
 
     #[test]
@@ -900,9 +900,9 @@ mod eurid_tests {
         assert_eq!(data.entity_type, super::super::super::contact::EntityType::Unknown);
         assert_eq!(eurid_extension.contact_type, super::ContactType::Tech);
         assert_eq!(eurid_extension.language, "en");
-        assert_eq!(eurid_extension.citizenship_country.is_none(), true);
-        assert_eq!(eurid_extension.whois_email.is_none(), true);
-        assert_eq!(eurid_extension.vat.is_none(), true);
+        assert!(eurid_extension.citizenship_country.is_none());
+        assert!(eurid_extension.whois_email.is_none());
+        assert!(eurid_extension.vat.is_none());
     }
 
     #[test]
@@ -963,9 +963,9 @@ mod eurid_tests {
         );
         assert_eq!(eurid_extension.contact_type, super::ContactType::Registrant);
         assert_eq!(eurid_extension.language, "en");
-        assert_eq!(eurid_extension.citizenship_country.is_none(), true);
-        assert_eq!(eurid_extension.whois_email.is_none(), true);
-        assert_eq!(eurid_extension.vat.is_none(), true);
+        assert!(eurid_extension.citizenship_country.is_none());
+        assert!(eurid_extension.whois_email.is_none());
+        assert!(eurid_extension.vat.is_none());
     }
 
     #[test]
@@ -1027,8 +1027,8 @@ mod eurid_tests {
         assert_eq!(data.entity_type, super::super::super::contact::EntityType::Unknown);
         assert_eq!(eurid_extension.contact_type, super::ContactType::Registrant);
         assert_eq!(eurid_extension.language, "en");
-        assert_eq!(eurid_extension.citizenship_country.is_none(), true);
-        assert_eq!(eurid_extension.whois_email.is_none(), true);
+        assert!(eurid_extension.citizenship_country.is_none());
+        assert!(eurid_extension.whois_email.is_none());
         assert_eq!(eurid_extension.vat.unwrap(), "VAT1234567890");
     }
 
@@ -1090,9 +1090,9 @@ mod eurid_tests {
         );
         assert_eq!(eurid_extension.contact_type, super::ContactType::Reseller);
         assert_eq!(eurid_extension.language, "en");
-        assert_eq!(eurid_extension.citizenship_country.is_none(), true);
-        assert_eq!(eurid_extension.whois_email.is_none(), true);
-        assert_eq!(eurid_extension.vat.is_none(), true);
+        assert!(eurid_extension.citizenship_country.is_none());
+        assert!(eurid_extension.whois_email.is_none());
+        assert!(eurid_extension.vat.is_none());
     }
 
     #[test]
@@ -1133,9 +1133,9 @@ mod eurid_tests {
         };
         let data = super::super::domain::handle_check_response(*res).unwrap();
         let eurid_extension = data.eurid_check.unwrap();
-        assert_eq!(data.avail, false);
+        assert!(!data.avail);
         assert_eq!(data.reason.unwrap(), "registered");
-        assert_eq!(eurid_extension.available_date.is_none(), true);
+        assert!(eurid_extension.available_date.is_none());
         assert_eq!(eurid_extension.status.len(), 1);
         assert_eq!(
             eurid_extension.status[0],
@@ -1181,9 +1181,9 @@ mod eurid_tests {
         };
         let data = super::super::domain::handle_check_response(*res).unwrap();
         let idn = data.eurid_idn.unwrap();
-        assert_eq!(data.avail, false);
+        assert!(!data.avail);
         assert_eq!(data.reason.unwrap(), "registered");
-        assert_eq!(data.eurid_check.is_none(), true);
+        assert!(data.eurid_check.is_none());
         assert_eq!(idn.ace, "xn---1573042515287-f9jaaaqc.xn--qxa6a");
         assert_eq!(idn.unicode, "αβααβα-1573042515287.ευ");
     }
@@ -1251,17 +1251,17 @@ mod eurid_tests {
         let data = super::super::domain::handle_info_response(*res).unwrap();
         let eurid_data = data.eurid_data.unwrap();
         assert_eq!(data.name, "somedomain.eu");
-        assert_eq!(eurid_data.on_hold, false);
-        assert_eq!(eurid_data.quarantined, false);
-        assert_eq!(eurid_data.suspended, false);
-        assert_eq!(eurid_data.seized, false);
+        assert!(!eurid_data.on_hold);
+        assert!(!eurid_data.quarantined);
+        assert!(!eurid_data.suspended);
+        assert!(!eurid_data.seized);
         assert_eq!(eurid_data.on_site.unwrap(), "c169");
-        assert_eq!(eurid_data.delayed, false);
+        assert!(!eurid_data.delayed);
         assert_eq!(eurid_data.max_extension_period, 7);
         assert_eq!(eurid_data.registrant_country, "BE");
-        assert_eq!(eurid_data.registrant_country_of_citizenship.is_none(), true);
-        assert_eq!(eurid_data.reseller.is_none(), true);
-        assert_eq!(eurid_data.deletion_date.is_none(), true);
+        assert!(eurid_data.registrant_country_of_citizenship.is_none());
+        assert!(eurid_data.reseller.is_none());
+        assert!(eurid_data.deletion_date.is_none());
     }
 
     #[test]
@@ -1348,23 +1348,23 @@ mod eurid_tests {
                     host: _,
                     eurid_idn,
                 } => {
-                    assert_eq!(eurid_idn.is_some(), true);
+                    assert!(eurid_idn.is_some());
                 }
                 _ => unreachable!(),
             }
         }
         assert_eq!(data.name, "вмкйршаудхыийведйкгг.ею");
-        assert_eq!(eurid_data.on_hold, false);
-        assert_eq!(eurid_data.quarantined, false);
-        assert_eq!(eurid_data.suspended, false);
-        assert_eq!(eurid_data.seized, false);
+        assert!(eurid_data.on_hold);
+        assert!(eurid_data.quarantined);
+        assert!(eurid_data.suspended);
+        assert!(eurid_data.seized);
         assert_eq!(eurid_data.on_site.unwrap(), "c195");
-        assert_eq!(eurid_data.delayed, false);
+        assert!(!eurid_data.delayed);
         assert_eq!(eurid_data.max_extension_period, 7);
         assert_eq!(eurid_data.registrant_country, "BE");
-        assert_eq!(eurid_data.registrant_country_of_citizenship.is_none(), true);
-        assert_eq!(eurid_data.reseller.is_none(), true);
-        assert_eq!(eurid_data.deletion_date.is_none(), true);
+        assert!(eurid_data.registrant_country_of_citizenship.is_none());
+        assert!(eurid_data.reseller.is_none());
+        assert!(eurid_data.deletion_date.is_none());
         assert_eq!(eurid_idn.unicode, "вмкйршаудхыийведйкгг.ею");
         assert_eq!(eurid_idn.ace, "xn--80adbeadbhzhddejt0e9bxb3cwd.xn--e1a4c");
     }
@@ -1402,9 +1402,9 @@ mod eurid_tests {
         };
         let data = super::super::domain::handle_renew_response(*res).unwrap();
         let eurid_data = data.data.eurid_data.unwrap();
-        assert_eq!(data.data.eurid_idn.is_none(), true);
+        assert!(data.data.eurid_idn.is_none());
         assert_eq!(data.data.name, "somedomain.eu");
-        assert_eq!(eurid_data.removed_deletion, true);
+        assert!(eurid_data.removed_deletion);
     }
 
     #[test]
@@ -1439,9 +1439,9 @@ mod eurid_tests {
         };
         let data = super::super::domain::handle_renew_response(*res).unwrap();
         let eurid_data = data.data.eurid_data.unwrap();
-        assert_eq!(data.data.eurid_idn.is_none(), true);
+        assert!(data.data.eurid_idn.is_none());
         assert_eq!(data.data.name, "somedomain.eu");
-        assert_eq!(eurid_data.removed_deletion, false);
+        assert!(!eurid_data.removed_deletion);
     }
 
     #[test]
@@ -1497,14 +1497,14 @@ mod eurid_tests {
         let eurid_idn = data.data.eurid_idn.unwrap();
         assert_eq!(data.data.name, "вмкйршаудхыийведйкгг.ею");
         assert_eq!(eurid_idn.ace, "xn--80adbeadbhzhddejt0e9bxb3cwd.xn--e1a4c");
-        assert_eq!(eurid_data.on_hold, false);
-        assert_eq!(eurid_data.quarantined, false);
-        assert_eq!(eurid_data.delayed, false);
+        assert!(!eurid_data.on_hold);
+        assert!(!eurid_data.quarantined);
+        assert!(!eurid_data.delayed);
         assert_eq!(eurid_data.reason, "RANDOM CHECK");
         assert_eq!(eurid_data.registrant, "c293");
         assert_eq!(eurid_data.billing, "c292");
         assert_eq!(eurid_data.technical.unwrap(), "c294");
-        assert_eq!(eurid_data.reseller.is_none(), true);
-        assert_eq!(eurid_data.on_site.is_none(), true);
+        assert!(eurid_data.reseller.is_none());
+        assert!(eurid_data.on_site.is_none());
     }
 }
