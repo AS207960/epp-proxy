@@ -9,7 +9,7 @@ use std::collections::HashMap;
 
 pub mod client;
 pub mod grpc;
-mod proto;
+pub mod proto;
 
 #[allow(missing_docs)]
 pub mod built_info {

@@ -26,6 +26,7 @@ pub mod tmch;
 pub mod traficom;
 pub mod united_tld;
 pub mod verisign;
+pub mod tm_notice;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub enum EPPMessageType {
