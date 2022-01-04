@@ -738,7 +738,7 @@ pub enum EPPResponseExtensionType {
     EPPFee08DeleteData(fee::EPPFee08DeleteData),
     #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.9}delData")]
     EPPFee09DeleteData(fee::EPPFee09DeleteData),
-    #[serde(rename = "{urn:ietf:params:xml:ns:fee-1.0}delData")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.11}delData")]
     EPPFee011DeleteData(fee::EPPFee011TransformData),
     #[serde(rename = "{urn:ietf:params:xml:ns:epp:fee-1.0}delData")]
     EPPFee10DeleteData(fee::EPPFee10TransformData),

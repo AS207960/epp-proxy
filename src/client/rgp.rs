@@ -19,7 +19,7 @@ pub struct RestoreResponse {
     pub fee_data: Option<fee::FeeData>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub enum RGPState {
     Unknown,
     AddPeriod,

@@ -10,7 +10,7 @@ pub struct FeeAgreement {
     pub fees: Vec<Fee>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub enum Command {
     Create,
     Renew,
