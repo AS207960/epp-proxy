@@ -14,38 +14,38 @@ async fn main() {
         .about("Test runner for the Verisign COM/NET EPP test")
         .author("Q of AS207960 <q@as207960.net>")
         .arg(
-            clap::Arg::with_name("acct1")
-                .short("a1")
+            clap::Arg::new("acct1")
+                .short('1')
                 .long("account_1")
                 .takes_value(true)
                 .required(true)
                 .help("Config file for the first account"),
         )
         .arg(
-            clap::Arg::with_name("acct2")
-                .short("a2")
+            clap::Arg::new("acct2")
+                .short('2')
                 .long("account_2")
                 .takes_value(true)
                 .required(true)
                 .help("Config file for the second account"),
         )
         .arg(
-            clap::Arg::with_name("domain")
-                .short("d")
+            clap::Arg::new("domain")
+                .short('d')
                 .long("domain")
                 .takes_value(true)
                 .required(true)
                 .help("Domain to use for testing"),
         )
         .arg(
-            clap::Arg::with_name("hsm_conf")
-                .short("h")
+            clap::Arg::new("hsm_conf")
+                .short('h')
                 .long("hsm-conf")
                 .takes_value(true)
                 .help("Where to read the HSM config file from"),
         )
         .arg(
-            clap::Arg::with_name("log")
+            clap::Arg::new("log")
                 .long("log")
                 .takes_value(true)
                 .default_value("./log/")

@@ -2,6 +2,7 @@
 extern crate log;
 
 use futures::StreamExt;
+use chrono::prelude::*;
 
 #[tokio::main]
 async fn main() {
@@ -10,81 +11,25 @@ async fn main() {
 
     let matches = clap::App::new("google-test")
         .version(env!("CARGO_PKG_VERSION"))
-        .about("Test runner for the Google EPP test")
+        .about("Test runner for the PIR EPP test")
         .author("Q of AS207960 <q@as207960.net>")
         .arg(
-            clap::Arg::with_name("acct-ga-1")
-                .short("aga1")
-                .long("account_ga_1")
+            clap::Arg::new("acct")
+                .short('a')
+                .long("account")
                 .takes_value(true)
                 .required(true)
-                .help("Config file for the first General Availability account"),
+                .help("Config file for the EPP account"),
         )
         .arg(
-            clap::Arg::with_name("acct-ga-2")
-                .short("aga2")
-                .long("account_ga_2")
-                .takes_value(true)
-                .required(true)
-                .help("Config file for the second General Availability account"),
-        )
-        .arg(
-            clap::Arg::with_name("acct-sunrise")
-                .short("as")
-                .long("account_sunrise")
-                .takes_value(true)
-                .required(true)
-                .help("Config file for the sunrise account"),
-        )
-        .arg(
-            clap::Arg::with_name("registrar_name")
-                .short("r")
-                .long("registrar_name")
-                .takes_value(true)
-                .required(true)
-                .help("Registrar account name"),
-        )
-        .arg(
-            clap::Arg::with_name("domain")
-                .short("d")
-                .long("domain")
-                .takes_value(true)
-                .required(true)
-                .help("Domain to use for testing (without TLD)"),
-        )
-        .arg(
-            clap::Arg::with_name("domain_idn")
-                .short("id")
-                .long("idn_domain")
-                .takes_value(true)
-                .required(true)
-                .help("IDN Domain to use for testing (without TLD)"),
-        )
-        .arg(
-            clap::Arg::with_name("tmcnis_user")
-                .short("tmu")
-                .long("tmcnis_user")
-                .takes_value(true)
-                .required(true)
-                .help("Username for trademark CNIS"),
-        )
-        .arg(
-            clap::Arg::with_name("tmcnis_pass")
-                .short("tmp")
-                .long("tmcnis_password")
-                .takes_value(true)
-                .required(true)
-                .help("Password for trademark CNIS"),
-        )
-        .arg(
-            clap::Arg::with_name("hsm_conf")
-                .short("h")
+            clap::Arg::new("hsm_conf")
+                .short('h')
                 .long("hsm-conf")
                 .takes_value(true)
                 .help("Where to read the HSM config file from"),
         )
         .arg(
-            clap::Arg::with_name("log")
+            clap::Arg::new("log")
                 .long("log")
                 .takes_value(true)
                 .default_value("./log/")
@@ -93,20 +38,6 @@ async fn main() {
         .get_matches();
 
     let pkcs11_engine = epp_proxy::setup_pkcs11_engine(matches.value_of("hsm_conf")).await;
-    let domain = matches.value_of("domain").unwrap();
-    let domain_idn = matches.value_of("domain_idn").unwrap();
-    let registrar_name = matches.value_of("registrar_name").unwrap();
-    let tmcnis_user = matches.value_of("tmcnis_user").unwrap();
-    let tmcnis_pass = matches.value_of("tmcnis_pass").unwrap();
-
-    let ga_tld = format!("{}-ga", registrar_name);
-    let sunrise_tld = format!("{}-sunrise", registrar_name);
-    let ga_domain = format!("{}.{}", domain, ga_tld);
-    let ga_domain_ns1 = format!("ns1.{}", ga_domain);
-    let ga_domain_ns2 = format!("ns2.{}", ga_domain);
-    let ga_domain_idn = format!("{}.{}", domain_idn, ga_tld);
-    let ga_domain_claims = format!("test-and-validate.{}", ga_tld);
-    let ga_domain_premium = format!("rich.{}", ga_tld);
 
     let log_dir_path: &std::path::Path = matches.value_of("log").unwrap().as_ref();
     match std::fs::create_dir_all(&log_dir_path) {
@@ -117,945 +48,1087 @@ async fn main() {
         }
     }
 
-    let conf_file_ga_1_path = matches.value_of("acct-ga-1").unwrap();
-    let conf_file_ga_2_path = matches.value_of("acct-ga-2").unwrap();
-    let conf_file_sunrise_path = matches.value_of("acct-sunrise").unwrap();
+    let conf_file_path = matches.value_of("acct").unwrap();
 
-    let conf_file_ga_1 = match std::fs::File::open(conf_file_ga_1_path) {
+    let conf_file = match std::fs::File::open(conf_file_path) {
         Ok(f) => f,
         Err(e) => {
-            error!("Can't open config file {}: {}", conf_file_ga_1_path, e);
-            return;
-        }
-    };
-    let conf_file_ga_2 = match std::fs::File::open(conf_file_ga_2_path) {
-        Ok(f) => f,
-        Err(e) => {
-            error!("Can't open config file {}: {}", conf_file_ga_2_path, e);
-            return;
-        }
-    };
-    let conf_file_sunrise = match std::fs::File::open(conf_file_sunrise_path) {
-        Ok(f) => f,
-        Err(e) => {
-            error!("Can't open config file {}: {}", conf_file_sunrise_path, e);
+            error!("Can't open config file {}: {}", conf_file_path, e);
             return;
         }
     };
 
-    let conf_ga_1: epp_proxy::ConfigFile = match serde_json::from_reader(conf_file_ga_1) {
+    let mut conf: epp_proxy::ConfigFile = match serde_json::from_reader(conf_file) {
         Ok(c) => c,
         Err(e) => {
-            error!("Can't parse config file {}: {}", conf_file_ga_1_path, e);
-            return;
-        }
-    };
-    let conf_ga_2: epp_proxy::ConfigFile = match serde_json::from_reader(conf_file_ga_2) {
-        Ok(c) => c,
-        Err(e) => {
-            error!("Can't parse config file {}: {}", conf_file_ga_1_path, e);
-            return;
-        }
-    };
-    let conf_sunrise: epp_proxy::ConfigFile = match serde_json::from_reader(conf_file_sunrise) {
-        Ok(c) => c,
-        Err(e) => {
-            error!("Can't parse config file {}: {}", conf_file_ga_1_path, e);
+            error!("Can't parse config file {}: {}", conf_file_path, e);
             return;
         }
     };
 
-    let log_dir_ga_1 = log_dir_path.join(&conf_ga_1.id);
-    match std::fs::create_dir_all(&log_dir_ga_1) {
+    let log_dir = log_dir_path.join(&conf.id);
+    match std::fs::create_dir_all(&log_dir) {
         Ok(()) => {}
         Err(e) => {
-            error!("Can't create log directory for {}: {}", conf_ga_1.id, e);
-            return;
-        }
-    }
-    let log_dir_ga_2 = log_dir_path.join(&conf_ga_2.id);
-    match std::fs::create_dir_all(&log_dir_ga_2) {
-        Ok(()) => {}
-        Err(e) => {
-            error!("Can't create log directory for {}: {}", conf_ga_2.id, e);
-            return;
-        }
-    }
-    let log_dir_sunrise = log_dir_path.join(&conf_sunrise.id);
-    match std::fs::create_dir_all(&log_dir_sunrise) {
-        Ok(()) => {}
-        Err(e) => {
-            error!("Can't create log directory for {}: {}", conf_sunrise.id, e);
+            error!("Can't create log directory for {}: {}", conf.id, e);
             return;
         }
     }
 
-    let epp_client_ga_1 = epp_proxy::create_client(log_dir_ga_1, &conf_ga_1, &pkcs11_engine, true).await;
-    let epp_client_ga_2 = epp_proxy::create_client(log_dir_ga_2, &conf_ga_2, &pkcs11_engine, true).await;
-    let epp_client_sunrise = epp_proxy::create_client(log_dir_sunrise, &conf_sunrise, &pkcs11_engine, true).await;
+    conf.errata = Some("pir".to_string());
+    conf.tag = "ClientX".to_string();
+    conf.password = "foo-BAR2#123".to_string();
+    conf.new_password = None;
 
-    // 2.1 - Login
-    let (mut cmd_tx_ga_1, mut ready_rx_ga_1) = epp_client_ga_1.start();
-    let (mut cmd_tx_ga_2, mut ready_rx_ga_2) = epp_client_ga_2.start();
+    let epp_client = epp_proxy::create_client(log_dir.clone(), &conf, &pkcs11_engine, true).await;
 
-    info!("Awaiting client GA 1 to become ready...");
-    let login_trans_id = ready_rx_ga_1.next().await.unwrap();
-    info!("Login transaction ID: {:#?}", login_trans_id);
-    info!("Awaiting client GA 2 to become ready...");
-    let login_trans_id = ready_rx_ga_2.next().await.unwrap();
+    // 2.2.2 Authentication
+    let (cmd_tx, mut ready_rx) = epp_client.start();
+
+    info!("Awaiting client to become ready...");
+    let login_trans_id = ready_rx.next().await.unwrap();
     info!("Login transaction ID: {:#?}", login_trans_id);
 
-    // Misc setup
-    info!("Setting up contacts");
+    // 2.2.3 Change Password
+    info!("Changing password");
 
-    info!("Finding available contact ID");
-    let mut contact_id_i = 1;
-    let contact_id = loop {
-        let contact_id = format!("STACLAR-{}", contact_id_i);
-        let res = epp_proxy::client::contact::check(&contact_id, &mut cmd_tx_ga_1).await.unwrap();
-        if res.response.avail {
-            break contact_id;
-        } else {
-            contact_id_i += 1;
-        }
-    };
+    info!("Logging out of account");
+    let final_cmd = epp_proxy::client::logout(cmd_tx).await.unwrap();
+    println!("Final command transaction: {:#?}", final_cmd.transaction_id);
 
+    conf.new_password = Some("bar-FOO2#123".to_string());
+
+    let epp_client = epp_proxy::create_client(log_dir, &conf, &pkcs11_engine, true).await;
+    let (mut cmd_tx, mut ready_rx) = epp_client.start();
+
+    info!("Awaiting client to become ready...");
+    let login_trans_id = ready_rx.next().await.unwrap();
+    info!("Login transaction ID: {:#?}", login_trans_id);
+
+    // 2.3.1.1 Check Contact OTE-C1 (Contact Available)
+    info!("Checking contact available");
+    epp_proxy::client::contact::check("OTE-C1", &mut cmd_tx).await.unwrap();
+
+    // 2.3.1.2 Create Contact OTE-C1
     info!("Creating contact");
-    epp_proxy::client::contact::create(&contact_id, epp_proxy::client::contact::NewContactData {
+    epp_proxy::client::contact::create("OTE-C1", epp_proxy::client::contact::NewContactData {
         local_address: Some(epp_proxy::client::contact::Address {
-            name: "Boaty McBoat Face".to_string(),
-            organisation: None,
+            name: "John Doe".to_string(),
+            organisation: Some("Example Corp. Inc".to_string()),
             streets: vec![
-                "10 Downing St".to_string()
+                "123 Example St.".to_string(),
+                "Suite 100".to_string(),
             ],
-            city: "London".to_string(),
-            province: Some("England".to_string()),
-            postal_code: Some("SW1A 2AA".to_string()),
-            country_code: "GB".to_string(),
+            city: "Anytown".to_string(),
+            province: Some("Any Prov".to_string()),
+            postal_code: Some("A1A1A1".to_string()),
+            country_code: "CA".to_string(),
             identity_number: None,
             birth_date: None,
         }),
         internationalised_address: None,
         phone: Some(epp_proxy::client::Phone {
-            number: "+44.1818118181".to_string(),
-            extension: None,
+            number: "+1.4165555555".to_string(),
+            extension: Some("1111".to_string()),
         }),
-        fax: None,
-        email: "test@example.com".to_string(),
+        fax: Some(epp_proxy::client::Phone {
+            number: "+1.4165555556".to_string(),
+            extension: None
+        }),
+        email: "jdoe@test.test".to_string(),
         entity_type: None,
         trading_name: None,
         company_number: None,
         disclosure: None,
-        auth_info: "test_auth1".to_string(),
+        auth_info: "my_secret1".to_string(),
         eurid_info: None,
         isnic_info: None,
         qualified_lawyer: None,
-    }, &mut cmd_tx_ga_1).await.unwrap();
+    }, &mut cmd_tx).await.unwrap();
 
+    // 2.3.1.3 Check Contact (Contact Not Available)
+    info!("Checking contact not available");
+    epp_proxy::client::contact::check("OTE-C1", &mut cmd_tx).await.unwrap();
 
-    info!("Creating nameservers");
-    let res = epp_proxy::client::host::check("ns1.as207960.net", &mut cmd_tx_ga_1).await.unwrap();
-    if res.response.avail {
-        epp_proxy::client::host::create("ns1.as207960.net", vec![], None, &mut cmd_tx_ga_1).await.unwrap();
-    }
-    let res = epp_proxy::client::host::check("ns2.as207960.net", &mut cmd_tx_ga_1).await.unwrap();
-    if res.response.avail {
-        epp_proxy::client::host::create("ns2.as207960.net", vec![], None, &mut cmd_tx_ga_1).await.unwrap();
-    }
+    // 2.3.1.4 Query Contact OTE-C1
+    info!("Getting contact info");
+    epp_proxy::client::contact::info("OTE-C1", &mut cmd_tx).await.unwrap();
 
-    // 2.2.2 - Perform a check to see that an ASCII domain label is available.
-    info!("Finding available domain");
-    epp_proxy::client::domain::check(&ga_domain, None, None, &mut cmd_tx_ga_1).await.unwrap();
+    // 2.3.1.5 Check Contact OTE-C2 (Contact Available)
+    info!("Checking contact available");
+    epp_proxy::client::contact::check("OTE-C2", &mut cmd_tx).await.unwrap();
 
-    // 2.2.3 - Create a domain with that ASCII label with all fields populated
+    // 2.3.1.6 Create Contact OTE-C2
+    info!("Creating contact");
+    epp_proxy::client::contact::create("OTE-C2", epp_proxy::client::contact::NewContactData {
+        local_address: Some(epp_proxy::client::contact::Address {
+            name: "John Doe".to_string(),
+            organisation: Some("Example Corp. Inc".to_string()),
+            streets: vec![
+                "123 Example St.".to_string(),
+                "Suite 100".to_string(),
+            ],
+            city: "Anytown".to_string(),
+            province: Some("Any Prov".to_string()),
+            postal_code: Some("A1A1A1".to_string()),
+            country_code: "CA".to_string(),
+            identity_number: None,
+            birth_date: None,
+        }),
+        internationalised_address: None,
+        phone: Some(epp_proxy::client::Phone {
+            number: "+1.4165555555".to_string(),
+            extension: Some("1111".to_string()),
+        }),
+        fax: Some(epp_proxy::client::Phone {
+            number: "+1.4165555556".to_string(),
+            extension: None
+        }),
+        email: "jdoe@test.test".to_string(),
+        entity_type: None,
+        trading_name: None,
+        company_number: None,
+        disclosure: None,
+        auth_info: "my_secret1".to_string(),
+        eurid_info: None,
+        isnic_info: None,
+        qualified_lawyer: None,
+    }, &mut cmd_tx).await.unwrap();
+
+    // 2.3.1.7 Check Contact OTE-C3 (Contact Available)
+    info!("Checking contact available");
+    epp_proxy::client::contact::check("OTE-C3", &mut cmd_tx).await.unwrap();
+
+    // 2.3.1.8 Create Contact OTE-C3
+    info!("Creating contact");
+    epp_proxy::client::contact::create("OTE-C3", epp_proxy::client::contact::NewContactData {
+        local_address: Some(epp_proxy::client::contact::Address {
+            name: "John Doe".to_string(),
+            organisation: Some("Example Corp. Inc".to_string()),
+            streets: vec![
+                "123 Example St.".to_string(),
+                "Suite 100".to_string(),
+            ],
+            city: "Anytown".to_string(),
+            province: Some("Any Prov".to_string()),
+            postal_code: Some("A1A1A1".to_string()),
+            country_code: "CA".to_string(),
+            identity_number: None,
+            birth_date: None,
+        }),
+        internationalised_address: None,
+        phone: Some(epp_proxy::client::Phone {
+            number: "+1.4165555555".to_string(),
+            extension: Some("1111".to_string()),
+        }),
+        fax: Some(epp_proxy::client::Phone {
+            number: "+1.4165555556".to_string(),
+            extension: None
+        }),
+        email: "jdoe@test.test".to_string(),
+        entity_type: None,
+        trading_name: None,
+        company_number: None,
+        disclosure: None,
+        auth_info: "my_secret1".to_string(),
+        eurid_info: None,
+        isnic_info: None,
+        qualified_lawyer: None,
+    }, &mut cmd_tx).await.unwrap();
+
+    // 2.3.1.9 Check Contact OTE-C4 (Contact Available)
+    info!("Checking contact available");
+    epp_proxy::client::contact::check("OTE-C4", &mut cmd_tx).await.unwrap();
+
+    // 2.3.1.10 Create Contact OTE-C4
+    info!("Creating contact");
+    epp_proxy::client::contact::create("OTE-C4", epp_proxy::client::contact::NewContactData {
+        local_address: Some(epp_proxy::client::contact::Address {
+            name: "John Doe".to_string(),
+            organisation: Some("Example Corp. Inc".to_string()),
+            streets: vec![
+                "123 Example St.".to_string(),
+                "Suite 100".to_string(),
+            ],
+            city: "Anytown".to_string(),
+            province: Some("Any Prov".to_string()),
+            postal_code: Some("A1A1A1".to_string()),
+            country_code: "CA".to_string(),
+            identity_number: None,
+            birth_date: None,
+        }),
+        internationalised_address: None,
+        phone: Some(epp_proxy::client::Phone {
+            number: "+1.4165555555".to_string(),
+            extension: Some("1111".to_string()),
+        }),
+        fax: Some(epp_proxy::client::Phone {
+            number: "+1.4165555556".to_string(),
+            extension: None
+        }),
+        email: "jdoe@test.test".to_string(),
+        entity_type: None,
+        trading_name: None,
+        company_number: None,
+        disclosure: None,
+        auth_info: "my_secret1".to_string(),
+        eurid_info: None,
+        isnic_info: None,
+        qualified_lawyer: None,
+    }, &mut cmd_tx).await.unwrap();
+
+    // 2.3.1.11 Update Contact (Change Element)
+    info!("Updating contact");
+    epp_proxy::client::contact::update("OTE-C3", vec![], vec![], epp_proxy::client::contact::UpdateContactData {
+        local_address: Some(epp_proxy::client::contact::Address {
+            name: "Jane Smith".to_string(),
+            organisation: Some("Example Corp. Inc".to_string()),
+            streets: vec![
+                "123 Example St.".to_string(),
+                "Suite 100".to_string(),
+            ],
+            city: "Anytown".to_string(),
+            province: Some("Any Prov".to_string()),
+            postal_code: Some("A1A1A1".to_string()),
+            country_code: "CA".to_string(),
+            identity_number: None,
+            birth_date: None,
+        }),
+        ..Default::default()
+    }, &mut cmd_tx).await.unwrap();
+
+    // 2.3.1.12 Update Contact (Remove Element)
+    info!("Updating contact");
+    epp_proxy::client::contact::update("OTE-C3", vec![], vec![], epp_proxy::client::contact::UpdateContactData {
+        fax: Some(epp_proxy::client::Phone {
+            number: "".to_string(),
+            extension: None
+        }),
+        ..Default::default()
+    }, &mut cmd_tx).await.unwrap();
+
+    // 2.3.1.13 Update Contact (Add Element)
+    info!("Updating contact");
+    epp_proxy::client::contact::update("OTE-C3", vec![], vec![], epp_proxy::client::contact::UpdateContactData {
+        fax: Some(epp_proxy::client::Phone {
+            number: "+1.4165555556".to_string(),
+            extension: None
+        }),
+        ..Default::default()
+    }, &mut cmd_tx).await.unwrap();
+
+    // 2.3.1.14 Check Name Server (Foreign Registry - Available)
+    info!("Checking nameserver");
+    epp_proxy::client::host::check("ns1.example.com", &mut cmd_tx).await.unwrap();
+
+    // 2.3.1.15 Create Name Server (Foreign Registry)
+    info!("Creating nameserver");
+    epp_proxy::client::host::create("ns1.example.com", vec![], None, &mut cmd_tx).await.unwrap();
+
+    // 2.3.1.16 Check Name Server (Foreign Registry - Available)
+    info!("Checking nameserver");
+    epp_proxy::client::host::check("ns2.example.com", &mut cmd_tx).await.unwrap();
+
+    // 2.3.1.17 Create Name Server (Foreign Registry)
+    info!("Creating nameserver");
+    epp_proxy::client::host::create("ns2.example.com", vec![], None, &mut cmd_tx).await.unwrap();
+
+    // 2.3.1.18 Check Domain (Domain Available for Registration)
+    info!("Checking domain");
+    epp_proxy::client::domain::check("example.org", None, None, &mut cmd_tx).await.unwrap();
+
+    // 2.3.1.19 Create domain
     info!("Creating domain");
-    epp_proxy::client::domain::create(
-        epp_proxy::client::domain::CreateInfo {
-            domain: &ga_domain,
-            nameservers: vec![
-                epp_proxy::client::domain::InfoNameserver::HostOnly("ns1.as207960.net".to_string()),
-                epp_proxy::client::domain::InfoNameserver::HostOnly("ns2.as207960.net".to_string()),
-            ],
-            period: Some(epp_proxy::client::Period {
-                unit: epp_proxy::client::PeriodUnit::Years,
-                value: 2,
-            }),
-            auth_info: "test_auth1",
-            registrant: &contact_id,
-            contacts: vec![epp_proxy::client::domain::InfoContact {
+    epp_proxy::client::domain::create(epp_proxy::client::domain::CreateInfo {
+        domain: "example.org",
+        period: Some(epp_proxy::client::Period {
+            unit: epp_proxy::client::PeriodUnit::Years,
+            value: 1
+        }),
+        registrant: "OTE-C1",
+        contacts: vec![epp_proxy::client::domain::InfoContact {
+            contact_type: "admin".to_string(),
+            contact_id: "OTE-C2".to_string()
+        }, epp_proxy::client::domain::InfoContact {
+            contact_type: "billing".to_string(),
+            contact_id: "OTE-C3".to_string()
+        }, epp_proxy::client::domain::InfoContact {
+            contact_type: "tech".to_string(),
+            contact_id: "OTE-C4".to_string()
+        }],
+        nameservers: vec![
+            epp_proxy::client::domain::InfoNameserver::HostOnly("ns1.example.com".to_string()),
+            epp_proxy::client::domain::InfoNameserver::HostOnly("ns2.example.com".to_string()),
+        ],
+        auth_info: "my_secret1",
+        sec_dns: None,
+        launch_create: None,
+        fee_agreement: None,
+        donuts_fee_agreement: None,
+        eurid_data: None,
+        isnic_payment: None
+    }, &mut cmd_tx).await.unwrap();
+
+    // 2.3.1.20 Check Domain (Domain Not Available for Registration)
+    info!("Checking domain not available");
+    epp_proxy::client::domain::check("example.org", None, None, &mut cmd_tx).await.unwrap();
+
+    // 2.3.1.21 Query Domain
+    info!("Querying domain");
+    epp_proxy::client::domain::info("example.org", None, None, None, None, &mut cmd_tx).await.unwrap();
+
+    // 2.3.1.22 Check Name Server (Available)
+    info!("Checking nameserver");
+    epp_proxy::client::host::check("ns1.example.org", &mut cmd_tx).await.unwrap();
+
+    // 2.3.1.23 Create Name Server
+    info!("Creating nameserver");
+    epp_proxy::client::host::create("ns1.example.org", vec![
+        epp_proxy::client::host::Address {
+            address: "203.171.1.93".to_string(),
+            ip_version: epp_proxy::client::host::AddressVersion::IPv4
+        }
+    ], None, &mut cmd_tx).await.unwrap();
+
+    // 2.3.1.24 Check Name Server (Unavailable)
+    info!("Checking nameserver unavailable");
+    epp_proxy::client::host::check("ns1.example.org", &mut cmd_tx).await.unwrap();
+
+    // 2.3.1.25 Query Name Server
+    info!("Querying nameserver");
+    epp_proxy::client::host::info("ns1.example.org", &mut cmd_tx).await.unwrap();
+
+    // 2.3.1.26 Check Name Server (Available)
+    info!("Checking nameserver");
+    epp_proxy::client::host::check("ns2.example.org", &mut cmd_tx).await.unwrap();
+
+    // 2.3.1.27 Create Name Server
+    info!("Creating nameserver");
+    epp_proxy::client::host::create("ns2.example.org", vec![
+        epp_proxy::client::host::Address {
+            address: "203.171.1.94".to_string(),
+            ip_version: epp_proxy::client::host::AddressVersion::IPv4
+        }
+    ], None, &mut cmd_tx).await.unwrap();
+
+    // 2.3.1.28 Update Name Server (Add IP Address)
+    info!("Updating nameserver");
+    epp_proxy::client::host::update("ns2.example.org", vec![
+        epp_proxy::client::host::UpdateObject::Address(epp_proxy::client::host::Address {
+            address: "203.171.1.95".to_string(),
+            ip_version: epp_proxy::client::host::AddressVersion::IPv4
+        })
+    ], vec![], None, None, &mut cmd_tx).await.unwrap();
+
+    // 2.3.1.29 Update Name Server (Remove IP Address)
+    info!("Updating nameserver");
+    epp_proxy::client::host::update("ns2.example.org", vec![], vec![
+        epp_proxy::client::host::UpdateObject::Address(epp_proxy::client::host::Address {
+            address: "203.171.1.95".to_string(),
+            ip_version: epp_proxy::client::host::AddressVersion::IPv4
+        })
+    ], None, None, &mut cmd_tx).await.unwrap();
+
+    // 2.3.1.30 Check Domain (Domain Available for Registration)
+    info!("Checking domain");
+    epp_proxy::client::domain::check("domain.org", None, None, &mut cmd_tx).await.unwrap();
+
+    // 2.3.1.19 Create domain
+    info!("Creating domain");
+    epp_proxy::client::domain::create(epp_proxy::client::domain::CreateInfo {
+        domain: "domain.org",
+        period: Some(epp_proxy::client::Period {
+            unit: epp_proxy::client::PeriodUnit::Years,
+            value: 1
+        }),
+        registrant: "OTE-C1",
+        contacts: vec![epp_proxy::client::domain::InfoContact {
+            contact_type: "admin".to_string(),
+            contact_id: "OTE-C2".to_string()
+        }, epp_proxy::client::domain::InfoContact {
+            contact_type: "billing".to_string(),
+            contact_id: "OTE-C3".to_string()
+        }, epp_proxy::client::domain::InfoContact {
+            contact_type: "tech".to_string(),
+            contact_id: "OTE-C4".to_string()
+        }],
+        nameservers: vec![
+            epp_proxy::client::domain::InfoNameserver::HostOnly("ns1.example.org".to_string()),
+            epp_proxy::client::domain::InfoNameserver::HostOnly("ns2.example.org".to_string()),
+        ],
+        auth_info: "my_secret1",
+        sec_dns: None,
+        launch_create: None,
+        fee_agreement: None,
+        donuts_fee_agreement: None,
+        eurid_data: None,
+        isnic_payment: None
+    }, &mut cmd_tx).await.unwrap();
+
+    // 2.3.1.32 Query Domain
+    info!("Querying domain");
+    let domain_info = epp_proxy::client::domain::info("domain.org", None, None, None, None, &mut cmd_tx).await.unwrap();
+
+    // 2.3.1.33 Renew Domain
+    info!("Renewing domain");
+    epp_proxy::client::domain::renew("domain.org", Some(epp_proxy::client::Period {
+        unit: epp_proxy::client::PeriodUnit::Years,
+        value: 3
+    }), domain_info.response.expiry_date.unwrap(), None, None, None, &mut cmd_tx).await.unwrap();
+
+    // 2.3.1.34 Update Domain – Change Name Servers
+    info!("Updating domain");
+    epp_proxy::client::domain::update(epp_proxy::client::domain::UpdateInfo {
+        domain: "domain.org",
+        add: vec![epp_proxy::client::domain::UpdateObject::Nameserver(
+            epp_proxy::client::domain::InfoNameserver::HostOnly("ns1.example.com".to_string())
+        ), epp_proxy::client::domain::UpdateObject::Nameserver(
+            epp_proxy::client::domain::InfoNameserver::HostOnly("ns1.example.com".to_string())
+        )],
+        remove: vec![epp_proxy::client::domain::UpdateObject::Nameserver(
+            epp_proxy::client::domain::InfoNameserver::HostOnly("ns1.example.org".to_string())
+        ), epp_proxy::client::domain::UpdateObject::Nameserver(
+            epp_proxy::client::domain::InfoNameserver::HostOnly("ns1.example.org".to_string())
+        )],
+        ..Default::default()
+    }, &mut cmd_tx).await.unwrap();
+
+    // 2.3.1.35 Update Domain - Change Contact
+    info!("Updating domain");
+    epp_proxy::client::domain::update(epp_proxy::client::domain::UpdateInfo {
+        domain: "domain.org",
+        add: vec![epp_proxy::client::domain::UpdateObject::Contact(
+            epp_proxy::client::domain::InfoContact {
                 contact_type: "admin".to_string(),
-                contact_id: contact_id.clone(),
-            }, epp_proxy::client::domain::InfoContact {
-                contact_type: "tech".to_string(),
-                contact_id: contact_id.clone(),
-            }, epp_proxy::client::domain::InfoContact {
-                contact_type: "billing".to_string(),
-                contact_id: contact_id.clone(),
-            }],
-            donuts_fee_agreement: None,
-            eurid_data: None,
-            fee_agreement: None,
-            launch_create: None,
-            isnic_payment: None,
-            sec_dns: Some(epp_proxy::client::domain::SecDNSData {
-                max_sig_life: None,
-                data: epp_proxy::client::domain::SecDNSDataType::DSData(vec![
-                    epp_proxy::client::domain::SecDNSDSData {
-                        key_tag: 6687,
-                        algorithm: 13,
-                        digest_type: 2,
-                        digest: "66818ACF61D1EF06C90B5871A045E2302A7474A6BAC046FE3FE23B9338F9D559".to_string(),
-                        key_data: None,
-                    }
-                ]),
-            }),
-        },
-        &mut cmd_tx_ga_1,
-    ).await.unwrap();
-
-    // 2.2.4 - Perform a check and verify that the ASCII domain label is no longer available
-    info!("Checking domain was registered");
-    epp_proxy::client::domain::check(&ga_domain, None, None, &mut cmd_tx_ga_1).await.unwrap();
-
-    // 2.3.2 - Perform a check to see that a Japanese IDN domain label is available
-    info!("Finding available IDN domain");
-    epp_proxy::client::domain::check(&ga_domain_idn, None, None, &mut cmd_tx_ga_1).await.unwrap();
-
-    // 2.3.3 - Create a domain with that Japanese IDN label with all fields populated
-    info!("Creating IDN domain");
-    epp_proxy::client::domain::create(
-        epp_proxy::client::domain::CreateInfo {
-            domain: &ga_domain_idn,
-            nameservers: vec![
-                epp_proxy::client::domain::InfoNameserver::HostOnly("ns1.as207960.net".to_string()),
-                epp_proxy::client::domain::InfoNameserver::HostOnly("ns2.as207960.net".to_string()),
-            ],
-            period: Some(epp_proxy::client::Period {
-                unit: epp_proxy::client::PeriodUnit::Years,
-                value: 2,
-            }),
-            auth_info: "test_auth1",
-            registrant: &contact_id,
-            contacts: vec![epp_proxy::client::domain::InfoContact {
-                contact_type: "admin".to_string(),
-                contact_id: contact_id.clone(),
-            }, epp_proxy::client::domain::InfoContact {
-                contact_type: "tech".to_string(),
-                contact_id: contact_id.clone(),
-            }, epp_proxy::client::domain::InfoContact {
-                contact_type: "billing".to_string(),
-                contact_id: contact_id.clone(),
-            }],
-            donuts_fee_agreement: None,
-            eurid_data: None,
-            fee_agreement: None,
-            launch_create: None,
-            isnic_payment: None,
-            sec_dns: Some(epp_proxy::client::domain::SecDNSData {
-                max_sig_life: None,
-                data: epp_proxy::client::domain::SecDNSDataType::DSData(vec![
-                    epp_proxy::client::domain::SecDNSDSData {
-                        key_tag: 6687,
-                        algorithm: 13,
-                        digest_type: 2,
-                        digest: "66818ACF61D1EF06C90B5871A045E2302A7474A6BAC046FE3FE23B9338F9D559".to_string(),
-                        key_data: None,
-                    }
-                ]),
-            }),
-        },
-        &mut cmd_tx_ga_1,
-    ).await.unwrap();
-
-    // 2.3.4 - Perform a check and verify that the Japanese IDN domain label is no longer available
-    info!("Checking IDN domain was registered");
-    epp_proxy::client::domain::check(&ga_domain_idn, None, None, &mut cmd_tx_ga_1).await.unwrap();
-
-    // 2.4.2 - Perform a check to see that domain name “test‑and‑validate.<registrar name>‑ga” is available
-    info!("Finding available claims domain");
-    epp_proxy::client::domain::check(&ga_domain_claims, None, None, &mut cmd_tx_ga_1).await.unwrap();
-
-    // 2.4.3 - Perform a check to retrieve the TCNID for “test‑and‑validate”
-    info!("Getting claims domain TCNID");
-    let mut claims_res = epp_proxy::client::domain::launch_claims_check(
-        &ga_domain_claims,
-        epp_proxy::client::launch::LaunchClaimsCheck {
-            phase: epp_proxy::client::launch::LaunchPhase {
-                phase_type: epp_proxy::client::launch::PhaseType::Claims,
-                phase_name: None,
+                contact_id: "OTE-C4".to_string()
             }
-        },
-        &mut cmd_tx_ga_1,
-    ).await.unwrap();
-    let claims_key = claims_res.response.claims_key.pop().unwrap().key;
-
-    // 2.4.4 - Look up the Claims Notice using the TCNID in the TMDB.
-    info!("Getting claims notice");
-    let req_client = reqwest::Client::new();
-    let claims_notice_txt = req_client.get(format!("https://test.tmcnis.org/cnis/{}.xml", claims_key))
-        .basic_auth(tmcnis_user, Some(tmcnis_pass))
-        .send().await.unwrap()
-        .text().await.unwrap();
-    let claims_notice_msg: epp_proxy::proto::tm_notice::TMMessage = xml_serde::from_str(&claims_notice_txt).unwrap();
-
-    // 2.4.5 - Create the domain name “test‑and‑validate.<registrar name>‑ga” with all fields populated
-    info!("Creating claims domain");
-    epp_proxy::client::domain::create(
-        epp_proxy::client::domain::CreateInfo {
-            domain: &ga_domain_claims,
-            nameservers: vec![
-                epp_proxy::client::domain::InfoNameserver::HostOnly("ns1.as207960.net".to_string()),
-                epp_proxy::client::domain::InfoNameserver::HostOnly("ns2.as207960.net".to_string()),
-            ],
-            period: Some(epp_proxy::client::Period {
-                unit: epp_proxy::client::PeriodUnit::Years,
-                value: 2,
-            }),
-            auth_info: "test_auth1",
-            registrant: &contact_id,
-            contacts: vec![epp_proxy::client::domain::InfoContact {
+        )],
+        remove: vec![epp_proxy::client::domain::UpdateObject::Contact(
+            epp_proxy::client::domain::InfoContact {
                 contact_type: "admin".to_string(),
-                contact_id: contact_id.clone(),
-            }, epp_proxy::client::domain::InfoContact {
-                contact_type: "tech".to_string(),
-                contact_id: contact_id.clone(),
-            }, epp_proxy::client::domain::InfoContact {
-                contact_type: "billing".to_string(),
-                contact_id: contact_id.clone(),
-            }],
-            donuts_fee_agreement: None,
-            eurid_data: None,
-            fee_agreement: None,
-            launch_create: Some(epp_proxy::client::launch::LaunchCreate {
-                phase: epp_proxy::client::launch::LaunchPhase {
-                    phase_type: epp_proxy::client::launch::PhaseType::Claims,
-                    phase_name: None,
+                contact_id: "OTE-C2".to_string()
+            }
+        )],
+        ..Default::default()
+    }, &mut cmd_tx).await.unwrap();
+
+    // 2.3.1.36 Update Domain – Change Authorization Information
+    info!("Updating domain");
+    epp_proxy::client::domain::update(epp_proxy::client::domain::UpdateInfo {
+        domain: "domain.org",
+        new_auth_info: Some("new_secret1"),
+        ..Default::default()
+    }, &mut cmd_tx).await.unwrap();
+
+    // 2.3.1.37 Update Domain - Change Domain Status
+    info!("Updating domain");
+    epp_proxy::client::domain::update(epp_proxy::client::domain::UpdateInfo {
+        domain: "domain.org",
+        add: vec![epp_proxy::client::domain::UpdateObject::Status(
+            epp_proxy::client::domain::Status::ClientUpdateProhibited
+        )],
+        ..Default::default()
+    }, &mut cmd_tx).await.unwrap();
+
+    // 2.3.2.1 Contact Transfer Request
+    info!("Requesting contact transfer");
+    epp_proxy::client::contact::transfer_request("OTE-C5", "my_secret1", &mut cmd_tx).await.unwrap();
+
+    // 2.3.2.2 Query Contact Transfer
+    info!("Querying contact transfer");
+    epp_proxy::client::contact::transfer_query("OTE-C5", &mut cmd_tx).await.unwrap();
+
+    // 2.3.2.3 Approve Contact Transfer
+    info!("Approving contact transfer");
+    epp_proxy::client::contact::transfer_accept("OTE-C6", "my_secret1", &mut cmd_tx).await.unwrap();
+
+    // 2.3.2.4 Reject Contact Transfer
+    info!("Rejecting contact transfer");
+    epp_proxy::client::contact::transfer_reject("OTE-C7", "my_secret1", &mut cmd_tx).await.unwrap();
+
+    // 2.3.2.5 Domain Transfer Request
+    info!("Requesting domain transfer");
+    epp_proxy::client::domain::transfer_request(
+        "transfer3.org", None, "my_secret1Y", None, None,
+        None, &mut cmd_tx
+    ).await.unwrap();
+
+    // 2.3.2.6 Approve Domain Transfer
+    info!("Approving domain transfer");
+    epp_proxy::client::domain::transfer_query("transfer2.org", Some("my_secret1X"), &mut cmd_tx).await.unwrap();
+    epp_proxy::client::domain::transfer_accept("transfer2.org", Some("my_secret1X"), &mut cmd_tx).await.unwrap();
+
+    // 2.3.2.7 Reject Domain Transfer
+    info!("Rejecting domain transfer");
+    epp_proxy::client::domain::transfer_reject("transfer1.org", Some("my_secret1X"), &mut cmd_tx).await.unwrap();
+
+    // 2.3.3.1 Correctly Handle 2003 Exception
+    info!("Causing 2003 error");
+    assert!(epp_proxy::client::domain::create(epp_proxy::client::domain::CreateInfo {
+        domain: "exception.org",
+        period: Some(epp_proxy::client::Period {
+            unit: epp_proxy::client::PeriodUnit::Years,
+            value: 1
+        }),
+        registrant: "OTE-C1",
+        contacts: vec![epp_proxy::client::domain::InfoContact {
+            contact_type: "admin".to_string(),
+            contact_id: "OTE-C2".to_string()
+        }, epp_proxy::client::domain::InfoContact {
+            contact_type: "billing".to_string(),
+            contact_id: "OTE-C3".to_string()
+        }, epp_proxy::client::domain::InfoContact {
+            contact_type: "tech".to_string(),
+            contact_id: "OTE-C4".to_string()
+        }],
+        nameservers: vec![
+            epp_proxy::client::domain::InfoNameserver::HostOnly("ns1.example.org".to_string()),
+            epp_proxy::client::domain::InfoNameserver::HostOnly("ns2.example.org".to_string()),
+        ],
+        auth_info: "",
+        sec_dns: None,
+        launch_create: None,
+        fee_agreement: None,
+        donuts_fee_agreement: None,
+        eurid_data: None,
+        isnic_payment: None
+    }, &mut cmd_tx).await.is_err());
+
+    // 2.3.3.2 Correctly Handle 2005 Exception
+    info!("Causing 2005 error");
+    assert!(epp_proxy::client::domain::create(epp_proxy::client::domain::CreateInfo {
+        domain: "-*invalid.org",
+        period: Some(epp_proxy::client::Period {
+            unit: epp_proxy::client::PeriodUnit::Years,
+            value: 1
+        }),
+        registrant: "OTE-C1",
+        contacts: vec![epp_proxy::client::domain::InfoContact {
+            contact_type: "admin".to_string(),
+            contact_id: "OTE-C2".to_string()
+        }, epp_proxy::client::domain::InfoContact {
+            contact_type: "billing".to_string(),
+            contact_id: "OTE-C3".to_string()
+        }, epp_proxy::client::domain::InfoContact {
+            contact_type: "tech".to_string(),
+            contact_id: "OTE-C4".to_string()
+        }],
+        nameservers: vec![
+            epp_proxy::client::domain::InfoNameserver::HostOnly("ns1.example.org".to_string()),
+            epp_proxy::client::domain::InfoNameserver::HostOnly("ns2.example.org".to_string()),
+        ],
+        auth_info: "my_secret1",
+        sec_dns: None,
+        launch_create: None,
+        fee_agreement: None,
+        donuts_fee_agreement: None,
+        eurid_data: None,
+        isnic_payment: None
+    }, &mut cmd_tx).await.is_err());
+
+    // 2.3.3.3 Correctly Handle 2306 Exception
+    info!("Causing 2306 error");
+    assert!(epp_proxy::client::domain::create(epp_proxy::client::domain::CreateInfo {
+        domain: "exception.org",
+        period: Some(epp_proxy::client::Period {
+            unit: epp_proxy::client::PeriodUnit::Years,
+            value: 99
+        }),
+        registrant: "OTE-C1",
+        contacts: vec![epp_proxy::client::domain::InfoContact {
+            contact_type: "admin".to_string(),
+            contact_id: "OTE-C2".to_string()
+        }, epp_proxy::client::domain::InfoContact {
+            contact_type: "billing".to_string(),
+            contact_id: "OTE-C3".to_string()
+        }, epp_proxy::client::domain::InfoContact {
+            contact_type: "tech".to_string(),
+            contact_id: "OTE-C4".to_string()
+        }],
+        nameservers: vec![
+            epp_proxy::client::domain::InfoNameserver::HostOnly("ns1.example.org".to_string()),
+            epp_proxy::client::domain::InfoNameserver::HostOnly("ns2.example.org".to_string()),
+        ],
+        auth_info: "my_secret1",
+        sec_dns: None,
+        launch_create: None,
+        fee_agreement: None,
+        donuts_fee_agreement: None,
+        eurid_data: None,
+        isnic_payment: None
+    }, &mut cmd_tx).await.is_err());
+
+    // 2.3.3.4 Correctly Handle 2002 Exception
+    info!("Causing 2002 error");
+    assert!(epp_proxy::client::domain::renew("example.org", Some(epp_proxy::client::Period {
+        unit: epp_proxy::client::PeriodUnit::Years,
+        value: 1
+    }), Utc.ymd(2011, 6, 21).and_hms(0, 0, 0), None, None, None,  &mut cmd_tx).await.is_err());
+
+    // 2.3.3.5 Correctly Handle 2303 Exception
+    info!("Causing 2303 error");
+    assert!(epp_proxy::client::domain::create(epp_proxy::client::domain::CreateInfo {
+        domain: "exception.org",
+        period: Some(epp_proxy::client::Period {
+            unit: epp_proxy::client::PeriodUnit::Years,
+            value: 2
+        }),
+        registrant: "OTE-C99",
+        contacts: vec![epp_proxy::client::domain::InfoContact {
+            contact_type: "admin".to_string(),
+            contact_id: "OTE-C2".to_string()
+        }, epp_proxy::client::domain::InfoContact {
+            contact_type: "billing".to_string(),
+            contact_id: "OTE-C3".to_string()
+        }, epp_proxy::client::domain::InfoContact {
+            contact_type: "tech".to_string(),
+            contact_id: "OTE-C4".to_string()
+        }],
+        nameservers: vec![
+            epp_proxy::client::domain::InfoNameserver::HostOnly("ns1.example.org".to_string()),
+            epp_proxy::client::domain::InfoNameserver::HostOnly("ns2.example.org".to_string()),
+        ],
+        auth_info: "my_secret1",
+        sec_dns: None,
+        launch_create: None,
+        fee_agreement: None,
+        donuts_fee_agreement: None,
+        eurid_data: None,
+        isnic_payment: None
+    }, &mut cmd_tx).await.is_err());
+
+    // 2.3.3.6 Correctly Handle 2305 Exception
+    info!("Causing 2305 error");
+    assert!(epp_proxy::client::contact::delete("OTE-C2", &mut cmd_tx).await.is_err());
+
+    // 2.3.3.7 Correctly Handle 2201 Exception
+    info!("Causing 2201 error");
+    assert!(epp_proxy::client::domain::delete("transfer3.org", None, None,None, &mut cmd_tx).await.is_err());
+
+    // 2.4.1.1 Check Domain (Domain Available for Registration)
+    info!("Checking DNSSEC domain");
+    epp_proxy::client::domain::check("dsdomain1.org", None,None, &mut cmd_tx).await.unwrap();
+
+    // 2.4.1.2 Create Domain with DS Record
+    info!("Creating DNSSEC domain");
+    epp_proxy::client::domain::create(epp_proxy::client::domain::CreateInfo {
+        domain: "dsdomain1.org",
+        period: Some(epp_proxy::client::Period {
+            unit: epp_proxy::client::PeriodUnit::Years,
+            value: 5
+        }),
+        registrant: "OTE-C1",
+        contacts: vec![epp_proxy::client::domain::InfoContact {
+            contact_type: "admin".to_string(),
+            contact_id: "OTE-C2".to_string()
+        }, epp_proxy::client::domain::InfoContact {
+            contact_type: "billing".to_string(),
+            contact_id: "OTE-C3".to_string()
+        }, epp_proxy::client::domain::InfoContact {
+            contact_type: "tech".to_string(),
+            contact_id: "OTE-C4".to_string()
+        }],
+        nameservers: vec![
+            epp_proxy::client::domain::InfoNameserver::HostOnly("ns1.example.com".to_string()),
+            epp_proxy::client::domain::InfoNameserver::HostOnly("ns2.example.com".to_string()),
+        ],
+        auth_info: "my_secret1",
+        sec_dns: Some(epp_proxy::client::domain::SecDNSData {
+            max_sig_life: None,
+            data: epp_proxy::client::domain::SecDNSDataType::DSData(vec![
+                epp_proxy::client::domain::SecDNSDSData {
+                    key_tag: 12345,
+                    algorithm: 3,
+                    digest_type: 1,
+                    digest: "49FD46E6C4B45C55D4AC49FD46E6C4B45C55D4AC".to_string(),
+                    key_data: None,
+                }
+            ])
+        }),
+        launch_create: None,
+        fee_agreement: None,
+        donuts_fee_agreement: None,
+        eurid_data: None,
+        isnic_payment: None
+    }, &mut cmd_tx).await.unwrap();
+
+    // 2.4.1.3 Create Domain with multiple DS Records
+    info!("Creating DNSSEC domain");
+    epp_proxy::client::domain::create(epp_proxy::client::domain::CreateInfo {
+        domain: "dsdomain2.org",
+        period: Some(epp_proxy::client::Period {
+            unit: epp_proxy::client::PeriodUnit::Years,
+            value: 5
+        }),
+        registrant: "OTE-C1",
+        contacts: vec![epp_proxy::client::domain::InfoContact {
+            contact_type: "admin".to_string(),
+            contact_id: "OTE-C2".to_string()
+        }, epp_proxy::client::domain::InfoContact {
+            contact_type: "billing".to_string(),
+            contact_id: "OTE-C3".to_string()
+        }, epp_proxy::client::domain::InfoContact {
+            contact_type: "tech".to_string(),
+            contact_id: "OTE-C4".to_string()
+        }],
+        nameservers: vec![
+            epp_proxy::client::domain::InfoNameserver::HostOnly("ns1.example.com".to_string()),
+            epp_proxy::client::domain::InfoNameserver::HostOnly("ns2.example.com".to_string()),
+        ],
+        auth_info: "my_secret1",
+        sec_dns: Some(epp_proxy::client::domain::SecDNSData {
+            max_sig_life: None,
+            data: epp_proxy::client::domain::SecDNSDataType::DSData(vec![
+                epp_proxy::client::domain::SecDNSDSData {
+                    key_tag: 12346,
+                    algorithm: 3,
+                    digest_type: 1,
+                    digest: "49FD46E6C4B45C55D4AC49FD46E6C4B45C55D4AD".to_string(),
+                    key_data: None,
                 },
-                code_mark: vec![],
-                signed_mark: None,
-                create_type: epp_proxy::client::launch::LaunchCreateType::Registration,
-                notices: vec![epp_proxy::client::launch::Notice {
-                    notice_id: claims_notice_msg.notice.id,
-                    validator: None,
-                    not_after: claims_notice_msg.notice.not_after,
-                    accepted_date: claims_notice_msg.notice.not_before,
-                }],
-                core_nic: vec![],
-            }),
-            isnic_payment: None,
-            sec_dns: Some(epp_proxy::client::domain::SecDNSData {
-                max_sig_life: None,
-                data: epp_proxy::client::domain::SecDNSDataType::DSData(vec![
+                epp_proxy::client::domain::SecDNSDSData {
+                    key_tag: 12344,
+                    algorithm: 3,
+                    digest_type: 1,
+                    digest: "49FC66E6C4B45C56D4AC49FD46E6C4B45C55D4AE".to_string(),
+                    key_data: None,
+                }
+            ])
+        }),
+        launch_create: None,
+        fee_agreement: None,
+        donuts_fee_agreement: None,
+        eurid_data: None,
+        isnic_payment: None
+    }, &mut cmd_tx).await.unwrap();
+
+    // 2.4.1.4 Query domain that has DS Data
+    info!("Querying DNSSEC domain");
+    epp_proxy::client::domain::info("dsdomain1.org", None, None, None, None, &mut cmd_tx).await.unwrap();
+
+    // 2.4.1.5 Update Domain- Adding Single DS Data
+    info!("Updating DNSSEC domain");
+    epp_proxy::client::domain::update(epp_proxy::client::domain::UpdateInfo {
+        domain: "example.org",
+        sec_dns: Some(epp_proxy::client::domain::UpdateSecDNS {
+            urgent: None,
+            new_max_sig_life: None,
+            remove: None,
+            add: Some(epp_proxy::client::domain::SecDNSDataType::DSData(vec![
+                epp_proxy::client::domain::SecDNSDSData {
+                    key_tag: 12348,
+                    algorithm: 3,
+                    digest_type: 1,
+                    digest: "38EC35D5B3A34B44C39B38EC35D5B3A34B44C39B".to_string(),
+                    key_data: None,
+                },
+            ]))
+        }),
+        ..Default::default()
+    }, &mut cmd_tx).await.unwrap();
+
+    // 2.4.1.6 Update Domain – Changing DS Data
+    info!("Updating DNSSEC domain");
+    epp_proxy::client::domain::update(epp_proxy::client::domain::UpdateInfo {
+        domain: "example.org",
+        sec_dns: Some(epp_proxy::client::domain::UpdateSecDNS {
+            urgent: None,
+            new_max_sig_life: None,
+            remove: Some(epp_proxy::client::domain::UpdateSecDNSRemove::Data(
+                epp_proxy::client::domain::SecDNSDataType::DSData(vec![
                     epp_proxy::client::domain::SecDNSDSData {
-                        key_tag: 6687,
-                        algorithm: 13,
-                        digest_type: 2,
-                        digest: "66818ACF61D1EF06C90B5871A045E2302A7474A6BAC046FE3FE23B9338F9D559".to_string(),
+                        key_tag: 12348,
+                        algorithm: 3,
+                        digest_type: 1,
+                        digest: "38EC35D5B3A34B44C39B38EC35D5B3A34B44C39B".to_string(),
                         key_data: None,
-                    }
-                ]),
-            }),
-        },
-        &mut cmd_tx_ga_1,
-    ).await.unwrap();
+                    },
+                ])
+            )),
+            add: Some(epp_proxy::client::domain::SecDNSDataType::DSData(vec![
+                epp_proxy::client::domain::SecDNSDSData {
+                    key_tag: 12349,
+                    algorithm: 3,
+                    digest_type: 1,
+                    digest: "38EF35D5B3A34B44C39B38EC35D5B3A34B44C39B".to_string(),
+                    key_data: None,
+                },
+            ]))
+        }),
+        ..Default::default()
+    }, &mut cmd_tx).await.unwrap();
 
-    // 2.4.6 - Perform a check and verify that the domain name “test‑and‑validate.<registrar name>‑ga” is no longer available
-    info!("Checking claims domain was registered");
-    epp_proxy::client::domain::check(&ga_domain_claims, None, None, &mut cmd_tx_ga_1).await.unwrap();
+    // 2.4.1.7 Update Domain – Adding Multiple DS Records
+    info!("Updating DNSSEC domain");
+    epp_proxy::client::domain::update(epp_proxy::client::domain::UpdateInfo {
+        domain: "example.org",
+        sec_dns: Some(epp_proxy::client::domain::UpdateSecDNS {
+            urgent: None,
+            new_max_sig_life: None,
+            remove: None,
+            add: Some(epp_proxy::client::domain::SecDNSDataType::DSData(vec![
+                epp_proxy::client::domain::SecDNSDSData {
+                    key_tag: 12350,
+                    algorithm: 4,
+                    digest_type: 1,
+                    digest: "38AB35D5B3A34B44C39B38EC35D5B3A34B44C39B".to_string(),
+                    key_data: None,
+                },
+                epp_proxy::client::domain::SecDNSDSData {
+                    key_tag: 12351,
+                    algorithm: 3,
+                    digest_type: 1,
+                    digest: "38AA35D5B3A34B44C39B38EC35D5B3A34B44C39C".to_string(),
+                    key_data: None,
+                },
+                epp_proxy::client::domain::SecDNSDSData {
+                    key_tag: 12352,
+                    algorithm: 3,
+                    digest_type: 1,
+                    digest: "38AC35D5B3A34B44C39B38EC35D5B3A34B44C39D".to_string(),
+                    key_data: None,
+                },
+                epp_proxy::client::domain::SecDNSDSData {
+                    key_tag: 12353,
+                    algorithm: 4,
+                    digest_type: 2,
+                    digest: "651463E06F19D2FCA0215F129F54A2E0A4771EBBA37D8AB1103BCD279F0719E6".to_string(),
+                    key_data: None,
+                },
+            ]))
+        }),
+        ..Default::default()
+    }, &mut cmd_tx).await.unwrap();
 
-    // 2.5.2 - Perform a check to see that the domain name “rich.<registrar name>‑ga” is available, and that it is a premium domain name
-    info!("Finding available premium domain");
-    let premium_check_res = epp_proxy::client::domain::check(
-        &ga_domain_premium, Some(epp_proxy::client::fee::FeeCheck {
-            currency: None,
-            commands: vec![epp_proxy::client::fee::FeeCheckCommand {
-                command: epp_proxy::client::fee::Command::Create,
-                period: Some(epp_proxy::client::Period {
-                    unit: epp_proxy::client::PeriodUnit::Years,
-                    value: 2,
-                }),
-            }],
-        }), None, &mut cmd_tx_ga_1,
-    ).await.unwrap();
-    let premium_fee_check = premium_check_res.response.fee_check.unwrap()
-        .commands.into_iter().filter(|c| c.command == epp_proxy::client::fee::Command::Create)
-        .next().unwrap();
-
-    // 2.5.3 - Create a domain with the domain name “rich.<registrar name>‑ga” with all fields populated
-    info!("Creating premium domain");
-    epp_proxy::client::domain::create(
-        epp_proxy::client::domain::CreateInfo {
-            domain: &ga_domain_premium,
-            nameservers: vec![
-                epp_proxy::client::domain::InfoNameserver::HostOnly("ns1.as207960.net".to_string()),
-                epp_proxy::client::domain::InfoNameserver::HostOnly("ns2.as207960.net".to_string()),
-            ],
-            period: Some(epp_proxy::client::Period {
-                unit: epp_proxy::client::PeriodUnit::Years,
-                value: 2,
-            }),
-            auth_info: "test_auth1",
-            registrant: &contact_id,
-            contacts: vec![epp_proxy::client::domain::InfoContact {
-                contact_type: "admin".to_string(),
-                contact_id: contact_id.clone(),
-            }, epp_proxy::client::domain::InfoContact {
-                contact_type: "tech".to_string(),
-                contact_id: contact_id.clone(),
-            }, epp_proxy::client::domain::InfoContact {
-                contact_type: "billing".to_string(),
-                contact_id: contact_id.clone(),
-            }],
-            donuts_fee_agreement: None,
-            eurid_data: None,
-            fee_agreement: Some(epp_proxy::client::fee::FeeAgreement {
-                currency: Some(premium_fee_check.currency),
-                fees: premium_fee_check.fees,
-            }),
-            launch_create: None,
-            isnic_payment: None,
-            sec_dns: Some(epp_proxy::client::domain::SecDNSData {
-                max_sig_life: None,
-                data: epp_proxy::client::domain::SecDNSDataType::DSData(vec![
+    // 2.4.1.8 Update Domain – Remove Multiple DS Records
+    info!("Updating DNSSEC domain");
+    epp_proxy::client::domain::update(epp_proxy::client::domain::UpdateInfo {
+        domain: "example.org",
+        sec_dns: Some(epp_proxy::client::domain::UpdateSecDNS {
+            urgent: None,
+            new_max_sig_life: None,
+            remove: Some(epp_proxy::client::domain::UpdateSecDNSRemove::Data(
+                epp_proxy::client::domain::SecDNSDataType::DSData(vec![
                     epp_proxy::client::domain::SecDNSDSData {
-                        key_tag: 6687,
-                        algorithm: 13,
-                        digest_type: 2,
-                        digest: "66818ACF61D1EF06C90B5871A045E2302A7474A6BAC046FE3FE23B9338F9D559".to_string(),
+                        key_tag: 12350,
+                        algorithm: 4,
+                        digest_type: 1,
+                        digest: "38AB35D5B3A34B44C39B38EC35D5B3A34B44C39B".to_string(),
                         key_data: None,
-                    }
-                ]),
-            }),
-        },
-        &mut cmd_tx_ga_1,
-    ).await.unwrap();
-
-    // 2.5.4 - Perform a check and verify that the domain name “rich.<registrar name>‑ga” is no longer available.
-    info!("Checking premium domain was registered");
-    epp_proxy::client::domain::check(&ga_domain_premium, None, None, &mut cmd_tx_ga_1).await.unwrap();
-
-    // 2.6.2 - Create two subordinate host objects underneath domain created in Step 2.2.
-    // Each host object should have a single IPv4 and IPv6 address.
-    info!("Creating hosts");
-    epp_proxy::client::host::create(&ga_domain_ns1, vec![epp_proxy::client::host::Address {
-        address: "1.1.1.1".to_string(),
-        ip_version: epp_proxy::client::host::AddressVersion::IPv4,
-    }, epp_proxy::client::host::Address {
-        address: "2606:4700:4700::1111".to_string(),
-        ip_version: epp_proxy::client::host::AddressVersion::IPv6,
-    }], None, &mut cmd_tx_ga_1,
-    ).await.unwrap();
-    epp_proxy::client::host::create(&ga_domain_ns2, vec![epp_proxy::client::host::Address {
-        address: "1.0.0.1".to_string(),
-        ip_version: epp_proxy::client::host::AddressVersion::IPv4,
-    }, epp_proxy::client::host::Address {
-        address: "2606:4700:4700::1001".to_string(),
-        ip_version: epp_proxy::client::host::AddressVersion::IPv6,
-    }], None, &mut cmd_tx_ga_1,
-    ).await.unwrap();
-
-    // 2.6.3 - Change the domain's nameservers to point at the new host objects
-    info!("Adding hosts to domain");
-    epp_proxy::client::domain::update(
-        epp_proxy::client::domain::UpdateInfo {
-            domain: &ga_domain,
-            add: vec![
-                epp_proxy::client::domain::UpdateObject::Nameserver(
-                    epp_proxy::client::domain::InfoNameserver::HostOnly(ga_domain_ns1.clone())
-                ),
-                epp_proxy::client::domain::UpdateObject::Nameserver(
-                    epp_proxy::client::domain::InfoNameserver::HostOnly(ga_domain_ns2.clone())
-                ),
-            ],
-            remove: vec![],
-            new_auth_info: None,
-            new_registrant: None,
-            sec_dns: None,
-            launch_info: None,
-            fee_agreement: None,
-            donuts_fee_agreement: None,
-            isnic_info: None,
-            eurid_data: None,
-        },
-        &mut cmd_tx_ga_1,
-    ).await.unwrap();
-
-    // 2.7.2 - Remove the nameservers set in Step 2.6
-    info!("Removing hosts from domain");
-    epp_proxy::client::domain::update(
-        epp_proxy::client::domain::UpdateInfo {
-            domain: &ga_domain,
-            add: vec![],
-            remove: vec![
-                epp_proxy::client::domain::UpdateObject::Nameserver(
-                    epp_proxy::client::domain::InfoNameserver::HostOnly(ga_domain_ns1.clone())
-                ),
-                epp_proxy::client::domain::UpdateObject::Nameserver(
-                    epp_proxy::client::domain::InfoNameserver::HostOnly(ga_domain_ns2.clone())
-                ),
-            ],
-            new_auth_info: None,
-            new_registrant: None,
-            sec_dns: None,
-            launch_info: None,
-            fee_agreement: None,
-            donuts_fee_agreement: None,
-            isnic_info: None,
-            eurid_data: None,
-        },
-        &mut cmd_tx_ga_1,
-    ).await.unwrap();
-
-    // 2.7.3 - Change the IPv4 and IPv6 addresses of the host objects
-    info!("Updating host objects");
-    epp_proxy::client::host::update(
-        &ga_domain_ns1,
-        vec![
-            epp_proxy::client::host::UpdateObject::Address(epp_proxy::client::host::Address {
-                address: "1.1.1.2".to_string(),
-                ip_version: epp_proxy::client::host::AddressVersion::IPv4,
-            }),
-            epp_proxy::client::host::UpdateObject::Address(epp_proxy::client::host::Address {
-                address: "2606:4700:4700::1112".to_string(),
-                ip_version: epp_proxy::client::host::AddressVersion::IPv6,
-            }),
-        ],
-        vec![
-            epp_proxy::client::host::UpdateObject::Address(epp_proxy::client::host::Address {
-                address: "1.1.1.1".to_string(),
-                ip_version: epp_proxy::client::host::AddressVersion::IPv4,
-            }),
-            epp_proxy::client::host::UpdateObject::Address(epp_proxy::client::host::Address {
-                address: "2606:4700:4700::1111".to_string(),
-                ip_version: epp_proxy::client::host::AddressVersion::IPv6,
-            }),
-        ],
-        None, None, &mut cmd_tx_ga_1,
-    ).await.unwrap();
-    epp_proxy::client::host::update(
-        &ga_domain_ns2,
-        vec![
-            epp_proxy::client::host::UpdateObject::Address(epp_proxy::client::host::Address {
-                address: "1.0.0.2".to_string(),
-                ip_version: epp_proxy::client::host::AddressVersion::IPv4,
-            }),
-            epp_proxy::client::host::UpdateObject::Address(epp_proxy::client::host::Address {
-                address: "2606:4700:4700::1002".to_string(),
-                ip_version: epp_proxy::client::host::AddressVersion::IPv6,
-            }),
-        ],
-        vec![
-            epp_proxy::client::host::UpdateObject::Address(epp_proxy::client::host::Address {
-                address: "1.0.0.1".to_string(),
-                ip_version: epp_proxy::client::host::AddressVersion::IPv4,
-            }),
-            epp_proxy::client::host::UpdateObject::Address(epp_proxy::client::host::Address {
-                address: "2606:4700:4700::1001".to_string(),
-                ip_version: epp_proxy::client::host::AddressVersion::IPv6,
-            }),
-        ],
-        None, None, &mut cmd_tx_ga_1,
-    ).await.unwrap();
-
-    // 2.7.4 - Delete the subordinate host objects
-    info!("Deleting host objects");
-    epp_proxy::client::host::delete(&ga_domain_ns1, &mut cmd_tx_ga_1).await.unwrap();
-    epp_proxy::client::host::delete(&ga_domain_ns2, &mut cmd_tx_ga_1).await.unwrap();
-
-    info!("Waiting for host pending delete to expire");
-    loop {
-        tokio::time::sleep(std::time::Duration::from_secs(60)).await;
-        let res = epp_proxy::client::host::check(&ga_domain_ns1, &mut cmd_tx_ga_1).await.unwrap();
-        if res.response.avail {
-            break;
-        }
-    }
-    loop {
-        let res = epp_proxy::client::host::check(&ga_domain_ns2, &mut cmd_tx_ga_1).await.unwrap();
-        if res.response.avail {
-            break;
-        }
-        tokio::time::sleep(std::time::Duration::from_secs(60)).await;
-    }
-
-    // 2.8.2 - Change the DNSSEC information of the domain created in Step 2.2
-    info!("Updating DNSSEC on domain");
-    epp_proxy::client::domain::update(
-        epp_proxy::client::domain::UpdateInfo {
-            domain: &ga_domain,
-            add: vec![],
-            remove: vec![],
-            new_auth_info: None,
-            new_registrant: None,
-            sec_dns: Some(epp_proxy::client::domain::UpdateSecDNS {
-                urgent: None,
-                remove: Some(epp_proxy::client::domain::UpdateSecDNSRemove::Data(epp_proxy::client::domain::SecDNSDataType::DSData(vec![
+                    },
                     epp_proxy::client::domain::SecDNSDSData {
-                        key_tag: 6687,
-                        algorithm: 13,
-                        digest_type: 2,
-                        digest: "66818ACF61D1EF06C90B5871A045E2302A7474A6BAC046FE3FE23B9338F9D559".to_string(),
+                        key_tag: 12351,
+                        algorithm: 3,
+                        digest_type: 1,
+                        digest: "38AA35D5B3A34B44C39B38EC35D5B3A34B44C39C".to_string(),
                         key_data: None,
-                    }
-                ]))),
-                add: Some(epp_proxy::client::domain::SecDNSDataType::DSData(vec![
+                    },
+                ])
+            )),
+            add: None,
+        }),
+        ..Default::default()
+    }, &mut cmd_tx).await.unwrap();
+
+    // 2.4.1.9 Update Domain – Remove Single DS Record (Update: Remove)
+    info!("Updating DNSSEC domain");
+    epp_proxy::client::domain::update(epp_proxy::client::domain::UpdateInfo {
+        domain: "dsdomain1.org",
+        sec_dns: Some(epp_proxy::client::domain::UpdateSecDNS {
+            urgent: None,
+            new_max_sig_life: None,
+            remove: Some(epp_proxy::client::domain::UpdateSecDNSRemove::Data(
+                epp_proxy::client::domain::SecDNSDataType::DSData(vec![
                     epp_proxy::client::domain::SecDNSDSData {
-                        key_tag: 6689,
-                        algorithm: 13,
-                        digest_type: 2,
-                        digest: "66818ACF61D1EF06C90B5871A045E2302A7474A6BAC046FE3FE23B9338F9D558".to_string(),
+                        key_tag: 12345,
+                        algorithm: 3,
+                        digest_type: 1,
+                        digest: "49FD46E6C4B45C55D4AC49FD46E6C4B45C55D4AC".to_string(),
                         key_data: None,
-                    }
-                ])),
-                new_max_sig_life: None,
-            }),
-            launch_info: None,
-            fee_agreement: None,
-            donuts_fee_agreement: None,
-            isnic_info: None,
-            eurid_data: None,
-        },
-        &mut cmd_tx_ga_1,
-    ).await.unwrap();
+                    },
+                ])
+            )),
+            add: None,
+        }),
+        ..Default::default()
+    }, &mut cmd_tx).await.unwrap();
 
-    // 2.9.2 - Query the info of the domain created in Step 2.2 and verify that it is still in the add grace period
-    info!("Checking domain in AGP");
-    epp_proxy::client::domain::info(&ga_domain, None, None, None, None, &mut cmd_tx_ga_1).await.unwrap();
+    // 2.4.1.10 Update Domain – Adding and Removing Multiple DS Records
+    info!("Updating DNSSEC domain");
+    epp_proxy::client::domain::update(epp_proxy::client::domain::UpdateInfo {
+        domain: "example.org",
+        sec_dns: Some(epp_proxy::client::domain::UpdateSecDNS {
+            urgent: None,
+            new_max_sig_life: None,
+            remove: Some(epp_proxy::client::domain::UpdateSecDNSRemove::Data(
+                epp_proxy::client::domain::SecDNSDataType::DSData(vec![
+                    epp_proxy::client::domain::SecDNSDSData {
+                        key_tag: 12352,
+                        algorithm: 3,
+                        digest_type: 1,
+                        digest: "38AC35D5B3A34B44C39B38EC35D5B3A34B44C39B".to_string(),
+                        key_data: None,
+                    },
+                    epp_proxy::client::domain::SecDNSDSData {
+                        key_tag: 12353,
+                        algorithm: 4,
+                        digest_type: 2,
+                        digest: "651463E06F19D2FCA0215F129F54A2E0A4771EBBA37D8AB1103BCD279F0719E6".to_string(),
+                        key_data: None,
+                    },
+                ])
+            )),
+            add: Some(epp_proxy::client::domain::SecDNSDataType::DSData(vec![
+                epp_proxy::client::domain::SecDNSDSData {
+                    key_tag: 12350,
+                    algorithm: 4,
+                    digest_type: 1,
+                    digest: "38AB35D5B3A34B44C39B38EC35D5B3A34B44C39B".to_string(),
+                    key_data: None,
+                },
+                epp_proxy::client::domain::SecDNSDSData {
+                    key_tag: 12351,
+                    algorithm: 3,
+                    digest_type: 1,
+                    digest: "38AA35D5B3A34B44C39B38EC35D5B3A34B44C39B".to_string(),
+                    key_data: None,
+                },
+            ]))
+        }),
+        ..Default::default()
+    }, &mut cmd_tx).await.unwrap();
 
-    // 2.9.3 - Delete domain created in Step 2.2
+    // 2.4.1.11 Update Domain – Remove All DS Records
+    info!("Updating DNSSEC domain");
+    epp_proxy::client::domain::update(epp_proxy::client::domain::UpdateInfo {
+        domain: "example.org",
+        sec_dns: Some(epp_proxy::client::domain::UpdateSecDNS {
+            urgent: None,
+            new_max_sig_life: None,
+            remove: Some(epp_proxy::client::domain::UpdateSecDNSRemove::All(true)),
+            add: None
+        }),
+        ..Default::default()
+    }, &mut cmd_tx).await.unwrap();
+
+    // 2.4.2.1 Correctly Handle 2306 Error Exception
+    info!("Causing 2306 error");
+    let _ = epp_proxy::client::domain::update(epp_proxy::client::domain::UpdateInfo {
+        domain: "example.org",
+        sec_dns: Some(epp_proxy::client::domain::UpdateSecDNS {
+            urgent: None,
+            add: Some(epp_proxy::client::domain::SecDNSDataType::DSData(vec![
+                epp_proxy::client::domain::SecDNSDSData {
+                    key_tag: 12350,
+                    // Should be 300 but the value is a u8 so not allowed, hopefully this also causes the error
+                    algorithm: 255,
+                    digest_type: 255,
+                    digest: "38AB35D5B3A34B44C39B38EC35D5B3A34B44C39B".to_string(),
+                    key_data: None,
+                },
+            ])),
+            remove: None,
+            new_max_sig_life: None
+        }),
+        ..Default::default()
+    }, &mut cmd_tx).await;
+
+    // 2.4.2.2 Correctly Handle 2303 Error Exception (Remove Single DS Record)
+    info!("Causing 2303 error");
+    assert!(epp_proxy::client::domain::update(epp_proxy::client::domain::UpdateInfo {
+        domain: "example.org",
+        sec_dns: Some(epp_proxy::client::domain::UpdateSecDNS {
+            urgent: None,
+            remove: Some(epp_proxy::client::domain::UpdateSecDNSRemove::Data(epp_proxy::client::domain::SecDNSDataType::DSData(vec![
+                epp_proxy::client::domain::SecDNSDSData {
+                    key_tag: 54321,
+                    algorithm: 3,
+                    digest_type: 1,
+                    digest: "38AB35D5B3A34B44C39B38EC35D5B3A34B44C39B".to_string(),
+                    key_data: None,
+                },
+            ]))),
+            add: None,
+            new_max_sig_life: None
+        }),
+        ..Default::default()
+    }, &mut cmd_tx).await.is_err());
+
+    // 2.4.2.3 Correctly Handle 2005 Error Exception (Adding Digest with space in between)
+    info!("Causing 2005 error");
+    assert!(epp_proxy::client::domain::update(epp_proxy::client::domain::UpdateInfo {
+        domain: "example.org",
+        sec_dns: Some(epp_proxy::client::domain::UpdateSecDNS {
+            urgent: None,
+            add: Some(epp_proxy::client::domain::SecDNSDataType::DSData(vec![
+                epp_proxy::client::domain::SecDNSDSData {
+                    key_tag: 12355,
+                    algorithm: 4,
+                    digest_type: 2,
+                    digest: "C06D93103F046E056033CA1D47CCD31F60DC7CE8E1BF C381A1252879C98752EE".to_string(),
+                    key_data: None,
+                },
+            ])),
+            remove: None,
+            new_max_sig_life: None
+        }),
+        ..Default::default()
+    }, &mut cmd_tx).await.is_err());
+
+    // 2.4.3.1 Delete a Domain (dsdomain1.org)
+    info!("Deleting DNSSEC domain");
+    epp_proxy::client::domain::delete("dsdomain1.org", None, None,None, &mut cmd_tx).await.unwrap();
+
+    // 2.4.3.2 Delete a Domain (dsdomain2.org)
+    info!("Deleting DNSSEC domain");
+    epp_proxy::client::domain::delete("dsdomain2.org", None, None,None, &mut cmd_tx).await.unwrap();
+
+    // 2.6.1 Delete Domain (example.org)
     info!("Deleting domain");
-    epp_proxy::client::domain::delete(&ga_domain, None, None, None, &mut cmd_tx_ga_1).await.unwrap();
+    epp_proxy::client::domain::delete("example.org", None, None,None, &mut cmd_tx).await.unwrap();
 
-    // 2.9.4 - Perform a check and verify that the domain label is now available
-    info!("Checking domain now available");
-    epp_proxy::client::domain::check(&ga_domain, None, None, &mut cmd_tx_ga_1).await.unwrap();
+    // 2.6.2 Delete Domain (domain.org)
+    info!("Deleting domain");
+    epp_proxy::client::domain::delete("domain.org", None, None,None, &mut cmd_tx).await.unwrap();
 
-    // 2.10.2 - Wait at least 60 minutes for the add grace period to expire
-    info!("Waiting for AGP to expire");
-    loop {
-        tokio::time::sleep(std::time::Duration::from_secs(60)).await;
-        let res = epp_proxy::client::domain::info(&ga_domain_idn, None, None, None, None, &mut cmd_tx_ga_1).await.unwrap();
-        if !res.response.rgp_state.contains(&epp_proxy::client::rgp::RGPState::AddPeriod) {
-            break;
-        }
-    }
+    // 2.6.3 Delete Contact (OTE-C1)
+    info!("Deleting contact");
+    epp_proxy::client::contact::delete("OTE-C1",  &mut cmd_tx).await.unwrap();
 
-    // 2.10.3 - Query the info of the domain created in Step 2.3 and verify that it is not in the add grace period
-    info!("Checking IDN domain not in AGP");
-    epp_proxy::client::domain::info(&ga_domain_idn, None, None, None, None, &mut cmd_tx_ga_1).await.unwrap();
+    // 2.6.4 Delete Contact (OTE-C2)
+    info!("Deleting contact");
+    epp_proxy::client::contact::delete("OTE-C2",  &mut cmd_tx).await.unwrap();
 
-    // 2.10.4 - Delete domain created in Step 2.3
-    info!("Deleting IDN domain");
-    epp_proxy::client::domain::delete(&ga_domain_idn, None, None, None, &mut cmd_tx_ga_1).await.unwrap();
+    // 2.6.5 Delete Contact (OTE-C3)
+    info!("Deleting contact");
+    epp_proxy::client::contact::delete("OTE-C3",  &mut cmd_tx).await.unwrap();
 
-    // 2.10.5 - Perform a check and verify that the domain label is still not available
-    info!("Checking domain still not available");
-    epp_proxy::client::domain::check(&ga_domain_idn, None, None, &mut cmd_tx_ga_1).await.unwrap();
+    // 2.6.6 Delete Contact (OTE-C4)
+    info!("Deleting contact");
+    epp_proxy::client::contact::delete("OTE-C4",  &mut cmd_tx).await.unwrap();
 
-    // 2.11.2 - Query the info of the domain used in Step 2.10 and verify that it has pending delete
-    // status and is in the redemption grace period
-    info!("Checking IDN domain in RGP");
-    epp_proxy::client::domain::info(&ga_domain_idn, None, None, None, None, &mut cmd_tx_ga_1).await.unwrap();
+    // 2.6.7 Delete Name Server (ns1.example.com)
+    info!("Deleting host");
+    epp_proxy::client::host::delete("ns1.example.com",  &mut cmd_tx).await.unwrap();
 
-    // 2.11.3 - Restore the domain. Note that no restore report is required
-    info!("Restoring IDN domain");
-    epp_proxy::client::rgp::request(&ga_domain_idn, None, &mut cmd_tx_ga_1).await.unwrap();
+    // 2.6.8 Delete Name Server (ns2.example.com)
+    info!("Deleting host");
+    epp_proxy::client::host::delete("ns2.example.com",  &mut cmd_tx).await.unwrap();
 
-    // 2.11.4 - Query the info of the domain again verify that it no longer has pending delete status
-    info!("Checking IDN domain no longer in RGP");
-    epp_proxy::client::domain::info(&ga_domain_idn, None, None, None, None, &mut cmd_tx_ga_1).await.unwrap();
+    // 2.7.1 Keep Session Alive
+    info!("Waiting 30 mins");
+    tokio::time::sleep(std::time::Duration::from_secs(30 * 60)).await;
 
-    // 2.12.2 - Delete the domain used in Step 2.11
-    info!("Deleting IDN domain");
-    epp_proxy::client::domain::delete(&ga_domain_idn, None, None, None, &mut cmd_tx_ga_1).await.unwrap();
+    // 2.7.2 Request Message Queue Information
+    info!("Requesting first message from queue");
+    let poll_msg = epp_proxy::client::poll::poll(&mut cmd_tx).await.unwrap();
 
-    // 2.12.3 - Wait at least 15 minutes
-    info!("Waiting for RGP to expire");
-    loop {
-        tokio::time::sleep(std::time::Duration::from_secs(60)).await;
-        let res = epp_proxy::client::domain::check(&ga_domain_idn, None, None,&mut cmd_tx_ga_1).await.unwrap();
-        if res.response.avail {
-            break;
-        }
-    }
+    // 2.7.3 Ack Queued Message
+    info!("Acking message");
+    epp_proxy::client::poll::poll_ack(&poll_msg.response.unwrap().id, &mut cmd_tx).await.unwrap();
 
-    // 2.12.4 - Perform a poll command and verify the receipt of a poll message announcing the release of the domain
-    info!("Polling deletion message");
-    let poll_msg = epp_proxy::client::poll::poll(&mut cmd_tx_ga_1).await.unwrap();
-    epp_proxy::client::poll::poll_ack(&poll_msg.response.unwrap().id, &mut cmd_tx_ga_1).await.unwrap();
-
-    // 2.13.1 - Using account <registrar name>‑3 create a domain
-    info!("Finding available domain");
-    let mut trans_domain_i = 1;
-    let trans_domain_1 = loop {
-        let trans_domain = format!("staclar-{}.{}", trans_domain_i, ga_tld);
-        let res = epp_proxy::client::domain::check(&trans_domain, None, None,&mut cmd_tx_ga_1).await.unwrap();
-        if res.response.avail {
-            break trans_domain;
-        } else {
-            trans_domain_i += 1;
-        }
-    };
-
-    info!("Creating domain");
-    epp_proxy::client::domain::create(
-        epp_proxy::client::domain::CreateInfo {
-            domain: &trans_domain_1,
-            nameservers: vec![],
-            period: Some(epp_proxy::client::Period {
-                unit: epp_proxy::client::PeriodUnit::Years,
-                value: 2,
-            }),
-            auth_info: "test_auth1",
-            registrant: &contact_id,
-            contacts: vec![epp_proxy::client::domain::InfoContact {
-                contact_type: "admin".to_string(),
-                contact_id: contact_id.clone(),
-            }, epp_proxy::client::domain::InfoContact {
-                contact_type: "tech".to_string(),
-                contact_id: contact_id.clone(),
-            }, epp_proxy::client::domain::InfoContact {
-                contact_type: "billing".to_string(),
-                contact_id: contact_id.clone(),
-            }],
-            donuts_fee_agreement: None,
-            eurid_data: None,
-            fee_agreement: None,
-            launch_create: None,
-            isnic_payment: None,
-            sec_dns: None,
-        },
-        &mut cmd_tx_ga_1,
-    ).await.unwrap();
-
-    // 2.13.2 - Using account <registrar name>‑4 request a transfer on the domain created above
-    info!("Requesting transfer");
-    epp_proxy::client::domain::transfer_request(
-        &trans_domain_1, None, "test_auth1", None,
-        None, None, &mut cmd_tx_ga_2
-    ).await.unwrap();
-
-    // 2.13.2.a - Perform a transfer query and verify that the domain’s transfer status is now pending
-    info!("Checking transfer is pending");
-    epp_proxy::client::domain::transfer_query(&trans_domain_1, Some("test_auth1"), &mut cmd_tx_ga_2).await.unwrap();
-
-    // 2.14.1 - Using account <registrar name>‑3 create a domain
-    info!("Finding available domain");
-    trans_domain_i += 1;
-    let trans_domain_2 = loop {
-        let trans_domain = format!("staclar-{}.{}", trans_domain_i, ga_tld);
-        let res = epp_proxy::client::domain::check(&trans_domain, None, None,&mut cmd_tx_ga_1).await.unwrap();
-        if res.response.avail {
-            break trans_domain;
-        } else {
-            trans_domain_i += 1;
-        }
-    };
-
-    info!("Creating domain");
-    epp_proxy::client::domain::create(
-        epp_proxy::client::domain::CreateInfo {
-            domain: &trans_domain_2,
-            nameservers: vec![],
-            period: Some(epp_proxy::client::Period {
-                unit: epp_proxy::client::PeriodUnit::Years,
-                value: 2,
-            }),
-            auth_info: "test_auth1",
-            registrant: &contact_id,
-            contacts: vec![epp_proxy::client::domain::InfoContact {
-                contact_type: "admin".to_string(),
-                contact_id: contact_id.clone(),
-            }, epp_proxy::client::domain::InfoContact {
-                contact_type: "tech".to_string(),
-                contact_id: contact_id.clone(),
-            }, epp_proxy::client::domain::InfoContact {
-                contact_type: "billing".to_string(),
-                contact_id: contact_id.clone(),
-            }],
-            donuts_fee_agreement: None,
-            eurid_data: None,
-            fee_agreement: None,
-            launch_create: None,
-            isnic_payment: None,
-            sec_dns: None,
-        },
-        &mut cmd_tx_ga_1,
-    ).await.unwrap();
-
-    // 2.14.2 - Using account <registrar name>‑4 request a transfer on the domain created above
-    info!("Requesting transfer");
-    epp_proxy::client::domain::transfer_request(
-        &trans_domain_2, None, "test_auth1", None,
-        None, None, &mut cmd_tx_ga_2
-    ).await.unwrap();
-
-    // 2.14.2.a - Perform a transfer query and verify that the domain’s transfer status is now pending
-    info!("Checking transfer is pending");
-    epp_proxy::client::domain::transfer_query(&trans_domain_2, Some("test_auth1"), &mut cmd_tx_ga_2).await.unwrap();
-
-    // 2.15.1 - Using account <registrar name>‑3 create a domain
-    info!("Finding available domain");
-    trans_domain_i += 1;
-    let trans_domain_3 = loop {
-        let trans_domain = format!("staclar-{}.{}", trans_domain_i, ga_tld);
-        let res = epp_proxy::client::domain::check(&trans_domain, None, None,&mut cmd_tx_ga_1).await.unwrap();
-        if res.response.avail {
-            break trans_domain;
-        } else {
-            trans_domain_i += 1;
-        }
-    };
-
-    info!("Creating domain");
-    epp_proxy::client::domain::create(
-        epp_proxy::client::domain::CreateInfo {
-            domain: &trans_domain_3,
-            nameservers: vec![],
-            period: Some(epp_proxy::client::Period {
-                unit: epp_proxy::client::PeriodUnit::Years,
-                value: 2,
-            }),
-            auth_info: "test_auth1",
-            registrant: &contact_id,
-            contacts: vec![epp_proxy::client::domain::InfoContact {
-                contact_type: "admin".to_string(),
-                contact_id: contact_id.clone(),
-            }, epp_proxy::client::domain::InfoContact {
-                contact_type: "tech".to_string(),
-                contact_id: contact_id.clone(),
-            }, epp_proxy::client::domain::InfoContact {
-                contact_type: "billing".to_string(),
-                contact_id: contact_id.clone(),
-            }],
-            donuts_fee_agreement: None,
-            eurid_data: None,
-            fee_agreement: None,
-            launch_create: None,
-            isnic_payment: None,
-            sec_dns: None,
-        },
-        &mut cmd_tx_ga_1,
-    ).await.unwrap();
-
-    // 2.15.2 - Using account <registrar name>‑4 request a transfer on the domain created above
-    info!("Requesting transfer");
-    epp_proxy::client::domain::transfer_request(
-        &trans_domain_3, None, "test_auth1", None,
-        None, None, &mut cmd_tx_ga_2
-    ).await.unwrap();
-
-    // 2.15.2.a - Perform a transfer query and verify that the domain’s transfer status is now pending
-    info!("Checking transfer is pending");
-    epp_proxy::client::domain::transfer_query(&trans_domain_3, Some("test_auth1"), &mut cmd_tx_ga_2).await.unwrap();
-
-    // 2.16.1 - Using account <registrar name>‑3 approve a pending transfer away from this registrar
-    // on the domain created in Step 2.13
-    info!("Accepting transfer");
-    epp_proxy::client::domain::transfer_accept(&trans_domain_1, None, &mut cmd_tx_ga_1).await.unwrap();
-
-    // 2.16.1.b - Perform a transfer query and verify that the domain’s transfer status is now client approved
-    info!("Checking transfer is approved");
-    epp_proxy::client::domain::transfer_query(&trans_domain_1, Some("test_auth1"), &mut cmd_tx_ga_1).await.unwrap();
-
-    // 2.16.2 - Using account <registrar name>‑4 perform a poll command and verify the receipt of a
-    // poll message announcing the approval of the transfer of the domain
-    info!("Polling transfer message");
-    let poll_msg = epp_proxy::client::poll::poll(&mut cmd_tx_ga_2).await.unwrap();
-    epp_proxy::client::poll::poll_ack(&poll_msg.response.unwrap().id, &mut cmd_tx_ga_2).await.unwrap();
-
-    // 2.16.2.b - Do an info on the domain and verify its sponsoring client is now set to <registrar name>‑4
-    info!("Checking domain sponsorship changed");
-    epp_proxy::client::domain::info(&trans_domain_1, None, None, None, None, &mut cmd_tx_ga_2).await.unwrap();
-
-    // 2.17.1 - Using account <registrar name>‑3 deny a pending transfer away from this registrar on the domain created in Step 2.14
-    info!("Denying transfer");
-    epp_proxy::client::domain::transfer_reject(&trans_domain_2, None, &mut cmd_tx_ga_1).await.unwrap();
-
-    // 2.17.1.b - Perform a transfer query and verify that the domain’s transfer status is now client rejected
-    info!("Checking transfer is denied");
-    epp_proxy::client::domain::transfer_query(&trans_domain_2, Some("test_auth1"), &mut cmd_tx_ga_1).await.unwrap();
-
-    // 2.17.2 - Using account <registrar name>‑4 perform a poll command and verify the receipt of a
-    // poll message announcing the denial of the transfer of the domain
-    info!("Polling transfer message");
-    let poll_msg = epp_proxy::client::poll::poll(&mut cmd_tx_ga_2).await.unwrap();
-    epp_proxy::client::poll::poll_ack(&poll_msg.response.unwrap().id, &mut cmd_tx_ga_2).await.unwrap();
-
-    // 2.17.2.b - Do an info on the domain and verify its sponsoring client is still set to <registrar name>‑3
-    info!("Checking domain sponsorship not changed");
-    epp_proxy::client::domain::info(&trans_domain_2, Some("test_auth1"), None, None, None, &mut cmd_tx_ga_2).await.unwrap();
-
-    // 2.18.1 - Using account <registrar name>‑4 cancel the pending transfer on the domain created in Step 2.15
-    info!("Canceling transfer");
-    epp_proxy::client::domain::transfer_cancel(&trans_domain_3, None, &mut cmd_tx_ga_2).await.unwrap();
-
-    // 2.18.1.b - Perform a transfer query and verify that the domain’s transfer status is now client cancelled
-    info!("Checking transfer is cancelled");
-    epp_proxy::client::domain::transfer_query(&trans_domain_3, Some("test_auth1"), &mut cmd_tx_ga_1).await.unwrap();
-
-    // 2.18.2 - Using account <registrar name>‑3 perform a poll command and verify the receipt of a
-    // poll message announcing the cancellation of the transfer of the domain
-    info!("Polling transfer message");
-    let poll_msg = epp_proxy::client::poll::poll(&mut cmd_tx_ga_1).await.unwrap();
-    epp_proxy::client::poll::poll_ack(&poll_msg.response.unwrap().id, &mut cmd_tx_ga_1).await.unwrap();
-
-    info!("Logging out of GA accounts");
-    let final_cmd_ga_1 = epp_proxy::client::logout(cmd_tx_ga_1).await.unwrap();
-    let final_cmd_ga_2 = epp_proxy::client::logout(cmd_tx_ga_2).await.unwrap();
-
-    println!("Final command transaction: {:#?}", final_cmd_ga_1.transaction_id);
-    println!("Final command transaction: {:#?}", final_cmd_ga_2.transaction_id);
-
-    let (mut cmd_tx_sunrise, mut ready_rx_sunrise) = epp_client_sunrise.start();
-
-    info!("Awaiting client sunrise to become ready...");
-    let login_trans_id = ready_rx_sunrise.next().await.unwrap();
-    info!("Login transaction ID: {:#?}", login_trans_id);
-
-    // 3.1.2 - Create a domain using an encoded signed mark provided by the TMCH for testing purposes
-    info!("Creating domain with SMD");
-    let test_smd = include_str!("./test-smd.txt");
-    epp_proxy::client::domain::create(
-        epp_proxy::client::domain::CreateInfo {
-            domain: &format!("test-and-validate.{}", sunrise_tld),
-            nameservers: vec![],
-            period: Some(epp_proxy::client::Period {
-                unit: epp_proxy::client::PeriodUnit::Years,
-                value: 2,
-            }),
-            auth_info: "test_auth1",
-            registrant: &contact_id,
-            contacts: vec![epp_proxy::client::domain::InfoContact {
-                contact_type: "admin".to_string(),
-                contact_id: contact_id.clone(),
-            }, epp_proxy::client::domain::InfoContact {
-                contact_type: "tech".to_string(),
-                contact_id: contact_id.clone(),
-            }, epp_proxy::client::domain::InfoContact {
-                contact_type: "billing".to_string(),
-                contact_id: contact_id.clone(),
-            }],
-            donuts_fee_agreement: None,
-            eurid_data: None,
-            fee_agreement: None,
-            launch_create: Some(epp_proxy::client::launch::LaunchCreate {
-                phase: epp_proxy::client::launch::LaunchPhase {
-                    phase_type: epp_proxy::client::launch::PhaseType::Sunrise, phase_name: None
-                },
-                code_mark: vec![],
-                signed_mark: Some(test_smd.to_string()),
-                create_type: epp_proxy::client::launch::LaunchCreateType::Registration,
-                notices: vec![],
-                core_nic: vec![]
-            }),
-            isnic_payment: None,
-            sec_dns: None,
-        },
-        &mut cmd_tx_sunrise,
-    ).await.unwrap();
-
-    info!("Logging out of sunrise account");
-    let final_cmd_sunrise = epp_proxy::client::logout(cmd_tx_sunrise).await.unwrap();
-    println!("Final command transaction: {:#?}", final_cmd_sunrise.transaction_id);
+    // 2.8 End Session
+    info!("Logging out");
+    let final_cmd = epp_proxy::client::logout(cmd_tx).await.unwrap();
+    println!("Final command transaction: {:#?}", final_cmd.transaction_id);
 }

@@ -398,6 +398,7 @@ pub async fn delete(
     .await
 }
 
+#[derive(Default)]
 pub struct UpdateContactData {
     ///  New localised address of the contact
     pub local_address: Option<Address>,

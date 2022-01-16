@@ -62,8 +62,8 @@ async fn main() {
         .about("gRPC to EPP proxy")
         .author("Q of AS207960 <q@as207960.net>")
         .arg(
-            clap::Arg::with_name("listen")
-                .short("l")
+            clap::Arg::new("listen")
+                .short('l')
                 .long("listen")
                 .takes_value(true)
                 .default_value("[::1]:50051")
@@ -77,22 +77,22 @@ async fn main() {
                 .help("Which address for gRPC to listen on"),
         )
         .arg(
-            clap::Arg::with_name("conf")
-                .short("c")
+            clap::Arg::new("conf")
+                .short('c')
                 .long("conf")
                 .takes_value(true)
                 .default_value("./conf/")
                 .help("Where to read config files from"),
         )
         .arg(
-            clap::Arg::with_name("hsm_conf")
-                .short("h")
+            clap::Arg::new("hsm_conf")
+                .short('h')
                 .long("hsm-conf")
                 .takes_value(true)
                 .help("Where to read the HSM config file from"),
         )
         .arg(
-            clap::Arg::with_name("log")
+            clap::Arg::new("log")
                 .long("log")
                 .takes_value(true)
                 .default_value("./log/")

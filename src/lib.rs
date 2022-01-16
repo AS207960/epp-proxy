@@ -42,11 +42,11 @@ pub struct ConfigFile {
     #[serde(default)]
     source_address: Option<std::net::IpAddr>,
     /// Client ID to login to the server
-    tag: String,
+    pub tag: String,
     /// Password to login to the server
-    password: String,
+    pub password: String,
     /// New password if the password is to be changed
-    new_password: Option<String>,
+    pub new_password: Option<String>,
     /// The zones the server is responsible for such as `co.uk` or `ch`
     zones: Vec<String>,
     /// PKCS12 file for TLS client auth
@@ -60,7 +60,7 @@ pub struct ConfigFile {
     /// Does the server support pipelining?
     pipelining: bool,
     /// For naughty servers
-    errata: Option<String>,
+    pub errata: Option<String>,
     nominet_dac: Option<NominetDACConfig>,
 }
 

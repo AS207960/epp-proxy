@@ -564,6 +564,7 @@ pub async fn delete(
     .await
 }
 
+#[derive(Default)]
 pub struct UpdateInfo<'a> {
     pub domain: &'a str,
     pub add: Vec<UpdateObject>,

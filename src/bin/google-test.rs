@@ -13,78 +13,78 @@ async fn main() {
         .about("Test runner for the Google EPP test")
         .author("Q of AS207960 <q@as207960.net>")
         .arg(
-            clap::Arg::with_name("acct-ga-1")
-                .short("aga1")
+            clap::Arg::new("acct-ga-1")
+                .short('3')
                 .long("account_ga_1")
                 .takes_value(true)
                 .required(true)
                 .help("Config file for the first General Availability account"),
         )
         .arg(
-            clap::Arg::with_name("acct-ga-2")
-                .short("aga2")
+            clap::Arg::new("acct-ga-2")
+                .short('4')
                 .long("account_ga_2")
                 .takes_value(true)
                 .required(true)
                 .help("Config file for the second General Availability account"),
         )
         .arg(
-            clap::Arg::with_name("acct-sunrise")
-                .short("as")
+            clap::Arg::new("acct-sunrise")
+                .short('1')
                 .long("account_sunrise")
                 .takes_value(true)
                 .required(true)
                 .help("Config file for the sunrise account"),
         )
         .arg(
-            clap::Arg::with_name("registrar_name")
-                .short("r")
+            clap::Arg::new("registrar_name")
+                .short('r')
                 .long("registrar_name")
                 .takes_value(true)
                 .required(true)
                 .help("Registrar account name"),
         )
         .arg(
-            clap::Arg::with_name("domain")
-                .short("d")
+            clap::Arg::new("domain")
+                .short('d')
                 .long("domain")
                 .takes_value(true)
                 .required(true)
                 .help("Domain to use for testing (without TLD)"),
         )
         .arg(
-            clap::Arg::with_name("domain_idn")
-                .short("id")
+            clap::Arg::new("domain_idn")
+                .short('i')
                 .long("idn_domain")
                 .takes_value(true)
                 .required(true)
                 .help("IDN Domain to use for testing (without TLD)"),
         )
         .arg(
-            clap::Arg::with_name("tmcnis_user")
-                .short("tmu")
+            clap::Arg::new("tmcnis_user")
+                .short('u')
                 .long("tmcnis_user")
                 .takes_value(true)
                 .required(true)
                 .help("Username for trademark CNIS"),
         )
         .arg(
-            clap::Arg::with_name("tmcnis_pass")
-                .short("tmp")
+            clap::Arg::new("tmcnis_pass")
+                .short('p')
                 .long("tmcnis_password")
                 .takes_value(true)
                 .required(true)
                 .help("Password for trademark CNIS"),
         )
         .arg(
-            clap::Arg::with_name("hsm_conf")
-                .short("h")
+            clap::Arg::new("hsm_conf")
+                .short('h')
                 .long("hsm-conf")
                 .takes_value(true)
                 .help("Where to read the HSM config file from"),
         )
         .arg(
-            clap::Arg::with_name("log")
+            clap::Arg::new("log")
                 .long("log")
                 .takes_value(true)
                 .default_value("./log/")
@@ -1014,7 +1014,7 @@ async fn main() {
     info!("Login transaction ID: {:#?}", login_trans_id);
 
     // 3.1.2 - Create a domain using an encoded signed mark provided by the TMCH for testing purposes
-    info!("Creating domain with ESM");
+    info!("Creating domain with SMD");
     let test_smd = include_str!("./test-smd.txt");
     epp_proxy::client::domain::create(
         epp_proxy::client::domain::CreateInfo {
