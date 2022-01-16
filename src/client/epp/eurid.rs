@@ -897,7 +897,10 @@ mod eurid_tests {
         };
         let data = super::super::contact::handle_info_response(*res).unwrap();
         let eurid_extension = data.eurid_contact_extension.unwrap();
-        assert_eq!(data.entity_type, super::super::super::contact::EntityType::Unknown);
+        assert_eq!(
+            data.entity_type,
+            super::super::super::contact::EntityType::Unknown
+        );
         assert_eq!(eurid_extension.contact_type, super::ContactType::Tech);
         assert_eq!(eurid_extension.language, "en");
         assert!(eurid_extension.citizenship_country.is_none());
@@ -1024,7 +1027,10 @@ mod eurid_tests {
         };
         let data = super::super::contact::handle_info_response(*res).unwrap();
         let eurid_extension = data.eurid_contact_extension.unwrap();
-        assert_eq!(data.entity_type, super::super::super::contact::EntityType::Unknown);
+        assert_eq!(
+            data.entity_type,
+            super::super::super::contact::EntityType::Unknown
+        );
         assert_eq!(eurid_extension.contact_type, super::ContactType::Registrant);
         assert_eq!(eurid_extension.language, "en");
         assert!(eurid_extension.citizenship_country.is_none());

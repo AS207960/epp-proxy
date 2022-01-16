@@ -374,7 +374,8 @@ pub fn handle_mark_info_response(response: tmch_proto::TMCHResponse) -> Response
                     labels: msg.labels.into_iter().map(Into::into).collect(),
                     variations: msg
                         .variations
-                        .into_iter().flat_map(|v| v.labels)
+                        .into_iter()
+                        .flat_map(|v| v.labels)
                         .map(Into::into)
                         .collect(),
                     creation_date: msg.creation_date,

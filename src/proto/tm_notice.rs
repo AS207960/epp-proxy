@@ -15,5 +15,5 @@ pub struct TMNotice {
     #[serde(rename = "{urn:ietf:params:xml:ns:tmNotice-1.0}notAfter")]
     pub not_after: DateTime<Utc>,
     #[serde(rename = "{urn:ietf:params:xml:ns:tmNotice-1.0}label")]
-    pub label: String
+    pub label: String,
 }

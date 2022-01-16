@@ -22,11 +22,11 @@ pub mod qualified_lawyer;
 pub mod rgp;
 pub mod secdns;
 pub mod switch;
+pub mod tm_notice;
 pub mod tmch;
 pub mod traficom;
 pub mod united_tld;
 pub mod verisign;
-pub mod tm_notice;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub enum EPPMessageType {

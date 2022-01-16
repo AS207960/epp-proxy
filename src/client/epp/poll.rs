@@ -1252,7 +1252,10 @@ mod poll_tests {
                 change_data: None,
             } => {
                 assert_eq!(trn_data.data.name, "example.uk.com");
-                assert_eq!(trn_data.data.status, super::super::super::TransferStatus::Pending);
+                assert_eq!(
+                    trn_data.data.status,
+                    super::super::super::TransferStatus::Pending
+                );
                 assert_eq!(trn_data.data.requested_client_id, "H12345");
                 assert_eq!(trn_data.data.act_client_id, "H54321");
             }
