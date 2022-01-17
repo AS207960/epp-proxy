@@ -501,10 +501,10 @@ pub struct EPPHandshakeDomainListData {
 
 #[derive(Debug, Serialize)]
 pub struct EPPRelease {
-    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/std-release-1.0}release:registrarTag")]
-    pub registrar_tag: String,
     #[serde(rename = "$value")]
     pub object: EPPReleaseObject,
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/std-release-1.0}release:registrarTag")]
+    pub registrar_tag: String,
 }
 
 #[derive(Debug, Serialize)]

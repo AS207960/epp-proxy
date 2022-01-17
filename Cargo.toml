@@ -1,8 +1,6 @@
-cargo-features = ["strip"]
-
 [package]
 name = "epp-proxy"
-version = "0.4.1"
+version = "0.4.2"
 authors = ["Q <q@misell.cymru>"]
 edition = "2018"
 

@@ -629,7 +629,7 @@ async fn main() {
                 ),
                 epp_proxy::client::domain::UpdateObject::Nameserver(
                     epp_proxy::client::domain::InfoNameserver::HostOnly(
-                        "ns1.example.org".to_string(),
+                        "ns2.example.org".to_string(),
                     ),
                 ),
             ],
@@ -1250,7 +1250,7 @@ async fn main() {
                             key_tag: 12352,
                             algorithm: 3,
                             digest_type: 1,
-                            digest: "38AC35D5B3A34B44C39B38EC35D5B3A34B44C39B".to_string(),
+                            digest: "38AC35D5B3A34B44C39B38EC35D5B3A34B44C39D".to_string(),
                             key_data: None,
                         },
                         epp_proxy::client::domain::SecDNSDSData {
@@ -1308,7 +1308,7 @@ async fn main() {
 
     // 2.4.2.1 Correctly Handle 2306 Error Exception
     info!("Causing 2306 error");
-    let _ = epp_proxy::client::domain::update(
+    assert!(epp_proxy::client::domain::update(
         epp_proxy::client::domain::UpdateInfo {
             domain: "example.org",
             sec_dns: Some(epp_proxy::client::domain::UpdateSecDNS {
@@ -1330,7 +1330,8 @@ async fn main() {
         },
         &mut cmd_tx,
     )
-    .await;
+    .await
+    .is_err());
 
     // 2.4.2.2 Correctly Handle 2303 Error Exception (Remove Single DS Record)
     info!("Causing 2303 error");
