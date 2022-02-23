@@ -2,8 +2,8 @@ use super::super::fee::{
     Applied, Command, Credit, DonutsAmount, DonutsCategory, DonutsFeeData, DonutsFeeSet,
     DonutsFeeType, DonutsFeeTypes, Fee, FeeAgreement, FeeData,
 };
-use super::ServerFeatures;
 use super::super::proto;
+use super::ServerFeatures;
 
 impl From<&proto::fee::EPPFeeCommand> for Command {
     fn from(from: &proto::fee::EPPFeeCommand) -> Self {

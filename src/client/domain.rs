@@ -165,7 +165,7 @@ pub struct SecDNSKeyData {
 #[derive(Debug)]
 pub struct CreateRequest {
     pub(super) name: String,
-    pub(super) period: Option<Period>,
+    pub(super) period: Option<super::Period>,
     pub(super) registrant: String,
     pub(super) contacts: Vec<InfoContact>,
     pub(super) nameservers: Vec<InfoNameserver>,
@@ -177,22 +177,6 @@ pub struct CreateRequest {
     pub(super) eurid_data: Option<super::eurid::DomainCreate>,
     pub(super) isnic_payment: Option<super::isnic::PaymentInfo>,
     pub return_path: Sender<CreateResponse>,
-}
-
-/// Domain registration period
-#[derive(Debug)]
-pub struct Period {
-    /// Unit of time
-    pub unit: PeriodUnit,
-    /// Number of units of time
-    pub value: u32,
-}
-
-/// Domain registration period time unit
-#[derive(Debug)]
-pub enum PeriodUnit {
-    Years,
-    Months,
 }
 
 #[derive(Debug)]
@@ -292,7 +276,7 @@ pub struct VerisignSyncRequest {
 #[derive(Debug)]
 pub struct RenewRequest {
     pub(super) name: String,
-    pub(super) add_period: Option<Period>,
+    pub(super) add_period: Option<super::Period>,
     pub(super) cur_expiry_date: DateTime<Utc>,
     pub(super) fee_agreement: Option<fee::FeeAgreement>,
     pub(super) donuts_fee_agreement: Option<fee::DonutsFeeData>,
@@ -329,7 +313,7 @@ pub struct TransferQueryRequest {
 pub struct TransferRequestRequest {
     pub(super) name: String,
     pub(super) auth_info: String,
-    pub(super) add_period: Option<Period>,
+    pub(super) add_period: Option<super::Period>,
     pub(super) fee_agreement: Option<fee::FeeAgreement>,
     pub(super) donuts_fee_agreement: Option<fee::DonutsFeeData>,
     pub(super) eurid_data: Option<super::eurid::DomainTransfer>,
@@ -503,7 +487,7 @@ pub async fn info(
 
 pub struct CreateInfo<'a> {
     pub domain: &'a str,
-    pub period: Option<Period>,
+    pub period: Option<super::Period>,
     pub registrant: &'a str,
     pub contacts: Vec<InfoContact>,
     pub nameservers: Vec<InfoNameserver>,
@@ -580,6 +564,7 @@ pub async fn delete(
     .await
 }
 
+#[derive(Default)]
 pub struct UpdateInfo<'a> {
     pub domain: &'a str,
     pub add: Vec<UpdateObject>,
@@ -664,7 +649,7 @@ pub async fn verisign_sync(
 /// * `client_sender` - Reference to the tokio channel into the client
 pub async fn renew(
     domain: &str,
-    add_period: Option<Period>,
+    add_period: Option<super::Period>,
     cur_expiry_date: DateTime<Utc>,
     fee_agreement: Option<fee::FeeAgreement>,
     donuts_fee_agreement: Option<fee::DonutsFeeData>,
@@ -721,7 +706,7 @@ pub async fn transfer_query(
 /// * `client_sender` - Reference to the tokio channel into the client
 pub async fn transfer_request(
     domain: &str,
-    add_period: Option<Period>,
+    add_period: Option<super::Period>,
     auth_info: &str,
     fee_agreement: Option<fee::FeeAgreement>,
     donuts_fee_agreement: Option<fee::DonutsFeeData>,

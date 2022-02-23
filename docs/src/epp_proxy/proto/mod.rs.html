@@ -1,6 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/proto/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings"></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
-<link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../epp_proxy/index.html'><div class='logo-container'><img src='https://as207960.net/img/logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img src="../../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img src="../../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src&#x2F;proto&#x2F;mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../epp_proxy/index.html'><div class='logo-container rust-logo'><img src='https:&#x2F;&#x2F;as207960.net&#x2F;assets&#x2F;img&#x2F;logo.svg' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
 <span id="2">   2</span>
 <span id="3">   3</span>
 <span id="4">   4</span>
@@ -1122,8 +1120,31 @@
 <span id="1120">1120</span>
 <span id="1121">1121</span>
 <span id="1122">1122</span>
-</pre><pre class="rust">
-<span class="doccomment">//! Serde structs for serialisation and deserialisation of EPP XML messages</span>
+<span id="1123">1123</span>
+<span id="1124">1124</span>
+<span id="1125">1125</span>
+<span id="1126">1126</span>
+<span id="1127">1127</span>
+<span id="1128">1128</span>
+<span id="1129">1129</span>
+<span id="1130">1130</span>
+<span id="1131">1131</span>
+<span id="1132">1132</span>
+<span id="1133">1133</span>
+<span id="1134">1134</span>
+<span id="1135">1135</span>
+<span id="1136">1136</span>
+<span id="1137">1137</span>
+<span id="1138">1138</span>
+<span id="1139">1139</span>
+<span id="1140">1140</span>
+<span id="1141">1141</span>
+<span id="1142">1142</span>
+<span id="1143">1143</span>
+<span id="1144">1144</span>
+<span id="1145">1145</span>
+<span id="1146">1146</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Serde structs for serialisation and deserialisation of EPP XML messages</span>
 <span class="doccomment">//! (these are insane, stay away if you value your sanity)</span>
 
 <span class="kw">use</span> <span class="ident">chrono::prelude</span>::<span class="kw-2">*</span>;
@@ -1141,11 +1162,13 @@
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">launch</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">login_sec</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">maintenance</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">mark</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">nominet</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">qualified_lawyer</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">rgp</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">secdns</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">switch</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">tmch</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">traficom</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">united_tld</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">verisign</span>;
@@ -1191,13 +1214,13 @@
 }
 
 <span class="kw">impl</span> <span class="ident">EPPServiceMenu</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">supports</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">obj</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">objects</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span> <span class="op">=</span><span class="op">=</span> <span class="ident">obj</span>)
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">supports</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">obj</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">objects</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span> <span class="op">==</span> <span class="ident">obj</span>)
     }
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">supports_ext</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">obj</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">supports_ext</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">obj</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">extension</span>
             .<span class="ident">as_ref</span>()
-            .<span class="ident">map_or</span>(<span class="bool-val">false</span>, <span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">extensions</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span> <span class="op">=</span><span class="op">=</span> <span class="ident">obj</span>))
+            .<span class="ident">map_or</span>(<span class="bool-val">false</span>, <span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">extensions</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span> <span class="op">==</span> <span class="ident">obj</span>))
     }
 }
 
@@ -1241,6 +1264,10 @@
         <span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;{http://www.nominet.org.uk/epp/xml/contact-nom-ext-1.0}contact-nom-ext:update&quot;</span>
     )]</span>
     <span class="ident">NominetContactExtUpdate</span>(<span class="ident">nominet::EPPContactInfo</span>),
+    <span class="attribute">#[<span class="ident">serde</span>(
+        <span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;{http://www.nominet.org.uk/epp/xml/nom-data-quality-1.0}nom-data-quality:update&quot;</span>
+    )]</span>
+    <span class="ident">NominetDataQualityUpdate</span>(<span class="ident">nominet::EPPDataQualityUpdate</span>),
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;{urn:ietf:params:xml:ns:rgp-1.0}rgp:update&quot;</span>)]</span>
     <span class="ident">EPPRGPUpdate</span>(<span class="ident">rgp::EPPRGPUpdate</span>),
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;{urn:ietf:params:xml:ns:secDNS-1.1}secDNS:create&quot;</span>)]</span>
@@ -1382,32 +1409,32 @@
 }
 
 <span class="kw">impl</span> <span class="ident">EPPResponse</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_success</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_success</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">results</span>.<span class="ident">first</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>.<span class="ident">code</span>.<span class="ident">is_success</span>(),
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
+            <span class="prelude-val">Some</span>(<span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">code</span>.<span class="ident">is_success</span>(),
+            <span class="prelude-val">None</span> =&gt; <span class="bool-val">false</span>,
         }
     }
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_closing</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_closing</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">results</span>.<span class="ident">first</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>.<span class="ident">code</span>.<span class="ident">is_closing</span>(),
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
+            <span class="prelude-val">Some</span>(<span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">code</span>.<span class="ident">is_closing</span>(),
+            <span class="prelude-val">None</span> =&gt; <span class="bool-val">false</span>,
         }
     }
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_pending</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_pending</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">results</span>.<span class="ident">first</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>.<span class="ident">code</span> <span class="op">=</span><span class="op">=</span> <span class="ident">EPPResultCode::SuccessActionPending</span>,
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
+            <span class="prelude-val">Some</span>(<span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">code</span> <span class="op">==</span> <span class="ident">EPPResultCode::SuccessActionPending</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="bool-val">false</span>,
         }
     }
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_server_error</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_server_error</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">results</span>.<span class="ident">first</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>.<span class="ident">code</span>.<span class="ident">is_server_error</span>(),
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
+            <span class="prelude-val">Some</span>(<span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">code</span>.<span class="ident">is_server_error</span>(),
+            <span class="prelude-val">None</span> =&gt; <span class="bool-val">false</span>,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">response_msg</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">response_msg</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">output</span> <span class="op">=</span> <span class="macro">vec!</span>[];
         <span class="kw">for</span> <span class="ident">r</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">results</span> {
             <span class="kw">match</span> <span class="ident">r</span>.<span class="ident">extra_values</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> {
@@ -1415,7 +1442,7 @@
                     .<span class="ident">map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;({}) {}&quot;</span>, <span class="ident">e</span>.<span class="ident">value</span>, <span class="ident">e</span>.<span class="ident">reason</span>))
                     .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()
             }) {
-                <span class="prelude-val">Some</span>(<span class="ident">extra</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">extra</span>) =&gt; {
                     <span class="ident">output</span>.<span class="ident">push</span>(<span class="macro">format!</span>(
                         <span class="string">&quot;({:?}) {}: {}&quot;</span>,
                         <span class="ident">r</span>.<span class="ident">code</span>,
@@ -1423,7 +1450,7 @@
                         <span class="ident">extra</span>.<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>)
                     ));
                 }
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">None</span> =&gt; {
                     <span class="kw">match</span> <span class="ident">r</span>.<span class="ident">values</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> {
                         <span class="ident">v</span>.<span class="ident">iter</span>()
                             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> {
@@ -1434,10 +1461,10 @@
                             })
                             .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()
                     }) {
-                        <span class="prelude-val">Some</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="prelude-val">Some</span>(<span class="ident">v</span>) =&gt; {
                             <span class="ident">output</span>.<span class="ident">push</span>(<span class="macro">format!</span>(<span class="string">&quot;({:?}) {}: {}&quot;</span>, <span class="ident">r</span>.<span class="ident">code</span>, <span class="ident">r</span>.<span class="ident">message</span>, <span class="ident">v</span>.<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>)));
                         }
-                        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="prelude-val">None</span> =&gt; {
                             <span class="ident">output</span>.<span class="ident">push</span>(<span class="macro">format!</span>(<span class="string">&quot;({:?}) {}&quot;</span>, <span class="ident">r</span>.<span class="ident">code</span>, <span class="ident">r</span>.<span class="ident">message</span>));
                         }
                     }
@@ -1500,7 +1527,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">EPPResultCode</span> {
-    <span class="kw">fn</span> <span class="ident">is_success</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">is_success</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="macro">matches!</span>(
             <span class="self">self</span>,
             <span class="ident">EPPResultCode::Success</span>
@@ -1511,7 +1538,7 @@
         )
     }
 
-    <span class="kw">fn</span> <span class="ident">is_closing</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">is_closing</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="macro">matches!</span>(
             <span class="self">self</span>,
             <span class="ident">EPPResultCode::SuccessEndingSession</span>
@@ -1521,7 +1548,7 @@
         )
     }
 
-    <span class="kw">fn</span> <span class="ident">is_server_error</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">is_server_error</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="macro">matches!</span>(
             <span class="self">self</span>,
             <span class="ident">EPPResultCode::CommandFailed</span>
@@ -1533,49 +1560,49 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">EPPResultCode</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">value</span>: <span class="ident">u16</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">EPPResultCode</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">value</span>: <span class="ident">u16</span>) -&gt; <span class="ident">EPPResultCode</span> {
         <span class="kw">match</span> <span class="ident">value</span> {
-            <span class="number">1000</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EPPResultCode::Success</span>,
-            <span class="number">1001</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EPPResultCode::SuccessActionPending</span>,
-            <span class="number">1300</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EPPResultCode::SuccessNoMessages</span>,
-            <span class="number">1301</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EPPResultCode::SuccessAckToDequeue</span>,
-            <span class="number">1500</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EPPResultCode::SuccessEndingSession</span>,
-            <span class="number">2000</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EPPResultCode::UnknownCommand</span>,
-            <span class="number">2001</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EPPResultCode::CommandSyntaxError</span>,
-            <span class="number">2002</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EPPResultCode::CommandUseError</span>,
-            <span class="number">2003</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EPPResultCode::RequiredParameterMissing</span>,
-            <span class="number">2004</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EPPResultCode::ParameterValueRangeError</span>,
-            <span class="number">2005</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EPPResultCode::ParameterValueSyntaxError</span>,
-            <span class="number">2100</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EPPResultCode::UnimplementedProtocolVersion</span>,
-            <span class="number">2101</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EPPResultCode::UnimplementedCommand</span>,
-            <span class="number">2102</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EPPResultCode::UnimplementedOption</span>,
-            <span class="number">2103</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EPPResultCode::UnimplementedExtension</span>,
-            <span class="number">2104</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EPPResultCode::BillingFailure</span>,
-            <span class="number">2105</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EPPResultCode::ObjectNotEligibleForRenewal</span>,
-            <span class="number">2106</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EPPResultCode::ObjectNotEligibleForTransfer</span>,
-            <span class="number">2200</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EPPResultCode::AuthenticationError</span>,
-            <span class="number">2201</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EPPResultCode::AuthorizationError</span>,
-            <span class="number">2202</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EPPResultCode::InvalidAuthorization</span>,
-            <span class="number">2300</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EPPResultCode::ObjectPendingTransfer</span>,
-            <span class="number">2301</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EPPResultCode::ObjectNotPendingTransfer</span>,
-            <span class="number">2302</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EPPResultCode::ObjectExists</span>,
-            <span class="number">2303</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EPPResultCode::ObjectDoesNotExist</span>,
-            <span class="number">2304</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EPPResultCode::ObjectStatusProhibitsOperation</span>,
-            <span class="number">2305</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EPPResultCode::ObjectAssociationProhibitsOperation</span>,
-            <span class="number">2306</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EPPResultCode::ParameterValuePolicyError</span>,
-            <span class="number">2307</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EPPResultCode::UnimplementedObjectService</span>,
-            <span class="number">2308</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EPPResultCode::DataManagementPolicyViolation</span>,
-            <span class="number">2400</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EPPResultCode::CommandFailed</span>,
-            <span class="number">2500</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EPPResultCode::CommandFailedServerClosingConnection</span>,
-            <span class="number">2501</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EPPResultCode::AuthenticationServerClosingConnection</span>,
-            <span class="number">2502</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EPPResultCode::SessionLimitExceededServerClosingConnection</span>,
-            <span class="ident">o</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EPPResultCode::Other</span>(<span class="ident">o</span>),
+            <span class="number">1000</span> =&gt; <span class="ident">EPPResultCode::Success</span>,
+            <span class="number">1001</span> =&gt; <span class="ident">EPPResultCode::SuccessActionPending</span>,
+            <span class="number">1300</span> =&gt; <span class="ident">EPPResultCode::SuccessNoMessages</span>,
+            <span class="number">1301</span> =&gt; <span class="ident">EPPResultCode::SuccessAckToDequeue</span>,
+            <span class="number">1500</span> =&gt; <span class="ident">EPPResultCode::SuccessEndingSession</span>,
+            <span class="number">2000</span> =&gt; <span class="ident">EPPResultCode::UnknownCommand</span>,
+            <span class="number">2001</span> =&gt; <span class="ident">EPPResultCode::CommandSyntaxError</span>,
+            <span class="number">2002</span> =&gt; <span class="ident">EPPResultCode::CommandUseError</span>,
+            <span class="number">2003</span> =&gt; <span class="ident">EPPResultCode::RequiredParameterMissing</span>,
+            <span class="number">2004</span> =&gt; <span class="ident">EPPResultCode::ParameterValueRangeError</span>,
+            <span class="number">2005</span> =&gt; <span class="ident">EPPResultCode::ParameterValueSyntaxError</span>,
+            <span class="number">2100</span> =&gt; <span class="ident">EPPResultCode::UnimplementedProtocolVersion</span>,
+            <span class="number">2101</span> =&gt; <span class="ident">EPPResultCode::UnimplementedCommand</span>,
+            <span class="number">2102</span> =&gt; <span class="ident">EPPResultCode::UnimplementedOption</span>,
+            <span class="number">2103</span> =&gt; <span class="ident">EPPResultCode::UnimplementedExtension</span>,
+            <span class="number">2104</span> =&gt; <span class="ident">EPPResultCode::BillingFailure</span>,
+            <span class="number">2105</span> =&gt; <span class="ident">EPPResultCode::ObjectNotEligibleForRenewal</span>,
+            <span class="number">2106</span> =&gt; <span class="ident">EPPResultCode::ObjectNotEligibleForTransfer</span>,
+            <span class="number">2200</span> =&gt; <span class="ident">EPPResultCode::AuthenticationError</span>,
+            <span class="number">2201</span> =&gt; <span class="ident">EPPResultCode::AuthorizationError</span>,
+            <span class="number">2202</span> =&gt; <span class="ident">EPPResultCode::InvalidAuthorization</span>,
+            <span class="number">2300</span> =&gt; <span class="ident">EPPResultCode::ObjectPendingTransfer</span>,
+            <span class="number">2301</span> =&gt; <span class="ident">EPPResultCode::ObjectNotPendingTransfer</span>,
+            <span class="number">2302</span> =&gt; <span class="ident">EPPResultCode::ObjectExists</span>,
+            <span class="number">2303</span> =&gt; <span class="ident">EPPResultCode::ObjectDoesNotExist</span>,
+            <span class="number">2304</span> =&gt; <span class="ident">EPPResultCode::ObjectStatusProhibitsOperation</span>,
+            <span class="number">2305</span> =&gt; <span class="ident">EPPResultCode::ObjectAssociationProhibitsOperation</span>,
+            <span class="number">2306</span> =&gt; <span class="ident">EPPResultCode::ParameterValuePolicyError</span>,
+            <span class="number">2307</span> =&gt; <span class="ident">EPPResultCode::UnimplementedObjectService</span>,
+            <span class="number">2308</span> =&gt; <span class="ident">EPPResultCode::DataManagementPolicyViolation</span>,
+            <span class="number">2400</span> =&gt; <span class="ident">EPPResultCode::CommandFailed</span>,
+            <span class="number">2500</span> =&gt; <span class="ident">EPPResultCode::CommandFailedServerClosingConnection</span>,
+            <span class="number">2501</span> =&gt; <span class="ident">EPPResultCode::AuthenticationServerClosingConnection</span>,
+            <span class="number">2502</span> =&gt; <span class="ident">EPPResultCode::SessionLimitExceededServerClosingConnection</span>,
+            <span class="ident">o</span> =&gt; <span class="ident">EPPResultCode::Other</span>(<span class="ident">o</span>),
         }
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">serde::Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">EPPResultCode</span> {
-    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">EPPResultCode</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">EPPResultCode</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">D</span>: <span class="ident">serde::Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
     {
@@ -1584,25 +1611,25 @@
         <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">serde::de::Visitor</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">U16Visitor</span> {
             <span class="kw">type</span> <span class="ident">Value</span> <span class="op">=</span> <span class="ident">u16</span>;
 
-            <span class="kw">fn</span> <span class="ident">expecting</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">formatter</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::fmt::Result</span> {
+            <span class="kw">fn</span> <span class="ident">expecting</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">formatter</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span>) -&gt; <span class="ident">std::fmt::Result</span> {
                 <span class="ident">formatter</span>.<span class="ident">write_str</span>(<span class="string">&quot;an integer between 0 and 2^16&quot;</span>)
             }
 
-            <span class="kw">fn</span> <span class="ident">visit_u8</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">value</span>: <span class="ident">u8</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Value</span>, <span class="ident">E</span><span class="op">&gt;</span>
+            <span class="kw">fn</span> <span class="ident">visit_u8</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">value</span>: <span class="ident">u8</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">E</span><span class="op">&gt;</span>
             <span class="kw">where</span>
                 <span class="ident">E</span>: <span class="ident">serde::de::Error</span>,
             {
                 <span class="prelude-val">Ok</span>(<span class="ident">u16::from</span>(<span class="ident">value</span>))
             }
 
-            <span class="kw">fn</span> <span class="ident">visit_u16</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">value</span>: <span class="ident">u16</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Value</span>, <span class="ident">E</span><span class="op">&gt;</span>
+            <span class="kw">fn</span> <span class="ident">visit_u16</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">value</span>: <span class="ident">u16</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">E</span><span class="op">&gt;</span>
             <span class="kw">where</span>
                 <span class="ident">E</span>: <span class="ident">serde::de::Error</span>,
             {
                 <span class="prelude-val">Ok</span>(<span class="ident">value</span>)
             }
 
-            <span class="kw">fn</span> <span class="ident">visit_u32</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">value</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Value</span>, <span class="ident">E</span><span class="op">&gt;</span>
+            <span class="kw">fn</span> <span class="ident">visit_u32</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">value</span>: <span class="ident">u32</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">E</span><span class="op">&gt;</span>
             <span class="kw">where</span>
                 <span class="ident">E</span>: <span class="ident">serde::de::Error</span>,
             {
@@ -1614,7 +1641,7 @@
                 }
             }
 
-            <span class="kw">fn</span> <span class="ident">visit_u64</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">value</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Value</span>, <span class="ident">E</span><span class="op">&gt;</span>
+            <span class="kw">fn</span> <span class="ident">visit_u64</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">value</span>: <span class="ident">u64</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">E</span><span class="op">&gt;</span>
             <span class="kw">where</span>
                 <span class="ident">E</span>: <span class="ident">serde::de::Error</span>,
             {
@@ -1628,8 +1655,8 @@
         }
 
         <span class="kw">match</span> <span class="ident">deserializer</span>.<span class="ident">deserialize_u16</span>(<span class="ident">U16Visitor</span>) {
-            <span class="prelude-val">Ok</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">EPPResultCode::from</span>(<span class="ident">i</span>)),
-            <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>),
+            <span class="prelude-val">Ok</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">EPPResultCode::from</span>(<span class="ident">i</span>)),
+            <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">e</span>),
         }
     }
 }
@@ -1726,6 +1753,10 @@
     <span class="ident">NominetDomainFailData</span>(<span class="ident">nominet::EPPDomainFailData</span>),
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;{http://www.nominet.org.uk/epp/xml/std-notifications-1.2}trnData&quot;</span>)]</span>
     <span class="ident">NominetTransferData</span>(<span class="ident">nominet::EPPTransferData</span>),
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;{http://www.nominet.org.uk/epp/xml/std-handshake-1.0}hanData&quot;</span>)]</span>
+    <span class="ident">NominetHandshakeData</span>(<span class="ident">nominet::EPPHandshakeData</span>),
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;{http://www.nominet.org.uk/epp/xml/std-release-1.0}releasePending&quot;</span>)]</span>
+    <span class="ident">NominetReleasePending</span>(<span class="ident">String</span>),
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;{http://www.eurid.eu/xml/epp/registrarFinance-1.0}infData&quot;</span>)]</span>
     <span class="ident">EURIDRegistrarFinanceData</span>(<span class="ident">eurid::EURIDRegistrarFinanceInfoData</span>),
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;{http://www.eurid.eu/xml/epp/registrarHitPoints-1.0}infData&quot;</span>)]</span>
@@ -1794,10 +1825,14 @@
     <span class="ident">NominetContactExtInfo</span>(<span class="ident">nominet::EPPContactInfo</span>),
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;{http://www.nominet.org.uk/epp/xml/std-warning-1.1}ignored-field&quot;</span>)]</span>
     <span class="ident">NominetIgnoredField</span>(<span class="ident">nominet::EPPIgnoredField</span>),
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;{http://www.nominet.org.uk/epp/xml/std-warning-1.1}ignored-attribute&quot;</span>)]</span>
+    <span class="ident">NominetIgnoredAttribute</span>(<span class="ident">nominet::EPPIgnoredAttribute</span>),
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;{http://www.nominet.org.uk/epp/xml/std-warning-1.1}postalInfo-ignored&quot;</span>)]</span>
     <span class="ident">NominetPostalInfoIgnored</span>(<span class="ident">nominet::EPPPostalInfoIgnored</span>),
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;{http://www.nominet.org.uk/epp/xml/std-warning-1.1}truncated-field&quot;</span>)]</span>
     <span class="ident">NominetTruncatedField</span>(<span class="ident">nominet::EPPTruncatedField</span>),
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;{http://www.nominet.org.uk/epp/xml/std-warning-1.1}host-ignored&quot;</span>)]</span>
+    <span class="ident">NominetHostIgnored</span>(<span class="ident">nominet::EPPHostIgnored</span>),
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;{http://www.nominet.org.uk/epp/xml/nom-data-quality-1.1}infData&quot;</span>)]</span>
     <span class="ident">NominetDataQuality</span>(<span class="ident">nominet::EPPDataQualityInfo</span>),
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;{http://www.verisign.com/epp/whoisInf-1.0}whoisInfData&quot;</span>)]</span>
@@ -2004,6 +2039,16 @@
     <span class="ident">Contact</span>(<span class="ident">contact::EPPContactUpdate</span>),
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;{urn:ietf:params:xml:ns:domain-1.0}domain:update&quot;</span>)]</span>
     <span class="ident">Domain</span>(<span class="ident">domain::EPPDomainUpdate</span>),
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;{http://www.nominet.org.uk/epp/xml/std-handshake-1.0}handshake:accept&quot;</span>)]</span>
+    <span class="ident">NominetHandshakeAccept</span>(<span class="ident">nominet::EPPHandshakeAccept</span>),
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;{http://www.nominet.org.uk/epp/xml/std-handshake-1.0}handshake:reject&quot;</span>)]</span>
+    <span class="ident">NominetHandshakeReject</span>(<span class="ident">nominet::EPPHandshakeReject</span>),
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;{http://www.nominet.org.uk/epp/xml/std-release-1.0}release:release&quot;</span>)]</span>
+    <span class="ident">NominetRelease</span>(<span class="ident">nominet::EPPRelease</span>),
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;{http://www.nominet.org.uk/epp/xml/std-locks-1.0}lock:lock&quot;</span>)]</span>
+    <span class="ident">NominetLock</span>(<span class="ident">nominet::EPPLock</span>),
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;{http://www.nominet.org.uk/epp/xml/std-locks-1.0}lock:unlock&quot;</span>)]</span>
+    <span class="ident">NominetUnlock</span>(<span class="ident">nominet::EPPLock</span>),
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>
@@ -2083,19 +2128,19 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">serde::de::Visitor</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">DateTimeVisitor</span> {
     <span class="kw">type</span> <span class="ident">Value</span> <span class="op">=</span> <span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span>;
 
-    <span class="kw">fn</span> <span class="ident">expecting</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">formatter</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">expecting</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">formatter</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span>) -&gt; <span class="ident">std::fmt::Result</span> {
         <span class="macro">write!</span>(<span class="ident">formatter</span>, <span class="string">&quot;a formatted date and time string&quot;</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">visit_str</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Value</span>, <span class="ident">E</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">visit_str</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">E</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">E</span>: <span class="ident">serde::de::Error</span>,
     {
         <span class="kw">match</span> <span class="ident">value</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span><span class="op">&gt;</span>() {
-            <span class="prelude-val">Ok</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">v</span>.<span class="ident">with_timezone</span>(<span class="kw-2">&amp;</span><span class="ident">Utc</span>)),
-            <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">Utc</span>.<span class="ident">datetime_from_str</span>(<span class="ident">value</span>, <span class="string">&quot;%FT%T%.f&quot;</span>) {
-                <span class="prelude-val">Ok</span>(<span class="ident">t</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">t</span>),
-                <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Utc</span>.<span class="ident">datetime_from_str</span>(<span class="ident">value</span>, <span class="string">&quot;%FT%T&quot;</span>).<span class="ident">map_err</span>(<span class="ident">E::custom</span>),
+            <span class="prelude-val">Ok</span>(<span class="ident">v</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">v</span>.<span class="ident">with_timezone</span>(<span class="kw-2">&amp;</span><span class="ident">Utc</span>)),
+            <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="kw">match</span> <span class="ident">Utc</span>.<span class="ident">datetime_from_str</span>(<span class="ident">value</span>, <span class="string">&quot;%FT%T%.f&quot;</span>) {
+                <span class="prelude-val">Ok</span>(<span class="ident">t</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">t</span>),
+                <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="ident">Utc</span>.<span class="ident">datetime_from_str</span>(<span class="ident">value</span>, <span class="string">&quot;%FT%T&quot;</span>).<span class="ident">map_err</span>(<span class="ident">E::custom</span>),
             },
         }
     }
@@ -2106,17 +2151,17 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">serde::de::Visitor</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">DateVisitor</span> {
     <span class="kw">type</span> <span class="ident">Value</span> <span class="op">=</span> <span class="ident">Date</span><span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span>;
 
-    <span class="kw">fn</span> <span class="ident">expecting</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">formatter</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">expecting</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">formatter</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span>) -&gt; <span class="ident">std::fmt::Result</span> {
         <span class="macro">write!</span>(<span class="ident">formatter</span>, <span class="string">&quot;a formatted date string&quot;</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">visit_str</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Value</span>, <span class="ident">E</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">visit_str</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">E</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">E</span>: <span class="ident">serde::de::Error</span>,
     {
         <span class="kw">match</span> <span class="ident">NaiveDate::parse_from_str</span>(<span class="ident">value</span>, <span class="string">&quot;%Y-%m-%d&quot;</span>) {
-            <span class="prelude-val">Ok</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Date::from_utc</span>(<span class="ident">v</span>, <span class="ident">Utc</span>)),
-            <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">E::custom</span>(<span class="ident">e</span>)),
+            <span class="prelude-val">Ok</span>(<span class="ident">v</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Date::from_utc</span>(<span class="ident">v</span>, <span class="ident">Utc</span>)),
+            <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">E::custom</span>(<span class="ident">e</span>)),
         }
     }
 }
@@ -2126,18 +2171,18 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">serde::de::Visitor</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">OptDateTimeVisitor</span> {
     <span class="kw">type</span> <span class="ident">Value</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span><span class="op">&gt;</span>;
 
-    <span class="kw">fn</span> <span class="ident">expecting</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">formatter</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">expecting</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">formatter</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span>) -&gt; <span class="ident">std::fmt::Result</span> {
         <span class="macro">write!</span>(<span class="ident">formatter</span>, <span class="string">&quot;a formatted date and time string&quot;</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">visit_none</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Value</span>, <span class="ident">E</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">visit_none</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">E</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">E</span>: <span class="ident">serde::de::Error</span>,
     {
         <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">visit_some</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">d</span>: <span class="ident">D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Value</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">visit_some</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">d</span>: <span class="ident">D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">D</span>: <span class="ident">serde::de::Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
     {
@@ -2150,18 +2195,18 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">serde::de::Visitor</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">OptDateVisitor</span> {
     <span class="kw">type</span> <span class="ident">Value</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Date</span><span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span><span class="op">&gt;</span>;
 
-    <span class="kw">fn</span> <span class="ident">expecting</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">formatter</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">expecting</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">formatter</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span>) -&gt; <span class="ident">std::fmt::Result</span> {
         <span class="macro">write!</span>(<span class="ident">formatter</span>, <span class="string">&quot;a formatted date string&quot;</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">visit_none</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Value</span>, <span class="ident">E</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">visit_none</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">E</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">E</span>: <span class="ident">serde::de::Error</span>,
     {
         <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">visit_some</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">d</span>: <span class="ident">D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Value</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">visit_some</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">d</span>: <span class="ident">D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">D</span>: <span class="ident">serde::de::Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
     {
@@ -2169,49 +2214,49 @@
     }
 }
 
-<span class="kw">fn</span> <span class="ident">deserialize_datetime</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">d</span>: <span class="ident">D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
+<span class="kw">fn</span> <span class="ident">deserialize_datetime</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">d</span>: <span class="ident">D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">D</span>: <span class="ident">serde::de::Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
 {
     <span class="ident">d</span>.<span class="ident">deserialize_str</span>(<span class="ident">DateTimeVisitor</span>)
 }
 
-<span class="kw">fn</span> <span class="ident">deserialize_datetime_opt</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">d</span>: <span class="ident">D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
+<span class="kw">fn</span> <span class="ident">deserialize_datetime_opt</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">d</span>: <span class="ident">D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">D</span>: <span class="ident">serde::de::Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
 {
     <span class="kw">let</span> <span class="ident">date</span> <span class="op">=</span> <span class="ident">d</span>.<span class="ident">deserialize_option</span>(<span class="ident">OptDateTimeVisitor</span>)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>(<span class="kw">match</span> <span class="ident">date</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">d</span>) <span class="op">=</span><span class="op">&gt;</span> {
-            <span class="kw">if</span> <span class="ident">d</span> <span class="op">=</span><span class="op">=</span> <span class="ident">Utc</span>.<span class="ident">ymd</span>(<span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>).<span class="ident">and_hms</span>(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>) {
+        <span class="prelude-val">Some</span>(<span class="ident">d</span>) =&gt; {
+            <span class="kw">if</span> <span class="ident">d</span> <span class="op">==</span> <span class="ident">Utc</span>.<span class="ident">ymd</span>(<span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>).<span class="ident">and_hms</span>(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>) {
                 <span class="prelude-val">None</span>
             } <span class="kw">else</span> {
                 <span class="prelude-val">Some</span>(<span class="ident">d</span>)
             }
         }
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+        <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
     })
 }
 
-<span class="kw">fn</span> <span class="ident">deserialize_date_opt</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">d</span>: <span class="ident">D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Date</span><span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
+<span class="kw">fn</span> <span class="ident">deserialize_date_opt</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">d</span>: <span class="ident">D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Date</span><span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">D</span>: <span class="ident">serde::de::Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
 {
     <span class="kw">let</span> <span class="ident">date</span> <span class="op">=</span> <span class="ident">d</span>.<span class="ident">deserialize_option</span>(<span class="ident">OptDateVisitor</span>)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>(<span class="kw">match</span> <span class="ident">date</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">d</span>) <span class="op">=</span><span class="op">&gt;</span> {
-            <span class="kw">if</span> <span class="ident">d</span> <span class="op">=</span><span class="op">=</span> <span class="ident">Utc</span>.<span class="ident">ymd</span>(<span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>) {
+        <span class="prelude-val">Some</span>(<span class="ident">d</span>) =&gt; {
+            <span class="kw">if</span> <span class="ident">d</span> <span class="op">==</span> <span class="ident">Utc</span>.<span class="ident">ymd</span>(<span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>) {
                 <span class="prelude-val">None</span>
             } <span class="kw">else</span> {
                 <span class="prelude-val">Some</span>(<span class="ident">d</span>)
             }
         }
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+        <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
     })
 }
 
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::trivially_copy_pass_by_ref</span>)]</span>
-<span class="kw">fn</span> <span class="ident">serialize_date</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">d</span>: <span class="kw-2">&amp;</span><span class="ident">Date</span><span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span>, <span class="ident">s</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
+<span class="kw">fn</span> <span class="ident">serialize_date</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">d</span>: <span class="kw-2">&amp;</span><span class="ident">Date</span><span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span>, <span class="ident">s</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">S</span>: <span class="ident">serde::ser::Serializer</span>,
 {
@@ -2219,31 +2264,33 @@
 }
 
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::trivially_copy_pass_by_ref</span>)]</span>
-<span class="kw">fn</span> <span class="ident">serialize_date_opt</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">d</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Date</span><span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">s</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
+<span class="kw">fn</span> <span class="ident">serialize_date_opt</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">d</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Date</span><span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">s</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">S</span>: <span class="ident">serde::ser::Serializer</span>,
 {
     <span class="kw">match</span> <span class="ident">d</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">d</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>.<span class="ident">serialize_str</span>(<span class="kw-2">&amp;</span><span class="ident">d</span>.<span class="ident">format</span>(<span class="string">&quot;%Y-%m-%d&quot;</span>).<span class="ident">to_string</span>()),
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>.<span class="ident">serialize_none</span>(),
+        <span class="prelude-val">Some</span>(<span class="ident">d</span>) =&gt; <span class="ident">s</span>.<span class="ident">serialize_str</span>(<span class="kw-2">&amp;</span><span class="ident">d</span>.<span class="ident">format</span>(<span class="string">&quot;%Y-%m-%d&quot;</span>).<span class="ident">to_string</span>()),
+        <span class="prelude-val">None</span> =&gt; <span class="ident">s</span>.<span class="ident">serialize_none</span>(),
     }
 }
 
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::trivially_copy_pass_by_ref</span>)]</span>
-<span class="kw">fn</span> <span class="ident">serialize_opt_bool</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">d</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>, <span class="ident">s</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
+<span class="kw">fn</span> <span class="ident">serialize_opt_bool</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">d</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>, <span class="ident">s</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">S</span>: <span class="ident">serde::ser::Serializer</span>,
 {
     <span class="kw">match</span> <span class="ident">d</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">d</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Some</span>(<span class="ident">d</span>) =&gt; {
             <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">d</span> {
                 <span class="ident">s</span>.<span class="ident">serialize_str</span>(<span class="string">&quot;true&quot;</span>)
             } <span class="kw">else</span> {
                 <span class="ident">s</span>.<span class="ident">serialize_str</span>(<span class="string">&quot;false&quot;</span>)
             }
         }
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>.<span class="ident">serialize_none</span>(),
+        <span class="prelude-val">None</span> =&gt; <span class="ident">s</span>.<span class="ident">serialize_none</span>(),
     }
 }
-</pre></div>
-</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="epp_proxy" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div><script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script></body></html>
+</code></pre></div>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="epp_proxy" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
+    <script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script>
+</body></html>

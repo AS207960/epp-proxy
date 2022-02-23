@@ -36,7 +36,7 @@ macro_rules! router {
         #[derive(Default, Debug)]
         pub struct Router<I: InnerRouter<T>, T> {
             _marker: std::marker::PhantomData<T>,
-            inner: Box<I>,
+            pub inner: Box<I>,
             $($n: HashMap<uuid::Uuid, Sender<$res>>,)*
         }
 
@@ -108,7 +108,8 @@ macro_rules! router {
 }
 
 router!(
-    Logout,                 super::LogoutRequest,                       ();
+    Hello,                  super::BlankRequest,                       ();
+    Logout,                 super::BlankRequest,                       ();
     Poll,                   super::poll::PollRequest,                   Option<super::poll::PollResponse>;
     PollAck,                super::poll::PollAckRequest,                super::poll::PollAckResponse;
     DomainCheck,            super::domain::CheckRequest,                super::domain::CheckResponse;
@@ -144,11 +145,29 @@ router!(
     NominetAccept,          super::nominet::HandshakeAcceptRequest,     super::nominet::HandshakeResponse;
     NominetReject,          super::nominet::HandshakeRejectRequest,     super::nominet::HandshakeResponse;
     NominetRelease,         super::nominet::ReleaseRequest,             super::nominet::ReleaseResponse;
+    NominetContactValidate, super::nominet::ContactValidateRequest,     super::nominet::ContactValidateResponse;
+    NominetLock,            super::nominet::LockRequest,                super::nominet::LockResponse;
+    NominetUnlock,          super::nominet::LockRequest,                super::nominet::LockResponse;
     Balance,                super::balance::BalanceRequest,             super::balance::BalanceResponse;
     MaintenanceList,        super::maintenance::ListRequest,            super::maintenance::ListResponse;
     MaintenanceInfo,        super::maintenance::InfoRequest,            super::maintenance::InfoResponse;
     EURIDHitPoints,         super::eurid::HitPointsRequest,             super::eurid::HitPointsResponse;
     EURIDRegistrationLimit, super::eurid::RegistrationLimitRequest,     super::eurid::RegistrationLimitResponse;
     EURIDDNSSECEligibility, super::eurid::DNSSECEligibilityRequest,     super::eurid::DNSSECEligibilityResponse;
-    EURIDDNSQuality,        super::eurid::DNSQualityRequest,            super::eurid::DNSQualityResponse
+    EURIDDNSQuality,        super::eurid::DNSQualityRequest,            super::eurid::DNSQualityResponse;
+    TMCHCheck,              super::tmch::CheckRequest,                  super::tmch::CheckResponse;
+    TMCHCreate,             super::tmch::CreateRequest,                 super::tmch::CreateResponse;
+    TMCHMarkInfo,           super::tmch::MarkInfoRequest,               super::tmch::MarkInfoResponse;
+    TMCHMarkSMDInfo,        super::tmch::MarkSMDInfoRequest,            super::tmch::MarkSMDInfoResponse;
+    TMCHMarkEncodedSMDInfo, super::tmch::MarkSMDInfoRequest,            super::tmch::MarkSMDInfoResponse;
+    TMCHMarkFileInfo,       super::tmch::MarkSMDInfoRequest,            super::tmch::MarkSMDInfoResponse;
+    TMCHUpdate,             super::tmch::UpdateRequest,                 super::tmch::UpdateResponse;
+    TMCHRenew,              super::tmch::RenewRequest,                  super::tmch::RenewResponse;
+    TMCHTransferInitiate,   super::tmch::TransferInitiateRequest,       super::tmch::TransferInitiateResponse;
+    TMCHTransfer,           super::tmch::TransferRequest,               super::tmch::TransferResponse;
+    TMCHTrexActivate,       super::tmch::TrexActivateRequest,           super::tmch::TrexActivateResponse;
+    TMCHTrexRenew,          super::tmch::TrexRenewRequest,              super::tmch::TrexRenewResponse;
+    DACDomain,              super::dac::DACDomainRequest,               super::dac::DACDomainResponse;
+    DACUsage,               super::dac::DACUsageRequest,                super::dac::DACUsageResponse;
+    DACLimits,              super::dac::DACUsageRequest,                super::dac::DACUsageResponse
 );

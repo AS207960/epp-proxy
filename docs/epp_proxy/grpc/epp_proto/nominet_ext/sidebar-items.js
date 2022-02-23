@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["DataQualityStatus",""]],"struct":[["DataQuality",""]]});
+initSidebarItems({"enum":[["BillType",""],["DataQualityStatus",""],["RegistrationStatus",""]],"struct":[["DataQuality",""],["DomainCheckInfo",""],["DomainCreate",""],["DomainInfo",""],["DomainUpdate",""]]});

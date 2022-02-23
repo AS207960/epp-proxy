@@ -39,9 +39,9 @@ pub struct InfoResponse {
     /// The internationalised address of the contact
     pub internationalised_address: Option<Address>,
     /// Voice phone number of the contact
-    pub phone: Option<Phone>,
+    pub phone: Option<super::Phone>,
     /// Fax number of the contact
-    pub fax: Option<Phone>,
+    pub fax: Option<super::Phone>,
     /// Email address of the contact
     pub email: String,
     /// Sponsoring client ID
@@ -65,14 +65,6 @@ pub struct InfoResponse {
     pub eurid_contact_extension: Option<super::eurid::ContactExtension>,
     pub isnic_info: Option<super::isnic::ContactInfo>,
     pub qualified_lawyer: Option<QualifiedLawyerInfo>,
-}
-
-#[derive(Debug)]
-pub struct Phone {
-    /// Initial dialable part of the number
-    pub number: String,
-    /// Optional internal extension
-    pub extension: Option<String>,
 }
 
 #[derive(Debug)]
@@ -173,8 +165,8 @@ pub struct CreateRequest {
     pub(super) id: String,
     pub(super) local_address: Option<Address>,
     pub(super) internationalised_address: Option<Address>,
-    pub(super) phone: Option<Phone>,
-    pub(super) fax: Option<Phone>,
+    pub(super) phone: Option<super::Phone>,
+    pub(super) fax: Option<super::Phone>,
     pub(super) email: String,
     pub(super) entity_type: Option<EntityType>,
     pub(super) trading_name: Option<String>,
@@ -216,8 +208,8 @@ pub struct UpdateRequest {
     pub(super) remove_statuses: Vec<Status>,
     pub(super) new_local_address: Option<Address>,
     pub(super) new_internationalised_address: Option<Address>,
-    pub(super) new_phone: Option<Phone>,
-    pub(super) new_fax: Option<Phone>,
+    pub(super) new_phone: Option<super::Phone>,
+    pub(super) new_fax: Option<super::Phone>,
     pub(super) new_email: Option<String>,
     pub(super) new_entity_type: Option<EntityType>,
     pub(super) new_trading_name: Option<String>,
@@ -326,9 +318,9 @@ pub struct NewContactData {
     /// Internationalised address of the contact
     pub internationalised_address: Option<Address>,
     /// Voice phone number of the contact
-    pub phone: Option<Phone>,
+    pub phone: Option<super::Phone>,
     /// Fax number of the contact
-    pub fax: Option<Phone>,
+    pub fax: Option<super::Phone>,
     /// Email address of the contact
     pub email: String,
     /// New entity type of the contact
@@ -406,15 +398,16 @@ pub async fn delete(
     .await
 }
 
+#[derive(Default)]
 pub struct UpdateContactData {
     ///  New localised address of the contact
     pub local_address: Option<Address>,
     /// New internationalised address of the contact
     pub internationalised_address: Option<Address>,
     /// New voice phone number of the contact
-    pub phone: Option<Phone>,
+    pub phone: Option<super::Phone>,
     /// New fax number of the contact
-    pub fax: Option<Phone>,
+    pub fax: Option<super::Phone>,
     /// New email address of the contact
     pub email: Option<String>,
     /// New entity type of the contact

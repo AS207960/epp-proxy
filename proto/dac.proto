@@ -1,0 +1,50 @@
+syntax = "proto3";
+package epp.dac;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+
+enum Environment {
+  RealTime = 0;
+  TimeDelay = 1;
+}
+
+message DomainRequest {
+    string name = 1;
+    Environment environment = 2;
+    string registry_name = 3;
+}
+
+enum DomainState {
+    Registered = 0;
+    Available = 1;
+    NotWithinRegistry = 2;
+    RulesPrevent = 3;
+}
+
+enum DomainStatus {
+    Unknown = 0;
+    RegisteredUntilExpiry = 1;
+    RenewalRequired = 2;
+    NoLongerRequired = 3;
+}
+
+message DomainResponse {
+    DomainState registration_state = 1;
+    bool detagged = 2;
+    google.protobuf.BoolValue suspended = 3;
+    google.protobuf.Timestamp created = 4;
+    google.protobuf.Timestamp expiry = 5;
+    DomainStatus status = 6;
+    string tag = 7;
+}
+
+message UsageRequest {
+    Environment environment = 1;
+    string registry_name = 2;
+}
+
+message UsageResponse {
+    uint64 usage_60 = 1;
+    uint64 usage_24 = 2;
+}

@@ -25,21 +25,40 @@ pub struct HandshakeResponse {
 #[derive(Debug)]
 pub struct ReleaseRequest {
     pub(super) registrar_tag: String,
-    pub(super) object: ReleaseObject,
+    pub(super) object: Object,
     pub return_path: Sender<ReleaseResponse>,
 }
 
 #[derive(Debug)]
-pub enum ReleaseObject {
+pub enum Object {
     Domain(String),
-    Registrant(String)
+    Registrant(String),
 }
 
 #[derive(Debug)]
 pub struct ReleaseResponse {
     pub pending: bool,
-    pub message: Option<String>
+    pub message: Option<String>,
 }
+
+#[derive(Debug)]
+pub struct ContactValidateRequest {
+    pub(super) contact_id: String,
+    pub return_path: Sender<ContactValidateResponse>,
+}
+
+#[derive(Debug)]
+pub struct ContactValidateResponse {}
+
+#[derive(Debug)]
+pub struct LockRequest {
+    pub(super) object: Object,
+    pub(super) lock_type: String,
+    pub return_path: Sender<LockResponse>,
+}
+
+#[derive(Debug)]
+pub struct LockResponse {}
 
 #[derive(Debug)]
 pub struct TagListRequest {
@@ -174,7 +193,6 @@ pub async fn handshake_accept(
     .await
 }
 
-
 /// Rejects a pending transfer in
 ///
 /// # Arguments
@@ -196,7 +214,6 @@ pub async fn handshake_reject(
     .await
 }
 
-
 /// Requests the transfer out of a domain
 ///
 /// # Arguments
@@ -205,7 +222,7 @@ pub async fn handshake_reject(
 /// * `client_sender` - Reference to the tokio channel into the client
 pub async fn release(
     registrar_tag: &str,
-    object: ReleaseObject,
+    object: Object,
     client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<ReleaseResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
@@ -221,7 +238,6 @@ pub async fn release(
     .await
 }
 
-
 /// Fetches a list of registered tags
 ///
 /// # Arguments
@@ -233,6 +249,75 @@ pub async fn tag_list(
     super::send_epp_client_request(
         client_sender,
         RequestMessage::NominetTagList(Box::new(TagListRequest {
+            return_path: sender,
+        })),
+        receiver,
+    )
+    .await
+}
+
+/// Sets the valid flag on contact data quality
+///
+/// # Arguments
+/// * `id` - ID of the contact object
+/// * `client_sender` - Reference to the tokio channel into the client
+pub async fn contact_validate(
+    id: &str,
+    client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
+) -> Result<CommandResponse<ContactValidateResponse>, super::Error> {
+    let (sender, receiver) = futures::channel::oneshot::channel();
+    super::send_epp_client_request(
+        client_sender,
+        RequestMessage::NominetContactValidate(Box::new(ContactValidateRequest {
+            contact_id: id.to_string(),
+            return_path: sender,
+        })),
+        receiver,
+    )
+    .await
+}
+
+/// Locks contact's domains / specific domain
+///
+/// # Arguments
+/// * `object` - Contact / domain
+/// * `lock_type` - Reason for locking
+/// * `client_sender` - Reference to the tokio channel into the client
+pub async fn lock(
+    object: Object,
+    lock_type: &str,
+    client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
+) -> Result<CommandResponse<LockResponse>, super::Error> {
+    let (sender, receiver) = futures::channel::oneshot::channel();
+    super::send_epp_client_request(
+        client_sender,
+        RequestMessage::NominetLock(Box::new(LockRequest {
+            object,
+            lock_type: lock_type.to_string(),
+            return_path: sender,
+        })),
+        receiver,
+    )
+    .await
+}
+
+/// Unlocks contact's domains / specific domain
+///
+/// # Arguments
+/// * `object` - Contact / domain
+/// * `lock_type` - Reason for locking
+/// * `client_sender` - Reference to the tokio channel into the client
+pub async fn unlock(
+    object: Object,
+    lock_type: &str,
+    client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
+) -> Result<CommandResponse<LockResponse>, super::Error> {
+    let (sender, receiver) = futures::channel::oneshot::channel();
+    super::send_epp_client_request(
+        client_sender,
+        RequestMessage::NominetUnlock(Box::new(LockRequest {
+            object,
+            lock_type: lock_type.to_string(),
             return_path: sender,
         })),
         receiver,

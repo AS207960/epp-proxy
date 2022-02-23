@@ -1,6 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/client/contact.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>contact.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings"></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
-<link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../epp_proxy/index.html'><div class='logo-container'><img src='https://as207960.net/img/logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img src="../../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img src="../../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src&#x2F;client&#x2F;contact.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>contact.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../epp_proxy/index.html'><div class='logo-container rust-logo'><img src='https:&#x2F;&#x2F;as207960.net&#x2F;assets&#x2F;img&#x2F;logo.svg' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -562,16 +560,7 @@
 <span id="560">560</span>
 <span id="561">561</span>
 <span id="562">562</span>
-<span id="563">563</span>
-<span id="564">564</span>
-<span id="565">565</span>
-<span id="566">566</span>
-<span id="567">567</span>
-<span id="568">568</span>
-<span id="569">569</span>
-<span id="570">570</span>
-</pre><pre class="rust">
-<span class="doccomment">//! Commands relating to contact objects</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Commands relating to contact objects</span>
 
 <span class="kw">use</span> <span class="ident">chrono::prelude</span>::<span class="kw-2">*</span>;
 
@@ -612,9 +601,9 @@
     <span class="doccomment">/// The internationalised address of the contact</span>
     <span class="kw">pub</span> <span class="ident">internationalised_address</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Address</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Voice phone number of the contact</span>
-    <span class="kw">pub</span> <span class="ident">phone</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Phone</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">phone</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::Phone</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Fax number of the contact</span>
-    <span class="kw">pub</span> <span class="ident">fax</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Phone</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">fax</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::Phone</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Email address of the contact</span>
     <span class="kw">pub</span> <span class="ident">email</span>: <span class="ident">String</span>,
     <span class="doccomment">/// Sponsoring client ID</span>
@@ -634,18 +623,10 @@
     <span class="kw">pub</span> <span class="ident">company_number</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">disclosure</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">DisclosureType</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">auth_info</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">nominet_data_quality</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">super</span><span class="ident">::nominet::DataQualityData</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">eurid_contact_extension</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">super</span><span class="ident">::eurid::ContactExtension</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">isnic_info</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">super</span><span class="ident">::isnic::ContactInfo</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">nominet_data_quality</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::nominet::DataQualityData</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">eurid_contact_extension</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::eurid::ContactExtension</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">isnic_info</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::isnic::ContactInfo</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">qualified_lawyer</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">QualifiedLawyerInfo</span><span class="op">&gt;</span>,
-}
-
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Phone</span> {
-    <span class="doccomment">/// Initial dialable part of the number</span>
-    <span class="kw">pub</span> <span class="ident">number</span>: <span class="ident">String</span>,
-    <span class="doccomment">/// Optional internal extension</span>
-    <span class="kw">pub</span> <span class="ident">extension</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
@@ -703,7 +684,7 @@
     <span class="ident">Unknown</span>,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">DisclosureType</span> {
     <span class="ident">LocalName</span> <span class="op">=</span> <span class="number">1</span>,
     <span class="ident">InternationalisedName</span> <span class="op">=</span> <span class="number">2</span>,
@@ -716,7 +697,7 @@
     <span class="ident">Email</span> <span class="op">=</span> <span class="number">9</span>,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Status</span> {
     <span class="ident">ClientDeleteProhibited</span>,
     <span class="ident">ClientTransferProhibited</span>,
@@ -746,17 +727,17 @@
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">id</span>: <span class="ident">String</span>,
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">local_address</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Address</span><span class="op">&gt;</span>,
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">internationalised_address</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Address</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">phone</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Phone</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">fax</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Phone</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">phone</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::Phone</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">fax</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::Phone</span><span class="op">&gt;</span>,
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">email</span>: <span class="ident">String</span>,
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">entity_type</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">EntityType</span><span class="op">&gt;</span>,
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">trading_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">company_number</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">disclosure</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">DisclosureType</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">auth_info</span>: <span class="ident">String</span>,
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">eurid_contact_extension</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">super</span><span class="ident">::eurid::ContactExtension</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">eurid_contact_extension</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::eurid::ContactExtension</span><span class="op">&gt;</span>,
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">qualified_lawyer</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">QualifiedLawyerInfo</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">isnic_info</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">super</span><span class="ident">::isnic::ContactCreate</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">isnic_info</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::isnic::ContactCreate</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">return_path</span>: <span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">CreateResponse</span><span class="op">&gt;</span>,
 }
 
@@ -789,17 +770,17 @@
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">remove_statuses</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Status</span><span class="op">&gt;</span>,
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">new_local_address</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Address</span><span class="op">&gt;</span>,
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">new_internationalised_address</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Address</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">new_phone</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Phone</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">new_fax</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Phone</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">new_phone</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::Phone</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">new_fax</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::Phone</span><span class="op">&gt;</span>,
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">new_email</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">new_entity_type</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">EntityType</span><span class="op">&gt;</span>,
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">new_trading_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">new_company_number</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">new_disclosure</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">DisclosureType</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">new_auth_info</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">new_eurid_contact_extension</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">super</span><span class="ident">::eurid::ContactExtensionUpdate</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">new_eurid_contact_extension</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::eurid::ContactExtensionUpdate</span><span class="op">&gt;</span>,
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">qualified_lawyer</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">QualifiedLawyerInfo</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">isnic_info</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">super</span><span class="ident">::isnic::ContactUpdate</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">isnic_info</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::isnic::ContactUpdate</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">return_path</span>: <span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">UpdateResponse</span><span class="op">&gt;</span>,
 }
 
@@ -831,7 +812,7 @@
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TransferData</span> {
-    <span class="kw">pub</span> <span class="ident">status</span>: <span class="kw">super</span><span class="ident">::TransferStatus</span>,
+    <span class="kw">pub</span> <span class="ident">status</span>: <span class="ident"><span class="kw">super</span>::TransferStatus</span>,
     <span class="doccomment">/// Which client requested the transfer</span>
     <span class="kw">pub</span> <span class="ident">requested_client_id</span>: <span class="ident">String</span>,
     <span class="doccomment">/// The date of the transfer request</span>
@@ -858,10 +839,10 @@
 <span class="doccomment">/// * `client_sender` - Reference to the tokio channel into the client</span>
 <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">check</span>(
     <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    <span class="ident">client_sender</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">futures::channel::mpsc::Sender</span><span class="op">&lt;</span><span class="ident">RequestMessage</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CommandResponse</span><span class="op">&lt;</span><span class="ident">CheckResponse</span><span class="op">&gt;</span>, <span class="kw">super</span><span class="ident">::Error</span><span class="op">&gt;</span> {
+    <span class="ident">client_sender</span>: <span class="kw-2">&amp;mut</span> <span class="ident">futures::channel::mpsc::Sender</span><span class="op">&lt;</span><span class="ident">RequestMessage</span><span class="op">&gt;</span>,
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CommandResponse</span><span class="op">&lt;</span><span class="ident">CheckResponse</span><span class="op">&gt;</span>, <span class="ident"><span class="kw">super</span>::Error</span><span class="op">&gt;</span> {
     <span class="kw">let</span> (<span class="ident">sender</span>, <span class="ident">receiver</span>) <span class="op">=</span> <span class="ident">futures::channel::oneshot::channel</span>();
-    <span class="kw">super</span><span class="ident">::send_epp_client_request</span>(
+    <span class="ident"><span class="kw">super</span>::send_epp_client_request</span>(
         <span class="ident">client_sender</span>,
         <span class="ident">RequestMessage::ContactCheck</span>(<span class="ident">Box::new</span>(<span class="ident">CheckRequest</span> {
             <span class="ident">id</span>: <span class="ident">id</span>.<span class="ident">to_string</span>(),
@@ -879,10 +860,10 @@
 <span class="doccomment">/// * `client_sender` - Reference to the tokio channel into the client</span>
 <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">info</span>(
     <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    <span class="ident">client_sender</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">futures::channel::mpsc::Sender</span><span class="op">&lt;</span><span class="ident">RequestMessage</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CommandResponse</span><span class="op">&lt;</span><span class="ident">InfoResponse</span><span class="op">&gt;</span>, <span class="kw">super</span><span class="ident">::Error</span><span class="op">&gt;</span> {
+    <span class="ident">client_sender</span>: <span class="kw-2">&amp;mut</span> <span class="ident">futures::channel::mpsc::Sender</span><span class="op">&lt;</span><span class="ident">RequestMessage</span><span class="op">&gt;</span>,
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CommandResponse</span><span class="op">&lt;</span><span class="ident">InfoResponse</span><span class="op">&gt;</span>, <span class="ident"><span class="kw">super</span>::Error</span><span class="op">&gt;</span> {
     <span class="kw">let</span> (<span class="ident">sender</span>, <span class="ident">receiver</span>) <span class="op">=</span> <span class="ident">futures::channel::oneshot::channel</span>();
-    <span class="kw">super</span><span class="ident">::send_epp_client_request</span>(
+    <span class="ident"><span class="kw">super</span>::send_epp_client_request</span>(
         <span class="ident">client_sender</span>,
         <span class="ident">RequestMessage::ContactInfo</span>(<span class="ident">Box::new</span>(<span class="ident">InfoRequest</span> {
             <span class="ident">id</span>: <span class="ident">id</span>.<span class="ident">to_string</span>(),
@@ -899,9 +880,9 @@
     <span class="doccomment">/// Internationalised address of the contact</span>
     <span class="kw">pub</span> <span class="ident">internationalised_address</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Address</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Voice phone number of the contact</span>
-    <span class="kw">pub</span> <span class="ident">phone</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Phone</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">phone</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::Phone</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Fax number of the contact</span>
-    <span class="kw">pub</span> <span class="ident">fax</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Phone</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">fax</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::Phone</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Email address of the contact</span>
     <span class="kw">pub</span> <span class="ident">email</span>: <span class="ident">String</span>,
     <span class="doccomment">/// New entity type of the contact</span>
@@ -913,8 +894,8 @@
     <span class="doccomment">/// Elements the contact has consented to disclosure of</span>
     <span class="kw">pub</span> <span class="ident">disclosure</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">DisclosureType</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">auth_info</span>: <span class="ident">String</span>,
-    <span class="kw">pub</span> <span class="ident">eurid_info</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">super</span><span class="ident">::eurid::ContactExtension</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">isnic_info</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">super</span><span class="ident">::isnic::ContactCreate</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">eurid_info</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::eurid::ContactExtension</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">isnic_info</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::isnic::ContactCreate</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">qualified_lawyer</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">QualifiedLawyerInfo</span><span class="op">&gt;</span>,
 }
 
@@ -931,10 +912,10 @@
 <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create</span>(
     <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
     <span class="ident">data</span>: <span class="ident">NewContactData</span>,
-    <span class="ident">client_sender</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">futures::channel::mpsc::Sender</span><span class="op">&lt;</span><span class="ident">RequestMessage</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CommandResponse</span><span class="op">&lt;</span><span class="ident">CreateResponse</span><span class="op">&gt;</span>, <span class="kw">super</span><span class="ident">::Error</span><span class="op">&gt;</span> {
+    <span class="ident">client_sender</span>: <span class="kw-2">&amp;mut</span> <span class="ident">futures::channel::mpsc::Sender</span><span class="op">&lt;</span><span class="ident">RequestMessage</span><span class="op">&gt;</span>,
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CommandResponse</span><span class="op">&lt;</span><span class="ident">CreateResponse</span><span class="op">&gt;</span>, <span class="ident"><span class="kw">super</span>::Error</span><span class="op">&gt;</span> {
     <span class="kw">let</span> (<span class="ident">sender</span>, <span class="ident">receiver</span>) <span class="op">=</span> <span class="ident">futures::channel::oneshot::channel</span>();
-    <span class="kw">super</span><span class="ident">::send_epp_client_request</span>(
+    <span class="ident"><span class="kw">super</span>::send_epp_client_request</span>(
         <span class="ident">client_sender</span>,
         <span class="ident">RequestMessage::ContactCreate</span>(<span class="ident">Box::new</span>(<span class="ident">CreateRequest</span> {
             <span class="ident">id</span>: <span class="ident">id</span>.<span class="ident">to_string</span>(),
@@ -965,10 +946,10 @@
 <span class="doccomment">/// * `client_sender` - Reference to the tokio channel into the client</span>
 <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete</span>(
     <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    <span class="ident">client_sender</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">futures::channel::mpsc::Sender</span><span class="op">&lt;</span><span class="ident">RequestMessage</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CommandResponse</span><span class="op">&lt;</span><span class="ident">DeleteResponse</span><span class="op">&gt;</span>, <span class="kw">super</span><span class="ident">::Error</span><span class="op">&gt;</span> {
+    <span class="ident">client_sender</span>: <span class="kw-2">&amp;mut</span> <span class="ident">futures::channel::mpsc::Sender</span><span class="op">&lt;</span><span class="ident">RequestMessage</span><span class="op">&gt;</span>,
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CommandResponse</span><span class="op">&lt;</span><span class="ident">DeleteResponse</span><span class="op">&gt;</span>, <span class="ident"><span class="kw">super</span>::Error</span><span class="op">&gt;</span> {
     <span class="kw">let</span> (<span class="ident">sender</span>, <span class="ident">receiver</span>) <span class="op">=</span> <span class="ident">futures::channel::oneshot::channel</span>();
-    <span class="kw">super</span><span class="ident">::send_epp_client_request</span>(
+    <span class="ident"><span class="kw">super</span>::send_epp_client_request</span>(
         <span class="ident">client_sender</span>,
         <span class="ident">RequestMessage::ContactDelete</span>(<span class="ident">Box::new</span>(<span class="ident">DeleteRequest</span> {
             <span class="ident">id</span>: <span class="ident">id</span>.<span class="ident">to_string</span>(),
@@ -985,9 +966,9 @@
     <span class="doccomment">/// New internationalised address of the contact</span>
     <span class="kw">pub</span> <span class="ident">internationalised_address</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Address</span><span class="op">&gt;</span>,
     <span class="doccomment">/// New voice phone number of the contact</span>
-    <span class="kw">pub</span> <span class="ident">phone</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Phone</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">phone</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::Phone</span><span class="op">&gt;</span>,
     <span class="doccomment">/// New fax number of the contact</span>
-    <span class="kw">pub</span> <span class="ident">fax</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Phone</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">fax</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::Phone</span><span class="op">&gt;</span>,
     <span class="doccomment">/// New email address of the contact</span>
     <span class="kw">pub</span> <span class="ident">email</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     <span class="doccomment">/// New entity type of the contact</span>
@@ -999,8 +980,8 @@
     <span class="doccomment">/// Elements the contact has consented to disclosure of</span>
     <span class="kw">pub</span> <span class="ident">disclosure</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">DisclosureType</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">auth_info</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">eurid_info</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">super</span><span class="ident">::eurid::ContactExtensionUpdate</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">isnic_info</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">super</span><span class="ident">::isnic::ContactUpdate</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">eurid_info</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::eurid::ContactExtensionUpdate</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">isnic_info</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::isnic::ContactUpdate</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">qualified_lawyer</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">QualifiedLawyerInfo</span><span class="op">&gt;</span>,
 }
 
@@ -1020,10 +1001,10 @@
     <span class="ident">add_statuses</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Status</span><span class="op">&gt;</span>,
     <span class="ident">remove_statuses</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Status</span><span class="op">&gt;</span>,
     <span class="ident">new_data</span>: <span class="ident">UpdateContactData</span>,
-    <span class="ident">client_sender</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">futures::channel::mpsc::Sender</span><span class="op">&lt;</span><span class="ident">RequestMessage</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CommandResponse</span><span class="op">&lt;</span><span class="ident">UpdateResponse</span><span class="op">&gt;</span>, <span class="kw">super</span><span class="ident">::Error</span><span class="op">&gt;</span> {
+    <span class="ident">client_sender</span>: <span class="kw-2">&amp;mut</span> <span class="ident">futures::channel::mpsc::Sender</span><span class="op">&lt;</span><span class="ident">RequestMessage</span><span class="op">&gt;</span>,
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CommandResponse</span><span class="op">&lt;</span><span class="ident">UpdateResponse</span><span class="op">&gt;</span>, <span class="ident"><span class="kw">super</span>::Error</span><span class="op">&gt;</span> {
     <span class="kw">let</span> (<span class="ident">sender</span>, <span class="ident">receiver</span>) <span class="op">=</span> <span class="ident">futures::channel::oneshot::channel</span>();
-    <span class="kw">super</span><span class="ident">::send_epp_client_request</span>(
+    <span class="ident"><span class="kw">super</span>::send_epp_client_request</span>(
         <span class="ident">client_sender</span>,
         <span class="ident">RequestMessage::ContactUpdate</span>(<span class="ident">Box::new</span>(<span class="ident">UpdateRequest</span> {
             <span class="ident">id</span>: <span class="ident">id</span>.<span class="ident">to_string</span>(),
@@ -1056,10 +1037,10 @@
 <span class="doccomment">/// * `client_sender` - Reference to the tokio channel into the client</span>
 <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">transfer_query</span>(
     <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    <span class="ident">client_sender</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">futures::channel::mpsc::Sender</span><span class="op">&lt;</span><span class="ident">RequestMessage</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CommandResponse</span><span class="op">&lt;</span><span class="ident">TransferResponse</span><span class="op">&gt;</span>, <span class="kw">super</span><span class="ident">::Error</span><span class="op">&gt;</span> {
+    <span class="ident">client_sender</span>: <span class="kw-2">&amp;mut</span> <span class="ident">futures::channel::mpsc::Sender</span><span class="op">&lt;</span><span class="ident">RequestMessage</span><span class="op">&gt;</span>,
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CommandResponse</span><span class="op">&lt;</span><span class="ident">TransferResponse</span><span class="op">&gt;</span>, <span class="ident"><span class="kw">super</span>::Error</span><span class="op">&gt;</span> {
     <span class="kw">let</span> (<span class="ident">sender</span>, <span class="ident">receiver</span>) <span class="op">=</span> <span class="ident">futures::channel::oneshot::channel</span>();
-    <span class="kw">super</span><span class="ident">::send_epp_client_request</span>(
+    <span class="ident"><span class="kw">super</span>::send_epp_client_request</span>(
         <span class="ident">client_sender</span>,
         <span class="ident">RequestMessage::ContactTransferQuery</span>(<span class="ident">Box::new</span>(<span class="ident">TransferQueryRequest</span> {
             <span class="ident">id</span>: <span class="ident">id</span>.<span class="ident">to_string</span>(),
@@ -1079,10 +1060,10 @@
 <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">transfer_request</span>(
     <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
     <span class="ident">auth_info</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    <span class="ident">client_sender</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">futures::channel::mpsc::Sender</span><span class="op">&lt;</span><span class="ident">RequestMessage</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CommandResponse</span><span class="op">&lt;</span><span class="ident">TransferResponse</span><span class="op">&gt;</span>, <span class="kw">super</span><span class="ident">::Error</span><span class="op">&gt;</span> {
+    <span class="ident">client_sender</span>: <span class="kw-2">&amp;mut</span> <span class="ident">futures::channel::mpsc::Sender</span><span class="op">&lt;</span><span class="ident">RequestMessage</span><span class="op">&gt;</span>,
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CommandResponse</span><span class="op">&lt;</span><span class="ident">TransferResponse</span><span class="op">&gt;</span>, <span class="ident"><span class="kw">super</span>::Error</span><span class="op">&gt;</span> {
     <span class="kw">let</span> (<span class="ident">sender</span>, <span class="ident">receiver</span>) <span class="op">=</span> <span class="ident">futures::channel::oneshot::channel</span>();
-    <span class="kw">super</span><span class="ident">::send_epp_client_request</span>(
+    <span class="ident"><span class="kw">super</span>::send_epp_client_request</span>(
         <span class="ident">client_sender</span>,
         <span class="ident">RequestMessage::ContactTransferRequest</span>(<span class="ident">Box::new</span>(<span class="ident">TransferRequestRequest</span> {
             <span class="ident">id</span>: <span class="ident">id</span>.<span class="ident">to_string</span>(),
@@ -1103,10 +1084,10 @@
 <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">transfer_accept</span>(
     <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
     <span class="ident">auth_info</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    <span class="ident">client_sender</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">futures::channel::mpsc::Sender</span><span class="op">&lt;</span><span class="ident">RequestMessage</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CommandResponse</span><span class="op">&lt;</span><span class="ident">TransferResponse</span><span class="op">&gt;</span>, <span class="kw">super</span><span class="ident">::Error</span><span class="op">&gt;</span> {
+    <span class="ident">client_sender</span>: <span class="kw-2">&amp;mut</span> <span class="ident">futures::channel::mpsc::Sender</span><span class="op">&lt;</span><span class="ident">RequestMessage</span><span class="op">&gt;</span>,
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CommandResponse</span><span class="op">&lt;</span><span class="ident">TransferResponse</span><span class="op">&gt;</span>, <span class="ident"><span class="kw">super</span>::Error</span><span class="op">&gt;</span> {
     <span class="kw">let</span> (<span class="ident">sender</span>, <span class="ident">receiver</span>) <span class="op">=</span> <span class="ident">futures::channel::oneshot::channel</span>();
-    <span class="kw">super</span><span class="ident">::send_epp_client_request</span>(
+    <span class="ident"><span class="kw">super</span>::send_epp_client_request</span>(
         <span class="ident">client_sender</span>,
         <span class="ident">RequestMessage::ContactTransferAccept</span>(<span class="ident">Box::new</span>(<span class="ident">TransferRequestRequest</span> {
             <span class="ident">id</span>: <span class="ident">id</span>.<span class="ident">to_string</span>(),
@@ -1127,10 +1108,10 @@
 <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">transfer_reject</span>(
     <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
     <span class="ident">auth_info</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    <span class="ident">client_sender</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">futures::channel::mpsc::Sender</span><span class="op">&lt;</span><span class="ident">RequestMessage</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CommandResponse</span><span class="op">&lt;</span><span class="ident">TransferResponse</span><span class="op">&gt;</span>, <span class="kw">super</span><span class="ident">::Error</span><span class="op">&gt;</span> {
+    <span class="ident">client_sender</span>: <span class="kw-2">&amp;mut</span> <span class="ident">futures::channel::mpsc::Sender</span><span class="op">&lt;</span><span class="ident">RequestMessage</span><span class="op">&gt;</span>,
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CommandResponse</span><span class="op">&lt;</span><span class="ident">TransferResponse</span><span class="op">&gt;</span>, <span class="ident"><span class="kw">super</span>::Error</span><span class="op">&gt;</span> {
     <span class="kw">let</span> (<span class="ident">sender</span>, <span class="ident">receiver</span>) <span class="op">=</span> <span class="ident">futures::channel::oneshot::channel</span>();
-    <span class="kw">super</span><span class="ident">::send_epp_client_request</span>(
+    <span class="ident"><span class="kw">super</span>::send_epp_client_request</span>(
         <span class="ident">client_sender</span>,
         <span class="ident">RequestMessage::ContactTransferReject</span>(<span class="ident">Box::new</span>(<span class="ident">TransferRequestRequest</span> {
             <span class="ident">id</span>: <span class="ident">id</span>.<span class="ident">to_string</span>(),
@@ -1141,5 +1122,7 @@
     )
     .<span class="kw">await</span>
 }
-</pre></div>
-</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="epp_proxy" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div><script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script></body></html>
+</code></pre></div>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="epp_proxy" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
+    <script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script>
+</body></html>

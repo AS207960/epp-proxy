@@ -1,6 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/client/epp/maintenance.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>maintenance.rs - source</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled ><script id="default-settings"></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg">
-<link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../../epp_proxy/index.html'><div class='logo-container'><img src='https://as207960.net/img/logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img src="../../../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../../settings.html" title="settings"><img src="../../../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src&#x2F;client&#x2F;epp&#x2F;maintenance.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>maintenance.rs - source</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../../epp_proxy/index.html'><div class='logo-container rust-logo'><img src='https:&#x2F;&#x2F;as207960.net&#x2F;assets&#x2F;img&#x2F;logo.svg' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -156,39 +154,40 @@
 <span id="154">154</span>
 <span id="155">155</span>
 <span id="156">156</span>
-</pre><pre class="rust">
-<span class="doccomment">//! EPP commands relating to draft-ietf-regext-epp-registry-maintenance</span>
+<span id="157">157</span>
+</pre><pre class="rust"><code><span class="doccomment">//! EPP commands relating to draft-ietf-regext-epp-registry-maintenance</span>
 
-<span class="kw">use</span> <span class="kw">super</span>::<span class="kw">super</span><span class="ident">::maintenance</span>::{
+<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::maintenance</span>::{
     <span class="ident">Description</span>, <span class="ident">Environment</span>, <span class="ident">Impact</span>, <span class="ident">InfoRequest</span>, <span class="ident">InfoResponse</span>, <span class="ident">Intervention</span>, <span class="ident">ListRequest</span>,
     <span class="ident">ListResponse</span>, <span class="ident">ListResponseItem</span>, <span class="ident">PollType</span>, <span class="ident">Reason</span>, <span class="ident">System</span>,
 };
-<span class="kw">use</span> <span class="kw">super</span>::<span class="kw">super</span>::{<span class="ident">proto</span>, <span class="ident">Error</span>, <span class="ident">Response</span>, <span class="ident">ServerFeatures</span>};
-<span class="kw">use</span> <span class="kw">super</span><span class="ident">::router::HandleReqReturn</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span></span>::{<span class="ident">proto</span>, <span class="ident">Error</span>, <span class="ident">Response</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::router::HandleReqReturn</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::ServerFeatures</span>;
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">proto::maintenance::EPPMaintenanceItem</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">InfoResponse</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">proto::maintenance::EPPMaintenanceItem</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">proto::maintenance::EPPMaintenanceItem</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">InfoResponse</span> {
             <span class="ident">id</span>: <span class="ident">from</span>.<span class="ident">id</span>.<span class="ident">id</span>,
             <span class="ident">name</span>: <span class="ident">from</span>.<span class="ident">id</span>.<span class="ident">name</span>,
             <span class="ident">item_type</span>: <span class="ident">from</span>.<span class="ident">item_type</span>,
             <span class="ident">poll_type</span>: <span class="ident">from</span>.<span class="ident">poll_type</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">p</span> {
-                <span class="ident">proto::maintenance::EPPMaintenancePollType::Create</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">PollType::Create</span>,
-                <span class="ident">proto::maintenance::EPPMaintenancePollType::Update</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">PollType::Update</span>,
-                <span class="ident">proto::maintenance::EPPMaintenancePollType::Delete</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">PollType::Delete</span>,
-                <span class="ident">proto::maintenance::EPPMaintenancePollType::Courtesy</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">PollType::Courtesy</span>,
-                <span class="ident">proto::maintenance::EPPMaintenancePollType::End</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">PollType::End</span>,
+                <span class="ident">proto::maintenance::EPPMaintenancePollType::Create</span> =&gt; <span class="ident">PollType::Create</span>,
+                <span class="ident">proto::maintenance::EPPMaintenancePollType::Update</span> =&gt; <span class="ident">PollType::Update</span>,
+                <span class="ident">proto::maintenance::EPPMaintenancePollType::Delete</span> =&gt; <span class="ident">PollType::Delete</span>,
+                <span class="ident">proto::maintenance::EPPMaintenancePollType::Courtesy</span> =&gt; <span class="ident">PollType::Courtesy</span>,
+                <span class="ident">proto::maintenance::EPPMaintenancePollType::End</span> =&gt; <span class="ident">PollType::End</span>,
             }),
             <span class="ident">environment</span>: <span class="kw">match</span> <span class="ident">from</span>.<span class="ident">environment</span>.<span class="ident">env_type</span> {
-                <span class="ident">proto::maintenance::EPPMaintenanceEnvironmentEnum::Production</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">proto::maintenance::EPPMaintenanceEnvironmentEnum::Production</span> =&gt; {
                     <span class="ident">Environment::Production</span>
                 }
-                <span class="ident">proto::maintenance::EPPMaintenanceEnvironmentEnum::Ote</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Environment::Ote</span>,
-                <span class="ident">proto::maintenance::EPPMaintenanceEnvironmentEnum::Staging</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Environment::Staging</span>,
-                <span class="ident">proto::maintenance::EPPMaintenanceEnvironmentEnum::Development</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">proto::maintenance::EPPMaintenanceEnvironmentEnum::Ote</span> =&gt; <span class="ident">Environment::Ote</span>,
+                <span class="ident">proto::maintenance::EPPMaintenanceEnvironmentEnum::Staging</span> =&gt; <span class="ident">Environment::Staging</span>,
+                <span class="ident">proto::maintenance::EPPMaintenanceEnvironmentEnum::Development</span> =&gt; {
                     <span class="ident">Environment::Development</span>
                 }
-                <span class="ident">proto::maintenance::EPPMaintenanceEnvironmentEnum::Custom</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">proto::maintenance::EPPMaintenanceEnvironmentEnum::Custom</span> =&gt; {
                     <span class="ident">Environment::Custom</span>(<span class="ident">from</span>.<span class="ident">environment</span>.<span class="ident">name</span>.<span class="ident">unwrap_or_default</span>())
                 }
             },
@@ -200,9 +199,9 @@
                     <span class="ident">name</span>: <span class="ident">s</span>.<span class="ident">name</span>,
                     <span class="ident">host</span>: <span class="ident">s</span>.<span class="ident">host</span>,
                     <span class="ident">impact</span>: <span class="kw">match</span> <span class="ident">s</span>.<span class="ident">impact</span> {
-                        <span class="ident">proto::maintenance::EPPMaintenanceImpact::Full</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Impact::Full</span>,
-                        <span class="ident">proto::maintenance::EPPMaintenanceImpact::Partial</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Impact::Partial</span>,
-                        <span class="ident">proto::maintenance::EPPMaintenanceImpact::None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Impact::None</span>,
+                        <span class="ident">proto::maintenance::EPPMaintenanceImpact::Full</span> =&gt; <span class="ident">Impact::Full</span>,
+                        <span class="ident">proto::maintenance::EPPMaintenanceImpact::Partial</span> =&gt; <span class="ident">Impact::Partial</span>,
+                        <span class="ident">proto::maintenance::EPPMaintenanceImpact::None</span> =&gt; <span class="ident">Impact::None</span>,
                     },
                 })
                 .<span class="ident">collect</span>(),
@@ -211,25 +210,25 @@
             <span class="ident">created</span>: <span class="ident">from</span>.<span class="ident">created_date</span>,
             <span class="ident">updated</span>: <span class="ident">from</span>.<span class="ident">update_date</span>,
             <span class="ident">reason</span>: <span class="kw">match</span> <span class="ident">from</span>.<span class="ident">reason</span> {
-                <span class="ident">proto::maintenance::EPPMaintenanceReason::Planned</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Reason::Planned</span>,
-                <span class="ident">proto::maintenance::EPPMaintenanceReason::Emergency</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Reason::Emergency</span>,
+                <span class="ident">proto::maintenance::EPPMaintenanceReason::Planned</span> =&gt; <span class="ident">Reason::Planned</span>,
+                <span class="ident">proto::maintenance::EPPMaintenanceReason::Emergency</span> =&gt; <span class="ident">Reason::Emergency</span>,
             },
             <span class="ident">detail_url</span>: <span class="ident">from</span>.<span class="ident">detail</span>,
             <span class="ident">descriptions</span>: <span class="ident">from</span>
                 .<span class="ident">description</span>
                 .<span class="ident">into_iter</span>()
                 .<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">d</span>.<span class="ident">description_type</span> {
-                    <span class="ident">proto::maintenance::EPPMaintenanceDescriptionType::Plain</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident">proto::maintenance::EPPMaintenanceDescriptionType::Plain</span> =&gt; {
                         <span class="ident">Description::Plain</span>(<span class="ident">d</span>.<span class="ident">description</span>)
                     }
-                    <span class="ident">proto::maintenance::EPPMaintenanceDescriptionType::Html</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident">proto::maintenance::EPPMaintenanceDescriptionType::Html</span> =&gt; {
                         <span class="ident">Description::Html</span>(<span class="ident">d</span>.<span class="ident">description</span>)
                     }
                 })
                 .<span class="ident">collect</span>(),
             <span class="ident">tlds</span>: <span class="kw">match</span> <span class="ident">from</span>.<span class="ident">tlds</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">t</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">t</span>.<span class="ident">tlds</span>,
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">vec!</span>[],
+                <span class="prelude-val">Some</span>(<span class="ident">t</span>) =&gt; <span class="ident">t</span>.<span class="ident">tlds</span>,
+                <span class="prelude-val">None</span> =&gt; <span class="macro">vec!</span>[],
             },
             <span class="ident">intervention</span>: <span class="ident">from</span>.<span class="ident">intervention</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">Intervention</span> {
                 <span class="ident">connection</span>: <span class="ident">i</span>.<span class="ident">connection</span>,
@@ -239,7 +238,7 @@
     }
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_list</span>(<span class="ident">client</span>: <span class="kw-2">&amp;</span><span class="ident">ServerFeatures</span>, <span class="ident">_req</span>: <span class="kw-2">&amp;</span><span class="ident">ListRequest</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HandleReqReturn</span><span class="op">&lt;</span><span class="ident">ListResponse</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_list</span>(<span class="ident">client</span>: <span class="kw-2">&amp;</span><span class="ident">ServerFeatures</span>, <span class="ident">_req</span>: <span class="kw-2">&amp;</span><span class="ident">ListRequest</span>) -&gt; <span class="ident">HandleReqReturn</span><span class="op">&lt;</span><span class="ident">ListResponse</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="op">!</span><span class="ident">client</span>.<span class="ident">maintenance_supported</span> {
         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">Err</span>(<span class="ident">Error::Unsupported</span>));
     }
@@ -254,10 +253,10 @@
     ))
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_list_response</span>(<span class="ident">response</span>: <span class="ident">proto::EPPResponse</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">ListResponse</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_list_response</span>(<span class="ident">response</span>: <span class="ident">proto::EPPResponse</span>) -&gt; <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">ListResponse</span><span class="op">&gt;</span> {
     <span class="kw">match</span> <span class="ident">response</span>.<span class="ident">data</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">value</span>.<span class="ident">value</span> {
-            <span class="ident">proto::EPPResultDataValue::EPPMaintenanceInfo</span>(<span class="ident">maint_info</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Some</span>(<span class="ident">value</span>) =&gt; <span class="kw">match</span> <span class="ident">value</span>.<span class="ident">value</span> {
+            <span class="ident">proto::EPPResultDataValue::EPPMaintenanceInfo</span>(<span class="ident">maint_info</span>) =&gt; {
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">list</span>) <span class="op">=</span> <span class="ident">maint_info</span>.<span class="ident">list</span> {
                     <span class="ident">Response::Ok</span>(<span class="ident">ListResponse</span> {
                         <span class="ident">items</span>: <span class="ident">list</span>
@@ -277,13 +276,13 @@
                     <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>)
                 }
             }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
         },
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
+        <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
     }
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_info</span>(<span class="ident">client</span>: <span class="kw-2">&amp;</span><span class="ident">ServerFeatures</span>, <span class="ident">req</span>: <span class="kw-2">&amp;</span><span class="ident">InfoRequest</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HandleReqReturn</span><span class="op">&lt;</span><span class="ident">InfoResponse</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_info</span>(<span class="ident">client</span>: <span class="kw-2">&amp;</span><span class="ident">ServerFeatures</span>, <span class="ident">req</span>: <span class="kw-2">&amp;</span><span class="ident">InfoRequest</span>) -&gt; <span class="ident">HandleReqReturn</span><span class="op">&lt;</span><span class="ident">InfoResponse</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="op">!</span><span class="ident">client</span>.<span class="ident">maintenance_supported</span> {
         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">Err</span>(<span class="ident">Error::Unsupported</span>));
     }
@@ -298,20 +297,22 @@
     ))
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_info_response</span>(<span class="ident">response</span>: <span class="ident">proto::EPPResponse</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">InfoResponse</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_info_response</span>(<span class="ident">response</span>: <span class="ident">proto::EPPResponse</span>) -&gt; <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">InfoResponse</span><span class="op">&gt;</span> {
     <span class="kw">match</span> <span class="ident">response</span>.<span class="ident">data</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">value</span>.<span class="ident">value</span> {
-            <span class="ident">proto::EPPResultDataValue::EPPMaintenanceInfo</span>(<span class="ident">maint_info</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Some</span>(<span class="ident">value</span>) =&gt; <span class="kw">match</span> <span class="ident">value</span>.<span class="ident">value</span> {
+            <span class="ident">proto::EPPResultDataValue::EPPMaintenanceInfo</span>(<span class="ident">maint_info</span>) =&gt; {
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">item</span>) <span class="op">=</span> <span class="ident">maint_info</span>.<span class="ident">item</span> {
                     <span class="ident">Response::Ok</span>(<span class="ident">item</span>.<span class="ident">into</span>())
                 } <span class="kw">else</span> {
                     <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>)
                 }
             }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
         },
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
+        <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::ServerInternal</span>),
     }
 }
-</pre></div>
-</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="epp_proxy" data-search-index-js="../../../../search-index.js" data-search-js="../../../../search.js"></div><script src="../../../../main.js"></script><script src="../../../../source-script.js"></script><script src="../../../../source-files.js"></script></body></html>
+</code></pre></div>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="epp_proxy" data-search-index-js="../../../../search-index.js" data-search-js="../../../../search.js"></div>
+    <script src="../../../../main.js"></script><script src="../../../../source-script.js"></script><script src="../../../../source-files.js"></script>
+</body></html>

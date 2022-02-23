@@ -5,15 +5,15 @@ use std::convert::{TryFrom, TryInto};
 use super::super::domain::{
     CheckRequest, CheckResponse, ClaimsCheckRequest, ClaimsCheckResponse, CreateData,
     CreateRequest, CreateResponse, DeleteRequest, DeleteResponse, InfoContact, InfoHost,
-    InfoNameserver, InfoRequest, InfoResponse, PanData, Period, PeriodUnit, RenewData,
-    RenewRequest, RenewResponse, SecDNSDSData, SecDNSData, SecDNSDataType, SecDNSKeyData, Status,
-    TrademarkCheckRequest, TransferAcceptRejectRequest, TransferData, TransferQueryRequest,
-    TransferRequestRequest, TransferResponse, UpdateObject, UpdateRequest, UpdateResponse,
-    UpdateSecDNSRemove, VerisignSyncRequest,
+    InfoNameserver, InfoRequest, InfoResponse, PanData, RenewData, RenewRequest, RenewResponse,
+    SecDNSDSData, SecDNSData, SecDNSDataType, SecDNSKeyData, Status, TrademarkCheckRequest,
+    TransferAcceptRejectRequest, TransferData, TransferQueryRequest, TransferRequestRequest,
+    TransferResponse, UpdateObject, UpdateRequest, UpdateResponse, UpdateSecDNSRemove,
+    VerisignSyncRequest,
 };
-use super::super::{fee, launch, proto, Error, Response};
-use super::ServerFeatures;
+use super::super::{fee, launch, proto, Error, Period, PeriodUnit, Response};
 use super::router::HandleReqReturn;
+use super::ServerFeatures;
 
 impl From<proto::domain::EPPDomainStatusType> for Status {
     fn from(from: proto::domain::EPPDomainStatusType) -> Self {
@@ -1868,7 +1868,7 @@ pub fn handle_renew(client: &ServerFeatures, req: &RenewRequest) -> HandleReqRet
     check_domain(&req.name)?;
     let command = proto::EPPRenew::Domain(proto::domain::EPPDomainRenew {
         name: req.name.clone(),
-        period: req.add_period.as_ref().map(|p| p.into()),
+        period: req.add_period.as_ref().map(Into::into),
         current_expiry_date: req.cur_expiry_date.date(),
     });
     let mut ext = vec![];
@@ -2229,7 +2229,7 @@ mod domain_tests {
             _ => unreachable!(),
         };
         let data = super::handle_claims_check_response(*res).unwrap();
-        assert_eq!(data.exists, true);
+        assert!(data.exists);
         assert_eq!(data.claims_key.len(), 2);
         let claims_key_1 = data.claims_key.get(0).unwrap();
         let claims_key_2 = data.claims_key.get(1).unwrap();
@@ -2348,7 +2348,7 @@ mod domain_tests {
             _ => unreachable!(),
         };
         let data = super::handle_create_response(*res).unwrap();
-        assert_eq!(data.pending, true);
+        assert!(data.pending);
         let launch_create = data.launch_create.unwrap();
         assert_eq!(
             launch_create.phase.phase_type,

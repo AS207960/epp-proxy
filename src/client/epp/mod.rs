@@ -1,7 +1,6 @@
-use super::{
-    router as outer_router, LogoutRequest, RequestMessage,
-};
 use super::Client;
+use super::{router as outer_router, BlankRequest, RequestMessage};
+use crate::client::router::CommandTransactionID;
 use crate::proto;
 use chrono::prelude::*;
 use futures::future::FutureExt;
@@ -17,6 +16,7 @@ pub mod host;
 pub mod isnic;
 pub mod launch;
 pub mod maintenance;
+pub mod mark;
 pub mod nominet;
 pub mod poll;
 pub mod rgp;
@@ -48,7 +48,6 @@ fn send_msg(data: &proto::EPPMessage, host: &str) -> Result<String, ()> {
     };
     Ok(encoded_msg)
 }
-
 
 /// Features supported by the server
 #[derive(Debug, Default)]
@@ -165,7 +164,6 @@ impl ServerFeatures {
     }
 }
 
-
 /// Main client struct for the EEP client
 #[derive(Debug)]
 pub struct EPPClient {
@@ -176,31 +174,45 @@ pub struct EPPClient {
     new_password: Option<String>,
     server_id: String,
     pipelining: bool,
+    keepalive: bool,
     is_awaiting_response: bool,
     is_closing: bool,
-    /// Is the EPP server in a state to receive and process commands
-    ready: bool,
     router: outer_router::Router<router::Router, ServerFeatures>,
     /// What features does the server support
     features: ServerFeatures,
     nominet_tag_list_subordinate: bool,
     nominet_tag_list_subordinate_client: Option<futures::channel::mpsc::Sender<RequestMessage>>,
+    nominet_dac_subordinate_client: Option<futures::channel::mpsc::Sender<RequestMessage>>,
+    nominet_dac_client: Option<super::nominet_dac::DACClient>,
     tls_client: super::epp_like::tls_client::TLSClient,
 }
 
 impl super::Client for EPPClient {
     // Starts up the EPP client and returns the sending end of a tokio channel to inject
     // commands into the client to be processed
-    fn start(mut self: Box<Self>) -> futures::channel::mpsc::Sender<RequestMessage> {
+    fn start(
+        mut self: Box<Self>,
+    ) -> (
+        futures::channel::mpsc::Sender<RequestMessage>,
+        futures::channel::mpsc::UnboundedReceiver<CommandTransactionID>,
+    ) {
         info!("EPP Client for {} starting...", &self.host);
         if self.nominet_tag_list_subordinate {
             info!("This is a Nominet Tag list subordinate client");
         }
         let (sender, receiver) = futures::channel::mpsc::channel::<RequestMessage>(16);
+        let (ready_sender, ready_receiver) = futures::channel::mpsc::unbounded();
+
+        if let Some(nominet_dac_client) = self.nominet_dac_client.take() {
+            self.nominet_dac_subordinate_client
+                .replace(Box::new(nominet_dac_client).start().0);
+        }
+
         tokio::spawn(async move {
-            self._main_loop(receiver).await;
+            self._main_loop(receiver, ready_sender).await;
         });
-        sender
+
+        (sender, ready_receiver)
     }
 }
 
@@ -213,9 +225,19 @@ impl EPPClient {
         conf: super::ClientConf<'a, C>,
         pkcs11_engine: Option<crate::P11Engine>,
     ) -> std::io::Result<Self> {
-        let tls_client = super::epp_like::tls_client::TLSClient::new(
-            (&conf).into(), pkcs11_engine
-        ).await?;
+        let nominet_dac_client = match conf.nominet_dac.as_ref().map(|nominet_dac_conf| {
+            super::nominet_dac::DACClient::new(
+                nominet_dac_conf.real_time,
+                nominet_dac_conf.time_delay,
+                conf.source_address,
+            )
+        }) {
+            Some(c) => Some(c.await?),
+            None => None,
+        };
+
+        let tls_client =
+            super::epp_like::tls_client::TLSClient::new((&conf).into(), pkcs11_engine).await?;
 
         Ok(Self {
             log_dir: conf.log_dir,
@@ -224,6 +246,7 @@ impl EPPClient {
             password: conf.password.to_string(),
             new_password: conf.new_password.into().map(|c| c.to_string()),
             pipelining: conf.pipelining,
+            keepalive: conf.keepalive,
             features: ServerFeatures {
                 errata: conf.errata,
                 ..Default::default()
@@ -233,13 +256,18 @@ impl EPPClient {
             is_closing: false,
             nominet_tag_list_subordinate: false,
             nominet_tag_list_subordinate_client: None,
-            ready: false,
+            nominet_dac_subordinate_client: None,
+            nominet_dac_client,
             router: outer_router::Router::default(),
             tls_client,
         })
     }
 
-    async fn _main_loop(&mut self, receiver: futures::channel::mpsc::Receiver<RequestMessage>) {
+    async fn _main_loop(
+        &mut self,
+        receiver: futures::channel::mpsc::Receiver<RequestMessage>,
+        mut ready_sender: futures::channel::mpsc::UnboundedSender<CommandTransactionID>,
+    ) {
         let mut receiver = receiver.fuse();
         loop {
             self.is_closing = false;
@@ -269,7 +297,7 @@ impl EPPClient {
             };
             trace!("Got connection for {}", self.host);
 
-            {
+            let setup_res = {
                 let exit_str = format!("All senders for {} dropped, exiting...", self.host);
                 trace!("Setting up connection to {}", self.host);
                 let setup_fut = self._setup_connection(&mut sock).fuse();
@@ -290,7 +318,7 @@ impl EPPClient {
                         }
                     }
                 } {
-                    Ok(_) => {}
+                    Ok(s) => s,
                     Err(r) => {
                         if r {
                             break;
@@ -300,8 +328,9 @@ impl EPPClient {
                         }
                     }
                 }
-            }
+            };
             trace!("Connection setup to {}", self.host);
+            let _ = ready_sender.send(setup_res).await;
 
             let (sock_read, mut sock_write) = tokio::io::split(sock);
             let msg_receiver = super::epp_like::ClientReceiver {
@@ -403,27 +432,36 @@ impl EPPClient {
         &mut self,
         sock_write: &mut W,
     ) -> Result<(), ()> {
-        let message = proto::EPPMessage {
-            message: proto::EPPMessageType::Hello {},
-        };
-        self.is_awaiting_response = true;
-        let receiver = super::epp_like::send_msg(
-            &self.host, sock_write, &self.log_dir, send_msg, &message
-        ).fuse();
-        let mut delay = Box::pin(tokio::time::sleep(tokio::time::Duration::new(15, 0)).fuse());
-        futures::pin_mut!(receiver);
-        let resp = futures::select! {
-            r = receiver => r,
-            _ = delay => {
-                return Err(());
+        if self.keepalive {
+            let message = proto::EPPMessage {
+                message: proto::EPPMessageType::Hello {},
+            };
+            self.is_awaiting_response = true;
+            let receiver = super::epp_like::send_msg(
+                &self.host,
+                sock_write,
+                &self.log_dir,
+                send_msg,
+                &message,
+            )
+            .fuse();
+            let mut delay = Box::pin(tokio::time::sleep(tokio::time::Duration::new(15, 0)).fuse());
+            futures::pin_mut!(receiver);
+            let resp = futures::select! {
+                r = receiver => r,
+                _ = delay => {
+                    return Err(());
+                }
+            };
+            match resp {
+                Ok(_) => Ok(()),
+                Err(_) => {
+                    error!("Failed to send hello keepalive command");
+                    Err(())
+                }
             }
-        };
-        match resp {
-            Ok(_) => Ok(()),
-            Err(_) => {
-                error!("Failed to send hello keepalive command");
-                Err(())
-            }
+        } else {
+            Ok(())
         }
     }
 
@@ -432,8 +470,12 @@ impl EPPClient {
         req: outer_router::RequestMessage,
         sock_write: &mut W,
     ) -> Result<(), ()> {
-        match (req, self.nominet_tag_list_subordinate) {
-            (outer_router::RequestMessage::NominetTagList(t), false) => {
+        match (
+            req,
+            self.nominet_tag_list_subordinate,
+            &mut self.nominet_dac_subordinate_client,
+        ) {
+            (outer_router::RequestMessage::NominetTagList(t), false, _) => {
                 let client = match &mut self.nominet_tag_list_subordinate_client {
                     Some(c) => c,
                     None => return Err(()),
@@ -449,13 +491,59 @@ impl EPPClient {
                     }
                 }
             }
-            (outer_router::RequestMessage::Logout(t), _) => {
+            (outer_router::RequestMessage::DomainCheck(t), _, Some(dac_client)) => match dac_client
+                .send(outer_router::RequestMessage::DomainCheck(t))
+                .await
+            {
+                Ok(_) => Ok(()),
+                Err(e) => {
+                    warn!("Failed to send to subordinate DAC server: {}", e);
+                    Err(())
+                }
+            },
+            (outer_router::RequestMessage::DACDomain(t), _, Some(dac_client)) => {
+                match dac_client
+                    .send(outer_router::RequestMessage::DACDomain(t))
+                    .await
+                {
+                    Ok(_) => Ok(()),
+                    Err(e) => {
+                        warn!("Failed to send to subordinate DAC server: {}", e);
+                        Err(())
+                    }
+                }
+            }
+            (outer_router::RequestMessage::DACUsage(t), _, Some(dac_client)) => {
+                match dac_client
+                    .send(outer_router::RequestMessage::DACUsage(t))
+                    .await
+                {
+                    Ok(_) => Ok(()),
+                    Err(e) => {
+                        warn!("Failed to send to subordinate DAC server: {}", e);
+                        Err(())
+                    }
+                }
+            }
+            (outer_router::RequestMessage::DACLimits(t), _, Some(dac_client)) => {
+                match dac_client
+                    .send(outer_router::RequestMessage::DACLimits(t))
+                    .await
+                {
+                    Ok(_) => Ok(()),
+                    Err(e) => {
+                        warn!("Failed to send to subordinate DAC server: {}", e);
+                        Err(())
+                    }
+                }
+            }
+            (outer_router::RequestMessage::Hello(_), _, _) => {
                 match &mut self.nominet_tag_list_subordinate_client {
                     Some(client) => {
                         let (sender, _) = futures::channel::oneshot::channel();
                         match client
-                            .send(outer_router::RequestMessage::Logout(Box::new(
-                                LogoutRequest {
+                            .send(outer_router::RequestMessage::Hello(Box::new(
+                                BlankRequest {
                                     return_path: sender,
                                 },
                             )))
@@ -464,6 +552,63 @@ impl EPPClient {
                             Ok(_) => {}
                             Err(e) => {
                                 warn!("Failed to send to subordinate server: {}", e);
+                                return Err(());
+                            }
+                        }
+                    }
+                    None => {}
+                };
+                let message = proto::EPPMessage {
+                    message: proto::EPPMessageType::Hello {},
+                };
+                match super::epp_like::send_msg(
+                    &self.host,
+                    sock_write,
+                    &self.log_dir,
+                    send_msg,
+                    &message,
+                )
+                .await
+                {
+                    Ok(_) => Ok(()),
+                    Err(_) => Err(()),
+                }
+            }
+            (outer_router::RequestMessage::Logout(t), _, _) => {
+                match &mut self.nominet_tag_list_subordinate_client {
+                    Some(client) => {
+                        let (sender, _) = futures::channel::oneshot::channel();
+                        match client
+                            .send(outer_router::RequestMessage::Logout(Box::new(
+                                BlankRequest {
+                                    return_path: sender,
+                                },
+                            )))
+                            .await
+                        {
+                            Ok(_) => {}
+                            Err(e) => {
+                                warn!("Failed to send to subordinate server: {}", e);
+                                return Err(());
+                            }
+                        }
+                    }
+                    None => {}
+                };
+                match &mut self.nominet_dac_subordinate_client {
+                    Some(dac_client) => {
+                        let (sender, _) = futures::channel::oneshot::channel();
+                        match dac_client
+                            .send(outer_router::RequestMessage::Logout(Box::new(
+                                BlankRequest {
+                                    return_path: sender,
+                                },
+                            )))
+                            .await
+                        {
+                            Ok(_) => {}
+                            Err(e) => {
+                                warn!("Failed to send to subordinate DAC server: {}", e);
                                 return Err(());
                             }
                         }
@@ -488,7 +633,7 @@ impl EPPClient {
                     None => Ok(()),
                 }
             }
-            (req, _) => match self.router.handle_request(&self.features, req) {
+            (req, _, _) => match self.router.handle_request(&self.features, req) {
                 Some(((command, extension), command_id)) => {
                     self.is_awaiting_response = true;
                     match self
@@ -561,7 +706,7 @@ impl EPPClient {
     async fn _setup_connection(
         &mut self,
         sock: &mut super::epp_like::tls_client::TLSConnection,
-    ) -> Result<(), bool> {
+    ) -> Result<CommandTransactionID, bool> {
         let msg = match super::epp_like::recv_msg(sock, &self.host, &self.log_dir, recv_msg).await {
             Ok(m) => m,
             Err(_) => {
@@ -584,14 +729,16 @@ impl EPPClient {
             }
 
             match self._login(sock).await {
-                Ok(_) => {}
+                Ok(res) => Ok(CommandTransactionID {
+                    client: res.client_transaction_id.unwrap_or_default(),
+                    server: res.server_transaction_id.unwrap_or_default(),
+                }),
                 Err(_) => {
                     info!("Restarting connection...");
                     self._close(sock).await;
-                    return Err(false);
+                    Err(false)
                 }
             }
-            Ok(())
         } else {
             error!(
                 "Didn't receive greeting as first message from {}",
@@ -743,6 +890,15 @@ impl EPPClient {
         self.features.eurid_dns_quality_support = greeting
             .service_menu
             .supports("http://www.eurid.eu/xml/epp/dnsQuality-2.0");
+        self.features.eurid_poll_supported = greeting
+            .service_menu
+            .supports_ext("http://www.eurid.eu/xml/epp/poll-1.2");
+        self.features.eurid_idn_supported = greeting
+            .service_menu
+            .supports_ext("http://www.eurid.eu/xml/epp/idn-1.0");
+        self.features.eurid_homoglyph_supported = greeting
+            .service_menu
+            .supports_ext("http://www.eurid.eu/xml/epp/homoglyph-1.0");
         self.features.qualified_lawyer_supported = greeting
             .service_menu
             .supports_ext("urn:ietf:params:xml:ns:qualifiedLawyer-1.0");
@@ -761,6 +917,9 @@ impl EPPClient {
         self.features.isnic_account_supported = greeting
             .service_menu
             .supports_ext("urn:is.isnic:xml:ns:is-ext-account-1.0");
+        self.features.isnic_list_supported = greeting
+            .service_menu
+            .supports("urn:is.isnic:xml:ns:is-ext-list-1.0");
 
         if !(self.features.contact_supported
             | self.features.domain_supported
@@ -774,7 +933,10 @@ impl EPPClient {
         Ok(())
     }
 
-    async fn _login(&mut self, sock: &mut super::epp_like::tls_client::TLSConnection) -> Result<(), ()> {
+    async fn _login(
+        &mut self,
+        sock: &mut super::epp_like::tls_client::TLSConnection,
+    ) -> Result<proto::EPPTransactionIdentifier, ()> {
         let mut objects = vec![];
         let mut ext_objects = vec![];
 
@@ -890,6 +1052,15 @@ impl EPPClient {
             if self.features.eurid_contact_support {
                 ext_objects.push("http://www.eurid.eu/xml/epp/domain-ext-2.4".to_string())
             }
+            if self.features.eurid_poll_supported {
+                ext_objects.push("http://www.eurid.eu/xml/epp/poll-1.2".to_string())
+            }
+            if self.features.eurid_homoglyph_supported {
+                ext_objects.push("http://www.eurid.eu/xml/epp/homoglyph-1.0".to_string())
+            }
+            if self.features.eurid_idn_supported {
+                ext_objects.push("http://www.eurid.eu/xml/epp/idn-1.0".to_string())
+            }
             if self.features.qualified_lawyer_supported {
                 ext_objects.push("urn:ietf:params:xml:ns:qualifiedLawyer-1.0".to_string())
             }
@@ -908,6 +1079,9 @@ impl EPPClient {
             if self.features.isnic_account_supported {
                 ext_objects.push("urn:is.isnic:xml:ns:is-ext-account-1.0".to_string())
             }
+            if self.features.isnic_list_supported {
+                objects.push("urn:is.isnic:xml:ns:is-ext-list-1.0".to_string())
+            }
             if self.features.nominet_tag_list {
                 let new_client = Self {
                     host: self.host.clone(),
@@ -917,6 +1091,7 @@ impl EPPClient {
                     log_dir: self.log_dir.clone(),
                     new_password: None,
                     pipelining: self.pipelining,
+                    keepalive: self.keepalive,
                     features: ServerFeatures {
                         errata: self.features.errata.clone(),
                         ..Default::default()
@@ -925,11 +1100,12 @@ impl EPPClient {
                     is_awaiting_response: false,
                     is_closing: false,
                     nominet_tag_list_subordinate_client: None,
-                    ready: false,
+                    nominet_dac_subordinate_client: None,
+                    nominet_dac_client: None,
                     router: outer_router::Router::default(),
                     tls_client: self.tls_client.clone(),
                 };
-                self.nominet_tag_list_subordinate_client = Some(Box::new(new_client).start());
+                self.nominet_tag_list_subordinate_client = Some(Box::new(new_client).start().0);
             }
         }
 
@@ -945,7 +1121,7 @@ impl EPPClient {
                 )
                 .await
             {
-                Ok(_) => return Ok(()),
+                Ok(r) => return Ok(r),
                 Err(e) => {
                     if e {
                         return Err(());
@@ -957,7 +1133,7 @@ impl EPPClient {
             ._try_login(self.password.clone(), None, objects, ext_objects, sock)
             .await
         {
-            Ok(_) => Ok(()),
+            Ok(r) => Ok(r),
             Err(_) => Err(()),
         }
     }
@@ -969,7 +1145,7 @@ impl EPPClient {
         objects: Vec<String>,
         ext_objects: Vec<String>,
         sock: &mut super::epp_like::tls_client::TLSConnection,
-    ) -> Result<(), bool> {
+    ) -> Result<proto::EPPTransactionIdentifier, bool> {
         let mut command = proto::EPPLogin {
             client_id: self.tag.clone(),
             password: String::new(),
@@ -1078,7 +1254,7 @@ impl EPPClient {
                 Err(false)
             } else {
                 info!("Successfully logged into {}", self.server_id);
-                Ok(())
+                Ok(response.transaction_id)
             }
         } else {
             error!(
@@ -1114,9 +1290,7 @@ impl EPPClient {
         let message = proto::EPPMessage {
             message: proto::EPPMessageType::Command(Box::new(command)),
         };
-        match super::epp_like::send_msg(
-            &self.host, sock, &self.log_dir, send_msg, &message
-        ).await {
+        match super::epp_like::send_msg(&self.host, sock, &self.log_dir, send_msg, &message).await {
             Ok(_) => Ok(message_id),
             Err(_) => Err(()),
         }
@@ -1128,10 +1302,7 @@ impl EPPClient {
     }
 }
 
-pub fn handle_logout(
-    _client: &ServerFeatures,
-    _req: &LogoutRequest,
-) -> router::HandleReqReturn<()> {
+pub fn handle_logout(_client: &ServerFeatures, _req: &BlankRequest) -> router::HandleReqReturn<()> {
     Ok((proto::EPPCommandType::Logout {}, None))
 }
 

@@ -1,6 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/client/epp/rgp.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>rgp.rs - source</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled ><script id="default-settings"></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg">
-<link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../../epp_proxy/index.html'><div class='logo-container'><img src='https://as207960.net/img/logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img src="../../../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../../settings.html" title="settings"><img src="../../../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src&#x2F;client&#x2F;epp&#x2F;rgp.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>rgp.rs - source</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../../epp_proxy/index.html'><div class='logo-container rust-logo'><img src='https:&#x2F;&#x2F;as207960.net&#x2F;assets&#x2F;img&#x2F;logo.svg' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -137,24 +135,25 @@
 <span id="135">135</span>
 <span id="136">136</span>
 <span id="137">137</span>
-</pre><pre class="rust">
-<span class="doccomment">//! EPP commands relating to nominet specific features</span>
+<span id="138">138</span>
+</pre><pre class="rust"><code><span class="doccomment">//! EPP commands relating to nominet specific features</span>
 
-<span class="kw">use</span> <span class="kw">super</span>::<span class="kw">super</span><span class="ident">::rgp</span>::{<span class="ident">RGPState</span>, <span class="ident">RestoreRequest</span>, <span class="ident">RestoreResponse</span>};
-<span class="kw">use</span> <span class="kw">super</span>::<span class="kw">super</span>::{<span class="ident">proto</span>, <span class="ident">Error</span>, <span class="ident">Response</span>, <span class="ident">ServerFeatures</span>};
-<span class="kw">use</span> <span class="kw">super</span><span class="ident">::router::HandleReqReturn</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::rgp</span>::{<span class="ident">RGPState</span>, <span class="ident">RestoreRequest</span>, <span class="ident">RestoreResponse</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span></span>::{<span class="ident">proto</span>, <span class="ident">Error</span>, <span class="ident">Response</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::router::HandleReqReturn</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::ServerFeatures</span>;
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">proto::rgp::EPPRGPState</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RGPState</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">proto::rgp::EPPRGPState</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">proto::rgp::EPPRGPState</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">use</span> <span class="ident">proto::rgp::EPPRGPState</span>;
         <span class="kw">match</span> <span class="ident">from</span> {
-            <span class="ident">EPPRGPState::AddPeriod</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RGPState::AddPeriod</span>,
-            <span class="ident">EPPRGPState::AutoRenewPeriod</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RGPState::AutoRenewPeriod</span>,
-            <span class="ident">EPPRGPState::RenewPeriod</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RGPState::RenewPeriod</span>,
-            <span class="ident">EPPRGPState::TransferPeriod</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RGPState::TransferPeriod</span>,
-            <span class="ident">EPPRGPState::RedemptionPeriod</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RGPState::RedemptionPeriod</span>,
-            <span class="ident">EPPRGPState::PendingRestore</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RGPState::PendingRestore</span>,
-            <span class="ident">EPPRGPState::PendingDelete</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RGPState::PendingDelete</span>,
+            <span class="ident">EPPRGPState::AddPeriod</span> =&gt; <span class="ident">RGPState::AddPeriod</span>,
+            <span class="ident">EPPRGPState::AutoRenewPeriod</span> =&gt; <span class="ident">RGPState::AutoRenewPeriod</span>,
+            <span class="ident">EPPRGPState::RenewPeriod</span> =&gt; <span class="ident">RGPState::RenewPeriod</span>,
+            <span class="ident">EPPRGPState::TransferPeriod</span> =&gt; <span class="ident">RGPState::TransferPeriod</span>,
+            <span class="ident">EPPRGPState::RedemptionPeriod</span> =&gt; <span class="ident">RGPState::RedemptionPeriod</span>,
+            <span class="ident">EPPRGPState::PendingRestore</span> =&gt; <span class="ident">RGPState::PendingRestore</span>,
+            <span class="ident">EPPRGPState::PendingDelete</span> =&gt; <span class="ident">RGPState::PendingDelete</span>,
         }
     }
 }
@@ -162,11 +161,11 @@
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_restore</span>(
     <span class="ident">client</span>: <span class="kw-2">&amp;</span><span class="ident">ServerFeatures</span>,
     <span class="ident">req</span>: <span class="kw-2">&amp;</span><span class="ident">RestoreRequest</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HandleReqReturn</span><span class="op">&lt;</span><span class="ident">RestoreResponse</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">HandleReqReturn</span><span class="op">&lt;</span><span class="ident">RestoreResponse</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="op">!</span>(<span class="ident">client</span>.<span class="ident">rgp_supported</span> <span class="op">|</span><span class="op">|</span> <span class="ident">client</span>.<span class="ident">has_erratum</span>(<span class="string">&quot;traficom&quot;</span>)) {
         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">Err</span>(<span class="ident">Error::Unsupported</span>));
     }
-    <span class="kw">super</span><span class="ident">::domain::check_domain</span>(<span class="kw-2">&amp;</span><span class="ident">req</span>.<span class="ident">name</span>)<span class="question-mark">?</span>;
+    <span class="ident"><span class="kw">super</span>::domain::check_domain</span>(<span class="kw-2">&amp;</span><span class="ident">req</span>.<span class="ident">name</span>)<span class="question-mark">?</span>;
     <span class="kw">if</span> <span class="ident">client</span>.<span class="ident">has_erratum</span>(<span class="string">&quot;traficom&quot;</span>) {
         <span class="kw">let</span> <span class="ident">command</span> <span class="op">=</span> <span class="ident">proto::EPPDelete::Domain</span>(<span class="ident">proto::domain::EPPDomainCheck</span> {
             <span class="ident">name</span>: <span class="ident">req</span>.<span class="ident">name</span>.<span class="ident">clone</span>(),
@@ -195,35 +194,35 @@
                 },
             },
         )];
-        <span class="kw">super</span><span class="ident">::verisign::handle_verisign_namestore_erratum</span>(<span class="ident">client</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">exts</span>);
-        <span class="kw">super</span><span class="ident">::fee::handle_donuts_fee_agreement</span>(<span class="ident">client</span>, <span class="kw-2">&amp;</span><span class="ident">req</span>.<span class="ident">donuts_fee_agreement</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">exts</span>)<span class="question-mark">?</span>;
+        <span class="ident"><span class="kw">super</span>::verisign::handle_verisign_namestore_erratum</span>(<span class="ident">client</span>, <span class="kw-2">&amp;mut</span> <span class="ident">exts</span>);
+        <span class="ident"><span class="kw">super</span>::fee::handle_donuts_fee_agreement</span>(<span class="ident">client</span>, <span class="kw-2">&amp;</span><span class="ident">req</span>.<span class="ident">donuts_fee_agreement</span>, <span class="kw-2">&amp;mut</span> <span class="ident">exts</span>)<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>((<span class="ident">proto::EPPCommandType::Update</span>(<span class="ident">Box::new</span>(<span class="ident">command</span>)), <span class="prelude-val">Some</span>(<span class="ident">exts</span>)))
     }
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_restore_response</span>(<span class="ident">response</span>: <span class="ident">proto::EPPResponse</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">RestoreResponse</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_restore_response</span>(<span class="ident">response</span>: <span class="ident">proto::EPPResponse</span>) -&gt; <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">RestoreResponse</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">fee_data</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">response</span>.<span class="ident">extension</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">ext</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Some</span>(<span class="ident">ext</span>) =&gt; {
             <span class="kw">let</span> <span class="ident">fee10</span> <span class="op">=</span> <span class="ident">ext</span>.<span class="ident">value</span>.<span class="ident">iter</span>().<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">p</span> {
-                <span class="ident">proto::EPPResponseExtensionType::EPPFee10UpdateData</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>),
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+                <span class="ident">proto::EPPResponseExtensionType::EPPFee10UpdateData</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">i</span>),
+                <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
             });
             <span class="kw">let</span> <span class="ident">fee09</span> <span class="op">=</span> <span class="ident">ext</span>.<span class="ident">value</span>.<span class="ident">iter</span>().<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">p</span> {
-                <span class="ident">proto::EPPResponseExtensionType::EPPFee09UpdateData</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>),
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+                <span class="ident">proto::EPPResponseExtensionType::EPPFee09UpdateData</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">i</span>),
+                <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
             });
             <span class="kw">let</span> <span class="ident">fee08</span> <span class="op">=</span> <span class="ident">ext</span>.<span class="ident">value</span>.<span class="ident">iter</span>().<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">p</span> {
-                <span class="ident">proto::EPPResponseExtensionType::EPPFee08UpdateData</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>),
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+                <span class="ident">proto::EPPResponseExtensionType::EPPFee08UpdateData</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">i</span>),
+                <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
             });
             <span class="kw">let</span> <span class="ident">fee07</span> <span class="op">=</span> <span class="ident">ext</span>.<span class="ident">value</span>.<span class="ident">iter</span>().<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">p</span> {
-                <span class="ident">proto::EPPResponseExtensionType::EPPFee07UpdateData</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>),
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+                <span class="ident">proto::EPPResponseExtensionType::EPPFee07UpdateData</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">i</span>),
+                <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
             });
             <span class="kw">let</span> <span class="ident">fee05</span> <span class="op">=</span> <span class="ident">ext</span>.<span class="ident">value</span>.<span class="ident">iter</span>().<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">p</span> {
-                <span class="ident">proto::EPPResponseExtensionType::EPPFee05UpdateData</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>),
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+                <span class="ident">proto::EPPResponseExtensionType::EPPFee05UpdateData</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">i</span>),
+                <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
             });
 
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">f</span>) <span class="op">=</span> <span class="ident">fee10</span> {
@@ -238,12 +237,12 @@
                 <span class="ident">fee05</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">into</span>())
             }
         }
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+        <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
     };
 
     <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">response</span>.<span class="ident">extension</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">value</span>.<span class="ident">value</span>.<span class="ident">first</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">proto::EPPResponseExtensionType::EPPRGPUpdate</span>(<span class="ident">rgp_info</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Some</span>(<span class="ident">value</span>) =&gt; <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">value</span>.<span class="ident">value</span>.<span class="ident">first</span>() {
+            <span class="prelude-val">Some</span>(<span class="ident">proto::EPPResponseExtensionType::EPPRGPUpdate</span>(<span class="ident">rgp_info</span>)) =&gt; {
                 <span class="ident">Response::Ok</span>(<span class="ident">RestoreResponse</span> {
                     <span class="ident">pending</span>: <span class="ident">response</span>.<span class="ident">is_pending</span>(),
                     <span class="ident">transaction_id</span>: <span class="ident">response</span>
@@ -254,7 +253,7 @@
                     <span class="ident">fee_data</span>,
                 })
             }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Response::Ok</span>(<span class="ident">RestoreResponse</span> {
+            <span class="kw">_</span> =&gt; <span class="ident">Response::Ok</span>(<span class="ident">RestoreResponse</span> {
                 <span class="ident">pending</span>: <span class="ident">response</span>.<span class="ident">is_pending</span>(),
                 <span class="ident">transaction_id</span>: <span class="ident">response</span>
                     .<span class="ident">transaction_id</span>
@@ -264,7 +263,7 @@
                 <span class="ident">fee_data</span>,
             }),
         },
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Response::Ok</span>(<span class="ident">RestoreResponse</span> {
+        <span class="prelude-val">None</span> =&gt; <span class="ident">Response::Ok</span>(<span class="ident">RestoreResponse</span> {
             <span class="ident">pending</span>: <span class="ident">response</span>.<span class="ident">is_pending</span>(),
             <span class="ident">transaction_id</span>: <span class="ident">response</span>
                 .<span class="ident">transaction_id</span>
@@ -275,5 +274,7 @@
         }),
     }
 }
-</pre></div>
-</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="epp_proxy" data-search-index-js="../../../../search-index.js" data-search-js="../../../../search.js"></div><script src="../../../../main.js"></script><script src="../../../../source-script.js"></script><script src="../../../../source-files.js"></script></body></html>
+</code></pre></div>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="epp_proxy" data-search-index-js="../../../../search-index.js" data-search-js="../../../../search.js"></div>
+    <script src="../../../../main.js"></script><script src="../../../../source-script.js"></script><script src="../../../../source-files.js"></script>
+</body></html>

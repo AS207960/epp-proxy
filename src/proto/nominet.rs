@@ -114,7 +114,7 @@ pub struct EPPDomainUpdate {
 #[derive(Debug, Deserialize)]
 pub struct EPPDomainCheckData {
     #[serde(rename = "{http://www.nominet.org.uk/epp/xml/domain-nom-ext-1.2}abuse-limit")]
-    pub abuse_limit: u64
+    pub abuse_limit: u64,
 }
 
 #[derive(Debug, Deserialize)]
@@ -144,7 +144,7 @@ pub enum EPPDomainBillCode {
     #[serde(rename = "th")]
     Registrar,
     #[serde(rename = "bc")]
-    Customer
+    Customer,
 }
 
 #[derive(Debug, Deserialize)]
@@ -224,6 +224,14 @@ pub struct EPPIgnoredField {
 }
 
 #[derive(Debug, Deserialize)]
+pub struct EPPIgnoredAttribute {
+    #[serde(rename = "$attr:attribute-name")]
+    pub attribute_name: String,
+    #[serde(rename = "$value")]
+    pub message: String,
+}
+
+#[derive(Debug, Deserialize)]
 pub struct EPPHostIgnored {
     #[serde(rename = "$attr:host-name")]
     pub host_name: String,
@@ -258,7 +266,7 @@ pub enum EPPDataQualityStatus {
 #[derive(Debug, Serialize)]
 pub enum EPPDataQualityUpdate {
     #[serde(rename = "{http://www.nominet.org.uk/epp/xml/nom-data-quality-1.1}validate")]
-    Validate {}
+    Validate {},
 }
 
 #[derive(Debug, Deserialize)]
@@ -476,8 +484,11 @@ pub struct EPPHandshakeReject {
 pub struct EPPHandshakeData {
     #[serde(rename = "{http://www.nominet.org.uk/epp/xml/std-handshake-1.0}caseId")]
     pub case_id: String,
-    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/std-handshake-1.0}domainListData", default)]
-    pub domain_list: Option<EPPHandshakeDomainListData>
+    #[serde(
+        rename = "{http://www.nominet.org.uk/epp/xml/std-handshake-1.0}domainListData",
+        default
+    )]
+    pub domain_list: Option<EPPHandshakeDomainListData>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -501,7 +512,7 @@ pub enum EPPReleaseObject {
     #[serde(rename = "{http://www.nominet.org.uk/epp/xml/std-release-1.0}release:domainName")]
     Domain(String),
     #[serde(rename = "{http://www.nominet.org.uk/epp/xml/std-release-1.0}release:registrant")]
-    Registrant(String)
+    Registrant(String),
 }
 
 #[derive(Debug, Serialize)]
@@ -511,7 +522,7 @@ pub struct EPPLock {
     #[serde(rename = "$attr:object")]
     pub object_type: EPPLockObjectType,
     #[serde(rename = "$value")]
-    pub object: EPPReleaseObject,
+    pub object: EPPLockObject,
 }
 
 #[derive(Debug, Serialize)]
@@ -519,7 +530,7 @@ pub enum EPPLockObject {
     #[serde(rename = "{http://www.nominet.org.uk/epp/xml/std-locks-1.0}lock:domainName")]
     Domain(String),
     #[serde(rename = "{http://www.nominet.org.uk/epp/xml/std-locks-1.0}lock:contactId")]
-    Registrant(String)
+    Registrant(String),
 }
 
 #[derive(Debug, Serialize)]
@@ -527,11 +538,11 @@ pub enum EPPLockObjectType {
     #[serde(rename = "domain")]
     Domain,
     #[serde(rename = "contact")]
-    Registrant
+    Registrant,
 }
 
 #[derive(Debug, Serialize)]
 pub struct EPPUnrenew {
     #[serde(rename = "{http://www.nominet.org.uk/epp/xml/std-unrenew-1.0}unrenew:domainName")]
-    pub domains: Vec<String>
+    pub domains: Vec<String>,
 }

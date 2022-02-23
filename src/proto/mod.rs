@@ -16,15 +16,17 @@ pub mod isnic;
 pub mod launch;
 pub mod login_sec;
 pub mod maintenance;
+pub mod mark;
 pub mod nominet;
 pub mod qualified_lawyer;
 pub mod rgp;
 pub mod secdns;
 pub mod switch;
+pub mod tm_notice;
+pub mod tmch;
 pub mod traficom;
 pub mod united_tld;
 pub mod verisign;
-pub mod tmch;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub enum EPPMessageType {
@@ -117,6 +119,10 @@ pub enum EPPCommandExtensionType {
         rename = "{http://www.nominet.org.uk/epp/xml/contact-nom-ext-1.0}contact-nom-ext:update"
     )]
     NominetContactExtUpdate(nominet::EPPContactInfo),
+    #[serde(
+        rename = "{http://www.nominet.org.uk/epp/xml/nom-data-quality-1.0}nom-data-quality:update"
+    )]
+    NominetDataQualityUpdate(nominet::EPPDataQualityUpdate),
     #[serde(rename = "{urn:ietf:params:xml:ns:rgp-1.0}rgp:update")]
     EPPRGPUpdate(rgp::EPPRGPUpdate),
     #[serde(rename = "{urn:ietf:params:xml:ns:secDNS-1.1}secDNS:create")]
@@ -674,6 +680,8 @@ pub enum EPPResponseExtensionType {
     NominetContactExtInfo(nominet::EPPContactInfo),
     #[serde(rename = "{http://www.nominet.org.uk/epp/xml/std-warning-1.1}ignored-field")]
     NominetIgnoredField(nominet::EPPIgnoredField),
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/std-warning-1.1}ignored-attribute")]
+    NominetIgnoredAttribute(nominet::EPPIgnoredAttribute),
     #[serde(rename = "{http://www.nominet.org.uk/epp/xml/std-warning-1.1}postalInfo-ignored")]
     NominetPostalInfoIgnored(nominet::EPPPostalInfoIgnored),
     #[serde(rename = "{http://www.nominet.org.uk/epp/xml/std-warning-1.1}truncated-field")]
@@ -730,7 +738,7 @@ pub enum EPPResponseExtensionType {
     EPPFee08DeleteData(fee::EPPFee08DeleteData),
     #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.9}delData")]
     EPPFee09DeleteData(fee::EPPFee09DeleteData),
-    #[serde(rename = "{urn:ietf:params:xml:ns:fee-1.0}delData")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.11}delData")]
     EPPFee011DeleteData(fee::EPPFee011TransformData),
     #[serde(rename = "{urn:ietf:params:xml:ns:epp:fee-1.0}delData")]
     EPPFee10DeleteData(fee::EPPFee10TransformData),
@@ -892,6 +900,10 @@ pub enum EPPUpdate {
     NominetHandshakeReject(nominet::EPPHandshakeReject),
     #[serde(rename = "{http://www.nominet.org.uk/epp/xml/std-release-1.0}release:release")]
     NominetRelease(nominet::EPPRelease),
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/std-locks-1.0}lock:lock")]
+    NominetLock(nominet::EPPLock),
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/std-locks-1.0}lock:unlock")]
+    NominetUnlock(nominet::EPPLock),
 }
 
 #[derive(Debug, Serialize)]

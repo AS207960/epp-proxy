@@ -13,7 +13,7 @@ pub struct EPPLoginSecurity {
     )]
     pub password: Option<String>,
     #[serde(
-        rename = "{urn:ietf:params:xml:ns:epp:loginSec-1.0}loginSec:pw",
+        rename = "{urn:ietf:params:xml:ns:epp:loginSec-1.0}loginSec:newPW",
         skip_serializing_if = "Option::is_none"
     )]
     pub new_password: Option<String>,

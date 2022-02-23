@@ -8,10 +8,12 @@ use futures::future::FutureExt;
 
 pub mod epp;
 pub mod epp_like;
-pub mod tmch;
+pub mod nominet_dac;
+pub mod tmch_client;
 
 pub mod balance;
 pub mod contact;
+pub mod dac;
 pub mod domain;
 pub mod eurid;
 pub mod fee;
@@ -19,10 +21,12 @@ pub mod host;
 pub mod isnic;
 pub mod launch;
 pub mod maintenance;
+pub mod mark;
 pub mod nominet;
 pub mod poll;
 pub mod rgp;
 pub mod router;
+pub mod tmch;
 pub mod traficom;
 pub mod verisign;
 
@@ -38,6 +42,11 @@ pub enum ClientCertConf<'a> {
     },
 }
 
+pub struct NominetDACConf<'a> {
+    pub real_time: &'a str,
+    pub time_delay: &'a str,
+}
+
 pub struct ClientConf<'a, C: Into<Option<&'a str>>> {
     /// The server connection string, in the form `domain:port`
     pub host: &'a str,
@@ -48,6 +57,8 @@ pub struct ClientConf<'a, C: Into<Option<&'a str>>> {
     /// Directory path to log commands to
     pub log_dir: std::path::PathBuf,
     pub client_cert: Option<ClientCertConf<'a>>,
+    /// Source address to bind the TLS connection to, for IP based ACLs etc.
+    pub source_address: Option<&'a std::net::IpAddr>,
     /// List of PEM file paths
     pub root_certs: &'a [&'a str],
     /// Accept invalid TLS certs
@@ -60,6 +71,9 @@ pub struct ClientConf<'a, C: Into<Option<&'a str>>> {
     pub pipelining: bool,
     /// Errata of this server
     pub errata: Option<String>,
+    pub nominet_dac: Option<NominetDACConf<'a>>,
+    /// Should the client send keepalive commands automatically
+    pub keepalive: bool,
 }
 
 async fn send_epp_client_request<R>(
@@ -111,7 +125,29 @@ pub enum TransferStatus {
 }
 
 #[derive(Debug)]
-pub struct LogoutRequest {
+pub struct Period {
+    /// Unit of time
+    pub unit: PeriodUnit,
+    /// Number of units of time
+    pub value: u32,
+}
+
+#[derive(Debug)]
+pub enum PeriodUnit {
+    Years,
+    Months,
+}
+
+#[derive(Debug)]
+pub struct Phone {
+    /// Initial dialable part of the number
+    pub number: String,
+    /// Optional internal extension
+    pub extension: Option<String>,
+}
+
+#[derive(Debug)]
+pub struct BlankRequest {
     pub return_path: Sender<()>,
 }
 
@@ -125,7 +161,7 @@ pub async fn logout(
     let (sender, receiver) = futures::channel::oneshot::channel();
     send_epp_client_request(
         &mut client_sender,
-        RequestMessage::Logout(Box::new(LogoutRequest {
+        RequestMessage::Logout(Box::new(BlankRequest {
             return_path: sender,
         })),
         receiver,
@@ -134,5 +170,10 @@ pub async fn logout(
 }
 
 pub trait Client {
-    fn start(self: Box<Self>) -> futures::channel::mpsc::Sender<RequestMessage>;
+    fn start(
+        self: Box<Self>,
+    ) -> (
+        futures::channel::mpsc::Sender<RequestMessage>,
+        futures::channel::mpsc::UnboundedReceiver<router::CommandTransactionID>,
+    );
 }

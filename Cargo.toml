@@ -1,6 +1,8 @@
+cargo-features = ["strip"]
+
 [package]
 name = "epp-proxy"
-version = "0.3.0"
+version = "0.4.1"
 authors = ["Q <q@misell.cymru>"]
 edition = "2018"
 
@@ -13,37 +15,55 @@ log = "0.4"
 pretty_env_logger = "0.4"
 libc = "0.2"
 openssl = { version = "0.10", features = [] }
-openssl-sys = { version = "0.9.65", features = [] }
+openssl-sys = { version = "=0.9.65", features = [] }
 tokio-openssl = "0.6"
-quick-xml = { version = "0.18", features = ["serialize"]}
+quick-xml = { version = "0.22", features = ["serialize"]}
 serde = "1.0"
 serde_derive = "1.0"
 serde_json = "1.0"
 chrono = { version = "0.4", features = ["serde"] }
-time = "0.1"
+time = "0.3"
 uuid = { version = "0.8", features = ["v4"] }
 hex = "0.4"
 regex = "1"
-tonic = { version = "0.5", features = ["transport", "tls"] }
-prost = "0.8"
-prost-types = "0.8"
-clap = "2.33"
-base64 = "0.12"
-xml_serde = { git = "https://github.com/as207960/xml-serde", rev = "9fc66f9f5f5927c01b874b17c3e0839169785dff" }
-#xml_serde = { path = "../xml_serde" }
+tonic = { version = "0.6", features = ["transport", "tls"] }
+prost = "0.9"
+prost-types = "0.9"
+clap = "3"
+base64 = "0.13"
+xml_serde = "1"
 rust-keycloak = { git = "https://github.com/TheEnbyperor/rust-keycloak", rev = "31dc156acbf3048d9ff765f3cd6d32be6ae9b18a" }
-dotenv = "0.9.0"
+dotenv = "0.15.0"
 tower-service = "0.3"
 http = "0.2"
 sys-info = "0.9"
-sentry = { version = "0.21.0", features = ["log"] }
+sentry = { version = "0.23.0", features = ["log"] }
 foreign-types-shared = "0.1"
 lazy_static = "1"
 paste = "1"
+reqwest = "0"
 
 [build-dependencies]
-tonic-build = "0.5"
-built = { version = "0.4", features = ["git2"] }
+tonic-build = "0.6"
+built = { version = "0.5", features = ["git2"] }
 
 [patch.crates-io]
-openssl-sys = { git = "https://github.com/AS207960/rust-openssl", rev = "645f02befff2363ea4a5874a28eab21d780ffb7e" }
+openssl-sys = { git = "https://github.com/AS207960/rust-openssl", rev = "3ea7e492d78b506689c8c31ee9427399ae4735e9" }
+
+[lib]
+name = "epp_proxy"
+path = "src/lib.rs"
+
+[[bin]]
+name = "epp-proxy"
+path = "src/main.rs"
+
+[[bin]]
+name = "verisign-com-net-test"
+path = "src/bin/verisign-com-net-test.rs"
+
+[profile.release]
+strip = true
+opt-level = "z"
+lto = true
+panic = "abort"

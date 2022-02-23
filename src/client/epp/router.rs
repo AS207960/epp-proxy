@@ -52,6 +52,14 @@ macro_rules! router {
     }
 }
 
+fn request_nop<T, R>(_client: &super::ServerFeatures, _req: &T) -> HandleReqReturn<R> {
+    Err(Response::Err(Error::Unsupported))
+}
+
+fn response_nop<T, R>(_response: T) -> Result<R, Error> {
+    Err(Error::Unsupported)
+}
+
 router!(
     Logout,                 super::handle_logout,                     super::handle_logout_response;
     Poll,                   super::poll::handle_poll,                 super::poll::handle_poll_response;
@@ -89,11 +97,30 @@ router!(
     NominetAccept,          super::nominet::handle_accept,            super::nominet::handle_handshake_response;
     NominetReject,          super::nominet::handle_reject,            super::nominet::handle_handshake_response;
     NominetRelease,         super::nominet::handle_release,           super::nominet::handle_release_response;
+    NominetContactValidate, super::nominet::handle_contact_validate,  super::nominet::handle_contact_validate_response;
+    NominetLock,            super::nominet::handle_lock,              super::nominet::handle_lock_response;
+    NominetUnlock,          super::nominet::handle_unlock,            super::nominet::handle_lock_response;
     Balance,                super::balance::handle_balance,           super::balance::handle_balance_response;
     MaintenanceList,        super::maintenance::handle_list,          super::maintenance::handle_list_response;
     MaintenanceInfo,        super::maintenance::handle_info,          super::maintenance::handle_info_response;
     EURIDHitPoints,         super::eurid::handle_hit_points,          super::eurid::handle_hit_points_response;
     EURIDRegistrationLimit, super::eurid::handle_registration_limits, super::eurid::handle_registration_limits_response;
     EURIDDNSSECEligibility, super::eurid::handle_dnssec_eligibility,  super::eurid::handle_dnssec_eligibility_response;
-    EURIDDNSQuality,        super::eurid::handle_dns_quality,         super::eurid::handle_dns_quality_response
+    EURIDDNSQuality,        super::eurid::handle_dns_quality,         super::eurid::handle_dns_quality_response;
+    TMCHCheck,              request_nop,                              response_nop;
+    TMCHCreate,             request_nop,                              response_nop;
+    TMCHMarkInfo,           request_nop,                              response_nop;
+    TMCHMarkSMDInfo,        request_nop,                              response_nop;
+    TMCHMarkEncodedSMDInfo, request_nop,                              response_nop;
+    TMCHMarkFileInfo,       request_nop,                              response_nop;
+    TMCHUpdate,             request_nop,                              response_nop;
+    TMCHRenew,              request_nop,                              response_nop;
+    TMCHTransferInitiate,   request_nop,                              response_nop;
+    TMCHTransfer,           request_nop,                              response_nop;
+    TMCHTrexActivate,       request_nop,                              response_nop;
+    TMCHTrexRenew,          request_nop,                              response_nop;
+    DACDomain,              request_nop,                              response_nop;
+    DACUsage,               request_nop,                              response_nop;
+    DACLimits,              request_nop,                              response_nop;
+    Hello,                  request_nop,                              response_nop
 );

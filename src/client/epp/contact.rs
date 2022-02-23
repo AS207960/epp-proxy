@@ -6,13 +6,13 @@ use regex::Regex;
 
 use super::super::contact::{
     Address, CheckRequest, CheckResponse, CreateRequest, CreateResponse, DeleteRequest,
-    DeleteResponse, DisclosureType, EntityType, InfoRequest, InfoResponse, PanData, Phone,
+    DeleteResponse, DisclosureType, EntityType, InfoRequest, InfoResponse, PanData,
     QualifiedLawyerInfo, Status, TransferData, TransferQueryRequest, TransferRequestRequest,
     TransferResponse, UpdateRequest, UpdateResponse,
 };
-use super::super::{proto, Error, Response};
-use super::ServerFeatures;
+use super::super::{proto, Error, Phone, Response};
 use super::router::HandleReqReturn;
+use super::ServerFeatures;
 
 impl From<&proto::nominet::EPPContactType> for EntityType {
     fn from(from: &proto::nominet::EPPContactType) -> Self {
@@ -704,7 +704,7 @@ pub fn handle_create(
                 city: a.city.clone(),
                 province: a.province.clone(),
                 postal_code: if client.has_erratum("traficom") {
-                    a.postal_code.as_ref().map(|s| s.replace(" ", ""))
+                    a.postal_code.as_ref().map(|s| s.replace(' ', ""))
                 } else {
                     a.postal_code.clone()
                 },
@@ -816,10 +816,14 @@ pub fn handle_create(
                 let suppress_int_name = client.nominet_contact_ext;
                 let suppress_local_name = client.nominet_contact_ext;
 
-                let suppress_int_addr = client.nominet_contact_ext && contains_local_addr
-                    && contains_int_addr && req.local_address.is_some();
-                let suppress_local_addr = client.nominet_contact_ext && contains_local_addr
-                    && contains_int_addr && !suppress_int_addr;
+                let suppress_int_addr = client.nominet_contact_ext
+                    && contains_local_addr
+                    && contains_int_addr
+                    && req.local_address.is_some();
+                let suppress_local_addr = client.nominet_contact_ext
+                    && contains_local_addr
+                    && contains_int_addr
+                    && !suppress_int_addr;
 
                 if client.nominet_contact_ext && contains_local_name && !contains_local_org {
                     d.push(DisclosureType::LocalOrganisation);
@@ -827,16 +831,20 @@ pub fn handle_create(
                     d.push(DisclosureType::InternationalisedOrganisation);
                 }
 
-                let suppress_int_org = client.nominet_contact_ext && contains_local_org
-                    && contains_int_org && req.local_address.is_some();
-                let suppress_local_org = client.nominet_contact_ext && contains_local_org
-                    && contains_int_org && !suppress_int_org;
-
+                let suppress_int_org = client.nominet_contact_ext
+                    && contains_local_org
+                    && contains_int_org
+                    && req.local_address.is_some();
+                let suppress_local_org = client.nominet_contact_ext
+                    && contains_local_org
+                    && contains_int_org
+                    && !suppress_int_org;
 
                 d.sort_unstable_by_key(|a| (*a as i32));
                 proto::contact::EPPContactDisclosure {
                     flag: true,
-                    elements: d.iter()
+                    elements: d
+                        .iter()
                         .filter(|d| match d {
                             DisclosureType::LocalName => !suppress_local_name,
                             DisclosureType::InternationalisedName => !suppress_int_name,
@@ -844,9 +852,10 @@ pub fn handle_create(
                             DisclosureType::InternationalisedAddress => !suppress_int_addr,
                             DisclosureType::LocalOrganisation => !suppress_local_org,
                             DisclosureType::InternationalisedOrganisation => !suppress_int_org,
-                            _ => true
+                            _ => true,
                         })
-                        .map(|e| e.into()).collect(),
+                        .map(|e| e.into())
+                        .collect(),
                 }
             }),
         },

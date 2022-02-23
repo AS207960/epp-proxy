@@ -2,8 +2,8 @@
 
 use super::super::rgp::{RGPState, RestoreRequest, RestoreResponse};
 use super::super::{proto, Error, Response};
-use super::ServerFeatures;
 use super::router::HandleReqReturn;
+use super::ServerFeatures;
 
 impl From<&proto::rgp::EPPRGPState> for RGPState {
     fn from(from: &proto::rgp::EPPRGPState) -> Self {
