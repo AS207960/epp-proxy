@@ -1,1 +1,1 @@
-initSidebarItems({"fn":[["deserialize_date_year",""],["serialize_date_year",""]],"struct":[["DateYearVisitor",""],["QualifiedLawyerInfoData",""]]});
+initSidebarItems({"struct":[["QualifiedLawyerInfoData",""]]});

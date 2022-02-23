@@ -1,1 +1,0 @@
-initSidebarItems({"fn":[["fee_command_from_i32",""],["i32_from_fee_command",""]]});

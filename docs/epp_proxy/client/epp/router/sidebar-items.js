@@ -1,1 +1,1 @@
-initSidebarItems({"fn":[["request_nop",""],["response_nop",""]],"macro":[["router",""]],"struct":[["Router",""]],"type":[["HandleReqReturn",""]]});
+initSidebarItems({"struct":[["Router",""]],"type":[["HandleReqReturn",""]]});

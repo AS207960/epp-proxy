@@ -1,1 +1,0 @@
-initSidebarItems({"fn":[["handle_poll",""],["handle_poll_ack",""],["handle_poll_ack_response",""],["handle_poll_response",""]]});

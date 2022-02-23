@@ -1,1 +1,1 @@
-initSidebarItems({"fn":[["check_host",""],["handle_check",""],["handle_check_response",""],["handle_create",""],["handle_create_response",""],["handle_delete",""],["handle_delete_response",""],["handle_info",""],["handle_info_response",""],["handle_update",""],["handle_update_response",""]]});
+initSidebarItems({"fn":[["handle_check",""],["handle_check_response",""],["handle_create",""],["handle_create_response",""],["handle_delete",""],["handle_delete_response",""],["handle_info",""],["handle_info_response",""],["handle_update",""],["handle_update_response",""]]});
