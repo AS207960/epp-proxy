@@ -16,7 +16,7 @@ pub(super) async fn write_msg_log(
     let file_path = dir.join(format!("{}_{}.xml", time, msg_type));
     tokio::fs::create_dir_all(&dir).await?;
     let mut file = tokio::fs::File::create(file_path).await?;
-    file.write(msg.as_bytes()).await?;
+    file.write_all(msg.as_bytes()).await?;
     Ok(())
 }
 
