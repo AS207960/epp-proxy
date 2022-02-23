@@ -1,6 +1,6 @@
 [package]
 name = "epp-proxy"
-version = "0.2.0"
+version = "0.3.0"
 authors = ["Q <q@misell.cymru>"]
 edition = "2018"
 
@@ -13,7 +13,7 @@ log = "0.4"
 pretty_env_logger = "0.4"
 libc = "0.2"
 openssl = { version = "0.10", features = [] }
-openssl-sys = { version = "0.9", features = [] }
+openssl-sys = { version = "0.9.65", features = [] }
 tokio-openssl = "0.6"
 quick-xml = { version = "0.18", features = ["serialize"]}
 serde = "1.0"
@@ -24,9 +24,9 @@ time = "0.1"
 uuid = { version = "0.8", features = ["v4"] }
 hex = "0.4"
 regex = "1"
-tonic = { version = "0.4", features = ["transport", "tls"] }
-prost = "0.7"
-prost-types = "0.7"
+tonic = { version = "0.5", features = ["transport", "tls"] }
+prost = "0.8"
+prost-types = "0.8"
 clap = "2.33"
 base64 = "0.12"
 xml_serde = { git = "https://github.com/as207960/xml-serde", rev = "9fc66f9f5f5927c01b874b17c3e0839169785dff" }
@@ -42,8 +42,8 @@ lazy_static = "1"
 paste = "1"
 
 [build-dependencies]
-tonic-build = "0.4"
+tonic-build = "0.5"
 built = { version = "0.4", features = ["git2"] }
 
 [patch.crates-io]
-openssl-sys = { git = "https://github.com/AS207960/rust-openssl", rev = "3ea7e492d78b506689c8c31ee9427399ae4735e9" }
+openssl-sys = { git = "https://github.com/AS207960/rust-openssl", rev = "645f02befff2363ea4a5874a28eab21d780ffb7e" }
