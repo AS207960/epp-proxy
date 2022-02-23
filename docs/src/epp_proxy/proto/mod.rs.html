@@ -1150,6 +1150,35 @@
 <span id="1145">1145</span>
 <span id="1146">1146</span>
 <span id="1147">1147</span>
+<span id="1148">1148</span>
+<span id="1149">1149</span>
+<span id="1150">1150</span>
+<span id="1151">1151</span>
+<span id="1152">1152</span>
+<span id="1153">1153</span>
+<span id="1154">1154</span>
+<span id="1155">1155</span>
+<span id="1156">1156</span>
+<span id="1157">1157</span>
+<span id="1158">1158</span>
+<span id="1159">1159</span>
+<span id="1160">1160</span>
+<span id="1161">1161</span>
+<span id="1162">1162</span>
+<span id="1163">1163</span>
+<span id="1164">1164</span>
+<span id="1165">1165</span>
+<span id="1166">1166</span>
+<span id="1167">1167</span>
+<span id="1168">1168</span>
+<span id="1169">1169</span>
+<span id="1170">1170</span>
+<span id="1171">1171</span>
+<span id="1172">1172</span>
+<span id="1173">1173</span>
+<span id="1174">1174</span>
+<span id="1175">1175</span>
+<span id="1176">1176</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Serde structs for serialisation and deserialisation of EPP XML messages</span>
 <span class="doccomment">//! (these are insane, stay away if you value your sanity)</span>
 
@@ -1161,6 +1190,7 @@
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">contact</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">corenic</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">domain</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">email_forward</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">eurid</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">fee</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">host</span>;
@@ -1712,6 +1742,18 @@
     <span class="ident">EPPDomainRenewResult</span>(<span class="ident">domain::EPPDomainRenewData</span>),
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;{urn:ietf:params:xml:ns:domain-1.0}panData&quot;</span>)]</span>
     <span class="ident">EPPDomainPendingActionNotification</span>(<span class="ident">domain::EPPDomainPanData</span>),
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;{http://www.nic.name/epp/emailFwd-1.0}chkData&quot;</span>)]</span>
+    <span class="ident">EPPEmailForwardCheckResult</span>(<span class="ident">email_forward::EPPEmailForwardCheckData</span>),
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;{http://www.nic.name/epp/emailFwd-1.0}infData&quot;</span>)]</span>
+    <span class="ident">EPPEmailForwardInfoResult</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="ident">email_forward::EPPEmailForwardInfoData</span><span class="op">&gt;</span>),
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;{http://www.nic.name/epp/emailFwd-1.0}trnData&quot;</span>)]</span>
+    <span class="ident">EPPEmailForwardTransferResult</span>(<span class="ident">email_forward::EPPEmailForwardTransferData</span>),
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;{http://www.nic.name/epp/emailFwd-1.0}creData&quot;</span>)]</span>
+    <span class="ident">EPPEmailForwardCreateResult</span>(<span class="ident">email_forward::EPPEmailForwardCreateData</span>),
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;{http://www.nic.name/epp/emailFwd-1.0}renData&quot;</span>)]</span>
+    <span class="ident">EPPEmailForwardRenewResult</span>(<span class="ident">email_forward::EPPEmailForwardRenewData</span>),
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;{http://www.nic.name/epp/emailFwd-1.0}panData&quot;</span>)]</span>
+    <span class="ident">EPPEmailForwardPendingActionNotification</span>(<span class="ident">email_forward::EPPEmailForwardPanData</span>),
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;{urn:ietf:params:xml:ns:host-1.0}chkData&quot;</span>)]</span>
     <span class="ident">EPPHostCheckResult</span>(<span class="ident">host::EPPHostCheckData</span>),
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;{urn:ietf:params:xml:ns:host-1.0}infData&quot;</span>)]</span>
@@ -1982,6 +2024,8 @@
     <span class="ident">Host</span>(<span class="ident">host::EPPHostCheck</span>),
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;{urn:ietf:params:xml:ns:contact-1.0}contact:check&quot;</span>)]</span>
     <span class="ident">Contact</span>(<span class="ident">contact::EPPContactCheck</span>),
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;{http://www.nic.name/epp/emailFwd-1.0}emailFwd:check&quot;</span>)]</span>
+    <span class="ident">EmailForward</span>(<span class="ident">email_forward::EPPEmailForwardCheck</span>),
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>
@@ -1992,6 +2036,8 @@
     <span class="ident">Host</span>(<span class="ident">host::EPPHostCheck</span>),
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;{urn:ietf:params:xml:ns:contact-1.0}contact:info&quot;</span>)]</span>
     <span class="ident">Contact</span>(<span class="ident">contact::EPPContactCheck</span>),
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;{http://www.nic.name/epp/emailFwd-1.0}emailFwd:info&quot;</span>)]</span>
+    <span class="ident">EmailForward</span>(<span class="ident">email_forward::EPPEmailForwardCheck</span>),
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;{urn:ietf:params:xml:ns:epp:maintenance-0.3}maint:info&quot;</span>)]</span>
     <span class="ident">Maintenance</span>(<span class="ident">maintenance::EPPMaintenanceInfo</span>),
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;{http://www.nominet.org.uk/epp/xml/nom-tag-1.0}tag:list&quot;</span>)]</span>
@@ -2026,6 +2072,8 @@
     <span class="ident">Contact</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="ident">contact::EPPContactCreate</span><span class="op">&gt;</span>),
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;{urn:ietf:params:xml:ns:domain-1.0}domain:create&quot;</span>)]</span>
     <span class="ident">Domain</span>(<span class="ident">domain::EPPDomainCreate</span>),
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;{http://www.nic.name/epp/emailFwd-1.0}emailFwd:create&quot;</span>)]</span>
+    <span class="ident">EmailForward</span>(<span class="ident">email_forward::EPPEmailForwardCreate</span>),
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>
@@ -2036,6 +2084,8 @@
     <span class="ident">Contact</span>(<span class="ident">contact::EPPContactCheck</span>),
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;{urn:ietf:params:xml:ns:domain-1.0}domain:delete&quot;</span>)]</span>
     <span class="ident">Domain</span>(<span class="ident">domain::EPPDomainCheck</span>),
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;{http://www.nic.name/epp/emailFwd-1.0}emailFwd:delete&quot;</span>)]</span>
+    <span class="ident">EmailForward</span>(<span class="ident">email_forward::EPPEmailForwardCheck</span>),
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>
@@ -2046,6 +2096,8 @@
     <span class="ident">Contact</span>(<span class="ident">contact::EPPContactUpdate</span>),
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;{urn:ietf:params:xml:ns:domain-1.0}domain:update&quot;</span>)]</span>
     <span class="ident">Domain</span>(<span class="ident">domain::EPPDomainUpdate</span>),
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;{http://www.nic.name/epp/emailFwd-1.0}emailFwd:update&quot;</span>)]</span>
+    <span class="ident">EmailForward</span>(<span class="ident">email_forward::EPPEmailForwardUpdate</span>),
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;{http://www.nominet.org.uk/epp/xml/std-handshake-1.0}handshake:accept&quot;</span>)]</span>
     <span class="ident">NominetHandshakeAccept</span>(<span class="ident">nominet::EPPHandshakeAccept</span>),
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;{http://www.nominet.org.uk/epp/xml/std-handshake-1.0}handshake:reject&quot;</span>)]</span>
@@ -2062,6 +2114,8 @@
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">EPPRenew</span> {
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;{urn:ietf:params:xml:ns:domain-1.0}domain:renew&quot;</span>)]</span>
     <span class="ident">Domain</span>(<span class="ident">domain::EPPDomainRenew</span>),
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;{http://www.nic.name/epp/emailFwd-1.0}emailFwd:renew&quot;</span>)]</span>
+    <span class="ident">EmailForward</span>(<span class="ident">email_forward::EPPEmailForwardRenew</span>),
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>
@@ -2096,6 +2150,10 @@
     <span class="ident">ContactQuery</span>(<span class="ident">contact::EPPContactCheck</span>),
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;{urn:ietf:params:xml:ns:contact-1.0}contact:transfer&quot;</span>)]</span>
     <span class="ident">ContactRequest</span>(<span class="ident">contact::EPPContactTransfer</span>),
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;{http://www.nic.name/epp/emailFwd-1.0}emailFwd:transfer&quot;</span>)]</span>
+    <span class="ident">EmailForwardQuery</span>(<span class="ident">email_forward::EPPEmailForwardCheck</span>),
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;{http://www.nic.name/epp/emailFwd-1.0}emailFwd:transfer&quot;</span>)]</span>
+    <span class="ident">EmailForwardRequest</span>(<span class="ident">email_forward::EPPEmailForwardTransfer</span>),
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>
