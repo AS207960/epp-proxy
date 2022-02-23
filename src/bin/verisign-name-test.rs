@@ -4,9 +4,10 @@ extern crate log;
 use futures::StreamExt;
 
 const ALPHABET: [char; 63] = [
-    '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-',
-    'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
-    'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
+    '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h',
+    'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A',
+    'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
+    'U', 'V', 'W', 'X', 'Y', 'Z',
 ];
 
 #[tokio::main]
@@ -14,7 +15,7 @@ async fn main() {
     pretty_env_logger::init();
     openssl::init();
 
-    let matches = clap::App::new("verisign-name-test")
+    let matches = clap::Command::new("verisign-name-test")
         .version(env!("CARGO_PKG_VERSION"))
         .about("Test runner for the Verisign .name EPP test")
         .author("Q of AS207960 <q@as207960.net>")
@@ -82,6 +83,7 @@ async fn main() {
 
     let test_2ld = format!("{}.name", nanoid::nanoid!(16, &ALPHABET));
     let test_3ld = format!("test.{}.name", nanoid::nanoid!(16, &ALPHABET));
+    let test_email = format!("test@{}", test_2ld);
     let out_of_zone_ns = format!("ns1.{}.com", nanoid::nanoid!(16, &ALPHABET));
     let contact_id = nanoid::nanoid!(16, &ALPHABET);
 
@@ -157,12 +159,9 @@ async fn main() {
     info!("Creating out of zone nameserver");
     info!(
         "{:#?}",
-        epp_proxy::client::host::create(
-            &out_of_zone_ns,
-            vec![], None, &mut cmd_tx
-        )
-        .await
-        .unwrap()
+        epp_proxy::client::host::create(&out_of_zone_ns, vec![], None, &mut cmd_tx)
+            .await
+            .unwrap()
     );
 
     // 2.1.2.6 Check 2LD
@@ -171,8 +170,8 @@ async fn main() {
     info!(
         "{:#?}",
         epp_proxy::client::domain::check(&test_2ld, None, None, &mut cmd_tx)
-        .await
-        .unwrap()
+            .await
+            .unwrap()
     );
 
     // 2.1.2.7 Create 2LD
@@ -188,16 +187,20 @@ async fn main() {
             }),
             auth_info: "test_auth1",
             registrant: &contact_id,
-            contacts: vec![epp_proxy::client::domain::InfoContact {
-                contact_type: "admin".to_string(),
-                contact_id: contact_id.clone()
-            }, epp_proxy::client::domain::InfoContact {
-                contact_type: "tech".to_string(),
-                contact_id: contact_id.clone()
-            }, epp_proxy::client::domain::InfoContact {
-                contact_type: "billing".to_string(),
-                contact_id: contact_id.clone()
-            }],
+            contacts: vec![
+                epp_proxy::client::domain::InfoContact {
+                    contact_type: "admin".to_string(),
+                    contact_id: contact_id.clone(),
+                },
+                epp_proxy::client::domain::InfoContact {
+                    contact_type: "tech".to_string(),
+                    contact_id: contact_id.clone(),
+                },
+                epp_proxy::client::domain::InfoContact {
+                    contact_type: "billing".to_string(),
+                    contact_id: contact_id.clone(),
+                },
+            ],
             donuts_fee_agreement: None,
             eurid_data: None,
             fee_agreement: None,
@@ -207,8 +210,8 @@ async fn main() {
         },
         &mut cmd_tx,
     )
-        .await
-        .unwrap();
+    .await
+    .unwrap();
     info!("{:#?}", domain_create_res);
 
     // 2.1.2.8 Add In zone nameserver
@@ -221,7 +224,9 @@ async fn main() {
             vec![epp_proxy::client::host::Address {
                 address: "1.1.1.1".to_string(),
                 ip_version: epp_proxy::client::host::AddressVersion::IPv4,
-            }], None, &mut cmd_tx
+            }],
+            None,
+            &mut cmd_tx
         )
         .await
         .unwrap()
@@ -232,11 +237,9 @@ async fn main() {
     info!("Deleting in zone nameserver");
     info!(
         "{:#?}",
-        epp_proxy::client::host::delete(
-            &format!("ns1.{}.name", &test_2ld), &mut cmd_tx
-        )
-        .await
-        .unwrap()
+        epp_proxy::client::host::delete(&format!("ns1.{}.name", &test_2ld), &mut cmd_tx)
+            .await
+            .unwrap()
     );
 
     // 2.1.2.10 Renew 2LD
@@ -254,8 +257,8 @@ async fn main() {
         None,
         &mut cmd_tx,
     )
-        .await
-        .unwrap();
+    .await
+    .unwrap();
     info!("{:#?}", renew_res);
 
     // 2.1.2.11 Update 2LD
@@ -316,8 +319,8 @@ async fn main() {
     info!(
         "{:#?}",
         epp_proxy::client::domain::check(&test_3ld, None, None, &mut cmd_tx)
-        .await
-        .unwrap()
+            .await
+            .unwrap()
     );
 
     // 2.1.2.15 Create 3LD
@@ -333,16 +336,20 @@ async fn main() {
             }),
             auth_info: "test_auth1",
             registrant: &contact_id,
-            contacts: vec![epp_proxy::client::domain::InfoContact {
-                contact_type: "admin".to_string(),
-                contact_id: contact_id.clone()
-            }, epp_proxy::client::domain::InfoContact {
-                contact_type: "tech".to_string(),
-                contact_id: contact_id.clone()
-            }, epp_proxy::client::domain::InfoContact {
-                contact_type: "billing".to_string(),
-                contact_id: contact_id.clone()
-            }],
+            contacts: vec![
+                epp_proxy::client::domain::InfoContact {
+                    contact_type: "admin".to_string(),
+                    contact_id: contact_id.clone(),
+                },
+                epp_proxy::client::domain::InfoContact {
+                    contact_type: "tech".to_string(),
+                    contact_id: contact_id.clone(),
+                },
+                epp_proxy::client::domain::InfoContact {
+                    contact_type: "billing".to_string(),
+                    contact_id: contact_id.clone(),
+                },
+            ],
             donuts_fee_agreement: None,
             eurid_data: None,
             fee_agreement: None,
@@ -352,8 +359,8 @@ async fn main() {
         },
         &mut cmd_tx,
     )
-        .await
-        .unwrap();
+    .await
+    .unwrap();
     info!("{:#?}", domain_create_res);
 
     // 2.1.2.16 Add In zone nameserver
@@ -366,7 +373,9 @@ async fn main() {
             vec![epp_proxy::client::host::Address {
                 address: "1.1.1.1".to_string(),
                 ip_version: epp_proxy::client::host::AddressVersion::IPv4,
-            }], None, &mut cmd_tx
+            }],
+            None,
+            &mut cmd_tx
         )
         .await
         .unwrap()
@@ -377,11 +386,9 @@ async fn main() {
     info!("Deleting in zone nameserver");
     info!(
         "{:#?}",
-        epp_proxy::client::host::delete(
-            &format!("ns1.{}.name", &test_3ld), &mut cmd_tx
-        )
-        .await
-        .unwrap()
+        epp_proxy::client::host::delete(&format!("ns1.{}.name", &test_3ld), &mut cmd_tx)
+            .await
+            .unwrap()
     );
 
     // 2.1.2.18 Renew 3LD
@@ -399,8 +406,8 @@ async fn main() {
         None,
         &mut cmd_tx,
     )
-        .await
-        .unwrap();
+    .await
+    .unwrap();
     info!("{:#?}", renew_res);
 
     // 2.1.2.19 Update 3LD
@@ -451,6 +458,68 @@ async fn main() {
     info!(
         "{:#?}",
         epp_proxy::client::domain::delete(&test_3ld, None, None, None, &mut cmd_tx)
+            .await
+            .unwrap()
+    );
+
+    // 2.1.2.22 Add email forwarding
+    info!("======");
+    info!("Creating email forwarding");
+    let email_create_res = epp_proxy::client::email_forward::create(
+        epp_proxy::client::email_forward::CreateInfo {
+            email: &test_email,
+            period: Some(epp_proxy::client::Period {
+                unit: epp_proxy::client::PeriodUnit::Years,
+                value: 2,
+            }),
+            auth_info: "test_auth1",
+            registrant: &contact_id,
+            forward_to: "abc@def.com",
+            contacts: vec![
+                epp_proxy::client::domain::InfoContact {
+                    contact_type: "admin".to_string(),
+                    contact_id: contact_id.clone(),
+                },
+                epp_proxy::client::domain::InfoContact {
+                    contact_type: "tech".to_string(),
+                    contact_id: contact_id.clone(),
+                },
+                epp_proxy::client::domain::InfoContact {
+                    contact_type: "billing".to_string(),
+                    contact_id: contact_id.clone(),
+                },
+            ],
+            fee_agreement: None,
+        },
+        &mut cmd_tx,
+    )
+    .await
+    .unwrap();
+    info!("{:#?}", email_create_res);
+
+    // 2.1.2.23 Renew email forwarding
+    info!("======");
+    info!("Renewing email forwarding");
+    let renew_res = epp_proxy::client::email_forward::renew(
+        &test_email,
+        Some(epp_proxy::client::Period {
+            unit: epp_proxy::client::PeriodUnit::Years,
+            value: 2,
+        }),
+        email_create_res.response.data.expiration_date.unwrap(),
+        None,
+        &mut cmd_tx,
+    )
+    .await
+    .unwrap();
+    info!("{:#?}", renew_res);
+
+    // 2.1.2.24 Delete email forwarding
+    info!("======");
+    info!("Deleting email forwarding");
+    info!(
+        "{:#?}",
+        epp_proxy::client::email_forward::delete(&test_email, &mut cmd_tx)
             .await
             .unwrap()
     );

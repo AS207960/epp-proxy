@@ -10,6 +10,7 @@ use futures::SinkExt;
 pub mod balance;
 pub mod contact;
 pub mod domain;
+pub mod email_forward;
 pub mod eurid;
 pub mod fee;
 pub mod host;
@@ -153,6 +154,8 @@ pub struct ServerFeatures {
     isnic_list_supported: bool,
     /// urn:is.isnic:xml:ns:is-ext-account-1.0 support
     isnic_account_supported: bool,
+    /// http://www.nic.name/epp/emailFwd-1.0 support
+    email_forward_supported: bool,
 }
 
 impl ServerFeatures {

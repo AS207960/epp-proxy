@@ -267,6 +267,17 @@ router!(
     DomainTransferAccept;
     DomainTransferReject;
     VerisignSync;
+    EmailForwardCheck;
+    EmailForwardInfo;
+    EmailForwardCreate;
+    EmailForwardDelete;
+    EmailForwardUpdate;
+    EmailForwardRenew;
+    EmailForwardTransferQuery;
+    EmailForwardTransferRequest;
+    EmailForwardTransferCancel;
+    EmailForwardTransferAccept;
+    EmailForwardTransferReject;
     RestoreRequest;
     HostCheck;
     HostInfo;

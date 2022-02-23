@@ -15,6 +15,7 @@ pub mod balance;
 pub mod contact;
 pub mod dac;
 pub mod domain;
+pub mod email_forward;
 pub mod eurid;
 pub mod fee;
 pub mod host;

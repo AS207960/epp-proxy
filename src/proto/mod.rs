@@ -9,6 +9,7 @@ pub mod change_poll;
 pub mod contact;
 pub mod corenic;
 pub mod domain;
+pub mod email_forward;
 pub mod eurid;
 pub mod fee;
 pub mod host;
@@ -27,7 +28,6 @@ pub mod tmch;
 pub mod traficom;
 pub mod united_tld;
 pub mod verisign;
-pub mod email_forward;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub enum EPPMessageType {
@@ -561,6 +561,18 @@ pub enum EPPResultDataValue {
     EPPDomainRenewResult(domain::EPPDomainRenewData),
     #[serde(rename = "{urn:ietf:params:xml:ns:domain-1.0}panData")]
     EPPDomainPendingActionNotification(domain::EPPDomainPanData),
+    #[serde(rename = "{http://www.nic.name/epp/emailFwd-1.0}chkData")]
+    EPPEmailForwardCheckResult(email_forward::EPPEmailForwardCheckData),
+    #[serde(rename = "{http://www.nic.name/epp/emailFwd-1.0}infData")]
+    EPPEmailForwardInfoResult(Box<email_forward::EPPEmailForwardInfoData>),
+    #[serde(rename = "{http://www.nic.name/epp/emailFwd-1.0}trnData")]
+    EPPEmailForwardTransferResult(email_forward::EPPEmailForwardTransferData),
+    #[serde(rename = "{http://www.nic.name/epp/emailFwd-1.0}creData")]
+    EPPEmailForwardCreateResult(email_forward::EPPEmailForwardCreateData),
+    #[serde(rename = "{http://www.nic.name/epp/emailFwd-1.0}renData")]
+    EPPEmailForwardRenewResult(email_forward::EPPEmailForwardRenewData),
+    #[serde(rename = "{http://www.nic.name/epp/emailFwd-1.0}panData")]
+    EPPEmailForwardPendingActionNotification(email_forward::EPPEmailForwardPanData),
     #[serde(rename = "{urn:ietf:params:xml:ns:host-1.0}chkData")]
     EPPHostCheckResult(host::EPPHostCheckData),
     #[serde(rename = "{urn:ietf:params:xml:ns:host-1.0}infData")]
@@ -577,16 +589,6 @@ pub enum EPPResultDataValue {
     EPPContactCreateResult(contact::EPPContactCreateData),
     #[serde(rename = "{urn:ietf:params:xml:ns:contact-1.0}panData")]
     EPPContactPendingActionNotification(contact::EPPContactPanData),
-    #[serde(rename = "{http://www.nic.name/epp/emailFwd-1.0}chkData")]
-    EPPEmailForwardCheckResult(email_forward::EPPEmailForwardCheckData),
-    #[serde(rename = "{http://www.nic.name/epp/emailFwd-1.0}infData")]
-    EPPEmailForwardInfoResult(Box<email_forward::EPPEmailForwardInfoData>),
-    #[serde(rename = "{http://www.nic.name/epp/emailFwd-1.0}trnData")]
-    EPPEmailForwardTransferResult(email_forward::EPPEmailForwardTransferData),
-    #[serde(rename = "{http://www.nic.name/epp/emailFwd-1.0}creData")]
-    EPPEmailForwardCreateResult(email_forward::EPPEmailForwardCreateData),
-    #[serde(rename = "{http://www.nic.name/epp/emailFwd-1.0}panData")]
-    EPPEmailForwardPendingActionNotification(email_forward::EPPEmailForwardPanData),
     #[serde(rename = "{urn:ietf:params:xml:ns:obj-1.0}trnData")]
     TraficomTrnData(traficom::EPPObjTrnData),
     #[serde(rename = "{urn:ietf:params:xml:ns:epp:maintenance-0.3}infData")]
