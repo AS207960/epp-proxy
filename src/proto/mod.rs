@@ -27,6 +27,7 @@ pub mod tmch;
 pub mod traficom;
 pub mod united_tld;
 pub mod verisign;
+pub mod email_forward;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub enum EPPMessageType {
@@ -576,6 +577,16 @@ pub enum EPPResultDataValue {
     EPPContactCreateResult(contact::EPPContactCreateData),
     #[serde(rename = "{urn:ietf:params:xml:ns:contact-1.0}panData")]
     EPPContactPendingActionNotification(contact::EPPContactPanData),
+    #[serde(rename = "{http://www.nic.name/epp/emailFwd-1.0}chkData")]
+    EPPEmailForwardCheckResult(email_forward::EPPEmailForwardCheckData),
+    #[serde(rename = "{http://www.nic.name/epp/emailFwd-1.0}infData")]
+    EPPEmailForwardInfoResult(Box<email_forward::EPPEmailForwardInfoData>),
+    #[serde(rename = "{http://www.nic.name/epp/emailFwd-1.0}trnData")]
+    EPPEmailForwardTransferResult(email_forward::EPPEmailForwardTransferData),
+    #[serde(rename = "{http://www.nic.name/epp/emailFwd-1.0}creData")]
+    EPPEmailForwardCreateResult(email_forward::EPPEmailForwardCreateData),
+    #[serde(rename = "{http://www.nic.name/epp/emailFwd-1.0}panData")]
+    EPPEmailForwardPendingActionNotification(email_forward::EPPEmailForwardPanData),
     #[serde(rename = "{urn:ietf:params:xml:ns:obj-1.0}trnData")]
     TraficomTrnData(traficom::EPPObjTrnData),
     #[serde(rename = "{urn:ietf:params:xml:ns:epp:maintenance-0.3}infData")]
@@ -830,6 +841,8 @@ pub enum EPPCheck {
     Host(host::EPPHostCheck),
     #[serde(rename = "{urn:ietf:params:xml:ns:contact-1.0}contact:check")]
     Contact(contact::EPPContactCheck),
+    #[serde(rename = "{http://www.nic.name/epp/emailFwd-1.0}emailFwd:check")]
+    EmailForward(email_forward::EPPEmailForwardCheck),
 }
 
 #[derive(Debug, Serialize)]
@@ -840,6 +853,8 @@ pub enum EPPInfo {
     Host(host::EPPHostCheck),
     #[serde(rename = "{urn:ietf:params:xml:ns:contact-1.0}contact:info")]
     Contact(contact::EPPContactCheck),
+    #[serde(rename = "{http://www.nic.name/epp/emailFwd-1.0}emailFwd:info")]
+    EmailForward(email_forward::EPPEmailForwardCheck),
     #[serde(rename = "{urn:ietf:params:xml:ns:epp:maintenance-0.3}maint:info")]
     Maintenance(maintenance::EPPMaintenanceInfo),
     #[serde(rename = "{http://www.nominet.org.uk/epp/xml/nom-tag-1.0}tag:list")]
@@ -874,6 +889,8 @@ pub enum EPPCreate {
     Contact(Box<contact::EPPContactCreate>),
     #[serde(rename = "{urn:ietf:params:xml:ns:domain-1.0}domain:create")]
     Domain(domain::EPPDomainCreate),
+    #[serde(rename = "{http://www.nic.name/epp/emailFwd-1.0}emailFwd:create")]
+    EmailForward(email_forward::EPPEmailForwardCreate),
 }
 
 #[derive(Debug, Serialize)]
@@ -884,6 +901,8 @@ pub enum EPPDelete {
     Contact(contact::EPPContactCheck),
     #[serde(rename = "{urn:ietf:params:xml:ns:domain-1.0}domain:delete")]
     Domain(domain::EPPDomainCheck),
+    #[serde(rename = "{http://www.nic.name/epp/emailFwd-1.0}emailFwd:delete")]
+    EmailForward(email_forward::EPPEmailForwardCheck),
 }
 
 #[derive(Debug, Serialize)]
@@ -894,6 +913,8 @@ pub enum EPPUpdate {
     Contact(contact::EPPContactUpdate),
     #[serde(rename = "{urn:ietf:params:xml:ns:domain-1.0}domain:update")]
     Domain(domain::EPPDomainUpdate),
+    #[serde(rename = "{http://www.nic.name/epp/emailFwd-1.0}emailFwd:update")]
+    EmailForward(email_forward::EPPEmailForwardUpdate),
     #[serde(rename = "{http://www.nominet.org.uk/epp/xml/std-handshake-1.0}handshake:accept")]
     NominetHandshakeAccept(nominet::EPPHandshakeAccept),
     #[serde(rename = "{http://www.nominet.org.uk/epp/xml/std-handshake-1.0}handshake:reject")]
@@ -910,6 +931,8 @@ pub enum EPPUpdate {
 pub enum EPPRenew {
     #[serde(rename = "{urn:ietf:params:xml:ns:domain-1.0}domain:renew")]
     Domain(domain::EPPDomainRenew),
+    #[serde(rename = "{http://www.nic.name/epp/emailFwd-1.0}emailFwd:renew")]
+    EmailForward(email_forward::EPPEmailForwardRenew),
 }
 
 #[derive(Debug, Serialize)]
@@ -944,6 +967,10 @@ pub enum EPPTransferCommand {
     ContactQuery(contact::EPPContactCheck),
     #[serde(rename = "{urn:ietf:params:xml:ns:contact-1.0}contact:transfer")]
     ContactRequest(contact::EPPContactTransfer),
+    #[serde(rename = "{http://www.nic.name/epp/emailFwd-1.0}emailFwd:transfer")]
+    EmailForwardQuery(email_forward::EPPEmailForwardCheck),
+    #[serde(rename = "{http://www.nic.name/epp/emailFwd-1.0}emailFwd:transfer")]
+    EmailForwardRequest(email_forward::EPPEmailForwardTransfer),
 }
 
 #[derive(Debug, Serialize)]

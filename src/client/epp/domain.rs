@@ -642,11 +642,11 @@ pub(crate) fn check_domain<T>(id: &str) -> Result<(), Response<T>> {
 }
 
 pub(crate) fn check_pass<T>(id: &str) -> Result<(), Response<T>> {
-    if let 6..=16 = id.len() {
+    if let 6..=32 = id.len() {
         Ok(())
     } else {
         Err(Err(Error::Err(
-            "passwords have a min length of 6 and a max length of 16".to_string(),
+            "passwords have a min length of 6 and a max length of 32".to_string(),
         )))
     }
 }
