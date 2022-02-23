@@ -8,7 +8,7 @@ async fn main() {
     pretty_env_logger::init();
     openssl::init();
 
-    let matches = clap::App::new("google-test")
+    let matches = clap::Command::new("google-test")
         .version(env!("CARGO_PKG_VERSION"))
         .about("Test runner for the Google EPP test")
         .author("Q of AS207960 <q@as207960.net>")
@@ -544,7 +544,8 @@ async fn main() {
         .fee_check
         .unwrap()
         .commands
-        .into_iter().find(|c| c.command == epp_proxy::client::fee::Command::Create)
+        .into_iter()
+        .find(|c| c.command == epp_proxy::client::fee::Command::Create)
         .unwrap();
 
     // 2.5.3 - Create a domain with the domain name “rich.<registrar name>‑ga” with all fields populated

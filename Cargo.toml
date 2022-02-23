@@ -30,7 +30,6 @@ prost-types = "0.9"
 clap = "3"
 base64 = "0.13"
 xml_serde = "1"
-#xml_serde = { path = "../xml_serde" }
 rust-keycloak = { git = "https://github.com/TheEnbyperor/rust-keycloak", rev = "31dc156acbf3048d9ff765f3cd6d32be6ae9b18a" }
 dotenv = "0.15.0"
 tower-service = "0.3"
@@ -67,5 +66,3 @@ strip = true
 opt-level = "z"
 lto = true
 panic = "abort"
-
-

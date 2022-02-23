@@ -1,1 +1,1 @@
-initSidebarItems({"fn":[["make_tcp_socket",""],["recv_length_msg","Attempts to read a message where the first two bytes give length."],["recv_msg",""],["send_msg",""],["write_msg_log",""]],"mod":[["tls_client",""]],"struct":[["ClientReceiver","Tokio task that attemps to read in messages and push them onto a tokio channel as received."]]});
+initSidebarItems({});

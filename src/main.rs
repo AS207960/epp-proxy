@@ -57,7 +57,7 @@ async fn main() {
     //    sentry::init("https://786e367376234c2b9bee2bb1984c2e84@o222429.ingest.sentry.io/5247736");
     openssl::init();
 
-    let matches = clap::App::new("epp-proxy")
+    let matches = clap::Command::new("epp-proxy")
         .version(env!("CARGO_PKG_VERSION"))
         .about("gRPC to EPP proxy")
         .author("Q of AS207960 <q@as207960.net>")

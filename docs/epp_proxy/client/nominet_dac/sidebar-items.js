@@ -1,1 +1,1 @@
-initSidebarItems({"mod":[["proto",""],["recv",""],["router",""]],"struct":[["DACClient",""]]});
+initSidebarItems({"struct":[["DACClient",""]]});

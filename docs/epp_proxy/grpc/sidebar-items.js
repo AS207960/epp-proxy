@@ -1,1 +1,1 @@
-initSidebarItems({"fn":[["client_by_domain_or_id",""],["client_by_id",""]],"mod":[["contact",""],["dac",""],["domain",""],["epp_proto",""],["eurid",""],["fee",""],["host",""],["isnic",""],["launch",""],["maintenance",""],["mark",""],["nominet",""],["rgp",""],["tmch",""],["utils",""]],"struct":[["EPPProxy",""]]});
+initSidebarItems({"mod":[["epp_proto",""]],"struct":[["EPPProxy",""]]});
