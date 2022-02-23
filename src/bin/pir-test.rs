@@ -9,7 +9,7 @@ async fn main() {
     pretty_env_logger::init();
     openssl::init();
 
-    let matches = clap::App::new("google-test")
+    let matches = clap::Command::new("google-test")
         .version(env!("CARGO_PKG_VERSION"))
         .about("Test runner for the PIR EPP test")
         .author("Q of AS207960 <q@as207960.net>")
