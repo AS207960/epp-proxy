@@ -15,7 +15,7 @@ log = "0.4"
 pretty_env_logger = "0.4"
 libc = "0.2"
 openssl = { version = "0.10", features = [] }
-openssl-sys = { version = "=0.9.65", features = [] }
+openssl-sys = { version = "=0.9.63", features = [] }
 tokio-openssl = "0.6"
 quick-xml = { version = "0.22", features = ["serialize"]}
 serde = "1.0"
