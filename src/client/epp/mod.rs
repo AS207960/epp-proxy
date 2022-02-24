@@ -24,6 +24,7 @@ pub mod rgp;
 pub mod router;
 pub mod traficom;
 pub mod verisign;
+pub mod personal_registration;
 
 use crate::proto::EPPServiceExtension;
 
@@ -156,6 +157,8 @@ pub struct ServerFeatures {
     isnic_account_supported: bool,
     /// http://www.nic.name/epp/emailFwd-1.0 support
     email_forward_supported: bool,
+    /// http://www.nic.name/epp/persReg-1.0 support
+    personal_registration_supported: bool
 }
 
 impl ServerFeatures {
@@ -923,6 +926,12 @@ impl EPPClient {
         self.features.isnic_list_supported = greeting
             .service_menu
             .supports("urn:is.isnic:xml:ns:is-ext-list-1.0");
+        self.features.email_forward_supported = greeting
+            .service_menu
+            .supports("http://www.nic.name/epp/emailFwd-1.0");
+        self.features.personal_registration_supported = greeting
+            .service_menu
+            .supports_ext("http://www.nic.name/epp/persReg-1.0");
 
         if !(self.features.contact_supported
             | self.features.domain_supported
@@ -1084,6 +1093,12 @@ impl EPPClient {
             }
             if self.features.isnic_list_supported {
                 objects.push("urn:is.isnic:xml:ns:is-ext-list-1.0".to_string())
+            }
+            if self.features.email_forward_supported {
+                objects.push("http://www.nic.name/epp/emailFwd-1.0".to_string())
+            }
+            if self.features.personal_registration_supported {
+                ext_objects.push("http://www.nic.name/epp/persReg-1.0".to_string())
             }
             if self.features.nominet_tag_list {
                 let new_client = Self {

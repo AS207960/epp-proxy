@@ -108,6 +108,7 @@ pub struct InfoResponse {
     pub isnic_info: Option<super::isnic::DomainInfo>,
     pub eurid_data: Option<super::eurid::DomainInfo>,
     pub eurid_idn: Option<super::eurid::Idn>,
+    pub personal_registration: Option<super::personal_registration::PersonalRegistrationInfo>
 }
 
 /// Additional contact associated with a domain
@@ -176,6 +177,7 @@ pub struct CreateRequest {
     pub(super) donuts_fee_agreement: Option<fee::DonutsFeeData>,
     pub(super) eurid_data: Option<super::eurid::DomainCreate>,
     pub(super) isnic_payment: Option<super::isnic::PaymentInfo>,
+    pub(super) personal_registration: Option<super::personal_registration::PersonalRegistrationInfo>,
     pub return_path: Sender<CreateResponse>,
 }
 
@@ -199,6 +201,7 @@ pub struct CreateData {
     /// When will the domain expire
     pub expiration_date: Option<DateTime<Utc>>,
     pub eurid_idn: Option<super::eurid::Idn>,
+    pub personal_registration: Option<super::personal_registration::PersonalRegistrationCreate>,
 }
 
 #[derive(Debug)]
@@ -300,6 +303,7 @@ pub struct RenewData {
     pub new_expiry_date: Option<DateTime<Utc>>,
     pub eurid_idn: Option<super::eurid::Idn>,
     pub eurid_data: Option<super::eurid::DomainRenewInfo>,
+    pub personal_registration: Option<super::personal_registration::PersonalRegistrationCreate>
 }
 
 #[derive(Debug)]
@@ -353,6 +357,7 @@ pub struct TransferData {
     pub expiry_date: Option<DateTime<Utc>>,
     pub eurid_idn: Option<super::eurid::Idn>,
     pub eurid_data: Option<super::eurid::DomainTransferInfo>,
+    pub personal_registration: Option<super::personal_registration::PersonalRegistrationCreate>
 }
 
 #[derive(Debug, PartialEq, Eq)]
@@ -498,6 +503,7 @@ pub struct CreateInfo<'a> {
     pub donuts_fee_agreement: Option<fee::DonutsFeeData>,
     pub eurid_data: Option<super::eurid::DomainCreate>,
     pub isnic_payment: Option<super::isnic::PaymentInfo>,
+    pub personal_registration: Option<super::personal_registration::PersonalRegistrationInfo>
 }
 
 /// Registers a new domain
@@ -530,6 +536,7 @@ pub async fn create(
             donuts_fee_agreement: info.donuts_fee_agreement,
             eurid_data: info.eurid_data,
             isnic_payment: info.isnic_payment,
+            personal_registration: info.personal_registration,
             return_path: sender,
         })),
         receiver,

@@ -28,6 +28,7 @@ pub mod tmch;
 pub mod traficom;
 pub mod united_tld;
 pub mod verisign;
+pub mod personal_registration;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub enum EPPMessageType {
@@ -220,6 +221,8 @@ pub enum EPPCommandExtensionType {
     ISNICHostCreate(isnic::HostCreateUpdate),
     #[serde(rename = "{urn:is.isnic:xml:ns:is-ext-host-1.0}is-host:update")]
     ISNICHostUpdate(isnic::HostCreateUpdate),
+    #[serde(rename = "{http://www.nic.name/epp/persReg-1.0}persReg:create")]
+    PersonalRegistrationCreate(personal_registration::PersonalRegistrationCreate),
 }
 
 #[derive(Debug, Serialize)]
@@ -833,6 +836,14 @@ pub enum EPPResponseExtensionType {
     ISNICDomainInfo(isnic::DomainInfo),
     #[serde(rename = "{urn:is.isnic:xml:ns:is-ext-contact-1.0}infData")]
     ISNICContactInfo(isnic::ContactInfo),
+    #[serde(rename = "{http://www.nic.name/epp/persReg-1.0}creData")]
+    PersonalRegistrationCreateData(personal_registration::PersonalRegistrationCreateData),
+    #[serde(rename = "{http://www.nic.name/epp/persReg-1.0}renData")]
+    PersonalRegistrationRenewData(personal_registration::PersonalRegistrationCreateData),
+    #[serde(rename = "{http://www.nic.name/epp/persReg-1.0}trnData")]
+    PersonalRegistrationTransferData(personal_registration::PersonalRegistrationCreateData),
+    #[serde(rename = "{http://www.nic.name/epp/persReg-1.0}infData")]
+    PersonalRegistrationInfoData(personal_registration::PersonalRegistrationInfoData),
 }
 
 #[derive(Debug, Serialize)]

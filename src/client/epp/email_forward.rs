@@ -50,6 +50,17 @@ impl
             None => None,
         };
 
+        let personal_registration = match extension {
+            Some(ext) => {
+                let i = ext.value.iter().find_map(|p| match p {
+                    proto::EPPResponseExtensionType::PersonalRegistrationInfoData(i) => Some(i),
+                    _ => None,
+                });
+                i.map(Into::into)
+            }
+            None => None,
+        };
+
         Ok(InfoResponse {
             name: email_forward_info.name,
             registry_id: email_forward_info.registry_id,
@@ -82,6 +93,7 @@ impl
             },
             rgp_state,
             whois_info,
+            personal_registration,
         })
     }
 }
@@ -146,6 +158,17 @@ impl
             None => None,
         };
 
+        let personal_registration = match extension {
+            Some(ext) => {
+                let i = ext.value.iter().find_map(|p| match p {
+                    proto::EPPResponseExtensionType::PersonalRegistrationTransferData(i) => Some(i),
+                    _ => None,
+                });
+                i.map(Into::into)
+            }
+            None => None,
+        };
+
         Ok(TransferResponse {
             pending: false,
             data: TransferData {
@@ -156,6 +179,7 @@ impl
                 act_client_id: email_forward_transfer.act_client_id.clone(),
                 act_date: email_forward_transfer.act_date,
                 expiry_date: email_forward_transfer.expiry_date,
+                personal_registration,
             },
             fee_data,
         })
@@ -222,6 +246,17 @@ impl
             None => None,
         };
 
+        let personal_registration = match extension {
+            Some(ext) => {
+                let i = ext.value.iter().find_map(|p| match p {
+                    proto::EPPResponseExtensionType::PersonalRegistrationCreateData(i) => Some(i),
+                    _ => None,
+                });
+                i.map(Into::into)
+            }
+            None => None,
+        };
+
         match email_forward_create {
             Some(email_forward_create) => Ok(CreateResponse {
                 pending: false,
@@ -229,6 +264,7 @@ impl
                     name: email_forward_create.name.clone(),
                     creation_date: Some(email_forward_create.creation_date),
                     expiration_date: email_forward_create.expiry_date,
+                    personal_registration,
                 },
                 fee_data,
             }),
@@ -238,6 +274,7 @@ impl
                     name: "".to_string(),
                     creation_date: None,
                     expiration_date: None,
+                    personal_registration,
                 },
                 fee_data,
             }),
@@ -305,11 +342,23 @@ impl
             None => None,
         };
 
+        let personal_registration = match extension {
+            Some(ext) => {
+                let i = ext.value.iter().find_map(|p| match p {
+                    proto::EPPResponseExtensionType::PersonalRegistrationRenewData(i) => Some(i),
+                    _ => None,
+                });
+                i.map(Into::into)
+            }
+            None => None,
+        };
+
         Ok(RenewResponse {
             pending: false,
             data: RenewData {
                 name: email_forward_renew.name.to_owned(),
                 new_expiry_date: email_forward_renew.expiry_date,
+                personal_registration,
             },
             fee_data,
         })
@@ -743,6 +792,16 @@ pub fn handle_create(
             exts.push(proto::EPPCommandExtensionType::EPPFee011Create(
                 fee_agreement.into(),
             ));
+        } else {
+            return Err(Err(Error::Unsupported));
+        }
+    }
+
+    if let Some(personal_registration_data) = &req.personal_registration {
+        if client.personal_registration_supported {
+            exts.push(proto::EPPCommandExtensionType::PersonalRegistrationCreate(
+                personal_registration_data.into(),
+            ))
         } else {
             return Err(Err(Error::Unsupported));
         }

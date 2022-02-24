@@ -10,6 +10,7 @@ import "eurid.proto";
 import "launch.proto";
 import "domain_common.proto";
 import "isnic.proto";
+import "personal_registration.proto";
 
 message Contact {
     string id = 1;
@@ -108,6 +109,7 @@ message DomainInfoReply {
     eurid.IDN eurid_idn = 23;
     eurid.DomainInfo eurid_data = 24;
     isnic.DomainInfo isnic_info = 25;
+    personal_registration.PersonalRegistrationInfo personal_registration = 26;
 }
 
 message DomainCreateRequest {
@@ -124,6 +126,7 @@ message DomainCreateRequest {
     fee.FeeAgreement fee_agreement = 11;
     eurid.DomainCreateExtension eurid_data = 12;
     isnic.PaymentInfo isnic_payment = 13;
+    personal_registration.PersonalRegistrationInfo personal_registration = 14;
 }
 
 message DomainCreateReply {
@@ -138,6 +141,7 @@ message DomainCreateReply {
     string registry_name = 5;
     common.CommandResponse cmd_resp = 10;
     eurid.IDN eurid_idn = 11;
+    personal_registration.PersonalRegistrationCreate personal_registration = 12;
 }
 
 message DomainDeleteRequest {
@@ -217,6 +221,7 @@ message DomainRenewReply {
     common.CommandResponse cmd_resp = 8;
     eurid.IDN eurid_idn = 9;
     eurid.DomainRenewInfo eurid_data = 10;
+    personal_registration.PersonalRegistrationCreate personal_registration = 11;
 }
 
 message DomainTransferQueryRequest {
@@ -257,6 +262,7 @@ message DomainTransferReply {
     common.CommandResponse cmd_resp = 13;
     eurid.IDN eurid_idn = 14;
     eurid.DomainTransferInfo eurid_data = 15;
+    personal_registration.PersonalRegistrationCreate personal_registration = 16;
 }
 
 message SecDNSData {

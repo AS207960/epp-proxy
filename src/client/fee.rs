@@ -10,7 +10,7 @@ pub struct FeeAgreement {
     pub fees: Vec<Fee>,
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Copy, Clone)]
 pub enum Command {
     Create,
     Renew,
@@ -92,19 +92,19 @@ pub struct DonutsFeeSet {
     pub category: DonutsCategory,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct DonutsCategory {
     pub category: String,
     pub name: Option<String>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct DonutsFeeType {
     pub fee_type: DonutsFeeTypes,
     pub name: Option<String>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 pub enum DonutsFeeTypes {
     Fee,
     Price,

@@ -247,6 +247,17 @@ impl
             None => None,
         };
 
+        let personal_registration = match extension {
+            Some(ext) => {
+                let i = ext.value.iter().find_map(|p| match p {
+                    proto::EPPResponseExtensionType::PersonalRegistrationInfoData(i) => Some(i),
+                    _ => None,
+                });
+                i.map(Into::into)
+            }
+            None => None,
+        };
+
         Ok(InfoResponse {
             eurid_idn: super::eurid::extract_eurid_idn_singular(extension, domain_info.name.as_str())?,
             name: domain_info.name,
@@ -319,6 +330,7 @@ impl
             whois_info,
             isnic_info,
             eurid_data: super::eurid::extract_eurid_domain_info(extension),
+            personal_registration,
         })
     }
 }
@@ -395,6 +407,17 @@ impl
             None => None,
         };
 
+        let personal_registration = match extension {
+            Some(ext) => {
+                let i = ext.value.iter().find_map(|p| match p {
+                    proto::EPPResponseExtensionType::PersonalRegistrationTransferData(i) => Some(i),
+                    _ => None,
+                });
+                i.map(Into::into)
+            }
+            None => None,
+        };
+
         Ok(TransferResponse {
             pending: false,
             data: TransferData {
@@ -407,6 +430,7 @@ impl
                 expiry_date: domain_transfer.expiry_date,
                 eurid_data: super::eurid::extract_eurid_domain_transfer_info(extension),
                 eurid_idn: super::eurid::extract_eurid_idn_singular(extension, None)?,
+                personal_registration,
             },
             fee_data,
             donuts_fee_data,
@@ -498,6 +522,17 @@ impl
             None => None,
         };
 
+        let personal_registration = match extension {
+            Some(ext) => {
+                let i = ext.value.iter().find_map(|p| match p {
+                    proto::EPPResponseExtensionType::PersonalRegistrationCreateData(i) => Some(i),
+                    _ => None,
+                });
+                i.map(Into::into)
+            }
+            None => None,
+        };
+
         match domain_create {
             Some(domain_create) => Ok(CreateResponse {
                 pending: false,
@@ -509,6 +544,7 @@ impl
                     name: domain_create.name.clone(),
                     creation_date: Some(domain_create.creation_date),
                     expiration_date: domain_create.expiry_date,
+                    personal_registration,
                 },
                 fee_data,
                 donuts_fee_data,
@@ -521,6 +557,7 @@ impl
                     name: "".to_string(),
                     creation_date: None,
                     expiration_date: None,
+                    personal_registration,
                 },
                 fee_data,
                 donuts_fee_data,
@@ -602,6 +639,17 @@ impl
             None => None,
         };
 
+        let personal_registration = match extension {
+            Some(ext) => {
+                let i = ext.value.iter().find_map(|p| match p {
+                    proto::EPPResponseExtensionType::PersonalRegistrationRenewData(i) => Some(i),
+                    _ => None,
+                });
+                i.map(Into::into)
+            }
+            None => None,
+        };
+
         Ok(RenewResponse {
             pending: false,
             data: RenewData {
@@ -612,6 +660,7 @@ impl
                 name: domain_renew.name.to_owned(),
                 new_expiry_date: domain_renew.expiry_date,
                 eurid_data: super::eurid::extract_eurid_domain_renew_info(extension),
+                personal_registration,
             },
             fee_data,
             donuts_fee_data,
@@ -642,11 +691,11 @@ pub(crate) fn check_domain<T>(id: &str) -> Result<(), Response<T>> {
 }
 
 pub(crate) fn check_pass<T>(id: &str) -> Result<(), Response<T>> {
-    if let 6..=32 = id.len() {
+    if id.len() > 6 {
         Ok(())
     } else {
         Err(Err(Error::Err(
-            "passwords have a min length of 6 and a max length of 32".to_string(),
+            "passwords have a min length of 6".to_string(),
         )))
     }
 }
@@ -1298,6 +1347,16 @@ pub fn handle_create(
                     "payment extension required for ISNIC".to_string(),
                 )));
             }
+        }
+    }
+
+    if let Some(personal_registration_data) = &req.personal_registration {
+        if client.personal_registration_supported {
+            exts.push(proto::EPPCommandExtensionType::PersonalRegistrationCreate(
+                personal_registration_data.into(),
+            ))
+        } else {
+            return Err(Err(Error::Unsupported));
         }
     }
 

@@ -33,7 +33,7 @@ pub struct EPPLaunchCheckData {
 pub struct EPPLaunchCheckDatum {
     #[serde(rename = "{urn:ietf:params:xml:ns:launch-1.0}name")]
     pub name: EPPLaunchCheckName,
-    #[serde(rename = "{urn:ietf:params:xml:ns:launch-1.0}claimKey")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:launch-1.0}claimKey", default)]
     pub claim_key: Vec<EPPLaunchClaimKey>,
 }
 

@@ -1,0 +1,10 @@
+syntax = "proto3";
+package epp.personal_registration;
+
+message PersonalRegistrationCreate {
+    bool bundled_rate = 1;
+}
+
+message PersonalRegistrationInfo {
+    string consent_id = 1;
+}

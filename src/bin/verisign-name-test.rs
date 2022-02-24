@@ -3,11 +3,11 @@ extern crate log;
 
 use futures::StreamExt;
 
-const ALPHABET: [char; 63] = [
-    '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h',
-    'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A',
-    'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
-    'U', 'V', 'W', 'X', 'Y', 'Z',
+const ALPHABET: [char; 62] = [
+    '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i',
+    'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B',
+    'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U',
+    'V', 'W', 'X', 'Y', 'Z',
 ];
 
 #[tokio::main]
@@ -207,6 +207,7 @@ async fn main() {
             launch_create: None,
             isnic_payment: None,
             sec_dns: None,
+            personal_registration: None
         },
         &mut cmd_tx,
     )
@@ -220,7 +221,7 @@ async fn main() {
     info!(
         "{:#?}",
         epp_proxy::client::host::create(
-            &format!("ns1.{}.name", &test_2ld),
+            &format!("ns1.{}", &test_2ld),
             vec![epp_proxy::client::host::Address {
                 address: "1.1.1.1".to_string(),
                 ip_version: epp_proxy::client::host::AddressVersion::IPv4,
@@ -237,7 +238,7 @@ async fn main() {
     info!("Deleting in zone nameserver");
     info!(
         "{:#?}",
-        epp_proxy::client::host::delete(&format!("ns1.{}.name", &test_2ld), &mut cmd_tx)
+        epp_proxy::client::host::delete(&format!("ns1.{}", &test_2ld), &mut cmd_tx)
             .await
             .unwrap()
     );
@@ -356,6 +357,7 @@ async fn main() {
             launch_create: None,
             isnic_payment: None,
             sec_dns: None,
+            personal_registration: None
         },
         &mut cmd_tx,
     )
@@ -369,7 +371,7 @@ async fn main() {
     info!(
         "{:#?}",
         epp_proxy::client::host::create(
-            &format!("ns1.{}.name", &test_3ld),
+            &format!("ns1.{}", &test_3ld),
             vec![epp_proxy::client::host::Address {
                 address: "1.1.1.1".to_string(),
                 ip_version: epp_proxy::client::host::AddressVersion::IPv4,
@@ -386,7 +388,7 @@ async fn main() {
     info!("Deleting in zone nameserver");
     info!(
         "{:#?}",
-        epp_proxy::client::host::delete(&format!("ns1.{}.name", &test_3ld), &mut cmd_tx)
+        epp_proxy::client::host::delete(&format!("ns1.{}", &test_3ld), &mut cmd_tx)
             .await
             .unwrap()
     );
@@ -490,6 +492,7 @@ async fn main() {
                 },
             ],
             fee_agreement: None,
+            personal_registration: None
         },
         &mut cmd_tx,
     )

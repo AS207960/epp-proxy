@@ -90,6 +90,10 @@ pub mod epp_proto {
     pub mod dac {
         tonic::include_proto!("epp.dac");
     }
+
+    pub mod personal_registration {
+        tonic::include_proto!("epp.personal_registration");
+    }
 }
 
 #[derive(Debug)]
@@ -380,6 +384,9 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                         .map_or(Ok(None), |v| v.map(Some))?,
                     eurid_data: request.eurid_data.map(Into::into),
                     isnic_payment: request.isnic_payment.and_then(Into::into),
+                    personal_registration: request.personal_registration.map(|p| client::personal_registration::PersonalRegistrationInfo {
+                        consent_id: p.consent_id
+                    })
                 },
                 &mut sender,
             )
