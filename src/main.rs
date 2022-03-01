@@ -47,14 +47,17 @@ extern crate log;
 
 #[tokio::main]
 async fn main() {
-    //sentry::integrations::panic::register_panic_handler();
-    let mut log_builder = pretty_env_logger::formatted_builder();
-    log_builder.parse_filters(&std::env::var("RUST_LOG").unwrap_or_default());
-    let logger = sentry::integrations::log::SentryLogger::with_dest(log_builder.build());
-    log::set_boxed_logger(Box::new(logger)).unwrap();
-    log::set_max_level(log::LevelFilter::Trace);
-    //let _guard =
-    //    sentry::init("https://786e367376234c2b9bee2bb1984c2e84@o222429.ingest.sentry.io/5247736");
+    if systemd_journal_logger::connected_to_journal() {
+        systemd_journal_logger::init().unwrap();
+        log::set_max_level(log::LevelFilter::Debug);
+    } else {
+        let mut log_builder = pretty_env_logger::formatted_builder();
+        log_builder.parse_filters(&std::env::var("RUST_LOG").unwrap_or_default());
+        let logger = sentry::integrations::log::SentryLogger::with_dest(log_builder.build());
+        log::set_boxed_logger(Box::new(logger)).unwrap();
+        log::set_max_level(log::LevelFilter::Trace);
+    }
+
     openssl::init();
 
     let matches = clap::Command::new("epp-proxy")

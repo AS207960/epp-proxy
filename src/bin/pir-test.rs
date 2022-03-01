@@ -427,6 +427,7 @@ async fn main() {
             donuts_fee_agreement: None,
             eurid_data: None,
             isnic_payment: None,
+            personal_registration: None
         },
         &mut cmd_tx,
     )
@@ -574,6 +575,7 @@ async fn main() {
             donuts_fee_agreement: None,
             eurid_data: None,
             isnic_payment: None,
+            personal_registration: None
         },
         &mut cmd_tx,
     )
@@ -779,7 +781,8 @@ async fn main() {
             fee_agreement: None,
             donuts_fee_agreement: None,
             eurid_data: None,
-            isnic_payment: None
+            isnic_payment: None,
+            personal_registration: None
         },
         &mut cmd_tx
     )
@@ -820,7 +823,8 @@ async fn main() {
             fee_agreement: None,
             donuts_fee_agreement: None,
             eurid_data: None,
-            isnic_payment: None
+            isnic_payment: None,
+            personal_registration: None
         },
         &mut cmd_tx
     )
@@ -861,7 +865,8 @@ async fn main() {
             fee_agreement: None,
             donuts_fee_agreement: None,
             eurid_data: None,
-            isnic_payment: None
+            isnic_payment: None,
+            personal_registration: None
         },
         &mut cmd_tx
     )
@@ -919,7 +924,8 @@ async fn main() {
             fee_agreement: None,
             donuts_fee_agreement: None,
             eurid_data: None,
-            isnic_payment: None
+            isnic_payment: None,
+            personal_registration: None
         },
         &mut cmd_tx
     )
@@ -992,6 +998,7 @@ async fn main() {
             donuts_fee_agreement: None,
             eurid_data: None,
             isnic_payment: None,
+            personal_registration: None
         },
         &mut cmd_tx,
     )
@@ -1051,6 +1058,7 @@ async fn main() {
             donuts_fee_agreement: None,
             eurid_data: None,
             isnic_payment: None,
+            personal_registration: None
         },
         &mut cmd_tx,
     )

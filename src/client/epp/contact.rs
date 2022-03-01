@@ -805,7 +805,7 @@ pub fn handle_create(
         },
         disclose: match client.switch_balance {
             true => None,
-            false => req.disclosure.clone().map(|mut d| {
+            false => req.disclosure.clone().and_then(|mut d| {
                 let contains_local_name = d.contains(&DisclosureType::LocalName);
                 let contains_int_name = d.contains(&DisclosureType::InternationalisedName);
                 let contains_local_addr = d.contains(&DisclosureType::LocalAddress);
@@ -841,9 +841,7 @@ pub fn handle_create(
                     && !suppress_int_org;
 
                 d.sort_unstable_by_key(|a| (*a as i32));
-                proto::contact::EPPContactDisclosure {
-                    flag: true,
-                    elements: d
+                let elements: Vec<_> = d
                         .iter()
                         .filter(|d| match d {
                             DisclosureType::LocalName => !suppress_local_name,
@@ -855,7 +853,15 @@ pub fn handle_create(
                             _ => true,
                         })
                         .map(|e| e.into())
-                        .collect(),
+                        .collect();
+
+                if elements.is_empty() {
+                    None
+                } else {
+                    Some(proto::contact::EPPContactDisclosure {
+                        flag: true,
+                        elements,
+                    })
                 }
             }),
         },
@@ -1088,11 +1094,16 @@ pub fn handle_update(
                 postal_info,
                 disclose: match client.switch_balance {
                     true => None,
-                    false => req.new_disclosure.clone().map(|mut d| {
+                    false => req.new_disclosure.clone().and_then(|mut d| {
                         d.sort_unstable_by_key(|a| (*a as i32));
-                        proto::contact::EPPContactDisclosure {
-                            flag: true,
-                            elements: d.iter().map(|e| e.into()).collect(),
+                        let elements: Vec<_> = d.iter().map(|e| e.into()).collect();
+                        if elements.is_empty() {
+                            None
+                        } else {
+                            Some(proto::contact::EPPContactDisclosure {
+                                flag: true,
+                                elements,
+                            })
                         }
                     }),
                 },

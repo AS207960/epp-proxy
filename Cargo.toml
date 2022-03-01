@@ -1,6 +1,6 @@
 [package]
 name = "epp-proxy"
-version = "0.4.2"
+version = "0.4.3"
 authors = ["Q <q@misell.cymru>"]
 edition = "2018"
 
@@ -41,6 +41,7 @@ lazy_static = "1"
 paste = "1"
 reqwest = "0"
 nanoid = "0"
+systemd-journal-logger = "0"
 
 [build-dependencies]
 tonic-build = "0.6"

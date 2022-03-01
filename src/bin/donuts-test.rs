@@ -401,7 +401,7 @@ async fn main() {
     info!("Creating claims domain");
     info!("Claims domain: {}", claims_domain);
     let mut claims_res = epp_proxy::client::domain::launch_claims_check(
-        &claims_domain,
+        claims_domain,
         epp_proxy::client::launch::LaunchClaimsCheck {
             phase: epp_proxy::client::launch::LaunchPhase {
                 phase_type: epp_proxy::client::launch::PhaseType::Claims,
@@ -429,7 +429,7 @@ async fn main() {
 
     epp_proxy::client::domain::create(
         epp_proxy::client::domain::CreateInfo {
-            domain: &claims_domain,
+            domain: claims_domain,
             nameservers: vec![],
             period: Some(epp_proxy::client::Period {
                 unit: epp_proxy::client::PeriodUnit::Years,
@@ -587,9 +587,9 @@ async fn main() {
         .unwrap();
     let eap_fee =
         eap_check.response.donuts_fee_check.unwrap().sets.into_iter()
-            .filter(|s| s.category.name == Some("earlyAccess".to_string())).next().unwrap();
+            .find(|s| s.category.name == Some("earlyAccess".to_string())).unwrap();
     let eap_fee_command = eap_fee.fees.into_iter()
-        .filter(|f| f.command == epp_proxy::client::fee::Command::Create).next().unwrap();
+        .find(|f| f.command == epp_proxy::client::fee::Command::Create).unwrap();
 
     epp_proxy::client::domain::create(
         epp_proxy::client::domain::CreateInfo {
@@ -641,21 +641,21 @@ async fn main() {
     // Register a Premium domain name for 3 separate premium price points
     info!("Create 3 premium domains");
     let premium_check_1 = epp_proxy::client::domain::check(
-        &premium_domain_1, None, None, &mut cmd_tx_1
+        premium_domain_1, None, None, &mut cmd_tx_1
     )
         .await
         .unwrap();
     let premium_fee_1 =
         premium_check_1.response.donuts_fee_check.unwrap().sets.into_iter()
-            .filter(|s| s.category.name == Some("premium".to_string())).next().unwrap();
+            .find(|s| s.category.name == Some("premium".to_string())).unwrap();
     let premium_fee_command_1 = premium_fee_1.fees.iter()
-        .filter(|f| f.command == epp_proxy::client::fee::Command::Create).next().unwrap();
+        .find(|f| f.command == epp_proxy::client::fee::Command::Create).unwrap();
     let premium_fee_transfer_command_1 = premium_fee_1.fees.iter()
-        .filter(|f| f.command == epp_proxy::client::fee::Command::Transfer).next().unwrap();
+        .find(|f| f.command == epp_proxy::client::fee::Command::Transfer).unwrap();
 
     epp_proxy::client::domain::create(
         epp_proxy::client::domain::CreateInfo {
-            domain: &premium_domain_1,
+            domain: premium_domain_1,
             nameservers: vec![],
             period: Some(epp_proxy::client::Period {
                 unit: epp_proxy::client::PeriodUnit::Years,
@@ -701,23 +701,21 @@ async fn main() {
     .unwrap();
 
     let premium_check_2 = epp_proxy::client::domain::check(
-        &premium_domain_2, None, None, &mut cmd_tx_1
+        premium_domain_2, None, None, &mut cmd_tx_1
     )
         .await
         .unwrap();
     let premium_fee_2 =
         premium_check_2.response.donuts_fee_check.unwrap().sets.into_iter()
-            .filter(|s| s.category.name == Some("premium".to_string())).next().unwrap();
+            .find(|s| s.category.name == Some("premium".to_string())).unwrap();
     let premium_fee_command_2 = premium_fee_2.fees.iter()
-        .filter(|f| f.command == epp_proxy::client::fee::Command::Create).next().unwrap();
+        .find(|f| f.command == epp_proxy::client::fee::Command::Create).unwrap();
     let premium_fee_renew_command_2 = premium_fee_2.fees.iter()
-        .filter(|f| f.command == epp_proxy::client::fee::Command::Renew).next().unwrap();
-    let premium_fee_restore_command_2 = premium_fee_2.fees.iter()
-        .filter(|f| f.command == epp_proxy::client::fee::Command::Update && f.command_name == Some("restore".to_string())).next().unwrap();
+        .find(|f| f.command == epp_proxy::client::fee::Command::Renew).unwrap();
 
     let premium_domain_create_res = epp_proxy::client::domain::create(
         epp_proxy::client::domain::CreateInfo {
-            domain: &premium_domain_2,
+            domain: premium_domain_2,
             nameservers: vec![],
             period: Some(epp_proxy::client::Period {
                 unit: epp_proxy::client::PeriodUnit::Years,
@@ -763,19 +761,19 @@ async fn main() {
     .unwrap();
 
     let premium_check_3 = epp_proxy::client::domain::check(
-        &premium_domain_3, None, None, &mut cmd_tx_1
+        premium_domain_3, None, None, &mut cmd_tx_1
     )
         .await
         .unwrap();
     let premium_fee_3 =
         premium_check_3.response.donuts_fee_check.unwrap().sets.into_iter()
-            .filter(|s| s.category.name == Some("premium".to_string())).next().unwrap();
+            .find(|s| s.category.name == Some("premium".to_string())).unwrap();
     let premium_fee_command_3 = premium_fee_3.fees.into_iter()
-        .filter(|f| f.command == epp_proxy::client::fee::Command::Create).next().unwrap();
+        .find(|f| f.command == epp_proxy::client::fee::Command::Create).unwrap();
 
     epp_proxy::client::domain::create(
         epp_proxy::client::domain::CreateInfo {
-            domain: &premium_domain_3,
+            domain: premium_domain_3,
             nameservers: vec![],
             period: Some(epp_proxy::client::Period {
                 unit: epp_proxy::client::PeriodUnit::Years,
@@ -823,7 +821,7 @@ async fn main() {
     // Transfer a Premium name from your OTE1 account to your OTE2 account
     info!("Transferring premium domain");
     epp_proxy::client::domain::transfer_request(
-        &premium_domain_1,
+        premium_domain_1,
         None,
         "test_auth1",
         None,
@@ -845,14 +843,14 @@ async fn main() {
     .unwrap();
 
 
-    epp_proxy::client::domain::transfer_accept(&premium_domain_1, None, &mut cmd_tx_1)
+    epp_proxy::client::domain::transfer_accept(premium_domain_1, None, &mut cmd_tx_1)
         .await
         .unwrap();
 
     // Renew a Premium name
     info!("Renewing premium domain");
     epp_proxy::client::domain::renew(
-        &premium_domain_2,
+        premium_domain_2,
         Some(epp_proxy::client::Period {
             unit: epp_proxy::client::PeriodUnit::Years,
             value: 2,
@@ -877,21 +875,32 @@ async fn main() {
     .unwrap();
 
     // Delete and Restore a Premium name
-    info!("Deleting and restoring premiun name")
-    epp_proxy::client::domain::delete(&premium_domain_2, None, None, None, &mut cmd_tx_1)
+    info!("Deleting and restoring premiun name");
+    let premium_check_dr = epp_proxy::client::domain::check(
+        premium_domain_dr, None, None, &mut cmd_tx_1
+    )
+        .await
+        .unwrap();
+    let premium_fee_dr =
+        premium_check_dr.response.donuts_fee_check.unwrap().sets.into_iter()
+            .find(|s| s.category.name == Some("premium".to_string())).unwrap();
+    let premium_fee_restore_command_dr = premium_fee_2.fees.into_iter()
+        .find(|f| f.command == epp_proxy::client::fee::Command::Update && f.command_name == Some("restore".to_string())).unwrap();
+
+    epp_proxy::client::domain::delete(premium_domain_dr, None, None, None, &mut cmd_tx_1)
             .await
             .unwrap();
 
     epp_proxy::client::rgp::request(
-            &premium_domain_2,
+            premium_domain_dr,
             Some(epp_proxy::client::fee::DonutsFeeData {
                 sets: vec![epp_proxy::client::fee::DonutsFeeSet {
-                    category: premium_fee_2.category,
-                    fee_type: premium_fee_2.fee_type,
+                    category: premium_fee_dr.category,
+                    fee_type: premium_fee_dr.fee_type,
                     fees: vec![epp_proxy::client::fee::DonutsAmount {
-                        value: premium_fee_restore_command_2.value.clone(),
-                        command: premium_fee_restore_command_2.command,
-                        command_name: premium_fee_restore_command_2.command_name.clone(),
+                        value: premium_fee_restore_command_dr.value.clone(),
+                        command: premium_fee_restore_command_dr.command,
+                        command_name: premium_fee_restore_command_dr.command_name.clone(),
                     }]
                 }]
             }),
