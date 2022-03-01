@@ -1054,10 +1054,10 @@
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EPPRelease</span> {
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;{http://www.nominet.org.uk/epp/xml/std-release-1.0}release:registrarTag&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">registrar_tag</span>: <span class="ident">String</span>,
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;$value&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">object</span>: <span class="ident">EPPReleaseObject</span>,
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;{http://www.nominet.org.uk/epp/xml/std-release-1.0}release:registrarTag&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="ident">registrar_tag</span>: <span class="ident">String</span>,
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>
