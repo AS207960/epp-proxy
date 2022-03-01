@@ -842,18 +842,18 @@ pub fn handle_create(
 
                 d.sort_unstable_by_key(|a| (*a as i32));
                 let elements: Vec<_> = d
-                        .iter()
-                        .filter(|d| match d {
-                            DisclosureType::LocalName => !suppress_local_name,
-                            DisclosureType::InternationalisedName => !suppress_int_name,
-                            DisclosureType::LocalAddress => !suppress_local_addr,
-                            DisclosureType::InternationalisedAddress => !suppress_int_addr,
-                            DisclosureType::LocalOrganisation => !suppress_local_org,
-                            DisclosureType::InternationalisedOrganisation => !suppress_int_org,
-                            _ => true,
-                        })
-                        .map(|e| e.into())
-                        .collect();
+                    .iter()
+                    .filter(|d| match d {
+                        DisclosureType::LocalName => !suppress_local_name,
+                        DisclosureType::InternationalisedName => !suppress_int_name,
+                        DisclosureType::LocalAddress => !suppress_local_addr,
+                        DisclosureType::InternationalisedAddress => !suppress_int_addr,
+                        DisclosureType::LocalOrganisation => !suppress_local_org,
+                        DisclosureType::InternationalisedOrganisation => !suppress_int_org,
+                        _ => true,
+                    })
+                    .map(|e| e.into())
+                    .collect();
 
                 if elements.is_empty() {
                     None

@@ -19,6 +19,7 @@ pub mod login_sec;
 pub mod maintenance;
 pub mod mark;
 pub mod nominet;
+pub mod personal_registration;
 pub mod qualified_lawyer;
 pub mod rgp;
 pub mod secdns;
@@ -28,7 +29,6 @@ pub mod tmch;
 pub mod traficom;
 pub mod united_tld;
 pub mod verisign;
-pub mod personal_registration;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub enum EPPMessageType {

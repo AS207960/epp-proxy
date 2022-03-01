@@ -207,7 +207,7 @@ async fn main() {
             launch_create: None,
             isnic_payment: None,
             sec_dns: None,
-            personal_registration: None
+            personal_registration: None,
         },
         &mut cmd_tx,
     )
@@ -357,7 +357,7 @@ async fn main() {
             launch_create: None,
             isnic_payment: None,
             sec_dns: None,
-            personal_registration: None
+            personal_registration: None,
         },
         &mut cmd_tx,
     )
@@ -492,7 +492,7 @@ async fn main() {
                 },
             ],
             fee_agreement: None,
-            personal_registration: None
+            personal_registration: None,
         },
         &mut cmd_tx,
     )

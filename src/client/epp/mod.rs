@@ -19,12 +19,12 @@ pub mod launch;
 pub mod maintenance;
 pub mod mark;
 pub mod nominet;
+pub mod personal_registration;
 pub mod poll;
 pub mod rgp;
 pub mod router;
 pub mod traficom;
 pub mod verisign;
-pub mod personal_registration;
 
 use crate::proto::EPPServiceExtension;
 
@@ -158,7 +158,7 @@ pub struct ServerFeatures {
     /// http://www.nic.name/epp/emailFwd-1.0 support
     email_forward_supported: bool,
     /// http://www.nic.name/epp/persReg-1.0 support
-    personal_registration_supported: bool
+    personal_registration_supported: bool,
 }
 
 impl ServerFeatures {

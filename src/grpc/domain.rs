@@ -244,8 +244,10 @@ impl From<client::domain::InfoResponse> for epp_proto::domain::DomainInfoReply {
             isnic_info: res.isnic_info.map(|d| epp_proto::isnic::DomainInfo {
                 zone_contact: d.zone_contact,
             }),
-            personal_registration: res.personal_registration.map(|p| epp_proto::personal_registration::PersonalRegistrationInfo {
-                consent_id: p.consent_id
+            personal_registration: res.personal_registration.map(|p| {
+                epp_proto::personal_registration::PersonalRegistrationInfo {
+                    consent_id: p.consent_id,
+                }
             }),
         }
     }
@@ -264,8 +266,10 @@ impl From<client::domain::CreateResponse> for epp_proto::domain::DomainCreateRep
             launch_data: res.launch_create.map(Into::into),
             cmd_resp: None,
             eurid_idn: res.data.eurid_idn.map(Into::into),
-            personal_registration: res.data.personal_registration.map(|p| epp_proto::personal_registration::PersonalRegistrationCreate {
-                bundled_rate: p.bundled_rate
+            personal_registration: res.data.personal_registration.map(|p| {
+                epp_proto::personal_registration::PersonalRegistrationCreate {
+                    bundled_rate: p.bundled_rate,
+                }
             }),
         }
     }
@@ -288,8 +292,10 @@ impl From<client::domain::RenewResponse> for epp_proto::domain::DomainRenewReply
                 .map(|d| epp_proto::eurid::DomainRenewInfo {
                     removed_deletion: d.removed_deletion,
                 }),
-            personal_registration: res.data.personal_registration.map(|p| epp_proto::personal_registration::PersonalRegistrationCreate {
-                bundled_rate: p.bundled_rate
+            personal_registration: res.data.personal_registration.map(|p| {
+                epp_proto::personal_registration::PersonalRegistrationCreate {
+                    bundled_rate: p.bundled_rate,
+                }
             }),
         }
     }
@@ -325,8 +331,10 @@ impl From<client::domain::TransferResponse> for epp_proto::domain::DomainTransfe
                     on_site: d.on_site,
                     reseller: d.reseller,
                 }),
-            personal_registration: res.data.personal_registration.map(|p| epp_proto::personal_registration::PersonalRegistrationCreate {
-                bundled_rate: p.bundled_rate
+            personal_registration: res.data.personal_registration.map(|p| {
+                epp_proto::personal_registration::PersonalRegistrationCreate {
+                    bundled_rate: p.bundled_rate,
+                }
             }),
         }
     }
