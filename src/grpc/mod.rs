@@ -1512,6 +1512,10 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                                             change_data: _,
                                             data: i
                                         } => Some(epp_proto::poll_reply::Data::ContactInfo((*i).into())),
+                                        client::poll::PollData::HostInfoData {
+                                            change_data: _,
+                                            data: i
+                                        } => Some(epp_proto::poll_reply::Data::HostInfo((*i).into())),
                                         client::poll::PollData::DomainTransferData {
                                             change_data: _,
                                             data: i

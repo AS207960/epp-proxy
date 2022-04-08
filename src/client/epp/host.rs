@@ -1,5 +1,6 @@
 //! EPP commands relating to host (nameserver) objects
 
+use std::convert::{TryFrom, TryInto};
 use super::super::host::{
     Address, AddressVersion, CheckRequest, CheckResponse, CreateRequest, CreateResponse,
     DeleteRequest, DeleteResponse, InfoRequest, InfoResponse, Status, UpdateObject, UpdateRequest,
@@ -42,6 +43,39 @@ impl From<&Status> for proto::host::EPPHostStatusType {
             Status::ServerDeleteProhibited => EPPHostStatusType::ServerDeleteProhibited,
             Status::ServerUpdateProhibited => EPPHostStatusType::ServerUpdateProhibited,
         }
+    }
+}
+
+impl TryFrom<proto::host::EPPHostInfoData> for InfoResponse {
+    type Error = Error;
+
+    fn try_from(host_info: proto::host::EPPHostInfoData) -> Result<Self, Self::Error> {
+        Ok(InfoResponse {
+            name: host_info.name,
+            registry_id: host_info.registry_id.unwrap_or_default(),
+            statuses: host_info
+                .statuses
+                .into_iter()
+                .map(|s| s.status.into())
+                .collect(),
+            addresses: host_info
+                .addresses
+                .into_iter()
+                .map(|a| Address {
+                    address: a.address,
+                    ip_version: match a.ip_version {
+                        proto::host::EPPHostAddressVersion::IPv4 => AddressVersion::IPv4,
+                        proto::host::EPPHostAddressVersion::IPv6 => AddressVersion::IPv6,
+                    },
+                })
+                .collect(),
+            client_id: host_info.client_id,
+            client_created_id: host_info.client_created_id,
+            creation_date: host_info.creation_date,
+            last_updated_client: host_info.last_updated_client,
+            last_updated_date: host_info.last_updated_date,
+            last_transfer_date: host_info.last_transfer_date,
+        })
     }
 }
 
@@ -115,32 +149,7 @@ pub fn handle_info(client: &ServerFeatures, req: &InfoRequest) -> HandleReqRetur
 pub fn handle_info_response(response: proto::EPPResponse) -> Response<InfoResponse> {
     match response.data {
         Some(value) => match value.value {
-            proto::EPPResultDataValue::EPPHostInfoResult(host_info) => Response::Ok(InfoResponse {
-                name: host_info.name,
-                registry_id: host_info.registry_id.unwrap_or_default(),
-                statuses: host_info
-                    .statuses
-                    .into_iter()
-                    .map(|s| s.status.into())
-                    .collect(),
-                addresses: host_info
-                    .addresses
-                    .into_iter()
-                    .map(|a| Address {
-                        address: a.address,
-                        ip_version: match a.ip_version {
-                            proto::host::EPPHostAddressVersion::IPv4 => AddressVersion::IPv4,
-                            proto::host::EPPHostAddressVersion::IPv6 => AddressVersion::IPv6,
-                        },
-                    })
-                    .collect(),
-                client_id: host_info.client_id,
-                client_created_id: host_info.client_created_id,
-                creation_date: host_info.creation_date,
-                last_updated_client: host_info.last_updated_client,
-                last_updated_date: host_info.last_updated_date,
-                last_transfer_date: host_info.last_transfer_date,
-            }),
+            proto::EPPResultDataValue::EPPHostInfoResult(host_info) => (*host_info).try_into(),
             _ => Err(Error::ServerInternal),
         },
         None => Err(Error::ServerInternal),

@@ -33,6 +33,10 @@ pub enum PollData {
         data: Box<super::contact::InfoResponse>,
         change_data: Option<ChangeData>,
     },
+    HostInfoData {
+        data: Box<super::host::InfoResponse>,
+        change_data: Option<ChangeData>,
+    },
     DomainTransferData {
         data: super::domain::TransferResponse,
         change_data: Option<ChangeData>,

@@ -108,6 +108,7 @@ message PollReply {
         BalanceReply verisign_low_balance = 19;
         maintenance.MaintenanceInfoReply maintenance_info = 24;
         eurid.PollReply eurid_poll = 25;
+        host.HostInfoReply host_info = 26;
     }
     ChangeData change_data = 10;
     common.CommandResponse cmd_resp = 23;

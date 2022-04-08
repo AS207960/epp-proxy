@@ -102,16 +102,13 @@ async fn main() {
     info!("{:#?}", poll_msg);
 
     // 2.1.2.3 Poll Acknowledge command
-    if let Some(res) = poll_msg.response {
-        info!("======");
-        info!("Acknowledging message");
-        info!(
-            "{:#?}",
-            epp_proxy::client::poll::poll_ack(&res.id, &mut cmd_tx)
-                .await
-                .unwrap()
-        );
-    }
+    info!("======");
+    info!("Acknowledging message");
+    info!(
+        "{:#?}",
+        epp_proxy::client::poll::poll_ack("12345", &mut cmd_tx)
+            .await
+    );
 
     // 2.1.2.4 Add Contact
     info!("======");

@@ -269,215 +269,215 @@ async fn main() {
     .await
     .unwrap();
 
-    // Perform a check command for a domain.
-    info!("Domain check");
-    epp_proxy::client::domain::check(&format!("{}.test1ga", nanoid::nanoid!(16, &ALPHABET)), None, None, &mut cmd_tx_1)
-        .await
-        .unwrap();
+    // // Perform a check command for a domain.
+    // info!("Domain check");
+    // epp_proxy::client::domain::check(&format!("{}.test1ga", nanoid::nanoid!(16, &ALPHABET)), None, None, &mut cmd_tx_1)
+    //     .await
+    //     .unwrap();
+    //
+    // // Submit a Sunrise application
+    // info!("Creating sunrise domain");
+    // let test_smd_2 = include_str!("./test-smd.txt");
+    // epp_proxy::client::domain::create(
+    //     epp_proxy::client::domain::CreateInfo {
+    //         domain: "test-and-validate.sunrisemark2",
+    //         nameservers: vec![],
+    //         period: Some(epp_proxy::client::Period {
+    //             unit: epp_proxy::client::PeriodUnit::Years,
+    //             value: 2,
+    //         }),
+    //         auth_info: "test_auth1",
+    //         registrant: &contact_id,
+    //         contacts: vec![
+    //             epp_proxy::client::domain::InfoContact {
+    //                 contact_type: "admin".to_string(),
+    //                 contact_id: contact_id.clone(),
+    //             },
+    //             epp_proxy::client::domain::InfoContact {
+    //                 contact_type: "tech".to_string(),
+    //                 contact_id: contact_id.clone(),
+    //             },
+    //             epp_proxy::client::domain::InfoContact {
+    //                 contact_type: "billing".to_string(),
+    //                 contact_id: contact_id.clone(),
+    //             },
+    //         ],
+    //         donuts_fee_agreement: None,
+    //         eurid_data: None,
+    //         fee_agreement: None,
+    //         launch_create: Some(epp_proxy::client::launch::LaunchCreate {
+    //             phase: epp_proxy::client::launch::LaunchPhase {
+    //                 phase_type: epp_proxy::client::launch::PhaseType::Sunrise,
+    //                 phase_name: None,
+    //             },
+    //             code_mark: vec![],
+    //             signed_mark: Some(test_smd_2.to_string()),
+    //             create_type: epp_proxy::client::launch::LaunchCreateType::Application,
+    //             notices: vec![],
+    //             core_nic: vec![],
+    //         }),
+    //         isnic_payment: None,
+    //         sec_dns: None,
+    //         personal_registration: None
+    //     },
+    //     &mut cmd_tx_1,
+    // )
+    // .await
+    // .unwrap();
+    //
+    // // Register 5 domain names
+    // info!("Creating 5 domains");
+    //
+    // let domains = vec![
+    //     format!("{}.test1ga", nanoid::nanoid!(16, &ALPHABET)),
+    //     format!("{}.test1ga", nanoid::nanoid!(16, &ALPHABET)),
+    //     format!("{}.test1ga", nanoid::nanoid!(16, &ALPHABET)),
+    //     format!("{}.test1ga", nanoid::nanoid!(16, &ALPHABET)),
+    //     format!("{}.test1ga", nanoid::nanoid!(16, &ALPHABET)),
+    // ];
+    //
+    // for domain in domains.iter() {
+    //     epp_proxy::client::domain::create(
+    //         epp_proxy::client::domain::CreateInfo {
+    //             domain: domain.as_str(),
+    //             nameservers: vec![],
+    //             period: Some(epp_proxy::client::Period {
+    //                 unit: epp_proxy::client::PeriodUnit::Years,
+    //                 value: 2,
+    //             }),
+    //             auth_info: "test_auth1",
+    //             registrant: &contact_id,
+    //             contacts: vec![
+    //                 epp_proxy::client::domain::InfoContact {
+    //                     contact_type: "admin".to_string(),
+    //                     contact_id: contact_id.clone(),
+    //                 },
+    //                 epp_proxy::client::domain::InfoContact {
+    //                     contact_type: "tech".to_string(),
+    //                     contact_id: contact_id.clone(),
+    //                 },
+    //                 epp_proxy::client::domain::InfoContact {
+    //                     contact_type: "billing".to_string(),
+    //                     contact_id: contact_id.clone(),
+    //                 },
+    //             ],
+    //             donuts_fee_agreement: None,
+    //             eurid_data: None,
+    //             fee_agreement: None,
+    //             launch_create: None,
+    //             isnic_payment: None,
+    //             sec_dns: None,
+    //             personal_registration: None
+    //         },
+    //         &mut cmd_tx_1,
+    //     )
+    //         .await
+    //         .unwrap();
+    // }
+    // info!("GA domain names: {:?}", domains);
+    //
+    // // Transfer 2 domain names from your OTE1 account to your OTE2 account
+    // info!("Transferring two domains");
+    // for domain in &domains[0..2] {
+    //     epp_proxy::client::domain::transfer_request(
+    //         domain.as_str(),
+    //         None,
+    //         "test_auth1",
+    //         None,
+    //         None,
+    //         None,
+    //         &mut cmd_tx_2,
+    //     )
+    //     .await
+    //     .unwrap();
+    //
+    //
+    //     epp_proxy::client::domain::transfer_accept(domain.as_str(), None, &mut cmd_tx_1)
+    //         .await
+    //         .unwrap();
+    // }
 
-    // Submit a Sunrise application
-    info!("Creating sunrise domain");
-    let test_smd_2 = include_str!("./test-smd.txt");
-    epp_proxy::client::domain::create(
-        epp_proxy::client::domain::CreateInfo {
-            domain: "test-and-validate.sunrisemark2",
-            nameservers: vec![],
-            period: Some(epp_proxy::client::Period {
-                unit: epp_proxy::client::PeriodUnit::Years,
-                value: 2,
-            }),
-            auth_info: "test_auth1",
-            registrant: &contact_id,
-            contacts: vec![
-                epp_proxy::client::domain::InfoContact {
-                    contact_type: "admin".to_string(),
-                    contact_id: contact_id.clone(),
-                },
-                epp_proxy::client::domain::InfoContact {
-                    contact_type: "tech".to_string(),
-                    contact_id: contact_id.clone(),
-                },
-                epp_proxy::client::domain::InfoContact {
-                    contact_type: "billing".to_string(),
-                    contact_id: contact_id.clone(),
-                },
-            ],
-            donuts_fee_agreement: None,
-            eurid_data: None,
-            fee_agreement: None,
-            launch_create: Some(epp_proxy::client::launch::LaunchCreate {
-                phase: epp_proxy::client::launch::LaunchPhase {
-                    phase_type: epp_proxy::client::launch::PhaseType::Sunrise,
-                    phase_name: None,
-                },
-                code_mark: vec![],
-                signed_mark: Some(test_smd_2.to_string()),
-                create_type: epp_proxy::client::launch::LaunchCreateType::Application,
-                notices: vec![],
-                core_nic: vec![],
-            }),
-            isnic_payment: None,
-            sec_dns: None,
-            personal_registration: None
-        },
-        &mut cmd_tx_1,
-    )
-    .await
-    .unwrap();
-
-    // Register 5 domain names
-    info!("Creating 5 domains");
-
-    let domains = vec![
-        format!("{}.test1ga", nanoid::nanoid!(16, &ALPHABET)),
-        format!("{}.test1ga", nanoid::nanoid!(16, &ALPHABET)),
-        format!("{}.test1ga", nanoid::nanoid!(16, &ALPHABET)),
-        format!("{}.test1ga", nanoid::nanoid!(16, &ALPHABET)),
-        format!("{}.test1ga", nanoid::nanoid!(16, &ALPHABET)),
-    ];
-
-    for domain in domains.iter() {
-        epp_proxy::client::domain::create(
-            epp_proxy::client::domain::CreateInfo {
-                domain: domain.as_str(),
-                nameservers: vec![],
-                period: Some(epp_proxy::client::Period {
-                    unit: epp_proxy::client::PeriodUnit::Years,
-                    value: 2,
-                }),
-                auth_info: "test_auth1",
-                registrant: &contact_id,
-                contacts: vec![
-                    epp_proxy::client::domain::InfoContact {
-                        contact_type: "admin".to_string(),
-                        contact_id: contact_id.clone(),
-                    },
-                    epp_proxy::client::domain::InfoContact {
-                        contact_type: "tech".to_string(),
-                        contact_id: contact_id.clone(),
-                    },
-                    epp_proxy::client::domain::InfoContact {
-                        contact_type: "billing".to_string(),
-                        contact_id: contact_id.clone(),
-                    },
-                ],
-                donuts_fee_agreement: None,
-                eurid_data: None,
-                fee_agreement: None,
-                launch_create: None,
-                isnic_payment: None,
-                sec_dns: None,
-                personal_registration: None
-            },
-            &mut cmd_tx_1,
-        )
-            .await
-            .unwrap();
-    }
-    info!("GA domain names: {:?}", domains);
-
-    // Transfer 2 domain names from your OTE1 account to your OTE2 account
-    info!("Transferring two domains");
-    for domain in &domains[0..2] {
-        epp_proxy::client::domain::transfer_request(
-            domain.as_str(),
-            None,
-            "test_auth1",
-            None,
-            None,
-            None,
-            &mut cmd_tx_2,
-        )
-        .await
-        .unwrap();
-
-
-        epp_proxy::client::domain::transfer_accept(domain.as_str(), None, &mut cmd_tx_1)
-            .await
-            .unwrap();
-    }
-
-    // Register a domain name that is subject to Claims.
-    info!("Creating claims domain");
-    info!("Claims domain: {}", claims_domain);
-    let mut claims_res = epp_proxy::client::domain::launch_claims_check(
-        claims_domain,
-        epp_proxy::client::launch::LaunchClaimsCheck {
-            phase: epp_proxy::client::launch::LaunchPhase {
-                phase_type: epp_proxy::client::launch::PhaseType::Claims,
-                phase_name: None,
-            },
-        },
-        &mut cmd_tx_1,
-    )
-    .await
-    .unwrap();
-    let claims_key = claims_res.response.claims_key.pop().unwrap().key;
-
-    let req_client = reqwest::Client::new();
-    let claims_notice_txt = req_client
-        .get(format!("https://test.tmcnis.org/cnis/{}.xml", claims_key))
-        .basic_auth(tmcnis_user, Some(tmcnis_pass))
-        .send()
-        .await
-        .unwrap()
-        .text()
-        .await
-        .unwrap();
-    let claims_notice_msg: epp_proxy::proto::tm_notice::TMMessage =
-        xml_serde::from_str(&claims_notice_txt).unwrap();
-
-    epp_proxy::client::domain::create(
-        epp_proxy::client::domain::CreateInfo {
-            domain: claims_domain,
-            nameservers: vec![],
-            period: Some(epp_proxy::client::Period {
-                unit: epp_proxy::client::PeriodUnit::Years,
-                value: 2,
-            }),
-            auth_info: "test_auth1",
-            registrant: &contact_id,
-            contacts: vec![
-                epp_proxy::client::domain::InfoContact {
-                    contact_type: "admin".to_string(),
-                    contact_id: contact_id.clone(),
-                },
-                epp_proxy::client::domain::InfoContact {
-                    contact_type: "tech".to_string(),
-                    contact_id: contact_id.clone(),
-                },
-                epp_proxy::client::domain::InfoContact {
-                    contact_type: "billing".to_string(),
-                    contact_id: contact_id.clone(),
-                },
-            ],
-            donuts_fee_agreement: None,
-            eurid_data: None,
-            fee_agreement: None,
-            launch_create: Some(epp_proxy::client::launch::LaunchCreate {
-                phase: epp_proxy::client::launch::LaunchPhase {
-                    phase_type: epp_proxy::client::launch::PhaseType::Claims,
-                    phase_name: None,
-                },
-                code_mark: vec![],
-                signed_mark: None,
-                create_type: epp_proxy::client::launch::LaunchCreateType::Registration,
-                notices: vec![epp_proxy::client::launch::Notice {
-                    notice_id: claims_notice_msg.notice.id,
-                    validator: None,
-                    not_after: claims_notice_msg.notice.not_after,
-                    accepted_date: claims_notice_msg.notice.not_before,
-                }],
-                core_nic: vec![],
-            }),
-            isnic_payment: None,
-            sec_dns: None,
-            personal_registration: None
-        },
-        &mut cmd_tx_1,
-    )
-    .await
-    .unwrap();
+    // // Register a domain name that is subject to Claims.
+    // info!("Creating claims domain");
+    // info!("Claims domain: {}", claims_domain);
+    // let mut claims_res = epp_proxy::client::domain::launch_claims_check(
+    //     claims_domain,
+    //     epp_proxy::client::launch::LaunchClaimsCheck {
+    //         phase: epp_proxy::client::launch::LaunchPhase {
+    //             phase_type: epp_proxy::client::launch::PhaseType::Claims,
+    //             phase_name: None,
+    //         },
+    //     },
+    //     &mut cmd_tx_1,
+    // )
+    // .await
+    // .unwrap();
+    // let claims_key = claims_res.response.claims_key.pop().unwrap().key;
+    //
+    // let req_client = reqwest::Client::new();
+    // let claims_notice_txt = req_client
+    //     .get(format!("https://test.tmcnis.org/cnis/{}.xml", claims_key))
+    //     .basic_auth(tmcnis_user, Some(tmcnis_pass))
+    //     .send()
+    //     .await
+    //     .unwrap()
+    //     .text()
+    //     .await
+    //     .unwrap();
+    // let claims_notice_msg: epp_proxy::proto::tm_notice::TMMessage =
+    //     xml_serde::from_str(&claims_notice_txt).unwrap();
+    //
+    // epp_proxy::client::domain::create(
+    //     epp_proxy::client::domain::CreateInfo {
+    //         domain: claims_domain,
+    //         nameservers: vec![],
+    //         period: Some(epp_proxy::client::Period {
+    //             unit: epp_proxy::client::PeriodUnit::Years,
+    //             value: 2,
+    //         }),
+    //         auth_info: "test_auth1",
+    //         registrant: &contact_id,
+    //         contacts: vec![
+    //             epp_proxy::client::domain::InfoContact {
+    //                 contact_type: "admin".to_string(),
+    //                 contact_id: contact_id.clone(),
+    //             },
+    //             epp_proxy::client::domain::InfoContact {
+    //                 contact_type: "tech".to_string(),
+    //                 contact_id: contact_id.clone(),
+    //             },
+    //             epp_proxy::client::domain::InfoContact {
+    //                 contact_type: "billing".to_string(),
+    //                 contact_id: contact_id.clone(),
+    //             },
+    //         ],
+    //         donuts_fee_agreement: None,
+    //         eurid_data: None,
+    //         fee_agreement: None,
+    //         launch_create: Some(epp_proxy::client::launch::LaunchCreate {
+    //             phase: epp_proxy::client::launch::LaunchPhase {
+    //                 phase_type: epp_proxy::client::launch::PhaseType::Claims,
+    //                 phase_name: None,
+    //             },
+    //             code_mark: vec![],
+    //             signed_mark: None,
+    //             create_type: epp_proxy::client::launch::LaunchCreateType::Registration,
+    //             notices: vec![epp_proxy::client::launch::Notice {
+    //                 notice_id: claims_notice_msg.notice.id,
+    //                 validator: None,
+    //                 not_after: claims_notice_msg.notice.not_after,
+    //                 accepted_date: claims_notice_msg.notice.not_before,
+    //             }],
+    //             core_nic: vec![],
+    //         }),
+    //         isnic_payment: None,
+    //         sec_dns: None,
+    //         personal_registration: None
+    //     },
+    //     &mut cmd_tx_1,
+    // )
+    // .await
+    // .unwrap();
 
     // Register a DPML Block, in .dpml.zone
     info!("Creating DPML block");

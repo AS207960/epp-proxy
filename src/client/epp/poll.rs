@@ -117,6 +117,12 @@ pub fn handle_poll_response(response: proto::EPPResponse) -> Response<Option<Pol
                                     change_data: change_data_from_response(&response.extension)?,
                                 }
                             }
+                            proto::EPPResultDataValue::EPPHostInfoResult(host_info) => {
+                                PollData::HostInfoData {
+                                    data: Box::new((*host_info).try_into()?),
+                                    change_data: change_data_from_response(&response.extension)?,
+                                }
+                            }
                             proto::EPPResultDataValue::EPPDomainTransferResult(domain_transfer) => {
                                 PollData::DomainTransferData {
                                     data: (domain_transfer, &response.extension).try_into()?,

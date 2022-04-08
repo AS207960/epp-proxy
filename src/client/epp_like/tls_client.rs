@@ -227,8 +227,7 @@ impl TLSClient {
                 return Err(());
             }
         };
-        // I know this is disgusting, but OpenSSL isn't actually async compatible when using
-        // a HSM.
+        // I know this is disgusting, but OpenSSL isn't actually async compatible when using a HSM.
         trace!("Negotiating TLS connection to {}", self.hostname);
         let res = match if self.should_lock {
             let mut cx = Box::pin(cx);
