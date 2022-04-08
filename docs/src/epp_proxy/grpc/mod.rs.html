@@ -2163,6 +2163,15 @@
 <span id="2158">2158</span>
 <span id="2159">2159</span>
 <span id="2160">2160</span>
+<span id="2161">2161</span>
+<span id="2162">2162</span>
+<span id="2163">2163</span>
+<span id="2164">2164</span>
+<span id="2165">2165</span>
+<span id="2166">2166</span>
+<span id="2167">2167</span>
+<span id="2168">2168</span>
+<span id="2169">2169</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Implements the gRPC interface for the EPP client</span>
 
 <span class="kw">use</span> <span class="ident">std::convert::TryInto</span>;
@@ -2254,6 +2263,10 @@
 
     <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">dac</span> {
         <span class="macro">tonic::include_proto!</span>(<span class="string">&quot;epp.dac&quot;</span>);
+    }
+
+    <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">personal_registration</span> {
+        <span class="macro">tonic::include_proto!</span>(<span class="string">&quot;epp.personal_registration&quot;</span>);
     }
 }
 
@@ -2545,6 +2558,11 @@
                         .<span class="ident">map_or</span>(<span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>), <span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">map</span>(<span class="prelude-val">Some</span>))<span class="question-mark">?</span>,
                     <span class="ident">eurid_data</span>: <span class="ident">request</span>.<span class="ident">eurid_data</span>.<span class="ident">map</span>(<span class="ident">Into::into</span>),
                     <span class="ident">isnic_payment</span>: <span class="ident">request</span>.<span class="ident">isnic_payment</span>.<span class="ident">and_then</span>(<span class="ident">Into::into</span>),
+                    <span class="ident">personal_registration</span>: <span class="ident">request</span>.<span class="ident">personal_registration</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> {
+                        <span class="ident">client::personal_registration::PersonalRegistrationInfo</span> {
+                            <span class="ident">consent_id</span>: <span class="ident">p</span>.<span class="ident">consent_id</span>,
+                        }
+                    }),
                 },
                 <span class="kw-2">&amp;mut</span> <span class="ident">sender</span>,
             )
@@ -4324,5 +4342,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="epp_proxy" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (68369a041 2022-02-22)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="epp_proxy" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (4ce374923 2022-02-28)" ></div>
 </body></html>

@@ -62,7 +62,7 @@ pub struct InfoResponse {
     pub rgp_state: Vec<super::rgp::RGPState>,
     pub auth_info: Option<String>,
     pub whois_info: Option<super::verisign::InfoWhois>,
-    pub personal_registration: Option<super::personal_registration::PersonalRegistrationInfo>
+    pub personal_registration: Option<super::personal_registration::PersonalRegistrationInfo>,
 }
 
 #[derive(Debug)]
@@ -74,7 +74,8 @@ pub struct CreateRequest {
     pub(super) auth_info: String,
     pub(super) forward_to: String,
     pub(super) fee_agreement: Option<fee::FeeAgreement>,
-    pub(super) personal_registration: Option<super::personal_registration::PersonalRegistrationInfo>,
+    pub(super) personal_registration:
+        Option<super::personal_registration::PersonalRegistrationInfo>,
     pub return_path: Sender<CreateResponse>,
 }
 
@@ -95,7 +96,7 @@ pub struct CreateData {
     pub creation_date: Option<DateTime<Utc>>,
     /// When will the domain expire
     pub expiration_date: Option<DateTime<Utc>>,
-    pub personal_registration: Option<super::personal_registration::PersonalRegistrationCreate>
+    pub personal_registration: Option<super::personal_registration::PersonalRegistrationCreate>,
 }
 
 #[derive(Debug)]
@@ -160,7 +161,7 @@ pub struct RenewResponse {
 pub struct RenewData {
     pub name: String,
     pub new_expiry_date: Option<DateTime<Utc>>,
-    pub personal_registration: Option<super::personal_registration::PersonalRegistrationCreate>
+    pub personal_registration: Option<super::personal_registration::PersonalRegistrationCreate>,
 }
 
 #[derive(Debug)]
@@ -209,7 +210,7 @@ pub struct TransferData {
     pub act_date: DateTime<Utc>,
     /// New domain expiry date if amended by the transfer
     pub expiry_date: Option<DateTime<Utc>>,
-    pub personal_registration: Option<super::personal_registration::PersonalRegistrationCreate>
+    pub personal_registration: Option<super::personal_registration::PersonalRegistrationCreate>,
 }
 
 #[derive(Debug)]
@@ -275,7 +276,7 @@ pub struct CreateInfo<'a> {
     pub auth_info: &'a str,
     pub forward_to: &'a str,
     pub fee_agreement: Option<fee::FeeAgreement>,
-    pub personal_registration: Option<super::personal_registration::PersonalRegistrationInfo>
+    pub personal_registration: Option<super::personal_registration::PersonalRegistrationInfo>,
 }
 
 /// Registers a new email forwarding

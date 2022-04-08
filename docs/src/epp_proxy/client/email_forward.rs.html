@@ -524,6 +524,14 @@
 <span id="519">519</span>
 <span id="520">520</span>
 <span id="521">521</span>
+<span id="522">522</span>
+<span id="523">523</span>
+<span id="524">524</span>
+<span id="525">525</span>
+<span id="526">526</span>
+<span id="527">527</span>
+<span id="528">528</span>
+<span id="529">529</span>
 </pre><pre class="rust"><code><span class="doccomment">//! EPP commands relating to email forwarding objects</span>
 
 <span class="kw">use</span> <span class="ident">chrono::prelude</span>::<span class="kw-2">*</span>;
@@ -588,6 +596,7 @@
     <span class="kw">pub</span> <span class="ident">rgp_state</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::rgp::RGPState</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">auth_info</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">whois_info</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::verisign::InfoWhois</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">personal_registration</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::personal_registration::PersonalRegistrationInfo</span><span class="op">&gt;</span>,
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
@@ -599,6 +608,8 @@
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">auth_info</span>: <span class="ident">String</span>,
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">forward_to</span>: <span class="ident">String</span>,
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">fee_agreement</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">fee::FeeAgreement</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">personal_registration</span>:
+        <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::personal_registration::PersonalRegistrationInfo</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">return_path</span>: <span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">CreateResponse</span><span class="op">&gt;</span>,
 }
 
@@ -619,6 +630,7 @@
     <span class="kw">pub</span> <span class="ident">creation_date</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="doccomment">/// When will the domain expire</span>
     <span class="kw">pub</span> <span class="ident">expiration_date</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">personal_registration</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::personal_registration::PersonalRegistrationCreate</span><span class="op">&gt;</span>,
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
@@ -683,6 +695,7 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RenewData</span> {
     <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
     <span class="kw">pub</span> <span class="ident">new_expiry_date</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">personal_registration</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::personal_registration::PersonalRegistrationCreate</span><span class="op">&gt;</span>,
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
@@ -731,6 +744,7 @@
     <span class="kw">pub</span> <span class="ident">act_date</span>: <span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span>,
     <span class="doccomment">/// New domain expiry date if amended by the transfer</span>
     <span class="kw">pub</span> <span class="ident">expiry_date</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">personal_registration</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::personal_registration::PersonalRegistrationCreate</span><span class="op">&gt;</span>,
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
@@ -796,6 +810,7 @@
     <span class="kw">pub</span> <span class="ident">auth_info</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
     <span class="kw">pub</span> <span class="ident">forward_to</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
     <span class="kw">pub</span> <span class="ident">fee_agreement</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">fee::FeeAgreement</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">personal_registration</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::personal_registration::PersonalRegistrationInfo</span><span class="op">&gt;</span>,
 }
 
 <span class="doccomment">/// Registers a new email forwarding</span>
@@ -822,6 +837,7 @@
             <span class="ident">forward_to</span>: <span class="ident">info</span>.<span class="ident">forward_to</span>.<span class="ident">to_string</span>(),
             <span class="ident">auth_info</span>: <span class="ident">info</span>.<span class="ident">auth_info</span>.<span class="ident">to_string</span>(),
             <span class="ident">fee_agreement</span>: <span class="ident">info</span>.<span class="ident">fee_agreement</span>,
+            <span class="ident">personal_registration</span>: <span class="ident">info</span>.<span class="ident">personal_registration</span>,
             <span class="ident">return_path</span>: <span class="ident">sender</span>,
         })),
         <span class="ident">receiver</span>,
@@ -1046,5 +1062,5 @@
     .<span class="kw">await</span>
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="epp_proxy" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (68369a041 2022-02-22)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="epp_proxy" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (4ce374923 2022-02-28)" ></div>
 </body></html>

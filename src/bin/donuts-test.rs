@@ -200,10 +200,8 @@ async fn main() {
         }
     }
 
-    let epp_client_1 =
-        epp_proxy::create_client(log_dir_1, &conf_1, &pkcs11_engine, true).await;
-    let epp_client_2 =
-        epp_proxy::create_client(log_dir_2, &conf_2, &pkcs11_engine, true).await;
+    let epp_client_1 = epp_proxy::create_client(log_dir_1, &conf_1, &pkcs11_engine, true).await;
+    let epp_client_2 = epp_proxy::create_client(log_dir_2, &conf_2, &pkcs11_engine, true).await;
 
     // 2.1 - Login
     let (mut cmd_tx_1, mut ready_rx_1) = epp_client_1.start();
@@ -585,11 +583,19 @@ async fn main() {
     let eap_check = epp_proxy::client::domain::check(&eap_domain, None, None, &mut cmd_tx_1)
         .await
         .unwrap();
-    let eap_fee =
-        eap_check.response.donuts_fee_check.unwrap().sets.into_iter()
-            .find(|s| s.category.name == Some("earlyAccess".to_string())).unwrap();
-    let eap_fee_command = eap_fee.fees.into_iter()
-        .find(|f| f.command == epp_proxy::client::fee::Command::Create).unwrap();
+    let eap_fee = eap_check
+        .response
+        .donuts_fee_check
+        .unwrap()
+        .sets
+        .into_iter()
+        .find(|s| s.category.name == Some("earlyAccess".to_string()))
+        .unwrap();
+    let eap_fee_command = eap_fee
+        .fees
+        .into_iter()
+        .find(|f| f.command == epp_proxy::client::fee::Command::Create)
+        .unwrap();
 
     epp_proxy::client::domain::create(
         epp_proxy::client::domain::CreateInfo {
@@ -623,15 +629,15 @@ async fn main() {
                         value: eap_fee_command.value,
                         command: eap_fee_command.command,
                         command_name: eap_fee_command.command_name,
-                    }]
-                }]
+                    }],
+                }],
             }),
             eurid_data: None,
             fee_agreement: None,
             launch_create: None,
             isnic_payment: None,
             sec_dns: None,
-            personal_registration: None
+            personal_registration: None,
         },
         &mut cmd_tx_1,
     )
@@ -640,18 +646,28 @@ async fn main() {
 
     // Register a Premium domain name for 3 separate premium price points
     info!("Create 3 premium domains");
-    let premium_check_1 = epp_proxy::client::domain::check(
-        premium_domain_1, None, None, &mut cmd_tx_1
-    )
-        .await
+    let premium_check_1 =
+        epp_proxy::client::domain::check(premium_domain_1, None, None, &mut cmd_tx_1)
+            .await
+            .unwrap();
+    let premium_fee_1 = premium_check_1
+        .response
+        .donuts_fee_check
+        .unwrap()
+        .sets
+        .into_iter()
+        .find(|s| s.category.name == Some("premium".to_string()))
         .unwrap();
-    let premium_fee_1 =
-        premium_check_1.response.donuts_fee_check.unwrap().sets.into_iter()
-            .find(|s| s.category.name == Some("premium".to_string())).unwrap();
-    let premium_fee_command_1 = premium_fee_1.fees.iter()
-        .find(|f| f.command == epp_proxy::client::fee::Command::Create).unwrap();
-    let premium_fee_transfer_command_1 = premium_fee_1.fees.iter()
-        .find(|f| f.command == epp_proxy::client::fee::Command::Transfer).unwrap();
+    let premium_fee_command_1 = premium_fee_1
+        .fees
+        .iter()
+        .find(|f| f.command == epp_proxy::client::fee::Command::Create)
+        .unwrap();
+    let premium_fee_transfer_command_1 = premium_fee_1
+        .fees
+        .iter()
+        .find(|f| f.command == epp_proxy::client::fee::Command::Transfer)
+        .unwrap();
 
     epp_proxy::client::domain::create(
         epp_proxy::client::domain::CreateInfo {
@@ -685,33 +701,43 @@ async fn main() {
                         value: premium_fee_command_1.value.clone(),
                         command: premium_fee_command_1.command,
                         command_name: premium_fee_command_1.command_name.clone(),
-                    }]
-                }]
+                    }],
+                }],
             }),
             eurid_data: None,
             fee_agreement: None,
             launch_create: None,
             isnic_payment: None,
             sec_dns: None,
-            personal_registration: None
+            personal_registration: None,
         },
         &mut cmd_tx_1,
     )
     .await
     .unwrap();
 
-    let premium_check_2 = epp_proxy::client::domain::check(
-        premium_domain_2, None, None, &mut cmd_tx_1
-    )
-        .await
+    let premium_check_2 =
+        epp_proxy::client::domain::check(premium_domain_2, None, None, &mut cmd_tx_1)
+            .await
+            .unwrap();
+    let premium_fee_2 = premium_check_2
+        .response
+        .donuts_fee_check
+        .unwrap()
+        .sets
+        .into_iter()
+        .find(|s| s.category.name == Some("premium".to_string()))
         .unwrap();
-    let premium_fee_2 =
-        premium_check_2.response.donuts_fee_check.unwrap().sets.into_iter()
-            .find(|s| s.category.name == Some("premium".to_string())).unwrap();
-    let premium_fee_command_2 = premium_fee_2.fees.iter()
-        .find(|f| f.command == epp_proxy::client::fee::Command::Create).unwrap();
-    let premium_fee_renew_command_2 = premium_fee_2.fees.iter()
-        .find(|f| f.command == epp_proxy::client::fee::Command::Renew).unwrap();
+    let premium_fee_command_2 = premium_fee_2
+        .fees
+        .iter()
+        .find(|f| f.command == epp_proxy::client::fee::Command::Create)
+        .unwrap();
+    let premium_fee_renew_command_2 = premium_fee_2
+        .fees
+        .iter()
+        .find(|f| f.command == epp_proxy::client::fee::Command::Renew)
+        .unwrap();
 
     let premium_domain_create_res = epp_proxy::client::domain::create(
         epp_proxy::client::domain::CreateInfo {
@@ -745,31 +771,38 @@ async fn main() {
                         value: premium_fee_command_2.value.clone(),
                         command: premium_fee_command_2.command,
                         command_name: premium_fee_command_2.command_name.clone(),
-                    }]
-                }]
+                    }],
+                }],
             }),
             eurid_data: None,
             fee_agreement: None,
             launch_create: None,
             isnic_payment: None,
             sec_dns: None,
-            personal_registration: None
+            personal_registration: None,
         },
         &mut cmd_tx_1,
     )
     .await
     .unwrap();
 
-    let premium_check_3 = epp_proxy::client::domain::check(
-        premium_domain_3, None, None, &mut cmd_tx_1
-    )
-        .await
+    let premium_check_3 =
+        epp_proxy::client::domain::check(premium_domain_3, None, None, &mut cmd_tx_1)
+            .await
+            .unwrap();
+    let premium_fee_3 = premium_check_3
+        .response
+        .donuts_fee_check
+        .unwrap()
+        .sets
+        .into_iter()
+        .find(|s| s.category.name == Some("premium".to_string()))
         .unwrap();
-    let premium_fee_3 =
-        premium_check_3.response.donuts_fee_check.unwrap().sets.into_iter()
-            .find(|s| s.category.name == Some("premium".to_string())).unwrap();
-    let premium_fee_command_3 = premium_fee_3.fees.into_iter()
-        .find(|f| f.command == epp_proxy::client::fee::Command::Create).unwrap();
+    let premium_fee_command_3 = premium_fee_3
+        .fees
+        .into_iter()
+        .find(|f| f.command == epp_proxy::client::fee::Command::Create)
+        .unwrap();
 
     epp_proxy::client::domain::create(
         epp_proxy::client::domain::CreateInfo {
@@ -803,15 +836,15 @@ async fn main() {
                         value: premium_fee_command_3.value,
                         command: premium_fee_command_3.command,
                         command_name: premium_fee_command_3.command_name,
-                    }]
-                }]
+                    }],
+                }],
             }),
             eurid_data: None,
             fee_agreement: None,
             launch_create: None,
             isnic_payment: None,
             sec_dns: None,
-            personal_registration: None
+            personal_registration: None,
         },
         &mut cmd_tx_1,
     )
@@ -826,22 +859,21 @@ async fn main() {
         "test_auth1",
         None,
         Some(epp_proxy::client::fee::DonutsFeeData {
-                sets: vec![epp_proxy::client::fee::DonutsFeeSet {
-                    category: premium_fee_1.category,
-                    fee_type: premium_fee_1.fee_type,
-                    fees: vec![epp_proxy::client::fee::DonutsAmount {
-                        value: premium_fee_transfer_command_1.value.clone(),
-                        command: premium_fee_transfer_command_1.command,
-                        command_name: premium_fee_transfer_command_1.command_name.clone(),
-                    }]
-                }]
-            }),
+            sets: vec![epp_proxy::client::fee::DonutsFeeSet {
+                category: premium_fee_1.category,
+                fee_type: premium_fee_1.fee_type,
+                fees: vec![epp_proxy::client::fee::DonutsAmount {
+                    value: premium_fee_transfer_command_1.value.clone(),
+                    command: premium_fee_transfer_command_1.command,
+                    command_name: premium_fee_transfer_command_1.command_name.clone(),
+                }],
+            }],
+        }),
         None,
         &mut cmd_tx_2,
     )
     .await
     .unwrap();
-
 
     epp_proxy::client::domain::transfer_accept(premium_domain_1, None, &mut cmd_tx_1)
         .await
@@ -855,19 +887,23 @@ async fn main() {
             unit: epp_proxy::client::PeriodUnit::Years,
             value: 2,
         }),
-        premium_domain_create_res.response.data.expiration_date.unwrap(),
+        premium_domain_create_res
+            .response
+            .data
+            .expiration_date
+            .unwrap(),
         None,
         Some(epp_proxy::client::fee::DonutsFeeData {
-                sets: vec![epp_proxy::client::fee::DonutsFeeSet {
-                    category: premium_fee_2.category.clone(),
-                    fee_type: premium_fee_2.fee_type.clone(),
-                    fees: vec![epp_proxy::client::fee::DonutsAmount {
-                        value: premium_fee_renew_command_2.value.clone(),
-                        command: premium_fee_renew_command_2.command,
-                        command_name: premium_fee_renew_command_2.command_name.clone(),
-                    }]
-                }]
-            }),
+            sets: vec![epp_proxy::client::fee::DonutsFeeSet {
+                category: premium_fee_2.category.clone(),
+                fee_type: premium_fee_2.fee_type.clone(),
+                fees: vec![epp_proxy::client::fee::DonutsAmount {
+                    value: premium_fee_renew_command_2.value.clone(),
+                    command: premium_fee_renew_command_2.command,
+                    command_name: premium_fee_renew_command_2.command_name.clone(),
+                }],
+            }],
+        }),
         None,
         &mut cmd_tx_1,
     )
@@ -876,38 +912,48 @@ async fn main() {
 
     // Delete and Restore a Premium name
     info!("Deleting and restoring premiun name");
-    let premium_check_dr = epp_proxy::client::domain::check(
-        premium_domain_dr, None, None, &mut cmd_tx_1
-    )
-        .await
-        .unwrap();
-    let premium_fee_dr =
-        premium_check_dr.response.donuts_fee_check.unwrap().sets.into_iter()
-            .find(|s| s.category.name == Some("premium".to_string())).unwrap();
-    let premium_fee_restore_command_dr = premium_fee_2.fees.into_iter()
-        .find(|f| f.command == epp_proxy::client::fee::Command::Update && f.command_name == Some("restore".to_string())).unwrap();
-
-    epp_proxy::client::domain::delete(premium_domain_dr, None, None, None, &mut cmd_tx_1)
+    let premium_check_dr =
+        epp_proxy::client::domain::check(premium_domain_dr, None, None, &mut cmd_tx_1)
             .await
             .unwrap();
+    let premium_fee_dr = premium_check_dr
+        .response
+        .donuts_fee_check
+        .unwrap()
+        .sets
+        .into_iter()
+        .find(|s| s.category.name == Some("premium".to_string()))
+        .unwrap();
+    let premium_fee_restore_command_dr = premium_fee_2
+        .fees
+        .into_iter()
+        .find(|f| {
+            f.command == epp_proxy::client::fee::Command::Update
+                && f.command_name == Some("restore".to_string())
+        })
+        .unwrap();
 
-    epp_proxy::client::rgp::request(
-            premium_domain_dr,
-            Some(epp_proxy::client::fee::DonutsFeeData {
-                sets: vec![epp_proxy::client::fee::DonutsFeeSet {
-                    category: premium_fee_dr.category,
-                    fee_type: premium_fee_dr.fee_type,
-                    fees: vec![epp_proxy::client::fee::DonutsAmount {
-                        value: premium_fee_restore_command_dr.value.clone(),
-                        command: premium_fee_restore_command_dr.command,
-                        command_name: premium_fee_restore_command_dr.command_name.clone(),
-                    }]
-                }]
-            }),
-            &mut cmd_tx_1
-        )
+    epp_proxy::client::domain::delete(premium_domain_dr, None, None, None, &mut cmd_tx_1)
         .await
         .unwrap();
+
+    epp_proxy::client::rgp::request(
+        premium_domain_dr,
+        Some(epp_proxy::client::fee::DonutsFeeData {
+            sets: vec![epp_proxy::client::fee::DonutsFeeSet {
+                category: premium_fee_dr.category,
+                fee_type: premium_fee_dr.fee_type,
+                fees: vec![epp_proxy::client::fee::DonutsAmount {
+                    value: premium_fee_restore_command_dr.value.clone(),
+                    command: premium_fee_restore_command_dr.command,
+                    command_name: premium_fee_restore_command_dr.command_name.clone(),
+                }],
+            }],
+        }),
+        &mut cmd_tx_1,
+    )
+    .await
+    .unwrap();
 
     info!("Logging out of accounts");
     let final_cmd_1 = epp_proxy::client::logout(cmd_tx_1).await.unwrap();

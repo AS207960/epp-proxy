@@ -24,13 +24,13 @@ pub mod launch;
 pub mod maintenance;
 pub mod mark;
 pub mod nominet;
+pub mod personal_registration;
 pub mod poll;
 pub mod rgp;
 pub mod router;
 pub mod tmch;
 pub mod traficom;
 pub mod verisign;
-pub mod personal_registration;
 
 pub use router::{CommandResponse, RequestMessage, RequestSender, Response, Sender};
 
