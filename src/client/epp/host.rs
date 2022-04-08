@@ -1,6 +1,5 @@
 //! EPP commands relating to host (nameserver) objects
 
-use std::convert::{TryFrom, TryInto};
 use super::super::host::{
     Address, AddressVersion, CheckRequest, CheckResponse, CreateRequest, CreateResponse,
     DeleteRequest, DeleteResponse, InfoRequest, InfoResponse, Status, UpdateObject, UpdateRequest,
@@ -9,6 +8,7 @@ use super::super::host::{
 use super::super::{proto, Error, Response};
 use super::router::HandleReqReturn;
 use super::ServerFeatures;
+use std::convert::{TryFrom, TryInto};
 
 impl From<proto::host::EPPHostStatusType> for Status {
     fn from(from: proto::host::EPPHostStatusType) -> Self {

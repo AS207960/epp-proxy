@@ -120,15 +120,15 @@ async fn main() {
         .get_matches();
 
     let pkcs11_engine = epp_proxy::setup_pkcs11_engine(matches.value_of("hsm_conf")).await;
-    let claims_domain = matches.value_of("claims_domain").unwrap();
+    let _claims_domain = matches.value_of("claims_domain").unwrap();
     let test_smd = matches.value_of("test_smd").unwrap();
     let test_smd_label = matches.value_of("test_smd_label").unwrap();
     let premium_domain_1 = matches.value_of("premium_domain_1").unwrap();
     let premium_domain_2 = matches.value_of("premium_domain_2").unwrap();
     let premium_domain_3 = matches.value_of("premium_domain_3").unwrap();
     let premium_domain_dr = matches.value_of("premium_domain_dr").unwrap();
-    let tmcnis_user = matches.value_of("tmcnis_user").unwrap();
-    let tmcnis_pass = matches.value_of("tmcnis_pass").unwrap();
+    let _tmcnis_user = matches.value_of("tmcnis_user").unwrap();
+    let _tmcnis_pass = matches.value_of("tmcnis_pass").unwrap();
 
     let dpml_domain = format!("{}.dpml.zone", test_smd_label);
     let dpml_override_domain = format!("{}.test1ga", test_smd_label);

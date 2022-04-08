@@ -106,8 +106,7 @@ async fn main() {
     info!("Acknowledging message");
     info!(
         "{:#?}",
-        epp_proxy::client::poll::poll_ack("12345", &mut cmd_tx)
-            .await
+        epp_proxy::client::poll::poll_ack("12345", &mut cmd_tx).await
     );
 
     // 2.1.2.4 Add Contact
