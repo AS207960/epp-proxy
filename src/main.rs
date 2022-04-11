@@ -49,7 +49,7 @@ extern crate log;
 async fn main() {
     if systemd_journal_logger::connected_to_journal() {
         systemd_journal_logger::init().unwrap();
-        log::set_max_level(log::LevelFilter::Debug);
+        log::set_max_level(log::LevelFilter::Info);
     } else {
         let mut log_builder = pretty_env_logger::formatted_builder();
         log_builder.parse_filters(&std::env::var("RUST_LOG").unwrap_or_default());
