@@ -1,9 +1,7 @@
-FROM ekidd/rust-musl-builder:1.51.0 as builder
+FROM ekidd/rust-musl-builder:nightly-2021-12-23 as builder
 
 RUN USER=rust cargo init
 RUN mkdir static
-COPY --chown=rust:rust Cargo.toml Cargo.lock ./
-RUN USER=rust cargo build --release
 
 ADD --chown=rust:rust . ./
 RUN USER=rust cargo build --release

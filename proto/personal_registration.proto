@@ -1,5 +1,6 @@
 syntax = "proto3";
 package epp.personal_registration;
+option go_package = "github.com/as207960/epp-proxy/gen/go/epp/personal_registration";
 
 message PersonalRegistrationCreate {
     bool bundled_rate = 1;

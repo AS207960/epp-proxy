@@ -1,5 +1,6 @@
 syntax = "proto3";
 package epp.rgp;
+option go_package = "github.com/as207960/epp-proxy/gen/go/epp/rgp";
 
 import "fee.proto";
 import "common.proto";

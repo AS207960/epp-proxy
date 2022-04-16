@@ -1,5 +1,6 @@
 syntax = "proto3";
 package epp.nominet;
+option go_package = "github.com/as207960/epp-proxy/gen/go/epp/nominet";
 
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/wrappers.proto";

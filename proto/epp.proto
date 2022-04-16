@@ -1,8 +1,10 @@
 syntax = "proto3";
 package epp;
+option go_package = "github.com/as207960/epp-proxy/gen/go/epp";
 
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/wrappers.proto";
+import "google/api/annotations.proto";
 import "contact.proto";
 import "domain.proto";
 import "host.proto";
@@ -16,46 +18,234 @@ import "dac.proto";
 import "common.proto";
 
 service EPPProxy {
-    rpc DomainCheck              (domain.DomainCheckRequest)                returns (domain.DomainCheckReply);
-    rpc DomainClaimsCheck        (domain.DomainClaimsCheckRequest)          returns (domain.DomainClaimsCheckReply);
-    rpc DomainTrademarkCheck     (domain.DomainTrademarkCheckRequest)       returns (domain.DomainClaimsCheckReply);
-    rpc DomainInfo               (domain.DomainInfoRequest)                 returns (domain.DomainInfoReply);
-    rpc DomainCreate             (domain.DomainCreateRequest)               returns (domain.DomainCreateReply);
-    rpc DomainDelete             (domain.DomainDeleteRequest)               returns (domain.DomainDeleteReply);
-    rpc DomainUpdate             (domain.DomainUpdateRequest)               returns (domain.DomainUpdateReply);
-    rpc DomainRenew              (domain.DomainRenewRequest)                returns (domain.DomainRenewReply);
-    rpc DomainTransferQuery      (domain.DomainTransferQueryRequest)        returns (domain.DomainTransferReply);
-    rpc DomainTransferRequest    (domain.DomainTransferRequestRequest)      returns (domain.DomainTransferReply);
-    rpc DomainTransferCancel     (domain.DomainTransferAcceptRejectRequest) returns (domain.DomainTransferReply);
-    rpc DomainTransferAccept     (domain.DomainTransferAcceptRejectRequest) returns (domain.DomainTransferReply);
-    rpc DomainTransferReject     (domain.DomainTransferAcceptRejectRequest) returns (domain.DomainTransferReply);
-    rpc DomainRestoreRequest     (rgp.RequestRequest)                       returns (rgp.RestoreReply);
-    rpc DomainSync               (domain.DomainSyncRequest)                 returns (domain.DomainUpdateReply);
-    rpc HostCheck                (host.HostCheckRequest)                    returns (host.HostCheckReply);
-    rpc HostInfo                 (host.HostInfoRequest)                     returns (host.HostInfoReply);
-    rpc HostCreate               (host.HostCreateRequest)                   returns (host.HostCreateReply);
-    rpc HostDelete               (host.HostDeleteRequest)                   returns (host.HostDeleteReply);
-    rpc HostUpdate               (host.HostUpdateRequest)                   returns (host.HostUpdateReply);
-    rpc ContactCheck             (contact.ContactCheckRequest)              returns (contact.ContactCheckReply);
-    rpc ContactInfo              (contact.ContactInfoRequest)               returns (contact.ContactInfoReply);
-    rpc ContactCreate            (contact.ContactCreateRequest)             returns (contact.ContactCreateReply);
-    rpc ContactDelete            (contact.ContactDeleteRequest)             returns (contact.ContactDeleteReply);
-    rpc ContactUpdate            (contact.ContactUpdateRequest)             returns (contact.ContactUpdateReply);
-    rpc ContactTransferQuery     (contact.ContactTransferQueryRequest)      returns (contact.ContactTransferReply);
-    rpc ContactTransferRequest   (contact.ContactTransferRequestRequest)    returns (contact.ContactTransferReply);
-    rpc ContactTransferAccept    (contact.ContactTransferRequestRequest)    returns (contact.ContactTransferReply);
-    rpc ContactTransferReject    (contact.ContactTransferRequestRequest)    returns (contact.ContactTransferReply);
-    rpc MaintenanceList          (RegistryInfo)                             returns (maintenance.MaintenanceListReply);
-    rpc MaintenanceInfo          (maintenance.MaintenanceInfoRequest)       returns (maintenance.MaintenanceInfoReply);
-    rpc Poll                     (stream PollAck)                           returns (stream PollReply);
-    rpc NominetTagList           (RegistryInfo)                             returns (nominet.NominetTagListReply);
-    rpc NominetAccept            (nominet.HandshakeAcceptRequest)           returns (nominet.HandshakeReply);
-    rpc NominetReject            (nominet.HandshakeRejectRequest)           returns (nominet.HandshakeReply);
-    rpc NominetRelease           (nominet.ReleaseRequest)                   returns (nominet.ReleaseReply);
-    rpc NominetContactValidate   (nominet.ContactValidateRequest)           returns (nominet.ContactValidateReply);
-    rpc NominetLock              (nominet.LockRequest)                      returns (nominet.LockReply);
-    rpc NominetUnlock            (nominet.LockRequest)                      returns (nominet.LockReply);
-    rpc BalanceInfo              (RegistryInfo)                             returns (BalanceReply);
+    rpc DomainCheck              (domain.DomainCheckRequest)                returns (domain.DomainCheckReply) {
+        option (google.api.http) = {
+            post: "/domain/{name}/check"
+            body: "*"
+        };
+    }
+    rpc DomainClaimsCheck        (domain.DomainClaimsCheckRequest)          returns (domain.DomainClaimsCheckReply) {
+        option (google.api.http) = {
+            post: "/domain/{name}/claims_check"
+            body: "*"
+        };
+    }
+    rpc DomainTrademarkCheck     (domain.DomainTrademarkCheckRequest)       returns (domain.DomainClaimsCheckReply) {
+        option (google.api.http) = {
+            post: "/domain/{name}/trademark_check"
+            body: "*"
+        };
+    }
+    rpc DomainInfo               (domain.DomainInfoRequest)                 returns (domain.DomainInfoReply) {
+        option (google.api.http) = {
+            post: "/domain/{name}"
+            body: "*"
+        };
+    }
+    rpc DomainCreate             (domain.DomainCreateRequest)               returns (domain.DomainCreateReply) {
+        option (google.api.http) = {
+            post: "/domain/{name}/create"
+            body: "*"
+        };
+    }
+    rpc DomainDelete             (domain.DomainDeleteRequest)               returns (domain.DomainDeleteReply) {
+        option (google.api.http) = {
+            post: "/domain/{name}/delete"
+            body: "*"
+        };
+    }
+    rpc DomainUpdate             (domain.DomainUpdateRequest)               returns (domain.DomainUpdateReply) {
+        option (google.api.http) = {
+            post: "/domain/{name}/update"
+            body: "*"
+        };
+    }
+    rpc DomainRenew              (domain.DomainRenewRequest)                returns (domain.DomainRenewReply) {
+        option (google.api.http) = {
+            post: "/domain/{name}/renew"
+            body: "*"
+        };
+    }
+    rpc DomainTransferQuery      (domain.DomainTransferQueryRequest)        returns (domain.DomainTransferReply) {
+        option (google.api.http) = {
+            post: "/domain/{name}/transfer"
+            body: "*"
+        };
+    }
+    rpc DomainTransferRequest    (domain.DomainTransferRequestRequest)      returns (domain.DomainTransferReply) {
+        option (google.api.http) = {
+            post: "/domain/{name}/transfer/request"
+            body: "*"
+        };
+    }
+    rpc DomainTransferCancel     (domain.DomainTransferAcceptRejectRequest) returns (domain.DomainTransferReply) {
+        option (google.api.http) = {
+            post: "/domain/{name}/transfer/cancel"
+            body: "*"
+        };
+    }
+    rpc DomainTransferAccept     (domain.DomainTransferAcceptRejectRequest) returns (domain.DomainTransferReply) {
+        option (google.api.http) = {
+            post: "/domain/{name}/transfer/accept"
+            body: "*"
+        };
+    }
+    rpc DomainTransferReject     (domain.DomainTransferAcceptRejectRequest) returns (domain.DomainTransferReply) {
+        option (google.api.http) = {
+            post: "/domain/{name}/transfer/reject"
+            body: "*"
+        };
+    }
+    rpc DomainRestoreRequest     (rgp.RequestRequest)                       returns (rgp.RestoreReply) {
+        option (google.api.http) = {
+            post: "/domain/{name}/restore"
+            body: "*"
+        };
+    }
+    rpc DomainSync               (domain.DomainSyncRequest)                 returns (domain.DomainUpdateReply) {
+        option (google.api.http) = {
+            post: "/domain/{name}/sync"
+            body: "*"
+        };
+    }
+    rpc HostCheck                (host.HostCheckRequest)                    returns (host.HostCheckReply) {
+        option (google.api.http) = {
+            get: "/host/{registry_name}/{name}/check"
+        };
+    }
+    rpc HostInfo                 (host.HostInfoRequest)                     returns (host.HostInfoReply) {
+        option (google.api.http) = {
+            get: "/host/{registry_name}/{name}"
+        };
+    }
+    rpc HostCreate               (host.HostCreateRequest)                   returns (host.HostCreateReply) {
+        option (google.api.http) = {
+            post: "/host/{registry_name}/{name}/create"
+            body: "*"
+        };
+    }
+    rpc HostDelete               (host.HostDeleteRequest)                   returns (host.HostDeleteReply) {
+        option (google.api.http) = {
+            post: "/host/{registry_name}/{name}/delete"
+        };
+    }
+    rpc HostUpdate               (host.HostUpdateRequest)                   returns (host.HostUpdateReply) {
+        option (google.api.http) = {
+            post: "/host/{registry_name}/{name}/update"
+            body: "*"
+        };
+    }
+    rpc ContactCheck             (contact.ContactCheckRequest)              returns (contact.ContactCheckReply) {
+        option (google.api.http) = {
+            get: "/host/{registry_name}/{id}/check"
+        };
+    }
+    rpc ContactInfo              (contact.ContactInfoRequest)               returns (contact.ContactInfoReply) {
+        option (google.api.http) = {
+            get: "/host/{registry_name}/{id}"
+        };
+    }
+    rpc ContactCreate            (contact.ContactCreateRequest)             returns (contact.ContactCreateReply) {
+        option (google.api.http) = {
+            post: "/host/{registry_name}/{id}/create"
+            body: "*"
+        };
+    }
+    rpc ContactDelete            (contact.ContactDeleteRequest)             returns (contact.ContactDeleteReply) {
+        option (google.api.http) = {
+            post: "/host/{registry_name}/{id}/delete"
+        };
+    }
+    rpc ContactUpdate            (contact.ContactUpdateRequest)             returns (contact.ContactUpdateReply) {
+        option (google.api.http) = {
+            post: "/host/{registry_name}/{id}/update"
+            body: "*"
+        };
+    }
+    rpc ContactTransferQuery     (contact.ContactTransferQueryRequest)      returns (contact.ContactTransferReply) {
+        option (google.api.http) = {
+            post: "/host/{registry_name}/{id}/transfer"
+            body: "*"
+        };
+    }
+    rpc ContactTransferRequest   (contact.ContactTransferRequestRequest)    returns (contact.ContactTransferReply) {
+        option (google.api.http) = {
+            post: "/host/{registry_name}/{id}/transfer/request"
+            body: "*"
+        };
+    }
+    rpc ContactTransferAccept    (contact.ContactTransferRequestRequest)    returns (contact.ContactTransferReply) {
+        option (google.api.http) = {
+            post: "/host/{registry_name}/{id}/transfer/accept"
+            body: "*"
+        };
+    }
+    rpc ContactTransferReject    (contact.ContactTransferRequestRequest)    returns (contact.ContactTransferReply) {
+        option (google.api.http) = {
+            post: "/host/{registry_name}/{id}/transfer/reject"
+            body: "*"
+        };
+    }
+    rpc MaintenanceList          (RegistryInfo)                             returns (maintenance.MaintenanceListReply) {
+        option (google.api.http) = {
+            get: "/maintenance/{registry_name}"
+        };
+    }
+    rpc MaintenanceInfo          (maintenance.MaintenanceInfoRequest)       returns (maintenance.MaintenanceInfoReply) {
+        option (google.api.http) = {
+            get: "/maintenance/{registry_name}/{id}"
+        };
+    }
+    rpc Poll                     (stream PollAck)                           returns (stream PollReply) {
+        option (google.api.http) = {
+            post: "/poll"
+        };
+    }
+    rpc NominetTagList           (RegistryInfo)                             returns (nominet.NominetTagListReply) {
+        option (google.api.http) = {
+            get: "/nominet/{registry_name}/tag_list"
+        };
+    }
+    rpc NominetAccept            (nominet.HandshakeAcceptRequest)           returns (nominet.HandshakeReply) {
+        option (google.api.http) = {
+            post: "/nominet/{registry_name}/case/{case_id}/accept"
+            body: "*"
+        };
+    }
+    rpc NominetReject            (nominet.HandshakeRejectRequest)           returns (nominet.HandshakeReply){
+        option (google.api.http) = {
+            post: "/nominet/{registry_name}/case/{case_id}/reject"
+        };
+    }
+    rpc NominetRelease           (nominet.ReleaseRequest)                   returns (nominet.ReleaseReply) {
+        option (google.api.http) = {
+            post: "/nominet/{registry_name}/release"
+            body: "*"
+        };
+    }
+    rpc NominetContactValidate   (nominet.ContactValidateRequest)           returns (nominet.ContactValidateReply) {
+        option (google.api.http) = {
+            post: "/nominet/{registry_name}/contact_validate"
+            body: "*"
+        };
+    }
+    rpc NominetLock              (nominet.LockRequest)                      returns (nominet.LockReply) {
+        option (google.api.http) = {
+            post: "/nominet/{registry_name}/lock"
+            body: "*"
+        };
+    }
+    rpc NominetUnlock            (nominet.LockRequest)                      returns (nominet.LockReply) {
+        option (google.api.http) = {
+            post: "/nominet/{registry_name}/unlock"
+            body: "*"
+        };
+    }
+    rpc BalanceInfo              (RegistryInfo)                             returns (BalanceReply) {
+        option (google.api.http) = {
+          get: "/balance_info/{registry_name}"
+        };
+    }
     rpc HitPointsInfo            (RegistryInfo)                             returns (eurid.HitPointsReply);
     rpc RegistrationLimitInfo    (RegistryInfo)                             returns (eurid.RegistrationLimitReply);
     rpc DNSQualityInfo           (eurid.DNSQualityRequest)                  returns (eurid.DNSQualityReply);

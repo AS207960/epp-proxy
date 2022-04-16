@@ -1,5 +1,6 @@
 syntax = "proto3";
 package epp.contact.qualified_lawyer;
+option go_package = "github.com/as207960/epp-proxy/gen/go/epp/contact/qualified_lawyer";
 
 import "google/protobuf/wrappers.proto";
 

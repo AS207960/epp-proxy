@@ -1,0 +1,6311 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "epp.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "EPPProxy"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/balance_info/{registryName}": {
+      "get": {
+        "operationId": "EPPProxy_BalanceInfo",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/eppBalanceReply"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "registryName",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "EPPProxy"
+        ]
+      }
+    },
+    "/domain/{name}": {
+      "post": {
+        "operationId": "EPPProxy_DomainInfo",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/domainDomainInfoReply"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "authInfo": {
+                  "type": "string"
+                },
+                "hosts": {
+                  "$ref": "#/definitions/domainDomainHosts"
+                },
+                "launchInfo": {
+                  "$ref": "#/definitions/launchLaunchInfo"
+                },
+                "registryName": {
+                  "type": "string"
+                },
+                "donutsFeeAgreement": {
+                  "$ref": "#/definitions/feeDonutsFeeData"
+                },
+                "euridData": {
+                  "$ref": "#/definitions/eppeuridDomainInfoRequest"
+                }
+              }
+            }
+          }
+        ],
+        "tags": [
+          "EPPProxy"
+        ]
+      }
+    },
+    "/domain/{name}/check": {
+      "post": {
+        "operationId": "EPPProxy_DomainCheck",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/domainDomainCheckReply"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "feeCheck": {
+                  "$ref": "#/definitions/feeFeeCheck"
+                },
+                "launchCheck": {
+                  "$ref": "#/definitions/launchPhase"
+                },
+                "registryName": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "tags": [
+          "EPPProxy"
+        ]
+      }
+    },
+    "/domain/{name}/claims_check": {
+      "post": {
+        "operationId": "EPPProxy_DomainClaimsCheck",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/domainDomainClaimsCheckReply"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "launchCheck": {
+                  "$ref": "#/definitions/launchPhase"
+                },
+                "registryName": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "tags": [
+          "EPPProxy"
+        ]
+      }
+    },
+    "/domain/{name}/create": {
+      "post": {
+        "operationId": "EPPProxy_DomainCreate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/domainDomainCreateReply"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "period": {
+                  "$ref": "#/definitions/commonPeriod"
+                },
+                "registrant": {
+                  "type": "string"
+                },
+                "contacts": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/eppdomainContact"
+                  }
+                },
+                "nameservers": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/domainNameServer"
+                  }
+                },
+                "authInfo": {
+                  "type": "string"
+                },
+                "secDns": {
+                  "$ref": "#/definitions/domainSecDNSData"
+                },
+                "launchData": {
+                  "$ref": "#/definitions/launchLaunchCreate"
+                },
+                "registryName": {
+                  "type": "string"
+                },
+                "donutsFeeAgreement": {
+                  "$ref": "#/definitions/feeDonutsFeeData"
+                },
+                "feeAgreement": {
+                  "$ref": "#/definitions/feeFeeAgreement"
+                },
+                "euridData": {
+                  "$ref": "#/definitions/euridDomainCreateExtension"
+                },
+                "isnicPayment": {
+                  "$ref": "#/definitions/isnicPaymentInfo"
+                },
+                "personalRegistration": {
+                  "$ref": "#/definitions/personal_registrationPersonalRegistrationInfo"
+                }
+              }
+            }
+          }
+        ],
+        "tags": [
+          "EPPProxy"
+        ]
+      }
+    },
+    "/domain/{name}/delete": {
+      "post": {
+        "operationId": "EPPProxy_DomainDelete",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/domainDomainDeleteReply"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "launchData": {
+                  "$ref": "#/definitions/launchLaunchData"
+                },
+                "registryName": {
+                  "type": "string"
+                },
+                "donutsFeeAgreement": {
+                  "$ref": "#/definitions/feeDonutsFeeData"
+                },
+                "euridData": {
+                  "$ref": "#/definitions/euridDomainDeleteExtension"
+                }
+              }
+            }
+          }
+        ],
+        "tags": [
+          "EPPProxy"
+        ]
+      }
+    },
+    "/domain/{name}/renew": {
+      "post": {
+        "operationId": "EPPProxy_DomainRenew",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/domainDomainRenewReply"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "period": {
+                  "$ref": "#/definitions/commonPeriod"
+                },
+                "currentExpiryDate": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "registryName": {
+                  "type": "string"
+                },
+                "donutsFeeAgreement": {
+                  "$ref": "#/definitions/feeDonutsFeeData"
+                },
+                "feeAgreement": {
+                  "$ref": "#/definitions/feeFeeAgreement"
+                },
+                "isnicPayment": {
+                  "$ref": "#/definitions/isnicPaymentInfo"
+                }
+              }
+            }
+          }
+        ],
+        "tags": [
+          "EPPProxy"
+        ]
+      }
+    },
+    "/domain/{name}/restore": {
+      "post": {
+        "operationId": "EPPProxy_DomainRestoreRequest",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/rgpRestoreReply"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "registryName": {
+                  "type": "string"
+                },
+                "donutsFeeAgreement": {
+                  "$ref": "#/definitions/feeDonutsFeeData"
+                }
+              }
+            }
+          }
+        ],
+        "tags": [
+          "EPPProxy"
+        ]
+      }
+    },
+    "/domain/{name}/sync": {
+      "post": {
+        "operationId": "EPPProxy_DomainSync",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/domainDomainUpdateReply"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "registryName": {
+                  "type": "string"
+                },
+                "month": {
+                  "type": "integer",
+                  "format": "int64"
+                },
+                "day": {
+                  "type": "integer",
+                  "format": "int64"
+                }
+              }
+            }
+          }
+        ],
+        "tags": [
+          "EPPProxy"
+        ]
+      }
+    },
+    "/domain/{name}/trademark_check": {
+      "post": {
+        "operationId": "EPPProxy_DomainTrademarkCheck",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/domainDomainClaimsCheckReply"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "registryName": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "tags": [
+          "EPPProxy"
+        ]
+      }
+    },
+    "/domain/{name}/transfer": {
+      "post": {
+        "operationId": "EPPProxy_DomainTransferQuery",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/domainDomainTransferReply"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "authInfo": {
+                  "type": "string"
+                },
+                "registryName": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "tags": [
+          "EPPProxy"
+        ]
+      }
+    },
+    "/domain/{name}/transfer/accept": {
+      "post": {
+        "operationId": "EPPProxy_DomainTransferAccept",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/domainDomainTransferReply"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "authInfo": {
+                  "type": "string"
+                },
+                "registryName": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "tags": [
+          "EPPProxy"
+        ]
+      }
+    },
+    "/domain/{name}/transfer/cancel": {
+      "post": {
+        "operationId": "EPPProxy_DomainTransferCancel",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/domainDomainTransferReply"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "authInfo": {
+                  "type": "string"
+                },
+                "registryName": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "tags": [
+          "EPPProxy"
+        ]
+      }
+    },
+    "/domain/{name}/transfer/reject": {
+      "post": {
+        "operationId": "EPPProxy_DomainTransferReject",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/domainDomainTransferReply"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "authInfo": {
+                  "type": "string"
+                },
+                "registryName": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "tags": [
+          "EPPProxy"
+        ]
+      }
+    },
+    "/domain/{name}/transfer/request": {
+      "post": {
+        "operationId": "EPPProxy_DomainTransferRequest",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/domainDomainTransferReply"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "period": {
+                  "$ref": "#/definitions/commonPeriod"
+                },
+                "authInfo": {
+                  "type": "string"
+                },
+                "registryName": {
+                  "type": "string"
+                },
+                "donutsFeeAgreement": {
+                  "$ref": "#/definitions/feeDonutsFeeData"
+                },
+                "feeAgreement": {
+                  "$ref": "#/definitions/feeFeeAgreement"
+                },
+                "euridData": {
+                  "$ref": "#/definitions/euridDomainTransferExtension"
+                }
+              }
+            }
+          }
+        ],
+        "tags": [
+          "EPPProxy"
+        ]
+      }
+    },
+    "/domain/{name}/update": {
+      "post": {
+        "operationId": "EPPProxy_DomainUpdate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/domainDomainUpdateReply"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "add": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/domainDomainUpdateRequestParam"
+                  }
+                },
+                "remove": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/domainDomainUpdateRequestParam"
+                  }
+                },
+                "newRegistrant": {
+                  "type": "string"
+                },
+                "newAuthInfo": {
+                  "type": "string"
+                },
+                "secDns": {
+                  "$ref": "#/definitions/domainUpdateSecDNSData"
+                },
+                "launchData": {
+                  "$ref": "#/definitions/launchLaunchData"
+                },
+                "registryName": {
+                  "type": "string"
+                },
+                "donutsFeeAgreement": {
+                  "$ref": "#/definitions/feeDonutsFeeData"
+                },
+                "feeAgreement": {
+                  "$ref": "#/definitions/feeFeeAgreement"
+                },
+                "euridData": {
+                  "$ref": "#/definitions/euridDomainUpdateExtension"
+                },
+                "isnicInfo": {
+                  "$ref": "#/definitions/eppisnicDomainUpdate"
+                }
+              }
+            }
+          }
+        ],
+        "tags": [
+          "EPPProxy"
+        ]
+      }
+    },
+    "/epp.EPPProxy/DACDomain": {
+      "post": {
+        "operationId": "EPPProxy_DACDomain",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/dacDomainResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/dacDomainRequest"
+            }
+          }
+        ],
+        "tags": [
+          "EPPProxy"
+        ]
+      }
+    },
+    "/epp.EPPProxy/DACLimits": {
+      "post": {
+        "operationId": "EPPProxy_DACLimits",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/dacUsageResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/dacUsageRequest"
+            }
+          }
+        ],
+        "tags": [
+          "EPPProxy"
+        ]
+      }
+    },
+    "/epp.EPPProxy/DACUsage": {
+      "post": {
+        "operationId": "EPPProxy_DACUsage",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/dacUsageResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/dacUsageRequest"
+            }
+          }
+        ],
+        "tags": [
+          "EPPProxy"
+        ]
+      }
+    },
+    "/epp.EPPProxy/DNSQualityInfo": {
+      "post": {
+        "operationId": "EPPProxy_DNSQualityInfo",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/euridDNSQualityReply"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/euridDNSQualityRequest"
+            }
+          }
+        ],
+        "tags": [
+          "EPPProxy"
+        ]
+      }
+    },
+    "/epp.EPPProxy/DNSSECEligibilityInfo": {
+      "post": {
+        "operationId": "EPPProxy_DNSSECEligibilityInfo",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/euridDNSSECEligibilityReply"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/euridDNSSECEligibilityRequest"
+            }
+          }
+        ],
+        "tags": [
+          "EPPProxy"
+        ]
+      }
+    },
+    "/epp.EPPProxy/HitPointsInfo": {
+      "post": {
+        "operationId": "EPPProxy_HitPointsInfo",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/euridHitPointsReply"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/eppRegistryInfo"
+            }
+          }
+        ],
+        "tags": [
+          "EPPProxy"
+        ]
+      }
+    },
+    "/epp.EPPProxy/RegistrationLimitInfo": {
+      "post": {
+        "operationId": "EPPProxy_RegistrationLimitInfo",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/euridRegistrationLimitReply"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/eppRegistryInfo"
+            }
+          }
+        ],
+        "tags": [
+          "EPPProxy"
+        ]
+      }
+    },
+    "/epp.EPPProxy/TMCHMarkCheck": {
+      "post": {
+        "operationId": "EPPProxy_TMCHMarkCheck",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/tmchMarkCheckResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/tmchMarkCheckRequest"
+            }
+          }
+        ],
+        "tags": [
+          "EPPProxy"
+        ]
+      }
+    },
+    "/epp.EPPProxy/TMCHMarkCreate": {
+      "post": {
+        "operationId": "EPPProxy_TMCHMarkCreate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/tmchMarkCreateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/tmchMarkCreateRequest"
+            }
+          }
+        ],
+        "tags": [
+          "EPPProxy"
+        ]
+      }
+    },
+    "/epp.EPPProxy/TMCHMarkEncodedSMDInfo": {
+      "post": {
+        "operationId": "EPPProxy_TMCHMarkEncodedSMDInfo",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/tmchMarkSMDInfoResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/tmchMarkInfoRequest"
+            }
+          }
+        ],
+        "tags": [
+          "EPPProxy"
+        ]
+      }
+    },
+    "/epp.EPPProxy/TMCHMarkFileInfo": {
+      "post": {
+        "operationId": "EPPProxy_TMCHMarkFileInfo",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/tmchMarkSMDInfoResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/tmchMarkInfoRequest"
+            }
+          }
+        ],
+        "tags": [
+          "EPPProxy"
+        ]
+      }
+    },
+    "/epp.EPPProxy/TMCHMarkInfo": {
+      "post": {
+        "operationId": "EPPProxy_TMCHMarkInfo",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/tmchMarkInfoResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/tmchMarkInfoRequest"
+            }
+          }
+        ],
+        "tags": [
+          "EPPProxy"
+        ]
+      }
+    },
+    "/epp.EPPProxy/TMCHMarkRenew": {
+      "post": {
+        "operationId": "EPPProxy_TMCHMarkRenew",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/tmchMarkRenewResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/tmchMarkRenewRequest"
+            }
+          }
+        ],
+        "tags": [
+          "EPPProxy"
+        ]
+      }
+    },
+    "/epp.EPPProxy/TMCHMarkSMDInfo": {
+      "post": {
+        "operationId": "EPPProxy_TMCHMarkSMDInfo",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/tmchMarkSMDInfoResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/tmchMarkInfoRequest"
+            }
+          }
+        ],
+        "tags": [
+          "EPPProxy"
+        ]
+      }
+    },
+    "/epp.EPPProxy/TMCHMarkTransfer": {
+      "post": {
+        "operationId": "EPPProxy_TMCHMarkTransfer",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/tmchMarkTransferResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/tmchMarkTransferRequest"
+            }
+          }
+        ],
+        "tags": [
+          "EPPProxy"
+        ]
+      }
+    },
+    "/epp.EPPProxy/TMCHMarkTransferInitiate": {
+      "post": {
+        "operationId": "EPPProxy_TMCHMarkTransferInitiate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/tmchMarkTransferInitiateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/tmchMarkTransferInitiateRequest"
+            }
+          }
+        ],
+        "tags": [
+          "EPPProxy"
+        ]
+      }
+    },
+    "/epp.EPPProxy/TMCHMarkUpdate": {
+      "post": {
+        "operationId": "EPPProxy_TMCHMarkUpdate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/tmchMarkUpdateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/tmchMarkUpdateRequest"
+            }
+          }
+        ],
+        "tags": [
+          "EPPProxy"
+        ]
+      }
+    },
+    "/host/{registryName}/{id}": {
+      "get": {
+        "operationId": "EPPProxy_ContactInfo",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/contactContactInfoReply"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "registryName",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "EPPProxy"
+        ]
+      }
+    },
+    "/host/{registryName}/{id}/check": {
+      "get": {
+        "operationId": "EPPProxy_ContactCheck",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/contactContactCheckReply"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "registryName",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "EPPProxy"
+        ]
+      }
+    },
+    "/host/{registryName}/{id}/create": {
+      "post": {
+        "operationId": "EPPProxy_ContactCreate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/contactContactCreateReply"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "registryName",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "localAddress": {
+                  "$ref": "#/definitions/contactPostalAddress"
+                },
+                "internationalisedAddress": {
+                  "$ref": "#/definitions/contactPostalAddress"
+                },
+                "phone": {
+                  "$ref": "#/definitions/commonPhone"
+                },
+                "fax": {
+                  "$ref": "#/definitions/commonPhone"
+                },
+                "email": {
+                  "type": "string"
+                },
+                "entityType": {
+                  "$ref": "#/definitions/contactEntityType"
+                },
+                "tradingName": {
+                  "type": "string"
+                },
+                "companyNumber": {
+                  "type": "string"
+                },
+                "disclosure": {
+                  "$ref": "#/definitions/contactDisclosure"
+                },
+                "euridInfo": {
+                  "$ref": "#/definitions/euridContactExtension"
+                },
+                "authInfo": {
+                  "type": "string"
+                },
+                "qualifiedLawyer": {
+                  "$ref": "#/definitions/qualified_lawyerQualifiedLawyer"
+                },
+                "isnicInfo": {
+                  "$ref": "#/definitions/isnicContactCreate"
+                }
+              }
+            }
+          }
+        ],
+        "tags": [
+          "EPPProxy"
+        ]
+      }
+    },
+    "/host/{registryName}/{id}/delete": {
+      "post": {
+        "operationId": "EPPProxy_ContactDelete",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/contactContactDeleteReply"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "registryName",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "EPPProxy"
+        ]
+      }
+    },
+    "/host/{registryName}/{id}/transfer": {
+      "post": {
+        "operationId": "EPPProxy_ContactTransferQuery",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/contactContactTransferReply"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "registryName",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "authInfo": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "tags": [
+          "EPPProxy"
+        ]
+      }
+    },
+    "/host/{registryName}/{id}/transfer/accept": {
+      "post": {
+        "operationId": "EPPProxy_ContactTransferAccept",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/contactContactTransferReply"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "registryName",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "authInfo": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "tags": [
+          "EPPProxy"
+        ]
+      }
+    },
+    "/host/{registryName}/{id}/transfer/reject": {
+      "post": {
+        "operationId": "EPPProxy_ContactTransferReject",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/contactContactTransferReply"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "registryName",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "authInfo": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "tags": [
+          "EPPProxy"
+        ]
+      }
+    },
+    "/host/{registryName}/{id}/transfer/request": {
+      "post": {
+        "operationId": "EPPProxy_ContactTransferRequest",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/contactContactTransferReply"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "registryName",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "authInfo": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "tags": [
+          "EPPProxy"
+        ]
+      }
+    },
+    "/host/{registryName}/{id}/update": {
+      "post": {
+        "operationId": "EPPProxy_ContactUpdate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/contactContactUpdateReply"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "registryName",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "addStatuses": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/eppcontactContactStatus"
+                  }
+                },
+                "removeStatuses": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/eppcontactContactStatus"
+                  }
+                },
+                "newLocalAddress": {
+                  "$ref": "#/definitions/contactPostalAddress"
+                },
+                "newInternationalisedAddress": {
+                  "$ref": "#/definitions/contactPostalAddress"
+                },
+                "newPhone": {
+                  "$ref": "#/definitions/commonPhone"
+                },
+                "newFax": {
+                  "$ref": "#/definitions/commonPhone"
+                },
+                "newEmail": {
+                  "type": "string"
+                },
+                "newEntityType": {
+                  "$ref": "#/definitions/contactEntityType"
+                },
+                "newTradingName": {
+                  "type": "string"
+                },
+                "newCompanyNumber": {
+                  "type": "string"
+                },
+                "disclosure": {
+                  "$ref": "#/definitions/contactDisclosure"
+                },
+                "newAuthInfo": {
+                  "type": "string"
+                },
+                "newEuridInfo": {
+                  "$ref": "#/definitions/euridContactUpdateExtension"
+                },
+                "qualifiedLawyer": {
+                  "$ref": "#/definitions/qualified_lawyerQualifiedLawyer"
+                },
+                "isnicInfo": {
+                  "$ref": "#/definitions/isnicContactUpdate"
+                }
+              }
+            }
+          }
+        ],
+        "tags": [
+          "EPPProxy"
+        ]
+      }
+    },
+    "/host/{registryName}/{name}": {
+      "get": {
+        "operationId": "EPPProxy_HostInfo",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/hostHostInfoReply"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "registryName",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "EPPProxy"
+        ]
+      }
+    },
+    "/host/{registryName}/{name}/check": {
+      "get": {
+        "operationId": "EPPProxy_HostCheck",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/hostHostCheckReply"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "registryName",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "EPPProxy"
+        ]
+      }
+    },
+    "/host/{registryName}/{name}/create": {
+      "post": {
+        "operationId": "EPPProxy_HostCreate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/hostHostCreateReply"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "registryName",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "addresses": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/commonIPAddress"
+                  }
+                },
+                "isnicInfo": {
+                  "$ref": "#/definitions/isnicHostInfo"
+                }
+              }
+            }
+          }
+        ],
+        "tags": [
+          "EPPProxy"
+        ]
+      }
+    },
+    "/host/{registryName}/{name}/delete": {
+      "post": {
+        "operationId": "EPPProxy_HostDelete",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/hostHostDeleteReply"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "registryName",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "EPPProxy"
+        ]
+      }
+    },
+    "/host/{registryName}/{name}/update": {
+      "post": {
+        "operationId": "EPPProxy_HostUpdate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/hostHostUpdateReply"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "registryName",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "add": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/hostHostUpdateRequestParam"
+                  }
+                },
+                "remove": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/hostHostUpdateRequestParam"
+                  }
+                },
+                "newName": {
+                  "type": "string"
+                },
+                "isnicInfo": {
+                  "$ref": "#/definitions/isnicHostInfo"
+                }
+              }
+            }
+          }
+        ],
+        "tags": [
+          "EPPProxy"
+        ]
+      }
+    },
+    "/maintenance/{registryName}": {
+      "get": {
+        "operationId": "EPPProxy_MaintenanceList",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/maintenanceMaintenanceListReply"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "registryName",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "EPPProxy"
+        ]
+      }
+    },
+    "/maintenance/{registryName}/{id}": {
+      "get": {
+        "operationId": "EPPProxy_MaintenanceInfo",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/maintenanceMaintenanceInfoReply"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "registryName",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "EPPProxy"
+        ]
+      }
+    },
+    "/nominet/{registryName}/case/{caseId}/accept": {
+      "post": {
+        "operationId": "EPPProxy_NominetAccept",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/nominetHandshakeReply"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "registryName",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "caseId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "registrant": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "tags": [
+          "EPPProxy"
+        ]
+      }
+    },
+    "/nominet/{registryName}/case/{caseId}/reject": {
+      "post": {
+        "operationId": "EPPProxy_NominetReject",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/nominetHandshakeReply"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "registryName",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "caseId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "EPPProxy"
+        ]
+      }
+    },
+    "/nominet/{registryName}/contact_validate": {
+      "post": {
+        "operationId": "EPPProxy_NominetContactValidate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/nominetContactValidateReply"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "registryName",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "contactId": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "tags": [
+          "EPPProxy"
+        ]
+      }
+    },
+    "/nominet/{registryName}/lock": {
+      "post": {
+        "operationId": "EPPProxy_NominetLock",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/nominetLockReply"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "registryName",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "lockType": {
+                  "type": "string"
+                },
+                "object": {
+                  "$ref": "#/definitions/nominetObject"
+                }
+              }
+            }
+          }
+        ],
+        "tags": [
+          "EPPProxy"
+        ]
+      }
+    },
+    "/nominet/{registryName}/release": {
+      "post": {
+        "operationId": "EPPProxy_NominetRelease",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/nominetReleaseReply"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "registryName",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "registrarTag": {
+                  "type": "string"
+                },
+                "object": {
+                  "$ref": "#/definitions/nominetObject"
+                }
+              }
+            }
+          }
+        ],
+        "tags": [
+          "EPPProxy"
+        ]
+      }
+    },
+    "/nominet/{registryName}/tag_list": {
+      "get": {
+        "operationId": "EPPProxy_NominetTagList",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/nominetNominetTagListReply"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "registryName",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "EPPProxy"
+        ]
+      }
+    },
+    "/nominet/{registryName}/unlock": {
+      "post": {
+        "operationId": "EPPProxy_NominetUnlock",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/nominetLockReply"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "registryName",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "lockType": {
+                  "type": "string"
+                },
+                "object": {
+                  "$ref": "#/definitions/nominetObject"
+                }
+              }
+            }
+          }
+        ],
+        "tags": [
+          "EPPProxy"
+        ]
+      }
+    },
+    "/poll": {
+      "post": {
+        "operationId": "EPPProxy_Poll",
+        "responses": {
+          "200": {
+            "description": "A successful response.(streaming responses)",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "$ref": "#/definitions/eppPollReply"
+                },
+                "error": {
+                  "$ref": "#/definitions/googlerpcStatus"
+                }
+              },
+              "title": "Stream result of eppPollReply"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "msgId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "EPPProxy"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "CaseIDCaseIDType": {
+      "type": "string",
+      "enum": [
+        "Custom",
+        "UDRP",
+        "URS"
+      ],
+      "default": "Custom"
+    },
+    "ChangeDataCaseID": {
+      "type": "object",
+      "properties": {
+        "caseIdType": {
+          "$ref": "#/definitions/CaseIDCaseIDType"
+        },
+        "name": {
+          "type": "string"
+        },
+        "caseId": {
+          "type": "string"
+        }
+      }
+    },
+    "ChangeDataChangeOperation": {
+      "type": "object",
+      "properties": {
+        "operationType": {
+          "$ref": "#/definitions/ChangeOperationChangeOperationType"
+        },
+        "operation": {
+          "type": "string"
+        }
+      }
+    },
+    "ChangeDataChangeState": {
+      "type": "string",
+      "enum": [
+        "AFTER",
+        "BEFORE"
+      ],
+      "default": "AFTER"
+    },
+    "ChangeOperationChangeOperationType": {
+      "type": "string",
+      "enum": [
+        "Custom",
+        "Create",
+        "Delete",
+        "Renew",
+        "Transfer",
+        "Update",
+        "Restore",
+        "AutoRenew",
+        "AutoDelete",
+        "AutoPurge"
+      ],
+      "default": "Custom"
+    },
+    "DonutsFeeTypeFeeTypes": {
+      "type": "string",
+      "enum": [
+        "Custom",
+        "Fee",
+        "Price"
+      ],
+      "default": "Custom"
+    },
+    "IPAddressIPVersion": {
+      "type": "string",
+      "enum": [
+        "UNKNOWN",
+        "IPv4",
+        "IPv6"
+      ],
+      "default": "UNKNOWN"
+    },
+    "LaunchCreateCreateType": {
+      "type": "string",
+      "enum": [
+        "Registration",
+        "Application"
+      ],
+      "default": "Registration"
+    },
+    "MaintenanceListReplyItem": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "start": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "end": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "created": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updated": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "NominetTagListReplyTag": {
+      "type": "object",
+      "properties": {
+        "tag": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "tradingName": {
+          "type": "string"
+        },
+        "handshake": {
+          "type": "boolean"
+        }
+      }
+    },
+    "PaymentInfoCard": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "cvc": {
+          "type": "string"
+        }
+      }
+    },
+    "PeriodUnit": {
+      "type": "string",
+      "enum": [
+        "Years",
+        "Months"
+      ],
+      "default": "Years"
+    },
+    "PhasePhaseType": {
+      "type": "string",
+      "enum": [
+        "Open",
+        "Sunrise",
+        "Landrush",
+        "Claims",
+        "Custom"
+      ],
+      "default": "Open"
+    },
+    "ProcessProcessStage": {
+      "type": "string",
+      "enum": [
+        "Initial",
+        "Updated"
+      ],
+      "default": "Initial"
+    },
+    "commonCommandExtraValue": {
+      "type": "object",
+      "properties": {
+        "reason": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      }
+    },
+    "commonCommandResponse": {
+      "type": "object",
+      "properties": {
+        "extraValues": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/commonCommandExtraValue"
+          }
+        },
+        "transactionId": {
+          "$ref": "#/definitions/commonCommandTransactionID"
+        }
+      }
+    },
+    "commonCommandTransactionID": {
+      "type": "object",
+      "properties": {
+        "client": {
+          "type": "string"
+        },
+        "server": {
+          "type": "string"
+        }
+      }
+    },
+    "commonIPAddress": {
+      "type": "object",
+      "properties": {
+        "address": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/IPAddressIPVersion"
+        }
+      }
+    },
+    "commonPeriod": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "unit": {
+          "$ref": "#/definitions/PeriodUnit"
+        }
+      }
+    },
+    "commonPhone": {
+      "type": "object",
+      "properties": {
+        "number": {
+          "type": "string"
+        },
+        "extension": {
+          "type": "string"
+        }
+      }
+    },
+    "commonTransferStatus": {
+      "type": "string",
+      "enum": [
+        "UnknownStatus",
+        "ClientApproved",
+        "ClientCancelled",
+        "ClientRejected",
+        "Pending",
+        "ServerApproved",
+        "ServerCancelled"
+      ],
+      "default": "UnknownStatus"
+    },
+    "contactContactCheckReply": {
+      "type": "object",
+      "properties": {
+        "available": {
+          "type": "boolean"
+        },
+        "reason": {
+          "type": "string"
+        },
+        "cmdResp": {
+          "$ref": "#/definitions/commonCommandResponse"
+        }
+      }
+    },
+    "contactContactCreateReply": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "pending": {
+          "type": "boolean"
+        },
+        "creationDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "cmdResp": {
+          "$ref": "#/definitions/commonCommandResponse"
+        }
+      }
+    },
+    "contactContactDeleteReply": {
+      "type": "object",
+      "properties": {
+        "pending": {
+          "type": "boolean"
+        },
+        "cmdResp": {
+          "$ref": "#/definitions/commonCommandResponse"
+        }
+      }
+    },
+    "contactContactInfoReply": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "registryId": {
+          "type": "string"
+        },
+        "statuses": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/eppcontactContactStatus"
+          }
+        },
+        "localAddress": {
+          "$ref": "#/definitions/contactPostalAddress"
+        },
+        "internationalisedAddress": {
+          "$ref": "#/definitions/contactPostalAddress"
+        },
+        "phone": {
+          "$ref": "#/definitions/commonPhone"
+        },
+        "fax": {
+          "$ref": "#/definitions/commonPhone"
+        },
+        "email": {
+          "type": "string"
+        },
+        "clientId": {
+          "type": "string"
+        },
+        "clientCreatedId": {
+          "type": "string"
+        },
+        "creationDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "lastUpdatedClient": {
+          "type": "string"
+        },
+        "lastUpdatedDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "lastTransferDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "entityType": {
+          "$ref": "#/definitions/contactEntityType"
+        },
+        "tradingName": {
+          "type": "string"
+        },
+        "companyNumber": {
+          "type": "string"
+        },
+        "disclosure": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/contactDisclosureType"
+          }
+        },
+        "authInfo": {
+          "type": "string"
+        },
+        "nominetDataQuality": {
+          "$ref": "#/definitions/nominet_extDataQuality"
+        },
+        "euridInfo": {
+          "$ref": "#/definitions/euridContactExtension"
+        },
+        "cmdResp": {
+          "$ref": "#/definitions/commonCommandResponse"
+        },
+        "qualifiedLawyer": {
+          "$ref": "#/definitions/qualified_lawyerQualifiedLawyer"
+        },
+        "isnicInfo": {
+          "$ref": "#/definitions/isnicContactInfo"
+        }
+      }
+    },
+    "contactContactPANReply": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "result": {
+          "type": "boolean"
+        },
+        "serverTransactionId": {
+          "type": "string"
+        },
+        "clientTransactionId": {
+          "type": "string"
+        },
+        "date": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "contactContactTransferReply": {
+      "type": "object",
+      "properties": {
+        "pending": {
+          "type": "boolean"
+        },
+        "status": {
+          "$ref": "#/definitions/commonTransferStatus"
+        },
+        "requestedClientId": {
+          "type": "string"
+        },
+        "requestedDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "actClientId": {
+          "type": "string"
+        },
+        "actDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "cmdResp": {
+          "$ref": "#/definitions/commonCommandResponse"
+        }
+      }
+    },
+    "contactContactUpdateReply": {
+      "type": "object",
+      "properties": {
+        "pending": {
+          "type": "boolean"
+        },
+        "cmdResp": {
+          "$ref": "#/definitions/commonCommandResponse"
+        }
+      }
+    },
+    "contactDisclosure": {
+      "type": "object",
+      "properties": {
+        "disclosure": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/contactDisclosureType"
+          }
+        }
+      }
+    },
+    "contactDisclosureType": {
+      "type": "string",
+      "enum": [
+        "LocalName",
+        "InternationalisedName",
+        "LocalOrganisation",
+        "InternationalisedOrganisation",
+        "LocalAddress",
+        "InternationalisedAddress",
+        "Voice",
+        "Fax",
+        "Email"
+      ],
+      "default": "LocalName"
+    },
+    "contactEntityType": {
+      "type": "string",
+      "enum": [
+        "NotSet",
+        "UnknownEntity",
+        "UkLimitedCompany",
+        "UkPublicLimitedCompany",
+        "UkPartnership",
+        "UkSoleTrader",
+        "UkLimitedLiabilityPartnership",
+        "UkIndustrialProvidentRegisteredCompany",
+        "UkIndividual",
+        "UkSchool",
+        "UkRegisteredCharity",
+        "UkGovernmentBody",
+        "UkCorporationByRoyalCharter",
+        "UkStatutoryBody",
+        "UkPoliticalParty",
+        "OtherUkEntity",
+        "FinnishIndividual",
+        "FinnishCompany",
+        "FinnishAssociation",
+        "FinnishInstitution",
+        "FinnishPoliticalParty",
+        "FinnishMunicipality",
+        "FinnishGovernment",
+        "FinnishPublicCommunity",
+        "OtherIndividual",
+        "OtherCompany",
+        "OtherAssociation",
+        "OtherInstitution",
+        "OtherPoliticalParty",
+        "OtherMunicipality",
+        "OtherGovernment",
+        "OtherPublicCommunity"
+      ],
+      "default": "NotSet"
+    },
+    "contactPostalAddress": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "organisation": {
+          "type": "string"
+        },
+        "streets": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "city": {
+          "type": "string"
+        },
+        "province": {
+          "type": "string"
+        },
+        "postalCode": {
+          "type": "string"
+        },
+        "countryCode": {
+          "type": "string"
+        },
+        "identityNumber": {
+          "type": "string"
+        },
+        "birthDate": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "dacDomainRequest": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "environment": {
+          "$ref": "#/definitions/eppdacEnvironment"
+        },
+        "registryName": {
+          "type": "string"
+        }
+      }
+    },
+    "dacDomainResponse": {
+      "type": "object",
+      "properties": {
+        "registrationState": {
+          "$ref": "#/definitions/dacDomainState"
+        },
+        "detagged": {
+          "type": "boolean"
+        },
+        "suspended": {
+          "type": "boolean"
+        },
+        "created": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "expiry": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "status": {
+          "$ref": "#/definitions/eppdacDomainStatus"
+        },
+        "tag": {
+          "type": "string"
+        }
+      }
+    },
+    "dacDomainState": {
+      "type": "string",
+      "enum": [
+        "Registered",
+        "Available",
+        "NotWithinRegistry",
+        "RulesPrevent"
+      ],
+      "default": "Registered"
+    },
+    "dacUsageRequest": {
+      "type": "object",
+      "properties": {
+        "environment": {
+          "$ref": "#/definitions/eppdacEnvironment"
+        },
+        "registryName": {
+          "type": "string"
+        }
+      }
+    },
+    "dacUsageResponse": {
+      "type": "object",
+      "properties": {
+        "usage60": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "usage24": {
+          "type": "string",
+          "format": "uint64"
+        }
+      }
+    },
+    "domainDomainCheckReply": {
+      "type": "object",
+      "properties": {
+        "available": {
+          "type": "boolean"
+        },
+        "reason": {
+          "type": "string"
+        },
+        "feeCheck": {
+          "$ref": "#/definitions/feeFeeCheckData"
+        },
+        "donutsFeeCheck": {
+          "$ref": "#/definitions/feeDonutsFeeData"
+        },
+        "registryName": {
+          "type": "string"
+        },
+        "cmdResp": {
+          "$ref": "#/definitions/commonCommandResponse"
+        },
+        "euridIdn": {
+          "$ref": "#/definitions/euridIDN"
+        },
+        "euridData": {
+          "$ref": "#/definitions/euridDomainCheckData"
+        }
+      }
+    },
+    "domainDomainClaimsCheckReply": {
+      "type": "object",
+      "properties": {
+        "exists": {
+          "type": "boolean"
+        },
+        "claimsKeys": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/launchClaimsKey"
+          }
+        },
+        "registryName": {
+          "type": "string"
+        },
+        "cmdResp": {
+          "$ref": "#/definitions/commonCommandResponse"
+        }
+      }
+    },
+    "domainDomainCreateReply": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "pending": {
+          "type": "boolean"
+        },
+        "creationDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "expiryDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "feeData": {
+          "$ref": "#/definitions/feeFeeData"
+        },
+        "donutsFeeData": {
+          "$ref": "#/definitions/feeDonutsFeeData"
+        },
+        "launchData": {
+          "$ref": "#/definitions/launchLaunchData"
+        },
+        "registryName": {
+          "type": "string"
+        },
+        "cmdResp": {
+          "$ref": "#/definitions/commonCommandResponse"
+        },
+        "euridIdn": {
+          "$ref": "#/definitions/euridIDN"
+        },
+        "personalRegistration": {
+          "$ref": "#/definitions/personal_registrationPersonalRegistrationCreate"
+        }
+      }
+    },
+    "domainDomainDeleteReply": {
+      "type": "object",
+      "properties": {
+        "pending": {
+          "type": "boolean"
+        },
+        "feeData": {
+          "$ref": "#/definitions/feeFeeData"
+        },
+        "registryName": {
+          "type": "string"
+        },
+        "cmdResp": {
+          "$ref": "#/definitions/commonCommandResponse"
+        },
+        "euridIdn": {
+          "$ref": "#/definitions/euridIDN"
+        }
+      }
+    },
+    "domainDomainHosts": {
+      "type": "object",
+      "properties": {
+        "hosts": {
+          "$ref": "#/definitions/domainDomainHostsType"
+        }
+      }
+    },
+    "domainDomainHostsType": {
+      "type": "string",
+      "enum": [
+        "All",
+        "Delegated",
+        "Subordinate",
+        "None"
+      ],
+      "default": "All"
+    },
+    "domainDomainInfoReply": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "registryId": {
+          "type": "string"
+        },
+        "statuses": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/eppdomainDomainStatus"
+          }
+        },
+        "registrant": {
+          "type": "string"
+        },
+        "contacts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/eppdomainContact"
+          }
+        },
+        "nameservers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/domainNameServer"
+          }
+        },
+        "hosts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "clientId": {
+          "type": "string"
+        },
+        "clientCreatedId": {
+          "type": "string"
+        },
+        "creationDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "expiryDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "lastUpdatedClient": {
+          "type": "string"
+        },
+        "lastUpdatedDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "lastTransferDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "registryName": {
+          "type": "string"
+        },
+        "rgpState": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/rgpRGPState"
+          }
+        },
+        "authInfo": {
+          "type": "string"
+        },
+        "secDns": {
+          "$ref": "#/definitions/domainSecDNSData"
+        },
+        "launchInfo": {
+          "$ref": "#/definitions/launchLaunchInfoData"
+        },
+        "donutsFeeData": {
+          "$ref": "#/definitions/feeDonutsFeeData"
+        },
+        "verisignWhoisInfo": {
+          "$ref": "#/definitions/domainVerisignWhoisInfo"
+        },
+        "cmdResp": {
+          "$ref": "#/definitions/commonCommandResponse"
+        },
+        "euridIdn": {
+          "$ref": "#/definitions/euridIDN"
+        },
+        "euridData": {
+          "$ref": "#/definitions/eppeuridDomainInfo"
+        },
+        "isnicInfo": {
+          "$ref": "#/definitions/eppisnicDomainInfo"
+        },
+        "personalRegistration": {
+          "$ref": "#/definitions/personal_registrationPersonalRegistrationInfo"
+        }
+      }
+    },
+    "domainDomainPANReply": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "result": {
+          "type": "boolean"
+        },
+        "serverTransactionId": {
+          "type": "string"
+        },
+        "clientTransactionId": {
+          "type": "string"
+        },
+        "date": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "domainDomainRenewReply": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "pending": {
+          "type": "boolean"
+        },
+        "expiryDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "feeData": {
+          "$ref": "#/definitions/feeFeeData"
+        },
+        "donutsFeeData": {
+          "$ref": "#/definitions/feeDonutsFeeData"
+        },
+        "registryName": {
+          "type": "string"
+        },
+        "cmdResp": {
+          "$ref": "#/definitions/commonCommandResponse"
+        },
+        "euridIdn": {
+          "$ref": "#/definitions/euridIDN"
+        },
+        "euridData": {
+          "$ref": "#/definitions/euridDomainRenewInfo"
+        },
+        "personalRegistration": {
+          "$ref": "#/definitions/personal_registrationPersonalRegistrationCreate"
+        }
+      }
+    },
+    "domainDomainTransferReply": {
+      "type": "object",
+      "properties": {
+        "pending": {
+          "type": "boolean"
+        },
+        "name": {
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/definitions/commonTransferStatus"
+        },
+        "requestedClientId": {
+          "type": "string"
+        },
+        "requestedDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "actClientId": {
+          "type": "string"
+        },
+        "actDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "expiryDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "feeData": {
+          "$ref": "#/definitions/feeFeeData"
+        },
+        "donutsFeeData": {
+          "$ref": "#/definitions/feeDonutsFeeData"
+        },
+        "registryName": {
+          "type": "string"
+        },
+        "cmdResp": {
+          "$ref": "#/definitions/commonCommandResponse"
+        },
+        "euridIdn": {
+          "$ref": "#/definitions/euridIDN"
+        },
+        "euridData": {
+          "$ref": "#/definitions/euridDomainTransferInfo"
+        },
+        "personalRegistration": {
+          "$ref": "#/definitions/personal_registrationPersonalRegistrationCreate"
+        }
+      }
+    },
+    "domainDomainUpdateReply": {
+      "type": "object",
+      "properties": {
+        "pending": {
+          "type": "boolean"
+        },
+        "feeData": {
+          "$ref": "#/definitions/feeFeeData"
+        },
+        "donutsFeeData": {
+          "$ref": "#/definitions/feeDonutsFeeData"
+        },
+        "registryName": {
+          "type": "string"
+        },
+        "cmdResp": {
+          "$ref": "#/definitions/commonCommandResponse"
+        }
+      }
+    },
+    "domainDomainUpdateRequestParam": {
+      "type": "object",
+      "properties": {
+        "nameserver": {
+          "$ref": "#/definitions/domainNameServer"
+        },
+        "contact": {
+          "$ref": "#/definitions/eppdomainContact"
+        },
+        "state": {
+          "$ref": "#/definitions/eppdomainDomainStatus"
+        }
+      }
+    },
+    "domainNameServer": {
+      "type": "object",
+      "properties": {
+        "hostObj": {
+          "type": "string"
+        },
+        "hostName": {
+          "type": "string"
+        },
+        "addresses": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/commonIPAddress"
+          }
+        },
+        "euridIdn": {
+          "$ref": "#/definitions/euridIDN"
+        }
+      }
+    },
+    "domainSecDNSDSData": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/domainSecDNSDSDatum"
+          }
+        }
+      }
+    },
+    "domainSecDNSDSDatum": {
+      "type": "object",
+      "properties": {
+        "keyTag": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "algorithm": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "digestType": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "digest": {
+          "type": "string"
+        },
+        "keyData": {
+          "$ref": "#/definitions/domainSecDNSKeyDatum"
+        }
+      }
+    },
+    "domainSecDNSData": {
+      "type": "object",
+      "properties": {
+        "maxSigLife": {
+          "type": "string",
+          "format": "int64"
+        },
+        "dsData": {
+          "$ref": "#/definitions/domainSecDNSDSData"
+        },
+        "keyData": {
+          "$ref": "#/definitions/domainSecDNSKeyData"
+        }
+      }
+    },
+    "domainSecDNSKeyData": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/domainSecDNSKeyDatum"
+          }
+        }
+      }
+    },
+    "domainSecDNSKeyDatum": {
+      "type": "object",
+      "properties": {
+        "flags": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "protocol": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "algorithm": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "publicKey": {
+          "type": "string"
+        }
+      }
+    },
+    "domainUpdateSecDNSData": {
+      "type": "object",
+      "properties": {
+        "urgent": {
+          "type": "boolean"
+        },
+        "newMaxSigLife": {
+          "type": "string",
+          "format": "int64"
+        },
+        "addDsData": {
+          "$ref": "#/definitions/domainSecDNSDSData"
+        },
+        "addKeyData": {
+          "$ref": "#/definitions/domainSecDNSKeyData"
+        },
+        "all": {
+          "type": "boolean"
+        },
+        "remDsData": {
+          "$ref": "#/definitions/domainSecDNSDSData"
+        },
+        "remKeyData": {
+          "$ref": "#/definitions/domainSecDNSKeyData"
+        }
+      }
+    },
+    "domainVerisignWhoisInfo": {
+      "type": "object",
+      "properties": {
+        "registrar": {
+          "type": "string"
+        },
+        "whoisServer": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "irisServer": {
+          "type": "string"
+        }
+      }
+    },
+    "eppBalanceReply": {
+      "type": "object",
+      "properties": {
+        "balance": {
+          "type": "string"
+        },
+        "currency": {
+          "type": "string"
+        },
+        "creditLimit": {
+          "type": "string"
+        },
+        "availableCredit": {
+          "type": "string"
+        },
+        "fixedCreditThreshold": {
+          "type": "string"
+        },
+        "percentageCreditThreshold": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "cmdResp": {
+          "$ref": "#/definitions/commonCommandResponse"
+        }
+      }
+    },
+    "eppChangeData": {
+      "type": "object",
+      "properties": {
+        "changeState": {
+          "$ref": "#/definitions/ChangeDataChangeState"
+        },
+        "operation": {
+          "$ref": "#/definitions/ChangeDataChangeOperation"
+        },
+        "date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "serverTransactionId": {
+          "type": "string"
+        },
+        "who": {
+          "type": "string"
+        },
+        "caseId": {
+          "$ref": "#/definitions/ChangeDataCaseID"
+        },
+        "reason": {
+          "type": "string"
+        }
+      }
+    },
+    "eppPollReply": {
+      "type": "object",
+      "properties": {
+        "msgId": {
+          "type": "string"
+        },
+        "enqueueDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "message": {
+          "type": "string"
+        },
+        "domainInfo": {
+          "$ref": "#/definitions/domainDomainInfoReply"
+        },
+        "domainTransfer": {
+          "$ref": "#/definitions/domainDomainTransferReply"
+        },
+        "domainCreate": {
+          "$ref": "#/definitions/domainDomainCreateReply"
+        },
+        "domainRenew": {
+          "$ref": "#/definitions/domainDomainRenewReply"
+        },
+        "domainPan": {
+          "$ref": "#/definitions/domainDomainPANReply"
+        },
+        "contactInfo": {
+          "$ref": "#/definitions/contactContactInfoReply"
+        },
+        "contactTransfer": {
+          "$ref": "#/definitions/contactContactTransferReply"
+        },
+        "contactPan": {
+          "$ref": "#/definitions/contactContactPANReply"
+        },
+        "nominetDomainCancel": {
+          "$ref": "#/definitions/nominetDomainCancel"
+        },
+        "nominetDomainRelease": {
+          "$ref": "#/definitions/nominetDomainRelease"
+        },
+        "nominetDomainRegistrarChange": {
+          "$ref": "#/definitions/nominetDomainRegistrarChange"
+        },
+        "nominetHostCancel": {
+          "$ref": "#/definitions/nominetHostCancel"
+        },
+        "nominetProcess": {
+          "$ref": "#/definitions/nominetProcess"
+        },
+        "nominetSuspend": {
+          "$ref": "#/definitions/nominetSuspend"
+        },
+        "nominetDomainFail": {
+          "$ref": "#/definitions/nominetDomainFail"
+        },
+        "nominetRegistrantTransfer": {
+          "$ref": "#/definitions/nominetRegistrantTransfer"
+        },
+        "traficomTrn": {
+          "$ref": "#/definitions/traficomTrnData"
+        },
+        "verisignLowBalance": {
+          "$ref": "#/definitions/eppBalanceReply"
+        },
+        "maintenanceInfo": {
+          "$ref": "#/definitions/maintenanceMaintenanceInfoReply"
+        },
+        "euridPoll": {
+          "$ref": "#/definitions/eppeuridPollReply"
+        },
+        "hostInfo": {
+          "$ref": "#/definitions/hostHostInfoReply"
+        },
+        "changeData": {
+          "$ref": "#/definitions/eppChangeData"
+        },
+        "cmdResp": {
+          "$ref": "#/definitions/commonCommandResponse"
+        }
+      }
+    },
+    "eppRegistryInfo": {
+      "type": "object",
+      "properties": {
+        "registryName": {
+          "type": "string"
+        }
+      }
+    },
+    "eppcontactContactStatus": {
+      "type": "string",
+      "enum": [
+        "ClientDeleteProhibited",
+        "ClientTransferProhibited",
+        "ClientUpdateProhibited",
+        "Linked",
+        "Ok",
+        "PendingCreate",
+        "PendingDelete",
+        "PendingTransfer",
+        "PendingUpdate",
+        "ServerDeleteProhibited",
+        "ServerTransferProhibited",
+        "ServerUpdateProhibited"
+      ],
+      "default": "ClientDeleteProhibited"
+    },
+    "eppdacDomainStatus": {
+      "type": "string",
+      "enum": [
+        "Unknown",
+        "RegisteredUntilExpiry",
+        "RenewalRequired",
+        "NoLongerRequired"
+      ],
+      "default": "Unknown"
+    },
+    "eppdacEnvironment": {
+      "type": "string",
+      "enum": [
+        "RealTime",
+        "TimeDelay"
+      ],
+      "default": "RealTime"
+    },
+    "eppdomainContact": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        }
+      }
+    },
+    "eppdomainDomainStatus": {
+      "type": "string",
+      "enum": [
+        "ClientDeleteProhibited",
+        "ClientHold",
+        "ClientRenewProhibited",
+        "ClientTransferProhibited",
+        "ClientUpdateProhibited",
+        "Inactive",
+        "Ok",
+        "PendingCreate",
+        "PendingDelete",
+        "PendingRenew",
+        "PendingTransfer",
+        "PendingUpdate",
+        "ServerDeleteProhibited",
+        "ServerHold",
+        "ServerRenewProhibited",
+        "ServerTransferProhibited",
+        "ServerUpdateProhibited"
+      ],
+      "default": "ClientDeleteProhibited"
+    },
+    "eppeuridContactType": {
+      "type": "string",
+      "enum": [
+        "Registrant",
+        "Billing",
+        "Tech",
+        "OnSite",
+        "Reseller"
+      ],
+      "default": "Registrant"
+    },
+    "eppeuridDomainInfo": {
+      "type": "object",
+      "properties": {
+        "onHold": {
+          "type": "boolean"
+        },
+        "quarantined": {
+          "type": "boolean"
+        },
+        "suspended": {
+          "type": "boolean"
+        },
+        "delayed": {
+          "type": "boolean"
+        },
+        "seized": {
+          "type": "boolean"
+        },
+        "deletionDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "onSite": {
+          "type": "string"
+        },
+        "reseller": {
+          "type": "string"
+        },
+        "maxExtensionPeriod": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "registrantCountry": {
+          "type": "string"
+        },
+        "registrantCountryOfCitizenship": {
+          "type": "string"
+        },
+        "authInfoValidUntil": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "eppeuridDomainInfoRequest": {
+      "type": "object",
+      "properties": {
+        "request": {
+          "type": "boolean"
+        },
+        "cancel": {
+          "type": "boolean"
+        }
+      }
+    },
+    "eppeuridPollReply": {
+      "type": "object",
+      "properties": {
+        "context": {
+          "type": "string"
+        },
+        "objectType": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "objectUnicode": {
+          "type": "string"
+        },
+        "action": {
+          "type": "string"
+        },
+        "code": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "detail": {
+          "type": "string"
+        },
+        "registrar": {
+          "type": "string"
+        }
+      }
+    },
+    "eppfeeFeeCommand": {
+      "type": "object",
+      "properties": {
+        "command": {
+          "$ref": "#/definitions/feeCommand"
+        },
+        "period": {
+          "$ref": "#/definitions/commonPeriod"
+        }
+      }
+    },
+    "eppisnicContactStatus": {
+      "type": "string",
+      "enum": [
+        "Ok",
+        "OkUnconfirmed",
+        "PendingCreate",
+        "ServerExpired",
+        "ServerSuspended"
+      ],
+      "default": "Ok"
+    },
+    "eppisnicDomainInfo": {
+      "type": "object",
+      "properties": {
+        "zoneContact": {
+          "type": "string"
+        }
+      }
+    },
+    "eppisnicDomainUpdate": {
+      "type": "object",
+      "properties": {
+        "removeAllNs": {
+          "type": "boolean"
+        },
+        "newMasterNs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "epplaunchStatus": {
+      "type": "object",
+      "properties": {
+        "statusType": {
+          "$ref": "#/definitions/launchStatusType"
+        },
+        "statusName": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        }
+      }
+    },
+    "eppmaintenanceEnvironment": {
+      "type": "string",
+      "enum": [
+        "Production",
+        "OTE",
+        "Staging",
+        "Development",
+        "Custom"
+      ],
+      "default": "Production"
+    },
+    "eppmarksContact": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "organisation": {
+          "type": "string"
+        },
+        "address": {
+          "$ref": "#/definitions/marksAddress"
+        },
+        "voice": {
+          "$ref": "#/definitions/commonPhone"
+        },
+        "fax": {
+          "$ref": "#/definitions/commonPhone"
+        },
+        "email": {
+          "type": "string"
+        },
+        "contactType": {
+          "$ref": "#/definitions/eppmarksContactType"
+        }
+      }
+    },
+    "eppmarksContactType": {
+      "type": "string",
+      "enum": [
+        "OwnerContact",
+        "Agent",
+        "ThirdParty"
+      ],
+      "default": "OwnerContact"
+    },
+    "euridContactExtension": {
+      "type": "object",
+      "properties": {
+        "contactType": {
+          "$ref": "#/definitions/eppeuridContactType"
+        },
+        "whoisEmail": {
+          "type": "string"
+        },
+        "vat": {
+          "type": "string"
+        },
+        "citizenshipCountry": {
+          "type": "string"
+        },
+        "language": {
+          "type": "string"
+        }
+      }
+    },
+    "euridContactUpdateExtension": {
+      "type": "object",
+      "properties": {
+        "newWhoisEmail": {
+          "type": "string"
+        },
+        "newVat": {
+          "type": "string"
+        },
+        "newCitizenshipCountry": {
+          "type": "string"
+        },
+        "newLanguage": {
+          "type": "string"
+        }
+      }
+    },
+    "euridDNSQualityReply": {
+      "type": "object",
+      "properties": {
+        "score": {
+          "type": "string"
+        },
+        "checkTime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "cmdResp": {
+          "$ref": "#/definitions/commonCommandResponse"
+        },
+        "registryName": {
+          "type": "string"
+        }
+      }
+    },
+    "euridDNSQualityRequest": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "registryName": {
+          "type": "string"
+        }
+      }
+    },
+    "euridDNSSECEligibilityReply": {
+      "type": "object",
+      "properties": {
+        "eligible": {
+          "type": "boolean"
+        },
+        "message": {
+          "type": "string"
+        },
+        "code": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "cmdResp": {
+          "$ref": "#/definitions/commonCommandResponse"
+        },
+        "registryName": {
+          "type": "string"
+        }
+      }
+    },
+    "euridDNSSECEligibilityRequest": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "registryName": {
+          "type": "string"
+        }
+      }
+    },
+    "euridDomainCheckData": {
+      "type": "object",
+      "properties": {
+        "availableDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "status": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/eppdomainDomainStatus"
+          }
+        }
+      }
+    },
+    "euridDomainCreateExtension": {
+      "type": "object",
+      "properties": {
+        "onSite": {
+          "type": "string"
+        },
+        "reseller": {
+          "type": "string"
+        }
+      }
+    },
+    "euridDomainDeleteExtension": {
+      "type": "object",
+      "properties": {
+        "schedule": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "cancel": {
+          "type": "boolean"
+        }
+      }
+    },
+    "euridDomainRenewInfo": {
+      "type": "object",
+      "properties": {
+        "removedDeletion": {
+          "type": "boolean"
+        }
+      }
+    },
+    "euridDomainTransferExtension": {
+      "type": "object",
+      "properties": {
+        "registrant": {
+          "type": "string"
+        },
+        "billing": {
+          "type": "string"
+        },
+        "technical": {
+          "type": "string"
+        },
+        "reseller": {
+          "type": "string"
+        },
+        "onSite": {
+          "type": "string"
+        }
+      }
+    },
+    "euridDomainTransferInfo": {
+      "type": "object",
+      "properties": {
+        "onHold": {
+          "type": "boolean"
+        },
+        "quarantined": {
+          "type": "boolean"
+        },
+        "delayed": {
+          "type": "boolean"
+        },
+        "reason": {
+          "type": "string"
+        },
+        "registrant": {
+          "type": "string"
+        },
+        "billing": {
+          "type": "string"
+        },
+        "onSite": {
+          "type": "string"
+        },
+        "technical": {
+          "type": "string"
+        },
+        "reseller": {
+          "type": "string"
+        }
+      }
+    },
+    "euridDomainUpdateExtension": {
+      "type": "object",
+      "properties": {
+        "addOnSite": {
+          "type": "string"
+        },
+        "addReseller": {
+          "type": "string"
+        },
+        "removeOnSite": {
+          "type": "string"
+        },
+        "removeReseller": {
+          "type": "string"
+        }
+      }
+    },
+    "euridHitPointsReply": {
+      "type": "object",
+      "properties": {
+        "hitPoints": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "maxHitPoints": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "blockedUntil": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "cmdResp": {
+          "$ref": "#/definitions/commonCommandResponse"
+        }
+      }
+    },
+    "euridIDN": {
+      "type": "object",
+      "properties": {
+        "ace": {
+          "type": "string"
+        },
+        "unicode": {
+          "type": "string"
+        }
+      }
+    },
+    "euridRegistrationLimitReply": {
+      "type": "object",
+      "properties": {
+        "monthlyRegistrations": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "maxMonthlyRegistrations": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "limitedUntil": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "cmdResp": {
+          "$ref": "#/definitions/commonCommandResponse"
+        }
+      }
+    },
+    "feeApplied": {
+      "type": "string",
+      "enum": [
+        "Immediate",
+        "Delayed",
+        "Unspecified"
+      ],
+      "default": "Immediate"
+    },
+    "feeCommand": {
+      "type": "string",
+      "enum": [
+        "Create",
+        "Renew",
+        "Transfer",
+        "Delete",
+        "Restore",
+        "Update",
+        "Check",
+        "Info",
+        "Custom"
+      ],
+      "default": "Create"
+    },
+    "feeCredit": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        }
+      }
+    },
+    "feeDonutsAmount": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "command": {
+          "$ref": "#/definitions/feeCommand"
+        }
+      }
+    },
+    "feeDonutsCategory": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "feeDonutsFeeData": {
+      "type": "object",
+      "properties": {
+        "fees": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/feeDonutsFeeSet"
+          }
+        }
+      }
+    },
+    "feeDonutsFeeSet": {
+      "type": "object",
+      "properties": {
+        "fees": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/feeDonutsAmount"
+          }
+        },
+        "feeType": {
+          "$ref": "#/definitions/feeDonutsFeeType"
+        },
+        "category": {
+          "$ref": "#/definitions/feeDonutsCategory"
+        }
+      }
+    },
+    "feeDonutsFeeType": {
+      "type": "object",
+      "properties": {
+        "feeType": {
+          "$ref": "#/definitions/DonutsFeeTypeFeeTypes"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "feeFee": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "refundable": {
+          "type": "boolean"
+        },
+        "gracePeriod": {
+          "type": "string"
+        },
+        "applied": {
+          "$ref": "#/definitions/feeApplied"
+        }
+      }
+    },
+    "feeFeeAgreement": {
+      "type": "object",
+      "properties": {
+        "currency": {
+          "type": "string"
+        },
+        "fees": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/feeFee"
+          }
+        }
+      }
+    },
+    "feeFeeCheck": {
+      "type": "object",
+      "properties": {
+        "currency": {
+          "type": "string"
+        },
+        "commands": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/eppfeeFeeCommand"
+          }
+        }
+      }
+    },
+    "feeFeeCheckData": {
+      "type": "object",
+      "properties": {
+        "available": {
+          "type": "boolean"
+        },
+        "commands": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/feeFeeCheckDataFeeCommand"
+          }
+        },
+        "reason": {
+          "type": "string"
+        }
+      }
+    },
+    "feeFeeCheckDataFeeCommand": {
+      "type": "object",
+      "properties": {
+        "command": {
+          "$ref": "#/definitions/feeCommand"
+        },
+        "standard": {
+          "type": "boolean"
+        },
+        "period": {
+          "$ref": "#/definitions/commonPeriod"
+        },
+        "currency": {
+          "type": "string"
+        },
+        "fees": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/feeFee"
+          }
+        },
+        "credits": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/feeCredit"
+          }
+        },
+        "class": {
+          "type": "string"
+        },
+        "reason": {
+          "type": "string"
+        }
+      }
+    },
+    "feeFeeData": {
+      "type": "object",
+      "properties": {
+        "currency": {
+          "type": "string"
+        },
+        "period": {
+          "$ref": "#/definitions/commonPeriod"
+        },
+        "fees": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/feeFee"
+          }
+        },
+        "credits": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/feeCredit"
+          }
+        },
+        "balance": {
+          "type": "string"
+        },
+        "creditLimit": {
+          "type": "string"
+        }
+      }
+    },
+    "googlerpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "hostHostCheckReply": {
+      "type": "object",
+      "properties": {
+        "available": {
+          "type": "boolean"
+        },
+        "reason": {
+          "type": "string"
+        },
+        "cmdResp": {
+          "$ref": "#/definitions/commonCommandResponse"
+        }
+      }
+    },
+    "hostHostCreateReply": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "pending": {
+          "type": "boolean"
+        },
+        "creationDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "cmdResp": {
+          "$ref": "#/definitions/commonCommandResponse"
+        }
+      }
+    },
+    "hostHostDeleteReply": {
+      "type": "object",
+      "properties": {
+        "pending": {
+          "type": "boolean"
+        },
+        "cmdResp": {
+          "$ref": "#/definitions/commonCommandResponse"
+        }
+      }
+    },
+    "hostHostInfoReply": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "registryId": {
+          "type": "string"
+        },
+        "statuses": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/hostHostStatus"
+          }
+        },
+        "addresses": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/commonIPAddress"
+          }
+        },
+        "clientId": {
+          "type": "string"
+        },
+        "clientCreatedId": {
+          "type": "string"
+        },
+        "creationDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "lastUpdatedClient": {
+          "type": "string"
+        },
+        "lastUpdatedDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "lastTransferDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "cmdResp": {
+          "$ref": "#/definitions/commonCommandResponse"
+        }
+      }
+    },
+    "hostHostStatus": {
+      "type": "string",
+      "enum": [
+        "ClientDeleteProhibited",
+        "ClientUpdateProhibited",
+        "Linked",
+        "Ok",
+        "PendingCreate",
+        "PendingDelete",
+        "PendingTransfer",
+        "PendingUpdate",
+        "ServerDeleteProhibited",
+        "ServerUpdateProhibited"
+      ],
+      "default": "ClientDeleteProhibited"
+    },
+    "hostHostUpdateReply": {
+      "type": "object",
+      "properties": {
+        "pending": {
+          "type": "boolean"
+        },
+        "cmdResp": {
+          "$ref": "#/definitions/commonCommandResponse"
+        }
+      }
+    },
+    "hostHostUpdateRequestParam": {
+      "type": "object",
+      "properties": {
+        "address": {
+          "$ref": "#/definitions/commonIPAddress"
+        },
+        "state": {
+          "$ref": "#/definitions/hostHostStatus"
+        }
+      }
+    },
+    "isnicContactCreate": {
+      "type": "object",
+      "properties": {
+        "mobile": {
+          "$ref": "#/definitions/commonPhone"
+        },
+        "sid": {
+          "type": "string"
+        },
+        "autoUpdateFromNationalRegistry": {
+          "type": "boolean"
+        },
+        "paperInvoices": {
+          "type": "boolean"
+        },
+        "lang": {
+          "type": "string"
+        }
+      }
+    },
+    "isnicContactInfo": {
+      "type": "object",
+      "properties": {
+        "statuses": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/eppisnicContactStatus"
+          }
+        },
+        "mobile": {
+          "$ref": "#/definitions/commonPhone"
+        },
+        "sid": {
+          "type": "string"
+        },
+        "autoUpdateFromNationalRegistry": {
+          "type": "boolean"
+        },
+        "paperInvoices": {
+          "type": "boolean"
+        }
+      }
+    },
+    "isnicContactUpdate": {
+      "type": "object",
+      "properties": {
+        "mobile": {
+          "$ref": "#/definitions/commonPhone"
+        },
+        "autoUpdateFromNationalRegistry": {
+          "type": "boolean"
+        },
+        "paperInvoices": {
+          "type": "boolean"
+        },
+        "lang": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        }
+      }
+    },
+    "isnicHostInfo": {
+      "type": "object",
+      "properties": {
+        "zoneContact": {
+          "type": "string"
+        }
+      }
+    },
+    "isnicPaymentInfo": {
+      "type": "object",
+      "properties": {
+        "prepaid": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "card": {
+          "$ref": "#/definitions/PaymentInfoCard"
+        }
+      }
+    },
+    "launchClaimsKey": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "validatorId": {
+          "type": "string"
+        }
+      }
+    },
+    "launchCodeMark": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "validator": {
+          "type": "string"
+        },
+        "mark": {
+          "type": "string"
+        }
+      }
+    },
+    "launchCoreNICApplicationInfo": {
+      "type": "object",
+      "properties": {
+        "info": {
+          "type": "string"
+        },
+        "infoType": {
+          "type": "string"
+        }
+      }
+    },
+    "launchLaunchCreate": {
+      "type": "object",
+      "properties": {
+        "phase": {
+          "$ref": "#/definitions/launchPhase"
+        },
+        "codeMark": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/launchCodeMark"
+          }
+        },
+        "notices": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/launchNotice"
+          }
+        },
+        "signedMark": {
+          "type": "string"
+        },
+        "createType": {
+          "$ref": "#/definitions/LaunchCreateCreateType"
+        },
+        "coreNicAugmentedMark": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/launchCoreNICApplicationInfo"
+          }
+        }
+      }
+    },
+    "launchLaunchData": {
+      "type": "object",
+      "properties": {
+        "phase": {
+          "$ref": "#/definitions/launchPhase"
+        },
+        "applicationId": {
+          "type": "string"
+        }
+      }
+    },
+    "launchLaunchInfo": {
+      "type": "object",
+      "properties": {
+        "includeMark": {
+          "type": "boolean"
+        },
+        "phase": {
+          "$ref": "#/definitions/launchPhase"
+        },
+        "applicationId": {
+          "type": "string"
+        }
+      }
+    },
+    "launchLaunchInfoData": {
+      "type": "object",
+      "properties": {
+        "phase": {
+          "$ref": "#/definitions/launchPhase"
+        },
+        "applicationId": {
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/definitions/epplaunchStatus"
+        },
+        "mark": {
+          "type": "string"
+        }
+      }
+    },
+    "launchNotice": {
+      "type": "object",
+      "properties": {
+        "noticeId": {
+          "type": "string"
+        },
+        "validator": {
+          "type": "string"
+        },
+        "notAfter": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "acceptedAfter": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "launchPhase": {
+      "type": "object",
+      "properties": {
+        "phaseType": {
+          "$ref": "#/definitions/PhasePhaseType"
+        },
+        "phaseName": {
+          "type": "string"
+        }
+      }
+    },
+    "launchStatusType": {
+      "type": "string",
+      "enum": [
+        "Custom",
+        "PendingValidation",
+        "Validated",
+        "Invalid",
+        "PendingAllocation",
+        "Allocated",
+        "Rejected"
+      ],
+      "default": "Custom"
+    },
+    "maintenanceDescription": {
+      "type": "object",
+      "properties": {
+        "plain": {
+          "type": "string"
+        },
+        "html": {
+          "type": "string"
+        }
+      }
+    },
+    "maintenanceImpact": {
+      "type": "string",
+      "enum": [
+        "Full",
+        "Partial",
+        "None"
+      ],
+      "default": "Full"
+    },
+    "maintenanceIntervention": {
+      "type": "object",
+      "properties": {
+        "connection": {
+          "type": "boolean"
+        },
+        "implementation": {
+          "type": "boolean"
+        }
+      }
+    },
+    "maintenanceMaintenanceInfoReply": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "itemType": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "pollType": {
+          "$ref": "#/definitions/maintenancePollType"
+        },
+        "environment": {
+          "$ref": "#/definitions/eppmaintenanceEnvironment"
+        },
+        "environmentName": {
+          "type": "string"
+        },
+        "systems": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/maintenanceSystem"
+          }
+        },
+        "start": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "end": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "created": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updated": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "reason": {
+          "$ref": "#/definitions/maintenanceReason"
+        },
+        "detailUrl": {
+          "type": "string"
+        },
+        "descriptions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/maintenanceDescription"
+          }
+        },
+        "tlds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "intervention": {
+          "$ref": "#/definitions/maintenanceIntervention"
+        },
+        "cmdResp": {
+          "$ref": "#/definitions/commonCommandResponse"
+        }
+      }
+    },
+    "maintenanceMaintenanceListReply": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/MaintenanceListReplyItem"
+          }
+        },
+        "cmdResp": {
+          "$ref": "#/definitions/commonCommandResponse"
+        }
+      }
+    },
+    "maintenancePollType": {
+      "type": "string",
+      "enum": [
+        "NotSet",
+        "Create",
+        "Update",
+        "Delete",
+        "Courtesy",
+        "End"
+      ],
+      "default": "NotSet"
+    },
+    "maintenanceReason": {
+      "type": "string",
+      "enum": [
+        "Planned",
+        "Emergency"
+      ],
+      "default": "Planned"
+    },
+    "maintenanceSystem": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "host": {
+          "type": "string"
+        },
+        "impact": {
+          "$ref": "#/definitions/maintenanceImpact"
+        }
+      }
+    },
+    "marksAddress": {
+      "type": "object",
+      "properties": {
+        "street1": {
+          "type": "string"
+        },
+        "street2": {
+          "type": "string"
+        },
+        "street3": {
+          "type": "string"
+        },
+        "city": {
+          "type": "string"
+        },
+        "province": {
+          "type": "string"
+        },
+        "postalCode": {
+          "type": "string"
+        },
+        "countryCode": {
+          "type": "string"
+        }
+      }
+    },
+    "marksCourt": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "markName": {
+          "type": "string"
+        },
+        "holders": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/marksHolder"
+          }
+        },
+        "contacts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/eppmarksContact"
+          }
+        },
+        "labels": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "goodsAndServices": {
+          "type": "string"
+        },
+        "referenceNumber": {
+          "type": "string"
+        },
+        "protectionDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "countryCode": {
+          "type": "string"
+        },
+        "regions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "courtName": {
+          "type": "string"
+        }
+      }
+    },
+    "marksEntitlement": {
+      "type": "string",
+      "enum": [
+        "Owner",
+        "Assignee",
+        "Licensee"
+      ],
+      "default": "Owner"
+    },
+    "marksHolder": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "organisation": {
+          "type": "string"
+        },
+        "address": {
+          "$ref": "#/definitions/marksAddress"
+        },
+        "voice": {
+          "$ref": "#/definitions/commonPhone"
+        },
+        "fax": {
+          "$ref": "#/definitions/commonPhone"
+        },
+        "email": {
+          "type": "string"
+        },
+        "entitlement": {
+          "$ref": "#/definitions/marksEntitlement"
+        }
+      }
+    },
+    "marksMark": {
+      "type": "object",
+      "properties": {
+        "trademark": {
+          "$ref": "#/definitions/marksTradeMark"
+        },
+        "treatyOrStatute": {
+          "$ref": "#/definitions/marksTreatyOrStatute"
+        },
+        "court": {
+          "$ref": "#/definitions/marksCourt"
+        }
+      }
+    },
+    "marksProtection": {
+      "type": "object",
+      "properties": {
+        "countryCode": {
+          "type": "string"
+        },
+        "region": {
+          "type": "string"
+        },
+        "ruling": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "marksTradeMark": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "markName": {
+          "type": "string"
+        },
+        "holders": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/marksHolder"
+          }
+        },
+        "contacts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/eppmarksContact"
+          }
+        },
+        "jurisdiction": {
+          "type": "string"
+        },
+        "classes": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        "labels": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "goodsAndServices": {
+          "type": "string"
+        },
+        "applicationId": {
+          "type": "string"
+        },
+        "applicationDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "registrationId": {
+          "type": "string"
+        },
+        "registrationDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "expiryDate": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "marksTreatyOrStatute": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "markName": {
+          "type": "string"
+        },
+        "holders": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/marksHolder"
+          }
+        },
+        "contacts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/eppmarksContact"
+          }
+        },
+        "protections": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/marksProtection"
+          }
+        },
+        "labels": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "goodsAndServices": {
+          "type": "string"
+        },
+        "referenceNumber": {
+          "type": "string"
+        },
+        "protectionDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "title": {
+          "type": "string"
+        },
+        "executionDate": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "nominetContactValidateReply": {
+      "type": "object",
+      "properties": {
+        "cmdResp": {
+          "$ref": "#/definitions/commonCommandResponse"
+        }
+      }
+    },
+    "nominetDomainCancel": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "originator": {
+          "type": "string"
+        }
+      }
+    },
+    "nominetDomainFail": {
+      "type": "object",
+      "properties": {
+        "domain": {
+          "type": "string"
+        },
+        "reason": {
+          "type": "string"
+        }
+      }
+    },
+    "nominetDomainRegistrarChange": {
+      "type": "object",
+      "properties": {
+        "originator": {
+          "type": "string"
+        },
+        "registrarTag": {
+          "type": "string"
+        },
+        "caseId": {
+          "type": "string"
+        },
+        "domains": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/domainDomainInfoReply"
+          }
+        },
+        "contact": {
+          "$ref": "#/definitions/contactContactInfoReply"
+        }
+      }
+    },
+    "nominetDomainRelease": {
+      "type": "object",
+      "properties": {
+        "accountId": {
+          "type": "string"
+        },
+        "accountMoved": {
+          "type": "boolean"
+        },
+        "from": {
+          "type": "string"
+        },
+        "registrarTag": {
+          "type": "string"
+        },
+        "domains": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "nominetHandshakeReply": {
+      "type": "object",
+      "properties": {
+        "caseId": {
+          "type": "string"
+        },
+        "domains": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "cmdResp": {
+          "$ref": "#/definitions/commonCommandResponse"
+        }
+      }
+    },
+    "nominetHostCancel": {
+      "type": "object",
+      "properties": {
+        "hostObjects": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "domainNames": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "nominetLockReply": {
+      "type": "object",
+      "properties": {
+        "cmdResp": {
+          "$ref": "#/definitions/commonCommandResponse"
+        }
+      }
+    },
+    "nominetNominetTagListReply": {
+      "type": "object",
+      "properties": {
+        "tags": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/NominetTagListReplyTag"
+          }
+        },
+        "cmdResp": {
+          "$ref": "#/definitions/commonCommandResponse"
+        }
+      }
+    },
+    "nominetObject": {
+      "type": "object",
+      "properties": {
+        "domain": {
+          "type": "string"
+        },
+        "registrant": {
+          "type": "string"
+        }
+      }
+    },
+    "nominetProcess": {
+      "type": "object",
+      "properties": {
+        "stage": {
+          "$ref": "#/definitions/ProcessProcessStage"
+        },
+        "contact": {
+          "$ref": "#/definitions/contactContactInfoReply"
+        },
+        "processType": {
+          "type": "string"
+        },
+        "suspendDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "cancelDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "domainNames": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "nominetRegistrantTransfer": {
+      "type": "object",
+      "properties": {
+        "originator": {
+          "type": "string"
+        },
+        "accountId": {
+          "type": "string"
+        },
+        "oldAccountId": {
+          "type": "string"
+        },
+        "caseId": {
+          "type": "string"
+        },
+        "domainNames": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "contact": {
+          "$ref": "#/definitions/contactContactInfoReply"
+        }
+      }
+    },
+    "nominetReleaseReply": {
+      "type": "object",
+      "properties": {
+        "pending": {
+          "type": "boolean"
+        },
+        "message": {
+          "type": "string"
+        },
+        "cmdResp": {
+          "$ref": "#/definitions/commonCommandResponse"
+        }
+      }
+    },
+    "nominetSuspend": {
+      "type": "object",
+      "properties": {
+        "reason": {
+          "type": "string"
+        },
+        "cancelDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "domainNames": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "nominet_extDataQuality": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "$ref": "#/definitions/nominet_extDataQualityStatus"
+        },
+        "reason": {
+          "type": "string"
+        },
+        "dateCommenced": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "dateToSuspend": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "lockApplied": {
+          "type": "boolean"
+        },
+        "domains": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "nominet_extDataQualityStatus": {
+      "type": "string",
+      "enum": [
+        "Invalid",
+        "Valid"
+      ],
+      "default": "Invalid"
+    },
+    "personal_registrationPersonalRegistrationCreate": {
+      "type": "object",
+      "properties": {
+        "bundledRate": {
+          "type": "boolean"
+        }
+      }
+    },
+    "personal_registrationPersonalRegistrationInfo": {
+      "type": "object",
+      "properties": {
+        "consentId": {
+          "type": "string"
+        }
+      }
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "qualified_lawyerQualifiedLawyer": {
+      "type": "object",
+      "properties": {
+        "accreditationId": {
+          "type": "string"
+        },
+        "accreditationBody": {
+          "type": "string"
+        },
+        "accreditationYear": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "jurisdictionCountry": {
+          "type": "string"
+        },
+        "jurisdictionProvince": {
+          "type": "string"
+        }
+      }
+    },
+    "rgpRGPState": {
+      "type": "string",
+      "enum": [
+        "Unknown",
+        "AddPeriod",
+        "AutoRenewPeriod",
+        "RenewPeriod",
+        "TransferPeriod",
+        "RedemptionPeriod",
+        "PendingRestore",
+        "PendingDelete"
+      ],
+      "default": "Unknown"
+    },
+    "rgpRestoreReply": {
+      "type": "object",
+      "properties": {
+        "pending": {
+          "type": "boolean"
+        },
+        "state": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/rgpRGPState"
+          }
+        },
+        "feeData": {
+          "$ref": "#/definitions/feeFeeData"
+        },
+        "registryName": {
+          "type": "string"
+        },
+        "cmdResp": {
+          "$ref": "#/definitions/commonCommandResponse"
+        }
+      }
+    },
+    "tmchAddCase": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "udrp": {
+          "$ref": "#/definitions/tmchUDRPCase"
+        },
+        "court": {
+          "$ref": "#/definitions/tmchCourtCase"
+        },
+        "documents": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/tmchCaseDocument"
+          }
+        },
+        "labels": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "tmchBalanceData": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "string"
+        },
+        "currency": {
+          "type": "string"
+        },
+        "statusPoints": {
+          "type": "integer",
+          "format": "int64"
+        }
+      }
+    },
+    "tmchCaseAdd": {
+      "type": "object",
+      "properties": {
+        "document": {
+          "$ref": "#/definitions/tmchCaseDocument"
+        },
+        "label": {
+          "type": "string"
+        }
+      }
+    },
+    "tmchCaseDocument": {
+      "type": "object",
+      "properties": {
+        "documentClass": {
+          "$ref": "#/definitions/tmchCourtDocumentClass"
+        },
+        "fileName": {
+          "type": "string"
+        },
+        "fileType": {
+          "$ref": "#/definitions/tmchFileType"
+        },
+        "contents": {
+          "type": "string",
+          "format": "byte"
+        }
+      }
+    },
+    "tmchCaseRemove": {
+      "type": "object",
+      "properties": {
+        "label": {
+          "type": "string"
+        }
+      }
+    },
+    "tmchCaseUpdate": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "add": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/tmchCaseAdd"
+          }
+        },
+        "remove": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/tmchCaseRemove"
+          }
+        },
+        "newUdrp": {
+          "$ref": "#/definitions/tmchUDRPCase"
+        },
+        "newCourt": {
+          "$ref": "#/definitions/tmchCourtCase"
+        }
+      }
+    },
+    "tmchCourtCase": {
+      "type": "object",
+      "properties": {
+        "decisionId": {
+          "type": "string"
+        },
+        "courtName": {
+          "type": "string"
+        },
+        "countryCode": {
+          "type": "string"
+        },
+        "caseLanguage": {
+          "type": "string"
+        },
+        "regions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "tmchCourtDocumentClass": {
+      "type": "string",
+      "enum": [
+        "CourtOther",
+        "CourtDecision"
+      ],
+      "default": "CourtOther"
+    },
+    "tmchCreateLabel": {
+      "type": "object",
+      "properties": {
+        "label": {
+          "type": "string"
+        },
+        "smdInclusion": {
+          "type": "boolean"
+        },
+        "claimsNotify": {
+          "type": "boolean"
+        }
+      }
+    },
+    "tmchDocument": {
+      "type": "object",
+      "properties": {
+        "documentClass": {
+          "$ref": "#/definitions/tmchDocumentClass"
+        },
+        "fileName": {
+          "type": "string"
+        },
+        "fileType": {
+          "$ref": "#/definitions/tmchFileType"
+        },
+        "contents": {
+          "type": "string",
+          "format": "byte"
+        }
+      }
+    },
+    "tmchDocumentClass": {
+      "type": "string",
+      "enum": [
+        "Other",
+        "LicenseeDeclaration",
+        "AssigneeDeclaration",
+        "DeclarationProofOfUseOneSample",
+        "OtherProofOfUse",
+        "CopyOfCourtOrder"
+      ],
+      "default": "Other"
+    },
+    "tmchFileType": {
+      "type": "string",
+      "enum": [
+        "PDF",
+        "JPG"
+      ],
+      "default": "PDF"
+    },
+    "tmchMarkCheckRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "registryName": {
+          "type": "string"
+        }
+      }
+    },
+    "tmchMarkCheckResponse": {
+      "type": "object",
+      "properties": {
+        "available": {
+          "type": "boolean"
+        },
+        "reason": {
+          "type": "string"
+        },
+        "cmdResp": {
+          "$ref": "#/definitions/commonCommandResponse"
+        }
+      }
+    },
+    "tmchMarkCreateRequest": {
+      "type": "object",
+      "properties": {
+        "mark": {
+          "$ref": "#/definitions/marksMark"
+        },
+        "period": {
+          "$ref": "#/definitions/commonPeriod"
+        },
+        "documents": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/tmchDocument"
+          }
+        },
+        "labels": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/tmchCreateLabel"
+          }
+        },
+        "variations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "registryName": {
+          "type": "string"
+        }
+      }
+    },
+    "tmchMarkCreateResponse": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "createdDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "balance": {
+          "$ref": "#/definitions/tmchBalanceData"
+        },
+        "cmdResp": {
+          "$ref": "#/definitions/commonCommandResponse"
+        }
+      }
+    },
+    "tmchMarkInfoRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "registryName": {
+          "type": "string"
+        }
+      }
+    },
+    "tmchMarkInfoResponse": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/definitions/tmchMarkStatus"
+        },
+        "pouStatus": {
+          "$ref": "#/definitions/tmchMarkPOUStatus"
+        },
+        "labels": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/tmchMarkLabel"
+          }
+        },
+        "variations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/tmchMarkVariation"
+          }
+        },
+        "creationDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updateDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "expiryDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "pouExpiryDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "correctBefore": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "cmdResp": {
+          "$ref": "#/definitions/commonCommandResponse"
+        }
+      }
+    },
+    "tmchMarkLabel": {
+      "type": "object",
+      "properties": {
+        "aLabel": {
+          "type": "string"
+        },
+        "uLabel": {
+          "type": "string"
+        },
+        "smdInclusion": {
+          "type": "boolean"
+        },
+        "claimNotify": {
+          "type": "boolean"
+        }
+      }
+    },
+    "tmchMarkPOUStatus": {
+      "type": "object",
+      "properties": {
+        "statusType": {
+          "$ref": "#/definitions/tmchMarkPOUStatusType"
+        },
+        "message": {
+          "type": "string"
+        }
+      }
+    },
+    "tmchMarkPOUStatusType": {
+      "type": "string",
+      "enum": [
+        "POUNotSet",
+        "POUValid",
+        "POUInvalid",
+        "POUExpired",
+        "POUNA",
+        "POUNew",
+        "POUIncorrect",
+        "POUCorrected"
+      ],
+      "default": "POUNotSet"
+    },
+    "tmchMarkRenewRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "addPeriod": {
+          "$ref": "#/definitions/commonPeriod"
+        },
+        "currentExpiryDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "registryName": {
+          "type": "string"
+        }
+      }
+    },
+    "tmchMarkRenewResponse": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "newExpiryDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "balance": {
+          "$ref": "#/definitions/tmchBalanceData"
+        },
+        "cmdResp": {
+          "$ref": "#/definitions/commonCommandResponse"
+        }
+      }
+    },
+    "tmchMarkSMDInfoResponse": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/definitions/tmchMarkStatus"
+        },
+        "smdId": {
+          "type": "string"
+        },
+        "smd": {
+          "type": "string"
+        },
+        "cmdResp": {
+          "$ref": "#/definitions/commonCommandResponse"
+        }
+      }
+    },
+    "tmchMarkStatus": {
+      "type": "object",
+      "properties": {
+        "statusType": {
+          "$ref": "#/definitions/tmchMarkStatusType"
+        },
+        "message": {
+          "type": "string"
+        }
+      }
+    },
+    "tmchMarkStatusType": {
+      "type": "string",
+      "enum": [
+        "Unknown",
+        "New",
+        "Verified",
+        "Incorrect",
+        "Corrected",
+        "Invalid",
+        "Expired",
+        "Deactivated"
+      ],
+      "default": "Unknown"
+    },
+    "tmchMarkTransferInitiateRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "registryName": {
+          "type": "string"
+        }
+      }
+    },
+    "tmchMarkTransferInitiateResponse": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "authInfo": {
+          "type": "string"
+        },
+        "cmdResp": {
+          "$ref": "#/definitions/commonCommandResponse"
+        }
+      }
+    },
+    "tmchMarkTransferRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "authInfo": {
+          "type": "string"
+        },
+        "registryName": {
+          "type": "string"
+        }
+      }
+    },
+    "tmchMarkTransferResponse": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "transferDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "balance": {
+          "$ref": "#/definitions/tmchBalanceData"
+        },
+        "cmdResp": {
+          "$ref": "#/definitions/commonCommandResponse"
+        }
+      }
+    },
+    "tmchMarkUpdateAdd": {
+      "type": "object",
+      "properties": {
+        "document": {
+          "$ref": "#/definitions/tmchDocument"
+        },
+        "label": {
+          "$ref": "#/definitions/tmchCreateLabel"
+        },
+        "variation": {
+          "type": "string"
+        },
+        "case": {
+          "$ref": "#/definitions/tmchAddCase"
+        }
+      }
+    },
+    "tmchMarkUpdateRemove": {
+      "type": "object",
+      "properties": {
+        "label": {
+          "type": "string"
+        },
+        "variation": {
+          "type": "string"
+        }
+      }
+    },
+    "tmchMarkUpdateRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "add": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/tmchMarkUpdateAdd"
+          }
+        },
+        "remove": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/tmchMarkUpdateRemove"
+          }
+        },
+        "newMark": {
+          "$ref": "#/definitions/marksMark"
+        },
+        "updateLabels": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/tmchCreateLabel"
+          }
+        },
+        "updateCases": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/tmchCaseUpdate"
+          }
+        },
+        "registryName": {
+          "type": "string"
+        }
+      }
+    },
+    "tmchMarkUpdateResponse": {
+      "type": "object",
+      "properties": {
+        "cmdResp": {
+          "$ref": "#/definitions/commonCommandResponse"
+        }
+      }
+    },
+    "tmchMarkVariation": {
+      "type": "object",
+      "properties": {
+        "aLabel": {
+          "type": "string"
+        },
+        "uLabel": {
+          "type": "string"
+        },
+        "variationType": {
+          "type": "string"
+        },
+        "active": {
+          "type": "boolean"
+        }
+      }
+    },
+    "tmchUDRPCase": {
+      "type": "object",
+      "properties": {
+        "caseId": {
+          "type": "string"
+        },
+        "provider": {
+          "type": "string"
+        },
+        "caseLanguage": {
+          "type": "string"
+        }
+      }
+    },
+    "traficomTrnData": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

@@ -1,5 +1,6 @@
 syntax = "proto3";
 package epp.fee;
+option go_package = "github.com/as207960/epp-proxy/gen/go/epp/fee";
 
 import "google/protobuf/wrappers.proto";
 import "common.proto";

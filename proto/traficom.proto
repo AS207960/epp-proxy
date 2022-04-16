@@ -1,5 +1,6 @@
 syntax = "proto3";
 package epp.traficom;
+option go_package = "github.com/as207960/epp-proxy/gen/go/epp/traficom";
 
 message TrnData {
     string name = 1;
