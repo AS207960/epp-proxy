@@ -5,17 +5,17 @@ option go_package = "github.com/as207960/epp-proxy/gen/go/epp";
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/wrappers.proto";
 import "google/api/annotations.proto";
-import "contact.proto";
-import "domain.proto";
-import "host.proto";
-import "rgp.proto";
-import "nominet.proto";
-import "traficom.proto";
-import "maintenance.proto";
-import "eurid.proto";
-import "tmch.proto";
-import "dac.proto";
-import "common.proto";
+import "contact/contact.proto";
+import "domain/domain.proto";
+import "host/host.proto";
+import "rgp/rgp.proto";
+import "nominet/nominet.proto";
+import "traficom/traficom.proto";
+import "maintenance/maintenance.proto";
+import "eurid/eurid.proto";
+import "tmch/tmch.proto";
+import "dac/dac.proto";
+import "common/common.proto";
 
 service EPPProxy {
     rpc DomainCheck              (domain.DomainCheckRequest)                returns (domain.DomainCheckReply) {
@@ -137,52 +137,52 @@ service EPPProxy {
     }
     rpc ContactCheck             (contact.ContactCheckRequest)              returns (contact.ContactCheckReply) {
         option (google.api.http) = {
-            get: "/host/{registry_name}/{id}/check"
+            get: "/contact/{registry_name}/{id}/check"
         };
     }
     rpc ContactInfo              (contact.ContactInfoRequest)               returns (contact.ContactInfoReply) {
         option (google.api.http) = {
-            get: "/host/{registry_name}/{id}"
+            get: "/contact/{registry_name}/{id}"
         };
     }
     rpc ContactCreate            (contact.ContactCreateRequest)             returns (contact.ContactCreateReply) {
         option (google.api.http) = {
-            post: "/host/{registry_name}/{id}/create"
+            post: "/contact/{registry_name}/{id}/create"
             body: "*"
         };
     }
     rpc ContactDelete            (contact.ContactDeleteRequest)             returns (contact.ContactDeleteReply) {
         option (google.api.http) = {
-            post: "/host/{registry_name}/{id}/delete"
+            post: "/contact/{registry_name}/{id}/delete"
         };
     }
     rpc ContactUpdate            (contact.ContactUpdateRequest)             returns (contact.ContactUpdateReply) {
         option (google.api.http) = {
-            post: "/host/{registry_name}/{id}/update"
+            post: "/contact/{registry_name}/{id}/update"
             body: "*"
         };
     }
     rpc ContactTransferQuery     (contact.ContactTransferQueryRequest)      returns (contact.ContactTransferReply) {
         option (google.api.http) = {
-            post: "/host/{registry_name}/{id}/transfer"
+            post: "/contact/{registry_name}/{id}/transfer"
             body: "*"
         };
     }
     rpc ContactTransferRequest   (contact.ContactTransferRequestRequest)    returns (contact.ContactTransferReply) {
         option (google.api.http) = {
-            post: "/host/{registry_name}/{id}/transfer/request"
+            post: "/contact/{registry_name}/{id}/transfer/request"
             body: "*"
         };
     }
     rpc ContactTransferAccept    (contact.ContactTransferRequestRequest)    returns (contact.ContactTransferReply) {
         option (google.api.http) = {
-            post: "/host/{registry_name}/{id}/transfer/accept"
+            post: "/contact/{registry_name}/{id}/transfer/accept"
             body: "*"
         };
     }
     rpc ContactTransferReject    (contact.ContactTransferRequestRequest)    returns (contact.ContactTransferReply) {
         option (google.api.http) = {
-            post: "/host/{registry_name}/{id}/transfer/reject"
+            post: "/contact/{registry_name}/{id}/transfer/reject"
             body: "*"
         };
     }
@@ -246,23 +246,97 @@ service EPPProxy {
           get: "/balance_info/{registry_name}"
         };
     }
-    rpc HitPointsInfo            (RegistryInfo)                             returns (eurid.HitPointsReply);
-    rpc RegistrationLimitInfo    (RegistryInfo)                             returns (eurid.RegistrationLimitReply);
-    rpc DNSQualityInfo           (eurid.DNSQualityRequest)                  returns (eurid.DNSQualityReply);
-    rpc DNSSECEligibilityInfo    (eurid.DNSSECEligibilityRequest)           returns (eurid.DNSSECEligibilityReply);
-    rpc TMCHMarkCheck            (tmch.MarkCheckRequest)                    returns (tmch.MarkCheckResponse);
-    rpc TMCHMarkCreate           (tmch.MarkCreateRequest)                   returns (tmch.MarkCreateResponse);
-    rpc TMCHMarkInfo             (tmch.MarkInfoRequest)                     returns (tmch.MarkInfoResponse);
-    rpc TMCHMarkSMDInfo          (tmch.MarkInfoRequest)                     returns (tmch.MarkSMDInfoResponse);
-    rpc TMCHMarkEncodedSMDInfo   (tmch.MarkInfoRequest)                     returns (tmch.MarkSMDInfoResponse);
-    rpc TMCHMarkFileInfo         (tmch.MarkInfoRequest)                     returns (tmch.MarkSMDInfoResponse);
-    rpc TMCHMarkUpdate           (tmch.MarkUpdateRequest)                   returns (tmch.MarkUpdateResponse);
-    rpc TMCHMarkRenew            (tmch.MarkRenewRequest)                    returns (tmch.MarkRenewResponse);
-    rpc TMCHMarkTransferInitiate (tmch.MarkTransferInitiateRequest)         returns (tmch.MarkTransferInitiateResponse);
-    rpc TMCHMarkTransfer         (tmch.MarkTransferRequest)                 returns (tmch.MarkTransferResponse);
-    rpc DACDomain                (dac.DomainRequest)                        returns (dac.DomainResponse);
-    rpc DACUsage                 (dac.UsageRequest)                         returns (dac.UsageResponse);
-    rpc DACLimits                (dac.UsageRequest)                         returns (dac.UsageResponse);
+    rpc HitPointsInfo            (RegistryInfo)                             returns (eurid.HitPointsReply) {
+        option (google.api.http) = {
+          get: "/hit_points_info/{registry_name}"
+        };
+    }
+    rpc RegistrationLimitInfo    (RegistryInfo)                             returns (eurid.RegistrationLimitReply) {
+        option (google.api.http) = {
+          get: "/registration_limit_info/{registry_name}"
+        };
+    }
+    rpc DNSQualityInfo           (eurid.DNSQualityRequest)                  returns (eurid.DNSQualityReply) {
+        option (google.api.http) = {
+            post: "/eurid/{registry_name}/dns_quality_info"
+            body: "*"
+        };
+    }
+    rpc DNSSECEligibilityInfo    (eurid.DNSSECEligibilityRequest)           returns (eurid.DNSSECEligibilityReply) {
+        option (google.api.http) = {
+            post: "/eurid/{registry_name}/dnssec_eligibility_info"
+            body: "*"
+        };
+    }
+    rpc TMCHMarkCheck            (tmch.MarkCheckRequest)                    returns (tmch.MarkCheckResponse) {
+        option (google.api.http) = {
+            get: "/tmch/{registry_name}/mark/{id}/check"
+        };
+    }
+    rpc TMCHMarkCreate           (tmch.MarkCreateRequest)                   returns (tmch.MarkCreateResponse) {
+        option (google.api.http) = {
+            post: "/tmch/{registry_name}/mark/create"
+            body: "*"
+        };
+    }
+    rpc TMCHMarkInfo             (tmch.MarkInfoRequest)                     returns (tmch.MarkInfoResponse) {
+        option (google.api.http) = {
+            get: "/tmch/{registry_name}/mark/{id}/info"
+        };
+    }
+    rpc TMCHMarkSMDInfo          (tmch.MarkInfoRequest)                     returns (tmch.MarkSMDInfoResponse) {
+        option (google.api.http) = {
+            get: "/tmch/{registry_name}/mark/{id}/info/smd"
+        };
+    }
+    rpc TMCHMarkEncodedSMDInfo   (tmch.MarkInfoRequest)                     returns (tmch.MarkSMDInfoResponse) {
+        option (google.api.http) = {
+            get: "/tmch/{registry_name}/mark/{id}/info/encoded_smd"
+        };
+    }
+    rpc TMCHMarkFileInfo         (tmch.MarkInfoRequest)                     returns (tmch.MarkSMDInfoResponse) {
+        option (google.api.http) = {
+            get: "/tmch/{registry_name}/mark/{id}/info/file"
+        };
+    }
+    rpc TMCHMarkUpdate           (tmch.MarkUpdateRequest)                   returns (tmch.MarkUpdateResponse) {
+        option (google.api.http) = {
+            post: "/tmch/{registry_name}/mark/{id}/update"
+            body: "*"
+        };
+    }
+    rpc TMCHMarkRenew            (tmch.MarkRenewRequest)                    returns (tmch.MarkRenewResponse) {
+        option (google.api.http) = {
+            post: "/tmch/{registry_name}/mark/{id}/renew"
+            body: "*"
+        };
+    }
+    rpc TMCHMarkTransferInitiate (tmch.MarkTransferInitiateRequest)         returns (tmch.MarkTransferInitiateResponse)  {
+        option (google.api.http) = {
+            post: "/tmch/{registry_name}/mark/{id}/transfer/initiate"
+        };
+    }
+    rpc TMCHMarkTransfer         (tmch.MarkTransferRequest)                 returns (tmch.MarkTransferResponse) {
+        option (google.api.http) = {
+            post: "/tmch/{registry_name}/mark/{id}/transfer"
+            body: "*"
+        };
+    }
+    rpc DACDomain                (dac.DomainRequest)                        returns (dac.DomainResponse) {
+        option (google.api.http) = {
+            get: "/dac/{registry_name}/{environment}/domain/{name}"
+        };
+    }
+    rpc DACUsage                 (dac.UsageRequest)                         returns (dac.UsageResponse) {
+        option (google.api.http) = {
+            get: "/dac/{registry_name}/{environment}/usage"
+        };
+    }
+    rpc DACLimits                (dac.UsageRequest)                         returns (dac.UsageResponse) {
+        option (google.api.http) = {
+            get: "/dac/{registry_name}/{environment}/limits"
+        };
+    }
 }
 
 message RegistryInfo {

@@ -2,38 +2,38 @@ use super::super::client;
 use super::epp_proto;
 
 pub fn domain_status_from_i32(from: i32) -> Option<client::domain::Status> {
-    epp_proto::domain::DomainStatus::from_i32(from).map(|e| match e {
-        epp_proto::domain::DomainStatus::ClientDeleteProhibited => {
+    epp_proto::domain_common::DomainStatus::from_i32(from).map(|e| match e {
+        epp_proto::domain_common::DomainStatus::ClientDeleteProhibited => {
             client::domain::Status::ClientDeleteProhibited
         }
-        epp_proto::domain::DomainStatus::ClientHold => client::domain::Status::ClientHold,
-        epp_proto::domain::DomainStatus::ClientRenewProhibited => {
+        epp_proto::domain_common::DomainStatus::ClientHold => client::domain::Status::ClientHold,
+        epp_proto::domain_common::DomainStatus::ClientRenewProhibited => {
             client::domain::Status::ClientRenewProhibited
         }
-        epp_proto::domain::DomainStatus::ClientTransferProhibited => {
+        epp_proto::domain_common::DomainStatus::ClientTransferProhibited => {
             client::domain::Status::ClientTransferProhibited
         }
-        epp_proto::domain::DomainStatus::ClientUpdateProhibited => {
+        epp_proto::domain_common::DomainStatus::ClientUpdateProhibited => {
             client::domain::Status::ClientUpdateProhibited
         }
-        epp_proto::domain::DomainStatus::Inactive => client::domain::Status::Inactive,
-        epp_proto::domain::DomainStatus::Ok => client::domain::Status::Ok,
-        epp_proto::domain::DomainStatus::PendingCreate => client::domain::Status::PendingCreate,
-        epp_proto::domain::DomainStatus::PendingDelete => client::domain::Status::PendingDelete,
-        epp_proto::domain::DomainStatus::PendingRenew => client::domain::Status::PendingRenew,
-        epp_proto::domain::DomainStatus::PendingTransfer => client::domain::Status::PendingTransfer,
-        epp_proto::domain::DomainStatus::PendingUpdate => client::domain::Status::PendingUpdate,
-        epp_proto::domain::DomainStatus::ServerDeleteProhibited => {
+        epp_proto::domain_common::DomainStatus::Inactive => client::domain::Status::Inactive,
+        epp_proto::domain_common::DomainStatus::Ok => client::domain::Status::Ok,
+        epp_proto::domain_common::DomainStatus::PendingCreate => client::domain::Status::PendingCreate,
+        epp_proto::domain_common::DomainStatus::PendingDelete => client::domain::Status::PendingDelete,
+        epp_proto::domain_common::DomainStatus::PendingRenew => client::domain::Status::PendingRenew,
+        epp_proto::domain_common::DomainStatus::PendingTransfer => client::domain::Status::PendingTransfer,
+        epp_proto::domain_common::DomainStatus::PendingUpdate => client::domain::Status::PendingUpdate,
+        epp_proto::domain_common::DomainStatus::ServerDeleteProhibited => {
             client::domain::Status::ServerDeleteProhibited
         }
-        epp_proto::domain::DomainStatus::ServerHold => client::domain::Status::ServerHold,
-        epp_proto::domain::DomainStatus::ServerRenewProhibited => {
+        epp_proto::domain_common::DomainStatus::ServerHold => client::domain::Status::ServerHold,
+        epp_proto::domain_common::DomainStatus::ServerRenewProhibited => {
             client::domain::Status::ServerRenewProhibited
         }
-        epp_proto::domain::DomainStatus::ServerTransferProhibited => {
+        epp_proto::domain_common::DomainStatus::ServerTransferProhibited => {
             client::domain::Status::ServerTransferProhibited
         }
-        epp_proto::domain::DomainStatus::ServerUpdateProhibited => {
+        epp_proto::domain_common::DomainStatus::ServerUpdateProhibited => {
             client::domain::Status::ServerUpdateProhibited
         }
     })
@@ -42,47 +42,47 @@ pub fn domain_status_from_i32(from: i32) -> Option<client::domain::Status> {
 fn i32_from_domain_status(from: client::domain::Status) -> i32 {
     match from {
         client::domain::Status::ClientDeleteProhibited => {
-            epp_proto::domain::DomainStatus::ClientDeleteProhibited.into()
+            epp_proto::domain_common::DomainStatus::ClientDeleteProhibited.into()
         }
-        client::domain::Status::ClientHold => epp_proto::domain::DomainStatus::ClientHold.into(),
+        client::domain::Status::ClientHold => epp_proto::domain_common::DomainStatus::ClientHold.into(),
         client::domain::Status::ClientRenewProhibited => {
-            epp_proto::domain::DomainStatus::ClientRenewProhibited.into()
+            epp_proto::domain_common::DomainStatus::ClientRenewProhibited.into()
         }
         client::domain::Status::ClientTransferProhibited => {
-            epp_proto::domain::DomainStatus::ClientTransferProhibited.into()
+            epp_proto::domain_common::DomainStatus::ClientTransferProhibited.into()
         }
         client::domain::Status::ClientUpdateProhibited => {
-            epp_proto::domain::DomainStatus::ClientUpdateProhibited.into()
+            epp_proto::domain_common::DomainStatus::ClientUpdateProhibited.into()
         }
-        client::domain::Status::Inactive => epp_proto::domain::DomainStatus::Inactive.into(),
-        client::domain::Status::Ok => epp_proto::domain::DomainStatus::Ok.into(),
+        client::domain::Status::Inactive => epp_proto::domain_common::DomainStatus::Inactive.into(),
+        client::domain::Status::Ok => epp_proto::domain_common::DomainStatus::Ok.into(),
         client::domain::Status::PendingCreate => {
-            epp_proto::domain::DomainStatus::PendingCreate.into()
+            epp_proto::domain_common::DomainStatus::PendingCreate.into()
         }
         client::domain::Status::PendingDelete => {
-            epp_proto::domain::DomainStatus::PendingDelete.into()
+            epp_proto::domain_common::DomainStatus::PendingDelete.into()
         }
         client::domain::Status::PendingRenew => {
-            epp_proto::domain::DomainStatus::PendingRenew.into()
+            epp_proto::domain_common::DomainStatus::PendingRenew.into()
         }
         client::domain::Status::PendingTransfer => {
-            epp_proto::domain::DomainStatus::PendingTransfer.into()
+            epp_proto::domain_common::DomainStatus::PendingTransfer.into()
         }
         client::domain::Status::PendingUpdate => {
-            epp_proto::domain::DomainStatus::PendingUpdate.into()
+            epp_proto::domain_common::DomainStatus::PendingUpdate.into()
         }
         client::domain::Status::ServerDeleteProhibited => {
-            epp_proto::domain::DomainStatus::ServerDeleteProhibited.into()
+            epp_proto::domain_common::DomainStatus::ServerDeleteProhibited.into()
         }
-        client::domain::Status::ServerHold => epp_proto::domain::DomainStatus::ServerHold.into(),
+        client::domain::Status::ServerHold => epp_proto::domain_common::DomainStatus::ServerHold.into(),
         client::domain::Status::ServerRenewProhibited => {
-            epp_proto::domain::DomainStatus::ServerRenewProhibited.into()
+            epp_proto::domain_common::DomainStatus::ServerRenewProhibited.into()
         }
         client::domain::Status::ServerTransferProhibited => {
-            epp_proto::domain::DomainStatus::ServerTransferProhibited.into()
+            epp_proto::domain_common::DomainStatus::ServerTransferProhibited.into()
         }
         client::domain::Status::ServerUpdateProhibited => {
-            epp_proto::domain::DomainStatus::ServerUpdateProhibited.into()
+            epp_proto::domain_common::DomainStatus::ServerUpdateProhibited.into()
         }
     }
 }

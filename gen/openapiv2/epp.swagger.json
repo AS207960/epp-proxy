@@ -46,6 +46,132 @@
         ]
       }
     },
+    "/dac/{registryName}/{environment}/domain/{name}": {
+      "get": {
+        "operationId": "EPPProxy_DACDomain",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/dacDomainResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "registryName",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "environment",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "RealTime",
+              "TimeDelay"
+            ]
+          },
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "EPPProxy"
+        ]
+      }
+    },
+    "/dac/{registryName}/{environment}/limits": {
+      "get": {
+        "operationId": "EPPProxy_DACLimits",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/dacUsageResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "registryName",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "environment",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "RealTime",
+              "TimeDelay"
+            ]
+          }
+        ],
+        "tags": [
+          "EPPProxy"
+        ]
+      }
+    },
+    "/dac/{registryName}/{environment}/usage": {
+      "get": {
+        "operationId": "EPPProxy_DACUsage",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/dacUsageResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "registryName",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "environment",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "RealTime",
+              "TimeDelay"
+            ]
+          }
+        ],
+        "tags": [
+          "EPPProxy"
+        ]
+      }
+    },
     "/domain/{name}": {
       "post": {
         "operationId": "EPPProxy_DomainInfo",
@@ -856,103 +982,7 @@
         ]
       }
     },
-    "/epp.EPPProxy/DACDomain": {
-      "post": {
-        "operationId": "EPPProxy_DACDomain",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/dacDomainResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/googlerpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/dacDomainRequest"
-            }
-          }
-        ],
-        "tags": [
-          "EPPProxy"
-        ]
-      }
-    },
-    "/epp.EPPProxy/DACLimits": {
-      "post": {
-        "operationId": "EPPProxy_DACLimits",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/dacUsageResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/googlerpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/dacUsageRequest"
-            }
-          }
-        ],
-        "tags": [
-          "EPPProxy"
-        ]
-      }
-    },
-    "/epp.EPPProxy/DACUsage": {
-      "post": {
-        "operationId": "EPPProxy_DACUsage",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/dacUsageResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/googlerpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/dacUsageRequest"
-            }
-          }
-        ],
-        "tags": [
-          "EPPProxy"
-        ]
-      }
-    },
-    "/epp.EPPProxy/DNSQualityInfo": {
+    "/eurid/{registryName}/dns_quality_info": {
       "post": {
         "operationId": "EPPProxy_DNSQualityInfo",
         "responses": {
@@ -971,11 +1001,22 @@
         },
         "parameters": [
           {
+            "name": "registryName",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
             "name": "body",
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/euridDNSQualityRequest"
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                }
+              }
             }
           }
         ],
@@ -984,7 +1025,7 @@
         ]
       }
     },
-    "/epp.EPPProxy/DNSSECEligibilityInfo": {
+    "/eurid/{registryName}/dnssec_eligibility_info": {
       "post": {
         "operationId": "EPPProxy_DNSSECEligibilityInfo",
         "responses": {
@@ -1003,11 +1044,22 @@
         },
         "parameters": [
           {
+            "name": "registryName",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
             "name": "body",
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/euridDNSSECEligibilityRequest"
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                }
+              }
             }
           }
         ],
@@ -1016,8 +1068,8 @@
         ]
       }
     },
-    "/epp.EPPProxy/HitPointsInfo": {
-      "post": {
+    "/hit_points_info/{registryName}": {
+      "get": {
         "operationId": "EPPProxy_HitPointsInfo",
         "responses": {
           "200": {
@@ -1035,364 +1087,10 @@
         },
         "parameters": [
           {
-            "name": "body",
-            "in": "body",
+            "name": "registryName",
+            "in": "path",
             "required": true,
-            "schema": {
-              "$ref": "#/definitions/eppRegistryInfo"
-            }
-          }
-        ],
-        "tags": [
-          "EPPProxy"
-        ]
-      }
-    },
-    "/epp.EPPProxy/RegistrationLimitInfo": {
-      "post": {
-        "operationId": "EPPProxy_RegistrationLimitInfo",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/euridRegistrationLimitReply"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/googlerpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/eppRegistryInfo"
-            }
-          }
-        ],
-        "tags": [
-          "EPPProxy"
-        ]
-      }
-    },
-    "/epp.EPPProxy/TMCHMarkCheck": {
-      "post": {
-        "operationId": "EPPProxy_TMCHMarkCheck",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/tmchMarkCheckResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/googlerpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/tmchMarkCheckRequest"
-            }
-          }
-        ],
-        "tags": [
-          "EPPProxy"
-        ]
-      }
-    },
-    "/epp.EPPProxy/TMCHMarkCreate": {
-      "post": {
-        "operationId": "EPPProxy_TMCHMarkCreate",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/tmchMarkCreateResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/googlerpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/tmchMarkCreateRequest"
-            }
-          }
-        ],
-        "tags": [
-          "EPPProxy"
-        ]
-      }
-    },
-    "/epp.EPPProxy/TMCHMarkEncodedSMDInfo": {
-      "post": {
-        "operationId": "EPPProxy_TMCHMarkEncodedSMDInfo",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/tmchMarkSMDInfoResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/googlerpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/tmchMarkInfoRequest"
-            }
-          }
-        ],
-        "tags": [
-          "EPPProxy"
-        ]
-      }
-    },
-    "/epp.EPPProxy/TMCHMarkFileInfo": {
-      "post": {
-        "operationId": "EPPProxy_TMCHMarkFileInfo",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/tmchMarkSMDInfoResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/googlerpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/tmchMarkInfoRequest"
-            }
-          }
-        ],
-        "tags": [
-          "EPPProxy"
-        ]
-      }
-    },
-    "/epp.EPPProxy/TMCHMarkInfo": {
-      "post": {
-        "operationId": "EPPProxy_TMCHMarkInfo",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/tmchMarkInfoResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/googlerpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/tmchMarkInfoRequest"
-            }
-          }
-        ],
-        "tags": [
-          "EPPProxy"
-        ]
-      }
-    },
-    "/epp.EPPProxy/TMCHMarkRenew": {
-      "post": {
-        "operationId": "EPPProxy_TMCHMarkRenew",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/tmchMarkRenewResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/googlerpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/tmchMarkRenewRequest"
-            }
-          }
-        ],
-        "tags": [
-          "EPPProxy"
-        ]
-      }
-    },
-    "/epp.EPPProxy/TMCHMarkSMDInfo": {
-      "post": {
-        "operationId": "EPPProxy_TMCHMarkSMDInfo",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/tmchMarkSMDInfoResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/googlerpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/tmchMarkInfoRequest"
-            }
-          }
-        ],
-        "tags": [
-          "EPPProxy"
-        ]
-      }
-    },
-    "/epp.EPPProxy/TMCHMarkTransfer": {
-      "post": {
-        "operationId": "EPPProxy_TMCHMarkTransfer",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/tmchMarkTransferResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/googlerpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/tmchMarkTransferRequest"
-            }
-          }
-        ],
-        "tags": [
-          "EPPProxy"
-        ]
-      }
-    },
-    "/epp.EPPProxy/TMCHMarkTransferInitiate": {
-      "post": {
-        "operationId": "EPPProxy_TMCHMarkTransferInitiate",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/tmchMarkTransferInitiateResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/googlerpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/tmchMarkTransferInitiateRequest"
-            }
-          }
-        ],
-        "tags": [
-          "EPPProxy"
-        ]
-      }
-    },
-    "/epp.EPPProxy/TMCHMarkUpdate": {
-      "post": {
-        "operationId": "EPPProxy_TMCHMarkUpdate",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/tmchMarkUpdateResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/googlerpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/tmchMarkUpdateRequest"
-            }
+            "type": "string"
           }
         ],
         "tags": [
@@ -2513,6 +2211,491 @@
           "EPPProxy"
         ]
       }
+    },
+    "/registration_limit_info/{registryName}": {
+      "get": {
+        "operationId": "EPPProxy_RegistrationLimitInfo",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/euridRegistrationLimitReply"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "registryName",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "EPPProxy"
+        ]
+      }
+    },
+    "/tmch/{registryName}/mark/create": {
+      "post": {
+        "operationId": "EPPProxy_TMCHMarkCreate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/tmchMarkCreateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "registryName",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "mark": {
+                  "$ref": "#/definitions/marksMark"
+                },
+                "period": {
+                  "$ref": "#/definitions/commonPeriod"
+                },
+                "documents": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/tmchDocument"
+                  }
+                },
+                "labels": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/tmchCreateLabel"
+                  }
+                },
+                "variations": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "tags": [
+          "EPPProxy"
+        ]
+      }
+    },
+    "/tmch/{registryName}/mark/{id}/check": {
+      "get": {
+        "operationId": "EPPProxy_TMCHMarkCheck",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/tmchMarkCheckResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "registryName",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "EPPProxy"
+        ]
+      }
+    },
+    "/tmch/{registryName}/mark/{id}/info": {
+      "get": {
+        "operationId": "EPPProxy_TMCHMarkInfo",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/tmchMarkInfoResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "registryName",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "EPPProxy"
+        ]
+      }
+    },
+    "/tmch/{registryName}/mark/{id}/info/encoded_smd": {
+      "get": {
+        "operationId": "EPPProxy_TMCHMarkEncodedSMDInfo",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/tmchMarkSMDInfoResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "registryName",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "EPPProxy"
+        ]
+      }
+    },
+    "/tmch/{registryName}/mark/{id}/info/file": {
+      "get": {
+        "operationId": "EPPProxy_TMCHMarkFileInfo",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/tmchMarkSMDInfoResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "registryName",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "EPPProxy"
+        ]
+      }
+    },
+    "/tmch/{registryName}/mark/{id}/info/smd": {
+      "get": {
+        "operationId": "EPPProxy_TMCHMarkSMDInfo",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/tmchMarkSMDInfoResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "registryName",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "EPPProxy"
+        ]
+      }
+    },
+    "/tmch/{registryName}/mark/{id}/renew": {
+      "post": {
+        "operationId": "EPPProxy_TMCHMarkRenew",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/tmchMarkRenewResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "registryName",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "addPeriod": {
+                  "$ref": "#/definitions/commonPeriod"
+                },
+                "currentExpiryDate": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              }
+            }
+          }
+        ],
+        "tags": [
+          "EPPProxy"
+        ]
+      }
+    },
+    "/tmch/{registryName}/mark/{id}/transfer": {
+      "post": {
+        "operationId": "EPPProxy_TMCHMarkTransfer",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/tmchMarkTransferResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "registryName",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "authInfo": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "tags": [
+          "EPPProxy"
+        ]
+      }
+    },
+    "/tmch/{registryName}/mark/{id}/transfer/initiate": {
+      "post": {
+        "operationId": "EPPProxy_TMCHMarkTransferInitiate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/tmchMarkTransferInitiateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "registryName",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "EPPProxy"
+        ]
+      }
+    },
+    "/tmch/{registryName}/mark/{id}/update": {
+      "post": {
+        "operationId": "EPPProxy_TMCHMarkUpdate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/tmchMarkUpdateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "registryName",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "add": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/tmchMarkUpdateAdd"
+                  }
+                },
+                "remove": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/tmchMarkUpdateRemove"
+                  }
+                },
+                "newMark": {
+                  "$ref": "#/definitions/marksMark"
+                },
+                "updateLabels": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/tmchCreateLabel"
+                  }
+                },
+                "updateCases": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/tmchCaseUpdate"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "tags": [
+          "EPPProxy"
+        ]
+      }
     }
   },
   "definitions": {
@@ -3055,20 +3238,6 @@
         }
       }
     },
-    "dacDomainRequest": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string"
-        },
-        "environment": {
-          "$ref": "#/definitions/eppdacEnvironment"
-        },
-        "registryName": {
-          "type": "string"
-        }
-      }
-    },
     "dacDomainResponse": {
       "type": "object",
       "properties": {
@@ -3106,17 +3275,6 @@
         "RulesPrevent"
       ],
       "default": "Registered"
-    },
-    "dacUsageRequest": {
-      "type": "object",
-      "properties": {
-        "environment": {
-          "$ref": "#/definitions/eppdacEnvironment"
-        },
-        "registryName": {
-          "type": "string"
-        }
-      }
     },
     "dacUsageResponse": {
       "type": "object",
@@ -3270,7 +3428,7 @@
         "statuses": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/eppdomainDomainStatus"
+            "$ref": "#/definitions/eppdomain_commonDomainStatus"
           }
         },
         "registrant": {
@@ -3500,7 +3658,7 @@
           "$ref": "#/definitions/eppdomainContact"
         },
         "state": {
-          "$ref": "#/definitions/eppdomainDomainStatus"
+          "$ref": "#/definitions/eppdomain_commonDomainStatus"
         }
       }
     },
@@ -3786,14 +3944,6 @@
         }
       }
     },
-    "eppRegistryInfo": {
-      "type": "object",
-      "properties": {
-        "registryName": {
-          "type": "string"
-        }
-      }
-    },
     "eppcontactContactStatus": {
       "type": "string",
       "enum": [
@@ -3841,7 +3991,7 @@
         }
       }
     },
-    "eppdomainDomainStatus": {
+    "eppdomain_commonDomainStatus": {
       "type": "string",
       "enum": [
         "ClientDeleteProhibited",
@@ -4119,17 +4269,6 @@
         }
       }
     },
-    "euridDNSQualityRequest": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string"
-        },
-        "registryName": {
-          "type": "string"
-        }
-      }
-    },
     "euridDNSSECEligibilityReply": {
       "type": "object",
       "properties": {
@@ -4151,17 +4290,6 @@
         }
       }
     },
-    "euridDNSSECEligibilityRequest": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string"
-        },
-        "registryName": {
-          "type": "string"
-        }
-      }
-    },
     "euridDomainCheckData": {
       "type": "object",
       "properties": {
@@ -4172,7 +4300,7 @@
         "status": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/eppdomainDomainStatus"
+            "$ref": "#/definitions/eppdomain_commonDomainStatus"
           }
         }
       }
@@ -5879,17 +6007,6 @@
       ],
       "default": "PDF"
     },
-    "tmchMarkCheckRequest": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string"
-        },
-        "registryName": {
-          "type": "string"
-        }
-      }
-    },
     "tmchMarkCheckResponse": {
       "type": "object",
       "properties": {
@@ -5901,38 +6018,6 @@
         },
         "cmdResp": {
           "$ref": "#/definitions/commonCommandResponse"
-        }
-      }
-    },
-    "tmchMarkCreateRequest": {
-      "type": "object",
-      "properties": {
-        "mark": {
-          "$ref": "#/definitions/marksMark"
-        },
-        "period": {
-          "$ref": "#/definitions/commonPeriod"
-        },
-        "documents": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/tmchDocument"
-          }
-        },
-        "labels": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/tmchCreateLabel"
-          }
-        },
-        "variations": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "registryName": {
-          "type": "string"
         }
       }
     },
@@ -5951,17 +6036,6 @@
         },
         "cmdResp": {
           "$ref": "#/definitions/commonCommandResponse"
-        }
-      }
-    },
-    "tmchMarkInfoRequest": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string"
-        },
-        "registryName": {
-          "type": "string"
         }
       }
     },
@@ -6056,24 +6130,6 @@
       ],
       "default": "POUNotSet"
     },
-    "tmchMarkRenewRequest": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string"
-        },
-        "addPeriod": {
-          "$ref": "#/definitions/commonPeriod"
-        },
-        "currentExpiryDate": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "registryName": {
-          "type": "string"
-        }
-      }
-    },
     "tmchMarkRenewResponse": {
       "type": "object",
       "properties": {
@@ -6137,17 +6193,6 @@
       ],
       "default": "Unknown"
     },
-    "tmchMarkTransferInitiateRequest": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string"
-        },
-        "registryName": {
-          "type": "string"
-        }
-      }
-    },
     "tmchMarkTransferInitiateResponse": {
       "type": "object",
       "properties": {
@@ -6159,20 +6204,6 @@
         },
         "cmdResp": {
           "$ref": "#/definitions/commonCommandResponse"
-        }
-      }
-    },
-    "tmchMarkTransferRequest": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string"
-        },
-        "authInfo": {
-          "type": "string"
-        },
-        "registryName": {
-          "type": "string"
         }
       }
     },
@@ -6218,44 +6249,6 @@
           "type": "string"
         },
         "variation": {
-          "type": "string"
-        }
-      }
-    },
-    "tmchMarkUpdateRequest": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string"
-        },
-        "add": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/tmchMarkUpdateAdd"
-          }
-        },
-        "remove": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/tmchMarkUpdateRemove"
-          }
-        },
-        "newMark": {
-          "$ref": "#/definitions/marksMark"
-        },
-        "updateLabels": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/tmchCreateLabel"
-          }
-        },
-        "updateCases": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/tmchCaseUpdate"
-          }
-        },
-        "registryName": {
           "type": "string"
         }
       }

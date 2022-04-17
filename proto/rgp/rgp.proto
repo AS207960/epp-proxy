@@ -1,0 +1,33 @@
+syntax = "proto3";
+package epp.rgp;
+option go_package = "github.com/as207960/epp-proxy/gen/go/epp/rgp";
+
+import "fee/fee.proto";
+import "common/common.proto";
+import "google/protobuf/wrappers.proto";
+
+enum RGPState {
+    Unknown = 0;
+    AddPeriod = 1;
+    AutoRenewPeriod = 2;
+    RenewPeriod = 3;
+    TransferPeriod = 4;
+    RedemptionPeriod = 5;
+    PendingRestore = 6;
+    PendingDelete = 7;
+}
+
+message RequestRequest {
+    string name = 1;
+    google.protobuf.StringValue registry_name = 2;
+    fee.DonutsFeeData donuts_fee_agreement = 3;
+}
+
+message RestoreReply {
+    reserved 5;
+    bool pending = 1;
+    repeated RGPState state = 2;
+    fee.FeeData fee_data = 4;
+    string registry_name = 3;
+    common.CommandResponse cmd_resp = 6;
+}

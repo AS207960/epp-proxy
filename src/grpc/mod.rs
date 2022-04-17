@@ -31,6 +31,10 @@ pub mod epp_proto {
         tonic::include_proto!("epp.domain");
     }
 
+    pub mod domain_common {
+        tonic::include_proto!("epp.domain_common");
+    }
+
     pub mod host {
         tonic::include_proto!("epp.host");
     }

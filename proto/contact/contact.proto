@@ -1,0 +1,226 @@
+syntax = "proto3";
+package epp.contact;
+option go_package = "github.com/as207960/epp-proxy/gen/go/epp/contact";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+import "common/common.proto";
+import "eurid/eurid.proto";
+import "contact/qualified_lawyer/qualified_lawyer.proto";
+import "nominet_ext/nominet_ext.proto";
+import "isnic/isnic.proto";
+
+enum EntityType {
+    NotSet = 0;
+    UnknownEntity = 1;
+    UkLimitedCompany = 2;
+    UkPublicLimitedCompany = 3;
+    UkPartnership = 4;
+    UkSoleTrader = 5;
+    UkLimitedLiabilityPartnership = 6;
+    UkIndustrialProvidentRegisteredCompany = 7;
+    UkIndividual = 8;
+    UkSchool = 9;
+    UkRegisteredCharity = 10;
+    UkGovernmentBody = 11;
+    UkCorporationByRoyalCharter = 12;
+    UkStatutoryBody = 13;
+    UkPoliticalParty = 31;
+    OtherUkEntity = 14;
+    FinnishIndividual = 15;
+    FinnishCompany = 16;
+    FinnishAssociation = 17;
+    FinnishInstitution = 18;
+    FinnishPoliticalParty = 19;
+    FinnishMunicipality = 20;
+    FinnishGovernment = 21;
+    FinnishPublicCommunity = 22;
+    OtherIndividual = 23;
+    OtherCompany = 24;
+    OtherAssociation = 25;
+    OtherInstitution = 26;
+    OtherPoliticalParty = 27;
+    OtherMunicipality = 28;
+    OtherGovernment = 29;
+    OtherPublicCommunity = 30;
+}
+
+enum DisclosureType {
+    LocalName = 0;
+    InternationalisedName = 1;
+    LocalOrganisation = 2;
+    InternationalisedOrganisation = 3;
+    LocalAddress = 4;
+    InternationalisedAddress = 5;
+    Voice = 6;
+    Fax = 7;
+    Email = 8;
+}
+
+message PostalAddress {
+    string name = 2;
+    google.protobuf.StringValue organisation = 3;
+    repeated string streets = 4;
+    string city = 5;
+    google.protobuf.StringValue province = 6;
+    google.protobuf.StringValue postal_code = 7;
+    string country_code = 8;
+    google.protobuf.StringValue identity_number = 9;
+    google.protobuf.Timestamp birth_date = 10;
+}
+
+enum ContactStatus {
+    ClientDeleteProhibited = 0;
+    ClientTransferProhibited = 1;
+    ClientUpdateProhibited = 2;
+    Linked = 3;
+    Ok = 4;
+    PendingCreate = 5;
+    PendingDelete = 6;
+    PendingTransfer = 7;
+    PendingUpdate = 8;
+    ServerDeleteProhibited = 9;
+    ServerTransferProhibited = 10;
+    ServerUpdateProhibited = 11;
+}
+
+message ContactCheckRequest {
+    string id = 1;
+    string registry_name = 2;
+}
+
+message ContactCheckReply {
+    bool available = 1;
+    google.protobuf.StringValue reason = 2;
+    common.CommandResponse cmd_resp = 3;
+}
+
+message ContactInfoRequest {
+    string id = 1;
+    string registry_name = 2;
+}
+
+message Disclosure {
+    repeated DisclosureType disclosure = 1;
+}
+
+message ContactInfoReply {
+    string id = 1;
+    string registry_id = 2;
+    repeated ContactStatus statuses = 3;
+    PostalAddress local_address = 4;
+    PostalAddress internationalised_address = 5;
+    common.Phone phone = 6;
+    common.Phone fax = 7;
+    string email = 8;
+    string client_id = 9;
+    google.protobuf.StringValue client_created_id = 10;
+    google.protobuf.Timestamp creation_date = 11;
+    google.protobuf.StringValue last_updated_client = 12;
+    google.protobuf.Timestamp last_updated_date = 13;
+    google.protobuf.Timestamp last_transfer_date = 14;
+    EntityType entity_type = 15;
+    google.protobuf.StringValue trading_name = 16;
+    google.protobuf.StringValue company_number = 17;
+    repeated DisclosureType disclosure = 18;
+    google.protobuf.StringValue auth_info = 19;
+    nominet_ext.DataQuality nominet_data_quality = 20;
+    eurid.ContactExtension eurid_info = 22;
+    common.CommandResponse cmd_resp = 21;
+    qualified_lawyer.QualifiedLawyer qualified_lawyer = 23;
+    isnic.ContactInfo isnic_info = 24;
+}
+
+message ContactCreateRequest {
+    string id = 1;
+    PostalAddress local_address = 2;
+    PostalAddress internationalised_address = 3;
+    common.Phone phone = 4;
+    common.Phone fax = 5;
+    string email = 6;
+    EntityType entity_type = 7;
+    google.protobuf.StringValue trading_name = 8;
+    google.protobuf.StringValue company_number = 9;
+    Disclosure disclosure = 10;
+    eurid.ContactExtension eurid_info = 13;
+    string registry_name = 11;
+    string auth_info = 12;
+    qualified_lawyer.QualifiedLawyer qualified_lawyer = 14;
+    isnic.ContactCreate isnic_info = 15;
+}
+
+message ContactCreateReply {
+    reserved 4;
+    string id = 1;
+    bool pending = 2;
+    google.protobuf.Timestamp creation_date = 3;
+    common.CommandResponse cmd_resp = 5;
+}
+
+message ContactDeleteRequest {
+    string id = 1;
+    string registry_name = 2;
+}
+
+message ContactDeleteReply {
+    reserved 2;
+    bool pending = 1;
+    common.CommandResponse cmd_resp = 3;
+}
+
+message ContactUpdateRequest {
+    string id = 1;
+    repeated ContactStatus add_statuses = 2;
+    repeated ContactStatus remove_statuses = 3;
+    PostalAddress new_local_address = 4;
+    PostalAddress new_internationalised_address = 5;
+    common.Phone new_phone = 6;
+    common.Phone new_fax = 7;
+    google.protobuf.StringValue new_email = 8;
+    EntityType new_entity_type = 9;
+    google.protobuf.StringValue new_trading_name = 10;
+    google.protobuf.StringValue new_company_number = 11;
+    Disclosure disclosure = 12;
+    string registry_name = 13;
+    google.protobuf.StringValue new_auth_info = 14;
+    eurid.ContactUpdateExtension new_eurid_info = 15;
+    qualified_lawyer.QualifiedLawyer qualified_lawyer = 16;
+    isnic.ContactUpdate isnic_info = 17;
+}
+
+message ContactUpdateReply {
+    reserved 2;
+    bool pending = 1;
+    common.CommandResponse cmd_resp = 3;
+}
+
+message ContactTransferQueryRequest {
+    string id = 1;
+    google.protobuf.StringValue auth_info = 2;
+    string registry_name = 3;
+}
+
+message ContactTransferRequestRequest {
+    string id = 1;
+    string auth_info = 2;
+    string registry_name = 3;
+}
+
+message ContactTransferReply {
+    reserved 7;
+    bool pending = 1;
+    common.TransferStatus status = 2;
+    string requested_client_id = 3;
+    google.protobuf.Timestamp requested_date = 4;
+    string act_client_id = 5;
+    google.protobuf.Timestamp act_date = 6;
+    common.CommandResponse cmd_resp = 8;
+}
+
+message ContactPANReply {
+    string id = 1;
+    bool result = 2;
+    google.protobuf.StringValue server_transaction_id = 3;
+    google.protobuf.StringValue client_transaction_id = 4;
+    google.protobuf.Timestamp date = 5;
+}

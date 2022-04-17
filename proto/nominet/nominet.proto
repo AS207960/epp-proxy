@@ -1,0 +1,136 @@
+syntax = "proto3";
+package epp.nominet;
+option go_package = "github.com/as207960/epp-proxy/gen/go/epp/nominet";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+import "domain/domain.proto";
+import "contact/contact.proto";
+import "common/common.proto";
+
+message HandshakeAcceptRequest {
+    string registry_name = 1;
+    string case_id = 2;
+    google.protobuf.StringValue registrant = 3;
+}
+
+message HandshakeRejectRequest {
+    string registry_name = 1;
+    string case_id = 2;
+}
+
+message HandshakeReply {
+    string case_id = 1;
+    repeated string domains = 2;
+    common.CommandResponse cmd_resp = 3;
+}
+
+message ReleaseRequest {
+    string registry_name = 1;
+    string registrar_tag = 2;
+    Object object = 3;
+}
+
+message Object {
+    oneof object {
+        string domain = 3;
+        string registrant = 4;
+    }
+}
+
+message ReleaseReply {
+    bool pending = 1;
+    google.protobuf.StringValue message = 2;
+    common.CommandResponse cmd_resp = 3;
+}
+
+message NominetTagListReply {
+    message Tag {
+        string tag = 1;
+        string name = 2;
+        google.protobuf.StringValue trading_name = 3;
+        bool handshake = 4;
+    }
+
+    repeated Tag tags = 1;
+    common.CommandResponse cmd_resp = 2;
+}
+
+message DomainCancel {
+    string name = 1;
+    string originator = 2;
+}
+
+message DomainRelease {
+    string account_id = 1;
+    bool account_moved = 2;
+    string from = 3;
+    string registrar_tag = 4;
+    repeated string domains = 5;
+}
+
+message DomainRegistrarChange {
+    string originator = 1;
+    string registrar_tag = 2;
+    google.protobuf.StringValue case_id = 3;
+    repeated domain.DomainInfoReply domains = 4;
+    contact.ContactInfoReply contact = 5;
+}
+
+message HostCancel {
+    repeated string host_objects = 1;
+    repeated string domain_names = 2;
+}
+
+message Process {
+    enum ProcessStage {
+        Initial = 0;
+        Updated = 1;
+    }
+
+    ProcessStage stage = 1;
+    contact.ContactInfoReply contact = 2;
+    string process_type = 3;
+    google.protobuf.Timestamp suspend_date = 4;
+    google.protobuf.Timestamp cancel_date = 5;
+    repeated string domain_names = 6;
+}
+
+message Suspend {
+    string reason = 1;
+    google.protobuf.Timestamp cancel_date = 2;
+    repeated string domain_names = 3;
+}
+
+message DomainFail {
+    string domain = 1;
+    string reason = 2;
+}
+
+message RegistrantTransfer {
+    string originator = 1;
+    string account_id = 2;
+    string old_account_id = 3;
+    google.protobuf.StringValue case_id = 4;
+    repeated string domain_names = 5;
+    contact.ContactInfoReply contact = 6;
+}
+
+message ContactValidateRequest {
+    string registry_name = 1;
+    string contact_id = 2;
+}
+
+message ContactValidateReply {
+    common.CommandResponse cmd_resp = 1;
+}
+
+message LockRequest {
+    string registry_name = 1;
+    string lock_type = 2;
+    Object object = 3;
+}
+
+message LockReply {
+    common.CommandResponse cmd_resp = 1;
+}
