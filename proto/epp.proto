@@ -102,6 +102,12 @@ service EPPProxy {
             body: "*"
         };
     }
+    rpc DomainRestoreReport      (rgp.ReportRequest)                        returns (rgp.ReportReply) {
+        option (google.api.http) = {
+            post: "/domain/{name}/restore/report"
+            body: "*"
+        };
+    }
     rpc DomainSync               (domain.DomainSyncRequest)                 returns (domain.DomainUpdateReply) {
         option (google.api.http) = {
             post: "/domain/{name}/sync"

@@ -332,7 +332,7 @@ pub struct EPPReleaseData {
 
 #[derive(Debug, Deserialize)]
 pub struct EPPReleaseAccountData {
-    #[serde(rename = "$attr:moved")]
+    #[serde(rename = "$attr:moved", default)]
     pub moved: bool,
     #[serde(rename = "$value")]
     pub id: String,

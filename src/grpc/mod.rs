@@ -3,6 +3,7 @@
 use std::convert::TryInto;
 
 use futures::sink::SinkExt;
+use crate::grpc::utils::proto_to_chrono;
 
 use super::client;
 
@@ -841,6 +842,58 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                 .into_iter()
                 .map(rgp::i32_from_restore_status)
                 .collect(),
+            fee_data: res.fee_data.map(Into::into),
+            registry_name,
+            cmd_resp: Some(cmd_resp),
+        };
+
+        Ok(tonic::Response::new(reply))
+    }
+
+    async fn domain_restore_report(
+        &self,
+        request: tonic::Request<epp_proto::rgp::ReportRequest>,
+    ) -> Result<tonic::Response<epp_proto::rgp::ReportReply>, tonic::Status> {
+        let res = request.into_inner();
+        let (mut sender, registry_name) =
+            client_by_domain_or_id(&self.client_router, &res.name, res.registry_name)?;
+        let (res, cmd_resp) = utils::map_command_response(
+            client::rgp::report(
+                client::rgp::RestoreReportInfo {
+                    domain: &res.name,
+                    pre_data: &res.pre_data,
+                    post_data: &res.post_data,
+                    deletion_time: match proto_to_chrono(res.delete_time) {
+                        Some(t) => t,
+                        None => return Err(tonic::Status::invalid_argument(
+                            "Deletion time must be specified",
+                        ))
+                    },
+                    restore_time: match proto_to_chrono(res.restore_time) {
+                        Some(t) => t,
+                        None => return Err(tonic::Status::invalid_argument(
+                            "Restore time must be specified",
+                        ))
+                    },
+                    restore_reason: &res.restore_reason,
+                    statement_1: &res.statement_1,
+                    statement_2: &res.statement_2,
+                    other_information: if res.other_information.is_empty() {
+                        None
+                    } else {
+                        Some(&res.other_information)
+                    },
+                    donuts_fee_agreement: res.donuts_fee_agreement
+                    .map(TryInto::try_into)
+                    .map_or(Ok(None), |v| v.map(Some))?,
+                },
+                &mut sender,
+            )
+            .await?,
+        );
+
+        let reply = epp_proto::rgp::ReportReply {
+            pending: res.pending,
             fee_data: res.fee_data.map(Into::into),
             registry_name,
             cmd_resp: Some(cmd_resp),

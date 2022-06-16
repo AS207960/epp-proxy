@@ -83,6 +83,7 @@ router!(
     EmailForwardTransferAccept,  request_nop,                               response_nop;
     EmailForwardTransferReject,  request_nop,                               response_nop;
     RestoreRequest,              request_nop,                               response_nop;
+    RestoreReport,               request_nop,                               response_nop;
     HostCheck,                   request_nop,                               response_nop;
     HostInfo,                    request_nop,                               response_nop;
     HostCreate,                  request_nop,                               response_nop;

@@ -5,6 +5,7 @@ option go_package = "github.com/as207960/epp-proxy/gen/go/epp/rgp";
 import "fee/fee.proto";
 import "common/common.proto";
 import "google/protobuf/wrappers.proto";
+import "google/protobuf/timestamp.proto";
 
 enum RGPState {
     Unknown = 0;
@@ -30,4 +31,25 @@ message RestoreReply {
     fee.FeeData fee_data = 4;
     string registry_name = 3;
     common.CommandResponse cmd_resp = 6;
+}
+
+message ReportRequest {
+    string name = 1;
+    string pre_data = 2;
+    string post_data = 3;
+    google.protobuf.Timestamp delete_time = 4;
+    google.protobuf.Timestamp restore_time = 5;
+    string restore_reason = 6;
+    string statement_1 = 7;
+    string statement_2 = 8;
+    string other_information = 9;
+    google.protobuf.StringValue registry_name = 10;
+    fee.DonutsFeeData donuts_fee_agreement = 11;
+}
+
+message ReportReply {
+    bool pending = 1;
+    fee.FeeData fee_data = 3;
+    string registry_name = 4;
+    common.CommandResponse cmd_resp = 5;
 }

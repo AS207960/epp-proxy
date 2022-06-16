@@ -138,6 +138,7 @@ router!(
     EmailForwardTransferAccept,  super::email_forward::TransferAcceptRejectRequest, super::email_forward::TransferResponse;
     EmailForwardTransferReject,  super::email_forward::TransferAcceptRejectRequest, super::email_forward::TransferResponse;
     RestoreRequest,              super::rgp::RestoreRequest,                        super::rgp::RestoreResponse;
+    RestoreReport,               super::rgp::RestoreReportRequest,                  super::rgp::RestoreReportResponse;
     HostCheck,                   super::host::CheckRequest,                         super::host::CheckResponse;
     HostInfo,                    super::host::InfoRequest,                          super::host::InfoResponse;
     HostCreate,                  super::host::CreateRequest,                        super::host::CreateResponse;

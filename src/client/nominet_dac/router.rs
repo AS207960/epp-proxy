@@ -279,6 +279,7 @@ router!(
     EmailForwardTransferAccept;
     EmailForwardTransferReject;
     RestoreRequest;
+    RestoreReport;
     HostCheck;
     HostInfo;
     HostCreate;

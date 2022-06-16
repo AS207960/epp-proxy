@@ -90,6 +90,7 @@ router!(
     EmailForwardTransferAccept,  super::email_forward::handle_transfer_accept,  super::email_forward::handle_transfer_response;
     EmailForwardTransferReject,  super::email_forward::handle_transfer_reject,  super::email_forward::handle_transfer_response;
     RestoreRequest,              super::rgp::handle_restore,                    super::rgp::handle_restore_response;
+    RestoreReport,               super::rgp::handle_restore_report,             super::rgp::handle_restore_report_response;
     HostCheck,                   super::host::handle_check,                     super::host::handle_check_response;
     HostInfo,                    super::host::handle_info,                      super::host::handle_info_response;
     HostCreate,                  super::host::handle_create,                    super::host::handle_create_response;
