@@ -1,7 +1,16 @@
 FROM ekidd/rust-musl-builder:nightly-2021-12-23 as builder
 
-RUN USER=rust cargo init
-RUN mkdir static
+RUN curl -LO https://github.com/protocolbuffers/protobuf/releases/download/v3.15.8/protoc-3.15.8-linux-x86_64.zip && \
+  mkdir -p ~/.local && \
+  unzip protoc-3.15.8-linux-x86_64.zip -d ~/.local && \
+  rm protoc-3.15.8-linux-x86_64.zip && \
+  chmod +x ~/.local/bin/protoc
+
+USER rust
+
+ENV PROTOC=/home/rust/.local/bin/protoc
+
+RUN cargo init && mkdir static
 
 ADD --chown=rust:rust . ./
 RUN USER=rust cargo build --release
