@@ -2176,6 +2176,10 @@
 <span id="2171">2171</span>
 <span id="2172">2172</span>
 <span id="2173">2173</span>
+<span id="2174">2174</span>
+<span id="2175">2175</span>
+<span id="2176">2176</span>
+<span id="2177">2177</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Implements the gRPC interface for the EPP client</span>
 
 <span class="kw">use</span> <span class="ident">std::convert::TryInto</span>;
@@ -2207,6 +2211,10 @@
 
     <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">domain</span> {
         <span class="macro">tonic::include_proto!</span>(<span class="string">&quot;epp.domain&quot;</span>);
+    }
+
+    <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">domain_common</span> {
+        <span class="macro">tonic::include_proto!</span>(<span class="string">&quot;epp.domain_common&quot;</span>);
     }
 
     <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">host</span> {
@@ -4350,5 +4358,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="epp_proxy" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (3f391b845 2022-04-15)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="epp_proxy" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (878c7833f 2022-04-16)" ></div>
 </body></html>

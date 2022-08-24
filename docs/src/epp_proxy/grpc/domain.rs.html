@@ -368,42 +368,66 @@
 <span id="363">363</span>
 <span id="364">364</span>
 <span id="365">365</span>
+<span id="366">366</span>
+<span id="367">367</span>
+<span id="368">368</span>
+<span id="369">369</span>
+<span id="370">370</span>
+<span id="371">371</span>
+<span id="372">372</span>
+<span id="373">373</span>
+<span id="374">374</span>
+<span id="375">375</span>
+<span id="376">376</span>
+<span id="377">377</span>
+<span id="378">378</span>
+<span id="379">379</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::client</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::epp_proto</span>;
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">domain_status_from_i32</span>(<span class="ident">from</span>: <span class="ident">i32</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">client::domain::Status</span><span class="op">&gt;</span> {
-    <span class="ident">epp_proto::domain::DomainStatus::from_i32</span>(<span class="ident">from</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">e</span> {
-        <span class="ident">epp_proto::domain::DomainStatus::ClientDeleteProhibited</span> =&gt; {
+    <span class="ident">epp_proto::domain_common::DomainStatus::from_i32</span>(<span class="ident">from</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">e</span> {
+        <span class="ident">epp_proto::domain_common::DomainStatus::ClientDeleteProhibited</span> =&gt; {
             <span class="ident">client::domain::Status::ClientDeleteProhibited</span>
         }
-        <span class="ident">epp_proto::domain::DomainStatus::ClientHold</span> =&gt; <span class="ident">client::domain::Status::ClientHold</span>,
-        <span class="ident">epp_proto::domain::DomainStatus::ClientRenewProhibited</span> =&gt; {
+        <span class="ident">epp_proto::domain_common::DomainStatus::ClientHold</span> =&gt; <span class="ident">client::domain::Status::ClientHold</span>,
+        <span class="ident">epp_proto::domain_common::DomainStatus::ClientRenewProhibited</span> =&gt; {
             <span class="ident">client::domain::Status::ClientRenewProhibited</span>
         }
-        <span class="ident">epp_proto::domain::DomainStatus::ClientTransferProhibited</span> =&gt; {
+        <span class="ident">epp_proto::domain_common::DomainStatus::ClientTransferProhibited</span> =&gt; {
             <span class="ident">client::domain::Status::ClientTransferProhibited</span>
         }
-        <span class="ident">epp_proto::domain::DomainStatus::ClientUpdateProhibited</span> =&gt; {
+        <span class="ident">epp_proto::domain_common::DomainStatus::ClientUpdateProhibited</span> =&gt; {
             <span class="ident">client::domain::Status::ClientUpdateProhibited</span>
         }
-        <span class="ident">epp_proto::domain::DomainStatus::Inactive</span> =&gt; <span class="ident">client::domain::Status::Inactive</span>,
-        <span class="ident">epp_proto::domain::DomainStatus::Ok</span> =&gt; <span class="ident">client::domain::Status::Ok</span>,
-        <span class="ident">epp_proto::domain::DomainStatus::PendingCreate</span> =&gt; <span class="ident">client::domain::Status::PendingCreate</span>,
-        <span class="ident">epp_proto::domain::DomainStatus::PendingDelete</span> =&gt; <span class="ident">client::domain::Status::PendingDelete</span>,
-        <span class="ident">epp_proto::domain::DomainStatus::PendingRenew</span> =&gt; <span class="ident">client::domain::Status::PendingRenew</span>,
-        <span class="ident">epp_proto::domain::DomainStatus::PendingTransfer</span> =&gt; <span class="ident">client::domain::Status::PendingTransfer</span>,
-        <span class="ident">epp_proto::domain::DomainStatus::PendingUpdate</span> =&gt; <span class="ident">client::domain::Status::PendingUpdate</span>,
-        <span class="ident">epp_proto::domain::DomainStatus::ServerDeleteProhibited</span> =&gt; {
+        <span class="ident">epp_proto::domain_common::DomainStatus::Inactive</span> =&gt; <span class="ident">client::domain::Status::Inactive</span>,
+        <span class="ident">epp_proto::domain_common::DomainStatus::Ok</span> =&gt; <span class="ident">client::domain::Status::Ok</span>,
+        <span class="ident">epp_proto::domain_common::DomainStatus::PendingCreate</span> =&gt; {
+            <span class="ident">client::domain::Status::PendingCreate</span>
+        }
+        <span class="ident">epp_proto::domain_common::DomainStatus::PendingDelete</span> =&gt; {
+            <span class="ident">client::domain::Status::PendingDelete</span>
+        }
+        <span class="ident">epp_proto::domain_common::DomainStatus::PendingRenew</span> =&gt; {
+            <span class="ident">client::domain::Status::PendingRenew</span>
+        }
+        <span class="ident">epp_proto::domain_common::DomainStatus::PendingTransfer</span> =&gt; {
+            <span class="ident">client::domain::Status::PendingTransfer</span>
+        }
+        <span class="ident">epp_proto::domain_common::DomainStatus::PendingUpdate</span> =&gt; {
+            <span class="ident">client::domain::Status::PendingUpdate</span>
+        }
+        <span class="ident">epp_proto::domain_common::DomainStatus::ServerDeleteProhibited</span> =&gt; {
             <span class="ident">client::domain::Status::ServerDeleteProhibited</span>
         }
-        <span class="ident">epp_proto::domain::DomainStatus::ServerHold</span> =&gt; <span class="ident">client::domain::Status::ServerHold</span>,
-        <span class="ident">epp_proto::domain::DomainStatus::ServerRenewProhibited</span> =&gt; {
+        <span class="ident">epp_proto::domain_common::DomainStatus::ServerHold</span> =&gt; <span class="ident">client::domain::Status::ServerHold</span>,
+        <span class="ident">epp_proto::domain_common::DomainStatus::ServerRenewProhibited</span> =&gt; {
             <span class="ident">client::domain::Status::ServerRenewProhibited</span>
         }
-        <span class="ident">epp_proto::domain::DomainStatus::ServerTransferProhibited</span> =&gt; {
+        <span class="ident">epp_proto::domain_common::DomainStatus::ServerTransferProhibited</span> =&gt; {
             <span class="ident">client::domain::Status::ServerTransferProhibited</span>
         }
-        <span class="ident">epp_proto::domain::DomainStatus::ServerUpdateProhibited</span> =&gt; {
+        <span class="ident">epp_proto::domain_common::DomainStatus::ServerUpdateProhibited</span> =&gt; {
             <span class="ident">client::domain::Status::ServerUpdateProhibited</span>
         }
     })
@@ -412,47 +436,51 @@
 <span class="kw">fn</span> <span class="ident">i32_from_domain_status</span>(<span class="ident">from</span>: <span class="ident">client::domain::Status</span>) -&gt; <span class="ident">i32</span> {
     <span class="kw">match</span> <span class="ident">from</span> {
         <span class="ident">client::domain::Status::ClientDeleteProhibited</span> =&gt; {
-            <span class="ident">epp_proto::domain::DomainStatus::ClientDeleteProhibited</span>.<span class="ident">into</span>()
+            <span class="ident">epp_proto::domain_common::DomainStatus::ClientDeleteProhibited</span>.<span class="ident">into</span>()
         }
-        <span class="ident">client::domain::Status::ClientHold</span> =&gt; <span class="ident">epp_proto::domain::DomainStatus::ClientHold</span>.<span class="ident">into</span>(),
+        <span class="ident">client::domain::Status::ClientHold</span> =&gt; {
+            <span class="ident">epp_proto::domain_common::DomainStatus::ClientHold</span>.<span class="ident">into</span>()
+        }
         <span class="ident">client::domain::Status::ClientRenewProhibited</span> =&gt; {
-            <span class="ident">epp_proto::domain::DomainStatus::ClientRenewProhibited</span>.<span class="ident">into</span>()
+            <span class="ident">epp_proto::domain_common::DomainStatus::ClientRenewProhibited</span>.<span class="ident">into</span>()
         }
         <span class="ident">client::domain::Status::ClientTransferProhibited</span> =&gt; {
-            <span class="ident">epp_proto::domain::DomainStatus::ClientTransferProhibited</span>.<span class="ident">into</span>()
+            <span class="ident">epp_proto::domain_common::DomainStatus::ClientTransferProhibited</span>.<span class="ident">into</span>()
         }
         <span class="ident">client::domain::Status::ClientUpdateProhibited</span> =&gt; {
-            <span class="ident">epp_proto::domain::DomainStatus::ClientUpdateProhibited</span>.<span class="ident">into</span>()
+            <span class="ident">epp_proto::domain_common::DomainStatus::ClientUpdateProhibited</span>.<span class="ident">into</span>()
         }
-        <span class="ident">client::domain::Status::Inactive</span> =&gt; <span class="ident">epp_proto::domain::DomainStatus::Inactive</span>.<span class="ident">into</span>(),
-        <span class="ident">client::domain::Status::Ok</span> =&gt; <span class="ident">epp_proto::domain::DomainStatus::Ok</span>.<span class="ident">into</span>(),
+        <span class="ident">client::domain::Status::Inactive</span> =&gt; <span class="ident">epp_proto::domain_common::DomainStatus::Inactive</span>.<span class="ident">into</span>(),
+        <span class="ident">client::domain::Status::Ok</span> =&gt; <span class="ident">epp_proto::domain_common::DomainStatus::Ok</span>.<span class="ident">into</span>(),
         <span class="ident">client::domain::Status::PendingCreate</span> =&gt; {
-            <span class="ident">epp_proto::domain::DomainStatus::PendingCreate</span>.<span class="ident">into</span>()
+            <span class="ident">epp_proto::domain_common::DomainStatus::PendingCreate</span>.<span class="ident">into</span>()
         }
         <span class="ident">client::domain::Status::PendingDelete</span> =&gt; {
-            <span class="ident">epp_proto::domain::DomainStatus::PendingDelete</span>.<span class="ident">into</span>()
+            <span class="ident">epp_proto::domain_common::DomainStatus::PendingDelete</span>.<span class="ident">into</span>()
         }
         <span class="ident">client::domain::Status::PendingRenew</span> =&gt; {
-            <span class="ident">epp_proto::domain::DomainStatus::PendingRenew</span>.<span class="ident">into</span>()
+            <span class="ident">epp_proto::domain_common::DomainStatus::PendingRenew</span>.<span class="ident">into</span>()
         }
         <span class="ident">client::domain::Status::PendingTransfer</span> =&gt; {
-            <span class="ident">epp_proto::domain::DomainStatus::PendingTransfer</span>.<span class="ident">into</span>()
+            <span class="ident">epp_proto::domain_common::DomainStatus::PendingTransfer</span>.<span class="ident">into</span>()
         }
         <span class="ident">client::domain::Status::PendingUpdate</span> =&gt; {
-            <span class="ident">epp_proto::domain::DomainStatus::PendingUpdate</span>.<span class="ident">into</span>()
+            <span class="ident">epp_proto::domain_common::DomainStatus::PendingUpdate</span>.<span class="ident">into</span>()
         }
         <span class="ident">client::domain::Status::ServerDeleteProhibited</span> =&gt; {
-            <span class="ident">epp_proto::domain::DomainStatus::ServerDeleteProhibited</span>.<span class="ident">into</span>()
+            <span class="ident">epp_proto::domain_common::DomainStatus::ServerDeleteProhibited</span>.<span class="ident">into</span>()
         }
-        <span class="ident">client::domain::Status::ServerHold</span> =&gt; <span class="ident">epp_proto::domain::DomainStatus::ServerHold</span>.<span class="ident">into</span>(),
+        <span class="ident">client::domain::Status::ServerHold</span> =&gt; {
+            <span class="ident">epp_proto::domain_common::DomainStatus::ServerHold</span>.<span class="ident">into</span>()
+        }
         <span class="ident">client::domain::Status::ServerRenewProhibited</span> =&gt; {
-            <span class="ident">epp_proto::domain::DomainStatus::ServerRenewProhibited</span>.<span class="ident">into</span>()
+            <span class="ident">epp_proto::domain_common::DomainStatus::ServerRenewProhibited</span>.<span class="ident">into</span>()
         }
         <span class="ident">client::domain::Status::ServerTransferProhibited</span> =&gt; {
-            <span class="ident">epp_proto::domain::DomainStatus::ServerTransferProhibited</span>.<span class="ident">into</span>()
+            <span class="ident">epp_proto::domain_common::DomainStatus::ServerTransferProhibited</span>.<span class="ident">into</span>()
         }
         <span class="ident">client::domain::Status::ServerUpdateProhibited</span> =&gt; {
-            <span class="ident">epp_proto::domain::DomainStatus::ServerUpdateProhibited</span>.<span class="ident">into</span>()
+            <span class="ident">epp_proto::domain_common::DomainStatus::ServerUpdateProhibited</span>.<span class="ident">into</span>()
         }
     }
 }
@@ -734,5 +762,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="epp_proxy" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (3f391b845 2022-04-15)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="epp_proxy" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (878c7833f 2022-04-16)" ></div>
 </body></html>
