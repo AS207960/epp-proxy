@@ -109,3 +109,4 @@ Cargo.lock
 /conf-live
 /priv
 /log
+.DS_Store
