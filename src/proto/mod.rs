@@ -609,7 +609,7 @@ pub enum EPPResultDataValue {
     TraficomTrnData(traficom::EPPObjTrnData),
     #[serde(rename = "{urn:ietf:params:xml:ns:epp:maintenance-1.0}infData")]
     EPPMaintenanceInfo(maintenance::EPPMaintenanceInfoData),
-    #[serde(rename = "{urn:ietf:params:xml:ns:epp:maintenance-0.2}infData")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:maintenance-0.2}infData")]
     EPPMaintenanceInfo02(maintenance::EPPMaintenanceInfoData02),
     #[serde(rename = "{http://www.nominet.org.uk/epp/xml/nom-tag-1.0}listData")]
     NominetTagInfoResult(nominet::EPPTagListData),
@@ -887,7 +887,7 @@ pub enum EPPInfo {
     EmailForward(email_forward::EPPEmailForwardCheck),
     #[serde(rename = "{urn:ietf:params:xml:ns:epp:maintenance-1.0}maint:info")]
     Maintenance(maintenance::EPPMaintenanceInfo),
-    #[serde(rename = "{urn:ietf:params:xml:ns:epp:maintenance-0.2}maint:info")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:maintenance-0.2}maint:info")]
     Maintenance02(maintenance::EPPMaintenanceInfo02),
     #[serde(rename = "{http://www.nominet.org.uk/epp/xml/nom-tag-1.0}tag:list")]
     TagList {},

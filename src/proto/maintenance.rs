@@ -10,9 +10,9 @@ pub enum EPPMaintenanceInfo {
 
 #[derive(Debug, Serialize)]
 pub enum EPPMaintenanceInfo02 {
-    #[serde(rename = "{urn:ietf:params:xml:ns:epp:maintenance-0.2}maint:id")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:maintenance-0.2}maint:id")]
     Id(String),
-    #[serde(rename = "{urn:ietf:params:xml:ns:epp:maintenance-0.2}maint:list")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:maintenance-0.2}maint:list")]
     List(EPPMaintenanceInfoList)
 }
 
@@ -29,21 +29,21 @@ pub enum EPPMaintenanceInfoData {
 
 #[derive(Debug, Deserialize)]
 pub enum EPPMaintenanceInfoData02 {
-    #[serde(rename = "{urn:ietf:params:xml:ns:epp:maintenance-0.2}list")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:maintenance-0.2}list")]
     List(EPPMaintenanceInfoListData02),
-    #[serde(rename = "{urn:ietf:params:xml:ns:epp:maintenance-0.2}maint")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:maintenance-0.2}maint")]
     Maintenance(EPPMaintenanceItem02),
 }
 
 #[derive(Debug, Deserialize)]
 pub struct EPPMaintenanceInfoListData {
-    #[serde(rename = "{urn:ietf:params:xml:ns:epp:maintenance-0.2}listItem")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:maintenance-0.2}listItem")]
     pub list: Vec<EPPMaintenanceListItem>,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct EPPMaintenanceInfoListData02 {
-    #[serde(rename = "{urn:ietf:params:xml:ns:epp:maintenance-0.2}maint")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:maintenance-0.2}maint")]
     pub list: Vec<EPPMaintenanceListItem02>,
 }
 
@@ -103,52 +103,52 @@ pub struct EPPMaintenanceItem {
 
 #[derive(Debug, Deserialize)]
 pub struct EPPMaintenanceItem02 {
-    #[serde(rename = "{urn:ietf:params:xml:ns:epp:maintenance-0.2}id")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:maintenance-0.2}id")]
     pub id: EPPMaintenanceID,
-    #[serde(rename = "{urn:ietf:params:xml:ns:epp:maintenance-0.2}type", default)]
+    #[serde(rename = "{urn:ietf:params:xml:ns:maintenance-0.2}type", default)]
     pub item_type: Vec<String>,
     #[serde(
-        rename = "{urn:ietf:params:xml:ns:epp:maintenance-0.2}pollType",
+        rename = "{urn:ietf:params:xml:ns:maintenance-0.2}pollType",
         default
     )]
     pub poll_type: Option<EPPMaintenancePollType>,
-    #[serde(rename = "{urn:ietf:params:xml:ns:epp:maintenance-0.2}systems")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:maintenance-0.2}systems")]
     pub systems: EPPMaintenanceSystems02,
-    #[serde(rename = "{urn:ietf:params:xml:ns:epp:maintenance-0.2}environment")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:maintenance-0.2}environment")]
     pub environment: EPPMaintenanceEnvironment,
     #[serde(
-        rename = "{urn:ietf:params:xml:ns:epp:maintenance-0.2}start",
+        rename = "{urn:ietf:params:xml:ns:maintenance-0.2}start",
         deserialize_with = "super::deserialize_datetime"
     )]
     pub start: DateTime<Utc>,
     #[serde(
-        rename = "{urn:ietf:params:xml:ns:epp:maintenance-0.2}start",
+        rename = "{urn:ietf:params:xml:ns:maintenance-0.2}start",
         deserialize_with = "super::deserialize_datetime"
     )]
     pub end: DateTime<Utc>,
-    #[serde(rename = "{urn:ietf:params:xml:ns:epp:maintenance-0.2}reason")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:maintenance-0.2}reason")]
     pub reason: EPPMaintenanceReason,
-    #[serde(rename = "{urn:ietf:params:xml:ns:epp:maintenance-0.2}detail", default)]
+    #[serde(rename = "{urn:ietf:params:xml:ns:maintenance-0.2}detail", default)]
     pub detail: Option<String>,
     #[serde(
-        rename = "{urn:ietf:params:xml:ns:epp:maintenance-0.2}description",
+        rename = "{urn:ietf:params:xml:ns:maintenance-0.2}description",
         default
     )]
     pub description: Vec<EPPMaintenanceDescription>,
-    #[serde(rename = "{urn:ietf:params:xml:ns:epp:maintenance-0.2}tlds", default)]
+    #[serde(rename = "{urn:ietf:params:xml:ns:maintenance-0.2}tlds", default)]
     pub tlds: Option<EPPMaintenanceTLDs02>,
     #[serde(
-        rename = "{urn:ietf:params:xml:ns:epp:maintenance-0.2}intervention",
+        rename = "{urn:ietf:params:xml:ns:maintenance-0.2}intervention",
         default
     )]
     pub intervention: Option<EPPMaintenanceIntervention02>,
     #[serde(
-        rename = "{urn:ietf:params:xml:ns:epp:maintenance-0.2}crDate",
+        rename = "{urn:ietf:params:xml:ns:maintenance-0.2}crDate",
         deserialize_with = "super::deserialize_datetime"
     )]
     pub created_date: DateTime<Utc>,
     #[serde(
-        rename = "{urn:ietf:params:xml:ns:epp:maintenance-0.2}upDate",
+        rename = "{urn:ietf:params:xml:ns:maintenance-0.2}upDate",
         deserialize_with = "super::deserialize_datetime_opt",
         default
     )]
@@ -184,25 +184,25 @@ pub struct EPPMaintenanceListItem {
 
 #[derive(Debug, Deserialize)]
 pub struct EPPMaintenanceListItem02 {
-    #[serde(rename = "{urn:ietf:params:xml:ns:epp:maintenance-0.2}id")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:maintenance-0.2}id")]
     pub id: EPPMaintenanceID,
     #[serde(
-        rename = "{urn:ietf:params:xml:ns:epp:maintenance-0.2}start",
+        rename = "{urn:ietf:params:xml:ns:maintenance-0.2}start",
         deserialize_with = "super::deserialize_datetime"
     )]
     pub start: DateTime<Utc>,
     #[serde(
-        rename = "{urn:ietf:params:xml:ns:epp:maintenance-0.2}start",
+        rename = "{urn:ietf:params:xml:ns:maintenance-0.2}start",
         deserialize_with = "super::deserialize_datetime"
     )]
     pub end: DateTime<Utc>,
     #[serde(
-        rename = "{urn:ietf:params:xml:ns:epp:maintenance-0.2}crDate",
+        rename = "{urn:ietf:params:xml:ns:maintenance-0.2}crDate",
         deserialize_with = "super::deserialize_datetime"
     )]
     pub created_date: DateTime<Utc>,
     #[serde(
-        rename = "{urn:ietf:params:xml:ns:epp:maintenance-0.2}upDate",
+        rename = "{urn:ietf:params:xml:ns:maintenance-0.2}upDate",
         deserialize_with = "super::deserialize_datetime_opt",
         default
     )]
@@ -243,7 +243,7 @@ pub struct EPPMaintenanceSystems {
 
 #[derive(Debug, Deserialize)]
 pub struct EPPMaintenanceSystems02 {
-    #[serde(rename = "{urn:ietf:params:xml:ns:epp:maintenance-0.2}system")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:maintenance-0.2}system")]
     pub systems: Vec<EPPMaintenanceSystem02>,
 }
 
@@ -260,11 +260,11 @@ pub struct EPPMaintenanceSystem {
 
 #[derive(Debug, Deserialize)]
 pub struct EPPMaintenanceSystem02 {
-    #[serde(rename = "{urn:ietf:params:xml:ns:epp:maintenance-0.2}name")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:maintenance-0.2}name")]
     pub name: String,
-    #[serde(rename = "{urn:ietf:params:xml:ns:epp:maintenance-0.2}host", default)]
+    #[serde(rename = "{urn:ietf:params:xml:ns:maintenance-0.2}host", default)]
     pub host: Option<String>,
-    #[serde(rename = "{urn:ietf:params:xml:ns:epp:maintenance-0.2}impact")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:maintenance-0.2}impact")]
     pub impact: EPPMaintenanceImpact,
 }
 
@@ -276,7 +276,7 @@ pub struct EPPMaintenanceTLDs {
 
 #[derive(Debug, Deserialize)]
 pub struct EPPMaintenanceTLDs02 {
-    #[serde(rename = "{urn:ietf:params:xml:ns:epp:maintenance-0.2}tld")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:maintenance-0.2}tld")]
     pub tlds: Vec<String>,
 }
 
@@ -290,9 +290,9 @@ pub struct EPPMaintenanceIntervention {
 
 #[derive(Debug, Deserialize)]
 pub struct EPPMaintenanceIntervention02 {
-    #[serde(rename = "{urn:ietf:params:xml:ns:epp:maintenance-0.2}connection")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:maintenance-0.2}connection")]
     pub connection: bool,
-    #[serde(rename = "{urn:ietf:params:xml:ns:epp:maintenance-0.2}implementation")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:maintenance-0.2}implementation")]
     pub implementation: bool,
 }
 

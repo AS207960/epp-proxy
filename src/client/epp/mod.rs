@@ -118,7 +118,7 @@ pub struct ServerFeatures {
     eai_supported: bool,
     /// urn:ietf:params:xml:ns:epp:maintenance-1.0 support
     maintenance_supported: bool,
-    /// urn:ietf:params:xml:ns:epp:maintenance-0.2 support
+    /// urn:ietf:params:xml:ns:maintenance-0.2 support
     maintenance_02_supported: bool,
     /// RFC8807 support
     login_sec_supported: bool,
@@ -876,7 +876,7 @@ impl EPPClient {
             .supports("urn:ietf:params:xml:ns:epp:maintenance-1.0");
         self.features.maintenance_02_supported = greeting
             .service_menu
-            .supports("urn:ietf:params:xml:ns:epp:maintenance-0.2");
+            .supports("urn:ietf:params:xml:ns:maintenance-0.2");
         self.features.login_sec_supported = greeting
             .service_menu
             .supports_ext("urn:ietf:params:xml:ns:epp:loginSec-1.0");
@@ -1055,7 +1055,7 @@ impl EPPClient {
                 objects.push("urn:ietf:params:xml:ns:epp:maintenance-1.0".to_string())
             }
             if self.features.maintenance_02_supported {
-                objects.push("urn:ietf:params:xml:ns:epp:maintenance-0.2".to_string())
+                objects.push("urn:ietf:params:xml:ns:maintenance-0.2".to_string())
             }
             if self.features.eurid_hit_points_supported {
                 objects.push("http://www.eurid.eu/xml/epp/registrarHitPoints-1.0".to_string())
