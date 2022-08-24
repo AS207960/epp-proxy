@@ -1356,8 +1356,8 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                 .map(|i| epp_proto::maintenance::maintenance_list_reply::Item {
                     id: i.id,
                     name: i.name,
-                    start: utils::chrono_to_proto(Some(i.start)),
-                    end: utils::chrono_to_proto(Some(i.end)),
+                    start: utils::chrono_to_proto(i.start),
+                    end: utils::chrono_to_proto(i.end),
                     created: utils::chrono_to_proto(Some(i.created)),
                     updated: utils::chrono_to_proto(i.updated),
                 })

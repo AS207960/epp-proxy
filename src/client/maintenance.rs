@@ -51,8 +51,8 @@ pub struct ListResponse {
 pub struct ListResponseItem {
     pub id: String,
     pub name: Option<String>,
-    pub start: DateTime<Utc>,
-    pub end: DateTime<Utc>,
+    pub start: Option<DateTime<Utc>>,
+    pub end: Option<DateTime<Utc>>,
     pub created: DateTime<Utc>,
     pub updated: Option<DateTime<Utc>>,
 }
