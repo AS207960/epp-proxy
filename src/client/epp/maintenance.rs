@@ -181,8 +181,8 @@ pub fn handle_list_response(response: proto::EPPResponse) -> Response<ListRespon
                         .map(|i| ListResponseItem {
                             id: i.id.id,
                             name: i.id.name,
-                            start: i.start,
-                            end: i.end,
+                            start: Some(i.start),
+                            end: Some(i.end),
                             created: i.created_date,
                             updated: i.update_date,
                         })
