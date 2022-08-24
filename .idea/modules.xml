@@ -3,7 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/epp-proxy.iml" filepath="$PROJECT_DIR$/.idea/epp-proxy.iml" />
-      <module fileurl="file://$PROJECT_DIR$/../xml_serde/.idea/xml_serde.iml" filepath="$PROJECT_DIR$/../xml_serde/.idea/xml_serde.iml" />
     </modules>
   </component>
 </project>

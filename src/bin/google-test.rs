@@ -255,6 +255,7 @@ async fn main() {
             eurid_info: None,
             isnic_info: None,
             qualified_lawyer: None,
+            keysys: None,
         },
         &mut cmd_tx_ga_1,
     )
@@ -281,7 +282,7 @@ async fn main() {
 
     // 2.2.2 - Perform a check to see that an ASCII domain label is available.
     info!("Finding available domain");
-    epp_proxy::client::domain::check(&ga_domain, None, None, &mut cmd_tx_ga_1)
+    epp_proxy::client::domain::check(&ga_domain, None, None, None, &mut cmd_tx_ga_1)
         .await
         .unwrap();
 
@@ -333,6 +334,7 @@ async fn main() {
                 ]),
             }),
             personal_registration: None,
+            keysys: None,
         },
         &mut cmd_tx_ga_1,
     )
@@ -341,13 +343,13 @@ async fn main() {
 
     // 2.2.4 - Perform a check and verify that the ASCII domain label is no longer available
     info!("Checking domain was registered");
-    epp_proxy::client::domain::check(&ga_domain, None, None, &mut cmd_tx_ga_1)
+    epp_proxy::client::domain::check(&ga_domain, None, None, None, &mut cmd_tx_ga_1)
         .await
         .unwrap();
 
     // 2.3.2 - Perform a check to see that a Japanese IDN domain label is available
     info!("Finding available IDN domain");
-    epp_proxy::client::domain::check(&ga_domain_idn, None, None, &mut cmd_tx_ga_1)
+    epp_proxy::client::domain::check(&ga_domain_idn, None, None, None, &mut cmd_tx_ga_1)
         .await
         .unwrap();
 
@@ -399,6 +401,7 @@ async fn main() {
                 ]),
             }),
             personal_registration: None,
+            keysys: None,
         },
         &mut cmd_tx_ga_1,
     )
@@ -407,13 +410,13 @@ async fn main() {
 
     // 2.3.4 - Perform a check and verify that the Japanese IDN domain label is no longer available
     info!("Checking IDN domain was registered");
-    epp_proxy::client::domain::check(&ga_domain_idn, None, None, &mut cmd_tx_ga_1)
+    epp_proxy::client::domain::check(&ga_domain_idn, None, None, None, &mut cmd_tx_ga_1)
         .await
         .unwrap();
 
     // 2.4.2 - Perform a check to see that domain name “test‑and‑validate.<registrar name>‑ga” is available
     info!("Finding available claims domain");
-    epp_proxy::client::domain::check(&ga_domain_claims, None, None, &mut cmd_tx_ga_1)
+    epp_proxy::client::domain::check(&ga_domain_claims, None, None, None, &mut cmd_tx_ga_1)
         .await
         .unwrap();
 
@@ -511,6 +514,7 @@ async fn main() {
                 ]),
             }),
             personal_registration: None,
+            keysys: None,
         },
         &mut cmd_tx_ga_1,
     )
@@ -519,7 +523,7 @@ async fn main() {
 
     // 2.4.6 - Perform a check and verify that the domain name “test‑and‑validate.<registrar name>‑ga” is no longer available
     info!("Checking claims domain was registered");
-    epp_proxy::client::domain::check(&ga_domain_claims, None, None, &mut cmd_tx_ga_1)
+    epp_proxy::client::domain::check(&ga_domain_claims, None, None, None, &mut cmd_tx_ga_1)
         .await
         .unwrap();
 
@@ -537,6 +541,7 @@ async fn main() {
                 }),
             }],
         }),
+        None,
         None,
         &mut cmd_tx_ga_1,
     )
@@ -602,6 +607,7 @@ async fn main() {
                 ]),
             }),
             personal_registration: None,
+            keysys: None,
         },
         &mut cmd_tx_ga_1,
     )
@@ -610,7 +616,7 @@ async fn main() {
 
     // 2.5.4 - Perform a check and verify that the domain name “rich.<registrar name>‑ga” is no longer available.
     info!("Checking premium domain was registered");
-    epp_proxy::client::domain::check(&ga_domain_premium, None, None, &mut cmd_tx_ga_1)
+    epp_proxy::client::domain::check(&ga_domain_premium, None, None, None, &mut cmd_tx_ga_1)
         .await
         .unwrap();
 
@@ -674,6 +680,7 @@ async fn main() {
             donuts_fee_agreement: None,
             isnic_info: None,
             eurid_data: None,
+            keysys: None,
         },
         &mut cmd_tx_ga_1,
     )
@@ -702,6 +709,7 @@ async fn main() {
             donuts_fee_agreement: None,
             isnic_info: None,
             eurid_data: None,
+            keysys: None,
         },
         &mut cmd_tx_ga_1,
     )
@@ -837,6 +845,7 @@ async fn main() {
             donuts_fee_agreement: None,
             isnic_info: None,
             eurid_data: None,
+            keysys: None,
         },
         &mut cmd_tx_ga_1,
     )
@@ -851,13 +860,13 @@ async fn main() {
 
     // 2.9.3 - Delete domain created in Step 2.2
     info!("Deleting domain");
-    epp_proxy::client::domain::delete(&ga_domain, None, None, None, &mut cmd_tx_ga_1)
+    epp_proxy::client::domain::delete(&ga_domain, None, None, None, None,&mut cmd_tx_ga_1)
         .await
         .unwrap();
 
     // 2.9.4 - Perform a check and verify that the domain label is now available
     info!("Checking domain now available");
-    epp_proxy::client::domain::check(&ga_domain, None, None, &mut cmd_tx_ga_1)
+    epp_proxy::client::domain::check(&ga_domain, None, None, None, &mut cmd_tx_ga_1)
         .await
         .unwrap();
 
@@ -892,13 +901,13 @@ async fn main() {
 
     // 2.10.4 - Delete domain created in Step 2.3
     info!("Deleting IDN domain");
-    epp_proxy::client::domain::delete(&ga_domain_idn, None, None, None, &mut cmd_tx_ga_1)
+    epp_proxy::client::domain::delete(&ga_domain_idn, None, None, None, None,&mut cmd_tx_ga_1)
         .await
         .unwrap();
 
     // 2.10.5 - Perform a check and verify that the domain label is still not available
     info!("Checking domain still not available");
-    epp_proxy::client::domain::check(&ga_domain_idn, None, None, &mut cmd_tx_ga_1)
+    epp_proxy::client::domain::check(&ga_domain_idn, None, None, None, &mut cmd_tx_ga_1)
         .await
         .unwrap();
 
@@ -923,7 +932,7 @@ async fn main() {
 
     // 2.12.2 - Delete the domain used in Step 2.11
     info!("Deleting IDN domain");
-    epp_proxy::client::domain::delete(&ga_domain_idn, None, None, None, &mut cmd_tx_ga_1)
+    epp_proxy::client::domain::delete(&ga_domain_idn, None, None, None, None,&mut cmd_tx_ga_1)
         .await
         .unwrap();
 
@@ -931,7 +940,7 @@ async fn main() {
     info!("Waiting for RGP to expire");
     loop {
         tokio::time::sleep(std::time::Duration::from_secs(60)).await;
-        let res = epp_proxy::client::domain::check(&ga_domain_idn, None, None, &mut cmd_tx_ga_1)
+        let res = epp_proxy::client::domain::check(&ga_domain_idn, None, None, None, &mut cmd_tx_ga_1)
             .await
             .unwrap();
         if res.response.avail {
@@ -953,7 +962,7 @@ async fn main() {
     let mut trans_domain_i = 1;
     let trans_domain_1 = loop {
         let trans_domain = format!("staclar-{}.{}", trans_domain_i, ga_tld);
-        let res = epp_proxy::client::domain::check(&trans_domain, None, None, &mut cmd_tx_ga_1)
+        let res = epp_proxy::client::domain::check(&trans_domain, None, None, None, &mut cmd_tx_ga_1)
             .await
             .unwrap();
         if res.response.avail {
@@ -995,6 +1004,7 @@ async fn main() {
             isnic_payment: None,
             sec_dns: None,
             personal_registration: None,
+            keysys: None,
         },
         &mut cmd_tx_ga_1,
     )
@@ -1007,6 +1017,7 @@ async fn main() {
         &trans_domain_1,
         None,
         "test_auth1",
+        None,
         None,
         None,
         None,
@@ -1030,7 +1041,7 @@ async fn main() {
     trans_domain_i += 1;
     let trans_domain_2 = loop {
         let trans_domain = format!("staclar-{}.{}", trans_domain_i, ga_tld);
-        let res = epp_proxy::client::domain::check(&trans_domain, None, None, &mut cmd_tx_ga_1)
+        let res = epp_proxy::client::domain::check(&trans_domain, None, None, None, &mut cmd_tx_ga_1)
             .await
             .unwrap();
         if res.response.avail {
@@ -1072,6 +1083,7 @@ async fn main() {
             isnic_payment: None,
             sec_dns: None,
             personal_registration: None,
+            keysys: None,
         },
         &mut cmd_tx_ga_1,
     )
@@ -1084,6 +1096,7 @@ async fn main() {
         &trans_domain_2,
         None,
         "test_auth1",
+        None,
         None,
         None,
         None,
@@ -1107,7 +1120,7 @@ async fn main() {
     trans_domain_i += 1;
     let trans_domain_3 = loop {
         let trans_domain = format!("staclar-{}.{}", trans_domain_i, ga_tld);
-        let res = epp_proxy::client::domain::check(&trans_domain, None, None, &mut cmd_tx_ga_1)
+        let res = epp_proxy::client::domain::check(&trans_domain, None, None, None, &mut cmd_tx_ga_1)
             .await
             .unwrap();
         if res.response.avail {
@@ -1149,6 +1162,7 @@ async fn main() {
             isnic_payment: None,
             sec_dns: None,
             personal_registration: None,
+            keysys: None,
         },
         &mut cmd_tx_ga_1,
     )
@@ -1161,6 +1175,7 @@ async fn main() {
         &trans_domain_3,
         None,
         "test_auth1",
+        None,
         None,
         None,
         None,
@@ -1340,6 +1355,7 @@ async fn main() {
             isnic_payment: None,
             sec_dns: None,
             personal_registration: None,
+            keysys: None,
         },
         &mut cmd_tx_sunrise,
     )

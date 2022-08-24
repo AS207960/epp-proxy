@@ -485,7 +485,7 @@ impl TMCHClient {
         };
         let command = tmch_proto::TMCHCommand {
             command,
-            client_transaction_id: Some(message_id.to_hyphenated().to_string()),
+            client_transaction_id: Some(message_id.hyphenated().to_string()),
             extension: None,
         };
         let message = tmch_proto::TMCHMessage {

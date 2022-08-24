@@ -261,6 +261,7 @@ async fn main() {
             eurid_info: None,
             isnic_info: None,
             qualified_lawyer: None,
+            keysys: None,
         },
         &mut cmd_tx_1,
     )
@@ -269,7 +270,7 @@ async fn main() {
 
     // // Perform a check command for a domain.
     // info!("Domain check");
-    // epp_proxy::client::domain::check(&format!("{}.test1ga", nanoid::nanoid!(16, &ALPHABET)), None, None, &mut cmd_tx_1)
+    // epp_proxy::client::domain::check(&format!("{}.test1ga", nanoid::nanoid!(16, &ALPHABET)), None, None, None, &mut cmd_tx_1)
     //     .await
     //     .unwrap();
     //
@@ -520,7 +521,8 @@ async fn main() {
             }),
             isnic_payment: None,
             sec_dns: None,
-            personal_registration: None
+            personal_registration: None,
+            keysys: None,
         },
         &mut cmd_tx_1,
     )
@@ -570,7 +572,8 @@ async fn main() {
             }),
             isnic_payment: None,
             sec_dns: None,
-            personal_registration: None
+            personal_registration: None,
+            keysys: None,
         },
         &mut cmd_tx_1,
     )
@@ -580,7 +583,7 @@ async fn main() {
     // Register an Early Access domain
     info!("Create early access domain");
     info!("EAP domain: {}", eap_domain);
-    let eap_check = epp_proxy::client::domain::check(&eap_domain, None, None, &mut cmd_tx_1)
+    let eap_check = epp_proxy::client::domain::check(&eap_domain, None, None, None, &mut cmd_tx_1)
         .await
         .unwrap();
     let eap_fee = eap_check
@@ -638,6 +641,7 @@ async fn main() {
             isnic_payment: None,
             sec_dns: None,
             personal_registration: None,
+            keysys: None,
         },
         &mut cmd_tx_1,
     )
@@ -647,7 +651,7 @@ async fn main() {
     // Register a Premium domain name for 3 separate premium price points
     info!("Create 3 premium domains");
     let premium_check_1 =
-        epp_proxy::client::domain::check(premium_domain_1, None, None, &mut cmd_tx_1)
+        epp_proxy::client::domain::check(premium_domain_1, None, None, None, &mut cmd_tx_1)
             .await
             .unwrap();
     let premium_fee_1 = premium_check_1
@@ -710,6 +714,7 @@ async fn main() {
             isnic_payment: None,
             sec_dns: None,
             personal_registration: None,
+            keysys: None,
         },
         &mut cmd_tx_1,
     )
@@ -717,7 +722,7 @@ async fn main() {
     .unwrap();
 
     let premium_check_2 =
-        epp_proxy::client::domain::check(premium_domain_2, None, None, &mut cmd_tx_1)
+        epp_proxy::client::domain::check(premium_domain_2, None, None, None, &mut cmd_tx_1)
             .await
             .unwrap();
     let premium_fee_2 = premium_check_2
@@ -780,6 +785,7 @@ async fn main() {
             isnic_payment: None,
             sec_dns: None,
             personal_registration: None,
+            keysys: None,
         },
         &mut cmd_tx_1,
     )
@@ -787,7 +793,7 @@ async fn main() {
     .unwrap();
 
     let premium_check_3 =
-        epp_proxy::client::domain::check(premium_domain_3, None, None, &mut cmd_tx_1)
+        epp_proxy::client::domain::check(premium_domain_3, None, None, None, &mut cmd_tx_1)
             .await
             .unwrap();
     let premium_fee_3 = premium_check_3
@@ -845,6 +851,7 @@ async fn main() {
             isnic_payment: None,
             sec_dns: None,
             personal_registration: None,
+            keysys: None,
         },
         &mut cmd_tx_1,
     )
@@ -869,6 +876,7 @@ async fn main() {
                 }],
             }],
         }),
+        None,
         None,
         &mut cmd_tx_2,
     )
@@ -905,6 +913,7 @@ async fn main() {
             }],
         }),
         None,
+        None,
         &mut cmd_tx_1,
     )
     .await
@@ -913,7 +922,7 @@ async fn main() {
     // Delete and Restore a Premium name
     info!("Deleting and restoring premiun name");
     let premium_check_dr =
-        epp_proxy::client::domain::check(premium_domain_dr, None, None, &mut cmd_tx_1)
+        epp_proxy::client::domain::check(premium_domain_dr, None, None, None, &mut cmd_tx_1)
             .await
             .unwrap();
     let premium_fee_dr = premium_check_dr
@@ -933,7 +942,7 @@ async fn main() {
         })
         .unwrap();
 
-    epp_proxy::client::domain::delete(premium_domain_dr, None, None, None, &mut cmd_tx_1)
+    epp_proxy::client::domain::delete(premium_domain_dr, None, None, None, None, &mut cmd_tx_1)
         .await
         .unwrap();
 

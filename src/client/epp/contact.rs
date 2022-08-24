@@ -416,6 +416,17 @@ impl
             None => None,
         };
 
+        let keysys = match extension {
+            Some(ext) => {
+                let i = ext.value.iter().find_map(|p| match p {
+                    proto::EPPResponseExtensionType::KeysysResultData(proto::keysys::ResultData::Contact(i)) => Some(i),
+                    _ => None,
+                });
+                i.map(Into::into)
+            }
+            None => None,
+        };
+
         let local_address = contact_info
             .postal_info
             .iter()
@@ -494,6 +505,7 @@ impl
             eurid_contact_extension: eurid_ext_info.map(Into::into),
             qualified_lawyer: qualified_lawyer_ext_info.map(Into::into),
             isnic_info: isnic_ext_info.map(Into::into),
+            keysys,
         })
     }
 }
@@ -788,6 +800,19 @@ pub fn handle_create(
             return Err(Err(Error::Unsupported));
         }
     }
+
+    if let Some(keysys) = &req.keysys {
+        if client.keysys_supported {
+            ext.push(proto::EPPCommandExtensionType::KeysysCreate(proto::keysys::Create::Contact(proto::keysys::ContactCreate {
+                checkonly: Some(keysys.check_only),
+                force_duplication: Some(keysys.force_duplication),
+                pre_verify: Some(keysys.pre_verify),
+            })));
+        } else {
+            return Err(Err(Error::Unsupported));
+        }
+    }
+
     super::verisign::handle_verisign_namestore_erratum(client, &mut ext);
 
     if !req.auth_info.is_empty() {
@@ -1168,6 +1193,19 @@ pub fn handle_update(
             return Err(Err(Error::Unsupported));
         }
     }
+
+    if let Some(keysys) = &req.keysys {
+        if client.keysys_supported {
+            ext.push(proto::EPPCommandExtensionType::KeysysUpdate(proto::keysys::Update::Contact(proto::keysys::ContactUpdate {
+                checkonly: Some(keysys.check_only),
+                pre_verify: Some(keysys.pre_verify),
+                trigger_foa: Some(keysys.trigger_foa),
+            })));
+        } else {
+            return Err(Err(Error::Unsupported));
+        }
+    }
+
     super::verisign::handle_verisign_namestore_erratum(client, &mut ext);
 
     Ok((

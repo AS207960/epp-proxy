@@ -45,8 +45,8 @@
 #[macro_use]
 extern crate log;
 
-#[tokio::main]
-async fn main() {
+#[cfg(target_os = "linux")]
+fn setup_logging() {
     if systemd_journal_logger::connected_to_journal() {
         systemd_journal_logger::init().unwrap();
         log::set_max_level(log::LevelFilter::Info);
@@ -57,7 +57,20 @@ async fn main() {
         log::set_boxed_logger(Box::new(logger)).unwrap();
         log::set_max_level(log::LevelFilter::Trace);
     }
+}
 
+#[cfg(not(target_os = "linux"))]
+fn setup_logging() {
+    let mut log_builder = pretty_env_logger::formatted_builder();
+    log_builder.parse_filters(&std::env::var("RUST_LOG").unwrap_or_default());
+    let logger = sentry::integrations::log::SentryLogger::with_dest(log_builder.build());
+    log::set_boxed_logger(Box::new(logger)).unwrap();
+    log::set_max_level(log::LevelFilter::Trace);
+}
+
+#[tokio::main]
+async fn main() {
+    setup_logging();
     openssl::init();
 
     let matches = clap::Command::new("epp-proxy")
@@ -216,10 +229,16 @@ async fn main() {
         oauth_client,
     };
 
+    let reflection_svc = tonic_reflection::server::Builder::configure()
+        .register_encoded_file_descriptor_set(epp_proxy::grpc::epp_proto::FILE_DESCRIPTOR_SET)
+        .build()
+        .unwrap();
+
     info!("Listening for gRPC commands on {}...", addr);
     tonic::transport::Server::builder()
         .tls_config(tonic::transport::ServerTlsConfig::new().identity(identity))
         .unwrap()
+        .add_service(reflection_svc)
         .add_service(w_svc)
         .serve(addr)
         .await

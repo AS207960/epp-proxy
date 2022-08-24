@@ -29,6 +29,7 @@ pub mod tmch;
 pub mod traficom;
 pub mod united_tld;
 pub mod verisign;
+pub mod keysys;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub enum EPPMessageType {
@@ -223,6 +224,18 @@ pub enum EPPCommandExtensionType {
     ISNICHostUpdate(isnic::HostCreateUpdate),
     #[serde(rename = "{http://www.nic.name/epp/persReg-1.0}persReg:create")]
     PersonalRegistrationCreate(personal_registration::PersonalRegistrationCreate),
+    #[serde(rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:check")]
+    KeysysCheck(keysys::Check),
+    #[serde(rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:create")]
+    KeysysCreate(keysys::Create),
+    #[serde(rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:update")]
+    KeysysUpdate(keysys::Update),
+    #[serde(rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:delete")]
+    KeysysDelete(keysys::Delete),
+    #[serde(rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:renew")]
+    KeysysRenew(keysys::Renew),
+    #[serde(rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:trasfer")]
+    KeysysTransfer(keysys::Transfer),
 }
 
 #[derive(Debug, Serialize)]
@@ -594,8 +607,10 @@ pub enum EPPResultDataValue {
     EPPContactPendingActionNotification(contact::EPPContactPanData),
     #[serde(rename = "{urn:ietf:params:xml:ns:obj-1.0}trnData")]
     TraficomTrnData(traficom::EPPObjTrnData),
-    #[serde(rename = "{urn:ietf:params:xml:ns:epp:maintenance-0.3}infData")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp:maintenance-1.0}infData")]
     EPPMaintenanceInfo(maintenance::EPPMaintenanceInfoData),
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp:maintenance-0.2}infData")]
+    EPPMaintenanceInfo02(maintenance::EPPMaintenanceInfoData02),
     #[serde(rename = "{http://www.nominet.org.uk/epp/xml/nom-tag-1.0}listData")]
     NominetTagInfoResult(nominet::EPPTagListData),
     #[serde(rename = "{https://www.nic.ch/epp/balance-1.0}infData")]
@@ -844,6 +859,8 @@ pub enum EPPResponseExtensionType {
     PersonalRegistrationTransferData(personal_registration::PersonalRegistrationCreateData),
     #[serde(rename = "{http://www.nic.name/epp/persReg-1.0}infData")]
     PersonalRegistrationInfoData(personal_registration::PersonalRegistrationInfoData),
+    #[serde(rename = "{http://www.key-systems.net/epp/keysys-1.0}resData")]
+    KeysysResultData(keysys::ResultData),
 }
 
 #[derive(Debug, Serialize)]
@@ -868,8 +885,10 @@ pub enum EPPInfo {
     Contact(contact::EPPContactCheck),
     #[serde(rename = "{http://www.nic.name/epp/emailFwd-1.0}emailFwd:info")]
     EmailForward(email_forward::EPPEmailForwardCheck),
-    #[serde(rename = "{urn:ietf:params:xml:ns:epp:maintenance-0.3}maint:info")]
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp:maintenance-1.0}maint:info")]
     Maintenance(maintenance::EPPMaintenanceInfo),
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp:maintenance-0.2}maint:info")]
+    Maintenance02(maintenance::EPPMaintenanceInfo02),
     #[serde(rename = "{http://www.nominet.org.uk/epp/xml/nom-tag-1.0}tag:list")]
     TagList {},
     #[serde(rename = "{https://www.nic.ch/epp/balance-1.0}balance:info")]

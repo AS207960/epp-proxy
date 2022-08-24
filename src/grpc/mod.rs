@@ -21,9 +21,14 @@ mod nominet;
 mod rgp;
 mod tmch;
 mod utils;
+mod keysys;
 
 pub mod epp_proto {
     tonic::include_proto!("epp");
+
+    pub const FILE_DESCRIPTOR_SET: &[u8] =
+        tonic::include_file_descriptor_set!("file_descriptor_set");
+
     pub mod common {
         tonic::include_proto!("epp.common");
     }
@@ -99,6 +104,10 @@ pub mod epp_proto {
     pub mod personal_registration {
         tonic::include_proto!("epp.personal_registration");
     }
+
+    pub mod keysys {
+        tonic::include_proto!("epp.keysys");
+    }
 }
 
 #[derive(Debug)]
@@ -155,8 +164,10 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let (mut sender, registry_name) =
             client_by_domain_or_id(&self.client_router, &res.name, res.registry_name)?;
         let (res, cmd_resp) = utils::map_command_response(
-            client::domain::check(&res.name, res.fee_check.map(Into::into), None, &mut sender)
-                .await?,
+            client::domain::check(
+                &res.name, res.fee_check.map(Into::into), None,
+                res.keysys.map(Into::into), &mut sender
+            ).await?,
         );
 
         let mut reply: epp_proto::domain::DomainCheckReply = res.into();
@@ -394,6 +405,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                             consent_id: p.consent_id,
                         }
                     }),
+                    keysys: request.keysys.map(TryInto::try_into).map_or(Ok(None), |v| v.map(Some))?,
                 },
                 &mut sender,
             )
@@ -426,6 +438,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                     .map(TryInto::try_into)
                     .map_or(Ok(None), |v| v.map(Some))?,
                 request.eurid_data.and_then(Into::into),
+                request.keysys.map(Into::into),
                 &mut sender,
             )
             .await?,
@@ -640,6 +653,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                         .map_or(Ok(None), |v| v.map(Some))?,
                     eurid_data: request.eurid_data.map(Into::into),
                     isnic_info: request.isnic_info.map(Into::into),
+                    keysys: request.keysys.map(Into::into),
                 },
                 &mut sender,
             )
@@ -699,6 +713,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                     .map(TryInto::try_into)
                     .map_or(Ok(None), |v| v.map(Some))?,
                 request.isnic_payment.and_then(Into::into),
+                request.keysys.map(Into::into),
                 &mut sender,
             )
             .await?,
@@ -748,6 +763,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                     .map(TryInto::try_into)
                     .map_or(Ok(None), |v| v.map(Some))?,
                 request.eurid_data.map(Into::into),
+                request.keysys.map(Into::into),
                 &mut sender,
             )
             .await?,
@@ -1154,6 +1170,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                     eurid_info: request.eurid_info.map(Into::into),
                     isnic_info: request.isnic_info.map(Into::into),
                     qualified_lawyer: request.qualified_lawyer.map(Into::into),
+                    keysys: request.keysys.map(Into::into),
                 },
                 &mut sender,
             )
@@ -1228,6 +1245,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                     eurid_info: request.new_eurid_info.map(Into::into),
                     isnic_info: request.isnic_info.map(Into::into),
                     qualified_lawyer: request.qualified_lawyer.map(Into::into),
+                    keysys: request.keysys.map(Into::into),
                 },
                 &mut sender,
             )

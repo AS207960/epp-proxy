@@ -129,7 +129,7 @@ async fn main() {
     // Using your OT&E1 account, perform a CHECK domain command until you find an available domain
     info!(
         "{:#?}",
-        epp_proxy::client::domain::check(domain, None, None, &mut cmd_tx_1)
+        epp_proxy::client::domain::check(domain, None, None, None, &mut cmd_tx_1)
             .await
             .unwrap()
     );
@@ -156,6 +156,7 @@ async fn main() {
             isnic_payment: None,
             sec_dns: None,
             personal_registration: None,
+            keysys: None,
         },
         &mut cmd_tx_1,
     )
@@ -235,7 +236,8 @@ async fn main() {
                 fee_agreement: None,
                 donuts_fee_agreement: None,
                 isnic_info: None,
-                eurid_data: None
+                eurid_data: None,
+                keysys: None,
             },
             &mut cmd_tx_1
         )
@@ -276,7 +278,8 @@ async fn main() {
                 fee_agreement: None,
                 donuts_fee_agreement: None,
                 isnic_info: None,
-                eurid_data: None
+                eurid_data: None,
+                keysys: None,
             },
             &mut cmd_tx_1
         )
@@ -329,7 +332,8 @@ async fn main() {
                 fee_agreement: None,
                 donuts_fee_agreement: None,
                 isnic_info: None,
-                eurid_data: None
+                eurid_data: None,
+                keysys: None,
             },
             &mut cmd_tx_1
         )
@@ -368,7 +372,8 @@ async fn main() {
                 fee_agreement: None,
                 donuts_fee_agreement: None,
                 isnic_info: None,
-                eurid_data: None
+                eurid_data: None,
+                keysys: None,
             },
             &mut cmd_tx_1
         )
@@ -430,6 +435,7 @@ async fn main() {
         None,
         None,
         None,
+        None,
         &mut cmd_tx_1,
     )
     .await
@@ -472,6 +478,7 @@ async fn main() {
             domain,
             None,
             "test_auth2",
+            None,
             None,
             None,
             None,
@@ -533,6 +540,7 @@ async fn main() {
             domain,
             None,
             "test_auth2",
+            None,
             None,
             None,
             None,

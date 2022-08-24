@@ -9,6 +9,7 @@ import "eurid/eurid.proto";
 import "contact/qualified_lawyer/qualified_lawyer.proto";
 import "nominet_ext/nominet_ext.proto";
 import "isnic/isnic.proto";
+import "keysys/keysys.proto";
 
 enum EntityType {
     NotSet = 0;
@@ -129,6 +130,7 @@ message ContactInfoReply {
     common.CommandResponse cmd_resp = 21;
     qualified_lawyer.QualifiedLawyer qualified_lawyer = 23;
     isnic.ContactInfo isnic_info = 24;
+    keysys.ContactInfo keysys = 25;
 }
 
 message ContactCreateRequest {
@@ -147,6 +149,7 @@ message ContactCreateRequest {
     string auth_info = 12;
     qualified_lawyer.QualifiedLawyer qualified_lawyer = 14;
     isnic.ContactCreate isnic_info = 15;
+    keysys.ContactCreate keysys = 16;
 }
 
 message ContactCreateReply {
@@ -186,6 +189,7 @@ message ContactUpdateRequest {
     eurid.ContactUpdateExtension new_eurid_info = 15;
     qualified_lawyer.QualifiedLawyer qualified_lawyer = 16;
     isnic.ContactUpdate isnic_info = 17;
+    keysys.ContactUpdate keysys = 18;
 }
 
 message ContactUpdateReply {

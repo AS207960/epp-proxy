@@ -2,13 +2,14 @@
 
 use chrono::prelude::*;
 
-use super::{fee, launch, CommandResponse, RequestMessage, Sender};
+use super::{fee, launch, keysys, CommandResponse, RequestMessage, Sender};
 
 #[derive(Debug)]
 pub struct CheckRequest {
     pub(super) name: String,
     pub(super) fee_check: Option<fee::FeeCheck>,
     pub(super) launch_check: Option<launch::LaunchAvailabilityCheck>,
+    pub(super) keysys: Option<keysys::DomainCheck>,
     pub return_path: Sender<CheckResponse>,
 }
 
@@ -109,6 +110,7 @@ pub struct InfoResponse {
     pub eurid_data: Option<super::eurid::DomainInfo>,
     pub eurid_idn: Option<super::eurid::Idn>,
     pub personal_registration: Option<super::personal_registration::PersonalRegistrationInfo>,
+    pub keysys: Option<super::keysys::DomainInfo>,
 }
 
 /// Additional contact associated with a domain
@@ -179,6 +181,7 @@ pub struct CreateRequest {
     pub(super) isnic_payment: Option<super::isnic::PaymentInfo>,
     pub(super) personal_registration:
         Option<super::personal_registration::PersonalRegistrationInfo>,
+    pub(super) keysys: Option<super::keysys::DomainCreate>,
     pub return_path: Sender<CreateResponse>,
 }
 
@@ -211,6 +214,7 @@ pub struct DeleteRequest {
     pub(super) launch_info: Option<launch::LaunchUpdate>,
     pub(super) donuts_fee_agreement: Option<fee::DonutsFeeData>,
     pub(super) eurid_data: Option<super::eurid::DomainDelete>,
+    pub(super) keysys: Option<super::keysys::DomainDelete>,
     pub return_path: Sender<DeleteResponse>,
 }
 
@@ -236,6 +240,7 @@ pub struct UpdateRequest {
     pub(super) donuts_fee_agreement: Option<fee::DonutsFeeData>,
     pub(super) eurid_data: Option<super::eurid::DomainUpdate>,
     pub(super) isnic_info: Option<super::isnic::DomainUpdate>,
+    pub(super) keysys: Option<super::keysys::DomainUpdate>,
     pub return_path: Sender<UpdateResponse>,
 }
 
@@ -285,6 +290,7 @@ pub struct RenewRequest {
     pub(super) fee_agreement: Option<fee::FeeAgreement>,
     pub(super) donuts_fee_agreement: Option<fee::DonutsFeeData>,
     pub(super) isnic_payment: Option<super::isnic::PaymentInfo>,
+    pub(super) keysys: Option<super::keysys::DomainRenew>,
     pub return_path: Sender<RenewResponse>,
 }
 
@@ -322,6 +328,7 @@ pub struct TransferRequestRequest {
     pub(super) fee_agreement: Option<fee::FeeAgreement>,
     pub(super) donuts_fee_agreement: Option<fee::DonutsFeeData>,
     pub(super) eurid_data: Option<super::eurid::DomainTransfer>,
+    pub(super) keysys: Option<super::keysys::DomainTransfer>,
     pub return_path: Sender<TransferResponse>,
 }
 
@@ -401,6 +408,7 @@ pub async fn check(
     domain: &str,
     fee_check: Option<fee::FeeCheck>,
     launch_check: Option<launch::LaunchAvailabilityCheck>,
+    keysys: Option<keysys::DomainCheck>,
     client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<CheckResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
@@ -410,6 +418,7 @@ pub async fn check(
             name: domain.to_string(),
             fee_check,
             launch_check,
+            keysys,
             return_path: sender,
         })),
         receiver,
@@ -505,6 +514,7 @@ pub struct CreateInfo<'a> {
     pub eurid_data: Option<super::eurid::DomainCreate>,
     pub isnic_payment: Option<super::isnic::PaymentInfo>,
     pub personal_registration: Option<super::personal_registration::PersonalRegistrationInfo>,
+    pub keysys: Option<super::keysys::DomainCreate>
 }
 
 /// Registers a new domain
@@ -538,6 +548,7 @@ pub async fn create(
             eurid_data: info.eurid_data,
             isnic_payment: info.isnic_payment,
             personal_registration: info.personal_registration,
+            keysys: info.keysys,
             return_path: sender,
         })),
         receiver,
@@ -555,6 +566,7 @@ pub async fn delete(
     launch_info: Option<launch::LaunchUpdate>,
     donuts_fee_agreement: Option<fee::DonutsFeeData>,
     eurid_data: Option<super::eurid::DomainDelete>,
+    keysys: Option<super::keysys::DomainDelete>,
     client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<DeleteResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
@@ -565,6 +577,7 @@ pub async fn delete(
             launch_info,
             donuts_fee_agreement,
             eurid_data,
+            keysys,
             return_path: sender,
         })),
         receiver,
@@ -585,6 +598,7 @@ pub struct UpdateInfo<'a> {
     pub donuts_fee_agreement: Option<fee::DonutsFeeData>,
     pub eurid_data: Option<super::eurid::DomainUpdate>,
     pub isnic_info: Option<super::isnic::DomainUpdate>,
+    pub keysys: Option<super::keysys::DomainUpdate>,
 }
 
 /// Updates properties of a domain name
@@ -615,6 +629,7 @@ pub async fn update(
             donuts_fee_agreement: info.donuts_fee_agreement,
             eurid_data: info.eurid_data,
             isnic_info: info.isnic_info,
+            keysys: info.keysys,
             return_path: sender,
         })),
         receiver,
@@ -662,6 +677,7 @@ pub async fn renew(
     fee_agreement: Option<fee::FeeAgreement>,
     donuts_fee_agreement: Option<fee::DonutsFeeData>,
     isnic_payment: Option<super::isnic::PaymentInfo>,
+    keysys: Option<super::keysys::DomainRenew>,
     client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<RenewResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
@@ -674,6 +690,7 @@ pub async fn renew(
             fee_agreement,
             donuts_fee_agreement,
             isnic_payment,
+            keysys,
             return_path: sender,
         })),
         receiver,
@@ -719,6 +736,7 @@ pub async fn transfer_request(
     fee_agreement: Option<fee::FeeAgreement>,
     donuts_fee_agreement: Option<fee::DonutsFeeData>,
     eurid_data: Option<super::eurid::DomainTransfer>,
+    keysys: Option<super::keysys::DomainTransfer>,
     client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<TransferResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
@@ -731,6 +749,7 @@ pub async fn transfer_request(
             fee_agreement,
             donuts_fee_agreement,
             eurid_data,
+            keysys,
             return_path: sender,
         })),
         receiver,

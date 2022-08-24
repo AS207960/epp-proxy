@@ -249,6 +249,7 @@ impl From<client::domain::InfoResponse> for epp_proto::domain::DomainInfoReply {
                     consent_id: p.consent_id,
                 }
             }),
+            keysys: res.keysys.map(Into::into),
         }
     }
 }

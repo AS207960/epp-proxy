@@ -476,6 +476,7 @@ impl From<client::contact::InfoResponse> for epp_proto::contact::ContactInfoRepl
                 paper_invoices: c.paper_invoices,
             }),
             cmd_resp: None,
+            keysys: res.keysys.map(Into::into),
         }
     }
 }

@@ -65,6 +65,7 @@ pub struct InfoResponse {
     pub eurid_contact_extension: Option<super::eurid::ContactExtension>,
     pub isnic_info: Option<super::isnic::ContactInfo>,
     pub qualified_lawyer: Option<QualifiedLawyerInfo>,
+    pub keysys: Option<super::keysys::ContactInfo>,
 }
 
 #[derive(Debug)]
@@ -176,6 +177,7 @@ pub struct CreateRequest {
     pub(super) eurid_contact_extension: Option<super::eurid::ContactExtension>,
     pub(super) qualified_lawyer: Option<QualifiedLawyerInfo>,
     pub(super) isnic_info: Option<super::isnic::ContactCreate>,
+    pub(super) keysys: Option<super::keysys::ContactCreate>,
     pub return_path: Sender<CreateResponse>,
 }
 
@@ -219,6 +221,7 @@ pub struct UpdateRequest {
     pub(super) new_eurid_contact_extension: Option<super::eurid::ContactExtensionUpdate>,
     pub(super) qualified_lawyer: Option<QualifiedLawyerInfo>,
     pub(super) isnic_info: Option<super::isnic::ContactUpdate>,
+    pub(super) keysys: Option<super::keysys::ContactUpdate>,
     pub return_path: Sender<UpdateResponse>,
 }
 
@@ -335,6 +338,7 @@ pub struct NewContactData {
     pub eurid_info: Option<super::eurid::ContactExtension>,
     pub isnic_info: Option<super::isnic::ContactCreate>,
     pub qualified_lawyer: Option<QualifiedLawyerInfo>,
+    pub keysys: Option<super::keysys::ContactCreate>,
 }
 
 /// Creates a new contact
@@ -370,6 +374,7 @@ pub async fn create(
             eurid_contact_extension: data.eurid_info,
             isnic_info: data.isnic_info,
             qualified_lawyer: data.qualified_lawyer,
+            keysys: data.keysys,
             return_path: sender,
         })),
         receiver,
@@ -422,6 +427,7 @@ pub struct UpdateContactData {
     pub eurid_info: Option<super::eurid::ContactExtensionUpdate>,
     pub isnic_info: Option<super::isnic::ContactUpdate>,
     pub qualified_lawyer: Option<QualifiedLawyerInfo>,
+    pub keysys: Option<super::keysys::ContactUpdate>,
 }
 
 /// Updates an existing contact
@@ -462,6 +468,7 @@ pub async fn update(
             new_eurid_contact_extension: new_data.eurid_info,
             isnic_info: new_data.isnic_info,
             qualified_lawyer: new_data.qualified_lawyer,
+            keysys: new_data.keysys,
             return_path: sender,
         })),
         receiver,

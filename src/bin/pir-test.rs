@@ -145,6 +145,7 @@ async fn main() {
             eurid_info: None,
             isnic_info: None,
             qualified_lawyer: None,
+            keysys: None,
         },
         &mut cmd_tx,
     )
@@ -203,6 +204,7 @@ async fn main() {
             eurid_info: None,
             isnic_info: None,
             qualified_lawyer: None,
+            keysys: None,
         },
         &mut cmd_tx,
     )
@@ -249,6 +251,7 @@ async fn main() {
             eurid_info: None,
             isnic_info: None,
             qualified_lawyer: None,
+            keysys: None,
         },
         &mut cmd_tx,
     )
@@ -295,6 +298,7 @@ async fn main() {
             eurid_info: None,
             isnic_info: None,
             qualified_lawyer: None,
+            keysys: None,
         },
         &mut cmd_tx,
     )
@@ -388,7 +392,7 @@ async fn main() {
 
     // 2.3.1.18 Check Domain (Domain Available for Registration)
     info!("Checking domain");
-    epp_proxy::client::domain::check("example.org", None, None, &mut cmd_tx)
+    epp_proxy::client::domain::check("example.org", None, None, None, &mut cmd_tx)
         .await
         .unwrap();
 
@@ -428,6 +432,7 @@ async fn main() {
             eurid_data: None,
             isnic_payment: None,
             personal_registration: None,
+            keysys: None,
         },
         &mut cmd_tx,
     )
@@ -436,7 +441,7 @@ async fn main() {
 
     // 2.3.1.20 Check Domain (Domain Not Available for Registration)
     info!("Checking domain not available");
-    epp_proxy::client::domain::check("example.org", None, None, &mut cmd_tx)
+    epp_proxy::client::domain::check("example.org", None, None, None, &mut cmd_tx)
         .await
         .unwrap();
 
@@ -536,7 +541,7 @@ async fn main() {
 
     // 2.3.1.30 Check Domain (Domain Available for Registration)
     info!("Checking domain");
-    epp_proxy::client::domain::check("domain.org", None, None, &mut cmd_tx)
+    epp_proxy::client::domain::check("domain.org", None, None, None, &mut cmd_tx)
         .await
         .unwrap();
 
@@ -576,6 +581,7 @@ async fn main() {
             eurid_data: None,
             isnic_payment: None,
             personal_registration: None,
+            keysys: None,
         },
         &mut cmd_tx,
     )
@@ -598,6 +604,7 @@ async fn main() {
             value: 3,
         }),
         domain_info.response.expiry_date.unwrap(),
+        None,
         None,
         None,
         None,
@@ -727,6 +734,7 @@ async fn main() {
         None,
         None,
         None,
+        None,
         &mut cmd_tx,
     )
     .await
@@ -782,7 +790,8 @@ async fn main() {
             donuts_fee_agreement: None,
             eurid_data: None,
             isnic_payment: None,
-            personal_registration: None
+            personal_registration: None,
+            keysys: None,
         },
         &mut cmd_tx
     )
@@ -824,7 +833,8 @@ async fn main() {
             donuts_fee_agreement: None,
             eurid_data: None,
             isnic_payment: None,
-            personal_registration: None
+            personal_registration: None,
+            keysys: None,
         },
         &mut cmd_tx
     )
@@ -866,7 +876,8 @@ async fn main() {
             donuts_fee_agreement: None,
             eurid_data: None,
             isnic_payment: None,
-            personal_registration: None
+            personal_registration: None,
+            keysys: None,
         },
         &mut cmd_tx
     )
@@ -882,6 +893,7 @@ async fn main() {
             value: 1
         }),
         Utc.ymd(2011, 6, 21).and_hms(0, 0, 0),
+        None,
         None,
         None,
         None,
@@ -925,7 +937,8 @@ async fn main() {
             donuts_fee_agreement: None,
             eurid_data: None,
             isnic_payment: None,
-            personal_registration: None
+            personal_registration: None,
+            keysys: None,
         },
         &mut cmd_tx
     )
@@ -941,14 +954,14 @@ async fn main() {
     // 2.3.3.7 Correctly Handle 2201 Exception
     info!("Causing 2201 error");
     assert!(
-        epp_proxy::client::domain::delete("transfer3.org", None, None, None, &mut cmd_tx)
+        epp_proxy::client::domain::delete("transfer3.org", None, None, None, None, &mut cmd_tx)
             .await
             .is_err()
     );
 
     // 2.4.1.1 Check Domain (Domain Available for Registration)
     info!("Checking DNSSEC domain");
-    epp_proxy::client::domain::check("dsdomain1.org", None, None, &mut cmd_tx)
+    epp_proxy::client::domain::check("dsdomain1.org", None, None, None, &mut cmd_tx)
         .await
         .unwrap();
 
@@ -999,6 +1012,7 @@ async fn main() {
             eurid_data: None,
             isnic_payment: None,
             personal_registration: None,
+            keysys: None,
         },
         &mut cmd_tx,
     )
@@ -1059,6 +1073,7 @@ async fn main() {
             eurid_data: None,
             isnic_payment: None,
             personal_registration: None,
+            keysys: None,
         },
         &mut cmd_tx,
     )
@@ -1398,25 +1413,25 @@ async fn main() {
 
     // 2.4.3.1 Delete a Domain (dsdomain1.org)
     info!("Deleting DNSSEC domain");
-    epp_proxy::client::domain::delete("dsdomain1.org", None, None, None, &mut cmd_tx)
+    epp_proxy::client::domain::delete("dsdomain1.org", None, None, None, None,&mut cmd_tx)
         .await
         .unwrap();
 
     // 2.4.3.2 Delete a Domain (dsdomain2.org)
     info!("Deleting DNSSEC domain");
-    epp_proxy::client::domain::delete("dsdomain2.org", None, None, None, &mut cmd_tx)
+    epp_proxy::client::domain::delete("dsdomain2.org", None, None, None, None, &mut cmd_tx)
         .await
         .unwrap();
 
     // 2.6.1 Delete Domain (example.org)
     info!("Deleting domain");
-    epp_proxy::client::domain::delete("example.org", None, None, None, &mut cmd_tx)
+    epp_proxy::client::domain::delete("example.org", None, None, None, None, &mut cmd_tx)
         .await
         .unwrap();
 
     // 2.6.2 Delete Domain (domain.org)
     info!("Deleting domain");
-    epp_proxy::client::domain::delete("domain.org", None, None, None, &mut cmd_tx)
+    epp_proxy::client::domain::delete("domain.org", None, None, None, None, &mut cmd_tx)
         .await
         .unwrap();
 

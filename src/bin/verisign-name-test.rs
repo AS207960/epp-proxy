@@ -143,6 +143,7 @@ async fn main() {
                 eurid_info: None,
                 isnic_info: None,
                 qualified_lawyer: None,
+                keysys: None
             },
             &mut cmd_tx,
         )
@@ -165,7 +166,7 @@ async fn main() {
     info!("Checking second level domain");
     info!(
         "{:#?}",
-        epp_proxy::client::domain::check(&test_2ld, None, None, &mut cmd_tx)
+        epp_proxy::client::domain::check(&test_2ld, None, None, None, &mut cmd_tx)
             .await
             .unwrap()
     );
@@ -204,6 +205,7 @@ async fn main() {
             isnic_payment: None,
             sec_dns: None,
             personal_registration: None,
+            keysys: None,
         },
         &mut cmd_tx,
     )
@@ -252,6 +254,7 @@ async fn main() {
         None,
         None,
         None,
+        None,
         &mut cmd_tx,
     )
     .await
@@ -282,7 +285,8 @@ async fn main() {
                 fee_agreement: None,
                 donuts_fee_agreement: None,
                 isnic_info: None,
-                eurid_data: None
+                eurid_data: None,
+                keysys: None,
             },
             &mut cmd_tx
         )
@@ -305,7 +309,7 @@ async fn main() {
     info!("Deleting second level domain");
     info!(
         "{:#?}",
-        epp_proxy::client::domain::delete(&test_2ld, None, None, None, &mut cmd_tx)
+        epp_proxy::client::domain::delete(&test_2ld, None, None, None, None, &mut cmd_tx)
             .await
             .unwrap()
     );
@@ -315,7 +319,7 @@ async fn main() {
     info!("Checking third level domain");
     info!(
         "{:#?}",
-        epp_proxy::client::domain::check(&test_3ld, None, None, &mut cmd_tx)
+        epp_proxy::client::domain::check(&test_3ld, None, None, None, &mut cmd_tx)
             .await
             .unwrap()
     );
@@ -354,6 +358,7 @@ async fn main() {
             isnic_payment: None,
             sec_dns: None,
             personal_registration: None,
+            keysys: None,
         },
         &mut cmd_tx,
     )
@@ -402,6 +407,7 @@ async fn main() {
         None,
         None,
         None,
+        None,
         &mut cmd_tx,
     )
     .await
@@ -432,7 +438,8 @@ async fn main() {
                 fee_agreement: None,
                 donuts_fee_agreement: None,
                 isnic_info: None,
-                eurid_data: None
+                eurid_data: None,
+                keysys: None,
             },
             &mut cmd_tx
         )
@@ -455,7 +462,7 @@ async fn main() {
     info!("Deleting third level domain");
     info!(
         "{:#?}",
-        epp_proxy::client::domain::delete(&test_3ld, None, None, None, &mut cmd_tx)
+        epp_proxy::client::domain::delete(&test_3ld, None, None, None, None, &mut cmd_tx)
             .await
             .unwrap()
     );

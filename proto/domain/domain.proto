@@ -12,6 +12,7 @@ import "launch/launch.proto";
 import "domain_common/domain_common.proto";
 import "isnic/isnic.proto";
 import "personal_registration/personal_registration.proto";
+import "keysys/keysys.proto";
 
 message Contact {
     string id = 1;
@@ -43,6 +44,7 @@ message DomainCheckRequest {
     fee.FeeCheck fee_check = 2;
     launch.Phase launch_check = 3;
     google.protobuf.StringValue registry_name = 4;
+    keysys.DomainCheck keysys = 5;
 }
 
 message DomainClaimsCheckRequest {
@@ -111,6 +113,7 @@ message DomainInfoReply {
     eurid.DomainInfo eurid_data = 24;
     isnic.DomainInfo isnic_info = 25;
     personal_registration.PersonalRegistrationInfo personal_registration = 26;
+    keysys.DomainInfo keysys = 27;
 }
 
 message DomainCreateRequest {
@@ -128,6 +131,7 @@ message DomainCreateRequest {
     eurid.DomainCreateExtension eurid_data = 12;
     isnic.PaymentInfo isnic_payment = 13;
     personal_registration.PersonalRegistrationInfo personal_registration = 14;
+    keysys.DomainCreate keysys = 15;
 }
 
 message DomainCreateReply {
@@ -151,6 +155,7 @@ message DomainDeleteRequest {
     google.protobuf.StringValue registry_name = 3;
     fee.DonutsFeeData donuts_fee_agreement = 4;
     eurid.DomainDeleteExtension eurid_data = 5;
+    keysys.DomainDelete keysys = 6;
 }
 
 message DomainDeleteReply {
@@ -183,6 +188,7 @@ message DomainUpdateRequest {
     fee.FeeAgreement fee_agreement = 10;
     eurid.DomainUpdateExtension eurid_data = 11;
     isnic.DomainUpdate isnic_info = 12;
+    keysys.DomainUpdate keysys = 13;
 }
 
 message DomainSyncRequest {
@@ -209,6 +215,7 @@ message DomainRenewRequest {
     fee.DonutsFeeData donuts_fee_agreement = 5;
     fee.FeeAgreement fee_agreement = 6;
     isnic.PaymentInfo isnic_payment = 7;
+    keysys.DomainRenew keysys = 8;
 }
 
 message DomainRenewReply {
@@ -239,6 +246,7 @@ message DomainTransferRequestRequest {
     fee.DonutsFeeData donuts_fee_agreement = 5;
     fee.FeeAgreement fee_agreement = 6;
     eurid.DomainTransferExtension eurid_data = 7;
+    keysys.DomainTransfer keysys = 8;
 }
 
 message DomainTransferAcceptRejectRequest {

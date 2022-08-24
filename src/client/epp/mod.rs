@@ -25,6 +25,7 @@ pub mod rgp;
 pub mod router;
 pub mod traficom;
 pub mod verisign;
+pub mod keysys;
 
 use crate::proto::EPPServiceExtension;
 
@@ -115,8 +116,10 @@ pub struct ServerFeatures {
     unhandled_ns_supported: bool,
     /// urn:ietf:params:xml:ns:epp:eai-0.2 support
     eai_supported: bool,
-    /// urn:ietf:params:xml:ns:epp:maintenance-0.3 support
+    /// urn:ietf:params:xml:ns:epp:maintenance-1.0 support
     maintenance_supported: bool,
+    /// urn:ietf:params:xml:ns:epp:maintenance-0.2 support
+    maintenance_02_supported: bool,
     /// RFC8807 support
     login_sec_supported: bool,
     /// http://www.eurid.eu/xml/epp/contact-ext-1.3 support
@@ -159,6 +162,8 @@ pub struct ServerFeatures {
     email_forward_supported: bool,
     /// http://www.nic.name/epp/persReg-1.0 support
     personal_registration_supported: bool,
+    /// http://www.key-systems.net/epp/keysys-1.0 support
+    keysys_supported: bool,
 }
 
 impl ServerFeatures {
@@ -868,7 +873,10 @@ impl EPPClient {
             .supports_ext("urn:ietf:params:xml:ns:epp:eai-0.2");
         self.features.maintenance_supported = greeting
             .service_menu
-            .supports("urn:ietf:params:xml:ns:epp:maintenance-0.3");
+            .supports("urn:ietf:params:xml:ns:epp:maintenance-1.0");
+        self.features.maintenance_02_supported = greeting
+            .service_menu
+            .supports("urn:ietf:params:xml:ns:epp:maintenance-0.2");
         self.features.login_sec_supported = greeting
             .service_menu
             .supports_ext("urn:ietf:params:xml:ns:epp:loginSec-1.0");
@@ -932,6 +940,9 @@ impl EPPClient {
         self.features.personal_registration_supported = greeting
             .service_menu
             .supports_ext("http://www.nic.name/epp/persReg-1.0");
+        self.features.keysys_supported = greeting
+            .service_menu
+            .supports_ext("http://www.key-systems.net/epp/keysys-1.0");
 
         if !(self.features.contact_supported
             | self.features.domain_supported
@@ -1041,7 +1052,10 @@ impl EPPClient {
                 ext_objects.push("urn:ietf:params:xml:ns:epp:loginSec-1.0".to_string())
             }
             if self.features.maintenance_supported {
-                objects.push("urn:ietf:params:xml:ns:epp:maintenance-0.3".to_string())
+                objects.push("urn:ietf:params:xml:ns:epp:maintenance-1.0".to_string())
+            }
+            if self.features.maintenance_02_supported {
+                objects.push("urn:ietf:params:xml:ns:epp:maintenance-0.2".to_string())
             }
             if self.features.eurid_hit_points_supported {
                 objects.push("http://www.eurid.eu/xml/epp/registrarHitPoints-1.0".to_string())
@@ -1099,6 +1113,9 @@ impl EPPClient {
             }
             if self.features.personal_registration_supported {
                 ext_objects.push("http://www.nic.name/epp/persReg-1.0".to_string())
+            }
+            if self.features.keysys_supported {
+                ext_objects.push("http://www.key-systems.net/epp/keysys-1.0".to_string())
             }
             if self.features.nominet_tag_list {
                 let new_client = Self {
@@ -1303,7 +1320,7 @@ impl EPPClient {
             extension: extension
                 .into()
                 .map(|e| proto::EPPCommandExtension { value: e }),
-            client_transaction_id: Some(message_id.to_hyphenated().to_string()),
+            client_transaction_id: Some(message_id.hyphenated().to_string()),
         };
         let message = proto::EPPMessage {
             message: proto::EPPMessageType::Command(Box::new(command)),

@@ -1,0 +1,310 @@
+syntax = "proto3";
+package epp.keysys;
+option go_package = "github.com/as207960/epp-proxy/gen/go/epp/keysys";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+
+message ContactInfo {
+  bool validated = 1;
+  bool verification_requested = 2;
+  bool verified = 3;
+}
+
+message ContactCreate {
+  bool check_only = 1;
+  bool force_duplication = 2;
+  bool pre_verify = 3;
+}
+
+message ContactUpdate {
+  bool check_only = 1;
+  bool pre_verify = 2;
+  bool trigger_foa = 3;
+}
+
+message DomainCheck {
+  string allocation_token = 1;
+}
+
+message DomainCreate {
+  bool accept_premium_price = 1;
+  bool accept_ssl_requirements = 2;
+  string allocation_token = 3;
+  RenewalMode renewal_mode = 4;
+  TransferMode transfer_mode = 5;
+  repeated string whois_banner = 6;
+  string whois_rsp = 7;
+  string whois_url = 8;
+  oneof tld {
+    DomainInfoCA ca = 9;
+    DomainInfoDE de = 10;
+    DomainInfoEU eu = 11;
+    DomainInfoFR fr = 12;
+    DomainCreateGay gay = 13;
+    DomainInfoName name = 14;
+    DomainInfoRS rs = 15;
+    DomainInfoUS us = 16;
+  }
+}
+
+message DomainCreateGay {
+  bool accept_requirements = 1;
+}
+
+message DomainTransfer {
+  bool accept_premium_price = 1;
+  bool accept_quarantine = 2;
+  bool accept_trade = 3;
+  string allocation_token = 4;
+  bool at_request_authcode = 5;
+  bool be_request_authcode = 6;
+  string promotion_code = 7;
+}
+
+message DomainDelete {
+  DomainDeleteAction action = 1;
+  string target = 2;
+}
+
+enum DomainDeleteAction {
+    DefaultDelete = 0;
+    Instant = 1;
+    SetAutoDelete = 2;
+    SetAutoExpire = 3;
+    Push = 4;
+}
+
+message DomainRenew {
+  bool accept_premium_price = 1;
+  string promotion_code = 2;
+}
+
+message DomainUpdate {
+  RenewalMode renewal_mode = 1;
+  TransferMode transfer_mode = 2;
+  repeated string whois_banner = 3;
+  google.protobuf.StringValue whois_rsp = 4;
+  google.protobuf.StringValue whois_url = 5;
+  oneof tld {
+    DomainUpdateCA ca = 9;
+    DomainUpdateDE de = 10;
+    DomainUpdateEU eu = 11;
+    DomainUpdateFR fr = 12;
+    DomainInfoName name = 13;
+    DomainInfoRS rs = 14;
+    DomainInfoUS us = 15;
+  }
+}
+
+message DomainUpdateCA {
+  CALegalType legal_type = 1;
+  google.protobuf.BoolValue trademark = 2;
+}
+
+message DomainUpdateDE {
+  google.protobuf.StringValue abuse_contact = 1;
+  google.protobuf.StringValue general_contact = 2;
+  DETrustee trustee = 3;
+  google.protobuf.BoolValue holder_person = 4;
+}
+
+message DomainUpdateFR {
+  google.protobuf.BoolValue trustee = 1;
+}
+
+message DomainUpdateEU {
+  google.protobuf.BoolValue trustee = 1;
+  EULanguage registrant_language = 2;
+  EUCountry registrant_citizenship = 3;
+}
+
+message DomainInfo {
+  google.protobuf.Timestamp renewal_date = 1;
+  google.protobuf.Timestamp paid_until_date = 2;
+  google.protobuf.StringValue roid = 3;
+  RenewalMode renewal_mode = 4;
+  TransferMode transfer_mode = 5;
+  repeated string whois_banner = 6;
+  google.protobuf.StringValue whois_rsp = 7;
+  google.protobuf.StringValue whois_url = 8;
+  oneof tld {
+    DomainInfoCA ca = 9;
+    DomainInfoDE de = 10;
+    DomainInfoEU eu = 11;
+    DomainInfoFR fr = 12;
+    DomainInfoName name = 13;
+    DomainInfoRS rs = 14;
+    DomainInfoUS us = 15;
+  }
+}
+
+enum RenewalMode {
+  DefaultRenew = 0;
+  AutoRenew = 1;
+  AutoDelete = 2;
+  AutoExpire = 3;
+  AutoRenewMonthly = 4;
+  AutoRenewQuarterly = 5;
+  ExpireAuction = 6;
+}
+
+enum TransferMode {
+  DefaultTransfer = 0;
+  AutoApprove = 1;
+  AutoDeny = 2;
+}
+
+message DomainInfoCA {
+  CALegalType legal_type = 1;
+  bool trademark = 2;
+}
+
+enum CALegalType {
+  UnknownCALegalType = 0;
+  AboriginalPeoples = 1;
+  CanadianUnincorporatedAssociation = 2;
+  CanadianCorporation = 3;
+  CanadianCitizen = 4;
+  CanadianEducationalInstitution = 5;
+  CanadianGovernment = 6;
+  CanadianHospital = 7;
+  IndianBand = 8;
+  CanadianLibraryArchiveMuseum = 9;
+  LegalRepOfCanadianCitizenOrPermanentResident = 10;
+  TheQueen = 11;
+  OfficialMark = 12;
+  CanadianPoliticalParty = 13;
+  Partnership = 14;
+  CanadianPermanentResident = 15;
+  TradeMark = 16;
+  TradeUnion = 17;
+  Trust = 18;
+}
+
+message DomainInfoDE {
+  google.protobuf.StringValue abuse_contact = 1;
+  google.protobuf.StringValue general_contact = 2;
+  DETrustee trustee = 3;
+  bool holder_person = 4;
+}
+
+enum DETrustee {
+  None = 0;
+  Monthly = 1;
+  Annually = 2;
+  Disable = 3;
+}
+
+message DomainInfoEU {
+  bool trustee = 1;
+  EULanguage registrant_language = 2;
+  EUCountry registrant_citizenship = 3;
+}
+
+enum EULanguage {
+  UnknownLanguage = 0;
+  Bulgarian = 1;
+  Czech = 2;
+  Danish = 3;
+  German = 4;
+  ModernGreek = 5;
+  English = 6;
+  Spanish = 7;
+  Estonian = 8;
+  Finnish = 9;
+  French = 10;
+  Gaelic = 11;
+  Croatian = 12;
+  Hungarian = 13;
+  Italian = 14;
+  Lithuanian = 15;
+  Latvian = 16;
+  Maltese = 17;
+  DutchFlemish = 18;
+  Polish = 19;
+  Portuguese = 20;
+  Romanian = 21;
+  Slovak = 22;
+  Slovene = 23;
+  Swedish = 24;
+}
+
+enum EUCountry {
+  UnknownCountry = 0;
+  Austria = 1;
+  Belgium = 2;
+  Bulgaria = 3;
+  CzechRepublic = 4;
+  Cyprus = 5;
+  Germany = 6;
+  Denmark = 7;
+  Spain = 8;
+  Estonia = 9;
+  Finland = 10;
+  France = 11;
+  Greece = 12;
+  Hungary = 13;
+  Ireland = 14;
+  Italy = 15;
+  Liechtenstein = 16;
+  Lithuania = 17;
+  Luxembourg = 18;
+  Latvia = 19;
+  Malta = 20;
+  Netherlands = 21;
+  Poland = 22;
+  Portugal = 23;
+  Romania = 24;
+  Sweden = 25;
+  Slovakia = 26;
+  Slovenia = 27;
+  Croatia = 28;
+}
+
+message DomainInfoFR {
+  bool trustee = 1;
+}
+
+message DomainInfoName {
+  google.protobuf.StringValue email_forward = 1;
+}
+
+message DomainInfoRS {
+  oneof owner {
+    string owner_id_card = 1;
+    string owner_company_number = 2;
+  }
+  oneof admin {
+    string admin_id_card = 3;
+    string admin_company_number = 4;
+  }
+  oneof tech {
+    string tech_id_card = 5;
+    string tech_company_number = 6;
+  }
+}
+
+message DomainInfoUS {
+  USPurpose purpose = 1;
+  USCategory category = 2;
+  google.protobuf.StringValue validator = 3;
+}
+
+enum USPurpose {
+  UnknownPurpose = 0;
+  Business = 1;
+  NonProfit = 2;
+  Personal = 3;
+  Educational = 4;
+  USGovernment = 5;
+}
+
+enum USCategory {
+  UnknownCategory = 0;
+  USCitizen = 1;
+  USPermanentResident = 2;
+  USOrganisation = 3;
+  RegularActivity = 4;
+  OfficeOrFacility = 5;
+}
