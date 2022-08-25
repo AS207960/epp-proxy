@@ -1854,6 +1854,17 @@ pub fn handle_update(
         }
         None => true,
     };
+    let is_not_keysys_change = match &req.keysys {
+        Some(e) => {
+            e.whois_url.is_none()
+                && e.whois_rsp.is_none()
+                && e.whois_banner.is_empty()
+                && e.tld.is_none()
+                && e.renewal_mode.is_none()
+                && e.transfer_mode.is_none()
+        }
+        None => true,
+    };
 
     if req.add.is_empty()
         && req.remove.is_empty()
@@ -1861,6 +1872,7 @@ pub fn handle_update(
         && (req.sec_dns.is_none() || !client.secdns_supported)
         && is_not_eurid_change
         && is_not_isnic_change
+        && is_not_keysys_change
     {
         return Err(Err(Error::Err(
             "at least one operation must be specified".to_string(),
@@ -2040,7 +2052,7 @@ pub fn handle_update(
                 us_purpose: None,
                 us_category: None,
                 us_validator: None,
-                renewal_mode: Some(match keysys.renewal_mode {
+                renewal_mode: keysys.renewal_mode.as_ref().map(|m| match m {
                     super::super::keysys::RenewalMode::Default => proto::keysys::RenewalMode::Default,
                     super::super::keysys::RenewalMode::AutoDelete => proto::keysys::RenewalMode::AutoDelete,
                     super::super::keysys::RenewalMode::AutoExpire => proto::keysys::RenewalMode::AutoExpire,
@@ -2049,7 +2061,7 @@ pub fn handle_update(
                     super::super::keysys::RenewalMode::AutoRenewMonthly => proto::keysys::RenewalMode::AutoRenewMonthly,
                     super::super::keysys::RenewalMode::ExpireAuction => proto::keysys::RenewalMode::ExpireAuction,
                 }),
-                transfer_mode: Some(match keysys.transfer_mode {
+                transfer_mode: keysys.transfer_mode.as_ref().map(|m| match m {
                     super::super::keysys::TransferMode::Default => proto::keysys::TransferMode::Default,
                     super::super::keysys::TransferMode::AutoApprove => proto::keysys::TransferMode::AutoApprove,
                     super::super::keysys::TransferMode::AutoDeny => proto::keysys::TransferMode::AutoDeny,

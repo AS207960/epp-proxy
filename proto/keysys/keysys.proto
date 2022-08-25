@@ -140,19 +140,21 @@ message DomainInfo {
 }
 
 enum RenewalMode {
-  DefaultRenew = 0;
-  AutoRenew = 1;
-  AutoDelete = 2;
-  AutoExpire = 3;
-  AutoRenewMonthly = 4;
-  AutoRenewQuarterly = 5;
-  ExpireAuction = 6;
+  UnknownRenew = 0;
+  DefaultRenew = 1;
+  AutoRenew = 2;
+  AutoDelete = 3;
+  AutoExpire = 4;
+  AutoRenewMonthly = 5;
+  AutoRenewQuarterly = 6;
+  ExpireAuction = 7;
 }
 
 enum TransferMode {
-  DefaultTransfer = 0;
-  AutoApprove = 1;
-  AutoDeny = 2;
+  UnknownTransfer = 0;
+  DefaultTransfer = 1;
+  AutoApprove = 2;
+  AutoDeny = 3;
 }
 
 message DomainInfoCA {

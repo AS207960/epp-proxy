@@ -385,32 +385,32 @@ pub struct DomainUpdate {
     )]
     pub us_validator: Option<String>,
     #[serde(
-        rename = "{http://www.key-systems.net/epp/keysys-1.0}renewalmode",
+        rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:renewalmode",
         skip_serializing_if = "Option::is_none"
     )]
     pub renewal_mode: Option<RenewalMode>,
     #[serde(
-        rename = "{http://www.key-systems.net/epp/keysys-1.0}transfermode",
+        rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:transfermode",
         skip_serializing_if = "Option::is_none"
     )]
     pub transfer_mode: Option<TransferMode>,
     #[serde(
-        rename = "{http://www.key-systems.net/epp/keysys-1.0}whois-banner0",
+        rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:whois-banner0",
         skip_serializing_if = "Option::is_none"
     )]
     pub whois_banner_0: Option<String>,
     #[serde(
-        rename = "{http://www.key-systems.net/epp/keysys-1.0}whois-banner1",
+        rename = "{http://www.key-systems.net/epp/keysys-1.0}kesys:whois-banner1",
         skip_serializing_if = "Option::is_none"
     )]
     pub whois_banner_1: Option<String>,
     #[serde(
-        rename = "{http://www.key-systems.net/epp/keysys-1.0}whois-rsp",
+        rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:whois-rsp",
         skip_serializing_if = "Option::is_none"
     )]
     pub whois_rsp: Option<String>,
     #[serde(
-        rename = "{http://www.key-systems.net/epp/keysys-1.0}whois-url",
+        rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:whois-url",
         skip_serializing_if = "Option::is_none"
     )]
     pub whois_url: Option<String>,

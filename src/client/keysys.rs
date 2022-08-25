@@ -41,8 +41,8 @@ pub struct DomainCreate {
 
 #[derive(Debug)]
 pub struct DomainUpdate {
-    pub renewal_mode: RenewalMode,
-    pub transfer_mode: TransferMode,
+    pub renewal_mode: Option<RenewalMode>,
+    pub transfer_mode: Option<TransferMode>,
     pub whois_banner: Vec<String>,
     pub whois_rsp: Option<String>,
     pub whois_url: Option<String>,

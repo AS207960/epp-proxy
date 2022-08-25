@@ -100,25 +100,27 @@ impl From<epp_proto::keysys::DomainTransfer> for client::keysys::DomainTransfer 
     }
 }
 
-fn map_renewal_mode(renewal_mode: i32) -> client::keysys::RenewalMode {
+fn map_renewal_mode(renewal_mode: i32) -> Option<client::keysys::RenewalMode> {
     match epp_proto::keysys::RenewalMode::from_i32(renewal_mode) {
-        None => client::keysys::RenewalMode::Default,
-        Some(epp_proto::keysys::RenewalMode::DefaultRenew) => client::keysys::RenewalMode::Default,
-        Some(epp_proto::keysys::RenewalMode::AutoRenew) => client::keysys::RenewalMode::AutoRenew,
-        Some(epp_proto::keysys::RenewalMode::AutoExpire) => client::keysys::RenewalMode::AutoExpire,
-        Some(epp_proto::keysys::RenewalMode::AutoDelete) => client::keysys::RenewalMode::AutoDelete,
-        Some(epp_proto::keysys::RenewalMode::AutoRenewMonthly) => client::keysys::RenewalMode::AutoRenewMonthly,
-        Some(epp_proto::keysys::RenewalMode::AutoRenewQuarterly) => client::keysys::RenewalMode::AutoRenewQuarterly,
-        Some(epp_proto::keysys::RenewalMode::ExpireAuction) => client::keysys::RenewalMode::ExpireAuction,
+        None => None,
+        Some(epp_proto::keysys::RenewalMode::UnknownRenew) => None,
+        Some(epp_proto::keysys::RenewalMode::DefaultRenew) => Some(client::keysys::RenewalMode::Default),
+        Some(epp_proto::keysys::RenewalMode::AutoRenew) => Some(client::keysys::RenewalMode::AutoRenew),
+        Some(epp_proto::keysys::RenewalMode::AutoExpire) => Some(client::keysys::RenewalMode::AutoExpire),
+        Some(epp_proto::keysys::RenewalMode::AutoDelete) => Some(client::keysys::RenewalMode::AutoDelete),
+        Some(epp_proto::keysys::RenewalMode::AutoRenewMonthly) => Some(client::keysys::RenewalMode::AutoRenewMonthly),
+        Some(epp_proto::keysys::RenewalMode::AutoRenewQuarterly) => Some(client::keysys::RenewalMode::AutoRenewQuarterly),
+        Some(epp_proto::keysys::RenewalMode::ExpireAuction) => Some(client::keysys::RenewalMode::ExpireAuction),
     }
 }
 
-fn map_transfer_mode(transfer_mode: i32) -> client::keysys::TransferMode {
+fn map_transfer_mode(transfer_mode: i32) -> Option<client::keysys::TransferMode> {
     match epp_proto::keysys::TransferMode::from_i32(transfer_mode) {
-        None => client::keysys::TransferMode::Default,
-        Some(epp_proto::keysys::TransferMode::DefaultTransfer) => client::keysys::TransferMode::Default,
-        Some(epp_proto::keysys::TransferMode::AutoApprove) => client::keysys::TransferMode::AutoApprove,
-        Some(epp_proto::keysys::TransferMode::AutoDeny) => client::keysys::TransferMode::AutoDeny,
+        None => None,
+        Some(epp_proto::keysys::TransferMode::UnknownTransfer) => None,
+        Some(epp_proto::keysys::TransferMode::DefaultTransfer) => Some(client::keysys::TransferMode::Default),
+        Some(epp_proto::keysys::TransferMode::AutoApprove) => Some(client::keysys::TransferMode::AutoApprove),
+        Some(epp_proto::keysys::TransferMode::AutoDeny) => Some(client::keysys::TransferMode::AutoDeny),
     }
 }
 
@@ -249,8 +251,8 @@ impl TryFrom<epp_proto::keysys::DomainCreate> for client::keysys::DomainCreate {
             } else {
                 Some(res.allocation_token)
             },
-            renewal_mode: map_renewal_mode(res.renewal_mode),
-            transfer_mode: map_transfer_mode(res.transfer_mode),
+            renewal_mode: map_renewal_mode(res.renewal_mode).unwrap_or(client::keysys::RenewalMode::Default),
+            transfer_mode: map_transfer_mode(res.transfer_mode).unwrap_or(client::keysys::TransferMode::Default),
             whois_banner: res.whois_banner,
             whois_rsp: if res.whois_rsp.is_empty() {
                 None
