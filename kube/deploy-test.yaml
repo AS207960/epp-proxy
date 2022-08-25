@@ -8,7 +8,7 @@ spec:
     - ReadWriteMany
   resources:
     requests:
-      storage: 5Gi
+      storage: 25Gi
 ---
 kind: ConfigMap
 apiVersion: v1
@@ -34,7 +34,7 @@ spec:
   template:
     metadata:
       annotations:
-        cni.projectcalico.org/ipv6pools: "[\"epp-ip6-ippool\"]"
+        cni.projectcalico.org/ipv6pools: "[\"pi-epp-ip6-ippool\"]"
       labels:
         app: epp-proxy-test-primary
     spec:

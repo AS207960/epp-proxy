@@ -1597,6 +1597,10 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                                             change_data: _,
                                             data: i
                                         } => Some(epp_proto::poll_reply::Data::DomainTransfer(i.into())),
+                                        client::poll::PollData::DomainRenewData {
+                                            change_data: _,
+                                            data: i
+                                        } => Some(epp_proto::poll_reply::Data::DomainRenew(i.into())),
                                         client::poll::PollData::ContactTransferData {
                                             change_data: _,
                                             data: i
@@ -1651,7 +1655,9 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                                             Some(epp_proto::poll_reply::Data::TraficomTrn(i.into())),
                                         client::poll::PollData::EURIDPoll(i) =>
                                             Some(epp_proto::poll_reply::Data::EuridPoll(i.into())),
-                                        _ => None
+                                        client::poll::PollData::MaintenanceData(i) =>
+                                            Some(epp_proto::poll_reply::Data::MaintenanceInfo(i.into())),
+                                        client::poll::PollData::None => None
                                     },
                                 }))
                                 .await

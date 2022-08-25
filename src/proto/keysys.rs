@@ -48,6 +48,11 @@ pub enum ResultData {
     Domain(DomainInfoData),
 }
 
+#[derive(Debug, Deserialize)]
+pub enum PollData {
+    #[serde(rename = "{http://www.key-systems.net/epp/keysys-1.0}data")]
+    Domain(DomainPollData),
+}
 
 #[derive(Debug, Serialize)]
 pub struct ContactCreate {
@@ -478,6 +483,16 @@ pub struct DomainInfoData {
     pub whois_rsp: Option<String>,
     #[serde(rename = "{http://www.key-systems.net/epp/keysys-1.0}whois-url", default)]
     pub whois_url: Option<String>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct DomainPollData {
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp-1.0}domain")]
+    pub domain: String,
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp-1.0}period", default)]
+    pub period: Option<u32>,
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp-1.0}autorenew", default)]
+    pub auto_renew: bool,
 }
 
 #[derive(Debug, Serialize)]

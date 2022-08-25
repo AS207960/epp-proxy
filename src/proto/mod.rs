@@ -861,6 +861,8 @@ pub enum EPPResponseExtensionType {
     PersonalRegistrationInfoData(personal_registration::PersonalRegistrationInfoData),
     #[serde(rename = "{http://www.key-systems.net/epp/keysys-1.0}resData")]
     KeysysResultData(keysys::ResultData),
+    #[serde(rename = "{http://www.key-systems.net/epp/keysys-1.0}poll")]
+    KeysysPollData(keysys::PollData),
 }
 
 #[derive(Debug, Serialize)]
