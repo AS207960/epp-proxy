@@ -148,6 +148,7 @@ enum RenewalMode {
   AutoRenewMonthly = 5;
   AutoRenewQuarterly = 6;
   ExpireAuction = 7;
+  RenewOnce = 8;
 }
 
 enum TransferMode {

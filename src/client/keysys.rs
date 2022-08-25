@@ -232,7 +232,8 @@ pub enum RenewalMode {
     AutoExpire,
     AutoRenewMonthly,
     AutoRenewQuarterly,
-    ExpireAuction
+    ExpireAuction,
+    RenewOnce,
 }
 
 #[derive(Debug)]

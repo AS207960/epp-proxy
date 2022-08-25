@@ -111,6 +111,7 @@ fn map_renewal_mode(renewal_mode: i32) -> Option<client::keysys::RenewalMode> {
         Some(epp_proto::keysys::RenewalMode::AutoRenewMonthly) => Some(client::keysys::RenewalMode::AutoRenewMonthly),
         Some(epp_proto::keysys::RenewalMode::AutoRenewQuarterly) => Some(client::keysys::RenewalMode::AutoRenewQuarterly),
         Some(epp_proto::keysys::RenewalMode::ExpireAuction) => Some(client::keysys::RenewalMode::ExpireAuction),
+        Some(epp_proto::keysys::RenewalMode::RenewOnce) => Some(client::keysys::RenewalMode::RenewOnce),
     }
 }
 
@@ -409,6 +410,7 @@ impl From<client::keysys::DomainInfo> for epp_proto::keysys::DomainInfo {
                 client::keysys::RenewalMode::AutoRenewMonthly => epp_proto::keysys::RenewalMode::AutoRenewMonthly,
                 client::keysys::RenewalMode::AutoRenewQuarterly => epp_proto::keysys::RenewalMode::AutoRenewQuarterly,
                 client::keysys::RenewalMode::ExpireAuction => epp_proto::keysys::RenewalMode::ExpireAuction,
+                client::keysys::RenewalMode::RenewOnce => epp_proto::keysys::RenewalMode::RenewOnce,
             }.into(),
             transfer_mode: match res.transfer_mode {
                 client::keysys::TransferMode::Default => epp_proto::keysys::TransferMode::DefaultTransfer,

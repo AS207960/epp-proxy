@@ -602,6 +602,8 @@ pub enum RenewalMode {
     Default,
     #[serde(rename="AUTORENEW")]
     AutoRenew,
+    #[serde(rename="RENEWONCE")]
+    RenewOnce,
     #[serde(rename="AUTODELETE")]
     AutoDelete,
     #[serde(rename="AUTOEXPIRE")]

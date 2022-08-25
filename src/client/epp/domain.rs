@@ -1425,6 +1425,7 @@ pub fn handle_create(
                     super::super::keysys::RenewalMode::AutoRenewQuarterly => proto::keysys::RenewalMode::AutoRenewQuarterly,
                     super::super::keysys::RenewalMode::AutoRenewMonthly => proto::keysys::RenewalMode::AutoRenewMonthly,
                     super::super::keysys::RenewalMode::ExpireAuction => proto::keysys::RenewalMode::ExpireAuction,
+                    super::super::keysys::RenewalMode::RenewOnce => proto::keysys::RenewalMode::RenewOnce,
                 }),
                 transfer_mode: Some(match keysys.transfer_mode {
                     super::super::keysys::TransferMode::Default => proto::keysys::TransferMode::Default,
@@ -2060,6 +2061,7 @@ pub fn handle_update(
                     super::super::keysys::RenewalMode::AutoRenewQuarterly => proto::keysys::RenewalMode::AutoRenewQuarterly,
                     super::super::keysys::RenewalMode::AutoRenewMonthly => proto::keysys::RenewalMode::AutoRenewMonthly,
                     super::super::keysys::RenewalMode::ExpireAuction => proto::keysys::RenewalMode::ExpireAuction,
+                    super::super::keysys::RenewalMode::RenewOnce => proto::keysys::RenewalMode::RenewOnce,
                 }),
                 transfer_mode: keysys.transfer_mode.as_ref().map(|m| match m {
                     super::super::keysys::TransferMode::Default => proto::keysys::TransferMode::Default,

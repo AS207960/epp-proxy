@@ -27,7 +27,8 @@ for super::super::keysys::DomainInfo
                 super::proto::keysys::RenewalMode::AutoExpire => super::super::keysys::RenewalMode::AutoExpire,
                 super::proto::keysys::RenewalMode::AutoRenewQuarterly => super::super::keysys::RenewalMode::AutoRenewQuarterly,
                 super::proto::keysys::RenewalMode::AutoRenewMonthly => super::super::keysys::RenewalMode::AutoRenewMonthly,
-                super::proto::keysys::RenewalMode::ExpireAuction => super::super::keysys::RenewalMode::ExpireAuction
+                super::proto::keysys::RenewalMode::ExpireAuction => super::super::keysys::RenewalMode::ExpireAuction,
+                super::proto::keysys::RenewalMode::RenewOnce => super::super::keysys::RenewalMode::RenewOnce,
             },
             transfer_mode: match from.transfer_mode {
                 super::proto::keysys::TransferMode::Default => super::super::keysys::TransferMode::Default,
