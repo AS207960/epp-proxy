@@ -51,7 +51,7 @@ pub enum ResultData {
 #[derive(Debug, Deserialize)]
 pub enum PollData {
     #[serde(rename = "{http://www.key-systems.net/epp/keysys-1.0}data")]
-    Domain(DomainPollData),
+    Domain(PollDataData),
 }
 
 #[derive(Debug, Serialize)]
@@ -486,13 +486,19 @@ pub struct DomainInfoData {
 }
 
 #[derive(Debug, Deserialize)]
-pub struct DomainPollData {
-    #[serde(rename = "{urn:ietf:params:xml:ns:epp-1.0}domain")]
-    pub domain: String,
+pub struct PollDataData {
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp-1.0}domain", default)]
+    pub domain: Option<String>,
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp-1.0}contact", default)]
+    pub contact: Option<String>,
     #[serde(rename = "{urn:ietf:params:xml:ns:epp-1.0}period", default)]
     pub period: Option<u32>,
     #[serde(rename = "{urn:ietf:params:xml:ns:epp-1.0}autorenew", default)]
     pub auto_renew: bool,
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp-1.0}autodelete", default)]
+    pub auto_delete: bool,
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp-1.0}svtrid", default)]
+    pub server_transaction_id: Option<String>,
 }
 
 #[derive(Debug, Serialize)]
