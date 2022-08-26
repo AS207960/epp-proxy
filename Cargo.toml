@@ -2,7 +2,7 @@ cargo-features = ["strip"]
 
 [package]
 name = "epp-proxy"
-version = "0.5.2"
+version = "0.5.3"
 authors = ["Q <q@misell.cymru>"]
 edition = "2018"
 
@@ -33,7 +33,7 @@ prost-types = "0.11"
 clap = "3"
 base64 = "0.13"
 xml_serde = "1"
-rust-keycloak = { git = "https://github.com/TheEnbyperor/rust-keycloak", rev = "31dc156acbf3048d9ff765f3cd6d32be6ae9b18a" }
+rust-keycloak = { git = "https://github.com/TheEnbyperor/rust-keycloak", rev = "1f81e41407a1fa123131c2f4d213609165ac8b34" }
 dotenv = "0.15.0"
 tower-service = "0.3"
 http = "0.2"
