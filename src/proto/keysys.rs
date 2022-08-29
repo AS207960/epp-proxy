@@ -42,7 +42,10 @@ pub enum Transfer {
 
 #[derive(Debug, Deserialize)]
 pub enum ResultData {
-    #[serde(rename = "{http://www.key-systems.net/epp/keysys-1.0}contactInfData")]
+    #[serde(
+        rename = "{http://www.key-systems.net/epp/keysys-1.0}contactInfData",
+        alias = "{http://www.key-systems.net/epp/keysys-1.0}creData"
+    )]
     Contact(ContactInfoData),
     #[serde(rename = "{http://www.key-systems.net/epp/keysys-1.0}infData")]
     Domain(DomainInfoData),
