@@ -1360,10 +1360,10 @@ mod eurid_tests {
             }
         }
         assert_eq!(data.name, "вмкйршаудхыийведйкгг.ею");
-        assert!(eurid_data.on_hold);
-        assert!(eurid_data.quarantined);
-        assert!(eurid_data.suspended);
-        assert!(eurid_data.seized);
+        assert!(!eurid_data.on_hold);
+        assert!(!eurid_data.quarantined);
+        assert!(!eurid_data.suspended);
+        assert!(!eurid_data.seized);
         assert_eq!(eurid_data.on_site.unwrap(), "c195");
         assert!(!eurid_data.delayed);
         assert_eq!(eurid_data.max_extension_period, 7);

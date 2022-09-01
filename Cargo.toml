@@ -52,6 +52,10 @@ systemd-journal-logger = "0"
 tonic-build = "0.8"
 built = { version = "0.5", features = ["git2"] }
 
+[dev-dependencies]
+test-log = "0.2"
+env_logger = "0.9"
+
 [patch.crates-io]
 openssl-sys = { git = "https://github.com/AS207960/rust-openssl", rev = "3ea7e492d78b506689c8c31ee9427399ae4735e9" }
 

@@ -193,3 +193,86 @@ for super::super::keysys::DomainInfo
         })
     }
 }
+
+#[cfg(test)]
+mod domain_tests {
+    #[test_log::test]
+    fn info_check() {
+        const XML_DATA: &str = r#"
+<?xml version="1.0" encoding="UTF-8"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0">
+  <response>
+    <result code="1000">
+      <msg>Command completed successfully</msg>
+    </result>
+    <resData>
+      <domain:infData xmlns:domain="urn:ietf:params:xml:ns:domain-1.0">
+        <domain:name>fedi.monster</domain:name>
+        <domain:roid>19787813119534_DOMAIN-KEYSYS</domain:roid>
+        <domain:status s="inactive"/>
+        <domain:status s="ok"/>
+        <domain:status s="serverTransferProhibited"/>
+        <domain:registrant>P-AYI1850</domain:registrant>
+        <domain:contact type="admin">P-AYI1850</domain:contact>
+        <domain:contact type="tech">P-AYI1850</domain:contact>
+        <domain:contact type="billing">P-AYI1850</domain:contact>
+        <domain:clID>as207960</domain:clID>
+        <domain:crID>as207960</domain:crID>
+        <domain:crDate>2022-08-29T23:33:07.0Z</domain:crDate>
+        <domain:upID>as207960</domain:upID>
+        <domain:upDate>2022-08-29T23:33:07.0Z</domain:upDate>
+        <domain:exDate>2023-08-29T23:59:59.0Z</domain:exDate>
+        <domain:authInfo>
+          <domain:pw>test</domain:pw>
+        </domain:authInfo>
+      </domain:infData>
+    </resData>
+    <extension>
+      <keysys:resData xmlns:keysys="http://www.key-systems.net/epp/keysys-1.0">
+        <keysys:infData>
+          <keysys:renDate>2023-10-03T23:59:59.0Z</keysys:renDate>
+          <keysys:punDate>2023-08-29T23:59:59.0Z</keysys:punDate>
+          <keysys:domain-roid>D320175808-CNIC</keysys:domain-roid>
+          <keysys:renewalmode>DEFAULT</keysys:renewalmode>
+          <keysys:transferlock>0</keysys:transferlock>
+          <keysys:transfermode>DEFAULT</keysys:transfermode>
+          <keysys:whois-privacy>0</keysys:whois-privacy>
+        </keysys:infData>
+      </keysys:resData>
+      <rgp:infData xmlns:rgp="urn:ietf:params:xml:ns:rgp-1.0">
+        <rgp:rgpStatus s="addPeriod"/>
+      </rgp:infData>
+    </extension>
+    <trID>
+      <clTRID>0acb6c43-f631-4586-a012-523cd266ef91</clTRID>
+      <svTRID>8103732a-d866-4db2-b2ba-47bb86f93d5b</svTRID>
+    </trID>
+  </response>
+</epp>"#;
+        let res: super::super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
+        let res = match res.message {
+            super::super::proto::EPPMessageType::Response(r) => r,
+            _ => unreachable!(),
+        };
+        let data = super::super::domain::handle_info_response(*res).unwrap();
+        assert_eq!(data.name, "fedi.monster");
+        assert_eq!(data.registry_id, "19787813119534_DOMAIN-KEYSYS");
+        assert_eq!(data.registrant, "P-AYI1850");
+        assert_eq!(data.client_id, "as207960");
+        assert_eq!(data.client_created_id.unwrap(), "as207960");
+        assert_eq!(data.last_updated_client.unwrap(), "as207960");
+        assert_eq!(data.creation_date.unwrap(), "2022-08-29T23:33:07.0Z".parse::<chrono::DateTime<chrono::Utc>>().unwrap());
+        assert_eq!(data.last_updated_date.unwrap(), "2022-08-29T23:33:07.0Z".parse::<chrono::DateTime<chrono::Utc>>().unwrap());
+        assert_eq!(data.expiry_date.unwrap(), "2023-08-29T23:59:59.0Z".parse::<chrono::DateTime<chrono::Utc>>().unwrap());
+
+        let keysys = data.keysys.unwrap();
+        assert_eq!(keysys.transfer_mode, super::super::super::keysys::TransferMode::Default);
+        assert_eq!(keysys.renewal_mode, super::super::super::keysys::RenewalMode::Default);
+        assert_eq!(keysys.renewal_date, "2023-10-03T23:59:59.0Z".parse::<chrono::DateTime<chrono::Utc>>().unwrap());
+        assert_eq!(keysys.paid_until_date, "2023-08-29T23:59:59.0Z".parse::<chrono::DateTime<chrono::Utc>>().unwrap());
+        assert_eq!(keysys.roid.unwrap(), "D320175808-CNIC");
+
+        assert_eq!(data.rgp_state.len(), 1);
+        assert_eq!(*data.rgp_state.get(0).unwrap(), super::super::super::rgp::RGPState::AddPeriod);
+    }
+}

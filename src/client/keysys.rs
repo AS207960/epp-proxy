@@ -224,7 +224,7 @@ pub struct DomainUpdateUS {
     pub validator: Option<String>
 }
 
-#[derive(Debug)]
+#[derive(Debug, Eq, PartialEq)]
 pub enum RenewalMode {
     Default,
     AutoRenew,
@@ -236,21 +236,21 @@ pub enum RenewalMode {
     RenewOnce,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Eq, PartialEq)]
 pub enum TransferMode {
     Default,
     AutoApprove,
     AutoDeny,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Eq, PartialEq)]
 pub enum DETrustee {
     None,
     Monthly,
     Annually
 }
 
-#[derive(Debug)]
+#[derive(Debug, Eq, PartialEq)]
 pub enum CALegalType {
     AboriginalPeoples,
     CanadianUnincorporatedAssociation,
@@ -272,7 +272,7 @@ pub enum CALegalType {
     Trust
 }
 
-#[derive(Debug)]
+#[derive(Debug, Eq, PartialEq)]
 pub enum EULanguage {
     Bulgarian,
     Czech,
@@ -300,7 +300,7 @@ pub enum EULanguage {
     Swedish,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Eq, PartialEq)]
 pub enum EUCountry {
     Austria,
     Belgium,
@@ -332,7 +332,7 @@ pub enum EUCountry {
     Croatia
 }
 
-#[derive(Debug)]
+#[derive(Debug, Eq, PartialEq)]
 pub enum USPurpose {
     Business,
     NonProfit,
@@ -342,7 +342,7 @@ pub enum USPurpose {
 }
 
 
-#[derive(Debug)]
+#[derive(Debug, Eq, PartialEq)]
 pub enum USCategory {
     Citizen,
     PermanentResident,
