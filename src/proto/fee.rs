@@ -256,9 +256,15 @@ pub enum EPPFeeCommandType {
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct EPPFeeCommand {
-    #[serde(rename = "$attr:phase")]
+    #[serde(
+        rename = "$attr:phase",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub phase: Option<String>,
-    #[serde(rename = "$attr:subphase")]
+    #[serde(
+        rename = "$attr:subphase",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub subphase: Option<String>,
     #[serde(rename = "$value")]
     pub command: EPPFeeCommandType
