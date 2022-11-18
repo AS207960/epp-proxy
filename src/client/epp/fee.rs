@@ -184,6 +184,19 @@ impl From<&proto::fee::EPPFee05TransformData> for FeeData {
     }
 }
 
+impl From<&proto::fee::EPPFee06TransformData> for FeeData {
+    fn from(f: &proto::fee::EPPFee06TransformData) -> Self {
+        FeeData {
+            period: None,
+            currency: f.currency.to_owned(),
+            fees: f.fee.iter().map(Into::into).collect(),
+            credits: f.credit.iter().map(Into::into).collect(),
+            balance: f.balance.to_owned(),
+            credit_limit: f.credit_limit.to_owned(),
+        }
+    }
+}
+
 impl From<&proto::fee::EPPFee07TransformData> for FeeData {
     fn from(f: &proto::fee::EPPFee07TransformData) -> Self {
         FeeData {
@@ -249,6 +262,19 @@ impl From<&proto::fee::EPPFee10TransformData> for FeeData {
     }
 }
 
+impl From<&proto::fee::EPPFee06TransferData> for FeeData {
+    fn from(f: &proto::fee::EPPFee06TransferData) -> Self {
+        FeeData {
+            period: f.period.as_ref().map(Into::into),
+            currency: f.currency.to_owned(),
+            fees: f.fee.iter().map(Into::into).collect(),
+            credits: f.credit.iter().map(Into::into).collect(),
+            balance: f.balance.to_owned(),
+            credit_limit: f.credit_limit.to_owned(),
+        }
+    }
+}
+
 impl From<&proto::fee::EPPFee07TransferData> for FeeData {
     fn from(f: &proto::fee::EPPFee07TransferData) -> Self {
         FeeData {
@@ -300,6 +326,20 @@ impl From<&proto::fee::EPPFee05DeleteData> for FeeData {
         }
     }
 }
+
+impl From<&proto::fee::EPPFee06DeleteData> for FeeData {
+    fn from(f: &proto::fee::EPPFee06DeleteData) -> Self {
+        FeeData {
+            period: None,
+            currency: f.currency.to_owned(),
+            fees: vec![],
+            credits: f.credit.iter().map(Into::into).collect(),
+            balance: f.balance.to_owned(),
+            credit_limit: f.credit_limit.to_owned(),
+        }
+    }
+}
+
 
 impl From<&proto::fee::EPPFee07DeleteData> for FeeData {
     fn from(f: &proto::fee::EPPFee07DeleteData) -> Self {

@@ -110,6 +110,8 @@ pub struct ServerFeatures {
     fee_08_supported: bool,
     /// urn:ietf:params:xml:ns:fee-0.7 support
     fee_07_supported: bool,
+    /// urn:ietf:params:xml:ns:fee-0.7 support
+    fee_06_supported: bool,
     /// urn:ietf:params:xml:ns:fee-0.5 support
     fee_05_supported: bool,
     /// urn:ietf:params:xml:ns:epp:unhandled-namespaces-1.0 support
@@ -862,6 +864,9 @@ impl EPPClient {
         self.features.fee_07_supported = greeting
             .service_menu
             .supports_ext("urn:ietf:params:xml:ns:fee-0.7");
+        self.features.fee_06_supported = greeting
+            .service_menu
+            .supports_ext("urn:ietf:params:xml:ns:fee-0.6");
         self.features.fee_05_supported = greeting
             .service_menu
             .supports_ext("urn:ietf:params:xml:ns:fee-0.5");
@@ -1039,6 +1044,8 @@ impl EPPClient {
                 ext_objects.push("urn:ietf:params:xml:ns:fee-0.8".to_string())
             } else if self.features.fee_07_supported {
                 ext_objects.push("urn:ietf:params:xml:ns:fee-0.7".to_string())
+            } else if self.features.fee_06_supported {
+                ext_objects.push("urn:ietf:params:xml:ns:fee-0.6".to_string())
             } else if self.features.fee_05_supported {
                 ext_objects.push("urn:ietf:params:xml:ns:fee-0.5".to_string())
             }

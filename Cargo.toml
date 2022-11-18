@@ -34,6 +34,7 @@ clap = "3"
 base64 = "0.13"
 xml_serde = "1"
 rust-keycloak = { git = "https://github.com/TheEnbyperor/rust-keycloak", rev = "1f81e41407a1fa123131c2f4d213609165ac8b34" }
+#rust-keycloak = { path = "../rust-keycloak" }
 dotenv = "0.15.0"
 tower-service = "0.3"
 http = "0.2"

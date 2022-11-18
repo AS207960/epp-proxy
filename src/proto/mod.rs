@@ -142,6 +142,8 @@ pub enum EPPCommandExtensionType {
     VerisignWhoisInfExt(verisign::EPPWhoisInfoExt),
     #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.5}fee:check")]
     EPPFee05Check(fee::EPPFee05Check),
+    #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.6}fee:check")]
+    EPPFee06Check(fee::EPPFee06Check),
     #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.7}fee:check")]
     EPPFee07Check(fee::EPPFee07Check),
     #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.8}fee:check")]
@@ -152,10 +154,10 @@ pub enum EPPCommandExtensionType {
     EPPFee011Check(fee::EPPFee011Check),
     #[serde(rename = "{urn:ietf:params:xml:ns:epp:fee-1.0}fee:check")]
     EPPFee10Check(fee::EPPFee10Check),
-    #[allow(dead_code)]
     #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.5}fee:info")]
     EPPFee05Info(fee::EPPFee05Info),
-    #[allow(dead_code)]
+    #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.6}fee:info")]
+    EPPFee06Info(fee::EPPFee06Info),
     #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.7}fee:info")]
     EPPFee07Info(fee::EPPFee07Info),
     #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.11}fee:create")]
@@ -735,6 +737,8 @@ pub enum EPPResponseExtensionType {
     EPPCentralnicRegTypeInfoResult(centralnic::EPPRegType),
     #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.5}chkData")]
     EPPFee05CheckData(fee::EPPFee05CheckData),
+    #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.6}chkData")]
+    EPPFee06CheckData(fee::EPPFee06CheckData),
     #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.7}chkData")]
     EPPFee07CheckData(fee::EPPFee07CheckData),
     #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.8}chkData")]
@@ -747,10 +751,14 @@ pub enum EPPResponseExtensionType {
     EPPFee10CheckData(fee::EPPFee10CheckData),
     #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.5}infData")]
     EPPFee05InfoData(fee::EPPFee05InfoData),
+    #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.6}infData")]
+    EPPFee06InfoData(fee::EPPFee06InfoData),
     #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.7}infData")]
     EPPFee07InfoData(fee::EPPFee07InfoData),
     #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.5}creData")]
     EPPFee05CreateData(fee::EPPFee05TransformData),
+    #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.6}creData")]
+    EPPFee06CreateData(fee::EPPFee06TransformData),
     #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.7}creData")]
     EPPFee07CreateData(fee::EPPFee07TransformData),
     #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.8}creData")]
@@ -763,6 +771,8 @@ pub enum EPPResponseExtensionType {
     EPPFee10CreateData(fee::EPPFee10TransformData),
     #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.5}delData")]
     EPPFee05DeleteData(fee::EPPFee05DeleteData),
+    #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.6}delData")]
+    EPPFee06DeleteData(fee::EPPFee06DeleteData),
     #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.7}delData")]
     EPPFee07DeleteData(fee::EPPFee07DeleteData),
     #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.8}delData")]
@@ -775,6 +785,8 @@ pub enum EPPResponseExtensionType {
     EPPFee10DeleteData(fee::EPPFee10TransformData),
     #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.5}renData")]
     EPPFee05RenewData(fee::EPPFee05TransformData),
+    #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.6}renData")]
+    EPPFee06RenewData(fee::EPPFee06TransformData),
     #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.7}renData")]
     EPPFee07RenewData(fee::EPPFee07TransformData),
     #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.8}renData")]
@@ -787,6 +799,8 @@ pub enum EPPResponseExtensionType {
     EPPFee10RenewData(fee::EPPFee10TransformData),
     #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.5}trnData")]
     EPPFee05TransferData(fee::EPPFee05TransformData),
+    #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.6}trnData")]
+    EPPFee06TransferData(fee::EPPFee06TransferData),
     #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.7}trnData")]
     EPPFee07TransferData(fee::EPPFee07TransferData),
     #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.8}trnData")]
@@ -799,6 +813,8 @@ pub enum EPPResponseExtensionType {
     EPPFee10TransferData(fee::EPPFee10TransformData),
     #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.5}updData")]
     EPPFee05UpdateData(fee::EPPFee05TransformData),
+    #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.6}updData")]
+    EPPFee06UpdateData(fee::EPPFee06TransformData),
     #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.7}updData")]
     EPPFee07UpdateData(fee::EPPFee07TransformData),
     #[serde(rename = "{urn:ietf:params:xml:ns:fee-0.8}updData")]

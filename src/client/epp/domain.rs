@@ -389,6 +389,10 @@ impl
                     proto::EPPResponseExtensionType::EPPFee07TransferData(i) => Some(i),
                     _ => None,
                 });
+                let fee06 = ext.value.iter().find_map(|p| match p {
+                    proto::EPPResponseExtensionType::EPPFee06TransferData(i) => Some(i),
+                    _ => None,
+                });
                 let fee05 = ext.value.iter().find_map(|p| match p {
                     proto::EPPResponseExtensionType::EPPFee05TransferData(i) => Some(i),
                     _ => None,
@@ -403,6 +407,8 @@ impl
                 } else if let Some(f) = fee08 {
                     Some(f.into())
                 } else if let Some(f) = fee07 {
+                    Some(f.into())
+                } else if let Some(f) = fee06 {
                     Some(f.into())
                 } else {
                     fee05.map(|f| f.into())
@@ -492,6 +498,10 @@ impl
                     proto::EPPResponseExtensionType::EPPFee07CreateData(i) => Some(i),
                     _ => None,
                 });
+                let fee06 = ext.value.iter().find_map(|p| match p {
+                    proto::EPPResponseExtensionType::EPPFee06CreateData(i) => Some(i),
+                    _ => None,
+                });
                 let fee05 = ext.value.iter().find_map(|p| match p {
                     proto::EPPResponseExtensionType::EPPFee05CreateData(i) => Some(i),
                     _ => None,
@@ -506,6 +516,8 @@ impl
                 } else if let Some(f) = fee08 {
                     Some(f.into())
                 } else if let Some(f) = fee07 {
+                    Some(f.into())
+                } else if let Some(f) = fee06 {
                     Some(f.into())
                 } else {
                     fee05.map(|f| f.into())
@@ -621,6 +633,10 @@ impl
                     proto::EPPResponseExtensionType::EPPFee07RenewData(i) => Some(i),
                     _ => None,
                 });
+                let fee06 = ext.value.iter().find_map(|p| match p {
+                    proto::EPPResponseExtensionType::EPPFee06RenewData(i) => Some(i),
+                    _ => None,
+                });
                 let fee05 = ext.value.iter().find_map(|p| match p {
                     proto::EPPResponseExtensionType::EPPFee05RenewData(i) => Some(i),
                     _ => None,
@@ -635,6 +651,8 @@ impl
                 } else if let Some(f) = fee08 {
                     Some(f.into())
                 } else if let Some(f) = fee07 {
+                    Some(f.into())
+                } else if let Some(f) = fee06 {
                     Some(f.into())
                 } else {
                     fee05.map(|f| f.into())
@@ -908,6 +926,10 @@ pub fn handle_check_response(response: proto::EPPResponse) -> Response<CheckResp
                 proto::EPPResponseExtensionType::EPPFee07CheckData(i) => Some(i),
                 _ => None,
             });
+            let fee06 = ext.value.iter().find_map(|p| match p {
+                proto::EPPResponseExtensionType::EPPFee06CheckData(i) => Some(i),
+                _ => None,
+            });
             let fee05 = ext.value.iter().find_map(|p| match p {
                 proto::EPPResponseExtensionType::EPPFee05CheckData(i) => Some(i),
                 _ => None,
@@ -1011,6 +1033,25 @@ pub fn handle_check_response(response: proto::EPPResponse) -> Response<CheckResp
                             fees: d.fee.iter().map(Into::into).collect(),
                             credits: d.credit.iter().map(Into::into).collect(),
                             class: d.class.to_owned(),
+                            reason: None,
+                        })
+                        .collect(),
+                    reason: None,
+                })
+            } else if let Some(f) = fee06 {
+                Some(fee::FeeCheckData {
+                    available: true,
+                    commands: f
+                        .domains
+                        .iter()
+                        .map(|d| fee::FeeCommand {
+                            command: (&d.command).into(),
+                            period: Some((&d.period).into()),
+                            standard: None,
+                            currency: d.currency.to_owned(),
+                            fees: d.fee.iter().map(Into::into).collect(),
+                            class: d.class.to_owned(),
+                            credits: vec![],
                             reason: None,
                         })
                         .collect(),
@@ -1731,6 +1772,10 @@ pub fn handle_delete_response(response: proto::EPPResponse) -> Response<DeleteRe
                 proto::EPPResponseExtensionType::EPPFee07DeleteData(i) => Some(i),
                 _ => None,
             });
+            let fee06 = ext.value.iter().find_map(|p| match p {
+                proto::EPPResponseExtensionType::EPPFee06DeleteData(i) => Some(i),
+                _ => None,
+            });
             let fee05 = ext.value.iter().find_map(|p| match p {
                 proto::EPPResponseExtensionType::EPPFee05DeleteData(i) => Some(i),
                 _ => None,
@@ -1743,6 +1788,8 @@ pub fn handle_delete_response(response: proto::EPPResponse) -> Response<DeleteRe
             } else if let Some(f) = fee08 {
                 Some(f.into())
             } else if let Some(f) = fee07 {
+                Some(f.into())
+            } else if let Some(f) = fee06 {
                 Some(f.into())
             } else {
                 fee05.map(|f| f.into())
@@ -2317,6 +2364,10 @@ pub fn handle_update_response(response: proto::EPPResponse) -> Response<UpdateRe
                 proto::EPPResponseExtensionType::EPPFee07UpdateData(i) => Some(i),
                 _ => None,
             });
+            let fee06 = ext.value.iter().find_map(|p| match p {
+                proto::EPPResponseExtensionType::EPPFee06UpdateData(i) => Some(i),
+                _ => None,
+            });
             let fee05 = ext.value.iter().find_map(|p| match p {
                 proto::EPPResponseExtensionType::EPPFee05UpdateData(i) => Some(i),
                 _ => None,
@@ -2329,6 +2380,8 @@ pub fn handle_update_response(response: proto::EPPResponse) -> Response<UpdateRe
             } else if let Some(f) = fee08 {
                 Some(f.into())
             } else if let Some(f) = fee07 {
+                Some(f.into())
+            } else if let Some(f) = fee06 {
                 Some(f.into())
             } else {
                 fee05.map(|f| f.into())
