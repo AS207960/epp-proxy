@@ -849,6 +849,26 @@ pub fn handle_check(client: &ServerFeatures, req: &CheckRequest) -> HandleReqRet
                         .collect::<Result<Vec<_>, _>>()?,
                 },
             ))
+        } else if client.fee_06_supported {
+            ext.push(proto::EPPCommandExtensionType::EPPFee06Check(
+                proto::fee::EPPFee06Check {
+                    domains: fee_check
+                        .commands
+                        .iter()
+                        .map(|c| {
+                            Ok(proto::fee::EPPFee06CheckDomain {
+                                name: req.name.to_owned(),
+                                currency: fee_check.currency.to_owned(),
+                                command: match (&c.command).into() {
+                                    Some(n) => n,
+                                    None => return Err(Err(Error::Unsupported)),
+                                },
+                                period: c.period.as_ref().map(Into::into),
+                            })
+                        })
+                        .collect::<Result<Vec<_>, _>>()?,
+                },
+            ))
         } else if client.fee_05_supported {
             ext.push(proto::EPPCommandExtensionType::EPPFee05Check(
                 proto::fee::EPPFee05Check {
