@@ -5,14 +5,14 @@ use super::super::fee::{
 use super::super::proto;
 use super::ServerFeatures;
 
-impl From<&proto::fee::EPPFeeCommand> for Command {
-    fn from(from: &proto::fee::EPPFeeCommand) -> Self {
+impl From<&proto::fee::EPPFeeCommandType> for Command {
+    fn from(from: &proto::fee::EPPFeeCommandType) -> Self {
         match from {
-            proto::fee::EPPFeeCommand::Create => Command::Create,
-            proto::fee::EPPFeeCommand::Renew => Command::Renew,
-            proto::fee::EPPFeeCommand::Transfer => Command::Transfer,
-            proto::fee::EPPFeeCommand::Delete => Command::Delete,
-            proto::fee::EPPFeeCommand::Restore => Command::Restore,
+            proto::fee::EPPFeeCommandType::Create => Command::Create,
+            proto::fee::EPPFeeCommandType::Renew => Command::Renew,
+            proto::fee::EPPFeeCommandType::Transfer => Command::Transfer,
+            proto::fee::EPPFeeCommandType::Delete => Command::Delete,
+            proto::fee::EPPFeeCommandType::Restore => Command::Restore,
         }
     }
 }
@@ -32,14 +32,14 @@ impl From<&proto::united_tld::EPPChargeCommand> for Command {
     }
 }
 
-impl From<&Command> for Option<proto::fee::EPPFeeCommand> {
+impl From<&Command> for Option<proto::fee::EPPFeeCommandType> {
     fn from(from: &Command) -> Self {
         match from {
-            Command::Create => Some(proto::fee::EPPFeeCommand::Create),
-            Command::Renew => Some(proto::fee::EPPFeeCommand::Renew),
-            Command::Transfer => Some(proto::fee::EPPFeeCommand::Transfer),
-            Command::Delete => Some(proto::fee::EPPFeeCommand::Delete),
-            Command::Restore => Some(proto::fee::EPPFeeCommand::Restore),
+            Command::Create => Some(proto::fee::EPPFeeCommandType::Create),
+            Command::Renew => Some(proto::fee::EPPFeeCommandType::Renew),
+            Command::Transfer => Some(proto::fee::EPPFeeCommandType::Transfer),
+            Command::Delete => Some(proto::fee::EPPFeeCommandType::Delete),
+            Command::Restore => Some(proto::fee::EPPFeeCommandType::Restore),
             _ => None,
         }
     }

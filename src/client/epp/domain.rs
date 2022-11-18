@@ -757,9 +757,13 @@ pub fn handle_check(client: &ServerFeatures, req: &CheckRequest) -> HandleReqRet
                         .iter()
                         .map(|c| {
                             Ok(proto::fee::EPPFee10CheckCommand {
-                                name: match (&c.command).into() {
-                                    Some(n) => n,
-                                    None => return Err(Err(Error::Unsupported)),
+                                name: proto::fee::EPPFeeCommand {
+                                    command: match (&c.command).into() {
+                                        Some(n) => n,
+                                        None => return Err(Err(Error::Unsupported)),
+                                    },
+                                    phase: None,
+                                    subphase: None
                                 },
                                 period: c.period.as_ref().map(Into::into),
                             })
@@ -775,9 +779,13 @@ pub fn handle_check(client: &ServerFeatures, req: &CheckRequest) -> HandleReqRet
                     ext.push(proto::EPPCommandExtensionType::EPPFee011Check(
                         proto::fee::EPPFee011Check {
                             currency: fee_check.currency.to_owned(),
-                            command: match (&c.command).into() {
-                                Some(n) => n,
-                                None => return Err(Err(Error::Unsupported)),
+                            command: proto::fee::EPPFeeCommand {
+                                command: match (&c.command).into() {
+                                    Some(n) => n,
+                                    None => return Err(Err(Error::Unsupported)),
+                                },
+                                phase: None,
+                                subphase: None
                             },
                             period: c.period.as_ref().map(Into::into),
                         },
@@ -799,9 +807,13 @@ pub fn handle_check(client: &ServerFeatures, req: &CheckRequest) -> HandleReqRet
                                     id: req.name.to_owned(),
                                 },
                                 currency: fee_check.currency.to_owned(),
-                                command: match (&c.command).into() {
-                                    Some(n) => n,
-                                    None => return Err(Err(Error::Unsupported)),
+                                command: proto::fee::EPPFeeCommand {
+                                    command: match (&c.command).into() {
+                                        Some(n) => n,
+                                        None => return Err(Err(Error::Unsupported)),
+                                    },
+                                    phase: None,
+                                    subphase: None
                                 },
                                 period: c.period.as_ref().map(Into::into),
                             })
@@ -819,9 +831,13 @@ pub fn handle_check(client: &ServerFeatures, req: &CheckRequest) -> HandleReqRet
                             Ok(proto::fee::EPPFee08CheckDomain {
                                 name: req.name.to_owned(),
                                 currency: fee_check.currency.to_owned(),
-                                command: match (&c.command).into() {
-                                    Some(n) => n,
-                                    None => return Err(Err(Error::Unsupported)),
+                                command:  proto::fee::EPPFeeCommand {
+                                    command: match (&c.command).into() {
+                                        Some(n) => n,
+                                        None => return Err(Err(Error::Unsupported)),
+                                    },
+                                    phase: None,
+                                    subphase: None
                                 },
                                 period: c.period.as_ref().map(Into::into),
                             })
@@ -839,9 +855,13 @@ pub fn handle_check(client: &ServerFeatures, req: &CheckRequest) -> HandleReqRet
                             Ok(proto::fee::EPPFee07CheckDomain {
                                 name: req.name.to_owned(),
                                 currency: fee_check.currency.to_owned(),
-                                command: match (&c.command).into() {
-                                    Some(n) => n,
-                                    None => return Err(Err(Error::Unsupported)),
+                                command:  proto::fee::EPPFeeCommand {
+                                    command: match (&c.command).into() {
+                                        Some(n) => n,
+                                        None => return Err(Err(Error::Unsupported)),
+                                    },
+                                    phase: None,
+                                    subphase: None
                                 },
                                 period: c.period.as_ref().map(Into::into),
                             })
@@ -859,9 +879,13 @@ pub fn handle_check(client: &ServerFeatures, req: &CheckRequest) -> HandleReqRet
                             Ok(proto::fee::EPPFee06CheckDomain {
                                 name: req.name.to_owned(),
                                 currency: fee_check.currency.to_owned(),
-                                command: match (&c.command).into() {
-                                    Some(n) => n,
-                                    None => return Err(Err(Error::Unsupported)),
+                                command: proto::fee::EPPFeeCommand {
+                                    command: match (&c.command).into() {
+                                        Some(n) => n,
+                                        None => return Err(Err(Error::Unsupported)),
+                                    },
+                                    phase: Some("open".to_string()),
+                                    subphase: None
                                 },
                                 period: c.period.as_ref().map(Into::into),
                             })
@@ -879,9 +903,13 @@ pub fn handle_check(client: &ServerFeatures, req: &CheckRequest) -> HandleReqRet
                             Ok(proto::fee::EPPFee05CheckDomain {
                                 name: req.name.to_owned(),
                                 currency: fee_check.currency.to_owned(),
-                                command: match (&c.command).into() {
-                                    Some(n) => n,
-                                    None => return Err(Err(Error::Unsupported)),
+                                command: proto::fee::EPPFeeCommand {
+                                    command: match (&c.command).into() {
+                                        Some(n) => n,
+                                        None => return Err(Err(Error::Unsupported)),
+                                    },
+                                    phase: None,
+                                    subphase: None
                                 },
                                 period: c.period.as_ref().map(Into::into),
                             })
@@ -966,7 +994,7 @@ pub fn handle_check_response(response: proto::EPPResponse) -> Response<CheckResp
                         .commands
                         .iter()
                         .map(|c| fee::FeeCommand {
-                            command: (&c.name).into(),
+                            command: (&c.name.command).into(),
                             period: c.period.as_ref().map(Into::into),
                             standard: Some(c.standard),
                             currency: f.currency.to_owned(),
@@ -989,7 +1017,7 @@ pub fn handle_check_response(response: proto::EPPResponse) -> Response<CheckResp
                         .objects
                         .iter()
                         .map(|c| fee::FeeCommand {
-                            command: (&c.command.name).into(),
+                            command: (&c.command.name.command).into(),
                             period: c.period.as_ref().map(Into::into),
                             standard: Some(c.command.standard),
                             currency: c.currency.to_owned(),
@@ -1008,7 +1036,7 @@ pub fn handle_check_response(response: proto::EPPResponse) -> Response<CheckResp
                         .objects
                         .iter()
                         .map(|d| fee::FeeCommand {
-                            command: (&d.command).into(),
+                            command: (&d.command.command).into(),
                             period: d.period.as_ref().map(Into::into),
                             standard: None,
                             currency: d.currency.to_owned(),
@@ -1027,7 +1055,7 @@ pub fn handle_check_response(response: proto::EPPResponse) -> Response<CheckResp
                         .domains
                         .iter()
                         .map(|d| fee::FeeCommand {
-                            command: (&d.command).into(),
+                            command: (&d.command.command).into(),
                             period: d.period.as_ref().map(Into::into),
                             standard: None,
                             currency: d.currency.to_owned(),
@@ -1046,7 +1074,7 @@ pub fn handle_check_response(response: proto::EPPResponse) -> Response<CheckResp
                         .domains
                         .iter()
                         .map(|d| fee::FeeCommand {
-                            command: (&d.command).into(),
+                            command: (&d.command.command).into(),
                             period: d.period.as_ref().map(Into::into),
                             standard: None,
                             currency: d.currency.to_owned().unwrap_or_default(),
@@ -1065,7 +1093,7 @@ pub fn handle_check_response(response: proto::EPPResponse) -> Response<CheckResp
                         .domains
                         .iter()
                         .map(|d| fee::FeeCommand {
-                            command: (&d.command).into(),
+                            command: (&d.command.command).into(),
                             period: Some((&d.period).into()),
                             standard: None,
                             currency: d.currency.to_owned(),
@@ -1084,7 +1112,7 @@ pub fn handle_check_response(response: proto::EPPResponse) -> Response<CheckResp
                         .domains
                         .iter()
                         .map(|d| fee::FeeCommand {
-                            command: (&d.command).into(),
+                            command: (&d.command.command).into(),
                             period: Some((&d.period).into()),
                             standard: None,
                             currency: d.currency.to_owned(),

@@ -241,7 +241,7 @@ pub struct EPPFee10Agreement {
 }
 
 #[derive(Debug, Deserialize, Serialize)]
-pub enum EPPFeeCommand {
+pub enum EPPFeeCommandType {
     #[serde(rename = "create")]
     Create,
     #[serde(rename = "renew")]
@@ -252,6 +252,16 @@ pub enum EPPFeeCommand {
     Delete,
     #[serde(rename = "restore")]
     Restore,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct EPPFeeCommand {
+    #[serde(rename = "$attr:phase")]
+    pub phase: Option<String>,
+    #[serde(rename = "$attr:subphase")]
+    pub subphase: Option<String>,
+    #[serde(rename = "$value")]
+    pub command: EPPFeeCommandType
 }
 
 #[derive(Debug, Deserialize)]
