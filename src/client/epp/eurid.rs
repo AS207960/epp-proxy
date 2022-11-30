@@ -41,6 +41,10 @@ impl From<&proto::eurid::EURIDContactInfo> for ContactExtension {
             vat: from.vat.as_deref().map(Into::into),
             citizenship_country: from.country_of_citizenship.as_deref().map(Into::into),
             language: (&from.language).into(),
+            has_reserved_domain: from.has_reserved_domain,
+            has_domain_on_hold: from.has_domain_on_hold,
+            has_domain_registrar_lock: from.has_reserved_domain,
+            has_domain_registry_lock: from.has_domain_registry_lock,
         }
     }
 }
@@ -63,6 +67,10 @@ pub fn contact_info_from_extension(
         language: (&from.language).into(),
         natural_person: is_entity_natural_person(entity_type.as_ref()),
         country_of_citizenship: from.citizenship_country.as_deref().map(Into::into),
+        has_domain_registrar_lock: false,
+        has_domain_registry_lock: false,
+        has_domain_on_hold: false,
+        has_reserved_domain: false,
     }
 }
 
@@ -203,6 +211,7 @@ impl From<&DomainCreate> for proto::eurid::EURIDDomainCreate {
             contacts,
             nsgroups: vec![],
             keygroup: None,
+            registrar_reference: from.registrar_reference.as_ref().map(Into::into),
         }
     }
 }
@@ -254,6 +263,13 @@ impl From<&DomainUpdate> for proto::eurid::EURIDDomainUpdate {
                     nsgroups: vec![],
                     keygroup: None,
                 }),
+            },
+            change: if from.registrar_reference.is_some() {
+                Some(proto::eurid::EURIDDomainUpdateChange {
+                    registrar_reference: from.registrar_reference.as_ref().map(Into::into),
+                })
+            } else {
+                None
             },
         }
     }
@@ -313,6 +329,7 @@ impl From<&DomainTransfer> for proto::eurid::EURIDDomainTransfer {
                 nameservers: None,
                 nsgroups: vec![],
                 keygroup: None,
+                registrar_reference: from.registrar_reference.as_ref().map(Into::into),
             }),
         }
     }
@@ -346,6 +363,7 @@ pub fn extract_eurid_domain_info(from: &Option<proto::EPPResponseExtension>) -> 
 
     eurid_ext_info.map(|e| DomainInfo {
         on_hold: e.on_hold,
+        reserved: e.reserved,
         quarantined: e.quarantined,
         suspended: e.suspended,
         delayed: e.delayed,
@@ -366,6 +384,7 @@ pub fn extract_eurid_domain_info(from: &Option<proto::EPPResponseExtension>) -> 
             _ => None,
         }),
         auth_info_valid_until: eurid_auth_info.map(|a| a.valid_until),
+        registrar_reference: e.registrar_reference.as_ref().map(Into::into),
     })
 }
 
@@ -382,6 +401,7 @@ pub fn extract_eurid_domain_transfer_info(
 
     eurid_ext_info.map(|e| DomainTransferInfo {
         on_hold: e.on_hold,
+        reserved: e.reserved,
         quarantined: e.quarantined,
         delayed: e.delayed,
         on_site: e.contacts.iter().find_map(|c| match c.contact_type {
@@ -406,6 +426,7 @@ pub fn extract_eurid_domain_transfer_info(
         }),
         registrant: e.registrant.to_string(),
         reason: e.reason.to_string(),
+        registrar_reference: e.registrar_reference.as_ref().map(Into::into),
     })
 }
 

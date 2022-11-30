@@ -18,6 +18,10 @@ message ContactExtension {
     google.protobuf.StringValue vat = 3;
     google.protobuf.StringValue citizenship_country = 4;
     string language = 5;
+    bool has_reserved_domain = 6;
+    bool has_domain_on_hold = 7;
+    bool has_domain_registry_lock = 8;
+    bool has_domain_registrar_lock = 9;
 }
 
 message ContactUpdateExtension {
@@ -34,6 +38,7 @@ message DomainCheckData {
 
 message DomainInfo {
     bool on_hold = 1;
+    bool reserved = 13;
     bool quarantined = 2;
     bool suspended = 3;
     bool delayed = 4;
@@ -45,6 +50,7 @@ message DomainInfo {
     string registrant_country = 10;
     google.protobuf.StringValue registrant_country_of_citizenship = 11;
     google.protobuf.Timestamp auth_info_valid_until = 12;
+    google.protobuf.StringValue registrar_reference = 14;
 }
 
 message DomainInfoRequest {
@@ -56,6 +62,7 @@ message DomainInfoRequest {
 
 message DomainTransferInfo {
     bool on_hold = 1;
+    bool reserved = 10;
     bool quarantined = 2;
     bool delayed = 3;
     string reason = 4;
@@ -64,6 +71,7 @@ message DomainTransferInfo {
     google.protobuf.StringValue on_site = 7;
     google.protobuf.StringValue technical = 8;
     google.protobuf.StringValue reseller = 9;
+    google.protobuf.StringValue registrar_reference = 11;
 }
 
 message DomainRenewInfo {
@@ -73,6 +81,7 @@ message DomainRenewInfo {
 message DomainCreateExtension {
     google.protobuf.StringValue on_site = 1;
     google.protobuf.StringValue reseller = 2;
+    google.protobuf.StringValue registrar_reference = 3;
 }
 
 message DomainUpdateExtension {
@@ -80,6 +89,7 @@ message DomainUpdateExtension {
     google.protobuf.StringValue add_reseller = 2;
     google.protobuf.StringValue remove_on_site = 3;
     google.protobuf.StringValue remove_reseller = 4;
+    google.protobuf.StringValue registrar_reference = 5;
 }
 
 message DomainDeleteExtension {
@@ -95,6 +105,7 @@ message DomainTransferExtension {
     google.protobuf.StringValue technical = 3;
     google.protobuf.StringValue reseller = 4;
     google.protobuf.StringValue on_site = 5;
+    google.protobuf.StringValue registrar_reference = 6;
 }
 
 enum ContactType {

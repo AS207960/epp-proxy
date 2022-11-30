@@ -41,6 +41,10 @@ impl From<client::eurid::ContactExtension> for epp_proto::eurid::ContactExtensio
             vat: from.vat,
             language: from.language,
             whois_email: from.whois_email,
+            has_domain_on_hold: from.has_domain_on_hold,
+            has_domain_registry_lock: from.has_domain_registry_lock,
+            has_domain_registrar_lock: from.has_domain_registrar_lock,
+            has_reserved_domain: from.has_reserved_domain,
         }
     }
 }
@@ -53,6 +57,10 @@ impl From<epp_proto::eurid::ContactExtension> for client::eurid::ContactExtensio
             vat: from.vat,
             language: from.language,
             whois_email: from.whois_email,
+            has_reserved_domain: false,
+            has_domain_on_hold: false,
+            has_domain_registry_lock: false,
+            has_domain_registrar_lock: false,
         }
     }
 }
@@ -73,6 +81,7 @@ impl From<epp_proto::eurid::DomainCreateExtension> for client::eurid::DomainCrea
         client::eurid::DomainCreate {
             on_site: from.on_site,
             reseller: from.reseller,
+            registrar_reference: from.registrar_reference,
         }
     }
 }
@@ -84,6 +93,7 @@ impl From<epp_proto::eurid::DomainUpdateExtension> for client::eurid::DomainUpda
             remove_reseller: from.remove_reseller,
             add_on_site: from.add_on_site,
             add_reseller: from.add_reseller,
+            registrar_reference: from.registrar_reference,
         }
     }
 }
@@ -96,6 +106,7 @@ impl From<epp_proto::eurid::DomainTransferExtension> for client::eurid::DomainTr
             technical: from.technical,
             billing: from.billing,
             registrant: from.registrant,
+            registrar_reference: from.registrar_reference,
         }
     }
 }

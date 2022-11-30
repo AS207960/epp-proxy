@@ -1,121 +1,147 @@
 use chrono::prelude::*;
 
-/// domain-ext-2.4
+/// domain-ext-2.5
 
 #[derive(Debug, Deserialize)]
 pub struct EURIDDomainCheckData {
-    #[serde(rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.4}domain")]
+    #[serde(rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.5}domain")]
     pub domains: Vec<EURIDDomainCheckDatum>,
 }
 
 #[derive(Debug, Deserialize, Clone)]
 pub struct EURIDDomainCheckDatum {
-    #[serde(rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.4}name")]
+    #[serde(rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.5}name")]
     pub name: String,
     #[serde(
-        rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.4}availableDate",
+        rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.5}availableDate",
         deserialize_with = "super::deserialize_datetime_opt",
         default
     )]
     pub available_date: Option<DateTime<Utc>>,
-    #[serde(rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.4}status", default)]
+    #[serde(rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.5}status", default)]
     pub status: Vec<super::domain::EPPDomainStatus>,
 }
 
 #[derive(Debug, Serialize)]
 pub struct EURIDDomainCreate {
     #[serde(
-        rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.4}domain-ext:contact",
+        rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.5}domain-ext:contact",
         skip_serializing_if = "Vec::is_empty"
     )]
     pub contacts: Vec<EURIDDomainContact>,
     #[serde(
-        rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.4}domain-ext:nsgroup",
+        rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.5}domain-ext:nsgroup",
         skip_serializing_if = "Vec::is_empty"
     )]
     pub nsgroups: Vec<String>,
     #[serde(
-        rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.4}domain-ext:keygroup",
+        rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.5}domain-ext:keygroup",
         skip_serializing_if = "Option::is_none"
     )]
     pub keygroup: Option<String>,
+    #[serde(
+        rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.5}domain-ext:registrarReference",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub registrar_reference: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct EURIDDomainInfo {
-    #[serde(rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.4}onHold")]
+    #[serde(rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.5}onHold")]
     pub on_hold: bool,
-    #[serde(rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.4}quarantined")]
+    #[serde(rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.5}reserved")]
+    pub reserved: bool,
+    #[serde(rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.5}quarantined")]
     pub quarantined: bool,
-    #[serde(rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.4}suspended")]
+    #[serde(rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.5}suspended")]
     pub suspended: bool,
-    #[serde(rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.4}delayed")]
+    #[serde(rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.5}delayed")]
     pub delayed: bool,
-    #[serde(rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.4}seized")]
+    #[serde(rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.5}seized")]
     pub seized: bool,
     #[serde(
-        rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.4}deletionDate",
+        rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.5}deletionDate",
         deserialize_with = "super::deserialize_datetime_opt",
         default
     )]
     pub deletion_date: Option<DateTime<Utc>>,
     #[serde(
-        rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.4}contact",
+        rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.5}contact",
         default
     )]
     pub contacts: Vec<EURIDDomainContact>,
     #[serde(
-        rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.4}nsgroup",
+        rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.5}nsgroup",
         default
     )]
     pub nsgroups: Vec<String>,
     #[serde(
-        rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.4}keygroup",
+        rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.5}keygroup",
         default
     )]
     pub keygroup: Option<String>,
-    #[serde(rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.4}maxExtensionPeriod")]
+    #[serde(rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.5}maxExtensionPeriod")]
     pub max_extension_period: u32,
-    #[serde(rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.4}registrantCountry")]
+    #[serde(rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.5}registrantCountry")]
     pub registrant_country: String,
     #[serde(
-        rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.4}registrantCountryOfCitizenship",
+        rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.5}registrantCountryOfCitizenship",
         default
     )]
     pub registrant_country_of_citizenship: Option<String>,
+    #[serde(
+        rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.5}registrarReference",
+        default
+    )]
+    pub registrar_reference: Option<String>,
 }
 
 #[derive(Debug, Serialize)]
 pub struct EURIDDomainUpdate {
     #[serde(
-        rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.4}domain-ext:add",
+        rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.5}domain-ext:add",
         skip_serializing_if = "Option::is_none"
     )]
     pub add: Option<EURIDDomainUpdateAddRemove>,
     #[serde(
-        rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.4}domain-ext:rem",
+        rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.5}domain-ext:rem",
         skip_serializing_if = "Option::is_none"
     )]
     pub remove: Option<EURIDDomainUpdateAddRemove>,
+    #[serde(
+        rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.5}domain-ext:chg",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub change: Option<EURIDDomainUpdateChange>,
 }
 
 #[derive(Debug, Serialize)]
 pub struct EURIDDomainUpdateAddRemove {
     #[serde(
-        rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.4}domain-ext:contact",
+        rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.5}domain-ext:contact",
         skip_serializing_if = "Vec::is_empty"
     )]
     pub contacts: Vec<EURIDDomainContact>,
     #[serde(
-        rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.4}domain-ext:nsgroup",
+        rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.5}domain-ext:nsgroup",
         skip_serializing_if = "Vec::is_empty"
     )]
     pub nsgroups: Vec<String>,
     #[serde(
-        rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.4}domain-ext:keygroup",
+        rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.5}domain-ext:keygroup",
         skip_serializing_if = "Option::is_none"
     )]
     pub keygroup: Option<String>,
+}
+
+#[derive(Debug, Serialize)]
+pub struct EURIDDomainUpdateChange {
+    #[serde(
+        rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.5}domain-ext:registrarReference",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub registrar_reference: Option<String>,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -134,14 +160,14 @@ pub struct EURIDDomainRenewData {
 
 #[derive(Debug, Deserialize, PartialEq, Eq)]
 pub enum EURIDDomainRenewDataType {
-    #[serde(rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.4}removedDeletionDate")]
+    #[serde(rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.5}removedDeletionDate")]
     RemovedDeletionDate,
 }
 
 #[derive(Debug, Serialize)]
 pub struct EURIDDomainTransfer {
     #[serde(
-        rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.4}domain-ext:request",
+        rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.5}domain-ext:request",
         skip_serializing_if = "Option::is_none"
     )]
     pub transfer_request: Option<EURIDDomainTransferRequest>,
@@ -149,135 +175,167 @@ pub struct EURIDDomainTransfer {
 
 #[derive(Debug, Serialize)]
 pub struct EURIDDomainTransferRequest {
-    #[serde(rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.4}domain-ext:registrant")]
+    #[serde(rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.5}domain-ext:registrant")]
     pub registrant: String,
     #[serde(
-        rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.4}domain-ext:contact",
+        rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.5}domain-ext:contact",
         skip_serializing_if = "Vec::is_empty"
     )]
     pub contacts: Vec<EURIDDomainContact>,
     #[serde(
-        rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.4}domain-ext:ns",
+        rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.5}domain-ext:ns",
         skip_serializing_if = "Option::is_none"
     )]
     pub nameservers: Option<super::domain::EPPDomainInfoNameservers>,
     #[serde(
-        rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.4}domain-ext:nsgroup",
+        rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.5}domain-ext:nsgroup",
         skip_serializing_if = "Vec::is_empty"
     )]
     pub nsgroups: Vec<String>,
     #[serde(
-        rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.4}domain-ext:keygroup",
+        rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.5}domain-ext:keygroup",
         skip_serializing_if = "Option::is_none"
     )]
     pub keygroup: Option<String>,
+    #[serde(
+        rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.5}domain-ext:registrarReference",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub registrar_reference: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct EURIDDomainTransferData {
-    #[serde(rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.4}onHold")]
+    #[serde(rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.5}onHold")]
     pub on_hold: bool,
-    #[serde(rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.4}quarantined")]
+    #[serde(rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.5}reserved")]
+    pub reserved: bool,
+    #[serde(rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.5}quarantined")]
     pub quarantined: bool,
-    #[serde(rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.4}delayed")]
+    #[serde(rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.5}delayed")]
     pub delayed: bool,
-    #[serde(rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.4}reason")]
+    #[serde(rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.5}reason")]
     pub reason: String,
-    #[serde(rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.4}registrant")]
+    #[serde(rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.5}registrant")]
     pub registrant: String,
     #[serde(
-        rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.4}contact",
+        rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.5}contact",
         default
     )]
     pub contacts: Vec<EURIDDomainContact>,
-    #[serde(rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.4}ns", default)]
+    #[serde(rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.5}ns", default)]
     pub nameservers: Option<super::domain::EPPDomainInfoNameservers>,
     #[serde(
-        rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.4}nsgroup",
+        rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.5}nsgroup",
         default
     )]
     pub nsgroups: Vec<String>,
     #[serde(
-        rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.4}keygroup",
+        rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.5}keygroup",
         default
     )]
     pub keygroup: Option<String>,
+    #[serde(
+        rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.5}registrarReference",
+        default
+    )]
+    pub registrar_reference: Option<String>,
 }
 
 #[derive(Debug, Serialize)]
 pub enum EURIDDomainDelete {
-    #[serde(rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.4}domain-ext:delete")]
+    #[serde(rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.5}domain-ext:delete")]
     Schedule(EURIDDomainDeleteSchedule),
-    #[serde(rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.4}domain-ext:cancel")]
+    #[serde(rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.5}domain-ext:cancel")]
     Cancel {},
 }
 
 #[derive(Debug, Serialize)]
 pub struct EURIDDomainDeleteSchedule {
-    #[serde(rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.4}domain-ext:delDate")]
+    #[serde(rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.5}domain-ext:delDate")]
     pub delete_date: DateTime<Utc>,
 }
 
-/// contact-ext-1.3
+/// contact-ext-1.4
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct EURIDContactInfo {
-    #[serde(rename = "{http://www.eurid.eu/xml/epp/contact-ext-1.3}contact-ext:type")]
+    #[serde(rename = "{http://www.eurid.eu/xml/epp/contact-ext-1.4}contact-ext:type")]
     pub contact_type: EURIDContactType,
     #[serde(
-        rename = "{http://www.eurid.eu/xml/epp/contact-ext-1.3}contact-ext:whoisEmial",
+        rename = "{http://www.eurid.eu/xml/epp/contact-ext-1.4}contact-ext:whoisEmial",
         skip_serializing_if = "Option::is_none",
         default
     )]
     pub whois_email: Option<String>,
     #[serde(
-        rename = "{http://www.eurid.eu/xml/epp/contact-ext-1.3}contact-ext:vat",
+        rename = "{http://www.eurid.eu/xml/epp/contact-ext-1.4}contact-ext:vat",
         skip_serializing_if = "Option::is_none",
         default
     )]
     pub vat: Option<String>,
-    #[serde(rename = "{http://www.eurid.eu/xml/epp/contact-ext-1.3}contact-ext:lang")]
+    #[serde(rename = "{http://www.eurid.eu/xml/epp/contact-ext-1.4}contact-ext:lang")]
     pub language: String,
-    #[serde(rename = "{http://www.eurid.eu/xml/epp/contact-ext-1.3}contact-ext:naturalPerson")]
+    #[serde(rename = "{http://www.eurid.eu/xml/epp/contact-ext-1.4}contact-ext:naturalPerson")]
     pub natural_person: bool,
     #[serde(
-        rename = "{http://www.eurid.eu/xml/epp/contact-ext-1.3}contact-ext:countryOfCitizenship",
+        rename = "{http://www.eurid.eu/xml/epp/contact-ext-1.4}contact-ext:countryOfCitizenship",
         skip_serializing_if = "Option::is_none",
         default
     )]
     pub country_of_citizenship: Option<String>,
+    #[serde(
+        rename = "{http://www.eurid.eu/xml/epp/contact-ext-1.4}contact-ext:hasReservedDomain",
+        skip_serializing, default
+    )]
+    pub has_reserved_domain: bool,
+    #[serde(
+        rename = "{http://www.eurid.eu/xml/epp/contact-ext-1.4}contact-ext:hasDomainOnHold",
+        skip_serializing, default
+    )]
+    pub has_domain_on_hold: bool,
+    #[serde(
+        rename = "{http://www.eurid.eu/xml/epp/contact-ext-1.4}contact-ext:hasDomainRegistryLock",
+        skip_serializing, default
+    )]
+    pub has_domain_registry_lock: bool,
+    #[serde(
+        rename = "{http://www.eurid.eu/xml/epp/contact-ext-1.4}contact-ext:hasDomainRegistrarLock",
+        skip_serializing, default
+    )]
+    pub has_domain_registrar_lock: bool,
 }
 
 #[derive(Debug, Serialize)]
 pub struct EURIDContactUpdate {
-    #[serde(rename = "{http://www.eurid.eu/xml/epp/contact-ext-1.3}contact-ext:chg")]
+    #[serde(rename = "{http://www.eurid.eu/xml/epp/contact-ext-1.4}contact-ext:chg")]
     pub change: EURIDContactUpdateInfo,
 }
 
 #[derive(Debug, Serialize)]
 pub struct EURIDContactUpdateInfo {
     #[serde(
-        rename = "{http://www.eurid.eu/xml/epp/contact-ext-1.3}contact-ext:whoisEmial",
+        rename = "{http://www.eurid.eu/xml/epp/contact-ext-1.4}contact-ext:whoisEmial",
         skip_serializing_if = "Option::is_none"
     )]
     pub whois_email: Option<String>,
     #[serde(
-        rename = "{http://www.eurid.eu/xml/epp/contact-ext-1.3}contact-ext:vat",
+        rename = "{http://www.eurid.eu/xml/epp/contact-ext-1.4}contact-ext:vat",
         skip_serializing_if = "Option::is_none"
     )]
     pub vat: Option<String>,
     #[serde(
-        rename = "{http://www.eurid.eu/xml/epp/contact-ext-1.3}contact-ext:lang",
+        rename = "{http://www.eurid.eu/xml/epp/contact-ext-1.4}contact-ext:lang",
         skip_serializing_if = "Option::is_none"
     )]
     pub language: Option<String>,
     #[serde(
-        rename = "{http://www.eurid.eu/xml/epp/contact-ext-1.3}contact-ext:naturalPerson",
+        rename = "{http://www.eurid.eu/xml/epp/contact-ext-1.4}contact-ext:naturalPerson",
         skip_serializing_if = "Option::is_none"
     )]
     pub natural_person: Option<bool>,
     #[serde(
-        rename = "{http://www.eurid.eu/xml/epp/contact-ext-1.3}contact-ext:countryOfCitizenship",
+        rename = "{http://www.eurid.eu/xml/epp/contact-ext-1.4}contact-ext:countryOfCitizenship",
         skip_serializing_if = "Option::is_none"
     )]
     pub country_of_citizenship: Option<String>,

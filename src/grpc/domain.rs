@@ -243,6 +243,7 @@ impl From<client::domain::InfoResponse> for epp_proto::domain::DomainInfoReply {
             eurid_idn: res.eurid_idn.map(Into::into),
             eurid_data: res.eurid_data.map(|d| epp_proto::eurid::DomainInfo {
                 on_hold: d.on_hold,
+                reserved: d.reserved,
                 quarantined: d.quarantined,
                 suspended: d.suspended,
                 delayed: d.delayed,
@@ -254,6 +255,7 @@ impl From<client::domain::InfoResponse> for epp_proto::domain::DomainInfoReply {
                 registrant_country: d.registrant_country,
                 registrant_country_of_citizenship: d.registrant_country_of_citizenship,
                 auth_info_valid_until: super::utils::chrono_to_proto(d.auth_info_valid_until),
+                registrar_reference: d.registrar_reference,
             }),
             isnic_info: res.isnic_info.map(|d| epp_proto::isnic::DomainInfo {
                 zone_contact: d.zone_contact,
@@ -337,6 +339,7 @@ impl From<client::domain::TransferResponse> for epp_proto::domain::DomainTransfe
                 .eurid_data
                 .map(|d| epp_proto::eurid::DomainTransferInfo {
                     on_hold: d.on_hold,
+                    reserved: d.reserved,
                     quarantined: d.quarantined,
                     reason: d.reason,
                     delayed: d.delayed,
@@ -345,6 +348,7 @@ impl From<client::domain::TransferResponse> for epp_proto::domain::DomainTransfe
                     technical: d.technical,
                     on_site: d.on_site,
                     reseller: d.reseller,
+                    registrar_reference: d.registrar_reference,
                 }),
             personal_registration: res.data.personal_registration.map(|p| {
                 epp_proto::personal_registration::PersonalRegistrationCreate {

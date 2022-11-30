@@ -73,6 +73,10 @@ pub struct ContactExtension {
     pub vat: Option<String>,
     pub citizenship_country: Option<String>,
     pub language: String,
+    pub has_reserved_domain: bool,
+    pub has_domain_on_hold: bool,
+    pub has_domain_registry_lock: bool,
+    pub has_domain_registrar_lock: bool,
 }
 
 #[derive(Debug)]
@@ -120,6 +124,7 @@ pub struct DomainCheck {
 pub struct DomainCreate {
     pub on_site: Option<String>,
     pub reseller: Option<String>,
+    pub registrar_reference: Option<String>,
 }
 
 #[derive(Debug)]
@@ -128,6 +133,7 @@ pub struct DomainUpdate {
     pub add_reseller: Option<String>,
     pub remove_on_site: Option<String>,
     pub remove_reseller: Option<String>,
+    pub registrar_reference: Option<String>,
 }
 
 #[derive(Debug)]
@@ -143,6 +149,7 @@ pub struct DomainTransfer {
     pub technical: Option<String>,
     pub billing: String,
     pub registrant: String,
+    pub registrar_reference: Option<String>,
 }
 
 #[derive(Debug)]
@@ -159,6 +166,7 @@ pub enum DomainAuthInfo {
 #[derive(Debug)]
 pub struct DomainInfo {
     pub on_hold: bool,
+    pub reserved: bool,
     pub quarantined: bool,
     pub suspended: bool,
     pub delayed: bool,
@@ -170,11 +178,13 @@ pub struct DomainInfo {
     pub registrant_country: String,
     pub registrant_country_of_citizenship: Option<String>,
     pub auth_info_valid_until: Option<DateTime<Utc>>,
+    pub registrar_reference: Option<String>,
 }
 
 #[derive(Debug)]
 pub struct DomainTransferInfo {
     pub on_hold: bool,
+    pub reserved: bool,
     pub quarantined: bool,
     pub delayed: bool,
     pub reason: String,
@@ -183,6 +193,7 @@ pub struct DomainTransferInfo {
     pub on_site: Option<String>,
     pub technical: Option<String>,
     pub reseller: Option<String>,
+    pub registrar_reference: Option<String>,
 }
 
 #[derive(Debug)]
