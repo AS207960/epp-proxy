@@ -69,7 +69,7 @@ pub struct Data {
         deserialize_with = "super::super::deserialize_date_opt",
         default
     )]
-    pub expiry: Option<Date<Utc>>,
+    pub expiry: Option<NaiveDate>,
 }
 
 #[derive(Debug, Deserialize)]

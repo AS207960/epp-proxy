@@ -1,3 +1,4 @@
+use chrono::prelude::*;
 use super::super::client;
 use super::epp_proto;
 
@@ -241,7 +242,9 @@ impl From<client::contact::InfoResponse> for epp_proto::contact::ContactInfoRepl
             postal_code: a.postal_code,
             country_code: a.country_code,
             identity_number: a.identity_number,
-            birth_date: super::utils::chrono_to_proto(a.birth_date.map(|d| d.and_hms(0, 0, 0))),
+            birth_date: super::utils::chrono_to_proto(a.birth_date.map(|d|
+                Utc.from_utc_datetime(&d.and_hms_opt(0, 0, 0).unwrap())
+            )),
         };
 
         epp_proto::contact::ContactInfoReply {

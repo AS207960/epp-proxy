@@ -35,8 +35,8 @@ pub struct DACDomainResponse {
     pub registration_state: DomainState,
     pub detagged: bool,
     pub suspended: Option<bool>,
-    pub created: Date<Utc>,
-    pub expiry: Date<Utc>,
+    pub created: NaiveDate,
+    pub expiry: NaiveDate,
     pub status: DomainStatus,
     pub tag: String,
 }

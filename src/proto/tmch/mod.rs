@@ -275,7 +275,7 @@ pub struct TMCHRenew {
         rename = "{urn:ietf:params:xml:ns:tmch-1.1}curExpDate",
         serialize_with = "super::serialize_date"
     )]
-    pub current_expiry_date: Date<Utc>,
+    pub current_expiry_date: NaiveDate,
     #[serde(
         rename = "{urn:ietf:params:xml:ns:tmch-1.1}period",
         skip_serializing_if = "Option::is_none"

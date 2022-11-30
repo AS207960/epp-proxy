@@ -173,7 +173,7 @@ pub struct EPPEmailForwardRenew {
         rename = "{http://www.nic.name/epp/emailFwd-1.0}emailFwd:curExpDate",
         serialize_with = "super::serialize_date"
     )]
-    pub current_expiry_date: Date<Utc>,
+    pub current_expiry_date: NaiveDate,
     #[serde(rename = "{http://www.nic.name/epp/emailFwd-1.0}emailFwd:period")]
     pub period: Option<super::domain::EPPDomainPeriod>,
 }

@@ -320,7 +320,7 @@ pub struct TrexRenewRequest {
 #[derive(Debug)]
 pub struct TrexRenewLabel {
     pub label: String,
-    pub current_expiry_date: Date<Utc>,
+    pub current_expiry_date: NaiveDate,
     pub period: Option<super::Period>,
 }
 

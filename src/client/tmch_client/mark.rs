@@ -639,7 +639,7 @@ pub fn handle_renew(_client: &(), req: &RenewRequest) -> HandleReqReturn<RenewRe
     check_mark_id(&req.id)?;
     let command = tmch_proto::TMCHRenew {
         id: req.id.to_string(),
-        current_expiry_date: req.cur_expiry_date.date(),
+        current_expiry_date: req.cur_expiry_date.date_naive(),
         period: match req.add_period.as_ref() {
             Some(r) => Some(r.try_into().map_err(Result::Err)?),
             None => None,

@@ -892,7 +892,7 @@ async fn main() {
             unit: epp_proxy::client::PeriodUnit::Years,
             value: 1
         }),
-        Utc.ymd(2011, 6, 21).and_hms(0, 0, 0),
+        Utc.with_ymd_and_hms(2011, 6, 21, 0, 0, 0).unwrap(),
         None,
         None,
         None,

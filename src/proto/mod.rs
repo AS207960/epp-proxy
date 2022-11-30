@@ -1081,7 +1081,7 @@ impl<'de> serde::de::Visitor<'de> for DateTimeVisitor {
 struct DateVisitor;
 
 impl<'de> serde::de::Visitor<'de> for DateVisitor {
-    type Value = Date<Utc>;
+    type Value = NaiveDate;
 
     fn expecting(&self, formatter: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(formatter, "a formatted date string")
@@ -1092,7 +1092,7 @@ impl<'de> serde::de::Visitor<'de> for DateVisitor {
         E: serde::de::Error,
     {
         match NaiveDate::parse_from_str(value, "%Y-%m-%d") {
-            Ok(v) => Ok(Date::from_utc(v, Utc)),
+            Ok(v) => Ok(v),
             Err(e) => Err(E::custom(e)),
         }
     }
@@ -1125,7 +1125,7 @@ impl<'de> serde::de::Visitor<'de> for OptDateTimeVisitor {
 struct OptDateVisitor;
 
 impl<'de> serde::de::Visitor<'de> for OptDateVisitor {
-    type Value = Option<Date<Utc>>;
+    type Value = Option<NaiveDate>;
 
     fn expecting(&self, formatter: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(formatter, "a formatted date string")
@@ -1160,7 +1160,7 @@ where
     let date = d.deserialize_option(OptDateTimeVisitor)?;
     Ok(match date {
         Some(d) => {
-            if d == Utc.ymd(1, 1, 1).and_hms(0, 0, 0) {
+            if d == Utc.with_ymd_and_hms(1, 1, 1, 0, 0, 0).unwrap() {
                 None
             } else {
                 Some(d)
@@ -1170,14 +1170,14 @@ where
     })
 }
 
-fn deserialize_date_opt<'de, D>(d: D) -> Result<Option<Date<Utc>>, D::Error>
+fn deserialize_date_opt<'de, D>(d: D) -> Result<Option<NaiveDate>, D::Error>
 where
     D: serde::de::Deserializer<'de>,
 {
     let date = d.deserialize_option(OptDateVisitor)?;
     Ok(match date {
         Some(d) => {
-            if d == Utc.ymd(1, 1, 1) {
+            if d == NaiveDate::from_ymd_opt(1, 1, 1).unwrap() {
                 None
             } else {
                 Some(d)
@@ -1188,7 +1188,7 @@ where
 }
 
 #[allow(clippy::trivially_copy_pass_by_ref)]
-fn serialize_date<S>(d: &Date<Utc>, s: S) -> Result<S::Ok, S::Error>
+fn serialize_date<S>(d: &NaiveDate, s: S) -> Result<S::Ok, S::Error>
 where
     S: serde::ser::Serializer,
 {
@@ -1196,7 +1196,7 @@ where
 }
 
 #[allow(clippy::trivially_copy_pass_by_ref)]
-fn serialize_date_opt<S>(d: &Option<Date<Utc>>, s: S) -> Result<S::Ok, S::Error>
+fn serialize_date_opt<S>(d: &Option<NaiveDate>, s: S) -> Result<S::Ok, S::Error>
 where
     S: serde::ser::Serializer,
 {

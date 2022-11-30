@@ -313,7 +313,7 @@ pub struct EPPDomainRenew {
         rename = "{urn:ietf:params:xml:ns:domain-1.0}domain:curExpDate",
         serialize_with = "super::serialize_date"
     )]
-    pub current_expiry_date: Date<Utc>,
+    pub current_expiry_date: NaiveDate,
     #[serde(rename = "{urn:ietf:params:xml:ns:domain-1.0}domain:period")]
     pub period: Option<EPPDomainPeriod>,
 }

@@ -47,8 +47,8 @@ pub struct DomainRT {
     pub domain: String,
     pub registered: bool,
     pub detagged: bool,
-    pub created: Date<Utc>,
-    pub expiry: Date<Utc>,
+    pub created: NaiveDate,
+    pub expiry: NaiveDate,
     pub tag: String,
 }
 
@@ -74,8 +74,8 @@ pub struct DomainTD {
     pub registered: DomainRegistered,
     pub detagged: bool,
     pub suspended: bool,
-    pub created: Date<Utc>,
-    pub expiry: Date<Utc>,
+    pub created: NaiveDate,
+    pub expiry: NaiveDate,
     pub status: DomainStatus,
     pub tag: String,
 }

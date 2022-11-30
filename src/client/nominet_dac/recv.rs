@@ -104,8 +104,8 @@ fn decode_line(data: &str, host: &str) -> Result<super::proto::DACResponse, ()> 
                                 domain: domain.to_string(),
                                 registered,
                                 detagged: false,
-                                created: Utc.ymd(1970, 1, 1),
-                                expiry: Utc.ymd(1970, 1, 1),
+                                created: NaiveDate::from_ymd_opt(1970, 1, 1).unwrap(),
+                                expiry:  NaiveDate::from_ymd_opt(1970, 1, 1).unwrap(),
                                 tag: String::default(),
                             },
                         ))
@@ -146,8 +146,6 @@ fn decode_line(data: &str, host: &str) -> Result<super::proto::DACResponse, ()> 
                                 return Err(());
                             }
                         };
-                        let created = chrono::Date::from_utc(created, chrono::offset::Utc);
-                        let expiry = chrono::Date::from_utc(expiry, chrono::offset::Utc);
 
                         Ok(super::proto::DACResponse::DomainRT(
                             super::proto::DomainRT {
@@ -208,8 +206,6 @@ fn decode_line(data: &str, host: &str) -> Result<super::proto::DACResponse, ()> 
                                 return Err(());
                             }
                         };
-                        let created = chrono::Date::from_utc(created, chrono::offset::Utc);
-                        let expiry = chrono::Date::from_utc(expiry, chrono::offset::Utc);
                         let status = match status {
                             "0" => super::proto::DomainStatus::Unknown,
                             "2" => super::proto::DomainStatus::RegisteredUntilExpiry,

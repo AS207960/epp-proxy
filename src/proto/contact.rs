@@ -171,7 +171,7 @@ pub struct EPPContactPostalInfo {
         skip_serializing_if = "Option::is_none",
         default
     )]
-    pub traficom_birth_date: Option<Date<Utc>>,
+    pub traficom_birth_date: Option<NaiveDate>,
     #[serde(rename = "{urn:ietf:params:xml:ns:contact-1.0}contact:addr")]
     pub address: EPPContactAddress,
 }

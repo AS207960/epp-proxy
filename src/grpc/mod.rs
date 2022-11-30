@@ -1,10 +1,8 @@
 //! Implements the gRPC interface for the EPP client
 
 use std::convert::TryInto;
-
 use futures::sink::SinkExt;
 use crate::grpc::utils::proto_to_chrono;
-
 use super::client;
 
 mod contact;
@@ -1148,7 +1146,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
             postal_code: a.postal_code,
             country_code: a.country_code,
             identity_number: a.identity_number,
-            birth_date: utils::proto_to_chrono(a.birth_date).map(|d| d.date()),
+            birth_date: utils::proto_to_chrono(a.birth_date).map(|d| d.date_naive()),
         };
 
         let (res, cmd_resp) = utils::map_command_response(
@@ -1221,7 +1219,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
             postal_code: a.postal_code,
             country_code: a.country_code,
             identity_number: a.identity_number,
-            birth_date: utils::proto_to_chrono(a.birth_date).map(|d| d.date()),
+            birth_date: utils::proto_to_chrono(a.birth_date).map(|d| d.date_naive()),
         };
 
         let (res, cmd_resp) = utils::map_command_response(

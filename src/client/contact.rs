@@ -85,7 +85,7 @@ pub struct Address {
     /// National ID number for individuals
     pub identity_number: Option<String>,
     /// Individuals birth date
-    pub birth_date: Option<Date<Utc>>,
+    pub birth_date: Option<NaiveDate>,
 }
 
 #[derive(Debug, PartialEq, Eq)]

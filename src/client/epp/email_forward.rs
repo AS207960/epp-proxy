@@ -1163,7 +1163,7 @@ pub fn handle_renew(client: &ServerFeatures, req: &RenewRequest) -> HandleReqRet
     let command = proto::EPPRenew::EmailForward(proto::email_forward::EPPEmailForwardRenew {
         name: req.name.clone(),
         period: req.add_period.as_ref().map(Into::into),
-        current_expiry_date: req.cur_expiry_date.date(),
+        current_expiry_date: req.cur_expiry_date.date_naive(),
     });
     let mut ext = vec![];
 
