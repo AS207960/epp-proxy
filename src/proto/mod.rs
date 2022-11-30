@@ -192,17 +192,17 @@ pub enum EPPCommandExtensionType {
     EPPLoginSecurity(login_sec::EPPLoginSecurity),
     #[serde(rename = "{http://www.eurid.eu/xml/epp/authInfo-1.1}authInfo:info")]
     EURIDAuthInfo(eurid::EURIDAuthInfo),
-    #[serde(rename = "{http://www.eurid.eu/xml/epp/contact-ext-1.3}contact-ext:create")]
+    #[serde(rename = "{http://www.eurid.eu/xml/epp/contact-ext-1.4}contact-ext:create")]
     EURIDContactCreate(eurid::EURIDContactInfo),
-    #[serde(rename = "{http://www.eurid.eu/xml/epp/contact-ext-1.3}contact-ext:update")]
+    #[serde(rename = "{http://www.eurid.eu/xml/epp/contact-ext-1.4}contact-ext:update")]
     EURIDContactUpdate(eurid::EURIDContactUpdate),
-    #[serde(rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.4}domain-ext:create")]
+    #[serde(rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.5}domain-ext:create")]
     EURIDDomainCreate(eurid::EURIDDomainCreate),
-    #[serde(rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.4}domain-ext:update")]
+    #[serde(rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.5}domain-ext:update")]
     EURIDDomainUpdate(eurid::EURIDDomainUpdate),
-    #[serde(rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.4}domain-ext:transfer")]
+    #[serde(rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.5}domain-ext:transfer")]
     EURIDDomainTransfer(eurid::EURIDDomainTransfer),
-    #[serde(rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.4}domain-ext:delete")]
+    #[serde(rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.5}domain-ext:delete")]
     EURIDDomainDelete(eurid::EURIDDomainDelete),
     #[serde(rename = "{urn:ietf:params:xml:ns:qualifiedLawyer-1.0}qualifiedLawyer:create")]
     QualifiedLawyerCreate(qualified_lawyer::QualifiedLawyerInfoData),
@@ -849,15 +849,15 @@ pub enum EPPResponseExtensionType {
     EURIDAuthInfoData(eurid::EURIDAuthInfoData),
     #[serde(rename = "{http://www.eurid.eu/xml/epp/homoglyph-1.0}chkData")]
     EURIDHomoglyphCheckData(eurid::EURIDHomoglyphData),
-    #[serde(rename = "{http://www.eurid.eu/xml/epp/contact-ext-1.3}infData")]
+    #[serde(rename = "{http://www.eurid.eu/xml/epp/contact-ext-1.4}infData")]
     EURIDContactInfoData(eurid::EURIDContactInfo),
-    #[serde(rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.4}chkData")]
+    #[serde(rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.5}chkData")]
     EURIDDomainCheckData(eurid::EURIDDomainCheckData),
-    #[serde(rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.4}infData")]
+    #[serde(rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.5}infData")]
     EURIDDomainInfoData(eurid::EURIDDomainInfo),
-    #[serde(rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.4}renData")]
+    #[serde(rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.5}renData")]
     EURIDDomainRenewData(eurid::EURIDDomainRenewData),
-    #[serde(rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.4}trnData")]
+    #[serde(rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.5}trnData")]
     EURIDDomainTransferData(eurid::EURIDDomainTransferData),
     #[serde(rename = "{http://www.eurid.eu/xml/epp/idn-1.0}mapping")]
     EURIDIDNMapping(eurid::EURIDIDNMapping),
