@@ -869,7 +869,7 @@ mod eurid_tests {
     fn contact_info_0() {
         const XML_DATA: &str = r#"
 <?xml version="1.0" encoding="UTF-8"?>
-<epp xmlns="urn:ietf:params:xml:ns:epp-1.0" xmlns:contact-ext="http://www.eurid.eu/xml/epp/contact-ext-1.3" xmlns:contact="urn:ietf:params:xml:ns:contact-1.0">
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0" xmlns:contact-ext="http://www.eurid.eu/xml/epp/contact-ext-1.4" xmlns:contact="urn:ietf:params:xml:ns:contact-1.0">
   <response>
     <result code="1000">
       <msg>Command completed successfully</msg>
@@ -933,7 +933,7 @@ mod eurid_tests {
     fn contact_info_1() {
         const XML_DATA: &str = r#"
 <?xml version="1.0" encoding="UTF-8"?>
-<epp xmlns="urn:ietf:params:xml:ns:epp-1.0" xmlns:contact-ext="http://www.eurid.eu/xml/epp/contact-ext-1.3" xmlns:contact="urn:ietf:params:xml:ns:contact-1.0">
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0" xmlns:contact-ext="http://www.eurid.eu/xml/epp/contact-ext-1.4" xmlns:contact="urn:ietf:params:xml:ns:contact-1.0">
   <response>
     <result code="1000">
       <msg>Command completed successfully</msg>
@@ -996,7 +996,7 @@ mod eurid_tests {
     fn contact_info_2() {
         const XML_DATA: &str = r#"
 <?xml version="1.0" encoding="UTF-8"?>
-<epp xmlns="urn:ietf:params:xml:ns:epp-1.0" xmlns:contact-ext="http://www.eurid.eu/xml/epp/contact-ext-1.3" xmlns:contact="urn:ietf:params:xml:ns:contact-1.0">
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0" xmlns:contact-ext="http://www.eurid.eu/xml/epp/contact-ext-1.4" xmlns:contact="urn:ietf:params:xml:ns:contact-1.0">
   <response>
     <result code="1000">
       <msg>Command completed successfully</msg>
@@ -1063,7 +1063,7 @@ mod eurid_tests {
     fn contact_info_3() {
         const XML_DATA: &str = r#"
 <?xml version="1.0" encoding="UTF-8"?>
-<epp xmlns="urn:ietf:params:xml:ns:epp-1.0" xmlns:contact-ext="http://www.eurid.eu/xml/epp/contact-ext-1.3" xmlns:contact="urn:ietf:params:xml:ns:contact-1.0">
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0" xmlns:contact-ext="http://www.eurid.eu/xml/epp/contact-ext-1.4" xmlns:contact="urn:ietf:params:xml:ns:contact-1.0">
   <response>
     <result code="1000">
       <msg>Command completed successfully</msg>
@@ -1126,7 +1126,7 @@ mod eurid_tests {
     fn domain_check_0() {
         const XML_DATA: &str = r#"
 <?xml version="1.0" encoding="UTF-8"?>
-<epp xmlns="urn:ietf:params:xml:ns:epp-1.0" xmlns:domain-ext-2.4="http://www.eurid.eu/xml/epp/domain-ext-2.4" xmlns:domain="urn:ietf:params:xml:ns:domain-1.0">
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0" xmlns:domain-ext="http://www.eurid.eu/xml/epp/domain-ext-2.5" xmlns:domain="urn:ietf:params:xml:ns:domain-1.0">
   <response>
     <result code="1000">
       <msg>Command completed successfully</msg>
@@ -1140,12 +1140,12 @@ mod eurid_tests {
       </domain:chkData>
     </resData>
     <extension>
-      <domain-ext-2.4:chkData>
-        <domain-ext-2.4:domain>
-          <domain-ext-2.4:name>europa.eu</domain-ext-2.4:name>
-          <domain-ext-2.4:status s="serverTransferProhibited"/>
-        </domain-ext-2.4:domain>
-      </domain-ext-2.4:chkData>
+      <domain-ext:chkData>
+        <domain-ext:domain>
+          <domain-ext:name>europa.eu</domain-ext:name>
+          <domain-ext:status s="serverTransferProhibited"/>
+        </domain-ext:domain>
+      </domain-ext:chkData>
     </extension>
     <trID>
       <clTRID>domain-check02</clTRID>
@@ -1219,7 +1219,7 @@ mod eurid_tests {
     fn domain_info_0() {
         const XML_DATA: &str = r#"
 <?xml version="1.0" encoding="UTF-8"?>
-<epp xmlns="urn:ietf:params:xml:ns:epp-1.0" xmlns:domain-ext-2.3="http://www.eurid.eu/xml/epp/domain-ext-2.4" xmlns:domain="urn:ietf:params:xml:ns:domain-1.0">
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0" xmlns:domain-ext="http://www.eurid.eu/xml/epp/domain-ext-2.5" xmlns:domain="urn:ietf:params:xml:ns:domain-1.0">
   <response>
     <result code="1000">
       <msg>Command completed successfully</msg>
@@ -1251,18 +1251,19 @@ mod eurid_tests {
       </domain:infData>
     </resData>
     <extension>
-      <domain-ext-2.3:infData>
-        <domain-ext-2.3:onHold>false</domain-ext-2.3:onHold>
-        <domain-ext-2.3:quarantined>false</domain-ext-2.3:quarantined>
-        <domain-ext-2.3:suspended>false</domain-ext-2.3:suspended>
-        <domain-ext-2.3:seized>false</domain-ext-2.3:seized>
-        <domain-ext-2.3:contact type="onsite">c169</domain-ext-2.3:contact>
-        <domain-ext-2.3:nsgroup>nsgroup-1573042588055</domain-ext-2.3:nsgroup>
-        <domain-ext-2.3:nsgroup>nsgroup-1573042587789</domain-ext-2.3:nsgroup>
-        <domain-ext-2.3:delayed>false</domain-ext-2.3:delayed>
-        <domain-ext-2.3:maxExtensionPeriod>7</domain-ext-2.3:maxExtensionPeriod>
-        <domain-ext-2.3:registrantCountry>BE</domain-ext-2.3:registrantCountry>
-      </domain-ext-2.3:infData>
+      <domain-ext:infData>
+        <domain-ext:onHold>false</domain-ext:onHold>
+        <domain-ext:reserved>false</domain-ext:reserved>
+        <domain-ext:quarantined>false</domain-ext:quarantined>
+        <domain-ext:suspended>false</domain-ext:suspended>
+        <domain-ext:seized>false</domain-ext:seized>
+        <domain-ext:contact type="onsite">c169</domain-ext:contact>
+        <domain-ext:nsgroup>nsgroup-1573042588055</domain-ext:nsgroup>
+        <domain-ext:nsgroup>nsgroup-1573042587789</domain-ext:nsgroup>
+        <domain-ext:delayed>false</domain-ext:delayed>
+        <domain-ext:maxExtensionPeriod>7</domain-ext:maxExtensionPeriod>
+        <domain-ext:registrantCountry>BE</domain-ext:registrantCountry>
+      </domain-ext:infData>
     </extension>
     <trID>
       <clTRID>domain-info01</clTRID>
@@ -1295,7 +1296,7 @@ mod eurid_tests {
     fn domain_info_1() {
         const XML_DATA: &str = r#"
 <?xml version="1.0" encoding="UTF-8"?>
-<epp xmlns="urn:ietf:params:xml:ns:epp-1.0" xmlns:domain-ext-2.3="http://www.eurid.eu/xml/epp/domain-ext-2.4" xmlns:idn="http://www.eurid.eu/xml/epp/idn-1.0" xmlns:domain="urn:ietf:params:xml:ns:domain-1.0">
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0" xmlns:domain-ext="http://www.eurid.eu/xml/epp/domain-ext-2.5" xmlns:idn="http://www.eurid.eu/xml/epp/idn-1.0" xmlns:domain="urn:ietf:params:xml:ns:domain-1.0">
   <response>
     <result code="1000">
       <msg>Command completed successfully</msg>
@@ -1327,18 +1328,19 @@ mod eurid_tests {
       </domain:infData>
     </resData>
     <extension>
-      <domain-ext-2.3:infData>
-        <domain-ext-2.3:onHold>false</domain-ext-2.3:onHold>
-        <domain-ext-2.3:quarantined>false</domain-ext-2.3:quarantined>
-        <domain-ext-2.3:suspended>false</domain-ext-2.3:suspended>
-        <domain-ext-2.3:seized>false</domain-ext-2.3:seized>
-        <domain-ext-2.3:contact type="onsite">c195</domain-ext-2.3:contact>
-        <domain-ext-2.3:nsgroup>nsgroup-1573042616260</domain-ext-2.3:nsgroup>
-        <domain-ext-2.3:nsgroup>nsgroup-1573042615978</domain-ext-2.3:nsgroup>
-        <domain-ext-2.3:delayed>false</domain-ext-2.3:delayed>
-        <domain-ext-2.3:maxExtensionPeriod>7</domain-ext-2.3:maxExtensionPeriod>
-        <domain-ext-2.3:registrantCountry>BE</domain-ext-2.3:registrantCountry>
-      </domain-ext-2.3:infData>
+      <domain-ext:infData>
+        <domain-ext:onHold>false</domain-ext:onHold>
+        <domain-ext:reserved>false</domain-ext:reserved>
+        <domain-ext:quarantined>false</domain-ext:quarantined>
+        <domain-ext:suspended>false</domain-ext:suspended>
+        <domain-ext:seized>false</domain-ext:seized>
+        <domain-ext:contact type="onsite">c195</domain-ext:contact>
+        <domain-ext:nsgroup>nsgroup-1573042616260</domain-ext:nsgroup>
+        <domain-ext:nsgroup>nsgroup-1573042615978</domain-ext:nsgroup>
+        <domain-ext:delayed>false</domain-ext:delayed>
+        <domain-ext:maxExtensionPeriod>7</domain-ext:maxExtensionPeriod>
+        <domain-ext:registrantCountry>BE</domain-ext:registrantCountry>
+      </domain-ext:infData>
       <idn:mapping>
         <idn:name>
           <idn:ace>a.xn--80adbeadbhzhddejt0e9bxb3cwd.xn--e1a4c</idn:ace>
@@ -1400,7 +1402,7 @@ mod eurid_tests {
     fn domain_renew_0() {
         const XML_DATA: &str = r#"
 <?xml version="1.0" encoding="UTF-8"?>
-<epp xmlns="urn:ietf:params:xml:ns:epp-1.0" xmlns:domain-ext-2.3="http://www.eurid.eu/xml/epp/domain-ext-2.4" xmlns:domain="urn:ietf:params:xml:ns:domain-1.0">
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0" xmlns:domain-ext="http://www.eurid.eu/xml/epp/domain-ext-2.5" xmlns:domain="urn:ietf:params:xml:ns:domain-1.0">
   <response>
     <result code="1000">
       <msg>Command completed successfully</msg>
@@ -1412,9 +1414,9 @@ mod eurid_tests {
       </domain:renData>
     </resData>
     <extension>
-      <domain-ext-2.3:renData>
-        <domain-ext-2.3:removedDeletionDate/>
-      </domain-ext-2.3:renData>
+      <domain-ext:renData>
+        <domain-ext:removedDeletionDate/>
+      </domain-ext:renData>
     </extension>
     <trID>
       <clTRID>Extend domain for 8y,deletion date is removed</clTRID>
@@ -1438,7 +1440,7 @@ mod eurid_tests {
     fn domain_renew_1() {
         const XML_DATA: &str = r#"
 <?xml version="1.0" encoding="UTF-8"?>
-<epp xmlns="urn:ietf:params:xml:ns:epp-1.0" xmlns:domain-ext-2.3="http://www.eurid.eu/xml/epp/domain-ext-2.4" xmlns:domain="urn:ietf:params:xml:ns:domain-1.0">
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0" xmlns:domain-ext="http://www.eurid.eu/xml/epp/domain-ext-2.5" xmlns:domain="urn:ietf:params:xml:ns:domain-1.0">
   <response>
     <result code="1000">
       <msg>Command completed successfully</msg>
@@ -1450,8 +1452,8 @@ mod eurid_tests {
       </domain:renData>
     </resData>
     <extension>
-      <domain-ext-2.3:renData>
-      </domain-ext-2.3:renData>
+      <domain-ext:renData>
+      </domain-ext:renData>
     </extension>
     <trID>
       <clTRID>Extend domain for 8y,deletion date is removed</clTRID>
@@ -1475,7 +1477,7 @@ mod eurid_tests {
     fn domain_transfer_0() {
         const XML_DATA: &str = r#"
 <?xml version="1.0" encoding="UTF-8"?>
-<epp xmlns="urn:ietf:params:xml:ns:epp-1.0" xmlns:domain-ext-2.3="http://www.eurid.eu/xml/epp/domain-ext-2.4" xmlns:idn="http://www.eurid.eu/xml/epp/idn-1.0" xmlns:domain="urn:ietf:params:xml:ns:domain-1.0">
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0" xmlns:domain-ext="http://www.eurid.eu/xml/epp/domain-ext-2.5" xmlns:idn="http://www.eurid.eu/xml/epp/idn-1.0" xmlns:domain="urn:ietf:params:xml:ns:domain-1.0">
   <response>
     <result code="1000">
       <msg>Command completed successfully</msg>
@@ -1492,15 +1494,16 @@ mod eurid_tests {
       </domain:trnData>
     </resData>
     <extension>
-      <domain-ext-2.3:trnData>
-        <domain-ext-2.3:onHold>false</domain-ext-2.3:onHold>
-        <domain-ext-2.3:quarantined>false</domain-ext-2.3:quarantined>
-        <domain-ext-2.3:registrant>c293</domain-ext-2.3:registrant>
-        <domain-ext-2.3:contact type="billing">c292</domain-ext-2.3:contact>
-        <domain-ext-2.3:contact type="tech">c294</domain-ext-2.3:contact>
-        <domain-ext-2.3:delayed>false</domain-ext-2.3:delayed>
-        <domain-ext-2.3:reason>RANDOM CHECK</domain-ext-2.3:reason>
-      </domain-ext-2.3:trnData>
+      <domain-ext:trnData>
+        <domain-ext:onHold>false</domain-ext:onHold>
+        <domain-ext:reserved>false</domain-ext:reserved>
+        <domain-ext:quarantined>false</domain-ext:quarantined>
+        <domain-ext:registrant>c293</domain-ext:registrant>
+        <domain-ext:contact type="billing">c292</domain-ext:contact>
+        <domain-ext:contact type="tech">c294</domain-ext:contact>
+        <domain-ext:delayed>false</domain-ext:delayed>
+        <domain-ext:reason>RANDOM CHECK</domain-ext:reason>
+      </domain-ext:trnData>
       <idn:mapping>
         <idn:name>
           <idn:ace>xn--80adbeadbhzhddejt0e9bxb3cwd.xn--e1a4c</idn:ace>
