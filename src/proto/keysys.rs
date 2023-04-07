@@ -661,113 +661,113 @@ pub enum DETrustee {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub enum EULanguage {
-    #[serde(rename="bg")]
+    #[serde(rename="bg", alias="BG")]
     Bulgarian,
-    #[serde(rename="cs")]
+    #[serde(rename="cs", alias="CS")]
     Czech,
-    #[serde(rename="da")]
+    #[serde(rename="da", alias="DA")]
     Danish,
-    #[serde(rename="de")]
+    #[serde(rename="de", alias="DE")]
     German,
-    #[serde(rename="el")]
+    #[serde(rename="el", alias="EL")]
     ModernGreek,
-    #[serde(rename="en")]
+    #[serde(rename="en", alias="EN")]
     English,
-    #[serde(rename="es")]
+    #[serde(rename="es", alias="ES")]
     Spanish,
-    #[serde(rename="et")]
+    #[serde(rename="et", alias="ET")]
     Estonian,
-    #[serde(rename="fi")]
+    #[serde(rename="fi", alias="FI")]
     Finnish,
-    #[serde(rename="fr")]
+    #[serde(rename="fr", alias="FR")]
     French,
-    #[serde(rename="ga")]
+    #[serde(rename="ga", alias="GA")]
     Gaelic,
-    #[serde(rename="hr")]
+    #[serde(rename="hr", alias="HR")]
     Croatian,
-    #[serde(rename="hu")]
+    #[serde(rename="hu", alias="HU")]
     Hungarian,
-    #[serde(rename="it")]
+    #[serde(rename="it", alias="IT")]
     Italian,
-    #[serde(rename="lt")]
+    #[serde(rename="lt", alias="LT")]
     Lithuanian,
-    #[serde(rename="lv")]
+    #[serde(rename="lv", alias="LV")]
     Latvian,
-    #[serde(rename="mt")]
+    #[serde(rename="mt", alias="MT")]
     Maltese,
-    #[serde(rename="nl")]
+    #[serde(rename="nl", alias="NL")]
     DutchFlemish,
-    #[serde(rename="pl")]
+    #[serde(rename="pl", alias="PL")]
     Polish,
-    #[serde(rename="pt")]
+    #[serde(rename="pt", alias="PT")]
     Portuguese,
-    #[serde(rename="ro")]
+    #[serde(rename="ro", alias="RO")]
     Romanian,
-    #[serde(rename="sk")]
+    #[serde(rename="sk", alias="SK")]
     Slovak,
-    #[serde(rename="sl")]
+    #[serde(rename="sl", alias="SL")]
     Slovene,
-    #[serde(rename="sv")]
+    #[serde(rename="sv", alias="SV")]
     Swedish,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub enum EUCountry {
-    #[serde(rename="at")]
+    #[serde(rename="at", alias="AT")]
     Austria,
-    #[serde(rename="be")]
+    #[serde(rename="be", alias="BE")]
     Belgium,
-    #[serde(rename="bg")]
+    #[serde(rename="bg", alias="BG")]
     Bulgaria,
-    #[serde(rename="cz")]
+    #[serde(rename="cz", alias="CZ")]
     Czech,
-    #[serde(rename="cy")]
+    #[serde(rename="cy", alias="CY")]
     Cyprus,
-    #[serde(rename="de")]
+    #[serde(rename="de", alias="DE")]
     Germany,
-    #[serde(rename="dk")]
+    #[serde(rename="dk", alias="DK")]
     Denmark,
-    #[serde(rename="es")]
+    #[serde(rename="es", alias="ES")]
     Spain,
-    #[serde(rename="ee")]
+    #[serde(rename="ee", alias="EE")]
     Estonia,
-    #[serde(rename="fi")]
+    #[serde(rename="fi", alias="FI")]
     Finland,
-    #[serde(rename="fr")]
+    #[serde(rename="fr", alias="FR")]
     France,
-    #[serde(rename="gr")]
+    #[serde(rename="gr", alias="GR")]
     Greece,
-    #[serde(rename="hu")]
+    #[serde(rename="hu", alias="HU")]
     Hungary,
-    #[serde(rename="ie")]
+    #[serde(rename="ie", alias="IE")]
     Ireland,
-    #[serde(rename="it")]
+    #[serde(rename="it", alias="IT")]
     Italy,
-    #[serde(rename="li")]
+    #[serde(rename="li", alias="LI")]
     Liechtenstein,
-    #[serde(rename="lt")]
+    #[serde(rename="lt", alias="LT")]
     Lithuania,
-    #[serde(rename="lu")]
+    #[serde(rename="lu", alias="LU")]
     Luxembourg,
-    #[serde(rename="lv")]
+    #[serde(rename="lv", alias="LV")]
     Latvia,
-    #[serde(rename="mt")]
+    #[serde(rename="mt", alias="MT")]
     Malta,
-    #[serde(rename="nl")]
+    #[serde(rename="nl", alias="NL")]
     Netherlands,
-    #[serde(rename="pl")]
+    #[serde(rename="pl", alias="PL")]
     Poland,
-    #[serde(rename="pt")]
+    #[serde(rename="pt", alias="PT")]
     Portugal,
-    #[serde(rename="ro")]
+    #[serde(rename="ro", alias="RO")]
     Romania,
-    #[serde(rename="se")]
+    #[serde(rename="se", alias="SE")]
     Sweden,
-    #[serde(rename="sk")]
+    #[serde(rename="sk", alias="SK")]
     Slovakia,
-    #[serde(rename="si")]
+    #[serde(rename="si", alias="SI")]
     Slovenia,
-    #[serde(rename="hr")]
+    #[serde(rename="hr", alias="HR")]
     Croatia
 }
 
