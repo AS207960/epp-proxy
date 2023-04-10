@@ -118,10 +118,14 @@ impl TLSClient {
             match client_cert {
                 ClientCertConf::PKCS12(pkcs12_file) => {
                     let pkcs = tokio::fs::read(pkcs12_file).await?;
-                    let identity = openssl::pkcs12::Pkcs12::from_der(&pkcs)?.parse("")?;
-                    context_builder.set_certificate(&identity.cert)?;
-                    context_builder.set_private_key(&identity.pkey)?;
-                    for cert in identity.chain.into_iter().flatten() {
+                    let identity = openssl::pkcs12::Pkcs12::from_der(&pkcs)?.parse2("")?;
+                    if let Some(cert) = &identity.cert {
+                        context_builder.set_certificate(cert)?;
+                    }
+                    if let Some(pkey) = &identity.pkey {
+                        context_builder.set_private_key(pkey)?;
+                    }
+                    for cert in identity.ca.into_iter().flatten() {
                         context_builder.add_extra_chain_cert(cert)?;
                     }
                 }

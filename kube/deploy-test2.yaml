@@ -70,6 +70,8 @@ spec:
           env:
             - name: RUST_LOG
               value: info
+            - name: SSL_CERT_DIR
+              value: /etc/ssl/certs
           envFrom:
             - configMapRef:
                 name: epp-proxy-test-conf

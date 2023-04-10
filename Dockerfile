@@ -1,23 +1,28 @@
-FROM ekidd/rust-musl-builder:nightly-2021-12-23 as builder
+FROM rustlang/rust:nightly AS builder
+RUN update-ca-certificates
+WORKDIR /usr/src/
 
 RUN curl -LO https://github.com/protocolbuffers/protobuf/releases/download/v3.15.8/protoc-3.15.8-linux-x86_64.zip && \
-  mkdir -p ~/.local && \
-  unzip protoc-3.15.8-linux-x86_64.zip -d ~/.local && \
+  mkdir -p /root/.local && \
+  unzip protoc-3.15.8-linux-x86_64.zip -d /root/.local && \
   rm protoc-3.15.8-linux-x86_64.zip && \
-  chmod +x ~/.local/bin/protoc
+  chmod +x /root/.local/bin/protoc
 
-USER rust
+ENV PROTOC=/root/.local/bin/protoc
 
-ENV PROTOC=/home/rust/.local/bin/protoc
+RUN cargo init epp-proxy
+WORKDIR /usr/src/epp-proxy
+RUN mkdir static
 
-RUN cargo init && mkdir static
+ADD . ./
+RUN cargo install --path .
 
-ADD --chown=rust:rust . ./
-RUN USER=rust cargo build --release
+FROM debian:buster-slim
 
-FROM scratch
+RUN apt-get update && apt-get install -y libssl1.1 ca-certificates p11-kit-modules \
+    libengine-pkcs11-openssl && apt-get clean && rm -rf /var/lib/apt/lists/*
+RUN update-ca-certificates
 
-COPY --from=builder --chown=0:0 /etc/ssl/certs /etc/ssl/certs
-COPY --from=builder --chown=0:0 /home/rust/src/target/x86_64-unknown-linux-musl/release/epp-proxy /
+COPY --from=builder --chown=0:0 /usr/local/cargo/bin/epp-proxy /epp-proxy
 
 ENTRYPOINT ["/epp-proxy"]
