@@ -539,6 +539,8 @@ async fn main() {
                     unit: epp_proxy::client::PeriodUnit::Years,
                     value: 2,
                 }),
+                phase: None,
+                sub_phase: None,
             }],
         }),
         None,

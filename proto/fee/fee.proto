@@ -49,6 +49,9 @@ message FeeAgreement {
 message FeeCommand {
     Command command = 1;
     common.Period period = 2;
+    google.protobuf.StringValue custom_name = 3;
+    google.protobuf.StringValue phase = 4;
+    google.protobuf.StringValue sub_phase = 5;
 }
 
 message FeeCheckData {

@@ -193,8 +193,6 @@ impl Drop for P11EngineInner {
     }
 }
 
-// I think engine pointers can be shared between threads, but if it starts crashing, maybe I'm
-// wrong and remove this.
 unsafe impl Send for P11EngineInner {}
 
 impl P11Engine {

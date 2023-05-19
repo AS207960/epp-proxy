@@ -46,6 +46,8 @@ impl From<epp_proto::fee::FeeCheck> for client::fee::FeeCheck {
                         unit: super::utils::period_unit_from_i32(p.unit),
                         value: p.value,
                     }),
+                    phase: c.phase,
+                    sub_phase: c.sub_phase,
                 })
                 .collect(),
         }
