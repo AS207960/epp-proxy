@@ -1,4 +1,4 @@
-apiVersion: cert-manager.io/v1alpha2
+apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   name: epp-proxy-cert
@@ -6,13 +6,15 @@ spec:
   secretName: epp-proxy-tls
   duration: 2160h
   renewBefore: 360h
-  organization:
-    - AS207960
   commonName: epp-proxy
+  subject:
+    organizations:
+      - AS207960
   isCA: false
-  keySize: 4096
-  keyAlgorithm: rsa
-  keyEncoding: pkcs1
+  privateKey:
+    size: 4096
+    algorithm: RSA
+    encoding: PKCS1
   usages:
     - server auth
   dnsNames:
@@ -23,7 +25,7 @@ spec:
     kind: Issuer
     group: cert-manager.io
 ---
-apiVersion: cert-manager.io/v1alpha2
+apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   name: epp-proxy-test-primary-cert
@@ -31,13 +33,15 @@ spec:
   secretName: epp-proxy-test-primary-tls
   duration: 2160h
   renewBefore: 360h
-  organization:
-    - AS207960
   commonName: epp-proxy-test-primary
+  subject:
+    organizations:
+      - AS207960
   isCA: false
-  keySize: 4096
-  keyAlgorithm: rsa
-  keyEncoding: pkcs1
+  privateKey:
+    size: 4096
+    algorithm: RSA
+    encoding: PKCS1
   usages:
     - server auth
   dnsNames:
@@ -48,7 +52,7 @@ spec:
     kind: Issuer
     group: cert-manager.io
 ---
-apiVersion: cert-manager.io/v1alpha2
+apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   name: epp-proxy-test-secondary-cert
@@ -56,13 +60,15 @@ spec:
   secretName: epp-proxy-test-secondary-tls
   duration: 2160h
   renewBefore: 360h
-  organization:
-    - AS207960
   commonName: epp-proxy-test-secondary
+  subject:
+    organizations:
+      - AS207960
   isCA: false
-  keySize: 4096
-  keyAlgorithm: rsa
-  keyEncoding: pkcs1
+  privateKey:
+    size: 4096
+    algorithm: RSA
+    encoding: PKCS1
   usages:
     - server auth
   dnsNames:
