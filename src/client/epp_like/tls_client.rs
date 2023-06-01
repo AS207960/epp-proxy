@@ -92,18 +92,16 @@ impl TLSClient {
             .unwrap()
             .to_string();
 
-        let mut cert_store = openssl::x509::store::X509StoreBuilder::new()?;
-        if conf.root_certs.is_empty() {
-            cert_store.set_default_paths()?;
-        } else {
+        if !conf.root_certs.is_empty() {
+            let mut cert_store = openssl::x509::store::X509StoreBuilder::new()?;
             for root_cert_path in conf.root_certs.iter() {
                 let root_cert_bytes = tokio::fs::read(root_cert_path).await?;
                 let root_cert = openssl::x509::X509::from_pem(&root_cert_bytes)?;
                 cert_store.add_cert(root_cert)?;
             }
+            let cert_store = cert_store.build();
+            context_builder.set_cert_store(cert_store);
         }
-        let cert_store = cert_store.build();
-        context_builder.set_cert_store(cert_store);
 
         if !conf.danger_accept_invalid_hostname {
             context_builder
