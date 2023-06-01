@@ -10,9 +10,12 @@ pub(super) async fn write_msg_log(
     root: &std::path::Path,
 ) -> tokio::io::Result<()> {
     let now = Utc::now();
-    let date = now.format("%F").to_string();
-    let time = now.format("%H-%M-%S-%f").to_string();
-    let dir = root.join(date);
+    let time = now.format("%FT%H-%M-%S-%f").to_string();
+    let dir = root
+        .join(format!("{}", now.year()))
+        .join(format!("{}", now.month()))
+        .join(format!("{}", now.day()))
+        .join(format!("{}", now.hour()));
     let file_path = dir.join(format!("{}_{}.xml", time, msg_type));
     tokio::fs::create_dir_all(&dir).await?;
     let mut file = tokio::fs::File::create(file_path).await?;
