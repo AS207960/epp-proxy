@@ -12,10 +12,10 @@ pub(super) async fn write_msg_log(
     let now = Utc::now();
     let time = now.format("%FT%H-%M-%S-%f").to_string();
     let dir = root
-        .join(format!("{}", now.year()))
-        .join(format!("{}", now.month()))
-        .join(format!("{}", now.day()))
-        .join(format!("{}", now.hour()));
+        .join(format!("{:04}", now.year()))
+        .join(format!("{:02}", now.month()))
+        .join(format!("{:02}", now.day()))
+        .join(format!("{:02}", now.hour()));
     let file_path = dir.join(format!("{}_{}.xml", time, msg_type));
     tokio::fs::create_dir_all(&dir).await?;
     let mut file = tokio::fs::File::create(file_path).await?;
