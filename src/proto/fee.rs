@@ -459,7 +459,7 @@ pub struct EPPFee011Command {
 #[derive(Debug, Deserialize)]
 pub struct EPPFee10Command {
     #[serde(rename = "$attr:name")]
-    pub name: EPPFeeCommand,
+    pub name: EPPFeeCommandType,
     #[serde(rename = "$attr:standard", default = "default_as_false")]
     pub standard: bool,
     #[serde(rename = "{urn:ietf:params:xml:ns:epp:fee-1.0}period", default)]

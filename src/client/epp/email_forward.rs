@@ -608,7 +608,7 @@ pub fn handle_check_response(response: proto::EPPResponse) -> Response<CheckResp
                         .commands
                         .iter()
                         .map(|c| fee::FeeCommand {
-                            command: (&c.name.command).into(),
+                            command: (&c.name).into(),
                             period: c.period.as_ref().map(Into::into),
                             standard: Some(c.standard),
                             currency: f.currency.to_owned(),

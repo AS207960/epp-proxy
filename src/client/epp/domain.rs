@@ -992,7 +992,7 @@ pub fn handle_check_response(response: proto::EPPResponse) -> Response<CheckResp
                         .commands
                         .iter()
                         .map(|c| fee::FeeCommand {
-                            command: (&c.name.command).into(),
+                            command: (&c.name).into(),
                             period: c.period.as_ref().map(Into::into),
                             standard: Some(c.standard),
                             currency: f.currency.to_owned(),
@@ -2987,5 +2987,58 @@ mod domain_tests {
             super::launch::PhaseType::Sunrise
         );
         assert_eq!(launch_create.application_id.unwrap(), "2393-9323-E08C-03B1");
+    }
+
+    #[test]
+    fn fee_check_10() {
+        const XML_DATA: &str = r#"
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0">
+  <response>
+    <result code="1000">
+      <msg lang="en">Command completed successfully</msg>
+    </result>
+    <resData>
+      <domain:chkData xmlns:domain="urn:ietf:params:xml:ns:domain-1.0">
+        <domain:cd>
+          <domain:name avail="0">test.tv</domain:name>
+          <domain:reason>In use</domain:reason>
+        </domain:cd>
+      </domain:chkData>
+    </resData>
+    <extension>
+      <fee:chkData xmlns:fee="urn:ietf:params:xml:ns:epp:fee-1.0">
+        <fee:currency>USD</fee:currency>
+        <fee:cd avail="1">
+          <fee:objID>test.tv</fee:objID>
+          <fee:class>STANDARD</fee:class>
+          <fee:command name="transfer" standard="1" phase="open">
+            <fee:period unit="y">1</fee:period>
+            <fee:fee description="Transfer Fee" refundable="1" applied="delayed" grace-period="P5D">25.00</fee:fee>
+          </fee:command>
+        </fee:cd>
+      </fee:chkData>
+    </extension>
+    <trID>
+      <clTRID>d6b341c4-43a1-4fbd-bd24-9ada2b5c088b</clTRID>
+      <svTRID>2dbd511a-a3d1-4308-b6aa-98334e810df8</svTRID>
+    </trID>
+  </response>
+</epp>"#;
+        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
+        let res = match res.message {
+            super::proto::EPPMessageType::Response(r) => r,
+            _ => unreachable!(),
+        };
+        let data = super::handle_check_response(*res).unwrap();
+        assert_eq!(data.avail, false);
+        assert_eq!(data.reason.unwrap(), "In use");
+        let fee_check = data.fee_check.unwrap();
+        assert_eq!(fee_check.available, true);
+        let command = fee_check.commands.get(0).unwrap();
+        assert_eq!(command.command, super::fee::Command::Transfer);
+        assert_eq!(command.class.as_ref().unwrap(), "STANDARD");
+        assert_eq!(command.currency, "USD");
+        assert_eq!(command.fees.len(), 1);
     }
 }
