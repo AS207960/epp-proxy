@@ -63,6 +63,29 @@ pub struct TLSConnection {
     socket: tokio_openssl::SslStream<TcpStream>,
 }
 
+fn verify_debug(verify: bool, ctx: &mut openssl::ssl::X509StoreContextRef) -> bool {
+    info!("TLS verification");
+    info!("  result: {}", ctx.error().error_string());
+    info!("  error depth: {}", ctx.error_depth());
+    match ctx.current_cert() {
+        Some(cert) => {
+            info!("  current cert:");
+            println!(String::from_utf8_lossy(&cert.to_text().unwrap()));
+        }
+        None => {
+            info!("  current cert: None");
+        }
+    }
+    if let Some(chain) = ctx.chain() {
+        info!("  chain:");
+        for cert in chain {
+            println!(String::from_utf8_lossy(&cert.to_text().unwrap()));
+        }
+    }
+
+    verify
+}
+
 impl TLSClient {
     /// Creates a new TLS client ready to connect
     ///
@@ -79,9 +102,9 @@ impl TLSClient {
         context_builder.set_min_proto_version(Some(openssl::ssl::SslVersion::TLS1_2))?;
 
         if conf.danger_accept_invalid_certs {
-            context_builder.set_verify(openssl::ssl::SslVerifyMode::NONE);
+            context_builder.set_verify_callback(openssl::ssl::SslVerifyMode::NONE, verify_debug);
         } else {
-            context_builder.set_verify(openssl::ssl::SslVerifyMode::PEER);
+            context_builder.set_verify_callback(openssl::ssl::SslVerifyMode::PEER, verify_debug);
         }
 
         let hostname = conf
@@ -102,7 +125,7 @@ impl TLSClient {
                 cert_store.add_cert(root_cert)?;
             }
             let cert_store = cert_store.build();
-            context_builder.set_cert_store(cert_store);
+            context_builder.set_verify_cert_store(cert_store)?;
         }
 
         if !conf.danger_accept_invalid_hostname {
