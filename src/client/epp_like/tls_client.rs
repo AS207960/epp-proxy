@@ -63,14 +63,14 @@ pub struct TLSConnection {
     socket: tokio_openssl::SslStream<TcpStream>,
 }
 
-fn verify_debug(verify: bool, ctx: &mut openssl::ssl::X509StoreContextRef) -> bool {
+fn verify_debug(verify: bool, ctx: &mut openssl::x509::X509StoreContextRef) -> bool {
     info!("TLS verification");
     info!("  result: {}", ctx.error().error_string());
     info!("  error depth: {}", ctx.error_depth());
     match ctx.current_cert() {
         Some(cert) => {
             info!("  current cert:");
-            println!(String::from_utf8_lossy(&cert.to_text().unwrap()));
+            info!("{}", String::from_utf8_lossy(&cert.to_text().unwrap()));
         }
         None => {
             info!("  current cert: None");
@@ -79,7 +79,7 @@ fn verify_debug(verify: bool, ctx: &mut openssl::ssl::X509StoreContextRef) -> bo
     if let Some(chain) = ctx.chain() {
         info!("  chain:");
         for cert in chain {
-            println!(String::from_utf8_lossy(&cert.to_text().unwrap()));
+            info!("{}", String::from_utf8_lossy(&cert.to_text().unwrap()));
         }
     }
 
