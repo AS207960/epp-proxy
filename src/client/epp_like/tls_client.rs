@@ -75,8 +75,26 @@ impl TLSClient {
         let mut should_lock = false;
 
         let mut context_builder =
-            openssl::ssl::SslContext::builder(openssl::ssl::SslMethod::tls_client())?;
-        context_builder.set_min_proto_version(Some(openssl::ssl::SslVersion::TLS1_2))?;
+            openssl::ssl::SslContext::builder(openssl::ssl::SslMethod::tls())?;
+
+        let mut opts = openssl::ssl::SslOptions::ALL
+            | openssl::ssl::SslOptions::NO_COMPRESSION
+            | openssl::ssl::SslOptions::NO_SSLV2
+            | openssl::ssl::SslOptions::NO_SSLV3
+            | openssl::ssl::SslOptions::NO_TLSV1_1
+            | openssl::ssl::SslOptions::SINGLE_DH_USE
+            | openssl::ssl::SslOptions::SINGLE_ECDH_USE;
+        opts &= !openssl::ssl::SslOptions::DONT_INSERT_EMPTY_FRAGMENTS;
+        context_builder.set_options(opts);
+
+        let mode =
+            openssl::ssl::SslMode::AUTO_RETRY | openssl::ssl::SslMode::ACCEPT_MOVING_WRITE_BUFFER
+                | openssl::ssl::SslMode::ENABLE_PARTIAL_WRITE | openssl::ssl::SslMode::RELEASE_BUFFERS;
+        context_builder.set_mode(mode);
+
+        context_builder.set_cipher_list(
+            "DEFAULT:!aNULL:!eNULL:!MD5:!3DES:!DES:!RC4:!IDEA:!SEED:!aDSS:!SRP:!PSK",
+        )?;
 
         if conf.danger_accept_invalid_certs {
             context_builder.set_verify(openssl::ssl::SslVerifyMode::NONE);
@@ -92,7 +110,9 @@ impl TLSClient {
             .unwrap()
             .to_string();
 
-        if !conf.root_certs.is_empty() {
+        if conf.root_certs.is_empty() {
+            context_builder.set_default_verify_paths()?;
+        } else {
             let mut cert_store = openssl::x509::store::X509StoreBuilder::new()?;
             for root_cert_path in conf.root_certs.iter() {
                 let root_cert_bytes = tokio::fs::read(root_cert_path).await?;

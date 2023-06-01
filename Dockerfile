@@ -106,6 +106,8 @@ ENV PROTOC=/home/rust/.local/bin/protoc
 
 ADD --chown=rust:rust . ./
 RUN USER=rust cargo build --release
+
+USER root
 RUN update-ca-certificates
 
 FROM scratch
