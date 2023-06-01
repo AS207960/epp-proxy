@@ -757,14 +757,12 @@ pub fn handle_check(client: &ServerFeatures, req: &CheckRequest) -> HandleReqRet
                         .iter()
                         .map(|c| {
                             Ok(proto::fee::EPPFee10CheckCommand {
-                                name: proto::fee::EPPFeeCommand {
-                                    command: match (&c.command).into() {
-                                        Some(n) => n,
-                                        None => return Err(Err(Error::Unsupported)),
-                                    },
-                                    phase: c.phase.as_ref().map(Into::into),
-                                    subphase: c.sub_phase.as_ref().map(Into::into),
+                                name: match (&c.command).into() {
+                                    Some(n) => n,
+                                    None => return Err(Err(Error::Unsupported)),
                                 },
+                                phase: c.phase.as_ref().map(Into::into),
+                                subphase: c.sub_phase.as_ref().map(Into::into),
                                 period: c.period.as_ref().map(Into::into),
                             })
                         })

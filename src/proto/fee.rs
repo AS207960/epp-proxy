@@ -58,7 +58,17 @@ pub struct EPPFee10Check {
 #[derive(Debug, Serialize)]
 pub struct EPPFee10CheckCommand {
     #[serde(rename = "$attr:name")]
-    pub name: EPPFeeCommand,
+    pub name: EPPFeeCommandType,
+    #[serde(
+        rename = "$attr:phase",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub phase: Option<String>,
+    #[serde(
+        rename = "$attr:subphase",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub subphase: Option<String>,
     #[serde(
         rename = "{urn:ietf:params:xml:ns:epp:fee-1.0}fee:period",
         skip_serializing_if = "Option::is_none"
@@ -256,6 +266,8 @@ pub enum EPPFeeCommandType {
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct EPPFeeCommand {
+    #[serde(rename = "$value")]
+    pub command: EPPFeeCommandType,
     #[serde(
         rename = "$attr:phase",
         skip_serializing_if = "Option::is_none"
@@ -266,8 +278,6 @@ pub struct EPPFeeCommand {
         skip_serializing_if = "Option::is_none"
     )]
     pub subphase: Option<String>,
-    #[serde(rename = "$value")]
-    pub command: EPPFeeCommandType
 }
 
 #[derive(Debug, Deserialize)]
