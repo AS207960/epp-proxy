@@ -48,7 +48,7 @@ extern crate log;
 #[cfg(target_os = "linux")]
 fn setup_logging() {
     if systemd_journal_logger::connected_to_journal() {
-        systemd_journal_logger::init().unwrap();
+        systemd_journal_logger::JournalLog::default().install().unwrap();
         log::set_max_level(log::LevelFilter::Info);
     } else {
         let mut log_builder = pretty_env_logger::formatted_builder();
