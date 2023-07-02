@@ -68,6 +68,25 @@ fn setup_logging() {
     log::set_max_level(log::LevelFilter::Trace);
 }
 
+#[derive(Copy, Clone)]
+enum AuthMethod {
+    OAuth,
+    StaticKey,
+}
+
+impl clap::ValueEnum for AuthMethod {
+    fn value_variants<'a>() -> &'a [Self] {
+        &[Self::OAuth, Self::StaticKey]
+    }
+
+    fn to_possible_value(&self) -> Option<clap::builder::PossibleValue> {
+        Some(match self {
+            Self::OAuth => clap::builder::PossibleValue::new("oauth"),
+            Self::StaticKey => clap::builder::PossibleValue::new("static"),
+        })
+    }
+}
+
 #[tokio::main]
 async fn main() {
     setup_logging();
@@ -81,46 +100,55 @@ async fn main() {
             clap::Arg::new("listen")
                 .short('l')
                 .long("listen")
-                .takes_value(true)
+                .value_name("ADDR")
                 .default_value("[::1]:50051")
-                .validator(|s| {
-                    let addr: Result<std::net::SocketAddr, _> = s.parse();
-                    match addr {
-                        Ok(_) => Ok(()),
-                        Err(_) => Err("Invalid listen address format".to_string()),
-                    }
-                })
+                .value_parser(clap::value_parser!(std::net::SocketAddr))
                 .help("Which address for gRPC to listen on"),
         )
         .arg(
             clap::Arg::new("conf")
                 .short('c')
                 .long("conf")
-                .takes_value(true)
+                .value_name("FILE")
                 .default_value("./conf/")
                 .help("Where to read config files from"),
         )
         .arg(
             clap::Arg::new("hsm_conf")
-                .short('h')
+                .short('p')
                 .long("hsm-conf")
-                .takes_value(true)
+                .value_name("FILE")
                 .help("Where to read the HSM config file from"),
         )
         .arg(
             clap::Arg::new("log")
                 .long("log")
-                .takes_value(true)
+                .value_name("DIR")
                 .default_value("./log/")
+                .value_parser(clap::value_parser!(std::path::PathBuf))
                 .help("Directory to write command logs to"),
+        )
+        .arg(
+            clap::Arg::new("auth")
+                .long("auth")
+                .short('a')
+                .value_name("METHOD")
+                .value_parser(clap::builder::EnumValueParser::<AuthMethod>::new())
+                .default_value("oauth")
+                .help("Authentication method to use, oauth or static API key"),
         )
         .get_matches();
 
-    let oauth_client = epp_proxy::oauth_client();
+    let auth: Box<dyn Auth + Send + Sync> = match matches.get_one::<AuthMethod>("auth").unwrap() {
+        AuthMethod::OAuth => Box::new(epp_proxy::oauth_client()),
+        AuthMethod::StaticKey => Box::new(StaticAuth::new()),
+    };
     let identity = epp_proxy::server_identity().await;
-    let pkcs11_engine = epp_proxy::setup_pkcs11_engine(matches.value_of("hsm_conf")).await;
+    let pkcs11_engine =
+        epp_proxy::setup_pkcs11_engine(matches.get_one::<String>("hsm_conf").map(|s| s.as_str()))
+            .await;
 
-    let conf_dir_path = matches.value_of("conf").unwrap();
+    let conf_dir_path = matches.get_one::<String>("conf").unwrap();
     let mut configs = vec![];
     let conf_dir = match std::fs::read_dir(conf_dir_path) {
         Ok(r) => r,
@@ -163,8 +191,8 @@ async fn main() {
         }
     }
 
-    let log_dir_path: &std::path::Path = matches.value_of("log").unwrap().as_ref();
-    match std::fs::create_dir_all(&log_dir_path) {
+    let log_dir_path = matches.get_one::<std::path::PathBuf>("log").unwrap();
+    match std::fs::create_dir_all(log_dir_path) {
         Ok(()) => {}
         Err(e) => {
             error!("Can't create log directory: {}", e);
@@ -221,12 +249,12 @@ async fn main() {
     let server = epp_proxy::grpc::EPPProxy {
         client_router: router,
     };
-    let addr = matches.value_of("listen").unwrap().parse().unwrap();
+    let addr = matches.get_one::<std::net::SocketAddr>("listen").unwrap();
 
     let svc = epp_proxy::grpc::epp_proto::epp_proxy_server::EppProxyServer::new(server);
     let w_svc = AuthService {
         inner: svc,
-        oauth_client,
+        auth: std::sync::Arc::new(auth),
     };
 
     let reflection_svc = tonic_reflection::server::Builder::configure()
@@ -240,15 +268,51 @@ async fn main() {
         .unwrap()
         .add_service(reflection_svc)
         .add_service(w_svc)
-        .serve(addr)
+        .serve(*addr)
         .await
         .unwrap();
+}
+
+#[tonic::async_trait]
+trait Auth {
+    async fn auth(&self, token: &str) -> bool;
+}
+
+#[tonic::async_trait]
+impl Auth for rust_keycloak::oauth::OAuthClient {
+    async fn auth(&self, token: &str) -> bool {
+        self.verify_token(token, "access-epp").await.is_ok()
+    }
+}
+
+#[derive(Clone)]
+struct StaticAuth {
+    token: String,
+}
+
+impl StaticAuth {
+    fn new() -> Self {
+        dotenv::dotenv().ok();
+
+        let token = std::env::var("AUTH_TOKEN").expect("AUTH_TOKEN must be set");
+
+        Self {
+            token: token.trim().to_string(),
+        }
+    }
+}
+
+#[tonic::async_trait]
+impl Auth for StaticAuth {
+    async fn auth(&self, token: &str) -> bool {
+        token == self.token
+    }
 }
 
 #[derive(Clone)]
 struct AuthService<T> {
     inner: T,
-    oauth_client: rust_keycloak::oauth::OAuthClient,
+    auth: std::sync::Arc<Box<dyn Auth + Send + Sync>>,
 }
 
 impl<T> tower_service::Service<http::Request<tonic::transport::Body>> for AuthService<T>
@@ -271,7 +335,7 @@ where
 
     fn call(&mut self, req: http::Request<tonic::transport::Body>) -> Self::Future {
         let headers = req.headers().to_owned();
-        let client = self.oauth_client.clone();
+        let auth = self.auth.clone();
         let mut inner = self.inner.clone();
 
         Box::pin(async move {
@@ -280,9 +344,10 @@ where
                     Ok(t) => {
                         let auth_token_str = t.trim();
                         if let Some(auth_token) = auth_token_str.strip_prefix("Bearer ") {
-                            match client.verify_token(auth_token, "access-epp").await {
-                                Ok(_) => Ok(inner.call(req).await?),
-                                Err(_) => Err("Invalid auth token"),
+                            if auth.auth(auth_token).await {
+                                Ok(inner.call(req).await?)
+                            } else {
+                                Err("Invalid auth token")
                             }
                         } else {
                             Err("Invalid auth token")

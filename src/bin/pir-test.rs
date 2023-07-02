@@ -17,30 +17,33 @@ async fn main() {
             clap::Arg::new("acct")
                 .short('a')
                 .long("account")
-                .takes_value(true)
+                .value_name("FILE")
                 .required(true)
                 .help("Config file for the EPP account"),
         )
         .arg(
             clap::Arg::new("hsm_conf")
-                .short('h')
+                .short('p')
                 .long("hsm-conf")
-                .takes_value(true)
+                .value_name("FILE")
                 .help("Where to read the HSM config file from"),
         )
         .arg(
             clap::Arg::new("log")
                 .long("log")
-                .takes_value(true)
+                .value_name("DIR")
                 .default_value("./log/")
+                .value_parser(clap::value_parser!(std::path::PathBuf))
                 .help("Directory to write command logs to"),
         )
         .get_matches();
 
-    let pkcs11_engine = epp_proxy::setup_pkcs11_engine(matches.value_of("hsm_conf")).await;
+    let pkcs11_engine =
+        epp_proxy::setup_pkcs11_engine(matches.get_one::<String>("hsm_conf").map(|x| x.as_str()))
+            .await;
 
-    let log_dir_path: &std::path::Path = matches.value_of("log").unwrap().as_ref();
-    match std::fs::create_dir_all(&log_dir_path) {
+    let log_dir_path = matches.get_one::<std::path::PathBuf>("log").unwrap();
+    match std::fs::create_dir_all(log_dir_path) {
         Ok(()) => {}
         Err(e) => {
             error!("Can't create log directory: {}", e);
@@ -48,7 +51,7 @@ async fn main() {
         }
     }
 
-    let conf_file_path = matches.value_of("acct").unwrap();
+    let conf_file_path = matches.get_one::<String>("acct").unwrap();
 
     let conf_file = match std::fs::File::open(conf_file_path) {
         Ok(f) => f,
@@ -953,11 +956,16 @@ async fn main() {
 
     // 2.3.3.7 Correctly Handle 2201 Exception
     info!("Causing 2201 error");
-    assert!(
-        epp_proxy::client::domain::delete("transfer3.org", None, None, None, None, &mut cmd_tx)
-            .await
-            .is_err()
-    );
+    assert!(epp_proxy::client::domain::delete(
+        "transfer3.org",
+        None,
+        None,
+        None,
+        None,
+        &mut cmd_tx
+    )
+    .await
+    .is_err());
 
     // 2.4.1.1 Check Domain (Domain Available for Registration)
     info!("Checking DNSSEC domain");
@@ -1413,7 +1421,7 @@ async fn main() {
 
     // 2.4.3.1 Delete a Domain (dsdomain1.org)
     info!("Deleting DNSSEC domain");
-    epp_proxy::client::domain::delete("dsdomain1.org", None, None, None, None,&mut cmd_tx)
+    epp_proxy::client::domain::delete("dsdomain1.org", None, None, None, None, &mut cmd_tx)
         .await
         .unwrap();
 

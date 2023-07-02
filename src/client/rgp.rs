@@ -1,7 +1,7 @@
 //! EPP commands relating to nominet specific features
 
-use chrono::prelude::*;
 use super::{fee, CommandResponse, RequestMessage, Sender};
+use chrono::prelude::*;
 
 #[derive(Debug)]
 pub struct RestoreRequest {

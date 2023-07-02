@@ -2,7 +2,7 @@
 
 use chrono::prelude::*;
 
-use super::{fee, launch, keysys, CommandResponse, RequestMessage, Sender};
+use super::{fee, keysys, launch, CommandResponse, RequestMessage, Sender};
 
 #[derive(Debug)]
 pub struct CheckRequest {
@@ -514,7 +514,7 @@ pub struct CreateInfo<'a> {
     pub eurid_data: Option<super::eurid::DomainCreate>,
     pub isnic_payment: Option<super::isnic::PaymentInfo>,
     pub personal_registration: Option<super::personal_registration::PersonalRegistrationInfo>,
-    pub keysys: Option<super::keysys::DomainCreate>
+    pub keysys: Option<super::keysys::DomainCreate>,
 }
 
 /// Registers a new domain

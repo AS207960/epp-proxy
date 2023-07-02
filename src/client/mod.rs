@@ -20,6 +20,7 @@ pub mod eurid;
 pub mod fee;
 pub mod host;
 pub mod isnic;
+pub mod keysys;
 pub mod launch;
 pub mod maintenance;
 pub mod mark;
@@ -31,7 +32,6 @@ pub mod router;
 pub mod tmch;
 pub mod traficom;
 pub mod verisign;
-pub mod keysys;
 
 pub use router::{CommandResponse, RequestMessage, RequestSender, Response, Sender};
 

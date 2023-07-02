@@ -5,7 +5,7 @@ pub enum EPPMaintenanceInfo {
     #[serde(rename = "{urn:ietf:params:xml:ns:epp:maintenance-1.0}maint:id")]
     Id(String),
     #[serde(rename = "{urn:ietf:params:xml:ns:epp:maintenance-1.0}maint:list")]
-    List(EPPMaintenanceInfoList)
+    List(EPPMaintenanceInfoList),
 }
 
 #[derive(Debug, Serialize)]
@@ -13,7 +13,7 @@ pub enum EPPMaintenanceInfo02 {
     #[serde(rename = "{urn:ietf:params:xml:ns:maintenance-0.2}maint:id")]
     Id(String),
     #[serde(rename = "{urn:ietf:params:xml:ns:maintenance-0.2}maint:list")]
-    List(EPPMaintenanceInfoList)
+    List(EPPMaintenanceInfoList),
 }
 
 #[derive(Debug, Serialize)]
@@ -107,10 +107,7 @@ pub struct EPPMaintenanceItem02 {
     pub id: EPPMaintenanceID,
     #[serde(rename = "{urn:ietf:params:xml:ns:maintenance-0.2}type", default)]
     pub item_type: Vec<String>,
-    #[serde(
-        rename = "{urn:ietf:params:xml:ns:maintenance-0.2}pollType",
-        default
-    )]
+    #[serde(rename = "{urn:ietf:params:xml:ns:maintenance-0.2}pollType", default)]
     pub poll_type: Option<EPPMaintenancePollType>,
     #[serde(rename = "{urn:ietf:params:xml:ns:maintenance-0.2}systems")]
     pub systems: EPPMaintenanceSystems02,
@@ -259,7 +256,6 @@ pub struct EPPMaintenanceSystem {
     pub impact: EPPMaintenanceImpact,
 }
 
-
 #[derive(Debug, Deserialize)]
 pub struct EPPMaintenanceSystem02 {
     #[serde(rename = "{urn:ietf:params:xml:ns:maintenance-0.2}name")]
@@ -345,15 +341,13 @@ pub enum EPPMaintenanceImpact {
 }
 
 #[derive(Debug, Deserialize)]
+#[derive(Default)]
 pub enum EPPMaintenanceDescriptionType {
     #[serde(rename = "plain")]
+    #[default]
     Plain,
     #[serde(rename = "html")]
     Html,
 }
 
-impl Default for EPPMaintenanceDescriptionType {
-    fn default() -> Self {
-        EPPMaintenanceDescriptionType::Plain
-    }
-}
+

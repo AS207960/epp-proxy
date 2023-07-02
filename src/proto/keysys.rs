@@ -56,7 +56,7 @@ pub struct Poll {
     #[serde(rename = "{http://www.key-systems.net/epp/keysys-1.0}data", default)]
     data: Option<PollData>,
     #[serde(rename = "{http://www.key-systems.net/epp/keysys-1.0}info", default)]
-    info: Option<String>
+    info: Option<String>,
 }
 
 #[derive(Debug, Serialize)]
@@ -100,16 +100,25 @@ pub struct ContactUpdate {
         skip_serializing_if = "Option::is_none",
         serialize_with = "super::serialize_opt_bool"
     )]
-    pub trigger_foa: Option<bool>
+    pub trigger_foa: Option<bool>,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct ContactInfoData {
-    #[serde(rename = "{http://www.key-systems.net/epp/keysys-1.0}validated", default)]
+    #[serde(
+        rename = "{http://www.key-systems.net/epp/keysys-1.0}validated",
+        default
+    )]
     pub validated: bool,
-    #[serde(rename = "{http://www.key-systems.net/epp/keysys-1.0}verification-requested", default)]
+    #[serde(
+        rename = "{http://www.key-systems.net/epp/keysys-1.0}verification-requested",
+        default
+    )]
     pub verification_requested: bool,
-    #[serde(rename = "{http://www.key-systems.net/epp/keysys-1.0}verified", default)]
+    #[serde(
+        rename = "{http://www.key-systems.net/epp/keysys-1.0}verified",
+        default
+    )]
     pub verified: bool,
 }
 
@@ -117,9 +126,9 @@ pub struct ContactInfoData {
 pub struct DomainCheck {
     #[serde(
         rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:allocation-token",
-        skip_serializing_if = "Option::is_none",
+        skip_serializing_if = "Option::is_none"
     )]
-    pub allocation_token: Option<String>
+    pub allocation_token: Option<String>,
 }
 
 #[derive(Debug, Serialize)]
@@ -432,61 +441,145 @@ pub struct DomainInfoData {
     pub renewal_date: DateTime<Utc>,
     #[serde(rename = "{http://www.key-systems.net/epp/keysys-1.0}punDate")]
     pub paid_until_date: DateTime<Utc>,
-    #[serde(rename = "{http://www.key-systems.net/epp/keysys-1.0}domain-roid", default)]
+    #[serde(
+        rename = "{http://www.key-systems.net/epp/keysys-1.0}domain-roid",
+        default
+    )]
     pub domain_roid: Option<String>,
-    #[serde(rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:ca-legal-type", default)]
+    #[serde(
+        rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:ca-legal-type",
+        default
+    )]
     pub ca_legal_type: Option<CALegalType>,
-    #[serde(rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:ca-trademark", default)]
+    #[serde(
+        rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:ca-trademark",
+        default
+    )]
     pub ca_trademark: bool,
-    #[serde(rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:eu-accept-trustee-tac", default)]
+    #[serde(
+        rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:eu-accept-trustee-tac",
+        default
+    )]
     pub eu_accept_trustee_tac: bool,
-    #[serde(rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:eu-registrant-lang", default)]
+    #[serde(
+        rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:eu-registrant-lang",
+        default
+    )]
     pub eu_registrant_lang: Option<EULanguage>,
-    #[serde(rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:eu-registrant-citizenship", default)]
+    #[serde(
+        rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:eu-registrant-citizenship",
+        default
+    )]
     pub eu_registrant_citizenship: Option<EUCountry>,
-    #[serde(rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:de-abuse-contact", default)]
+    #[serde(
+        rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:de-abuse-contact",
+        default
+    )]
     pub de_abuse_contact: Option<String>,
-    #[serde(rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:de-accept-trustee-tac", default)]
+    #[serde(
+        rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:de-accept-trustee-tac",
+        default
+    )]
     pub de_accept_trustee_tac: Option<DETrustee>,
-    #[serde(rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:de-general-request", default)]
+    #[serde(
+        rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:de-general-request",
+        default
+    )]
     pub de_general_request: Option<String>,
-    #[serde(rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:de-holder-person", default)]
+    #[serde(
+        rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:de-holder-person",
+        default
+    )]
     pub de_holder_person: bool,
-    #[serde(rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:fr-accept-trustee-tac", default)]
+    #[serde(
+        rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:fr-accept-trustee-tac",
+        default
+    )]
     pub fr_accept_trustee_tac: bool,
-    #[serde(rename = "{http://www.key-systems.net/epp/keysys-1.0}name-emailforward", default)]
+    #[serde(
+        rename = "{http://www.key-systems.net/epp/keysys-1.0}name-emailforward",
+        default
+    )]
     pub name_emailforward: Option<String>,
-    #[serde(rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:rs-owner-idcard", default)]
+    #[serde(
+        rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:rs-owner-idcard",
+        default
+    )]
     pub rs_owner_idcard: Option<String>,
-    #[serde(rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:rs-owner-company-number", default)]
+    #[serde(
+        rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:rs-owner-company-number",
+        default
+    )]
     pub rs_owner_company_number: Option<String>,
-    #[serde(rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:rs-admin-idcard", default)]
+    #[serde(
+        rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:rs-admin-idcard",
+        default
+    )]
     pub rs_admin_idcard: Option<String>,
-    #[serde(rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:rs-admin-company-number", default)]
+    #[serde(
+        rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:rs-admin-company-number",
+        default
+    )]
     pub rs_admin_company_number: Option<String>,
-    #[serde(rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:rs-tech-idcard", default)]
+    #[serde(
+        rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:rs-tech-idcard",
+        default
+    )]
     pub rs_tech_idcard: Option<String>,
-    #[serde(rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:rs-tech-company-number", default)]
+    #[serde(
+        rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:rs-tech-company-number",
+        default
+    )]
     pub rs_tech_company_number: Option<String>,
-    #[serde(rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:us-nexus-apppurpose", default)]
+    #[serde(
+        rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:us-nexus-apppurpose",
+        default
+    )]
     pub us_purpose: Option<USPurpose>,
-    #[serde(rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:us-nexus-category", default)]
+    #[serde(
+        rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:us-nexus-category",
+        default
+    )]
     pub us_category: Option<USCategory>,
-    #[serde(rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:us-nexus-validator", default)]
+    #[serde(
+        rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:us-nexus-validator",
+        default
+    )]
     pub us_validator: Option<String>,
-    #[serde(rename = "{http://www.key-systems.net/epp/keysys-1.0}renewalmode", default)]
+    #[serde(
+        rename = "{http://www.key-systems.net/epp/keysys-1.0}renewalmode",
+        default
+    )]
     pub renewal_mode: RenewalMode,
-    #[serde(rename = "{http://www.key-systems.net/epp/keysys-1.0}transferlock", default)]
+    #[serde(
+        rename = "{http://www.key-systems.net/epp/keysys-1.0}transferlock",
+        default
+    )]
     pub transfer_lock: bool,
-    #[serde(rename = "{http://www.key-systems.net/epp/keysys-1.0}transfermode", default)]
+    #[serde(
+        rename = "{http://www.key-systems.net/epp/keysys-1.0}transfermode",
+        default
+    )]
     pub transfer_mode: TransferMode,
-    #[serde(rename = "{http://www.key-systems.net/epp/keysys-1.0}whois-banner0", default)]
+    #[serde(
+        rename = "{http://www.key-systems.net/epp/keysys-1.0}whois-banner0",
+        default
+    )]
     pub whois_banner_0: Option<String>,
-    #[serde(rename = "{http://www.key-systems.net/epp/keysys-1.0}whois-banner1", default)]
+    #[serde(
+        rename = "{http://www.key-systems.net/epp/keysys-1.0}whois-banner1",
+        default
+    )]
     pub whois_banner_1: Option<String>,
-    #[serde(rename = "{http://www.key-systems.net/epp/keysys-1.0}whois-rsp", default)]
+    #[serde(
+        rename = "{http://www.key-systems.net/epp/keysys-1.0}whois-rsp",
+        default
+    )]
     pub whois_rsp: Option<String>,
-    #[serde(rename = "{http://www.key-systems.net/epp/keysys-1.0}whois-url", default)]
+    #[serde(
+        rename = "{http://www.key-systems.net/epp/keysys-1.0}whois-url",
+        default
+    )]
     pub whois_url: Option<String>,
 }
 
@@ -516,7 +609,7 @@ pub struct DomainRenew {
     pub accept_premium_price: Option<bool>,
     #[serde(
         rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:promotion-code",
-        skip_serializing_if = "Option::is_none",
+        skip_serializing_if = "Option::is_none"
     )]
     pub promotion_code: Option<String>,
 }
@@ -549,13 +642,13 @@ pub struct DomainTransfer {
     #[serde(
         rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:at-requestauthcode",
         skip_serializing_if = "Option::is_none",
-    serialize_with = "super::serialize_opt_bool"
+        serialize_with = "super::serialize_opt_bool"
     )]
     pub at_request_authcode: Option<bool>,
     #[serde(
         rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:be-requestauthcode",
         skip_serializing_if = "Option::is_none",
-    serialize_with = "super::serialize_opt_bool"
+        serialize_with = "super::serialize_opt_bool"
     )]
     pub be_request_authcode: Option<bool>,
     #[serde(
@@ -576,7 +669,7 @@ pub struct DomainTransfer {
     pub eu_registrant_citizenship: Option<EUCountry>,
     #[serde(
         rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:promotion-code",
-        skip_serializing_if = "Option::is_none",
+        skip_serializing_if = "Option::is_none"
     )]
     pub promotion_code: Option<String>,
 }
@@ -597,34 +690,34 @@ pub struct DomainDelete {
 
 #[derive(Debug, Serialize)]
 pub enum DomainDeleteAction {
-    #[serde(rename="INSTANT")]
+    #[serde(rename = "INSTANT")]
     Instant,
-    #[serde(rename="AUTODELETE")]
+    #[serde(rename = "AUTODELETE")]
     AutoDelete,
-    #[serde(rename="AUTOEXPIRE")]
+    #[serde(rename = "AUTOEXPIRE")]
     AutoExpire,
-    #[serde(rename="PUSH")]
-    Push
+    #[serde(rename = "PUSH")]
+    Push,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub enum RenewalMode {
-    #[serde(rename="DEFAULT")]
+    #[serde(rename = "DEFAULT")]
     Default,
-    #[serde(rename="AUTORENEW")]
+    #[serde(rename = "AUTORENEW")]
     AutoRenew,
-    #[serde(rename="RENEWONCE")]
+    #[serde(rename = "RENEWONCE")]
     RenewOnce,
-    #[serde(rename="AUTODELETE")]
+    #[serde(rename = "AUTODELETE")]
     AutoDelete,
-    #[serde(rename="AUTOEXPIRE")]
+    #[serde(rename = "AUTOEXPIRE")]
     AutoExpire,
-    #[serde(rename="AUTORENEWMONTHLY")]
+    #[serde(rename = "AUTORENEWMONTHLY")]
     AutoRenewMonthly,
-    #[serde(rename="AUTORENEWQUARTERLY")]
+    #[serde(rename = "AUTORENEWQUARTERLY")]
     AutoRenewQuarterly,
-    #[serde(rename="EXPIREAUCTION")]
-    ExpireAuction
+    #[serde(rename = "EXPIREAUCTION")]
+    ExpireAuction,
 }
 
 impl Default for RenewalMode {
@@ -635,11 +728,11 @@ impl Default for RenewalMode {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub enum TransferMode {
-    #[serde(rename="DEFAULT")]
+    #[serde(rename = "DEFAULT")]
     Default,
-    #[serde(rename="AUTOAPPROVE")]
+    #[serde(rename = "AUTOAPPROVE")]
     AutoApprove,
-    #[serde(rename="AUTODENY")]
+    #[serde(rename = "AUTODENY")]
     AutoDeny,
 }
 
@@ -651,164 +744,164 @@ impl Default for TransferMode {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub enum DETrustee {
-    #[serde(rename="0")]
+    #[serde(rename = "0")]
     None,
-    #[serde(rename="1")]
+    #[serde(rename = "1")]
     Monthly,
-    #[serde(rename="2")]
-    Annual
+    #[serde(rename = "2")]
+    Annual,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub enum EULanguage {
-    #[serde(rename="bg", alias="BG")]
+    #[serde(rename = "bg", alias = "BG")]
     Bulgarian,
-    #[serde(rename="cs", alias="CS")]
+    #[serde(rename = "cs", alias = "CS")]
     Czech,
-    #[serde(rename="da", alias="DA")]
+    #[serde(rename = "da", alias = "DA")]
     Danish,
-    #[serde(rename="de", alias="DE")]
+    #[serde(rename = "de", alias = "DE")]
     German,
-    #[serde(rename="el", alias="EL")]
+    #[serde(rename = "el", alias = "EL")]
     ModernGreek,
-    #[serde(rename="en", alias="EN")]
+    #[serde(rename = "en", alias = "EN")]
     English,
-    #[serde(rename="es", alias="ES")]
+    #[serde(rename = "es", alias = "ES")]
     Spanish,
-    #[serde(rename="et", alias="ET")]
+    #[serde(rename = "et", alias = "ET")]
     Estonian,
-    #[serde(rename="fi", alias="FI")]
+    #[serde(rename = "fi", alias = "FI")]
     Finnish,
-    #[serde(rename="fr", alias="FR")]
+    #[serde(rename = "fr", alias = "FR")]
     French,
-    #[serde(rename="ga", alias="GA")]
+    #[serde(rename = "ga", alias = "GA")]
     Gaelic,
-    #[serde(rename="hr", alias="HR")]
+    #[serde(rename = "hr", alias = "HR")]
     Croatian,
-    #[serde(rename="hu", alias="HU")]
+    #[serde(rename = "hu", alias = "HU")]
     Hungarian,
-    #[serde(rename="it", alias="IT")]
+    #[serde(rename = "it", alias = "IT")]
     Italian,
-    #[serde(rename="lt", alias="LT")]
+    #[serde(rename = "lt", alias = "LT")]
     Lithuanian,
-    #[serde(rename="lv", alias="LV")]
+    #[serde(rename = "lv", alias = "LV")]
     Latvian,
-    #[serde(rename="mt", alias="MT")]
+    #[serde(rename = "mt", alias = "MT")]
     Maltese,
-    #[serde(rename="nl", alias="NL")]
+    #[serde(rename = "nl", alias = "NL")]
     DutchFlemish,
-    #[serde(rename="pl", alias="PL")]
+    #[serde(rename = "pl", alias = "PL")]
     Polish,
-    #[serde(rename="pt", alias="PT")]
+    #[serde(rename = "pt", alias = "PT")]
     Portuguese,
-    #[serde(rename="ro", alias="RO")]
+    #[serde(rename = "ro", alias = "RO")]
     Romanian,
-    #[serde(rename="sk", alias="SK")]
+    #[serde(rename = "sk", alias = "SK")]
     Slovak,
-    #[serde(rename="sl", alias="SL")]
+    #[serde(rename = "sl", alias = "SL")]
     Slovene,
-    #[serde(rename="sv", alias="SV")]
+    #[serde(rename = "sv", alias = "SV")]
     Swedish,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub enum EUCountry {
-    #[serde(rename="at", alias="AT")]
+    #[serde(rename = "at", alias = "AT")]
     Austria,
-    #[serde(rename="be", alias="BE")]
+    #[serde(rename = "be", alias = "BE")]
     Belgium,
-    #[serde(rename="bg", alias="BG")]
+    #[serde(rename = "bg", alias = "BG")]
     Bulgaria,
-    #[serde(rename="cz", alias="CZ")]
+    #[serde(rename = "cz", alias = "CZ")]
     Czech,
-    #[serde(rename="cy", alias="CY")]
+    #[serde(rename = "cy", alias = "CY")]
     Cyprus,
-    #[serde(rename="de", alias="DE")]
+    #[serde(rename = "de", alias = "DE")]
     Germany,
-    #[serde(rename="dk", alias="DK")]
+    #[serde(rename = "dk", alias = "DK")]
     Denmark,
-    #[serde(rename="es", alias="ES")]
+    #[serde(rename = "es", alias = "ES")]
     Spain,
-    #[serde(rename="ee", alias="EE")]
+    #[serde(rename = "ee", alias = "EE")]
     Estonia,
-    #[serde(rename="fi", alias="FI")]
+    #[serde(rename = "fi", alias = "FI")]
     Finland,
-    #[serde(rename="fr", alias="FR")]
+    #[serde(rename = "fr", alias = "FR")]
     France,
-    #[serde(rename="gr", alias="GR")]
+    #[serde(rename = "gr", alias = "GR")]
     Greece,
-    #[serde(rename="hu", alias="HU")]
+    #[serde(rename = "hu", alias = "HU")]
     Hungary,
-    #[serde(rename="ie", alias="IE")]
+    #[serde(rename = "ie", alias = "IE")]
     Ireland,
-    #[serde(rename="it", alias="IT")]
+    #[serde(rename = "it", alias = "IT")]
     Italy,
-    #[serde(rename="li", alias="LI")]
+    #[serde(rename = "li", alias = "LI")]
     Liechtenstein,
-    #[serde(rename="lt", alias="LT")]
+    #[serde(rename = "lt", alias = "LT")]
     Lithuania,
-    #[serde(rename="lu", alias="LU")]
+    #[serde(rename = "lu", alias = "LU")]
     Luxembourg,
-    #[serde(rename="lv", alias="LV")]
+    #[serde(rename = "lv", alias = "LV")]
     Latvia,
-    #[serde(rename="mt", alias="MT")]
+    #[serde(rename = "mt", alias = "MT")]
     Malta,
-    #[serde(rename="nl", alias="NL")]
+    #[serde(rename = "nl", alias = "NL")]
     Netherlands,
-    #[serde(rename="pl", alias="PL")]
+    #[serde(rename = "pl", alias = "PL")]
     Poland,
-    #[serde(rename="pt", alias="PT")]
+    #[serde(rename = "pt", alias = "PT")]
     Portugal,
-    #[serde(rename="ro", alias="RO")]
+    #[serde(rename = "ro", alias = "RO")]
     Romania,
-    #[serde(rename="se", alias="SE")]
+    #[serde(rename = "se", alias = "SE")]
     Sweden,
-    #[serde(rename="sk", alias="SK")]
+    #[serde(rename = "sk", alias = "SK")]
     Slovakia,
-    #[serde(rename="si", alias="SI")]
+    #[serde(rename = "si", alias = "SI")]
     Slovenia,
-    #[serde(rename="hr", alias="HR")]
-    Croatia
+    #[serde(rename = "hr", alias = "HR")]
+    Croatia,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub enum CALegalType {
-    #[serde(rename="ABO")]
+    #[serde(rename = "ABO")]
     AboriginalPeoples,
-    #[serde(rename="ASS")]
+    #[serde(rename = "ASS")]
     CanadianUnincorporatedAssociation,
-    #[serde(rename="CCO")]
+    #[serde(rename = "CCO")]
     Corporation,
-    #[serde(rename="CCT")]
+    #[serde(rename = "CCT")]
     Citizen,
-    #[serde(rename="EDU")]
+    #[serde(rename = "EDU")]
     CanadianEducationalInstitution,
-    #[serde(rename="GOV")]
+    #[serde(rename = "GOV")]
     Government,
-    #[serde(rename="HOP")]
+    #[serde(rename = "HOP")]
     CanadianHospital,
-    #[serde(rename="INB")]
+    #[serde(rename = "INB")]
     IndianBand,
-    #[serde(rename="LAM")]
+    #[serde(rename = "LAM")]
     CanadianLibraryArchiveMuseum,
-    #[serde(rename="LGR")]
+    #[serde(rename = "LGR")]
     LegalRepOfCanadianCitizenOrPermanentResident,
-    #[serde(rename="HMQ")]
+    #[serde(rename = "HMQ")]
     TheQueen,
-    #[serde(rename="OMK")]
+    #[serde(rename = "OMK")]
     OfficialMark,
-    #[serde(rename="PLT")]
+    #[serde(rename = "PLT")]
     CanadianPoliticalParty,
-    #[serde(rename="PRT")]
+    #[serde(rename = "PRT")]
     Partnership,
-    #[serde(rename="RES")]
+    #[serde(rename = "RES")]
     PermanentResident,
-    #[serde(rename="TDM")]
+    #[serde(rename = "TDM")]
     TradeMark,
-    #[serde(rename="TRD")]
+    #[serde(rename = "TRD")]
     TradeUnion,
-    #[serde(rename="TRS")]
-    Trust
+    #[serde(rename = "TRS")]
+    Trust,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -824,7 +917,6 @@ pub enum USPurpose {
     #[serde(rename = "P5")]
     Government,
 }
-
 
 #[derive(Debug, Serialize, Deserialize)]
 pub enum USCategory {

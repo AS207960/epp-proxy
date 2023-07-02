@@ -261,7 +261,9 @@ impl
         let keysys = match extension {
             Some(ext) => {
                 let i = ext.value.iter().find_map(|p| match p {
-                    proto::EPPResponseExtensionType::KeysysResultData(proto::keysys::ResultData::Domain(i)) => Some(i),
+                    proto::EPPResponseExtensionType::KeysysResultData(
+                        proto::keysys::ResultData::Domain(i),
+                    ) => Some(i),
                     _ => None,
                 });
                 match i.map(TryInto::try_into) {
@@ -829,7 +831,7 @@ pub fn handle_check(client: &ServerFeatures, req: &CheckRequest) -> HandleReqRet
                             Ok(proto::fee::EPPFee08CheckDomain {
                                 name: req.name.to_owned(),
                                 currency: fee_check.currency.to_owned(),
-                                command:  proto::fee::EPPFeeCommand {
+                                command: proto::fee::EPPFeeCommand {
                                     command: match (&c.command).into() {
                                         Some(n) => n,
                                         None => return Err(Err(Error::Unsupported)),
@@ -853,7 +855,7 @@ pub fn handle_check(client: &ServerFeatures, req: &CheckRequest) -> HandleReqRet
                             Ok(proto::fee::EPPFee07CheckDomain {
                                 name: req.name.to_owned(),
                                 currency: fee_check.currency.to_owned(),
-                                command:  proto::fee::EPPFeeCommand {
+                                command: proto::fee::EPPFeeCommand {
                                     command: match (&c.command).into() {
                                         Some(n) => n,
                                         None => return Err(Err(Error::Unsupported)),
@@ -932,9 +934,11 @@ pub fn handle_check(client: &ServerFeatures, req: &CheckRequest) -> HandleReqRet
 
     if let Some(keysys) = &req.keysys {
         if client.keysys_supported {
-            ext.push(proto::EPPCommandExtensionType::KeysysCheck(proto::keysys::Check::Domain(proto::keysys::DomainCheck {
-                allocation_token: keysys.allocation_token.to_owned(),
-            })));
+            ext.push(proto::EPPCommandExtensionType::KeysysCheck(
+                proto::keysys::Check::Domain(proto::keysys::DomainCheck {
+                    allocation_token: keysys.allocation_token.to_owned(),
+                }),
+            ));
         } else {
             return Err(Err(Error::Unsupported));
         }
@@ -1481,7 +1485,7 @@ pub fn handle_create(
             let mut e = proto::keysys::DomainCreate {
                 accept_premium_price: Some(keysys.accept_premium_price),
                 accept_ssl_requirement: Some(keysys.accept_ssl_requirements),
-                allocation_token: keysys.allocation_token.as_ref().map(|t| t.clone()),
+                allocation_token: keysys.allocation_token.as_ref().cloned(),
                 ca_legal_type: None,
                 ca_trademark: None,
                 eu_accept_trustee_tac: None,
@@ -1505,28 +1509,50 @@ pub fn handle_create(
                 us_category: None,
                 us_validator: None,
                 renewal_mode: Some(match keysys.renewal_mode {
-                    super::super::keysys::RenewalMode::Default => proto::keysys::RenewalMode::Default,
-                    super::super::keysys::RenewalMode::AutoDelete => proto::keysys::RenewalMode::AutoDelete,
-                    super::super::keysys::RenewalMode::AutoExpire => proto::keysys::RenewalMode::AutoExpire,
-                    super::super::keysys::RenewalMode::AutoRenew => proto::keysys::RenewalMode::AutoRenew,
-                    super::super::keysys::RenewalMode::AutoRenewQuarterly => proto::keysys::RenewalMode::AutoRenewQuarterly,
-                    super::super::keysys::RenewalMode::AutoRenewMonthly => proto::keysys::RenewalMode::AutoRenewMonthly,
-                    super::super::keysys::RenewalMode::ExpireAuction => proto::keysys::RenewalMode::ExpireAuction,
-                    super::super::keysys::RenewalMode::RenewOnce => proto::keysys::RenewalMode::RenewOnce,
+                    super::super::keysys::RenewalMode::Default => {
+                        proto::keysys::RenewalMode::Default
+                    }
+                    super::super::keysys::RenewalMode::AutoDelete => {
+                        proto::keysys::RenewalMode::AutoDelete
+                    }
+                    super::super::keysys::RenewalMode::AutoExpire => {
+                        proto::keysys::RenewalMode::AutoExpire
+                    }
+                    super::super::keysys::RenewalMode::AutoRenew => {
+                        proto::keysys::RenewalMode::AutoRenew
+                    }
+                    super::super::keysys::RenewalMode::AutoRenewQuarterly => {
+                        proto::keysys::RenewalMode::AutoRenewQuarterly
+                    }
+                    super::super::keysys::RenewalMode::AutoRenewMonthly => {
+                        proto::keysys::RenewalMode::AutoRenewMonthly
+                    }
+                    super::super::keysys::RenewalMode::ExpireAuction => {
+                        proto::keysys::RenewalMode::ExpireAuction
+                    }
+                    super::super::keysys::RenewalMode::RenewOnce => {
+                        proto::keysys::RenewalMode::RenewOnce
+                    }
                 }),
                 transfer_mode: Some(match keysys.transfer_mode {
-                    super::super::keysys::TransferMode::Default => proto::keysys::TransferMode::Default,
-                    super::super::keysys::TransferMode::AutoApprove => proto::keysys::TransferMode::AutoApprove,
-                    super::super::keysys::TransferMode::AutoDeny => proto::keysys::TransferMode::AutoDeny,
+                    super::super::keysys::TransferMode::Default => {
+                        proto::keysys::TransferMode::Default
+                    }
+                    super::super::keysys::TransferMode::AutoApprove => {
+                        proto::keysys::TransferMode::AutoApprove
+                    }
+                    super::super::keysys::TransferMode::AutoDeny => {
+                        proto::keysys::TransferMode::AutoDeny
+                    }
                 }),
-                whois_banner_0: keysys.whois_banner.get(0).map(|s| s.clone()),
-                whois_banner_1: keysys.whois_banner.get(1).map(|s| s.clone()),
-                whois_rsp: keysys.whois_rsp.as_ref().map(|s| s.clone()),
-                whois_url: keysys.whois_url.as_ref().map(|s| s.clone()),
+                whois_banner_0: keysys.whois_banner.get(0).cloned(),
+                whois_banner_1: keysys.whois_banner.get(1).cloned(),
+                whois_rsp: keysys.whois_rsp.as_ref().cloned(),
+                whois_url: keysys.whois_url.as_ref().cloned(),
             };
 
             match &keysys.tld {
-                None => {},
+                None => {}
                 Some(super::super::keysys::DomainCreateTLD::CA(d)) => {
                     e.ca_legal_type = Some(match d.legal_type {
                         super::super::keysys::CALegalType::CanadianPoliticalParty => proto::keysys::CALegalType::CanadianPoliticalParty,
@@ -1549,119 +1575,258 @@ pub fn handle_create(
                         super::super::keysys::CALegalType::Trust => proto::keysys::CALegalType::Trust,
                     });
                     e.ca_trademark = Some(d.trademark);
-                },
+                }
                 Some(super::super::keysys::DomainCreateTLD::EU(d)) => {
                     e.eu_accept_trustee_tac = Some(d.accept_trustee_tac);
                     e.eu_registrant_lang = d.registrant_lang.as_ref().map(|c| match c {
-                        super::super::keysys::EULanguage::Bulgarian => proto::keysys::EULanguage::Bulgarian,
+                        super::super::keysys::EULanguage::Bulgarian => {
+                            proto::keysys::EULanguage::Bulgarian
+                        }
                         super::super::keysys::EULanguage::Czech => proto::keysys::EULanguage::Czech,
-                        super::super::keysys::EULanguage::Croatian => proto::keysys::EULanguage::Croatian,
-                        super::super::keysys::EULanguage::DutchFlemish => proto::keysys::EULanguage::DutchFlemish,
-                        super::super::keysys::EULanguage::Danish => proto::keysys::EULanguage::Danish,
-                        super::super::keysys::EULanguage::Estonian => proto::keysys::EULanguage::Estonian,
-                        super::super::keysys::EULanguage::English => proto::keysys::EULanguage::English,
-                        super::super::keysys::EULanguage::French => proto::keysys::EULanguage::French,
-                        super::super::keysys::EULanguage::Finnish => proto::keysys::EULanguage::Finnish,
-                        super::super::keysys::EULanguage::Gaelic => proto::keysys::EULanguage::Gaelic,
-                        super::super::keysys::EULanguage::German => proto::keysys::EULanguage::German,
-                        super::super::keysys::EULanguage::Hungarian => proto::keysys::EULanguage::Hungarian,
-                        super::super::keysys::EULanguage::Italian => proto::keysys::EULanguage::Italian,
-                        super::super::keysys::EULanguage::Latvian => proto::keysys::EULanguage::Latvian,
-                        super::super::keysys::EULanguage::Lithuanian => proto::keysys::EULanguage::Lithuanian,
-                        super::super::keysys::EULanguage::Maltese => proto::keysys::EULanguage::Maltese,
-                        super::super::keysys::EULanguage::ModernGreek => proto::keysys::EULanguage::ModernGreek,
-                        super::super::keysys::EULanguage::Portuguese => proto::keysys::EULanguage::Portuguese,
-                        super::super::keysys::EULanguage::Polish => proto::keysys::EULanguage::Polish,
-                        super::super::keysys::EULanguage::Romanian => proto::keysys::EULanguage::Romanian,
-                        super::super::keysys::EULanguage::Swedish => proto::keysys::EULanguage::Swedish,
-                        super::super::keysys::EULanguage::Slovene => proto::keysys::EULanguage::Slovene,
-                        super::super::keysys::EULanguage::Slovak => proto::keysys::EULanguage::Slovak,
-                        super::super::keysys::EULanguage::Spanish => proto::keysys::EULanguage::Spanish,
+                        super::super::keysys::EULanguage::Croatian => {
+                            proto::keysys::EULanguage::Croatian
+                        }
+                        super::super::keysys::EULanguage::DutchFlemish => {
+                            proto::keysys::EULanguage::DutchFlemish
+                        }
+                        super::super::keysys::EULanguage::Danish => {
+                            proto::keysys::EULanguage::Danish
+                        }
+                        super::super::keysys::EULanguage::Estonian => {
+                            proto::keysys::EULanguage::Estonian
+                        }
+                        super::super::keysys::EULanguage::English => {
+                            proto::keysys::EULanguage::English
+                        }
+                        super::super::keysys::EULanguage::French => {
+                            proto::keysys::EULanguage::French
+                        }
+                        super::super::keysys::EULanguage::Finnish => {
+                            proto::keysys::EULanguage::Finnish
+                        }
+                        super::super::keysys::EULanguage::Gaelic => {
+                            proto::keysys::EULanguage::Gaelic
+                        }
+                        super::super::keysys::EULanguage::German => {
+                            proto::keysys::EULanguage::German
+                        }
+                        super::super::keysys::EULanguage::Hungarian => {
+                            proto::keysys::EULanguage::Hungarian
+                        }
+                        super::super::keysys::EULanguage::Italian => {
+                            proto::keysys::EULanguage::Italian
+                        }
+                        super::super::keysys::EULanguage::Latvian => {
+                            proto::keysys::EULanguage::Latvian
+                        }
+                        super::super::keysys::EULanguage::Lithuanian => {
+                            proto::keysys::EULanguage::Lithuanian
+                        }
+                        super::super::keysys::EULanguage::Maltese => {
+                            proto::keysys::EULanguage::Maltese
+                        }
+                        super::super::keysys::EULanguage::ModernGreek => {
+                            proto::keysys::EULanguage::ModernGreek
+                        }
+                        super::super::keysys::EULanguage::Portuguese => {
+                            proto::keysys::EULanguage::Portuguese
+                        }
+                        super::super::keysys::EULanguage::Polish => {
+                            proto::keysys::EULanguage::Polish
+                        }
+                        super::super::keysys::EULanguage::Romanian => {
+                            proto::keysys::EULanguage::Romanian
+                        }
+                        super::super::keysys::EULanguage::Swedish => {
+                            proto::keysys::EULanguage::Swedish
+                        }
+                        super::super::keysys::EULanguage::Slovene => {
+                            proto::keysys::EULanguage::Slovene
+                        }
+                        super::super::keysys::EULanguage::Slovak => {
+                            proto::keysys::EULanguage::Slovak
+                        }
+                        super::super::keysys::EULanguage::Spanish => {
+                            proto::keysys::EULanguage::Spanish
+                        }
                     });
-                    e.eu_registrant_citizenship = d.registrant_citizenship.as_ref().map(|c| match c {
-                        super::super::keysys::EUCountry::Austria => proto::keysys::EUCountry::Austria,
-                        super::super::keysys::EUCountry::Bulgaria => proto::keysys::EUCountry::Bulgaria,
-                        super::super::keysys::EUCountry::Belgium => proto::keysys::EUCountry::Belgium,
-                        super::super::keysys::EUCountry::Croatia => proto::keysys::EUCountry::Croatia,
-                        super::super::keysys::EUCountry::Cyprus => proto::keysys::EUCountry::Cyprus,
-                        super::super::keysys::EUCountry::Czech => proto::keysys::EUCountry::Czech,
-                        super::super::keysys::EUCountry::Denmark => proto::keysys::EUCountry::Denmark,
-                        super::super::keysys::EUCountry::Estonia => proto::keysys::EUCountry::Estonia,
-                        super::super::keysys::EUCountry::France => proto::keysys::EUCountry::France,
-                        super::super::keysys::EUCountry::Finland => proto::keysys::EUCountry::Finland,
-                        super::super::keysys::EUCountry::Greece => proto::keysys::EUCountry::Greece,
-                        super::super::keysys::EUCountry::Germany => proto::keysys::EUCountry::Germany,
-                        super::super::keysys::EUCountry::Hungary => proto::keysys::EUCountry::Hungary,
-                        super::super::keysys::EUCountry::Italy => proto::keysys::EUCountry::Italy,
-                        super::super::keysys::EUCountry::Ireland => proto::keysys::EUCountry::Ireland,
-                        super::super::keysys::EUCountry::Latvia => proto::keysys::EUCountry::Latvia,
-                        super::super::keysys::EUCountry::Luxembourg => proto::keysys::EUCountry::Luxembourg,
-                        super::super::keysys::EUCountry::Lithuania => proto::keysys::EUCountry::Lithuania,
-                        super::super::keysys::EUCountry::Liechtenstein => proto::keysys::EUCountry::Liechtenstein,
-                        super::super::keysys::EUCountry::Malta => proto::keysys::EUCountry::Malta,
-                        super::super::keysys::EUCountry::Netherlands => proto::keysys::EUCountry::Netherlands,
-                        super::super::keysys::EUCountry::Portugal => proto::keysys::EUCountry::Portugal,
-                        super::super::keysys::EUCountry::Poland => proto::keysys::EUCountry::Poland,
-                        super::super::keysys::EUCountry::Romania => proto::keysys::EUCountry::Romania,
-                        super::super::keysys::EUCountry::Slovenia => proto::keysys::EUCountry::Slovenia,
-                        super::super::keysys::EUCountry::Slovakia => proto::keysys::EUCountry::Slovakia,
-                        super::super::keysys::EUCountry::Spain => proto::keysys::EUCountry::Spain,
-                        super::super::keysys::EUCountry::Sweden => proto::keysys::EUCountry::Sweden,
-                    });
-                },
+                    e.eu_registrant_citizenship =
+                        d.registrant_citizenship.as_ref().map(|c| match c {
+                            super::super::keysys::EUCountry::Austria => {
+                                proto::keysys::EUCountry::Austria
+                            }
+                            super::super::keysys::EUCountry::Bulgaria => {
+                                proto::keysys::EUCountry::Bulgaria
+                            }
+                            super::super::keysys::EUCountry::Belgium => {
+                                proto::keysys::EUCountry::Belgium
+                            }
+                            super::super::keysys::EUCountry::Croatia => {
+                                proto::keysys::EUCountry::Croatia
+                            }
+                            super::super::keysys::EUCountry::Cyprus => {
+                                proto::keysys::EUCountry::Cyprus
+                            }
+                            super::super::keysys::EUCountry::Czech => {
+                                proto::keysys::EUCountry::Czech
+                            }
+                            super::super::keysys::EUCountry::Denmark => {
+                                proto::keysys::EUCountry::Denmark
+                            }
+                            super::super::keysys::EUCountry::Estonia => {
+                                proto::keysys::EUCountry::Estonia
+                            }
+                            super::super::keysys::EUCountry::France => {
+                                proto::keysys::EUCountry::France
+                            }
+                            super::super::keysys::EUCountry::Finland => {
+                                proto::keysys::EUCountry::Finland
+                            }
+                            super::super::keysys::EUCountry::Greece => {
+                                proto::keysys::EUCountry::Greece
+                            }
+                            super::super::keysys::EUCountry::Germany => {
+                                proto::keysys::EUCountry::Germany
+                            }
+                            super::super::keysys::EUCountry::Hungary => {
+                                proto::keysys::EUCountry::Hungary
+                            }
+                            super::super::keysys::EUCountry::Italy => {
+                                proto::keysys::EUCountry::Italy
+                            }
+                            super::super::keysys::EUCountry::Ireland => {
+                                proto::keysys::EUCountry::Ireland
+                            }
+                            super::super::keysys::EUCountry::Latvia => {
+                                proto::keysys::EUCountry::Latvia
+                            }
+                            super::super::keysys::EUCountry::Luxembourg => {
+                                proto::keysys::EUCountry::Luxembourg
+                            }
+                            super::super::keysys::EUCountry::Lithuania => {
+                                proto::keysys::EUCountry::Lithuania
+                            }
+                            super::super::keysys::EUCountry::Liechtenstein => {
+                                proto::keysys::EUCountry::Liechtenstein
+                            }
+                            super::super::keysys::EUCountry::Malta => {
+                                proto::keysys::EUCountry::Malta
+                            }
+                            super::super::keysys::EUCountry::Netherlands => {
+                                proto::keysys::EUCountry::Netherlands
+                            }
+                            super::super::keysys::EUCountry::Portugal => {
+                                proto::keysys::EUCountry::Portugal
+                            }
+                            super::super::keysys::EUCountry::Poland => {
+                                proto::keysys::EUCountry::Poland
+                            }
+                            super::super::keysys::EUCountry::Romania => {
+                                proto::keysys::EUCountry::Romania
+                            }
+                            super::super::keysys::EUCountry::Slovenia => {
+                                proto::keysys::EUCountry::Slovenia
+                            }
+                            super::super::keysys::EUCountry::Slovakia => {
+                                proto::keysys::EUCountry::Slovakia
+                            }
+                            super::super::keysys::EUCountry::Spain => {
+                                proto::keysys::EUCountry::Spain
+                            }
+                            super::super::keysys::EUCountry::Sweden => {
+                                proto::keysys::EUCountry::Sweden
+                            }
+                        });
+                }
                 Some(super::super::keysys::DomainCreateTLD::DE(d)) => {
-                    e.de_abuse_contact = d.abuse_contact.as_ref().map(|s| s.clone());
+                    e.de_abuse_contact = d.abuse_contact.as_ref().cloned();
                     e.de_accept_trustee_tac = Some(match d.accept_trustee_tac {
                         super::super::keysys::DETrustee::None => proto::keysys::DETrustee::None,
-                        super::super::keysys::DETrustee::Annually => proto::keysys::DETrustee::Annual,
-                        super::super::keysys::DETrustee::Monthly => proto::keysys::DETrustee::Monthly,
+                        super::super::keysys::DETrustee::Annually => {
+                            proto::keysys::DETrustee::Annual
+                        }
+                        super::super::keysys::DETrustee::Monthly => {
+                            proto::keysys::DETrustee::Monthly
+                        }
                     });
-                    e.de_general_request = d.general_request.as_ref().map(|s| s.clone());
+                    e.de_general_request = d.general_request.as_ref().cloned();
                     e.de_holder_person = Some(d.holder_person);
-                },
+                }
                 Some(super::super::keysys::DomainCreateTLD::FR(d)) => {
                     e.fr_accept_trustee_tac = Some(d.accept_trustee_tac);
-                },
+                }
                 Some(super::super::keysys::DomainCreateTLD::Gay(d)) => {
                     e.gay_accept_requirements = Some(d.accept_requirements);
-                },
+                }
                 Some(super::super::keysys::DomainCreateTLD::Name(d)) => {
-                    e.name_emailforward = d.email_forward.as_ref().map(|s| s.clone());
+                    e.name_emailforward = d.email_forward.as_ref().cloned();
                 }
                 Some(super::super::keysys::DomainCreateTLD::RS(d)) => {
                     match &d.owner {
-                        super::super::keysys::RsId::IDCard(n) => e.rs_owner_idcard = Some(n.clone()),
-                        super::super::keysys::RsId::CompanyNumber(n) => e.rs_owner_company_number = Some(n.clone()),
+                        super::super::keysys::RsId::IDCard(n) => {
+                            e.rs_owner_idcard = Some(n.clone())
+                        }
+                        super::super::keysys::RsId::CompanyNumber(n) => {
+                            e.rs_owner_company_number = Some(n.clone())
+                        }
                     }
                     match &d.tech {
                         super::super::keysys::RsId::IDCard(n) => e.rs_tech_idcard = Some(n.clone()),
-                        super::super::keysys::RsId::CompanyNumber(n) => e.rs_tech_company_number = Some(n.clone()),
+                        super::super::keysys::RsId::CompanyNumber(n) => {
+                            e.rs_tech_company_number = Some(n.clone())
+                        }
                     }
                     match &d.admin {
-                        super::super::keysys::RsId::IDCard(n) => e.rs_admin_idcard = Some(n.clone()),
-                        super::super::keysys::RsId::CompanyNumber(n) => e.rs_admin_company_number = Some(n.clone()),
+                        super::super::keysys::RsId::IDCard(n) => {
+                            e.rs_admin_idcard = Some(n.clone())
+                        }
+                        super::super::keysys::RsId::CompanyNumber(n) => {
+                            e.rs_admin_company_number = Some(n.clone())
+                        }
                     }
                 }
                 Some(super::super::keysys::DomainCreateTLD::US(d)) => {
                     e.us_purpose = Some(match d.purpose {
-                        super::super::keysys::USPurpose::Business => proto::keysys::USPurpose::Business,
-                        super::super::keysys::USPurpose::Government => proto::keysys::USPurpose::Government,
-                        super::super::keysys::USPurpose::Personal => proto::keysys::USPurpose::Personal,
-                        super::super::keysys::USPurpose::NonProfit => proto::keysys::USPurpose::NonProfit,
-                        super::super::keysys::USPurpose::Educational => proto::keysys::USPurpose::Educational,
+                        super::super::keysys::USPurpose::Business => {
+                            proto::keysys::USPurpose::Business
+                        }
+                        super::super::keysys::USPurpose::Government => {
+                            proto::keysys::USPurpose::Government
+                        }
+                        super::super::keysys::USPurpose::Personal => {
+                            proto::keysys::USPurpose::Personal
+                        }
+                        super::super::keysys::USPurpose::NonProfit => {
+                            proto::keysys::USPurpose::NonProfit
+                        }
+                        super::super::keysys::USPurpose::Educational => {
+                            proto::keysys::USPurpose::Educational
+                        }
                     });
                     e.us_category = Some(match d.category {
-                        super::super::keysys::USCategory::Citizen => proto::keysys::USCategory::Citizen,
-                        super::super::keysys::USCategory::PermanentResident => proto::keysys::USCategory::PermanentResident,
-                        super::super::keysys::USCategory::USOrganisation => proto::keysys::USCategory::USOrganisation,
-                        super::super::keysys::USCategory::OfficeOrFacility => proto::keysys::USCategory::OfficeOrFacility,
-                        super::super::keysys::USCategory::RegularActivity => proto::keysys::USCategory::RegularActivity,
+                        super::super::keysys::USCategory::Citizen => {
+                            proto::keysys::USCategory::Citizen
+                        }
+                        super::super::keysys::USCategory::PermanentResident => {
+                            proto::keysys::USCategory::PermanentResident
+                        }
+                        super::super::keysys::USCategory::USOrganisation => {
+                            proto::keysys::USCategory::USOrganisation
+                        }
+                        super::super::keysys::USCategory::OfficeOrFacility => {
+                            proto::keysys::USCategory::OfficeOrFacility
+                        }
+                        super::super::keysys::USCategory::RegularActivity => {
+                            proto::keysys::USCategory::RegularActivity
+                        }
                     });
-                    e.us_validator = d.validator.as_ref().map(|s| s.clone());
+                    e.us_validator = d.validator.as_ref().cloned();
                 }
             }
 
-            exts.push(proto::EPPCommandExtensionType::KeysysCreate(proto::keysys::Create::Domain(e)));
+            exts.push(proto::EPPCommandExtensionType::KeysysCreate(
+                proto::keysys::Create::Domain(e),
+            ));
         } else {
             return Err(Err(Error::Unsupported));
         }
@@ -1763,16 +1928,26 @@ pub fn handle_delete(
 
     if let Some(keysys) = &req.keysys {
         if client.keysys_supported {
-            ext.push(proto::EPPCommandExtensionType::KeysysDelete(proto::keysys::Delete::Domain(proto::keysys::DomainDelete {
-                action: match keysys.action {
-                    super::super::keysys::DomainDeleteAction::Default => None,
-                    super::super::keysys::DomainDeleteAction::AutoExpire => Some(proto::keysys::DomainDeleteAction::AutoDelete),
-                    super::super::keysys::DomainDeleteAction::AutoDelete => Some(proto::keysys::DomainDeleteAction::AutoDelete),
-                    super::super::keysys::DomainDeleteAction::Instant => Some(proto::keysys::DomainDeleteAction::Instant),
-                    super::super::keysys::DomainDeleteAction::Push => Some(proto::keysys::DomainDeleteAction::Push),
-                },
-                target: keysys.target.as_ref().map(|s| s.clone()),
-            })));
+            ext.push(proto::EPPCommandExtensionType::KeysysDelete(
+                proto::keysys::Delete::Domain(proto::keysys::DomainDelete {
+                    action: match keysys.action {
+                        super::super::keysys::DomainDeleteAction::Default => None,
+                        super::super::keysys::DomainDeleteAction::AutoExpire => {
+                            Some(proto::keysys::DomainDeleteAction::AutoDelete)
+                        }
+                        super::super::keysys::DomainDeleteAction::AutoDelete => {
+                            Some(proto::keysys::DomainDeleteAction::AutoDelete)
+                        }
+                        super::super::keysys::DomainDeleteAction::Instant => {
+                            Some(proto::keysys::DomainDeleteAction::Instant)
+                        }
+                        super::super::keysys::DomainDeleteAction::Push => {
+                            Some(proto::keysys::DomainDeleteAction::Push)
+                        }
+                    },
+                    target: keysys.target.as_ref().cloned(),
+                }),
+            ));
         } else {
             return Err(Err(Error::Unsupported));
         }
@@ -2147,28 +2322,50 @@ pub fn handle_update(
                 us_category: None,
                 us_validator: None,
                 renewal_mode: keysys.renewal_mode.as_ref().map(|m| match m {
-                    super::super::keysys::RenewalMode::Default => proto::keysys::RenewalMode::Default,
-                    super::super::keysys::RenewalMode::AutoDelete => proto::keysys::RenewalMode::AutoDelete,
-                    super::super::keysys::RenewalMode::AutoExpire => proto::keysys::RenewalMode::AutoExpire,
-                    super::super::keysys::RenewalMode::AutoRenew => proto::keysys::RenewalMode::AutoRenew,
-                    super::super::keysys::RenewalMode::AutoRenewQuarterly => proto::keysys::RenewalMode::AutoRenewQuarterly,
-                    super::super::keysys::RenewalMode::AutoRenewMonthly => proto::keysys::RenewalMode::AutoRenewMonthly,
-                    super::super::keysys::RenewalMode::ExpireAuction => proto::keysys::RenewalMode::ExpireAuction,
-                    super::super::keysys::RenewalMode::RenewOnce => proto::keysys::RenewalMode::RenewOnce,
+                    super::super::keysys::RenewalMode::Default => {
+                        proto::keysys::RenewalMode::Default
+                    }
+                    super::super::keysys::RenewalMode::AutoDelete => {
+                        proto::keysys::RenewalMode::AutoDelete
+                    }
+                    super::super::keysys::RenewalMode::AutoExpire => {
+                        proto::keysys::RenewalMode::AutoExpire
+                    }
+                    super::super::keysys::RenewalMode::AutoRenew => {
+                        proto::keysys::RenewalMode::AutoRenew
+                    }
+                    super::super::keysys::RenewalMode::AutoRenewQuarterly => {
+                        proto::keysys::RenewalMode::AutoRenewQuarterly
+                    }
+                    super::super::keysys::RenewalMode::AutoRenewMonthly => {
+                        proto::keysys::RenewalMode::AutoRenewMonthly
+                    }
+                    super::super::keysys::RenewalMode::ExpireAuction => {
+                        proto::keysys::RenewalMode::ExpireAuction
+                    }
+                    super::super::keysys::RenewalMode::RenewOnce => {
+                        proto::keysys::RenewalMode::RenewOnce
+                    }
                 }),
                 transfer_mode: keysys.transfer_mode.as_ref().map(|m| match m {
-                    super::super::keysys::TransferMode::Default => proto::keysys::TransferMode::Default,
-                    super::super::keysys::TransferMode::AutoApprove => proto::keysys::TransferMode::AutoApprove,
-                    super::super::keysys::TransferMode::AutoDeny => proto::keysys::TransferMode::AutoDeny,
+                    super::super::keysys::TransferMode::Default => {
+                        proto::keysys::TransferMode::Default
+                    }
+                    super::super::keysys::TransferMode::AutoApprove => {
+                        proto::keysys::TransferMode::AutoApprove
+                    }
+                    super::super::keysys::TransferMode::AutoDeny => {
+                        proto::keysys::TransferMode::AutoDeny
+                    }
                 }),
-                whois_banner_0: keysys.whois_banner.get(0).map(|s| s.clone()),
-                whois_banner_1: keysys.whois_banner.get(1).map(|s| s.clone()),
-                whois_rsp: keysys.whois_rsp.as_ref().map(|s| s.clone()),
-                whois_url: keysys.whois_url.as_ref().map(|s| s.clone()),
+                whois_banner_0: keysys.whois_banner.get(0).cloned(),
+                whois_banner_1: keysys.whois_banner.get(1).cloned(),
+                whois_rsp: keysys.whois_rsp.as_ref().cloned(),
+                whois_url: keysys.whois_url.as_ref().cloned(),
             };
 
             match &keysys.tld {
-                None => {},
+                None => {}
                 Some(super::super::keysys::DomainUpdateTLD::CA(d)) => {
                     e.ca_legal_type = d.legal_type.as_ref().map(|t| match t {
                         super::super::keysys::CALegalType::CanadianPoliticalParty => proto::keysys::CALegalType::CanadianPoliticalParty,
@@ -2191,119 +2388,260 @@ pub fn handle_update(
                         super::super::keysys::CALegalType::Trust => proto::keysys::CALegalType::Trust,
                     });
                     e.ca_trademark = d.trademark;
-                },
+                }
                 Some(super::super::keysys::DomainUpdateTLD::EU(d)) => {
                     e.eu_accept_trustee_tac = d.accept_trustee_tac;
                     e.eu_registrant_lang = d.registrant_lang.as_ref().map(|c| match c {
-                        super::super::keysys::EULanguage::Bulgarian => proto::keysys::EULanguage::Bulgarian,
+                        super::super::keysys::EULanguage::Bulgarian => {
+                            proto::keysys::EULanguage::Bulgarian
+                        }
                         super::super::keysys::EULanguage::Czech => proto::keysys::EULanguage::Czech,
-                        super::super::keysys::EULanguage::Croatian => proto::keysys::EULanguage::Croatian,
-                        super::super::keysys::EULanguage::DutchFlemish => proto::keysys::EULanguage::DutchFlemish,
-                        super::super::keysys::EULanguage::Danish => proto::keysys::EULanguage::Danish,
-                        super::super::keysys::EULanguage::Estonian => proto::keysys::EULanguage::Estonian,
-                        super::super::keysys::EULanguage::English => proto::keysys::EULanguage::English,
-                        super::super::keysys::EULanguage::French => proto::keysys::EULanguage::French,
-                        super::super::keysys::EULanguage::Finnish => proto::keysys::EULanguage::Finnish,
-                        super::super::keysys::EULanguage::Gaelic => proto::keysys::EULanguage::Gaelic,
-                        super::super::keysys::EULanguage::German => proto::keysys::EULanguage::German,
-                        super::super::keysys::EULanguage::Hungarian => proto::keysys::EULanguage::Hungarian,
-                        super::super::keysys::EULanguage::Italian => proto::keysys::EULanguage::Italian,
-                        super::super::keysys::EULanguage::Latvian => proto::keysys::EULanguage::Latvian,
-                        super::super::keysys::EULanguage::Lithuanian => proto::keysys::EULanguage::Lithuanian,
-                        super::super::keysys::EULanguage::Maltese => proto::keysys::EULanguage::Maltese,
-                        super::super::keysys::EULanguage::ModernGreek => proto::keysys::EULanguage::ModernGreek,
-                        super::super::keysys::EULanguage::Portuguese => proto::keysys::EULanguage::Portuguese,
-                        super::super::keysys::EULanguage::Polish => proto::keysys::EULanguage::Polish,
-                        super::super::keysys::EULanguage::Romanian => proto::keysys::EULanguage::Romanian,
-                        super::super::keysys::EULanguage::Swedish => proto::keysys::EULanguage::Swedish,
-                        super::super::keysys::EULanguage::Slovene => proto::keysys::EULanguage::Slovene,
-                        super::super::keysys::EULanguage::Slovak => proto::keysys::EULanguage::Slovak,
-                        super::super::keysys::EULanguage::Spanish => proto::keysys::EULanguage::Spanish,
+                        super::super::keysys::EULanguage::Croatian => {
+                            proto::keysys::EULanguage::Croatian
+                        }
+                        super::super::keysys::EULanguage::DutchFlemish => {
+                            proto::keysys::EULanguage::DutchFlemish
+                        }
+                        super::super::keysys::EULanguage::Danish => {
+                            proto::keysys::EULanguage::Danish
+                        }
+                        super::super::keysys::EULanguage::Estonian => {
+                            proto::keysys::EULanguage::Estonian
+                        }
+                        super::super::keysys::EULanguage::English => {
+                            proto::keysys::EULanguage::English
+                        }
+                        super::super::keysys::EULanguage::French => {
+                            proto::keysys::EULanguage::French
+                        }
+                        super::super::keysys::EULanguage::Finnish => {
+                            proto::keysys::EULanguage::Finnish
+                        }
+                        super::super::keysys::EULanguage::Gaelic => {
+                            proto::keysys::EULanguage::Gaelic
+                        }
+                        super::super::keysys::EULanguage::German => {
+                            proto::keysys::EULanguage::German
+                        }
+                        super::super::keysys::EULanguage::Hungarian => {
+                            proto::keysys::EULanguage::Hungarian
+                        }
+                        super::super::keysys::EULanguage::Italian => {
+                            proto::keysys::EULanguage::Italian
+                        }
+                        super::super::keysys::EULanguage::Latvian => {
+                            proto::keysys::EULanguage::Latvian
+                        }
+                        super::super::keysys::EULanguage::Lithuanian => {
+                            proto::keysys::EULanguage::Lithuanian
+                        }
+                        super::super::keysys::EULanguage::Maltese => {
+                            proto::keysys::EULanguage::Maltese
+                        }
+                        super::super::keysys::EULanguage::ModernGreek => {
+                            proto::keysys::EULanguage::ModernGreek
+                        }
+                        super::super::keysys::EULanguage::Portuguese => {
+                            proto::keysys::EULanguage::Portuguese
+                        }
+                        super::super::keysys::EULanguage::Polish => {
+                            proto::keysys::EULanguage::Polish
+                        }
+                        super::super::keysys::EULanguage::Romanian => {
+                            proto::keysys::EULanguage::Romanian
+                        }
+                        super::super::keysys::EULanguage::Swedish => {
+                            proto::keysys::EULanguage::Swedish
+                        }
+                        super::super::keysys::EULanguage::Slovene => {
+                            proto::keysys::EULanguage::Slovene
+                        }
+                        super::super::keysys::EULanguage::Slovak => {
+                            proto::keysys::EULanguage::Slovak
+                        }
+                        super::super::keysys::EULanguage::Spanish => {
+                            proto::keysys::EULanguage::Spanish
+                        }
                     });
-                    e.eu_registrant_citizenship = d.registrant_citizenship.as_ref().map(|c| match c {
-                        super::super::keysys::EUCountry::Austria => proto::keysys::EUCountry::Austria,
-                        super::super::keysys::EUCountry::Bulgaria => proto::keysys::EUCountry::Bulgaria,
-                        super::super::keysys::EUCountry::Belgium => proto::keysys::EUCountry::Belgium,
-                        super::super::keysys::EUCountry::Croatia => proto::keysys::EUCountry::Croatia,
-                        super::super::keysys::EUCountry::Cyprus => proto::keysys::EUCountry::Cyprus,
-                        super::super::keysys::EUCountry::Czech => proto::keysys::EUCountry::Czech,
-                        super::super::keysys::EUCountry::Denmark => proto::keysys::EUCountry::Denmark,
-                        super::super::keysys::EUCountry::Estonia => proto::keysys::EUCountry::Estonia,
-                        super::super::keysys::EUCountry::France => proto::keysys::EUCountry::France,
-                        super::super::keysys::EUCountry::Finland => proto::keysys::EUCountry::Finland,
-                        super::super::keysys::EUCountry::Greece => proto::keysys::EUCountry::Greece,
-                        super::super::keysys::EUCountry::Germany => proto::keysys::EUCountry::Germany,
-                        super::super::keysys::EUCountry::Hungary => proto::keysys::EUCountry::Hungary,
-                        super::super::keysys::EUCountry::Italy => proto::keysys::EUCountry::Italy,
-                        super::super::keysys::EUCountry::Ireland => proto::keysys::EUCountry::Ireland,
-                        super::super::keysys::EUCountry::Latvia => proto::keysys::EUCountry::Latvia,
-                        super::super::keysys::EUCountry::Luxembourg => proto::keysys::EUCountry::Luxembourg,
-                        super::super::keysys::EUCountry::Lithuania => proto::keysys::EUCountry::Lithuania,
-                        super::super::keysys::EUCountry::Liechtenstein => proto::keysys::EUCountry::Liechtenstein,
-                        super::super::keysys::EUCountry::Malta => proto::keysys::EUCountry::Malta,
-                        super::super::keysys::EUCountry::Netherlands => proto::keysys::EUCountry::Netherlands,
-                        super::super::keysys::EUCountry::Portugal => proto::keysys::EUCountry::Portugal,
-                        super::super::keysys::EUCountry::Poland => proto::keysys::EUCountry::Poland,
-                        super::super::keysys::EUCountry::Romania => proto::keysys::EUCountry::Romania,
-                        super::super::keysys::EUCountry::Slovenia => proto::keysys::EUCountry::Slovenia,
-                        super::super::keysys::EUCountry::Slovakia => proto::keysys::EUCountry::Slovakia,
-                        super::super::keysys::EUCountry::Spain => proto::keysys::EUCountry::Spain,
-                        super::super::keysys::EUCountry::Sweden => proto::keysys::EUCountry::Sweden,
-                    });
-                },
+                    e.eu_registrant_citizenship =
+                        d.registrant_citizenship.as_ref().map(|c| match c {
+                            super::super::keysys::EUCountry::Austria => {
+                                proto::keysys::EUCountry::Austria
+                            }
+                            super::super::keysys::EUCountry::Bulgaria => {
+                                proto::keysys::EUCountry::Bulgaria
+                            }
+                            super::super::keysys::EUCountry::Belgium => {
+                                proto::keysys::EUCountry::Belgium
+                            }
+                            super::super::keysys::EUCountry::Croatia => {
+                                proto::keysys::EUCountry::Croatia
+                            }
+                            super::super::keysys::EUCountry::Cyprus => {
+                                proto::keysys::EUCountry::Cyprus
+                            }
+                            super::super::keysys::EUCountry::Czech => {
+                                proto::keysys::EUCountry::Czech
+                            }
+                            super::super::keysys::EUCountry::Denmark => {
+                                proto::keysys::EUCountry::Denmark
+                            }
+                            super::super::keysys::EUCountry::Estonia => {
+                                proto::keysys::EUCountry::Estonia
+                            }
+                            super::super::keysys::EUCountry::France => {
+                                proto::keysys::EUCountry::France
+                            }
+                            super::super::keysys::EUCountry::Finland => {
+                                proto::keysys::EUCountry::Finland
+                            }
+                            super::super::keysys::EUCountry::Greece => {
+                                proto::keysys::EUCountry::Greece
+                            }
+                            super::super::keysys::EUCountry::Germany => {
+                                proto::keysys::EUCountry::Germany
+                            }
+                            super::super::keysys::EUCountry::Hungary => {
+                                proto::keysys::EUCountry::Hungary
+                            }
+                            super::super::keysys::EUCountry::Italy => {
+                                proto::keysys::EUCountry::Italy
+                            }
+                            super::super::keysys::EUCountry::Ireland => {
+                                proto::keysys::EUCountry::Ireland
+                            }
+                            super::super::keysys::EUCountry::Latvia => {
+                                proto::keysys::EUCountry::Latvia
+                            }
+                            super::super::keysys::EUCountry::Luxembourg => {
+                                proto::keysys::EUCountry::Luxembourg
+                            }
+                            super::super::keysys::EUCountry::Lithuania => {
+                                proto::keysys::EUCountry::Lithuania
+                            }
+                            super::super::keysys::EUCountry::Liechtenstein => {
+                                proto::keysys::EUCountry::Liechtenstein
+                            }
+                            super::super::keysys::EUCountry::Malta => {
+                                proto::keysys::EUCountry::Malta
+                            }
+                            super::super::keysys::EUCountry::Netherlands => {
+                                proto::keysys::EUCountry::Netherlands
+                            }
+                            super::super::keysys::EUCountry::Portugal => {
+                                proto::keysys::EUCountry::Portugal
+                            }
+                            super::super::keysys::EUCountry::Poland => {
+                                proto::keysys::EUCountry::Poland
+                            }
+                            super::super::keysys::EUCountry::Romania => {
+                                proto::keysys::EUCountry::Romania
+                            }
+                            super::super::keysys::EUCountry::Slovenia => {
+                                proto::keysys::EUCountry::Slovenia
+                            }
+                            super::super::keysys::EUCountry::Slovakia => {
+                                proto::keysys::EUCountry::Slovakia
+                            }
+                            super::super::keysys::EUCountry::Spain => {
+                                proto::keysys::EUCountry::Spain
+                            }
+                            super::super::keysys::EUCountry::Sweden => {
+                                proto::keysys::EUCountry::Sweden
+                            }
+                        });
+                }
                 Some(super::super::keysys::DomainUpdateTLD::DE(d)) => {
-                    e.de_abuse_contact = d.abuse_contact.as_ref().map(|s| s.clone());
+                    e.de_abuse_contact = d.abuse_contact.as_ref().cloned();
                     e.de_accept_trustee_tac = d.accept_trustee_tac.as_ref().map(|t| match t {
                         super::super::keysys::DETrustee::None => proto::keysys::DETrustee::None,
-                        super::super::keysys::DETrustee::Annually => proto::keysys::DETrustee::Annual,
-                        super::super::keysys::DETrustee::Monthly => proto::keysys::DETrustee::Monthly,
+                        super::super::keysys::DETrustee::Annually => {
+                            proto::keysys::DETrustee::Annual
+                        }
+                        super::super::keysys::DETrustee::Monthly => {
+                            proto::keysys::DETrustee::Monthly
+                        }
                     });
-                    e.de_general_request = d.general_request.as_ref().map(|s| s.clone());
+                    e.de_general_request = d.general_request.as_ref().cloned();
                     e.de_holder_person = d.holder_person;
-                },
+                }
                 Some(super::super::keysys::DomainUpdateTLD::FR(d)) => {
                     e.fr_accept_trustee_tac = d.accept_trustee_tac;
-                },
+                }
                 Some(super::super::keysys::DomainUpdateTLD::Name(d)) => {
-                    e.name_emailforward = d.email_forward.as_ref().map(|s| s.clone());
+                    e.name_emailforward = d.email_forward.as_ref().cloned();
                 }
                 Some(super::super::keysys::DomainUpdateTLD::RS(d)) => {
                     match &d.owner {
-                        Some(super::super::keysys::RsId::IDCard(n)) => e.rs_owner_idcard = Some(n.clone()),
-                        Some(super::super::keysys::RsId::CompanyNumber(n)) => e.rs_owner_company_number = Some(n.clone()),
+                        Some(super::super::keysys::RsId::IDCard(n)) => {
+                            e.rs_owner_idcard = Some(n.clone())
+                        }
+                        Some(super::super::keysys::RsId::CompanyNumber(n)) => {
+                            e.rs_owner_company_number = Some(n.clone())
+                        }
                         None => {}
                     }
                     match &d.tech {
-                        Some(super::super::keysys::RsId::IDCard(n)) => e.rs_tech_idcard = Some(n.clone()),
-                        Some(super::super::keysys::RsId::CompanyNumber(n)) => e.rs_tech_company_number = Some(n.clone()),
+                        Some(super::super::keysys::RsId::IDCard(n)) => {
+                            e.rs_tech_idcard = Some(n.clone())
+                        }
+                        Some(super::super::keysys::RsId::CompanyNumber(n)) => {
+                            e.rs_tech_company_number = Some(n.clone())
+                        }
                         None => {}
                     }
                     match &d.admin {
-                        Some(super::super::keysys::RsId::IDCard(n)) => e.rs_admin_idcard = Some(n.clone()),
-                        Some(super::super::keysys::RsId::CompanyNumber(n)) => e.rs_admin_company_number = Some(n.clone()),
+                        Some(super::super::keysys::RsId::IDCard(n)) => {
+                            e.rs_admin_idcard = Some(n.clone())
+                        }
+                        Some(super::super::keysys::RsId::CompanyNumber(n)) => {
+                            e.rs_admin_company_number = Some(n.clone())
+                        }
                         None => {}
                     }
                 }
                 Some(super::super::keysys::DomainUpdateTLD::US(d)) => {
                     e.us_purpose = d.purpose.as_ref().map(|p| match p {
-                        super::super::keysys::USPurpose::Business => proto::keysys::USPurpose::Business,
-                        super::super::keysys::USPurpose::Government => proto::keysys::USPurpose::Government,
-                        super::super::keysys::USPurpose::Personal => proto::keysys::USPurpose::Personal,
-                        super::super::keysys::USPurpose::NonProfit => proto::keysys::USPurpose::NonProfit,
-                        super::super::keysys::USPurpose::Educational => proto::keysys::USPurpose::Educational,
+                        super::super::keysys::USPurpose::Business => {
+                            proto::keysys::USPurpose::Business
+                        }
+                        super::super::keysys::USPurpose::Government => {
+                            proto::keysys::USPurpose::Government
+                        }
+                        super::super::keysys::USPurpose::Personal => {
+                            proto::keysys::USPurpose::Personal
+                        }
+                        super::super::keysys::USPurpose::NonProfit => {
+                            proto::keysys::USPurpose::NonProfit
+                        }
+                        super::super::keysys::USPurpose::Educational => {
+                            proto::keysys::USPurpose::Educational
+                        }
                     });
                     e.us_category = d.category.as_ref().map(|c| match c {
-                        super::super::keysys::USCategory::Citizen => proto::keysys::USCategory::Citizen,
-                        super::super::keysys::USCategory::PermanentResident => proto::keysys::USCategory::PermanentResident,
-                        super::super::keysys::USCategory::USOrganisation => proto::keysys::USCategory::USOrganisation,
-                        super::super::keysys::USCategory::OfficeOrFacility => proto::keysys::USCategory::OfficeOrFacility,
-                        super::super::keysys::USCategory::RegularActivity => proto::keysys::USCategory::RegularActivity,
+                        super::super::keysys::USCategory::Citizen => {
+                            proto::keysys::USCategory::Citizen
+                        }
+                        super::super::keysys::USCategory::PermanentResident => {
+                            proto::keysys::USCategory::PermanentResident
+                        }
+                        super::super::keysys::USCategory::USOrganisation => {
+                            proto::keysys::USCategory::USOrganisation
+                        }
+                        super::super::keysys::USCategory::OfficeOrFacility => {
+                            proto::keysys::USCategory::OfficeOrFacility
+                        }
+                        super::super::keysys::USCategory::RegularActivity => {
+                            proto::keysys::USCategory::RegularActivity
+                        }
                     });
-                    e.us_validator = d.validator.as_ref().map(|s| s.clone());
+                    e.us_validator = d.validator.as_ref().cloned();
                 }
             }
 
-            exts.push(proto::EPPCommandExtensionType::KeysysUpdate(proto::keysys::Update::Domain(e)));
+            exts.push(proto::EPPCommandExtensionType::KeysysUpdate(
+                proto::keysys::Update::Domain(e),
+            ));
         } else {
             return Err(Err(Error::Unsupported));
         }
@@ -2500,10 +2838,12 @@ pub fn handle_renew(client: &ServerFeatures, req: &RenewRequest) -> HandleReqRet
 
     if let Some(keysys) = &req.keysys {
         if client.keysys_supported {
-            ext.push(proto::EPPCommandExtensionType::KeysysRenew(proto::keysys::Renew::Domain(proto::keysys::DomainRenew {
-                accept_premium_price: Some(keysys.accept_premium_price),
-                promotion_code: keysys.promotion_code.as_ref().map(|p| p.clone())
-            })));
+            ext.push(proto::EPPCommandExtensionType::KeysysRenew(
+                proto::keysys::Renew::Domain(proto::keysys::DomainRenew {
+                    accept_premium_price: Some(keysys.accept_premium_price),
+                    promotion_code: keysys.promotion_code.as_ref().cloned(),
+                }),
+            ));
         } else {
             return Err(Err(Error::Unsupported));
         }
@@ -2621,26 +2961,28 @@ pub fn handle_transfer_request(
 
     if let Some(keysys) = &req.keysys {
         if client.keysys_supported {
-            ext.push(proto::EPPCommandExtensionType::KeysysTransfer(proto::keysys::Transfer::Domain(proto::keysys::DomainTransfer {
-                accept_premium_price: Some(keysys.accept_premium_price),
-                accept_quarantine: Some(keysys.accept_quarantine),
-                accept_trade: Some(keysys.accept_trade),
-                allocation_token: keysys.allocation_token.as_ref().map(|a| a.clone()),
-                at_request_authcode: if keysys.at_request_authcode {
-                    Some(true)
-                } else {
-                    None
-                },
-                be_request_authcode: if keysys.be_request_authcode {
-                    Some(true)
-                } else {
-                    None
-                },
-                eu_accept_trustee_tac: None,
-                eu_registrant_lang: None,
-                eu_registrant_citizenship: None,
-                promotion_code: keysys.promotion_code.as_ref().map(|a| a.clone()),
-            })));
+            ext.push(proto::EPPCommandExtensionType::KeysysTransfer(
+                proto::keysys::Transfer::Domain(proto::keysys::DomainTransfer {
+                    accept_premium_price: Some(keysys.accept_premium_price),
+                    accept_quarantine: Some(keysys.accept_quarantine),
+                    accept_trade: Some(keysys.accept_trade),
+                    allocation_token: keysys.allocation_token.as_ref().cloned(),
+                    at_request_authcode: if keysys.at_request_authcode {
+                        Some(true)
+                    } else {
+                        None
+                    },
+                    be_request_authcode: if keysys.be_request_authcode {
+                        Some(true)
+                    } else {
+                        None
+                    },
+                    eu_accept_trustee_tac: None,
+                    eu_registrant_lang: None,
+                    eu_registrant_citizenship: None,
+                    promotion_code: keysys.promotion_code.as_ref().cloned(),
+                }),
+            ));
         } else {
             return Err(Err(Error::Unsupported));
         }
@@ -3031,10 +3373,10 @@ mod domain_tests {
             _ => unreachable!(),
         };
         let data = super::handle_check_response(*res).unwrap();
-        assert_eq!(data.avail, false);
+        assert!(!data.avail);
         assert_eq!(data.reason.unwrap(), "In use");
         let fee_check = data.fee_check.unwrap();
-        assert_eq!(fee_check.available, true);
+        assert!(fee_check.available);
         let command = fee_check.commands.get(0).unwrap();
         assert_eq!(command.command, super::fee::Command::Transfer);
         assert_eq!(command.class.as_ref().unwrap(), "STANDARD");

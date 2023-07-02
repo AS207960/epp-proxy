@@ -286,22 +286,26 @@ pub struct EURIDContactInfo {
     pub country_of_citizenship: Option<String>,
     #[serde(
         rename = "{http://www.eurid.eu/xml/epp/contact-ext-1.4}contact-ext:hasReservedDomain",
-        skip_serializing, default
+        skip_serializing,
+        default
     )]
     pub has_reserved_domain: bool,
     #[serde(
         rename = "{http://www.eurid.eu/xml/epp/contact-ext-1.4}contact-ext:hasDomainOnHold",
-        skip_serializing, default
+        skip_serializing,
+        default
     )]
     pub has_domain_on_hold: bool,
     #[serde(
         rename = "{http://www.eurid.eu/xml/epp/contact-ext-1.4}contact-ext:hasDomainRegistryLock",
-        skip_serializing, default
+        skip_serializing,
+        default
     )]
     pub has_domain_registry_lock: bool,
     #[serde(
         rename = "{http://www.eurid.eu/xml/epp/contact-ext-1.4}contact-ext:hasDomainRegistrarLock",
-        skip_serializing, default
+        skip_serializing,
+        default
     )]
     pub has_domain_registrar_lock: bool,
 }

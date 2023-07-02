@@ -14,6 +14,7 @@ pub mod eurid;
 pub mod fee;
 pub mod host;
 pub mod isnic;
+pub mod keysys;
 pub mod launch;
 pub mod login_sec;
 pub mod maintenance;
@@ -29,7 +30,6 @@ pub mod tmch;
 pub mod traficom;
 pub mod united_tld;
 pub mod verisign;
-pub mod keysys;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub enum EPPMessageType {
@@ -1158,16 +1158,7 @@ where
     D: serde::de::Deserializer<'de>,
 {
     let date = d.deserialize_option(OptDateTimeVisitor)?;
-    Ok(match date {
-        Some(d) => {
-            if d == Utc.with_ymd_and_hms(1, 1, 1, 0, 0, 0).unwrap() {
-                None
-            } else {
-                Some(d)
-            }
-        }
-        None => None,
-    })
+    Ok(date.filter(|&d| d != Utc.with_ymd_and_hms(1, 1, 1, 0, 0, 0).unwrap()))
 }
 
 fn deserialize_date_opt<'de, D>(d: D) -> Result<Option<NaiveDate>, D::Error>
@@ -1175,16 +1166,7 @@ where
     D: serde::de::Deserializer<'de>,
 {
     let date = d.deserialize_option(OptDateVisitor)?;
-    Ok(match date {
-        Some(d) => {
-            if d == NaiveDate::from_ymd_opt(1, 1, 1).unwrap() {
-                None
-            } else {
-                Some(d)
-            }
-        }
-        None => None,
-    })
+    Ok(date.filter(|&d| d != NaiveDate::from_ymd_opt(1, 1, 1).unwrap()))
 }
 
 #[allow(clippy::trivially_copy_pass_by_ref)]

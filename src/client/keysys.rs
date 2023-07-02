@@ -23,7 +23,7 @@ pub struct ContactUpdate {
 
 #[derive(Debug)]
 pub struct DomainCheck {
-    pub allocation_token: Option<String>
+    pub allocation_token: Option<String>,
 }
 
 #[derive(Debug)]
@@ -82,7 +82,7 @@ pub struct DomainTransfer {
 #[derive(Debug)]
 pub struct DomainDelete {
     pub action: DomainDeleteAction,
-    pub target: Option<String>
+    pub target: Option<String>,
 }
 
 #[derive(Debug)]
@@ -91,7 +91,7 @@ pub enum DomainDeleteAction {
     Instant,
     AutoDelete,
     AutoExpire,
-    Push
+    Push,
 }
 
 #[derive(Debug)]
@@ -144,14 +144,14 @@ pub struct DomainUpdateCA {
 pub struct DomainCreateEU {
     pub accept_trustee_tac: bool,
     pub registrant_lang: Option<EULanguage>,
-    pub registrant_citizenship: Option<EUCountry>
+    pub registrant_citizenship: Option<EUCountry>,
 }
 
 #[derive(Debug)]
 pub struct DomainUpdateEU {
     pub accept_trustee_tac: Option<bool>,
     pub registrant_lang: Option<EULanguage>,
-    pub registrant_citizenship: Option<EUCountry>
+    pub registrant_citizenship: Option<EUCountry>,
 }
 
 #[derive(Debug)]
@@ -172,22 +172,22 @@ pub struct DomainUpdateDE {
 
 #[derive(Debug)]
 pub struct DomainCreateFR {
-    pub accept_trustee_tac: bool
+    pub accept_trustee_tac: bool,
 }
 
 #[derive(Debug)]
 pub struct DomainUpdateFR {
-    pub accept_trustee_tac: Option<bool>
+    pub accept_trustee_tac: Option<bool>,
 }
 
 #[derive(Debug)]
 pub struct DomainCreateGay {
-    pub accept_requirements: bool
+    pub accept_requirements: bool,
 }
 
 #[derive(Debug)]
 pub struct DomainName {
-    pub email_forward: Option<String>
+    pub email_forward: Option<String>,
 }
 
 #[derive(Debug)]
@@ -207,21 +207,21 @@ pub struct DomainUpdateRS {
 #[derive(Debug)]
 pub enum RsId {
     IDCard(String),
-    CompanyNumber(String)
+    CompanyNumber(String),
 }
 
 #[derive(Debug)]
 pub struct DomainCreateUS {
     pub purpose: USPurpose,
     pub category: USCategory,
-    pub validator: Option<String>
+    pub validator: Option<String>,
 }
 
 #[derive(Debug)]
 pub struct DomainUpdateUS {
     pub purpose: Option<USPurpose>,
     pub category: Option<USCategory>,
-    pub validator: Option<String>
+    pub validator: Option<String>,
 }
 
 #[derive(Debug, Eq, PartialEq)]
@@ -247,7 +247,7 @@ pub enum TransferMode {
 pub enum DETrustee {
     None,
     Monthly,
-    Annually
+    Annually,
 }
 
 #[derive(Debug, Eq, PartialEq)]
@@ -269,7 +269,7 @@ pub enum CALegalType {
     PermanentResident,
     TradeMark,
     TradeUnion,
-    Trust
+    Trust,
 }
 
 #[derive(Debug, Eq, PartialEq)]
@@ -329,7 +329,7 @@ pub enum EUCountry {
     Sweden,
     Slovakia,
     Slovenia,
-    Croatia
+    Croatia,
 }
 
 #[derive(Debug, Eq, PartialEq)]
@@ -340,7 +340,6 @@ pub enum USPurpose {
     Educational,
     Government,
 }
-
 
 #[derive(Debug, Eq, PartialEq)]
 pub enum USCategory {

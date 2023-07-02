@@ -59,15 +59,9 @@ pub struct EPPFee10Check {
 pub struct EPPFee10CheckCommand {
     #[serde(rename = "$attr:name")]
     pub name: EPPFeeCommandType,
-    #[serde(
-        rename = "$attr:phase",
-        skip_serializing_if = "Option::is_none"
-    )]
+    #[serde(rename = "$attr:phase", skip_serializing_if = "Option::is_none")]
     pub phase: Option<String>,
-    #[serde(
-        rename = "$attr:subphase",
-        skip_serializing_if = "Option::is_none"
-    )]
+    #[serde(rename = "$attr:subphase", skip_serializing_if = "Option::is_none")]
     pub subphase: Option<String>,
     #[serde(
         rename = "{urn:ietf:params:xml:ns:epp:fee-1.0}fee:period",
@@ -268,15 +262,9 @@ pub enum EPPFeeCommandType {
 pub struct EPPFeeCommand {
     #[serde(rename = "$value")]
     pub command: EPPFeeCommandType,
-    #[serde(
-        rename = "$attr:phase",
-        skip_serializing_if = "Option::is_none"
-    )]
+    #[serde(rename = "$attr:phase", skip_serializing_if = "Option::is_none")]
     pub phase: Option<String>,
-    #[serde(
-        rename = "$attr:subphase",
-        skip_serializing_if = "Option::is_none"
-    )]
+    #[serde(rename = "$attr:subphase", skip_serializing_if = "Option::is_none")]
     pub subphase: Option<String>,
 }
 
@@ -823,18 +811,16 @@ pub struct EPPFee011Fee {
 }
 
 #[derive(Debug, Deserialize, Serialize)]
+#[derive(Default)]
 pub enum EPPFee10Applied {
     #[serde(rename = "immediate")]
+    #[default]
     Immediate,
     #[serde(rename = "delayed")]
     Delayed,
 }
 
-impl Default for EPPFee10Applied {
-    fn default() -> Self {
-        EPPFee10Applied::Immediate
-    }
-}
+
 
 #[derive(Debug, Deserialize)]
 pub struct EPPFee10Credit {

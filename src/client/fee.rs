@@ -35,7 +35,7 @@ pub struct FeeCheckCommand {
     pub command: Command,
     pub period: Option<super::Period>,
     pub phase: Option<String>,
-    pub sub_phase: Option<String>
+    pub sub_phase: Option<String>,
 }
 
 #[derive(Debug)]

@@ -445,7 +445,7 @@ pub fn handle_check(client: &ServerFeatures, req: &CheckRequest) -> HandleReqRet
                                     None => return Err(Err(Error::Unsupported)),
                                 },
                                 phase: None,
-                                subphase: None
+                                subphase: None,
                             },
                             period: c.period.as_ref().map(Into::into),
                         },
@@ -475,7 +475,7 @@ pub fn handle_check(client: &ServerFeatures, req: &CheckRequest) -> HandleReqRet
                                         None => return Err(Err(Error::Unsupported)),
                                     },
                                     phase: None,
-                                    subphase: None
+                                    subphase: None,
                                 },
                                 period: c.period.as_ref().map(Into::into),
                             })
@@ -499,7 +499,7 @@ pub fn handle_check(client: &ServerFeatures, req: &CheckRequest) -> HandleReqRet
                                         None => return Err(Err(Error::Unsupported)),
                                     },
                                     phase: None,
-                                    subphase: None
+                                    subphase: None,
                                 },
                                 period: c.period.as_ref().map(Into::into),
                             })
@@ -523,7 +523,7 @@ pub fn handle_check(client: &ServerFeatures, req: &CheckRequest) -> HandleReqRet
                                         None => return Err(Err(Error::Unsupported)),
                                     },
                                     phase: None,
-                                    subphase: None
+                                    subphase: None,
                                 },
                                 period: c.period.as_ref().map(Into::into),
                             })
@@ -547,7 +547,7 @@ pub fn handle_check(client: &ServerFeatures, req: &CheckRequest) -> HandleReqRet
                                         None => return Err(Err(Error::Unsupported)),
                                     },
                                     phase: None,
-                                    subphase: None
+                                    subphase: None,
                                 },
                                 period: c.period.as_ref().map(Into::into),
                             })

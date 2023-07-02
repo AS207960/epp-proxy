@@ -88,11 +88,7 @@ impl From<proto::maintenance::EPPMaintenanceItem> for InfoResponse {
             updated: from.update_date,
             reason: from.reason.into(),
             detail_url: from.detail,
-            descriptions: from
-                .description
-                .into_iter()
-                .map(Into::into)
-                .collect(),
+            descriptions: from.description.into_iter().map(Into::into).collect(),
             tlds: match from.tlds {
                 Some(t) => t.tlds,
                 None => vec![],
@@ -133,11 +129,7 @@ impl From<proto::maintenance::EPPMaintenanceItem02> for InfoResponse {
             updated: from.update_date,
             reason: from.reason.into(),
             detail_url: from.detail,
-            descriptions: from
-                .description
-                .into_iter()
-                .map(Into::into)
-                .collect(),
+            descriptions: from.description.into_iter().map(Into::into).collect(),
             tlds: match from.tlds {
                 Some(t) => t.tlds,
                 None => vec![],
@@ -154,14 +146,18 @@ pub fn handle_list(client: &ServerFeatures, _req: &ListRequest) -> HandleReqRetu
     if client.maintenance_supported {
         Ok((
             proto::EPPCommandType::Info(proto::EPPInfo::Maintenance(
-                proto::maintenance::EPPMaintenanceInfo::List(proto::maintenance::EPPMaintenanceInfoList {})
+                proto::maintenance::EPPMaintenanceInfo::List(
+                    proto::maintenance::EPPMaintenanceInfoList {},
+                ),
             )),
             None,
         ))
     } else if client.maintenance_02_supported {
         Ok((
             proto::EPPCommandType::Info(proto::EPPInfo::Maintenance02(
-                proto::maintenance::EPPMaintenanceInfo02::List(proto::maintenance::EPPMaintenanceInfoList {})
+                proto::maintenance::EPPMaintenanceInfo02::List(
+                    proto::maintenance::EPPMaintenanceInfoList {},
+                ),
             )),
             None,
         ))
@@ -173,38 +169,38 @@ pub fn handle_list(client: &ServerFeatures, _req: &ListRequest) -> HandleReqRetu
 pub fn handle_list_response(response: proto::EPPResponse) -> Response<ListResponse> {
     match response.data {
         Some(value) => match value.value {
-            proto::EPPResultDataValue::EPPMaintenanceInfo(proto::maintenance::EPPMaintenanceInfoData::List(list)) => {
-                Response::Ok(ListResponse {
-                    items: list
-                        .list
-                        .into_iter()
-                        .map(|i| ListResponseItem {
-                            id: i.id.id,
-                            name: i.id.name,
-                            start: Some(i.start),
-                            end: Some(i.end),
-                            created: i.created_date,
-                            updated: i.update_date,
-                        })
-                        .collect(),
-                })
-            },
-            proto::EPPResultDataValue::EPPMaintenanceInfo02(proto::maintenance::EPPMaintenanceInfoData02::List(list)) => {
-                Response::Ok(ListResponse {
-                    items: list
-                        .list
-                        .into_iter()
-                        .map(|i| ListResponseItem {
-                            id: i.id.id,
-                            name: i.id.name,
-                            start: i.start,
-                            end: i.end,
-                            created: i.created_date,
-                            updated: i.update_date,
-                        })
-                        .collect(),
-                })
-            }
+            proto::EPPResultDataValue::EPPMaintenanceInfo(
+                proto::maintenance::EPPMaintenanceInfoData::List(list),
+            ) => Response::Ok(ListResponse {
+                items: list
+                    .list
+                    .into_iter()
+                    .map(|i| ListResponseItem {
+                        id: i.id.id,
+                        name: i.id.name,
+                        start: Some(i.start),
+                        end: Some(i.end),
+                        created: i.created_date,
+                        updated: i.update_date,
+                    })
+                    .collect(),
+            }),
+            proto::EPPResultDataValue::EPPMaintenanceInfo02(
+                proto::maintenance::EPPMaintenanceInfoData02::List(list),
+            ) => Response::Ok(ListResponse {
+                items: list
+                    .list
+                    .into_iter()
+                    .map(|i| ListResponseItem {
+                        id: i.id.id,
+                        name: i.id.name,
+                        start: i.start,
+                        end: i.end,
+                        created: i.created_date,
+                        updated: i.update_date,
+                    })
+                    .collect(),
+            }),
             _ => Err(Error::ServerInternal),
         },
         None => Err(Error::ServerInternal),
@@ -215,14 +211,14 @@ pub fn handle_info(client: &ServerFeatures, req: &InfoRequest) -> HandleReqRetur
     if client.maintenance_supported {
         Ok((
             proto::EPPCommandType::Info(proto::EPPInfo::Maintenance(
-                proto::maintenance::EPPMaintenanceInfo::Id(req.id.clone())
+                proto::maintenance::EPPMaintenanceInfo::Id(req.id.clone()),
             )),
             None,
         ))
     } else if client.maintenance_02_supported {
         Ok((
             proto::EPPCommandType::Info(proto::EPPInfo::Maintenance02(
-                proto::maintenance::EPPMaintenanceInfo02::Id(req.id.clone())
+                proto::maintenance::EPPMaintenanceInfo02::Id(req.id.clone()),
             )),
             None,
         ))
@@ -234,12 +230,12 @@ pub fn handle_info(client: &ServerFeatures, req: &InfoRequest) -> HandleReqRetur
 pub fn handle_info_response(response: proto::EPPResponse) -> Response<InfoResponse> {
     match response.data {
         Some(value) => match value.value {
-            proto::EPPResultDataValue::EPPMaintenanceInfo(proto::maintenance::EPPMaintenanceInfoData::Maintenance(item)) => {
-                Response::Ok(item.into())
-            }
-            proto::EPPResultDataValue::EPPMaintenanceInfo02(proto::maintenance::EPPMaintenanceInfoData02::Maintenance(item)) => {
-                Response::Ok(item.into())
-            }
+            proto::EPPResultDataValue::EPPMaintenanceInfo(
+                proto::maintenance::EPPMaintenanceInfoData::Maintenance(item),
+            ) => Response::Ok(item.into()),
+            proto::EPPResultDataValue::EPPMaintenanceInfo02(
+                proto::maintenance::EPPMaintenanceInfoData02::Maintenance(item),
+            ) => Response::Ok(item.into()),
             _ => Err(Error::ServerInternal),
         },
         None => Err(Error::ServerInternal),

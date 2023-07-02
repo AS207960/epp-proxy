@@ -22,18 +22,16 @@ pub struct EPPChangeData {
 }
 
 #[derive(Debug, Deserialize)]
+#[derive(Default)]
 pub enum EPPChangeState {
     #[serde(rename = "before")]
     Before,
     #[serde(rename = "after")]
+    #[default]
     After,
 }
 
-impl Default for EPPChangeState {
-    fn default() -> Self {
-        EPPChangeState::After
-    }
-}
+
 
 #[derive(Debug, Deserialize)]
 pub struct EPPChangeOperation {

@@ -16,7 +16,7 @@ async fn main() {
             clap::Arg::new("acct-ga-1")
                 .short('3')
                 .long("account_ga_1")
-                .takes_value(true)
+                .value_name("FILE")
                 .required(true)
                 .help("Config file for the first General Availability account"),
         )
@@ -24,7 +24,7 @@ async fn main() {
             clap::Arg::new("acct-ga-2")
                 .short('4')
                 .long("account_ga_2")
-                .takes_value(true)
+                .value_name("FILE")
                 .required(true)
                 .help("Config file for the second General Availability account"),
         )
@@ -32,7 +32,7 @@ async fn main() {
             clap::Arg::new("acct-sunrise")
                 .short('1')
                 .long("account_sunrise")
-                .takes_value(true)
+                .value_name("FILE")
                 .required(true)
                 .help("Config file for the sunrise account"),
         )
@@ -40,7 +40,7 @@ async fn main() {
             clap::Arg::new("registrar_name")
                 .short('r')
                 .long("registrar_name")
-                .takes_value(true)
+                .value_name("NAME")
                 .required(true)
                 .help("Registrar account name"),
         )
@@ -48,7 +48,7 @@ async fn main() {
             clap::Arg::new("domain")
                 .short('d')
                 .long("domain")
-                .takes_value(true)
+                .value_name("DOMAIN")
                 .required(true)
                 .help("Domain to use for testing (without TLD)"),
         )
@@ -56,7 +56,7 @@ async fn main() {
             clap::Arg::new("domain_idn")
                 .short('i')
                 .long("idn_domain")
-                .takes_value(true)
+                .value_name("DOMAIN")
                 .required(true)
                 .help("IDN Domain to use for testing (without TLD)"),
         )
@@ -64,7 +64,7 @@ async fn main() {
             clap::Arg::new("tmcnis_user")
                 .short('u')
                 .long("tmcnis_user")
-                .takes_value(true)
+                .value_name("USER")
                 .required(true)
                 .help("Username for trademark CNIS"),
         )
@@ -72,32 +72,35 @@ async fn main() {
             clap::Arg::new("tmcnis_pass")
                 .short('p')
                 .long("tmcnis_password")
-                .takes_value(true)
+                .value_name("PASS")
                 .required(true)
                 .help("Password for trademark CNIS"),
         )
         .arg(
             clap::Arg::new("hsm_conf")
-                .short('h')
+                .short('p')
                 .long("hsm-conf")
-                .takes_value(true)
+                .value_name("FILE")
                 .help("Where to read the HSM config file from"),
         )
         .arg(
             clap::Arg::new("log")
                 .long("log")
-                .takes_value(true)
+                .value_name("DIR")
                 .default_value("./log/")
+                .value_parser(clap::value_parser!(std::path::PathBuf))
                 .help("Directory to write command logs to"),
         )
         .get_matches();
 
-    let pkcs11_engine = epp_proxy::setup_pkcs11_engine(matches.value_of("hsm_conf")).await;
-    let domain = matches.value_of("domain").unwrap();
-    let domain_idn = matches.value_of("domain_idn").unwrap();
-    let registrar_name = matches.value_of("registrar_name").unwrap();
-    let tmcnis_user = matches.value_of("tmcnis_user").unwrap();
-    let tmcnis_pass = matches.value_of("tmcnis_pass").unwrap();
+    let pkcs11_engine =
+        epp_proxy::setup_pkcs11_engine(matches.get_one::<String>("hsm_conf").map(|x| x.as_str()))
+            .await;
+    let domain = matches.get_one::<String>("domain").unwrap();
+    let domain_idn = matches.get_one::<String>("domain_idn").unwrap();
+    let registrar_name = matches.get_one::<String>("registrar_name").unwrap();
+    let tmcnis_user = matches.get_one::<String>("tmcnis_user").unwrap();
+    let tmcnis_pass = matches.get_one::<String>("tmcnis_pass").unwrap();
 
     let ga_tld = format!("{}-ga", registrar_name);
     let sunrise_tld = format!("{}-sunrise", registrar_name);
@@ -108,8 +111,8 @@ async fn main() {
     let ga_domain_claims = format!("test-and-validate.{}", ga_tld);
     let ga_domain_premium = format!("rich.{}", ga_tld);
 
-    let log_dir_path: &std::path::Path = matches.value_of("log").unwrap().as_ref();
-    match std::fs::create_dir_all(&log_dir_path) {
+    let log_dir_path = matches.get_one::<std::path::PathBuf>("log").unwrap();
+    match std::fs::create_dir_all(log_dir_path) {
         Ok(()) => {}
         Err(e) => {
             error!("Can't create log directory: {}", e);
@@ -117,9 +120,9 @@ async fn main() {
         }
     }
 
-    let conf_file_ga_1_path = matches.value_of("acct-ga-1").unwrap();
-    let conf_file_ga_2_path = matches.value_of("acct-ga-2").unwrap();
-    let conf_file_sunrise_path = matches.value_of("acct-sunrise").unwrap();
+    let conf_file_ga_1_path = matches.get_one::<String>("acct-ga-1").unwrap();
+    let conf_file_ga_2_path = matches.get_one::<String>("acct-ga-2").unwrap();
+    let conf_file_sunrise_path = matches.get_one::<String>("acct-sunrise").unwrap();
 
     let conf_file_ga_1 = match std::fs::File::open(conf_file_ga_1_path) {
         Ok(f) => f,
@@ -862,7 +865,7 @@ async fn main() {
 
     // 2.9.3 - Delete domain created in Step 2.2
     info!("Deleting domain");
-    epp_proxy::client::domain::delete(&ga_domain, None, None, None, None,&mut cmd_tx_ga_1)
+    epp_proxy::client::domain::delete(&ga_domain, None, None, None, None, &mut cmd_tx_ga_1)
         .await
         .unwrap();
 
@@ -903,7 +906,7 @@ async fn main() {
 
     // 2.10.4 - Delete domain created in Step 2.3
     info!("Deleting IDN domain");
-    epp_proxy::client::domain::delete(&ga_domain_idn, None, None, None, None,&mut cmd_tx_ga_1)
+    epp_proxy::client::domain::delete(&ga_domain_idn, None, None, None, None, &mut cmd_tx_ga_1)
         .await
         .unwrap();
 
@@ -934,7 +937,7 @@ async fn main() {
 
     // 2.12.2 - Delete the domain used in Step 2.11
     info!("Deleting IDN domain");
-    epp_proxy::client::domain::delete(&ga_domain_idn, None, None, None, None,&mut cmd_tx_ga_1)
+    epp_proxy::client::domain::delete(&ga_domain_idn, None, None, None, None, &mut cmd_tx_ga_1)
         .await
         .unwrap();
 
@@ -942,9 +945,10 @@ async fn main() {
     info!("Waiting for RGP to expire");
     loop {
         tokio::time::sleep(std::time::Duration::from_secs(60)).await;
-        let res = epp_proxy::client::domain::check(&ga_domain_idn, None, None, None, &mut cmd_tx_ga_1)
-            .await
-            .unwrap();
+        let res =
+            epp_proxy::client::domain::check(&ga_domain_idn, None, None, None, &mut cmd_tx_ga_1)
+                .await
+                .unwrap();
         if res.response.avail {
             break;
         }
@@ -964,9 +968,10 @@ async fn main() {
     let mut trans_domain_i = 1;
     let trans_domain_1 = loop {
         let trans_domain = format!("staclar-{}.{}", trans_domain_i, ga_tld);
-        let res = epp_proxy::client::domain::check(&trans_domain, None, None, None, &mut cmd_tx_ga_1)
-            .await
-            .unwrap();
+        let res =
+            epp_proxy::client::domain::check(&trans_domain, None, None, None, &mut cmd_tx_ga_1)
+                .await
+                .unwrap();
         if res.response.avail {
             break trans_domain;
         } else {
@@ -1043,9 +1048,10 @@ async fn main() {
     trans_domain_i += 1;
     let trans_domain_2 = loop {
         let trans_domain = format!("staclar-{}.{}", trans_domain_i, ga_tld);
-        let res = epp_proxy::client::domain::check(&trans_domain, None, None, None, &mut cmd_tx_ga_1)
-            .await
-            .unwrap();
+        let res =
+            epp_proxy::client::domain::check(&trans_domain, None, None, None, &mut cmd_tx_ga_1)
+                .await
+                .unwrap();
         if res.response.avail {
             break trans_domain;
         } else {
@@ -1122,9 +1128,10 @@ async fn main() {
     trans_domain_i += 1;
     let trans_domain_3 = loop {
         let trans_domain = format!("staclar-{}.{}", trans_domain_i, ga_tld);
-        let res = epp_proxy::client::domain::check(&trans_domain, None, None, None, &mut cmd_tx_ga_1)
-            .await
-            .unwrap();
+        let res =
+            epp_proxy::client::domain::check(&trans_domain, None, None, None, &mut cmd_tx_ga_1)
+                .await
+                .unwrap();
         if res.response.avail {
             break trans_domain;
         } else {

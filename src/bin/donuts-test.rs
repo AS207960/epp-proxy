@@ -23,7 +23,7 @@ async fn main() {
             clap::Arg::new("acct-1")
                 .short('1')
                 .long("account_1")
-                .takes_value(true)
+                .value_name("FILE")
                 .required(true)
                 .help("Config file for the first account"),
         )
@@ -31,7 +31,7 @@ async fn main() {
             clap::Arg::new("acct-2")
                 .short('2')
                 .long("account_2")
-                .takes_value(true)
+                .value_name("FILE")
                 .required(true)
                 .help("Config file for the second account"),
         )
@@ -39,7 +39,7 @@ async fn main() {
             clap::Arg::new("claims_domain")
                 .short('c')
                 .long("claims_domain")
-                .takes_value(true)
+                .value_name("DOMAIN")
                 .required(true)
                 .help("Domain to use for claims testing"),
         )
@@ -47,7 +47,7 @@ async fn main() {
             clap::Arg::new("tmcnis_user")
                 .short('u')
                 .long("tmcnis_user")
-                .takes_value(true)
+                .value_name("USER")
                 .required(true)
                 .help("Username for trademark CNIS"),
         )
@@ -55,7 +55,7 @@ async fn main() {
             clap::Arg::new("tmcnis_pass")
                 .short('p')
                 .long("tmcnis_password")
-                .takes_value(true)
+                .value_name("PASS")
                 .required(true)
                 .help("Password for trademark CNIS"),
         )
@@ -63,7 +63,7 @@ async fn main() {
             clap::Arg::new("test_smd")
                 .short('s')
                 .long("test_smd")
-                .takes_value(true)
+                .value_name("FILE")
                 .required(true)
                 .help("Test SMD file"),
         )
@@ -71,71 +71,74 @@ async fn main() {
             clap::Arg::new("test_smd_label")
                 .short('l')
                 .long("test_smd_label")
-                .takes_value(true)
+                .value_name("LABEL")
                 .required(true)
                 .help("Test SMD label"),
         )
         .arg(
             clap::Arg::new("premium_domain_1")
                 .long("premium_domain_1")
-                .takes_value(true)
+                .value_name("DOMAIN")
                 .required(true)
                 .help("Premium domain 1"),
         )
         .arg(
             clap::Arg::new("premium_domain_2")
                 .long("premium_domain_2")
-                .takes_value(true)
+                .value_name("DOMAIN")
                 .required(true)
                 .help("Premium domain 2"),
         )
         .arg(
             clap::Arg::new("premium_domain_3")
                 .long("premium_domain_3")
-                .takes_value(true)
+                .value_name("DOMAIN")
                 .required(true)
                 .help("Premium domain 3"),
         )
         .arg(
             clap::Arg::new("premium_domain_dr")
                 .long("premium_domain_delete_restore")
-                .takes_value(true)
+                .value_name("DOMAIN")
                 .required(true)
                 .help("Premium domain for delete / restore"),
         )
         .arg(
             clap::Arg::new("hsm_conf")
-                .short('h')
+                .short('p')
                 .long("hsm-conf")
-                .takes_value(true)
+                .value_name("FILE")
                 .help("Where to read the HSM config file from"),
         )
         .arg(
             clap::Arg::new("log")
                 .long("log")
-                .takes_value(true)
+                .value_name("DIR")
                 .default_value("./log/")
+                .value_parser(clap::value_parser!(std::path::PathBuf))
                 .help("Directory to write command logs to"),
         )
         .get_matches();
 
-    let pkcs11_engine = epp_proxy::setup_pkcs11_engine(matches.value_of("hsm_conf")).await;
-    let _claims_domain = matches.value_of("claims_domain").unwrap();
-    let test_smd = matches.value_of("test_smd").unwrap();
-    let test_smd_label = matches.value_of("test_smd_label").unwrap();
-    let premium_domain_1 = matches.value_of("premium_domain_1").unwrap();
-    let premium_domain_2 = matches.value_of("premium_domain_2").unwrap();
-    let premium_domain_3 = matches.value_of("premium_domain_3").unwrap();
-    let premium_domain_dr = matches.value_of("premium_domain_dr").unwrap();
-    let _tmcnis_user = matches.value_of("tmcnis_user").unwrap();
-    let _tmcnis_pass = matches.value_of("tmcnis_pass").unwrap();
+    let pkcs11_engine =
+        epp_proxy::setup_pkcs11_engine(matches.get_one::<String>("hsm_conf").map(|x| x.as_str()))
+            .await;
+    let claims_domain = matches.get_one::<String>("claims_domain").unwrap();
+    let test_smd = matches.get_one::<String>("test_smd").unwrap();
+    let test_smd_label = matches.get_one::<String>("test_smd_label").unwrap();
+    let premium_domain_1 = matches.get_one::<String>("premium_domain_1").unwrap();
+    let premium_domain_2 = matches.get_one::<String>("premium_domain_2").unwrap();
+    let premium_domain_3 = matches.get_one::<String>("premium_domain_3").unwrap();
+    let premium_domain_dr = matches.get_one::<String>("premium_domain_dr").unwrap();
+    let tmcnis_user = matches.get_one::<String>("tmcnis_user").unwrap();
+    let tmcnis_pass = matches.get_one::<String>("tmcnis_pass").unwrap();
 
     let dpml_domain = format!("{}.dpml.zone", test_smd_label);
     let dpml_override_domain = format!("{}.test1ga", test_smd_label);
     let eap_domain = format!("{}.19earlyaccess", nanoid::nanoid!(16, &ALPHABET));
 
-    let log_dir_path: &std::path::Path = matches.value_of("log").unwrap().as_ref();
-    match std::fs::create_dir_all(&log_dir_path) {
+    let log_dir_path = matches.get_one::<std::path::PathBuf>("log").unwrap();
+    match std::fs::create_dir_all(log_dir_path) {
         Ok(()) => {}
         Err(e) => {
             error!("Can't create log directory: {}", e);
@@ -143,8 +146,8 @@ async fn main() {
         }
     }
 
-    let conf_file_1_path = matches.value_of("acct-1").unwrap();
-    let conf_file_2_path = matches.value_of("acct-2").unwrap();
+    let conf_file_1_path = matches.get_one::<String>("acct-1").unwrap();
+    let conf_file_2_path = matches.get_one::<String>("acct-2").unwrap();
 
     let conf_file_1 = match std::fs::File::open(conf_file_1_path) {
         Ok(f) => f,
@@ -268,215 +271,224 @@ async fn main() {
     .await
     .unwrap();
 
-    // // Perform a check command for a domain.
-    // info!("Domain check");
-    // epp_proxy::client::domain::check(&format!("{}.test1ga", nanoid::nanoid!(16, &ALPHABET)), None, None, None, &mut cmd_tx_1)
-    //     .await
-    //     .unwrap();
-    //
-    // // Submit a Sunrise application
-    // info!("Creating sunrise domain");
-    // let test_smd_2 = include_str!("./test-smd.txt");
-    // epp_proxy::client::domain::create(
-    //     epp_proxy::client::domain::CreateInfo {
-    //         domain: "test-and-validate.sunrisemark2",
-    //         nameservers: vec![],
-    //         period: Some(epp_proxy::client::Period {
-    //             unit: epp_proxy::client::PeriodUnit::Years,
-    //             value: 2,
-    //         }),
-    //         auth_info: "test_auth1",
-    //         registrant: &contact_id,
-    //         contacts: vec![
-    //             epp_proxy::client::domain::InfoContact {
-    //                 contact_type: "admin".to_string(),
-    //                 contact_id: contact_id.clone(),
-    //             },
-    //             epp_proxy::client::domain::InfoContact {
-    //                 contact_type: "tech".to_string(),
-    //                 contact_id: contact_id.clone(),
-    //             },
-    //             epp_proxy::client::domain::InfoContact {
-    //                 contact_type: "billing".to_string(),
-    //                 contact_id: contact_id.clone(),
-    //             },
-    //         ],
-    //         donuts_fee_agreement: None,
-    //         eurid_data: None,
-    //         fee_agreement: None,
-    //         launch_create: Some(epp_proxy::client::launch::LaunchCreate {
-    //             phase: epp_proxy::client::launch::LaunchPhase {
-    //                 phase_type: epp_proxy::client::launch::PhaseType::Sunrise,
-    //                 phase_name: None,
-    //             },
-    //             code_mark: vec![],
-    //             signed_mark: Some(test_smd_2.to_string()),
-    //             create_type: epp_proxy::client::launch::LaunchCreateType::Application,
-    //             notices: vec![],
-    //             core_nic: vec![],
-    //         }),
-    //         isnic_payment: None,
-    //         sec_dns: None,
-    //         personal_registration: None
-    //     },
-    //     &mut cmd_tx_1,
-    // )
-    // .await
-    // .unwrap();
-    //
-    // // Register 5 domain names
-    // info!("Creating 5 domains");
-    //
-    // let domains = vec![
-    //     format!("{}.test1ga", nanoid::nanoid!(16, &ALPHABET)),
-    //     format!("{}.test1ga", nanoid::nanoid!(16, &ALPHABET)),
-    //     format!("{}.test1ga", nanoid::nanoid!(16, &ALPHABET)),
-    //     format!("{}.test1ga", nanoid::nanoid!(16, &ALPHABET)),
-    //     format!("{}.test1ga", nanoid::nanoid!(16, &ALPHABET)),
-    // ];
-    //
-    // for domain in domains.iter() {
-    //     epp_proxy::client::domain::create(
-    //         epp_proxy::client::domain::CreateInfo {
-    //             domain: domain.as_str(),
-    //             nameservers: vec![],
-    //             period: Some(epp_proxy::client::Period {
-    //                 unit: epp_proxy::client::PeriodUnit::Years,
-    //                 value: 2,
-    //             }),
-    //             auth_info: "test_auth1",
-    //             registrant: &contact_id,
-    //             contacts: vec![
-    //                 epp_proxy::client::domain::InfoContact {
-    //                     contact_type: "admin".to_string(),
-    //                     contact_id: contact_id.clone(),
-    //                 },
-    //                 epp_proxy::client::domain::InfoContact {
-    //                     contact_type: "tech".to_string(),
-    //                     contact_id: contact_id.clone(),
-    //                 },
-    //                 epp_proxy::client::domain::InfoContact {
-    //                     contact_type: "billing".to_string(),
-    //                     contact_id: contact_id.clone(),
-    //                 },
-    //             ],
-    //             donuts_fee_agreement: None,
-    //             eurid_data: None,
-    //             fee_agreement: None,
-    //             launch_create: None,
-    //             isnic_payment: None,
-    //             sec_dns: None,
-    //             personal_registration: None
-    //         },
-    //         &mut cmd_tx_1,
-    //     )
-    //         .await
-    //         .unwrap();
-    // }
-    // info!("GA domain names: {:?}", domains);
-    //
-    // // Transfer 2 domain names from your OTE1 account to your OTE2 account
-    // info!("Transferring two domains");
-    // for domain in &domains[0..2] {
-    //     epp_proxy::client::domain::transfer_request(
-    //         domain.as_str(),
-    //         None,
-    //         "test_auth1",
-    //         None,
-    //         None,
-    //         None,
-    //         &mut cmd_tx_2,
-    //     )
-    //     .await
-    //     .unwrap();
-    //
-    //
-    //     epp_proxy::client::domain::transfer_accept(domain.as_str(), None, &mut cmd_tx_1)
-    //         .await
-    //         .unwrap();
-    // }
+    // Perform a check command for a domain.
+    info!("Domain check");
+    epp_proxy::client::domain::check(
+        &format!("{}.test1ga", nanoid::nanoid!(16, &ALPHABET)),
+        None,
+        None,
+        None,
+        &mut cmd_tx_1,
+    )
+    .await
+    .unwrap();
 
-    // // Register a domain name that is subject to Claims.
-    // info!("Creating claims domain");
-    // info!("Claims domain: {}", claims_domain);
-    // let mut claims_res = epp_proxy::client::domain::launch_claims_check(
-    //     claims_domain,
-    //     epp_proxy::client::launch::LaunchClaimsCheck {
-    //         phase: epp_proxy::client::launch::LaunchPhase {
-    //             phase_type: epp_proxy::client::launch::PhaseType::Claims,
-    //             phase_name: None,
-    //         },
-    //     },
-    //     &mut cmd_tx_1,
-    // )
-    // .await
-    // .unwrap();
-    // let claims_key = claims_res.response.claims_key.pop().unwrap().key;
-    //
-    // let req_client = reqwest::Client::new();
-    // let claims_notice_txt = req_client
-    //     .get(format!("https://test.tmcnis.org/cnis/{}.xml", claims_key))
-    //     .basic_auth(tmcnis_user, Some(tmcnis_pass))
-    //     .send()
-    //     .await
-    //     .unwrap()
-    //     .text()
-    //     .await
-    //     .unwrap();
-    // let claims_notice_msg: epp_proxy::proto::tm_notice::TMMessage =
-    //     xml_serde::from_str(&claims_notice_txt).unwrap();
-    //
-    // epp_proxy::client::domain::create(
-    //     epp_proxy::client::domain::CreateInfo {
-    //         domain: claims_domain,
-    //         nameservers: vec![],
-    //         period: Some(epp_proxy::client::Period {
-    //             unit: epp_proxy::client::PeriodUnit::Years,
-    //             value: 2,
-    //         }),
-    //         auth_info: "test_auth1",
-    //         registrant: &contact_id,
-    //         contacts: vec![
-    //             epp_proxy::client::domain::InfoContact {
-    //                 contact_type: "admin".to_string(),
-    //                 contact_id: contact_id.clone(),
-    //             },
-    //             epp_proxy::client::domain::InfoContact {
-    //                 contact_type: "tech".to_string(),
-    //                 contact_id: contact_id.clone(),
-    //             },
-    //             epp_proxy::client::domain::InfoContact {
-    //                 contact_type: "billing".to_string(),
-    //                 contact_id: contact_id.clone(),
-    //             },
-    //         ],
-    //         donuts_fee_agreement: None,
-    //         eurid_data: None,
-    //         fee_agreement: None,
-    //         launch_create: Some(epp_proxy::client::launch::LaunchCreate {
-    //             phase: epp_proxy::client::launch::LaunchPhase {
-    //                 phase_type: epp_proxy::client::launch::PhaseType::Claims,
-    //                 phase_name: None,
-    //             },
-    //             code_mark: vec![],
-    //             signed_mark: None,
-    //             create_type: epp_proxy::client::launch::LaunchCreateType::Registration,
-    //             notices: vec![epp_proxy::client::launch::Notice {
-    //                 notice_id: claims_notice_msg.notice.id,
-    //                 validator: None,
-    //                 not_after: claims_notice_msg.notice.not_after,
-    //                 accepted_date: claims_notice_msg.notice.not_before,
-    //             }],
-    //             core_nic: vec![],
-    //         }),
-    //         isnic_payment: None,
-    //         sec_dns: None,
-    //         personal_registration: None
-    //     },
-    //     &mut cmd_tx_1,
-    // )
-    // .await
-    // .unwrap();
+    // Submit a Sunrise application
+    info!("Creating sunrise domain");
+    let test_smd_2 = include_str!("./test-smd.txt");
+    epp_proxy::client::domain::create(
+        epp_proxy::client::domain::CreateInfo {
+            domain: "test-and-validate.sunrisemark2",
+            nameservers: vec![],
+            period: Some(epp_proxy::client::Period {
+                unit: epp_proxy::client::PeriodUnit::Years,
+                value: 2,
+            }),
+            auth_info: "test_auth1",
+            registrant: &contact_id,
+            contacts: vec![
+                epp_proxy::client::domain::InfoContact {
+                    contact_type: "admin".to_string(),
+                    contact_id: contact_id.clone(),
+                },
+                epp_proxy::client::domain::InfoContact {
+                    contact_type: "tech".to_string(),
+                    contact_id: contact_id.clone(),
+                },
+                epp_proxy::client::domain::InfoContact {
+                    contact_type: "billing".to_string(),
+                    contact_id: contact_id.clone(),
+                },
+            ],
+            donuts_fee_agreement: None,
+            eurid_data: None,
+            fee_agreement: None,
+            launch_create: Some(epp_proxy::client::launch::LaunchCreate {
+                phase: epp_proxy::client::launch::LaunchPhase {
+                    phase_type: epp_proxy::client::launch::PhaseType::Sunrise,
+                    phase_name: None,
+                },
+                code_mark: vec![],
+                signed_mark: Some(test_smd_2.to_string()),
+                create_type: epp_proxy::client::launch::LaunchCreateType::Application,
+                notices: vec![],
+                core_nic: vec![],
+            }),
+            isnic_payment: None,
+            sec_dns: None,
+            personal_registration: None,
+            keysys: None,
+        },
+        &mut cmd_tx_1,
+    )
+    .await
+    .unwrap();
+
+    // Register 5 domain names
+    info!("Creating 5 domains");
+
+    let domains = vec![
+        format!("{}.test1ga", nanoid::nanoid!(16, &ALPHABET)),
+        format!("{}.test1ga", nanoid::nanoid!(16, &ALPHABET)),
+        format!("{}.test1ga", nanoid::nanoid!(16, &ALPHABET)),
+        format!("{}.test1ga", nanoid::nanoid!(16, &ALPHABET)),
+        format!("{}.test1ga", nanoid::nanoid!(16, &ALPHABET)),
+    ];
+
+    for domain in domains.iter() {
+        epp_proxy::client::domain::create(
+            epp_proxy::client::domain::CreateInfo {
+                domain: domain.as_str(),
+                nameservers: vec![],
+                period: Some(epp_proxy::client::Period {
+                    unit: epp_proxy::client::PeriodUnit::Years,
+                    value: 2,
+                }),
+                auth_info: "test_auth1",
+                registrant: &contact_id,
+                contacts: vec![
+                    epp_proxy::client::domain::InfoContact {
+                        contact_type: "admin".to_string(),
+                        contact_id: contact_id.clone(),
+                    },
+                    epp_proxy::client::domain::InfoContact {
+                        contact_type: "tech".to_string(),
+                        contact_id: contact_id.clone(),
+                    },
+                    epp_proxy::client::domain::InfoContact {
+                        contact_type: "billing".to_string(),
+                        contact_id: contact_id.clone(),
+                    },
+                ],
+                donuts_fee_agreement: None,
+                eurid_data: None,
+                fee_agreement: None,
+                launch_create: None,
+                isnic_payment: None,
+                sec_dns: None,
+                personal_registration: None,
+                keysys: None,
+            },
+            &mut cmd_tx_1,
+        )
+        .await
+        .unwrap();
+    }
+    info!("GA domain names: {:?}", domains);
+
+    // Transfer 2 domain names from your OTE1 account to your OTE2 account
+    info!("Transferring two domains");
+    for domain in &domains[0..2] {
+        epp_proxy::client::domain::transfer_request(
+            domain.as_str(),
+            None,
+            "test_auth1",
+            None,
+            None,
+            None,
+            None,
+            &mut cmd_tx_2,
+        )
+        .await
+        .unwrap();
+
+        epp_proxy::client::domain::transfer_accept(domain.as_str(), None, &mut cmd_tx_1)
+            .await
+            .unwrap();
+    }
+
+    // Register a domain name that is subject to Claims.
+    info!("Creating claims domain");
+    info!("Claims domain: {}", claims_domain);
+    let mut claims_res = epp_proxy::client::domain::launch_claims_check(
+        claims_domain,
+        epp_proxy::client::launch::LaunchClaimsCheck {
+            phase: epp_proxy::client::launch::LaunchPhase {
+                phase_type: epp_proxy::client::launch::PhaseType::Claims,
+                phase_name: None,
+            },
+        },
+        &mut cmd_tx_1,
+    )
+    .await
+    .unwrap();
+    let claims_key = claims_res.response.claims_key.pop().unwrap().key;
+
+    let req_client = reqwest::Client::new();
+    let claims_notice_txt = req_client
+        .get(format!("https://test.tmcnis.org/cnis/{}.xml", claims_key))
+        .basic_auth(tmcnis_user, Some(tmcnis_pass))
+        .send()
+        .await
+        .unwrap()
+        .text()
+        .await
+        .unwrap();
+    let claims_notice_msg: epp_proxy::proto::tm_notice::TMMessage =
+        xml_serde::from_str(&claims_notice_txt).unwrap();
+
+    epp_proxy::client::domain::create(
+        epp_proxy::client::domain::CreateInfo {
+            domain: claims_domain,
+            nameservers: vec![],
+            period: Some(epp_proxy::client::Period {
+                unit: epp_proxy::client::PeriodUnit::Years,
+                value: 2,
+            }),
+            auth_info: "test_auth1",
+            registrant: &contact_id,
+            contacts: vec![
+                epp_proxy::client::domain::InfoContact {
+                    contact_type: "admin".to_string(),
+                    contact_id: contact_id.clone(),
+                },
+                epp_proxy::client::domain::InfoContact {
+                    contact_type: "tech".to_string(),
+                    contact_id: contact_id.clone(),
+                },
+                epp_proxy::client::domain::InfoContact {
+                    contact_type: "billing".to_string(),
+                    contact_id: contact_id.clone(),
+                },
+            ],
+            donuts_fee_agreement: None,
+            eurid_data: None,
+            fee_agreement: None,
+            launch_create: Some(epp_proxy::client::launch::LaunchCreate {
+                phase: epp_proxy::client::launch::LaunchPhase {
+                    phase_type: epp_proxy::client::launch::PhaseType::Claims,
+                    phase_name: None,
+                },
+                code_mark: vec![],
+                signed_mark: None,
+                create_type: epp_proxy::client::launch::LaunchCreateType::Registration,
+                notices: vec![epp_proxy::client::launch::Notice {
+                    notice_id: claims_notice_msg.notice.id,
+                    validator: None,
+                    not_after: claims_notice_msg.notice.not_after,
+                    accepted_date: claims_notice_msg.notice.not_before,
+                }],
+                core_nic: vec![],
+            }),
+            isnic_payment: None,
+            sec_dns: None,
+            personal_registration: None,
+            keysys: None,
+        },
+        &mut cmd_tx_1,
+    )
+    .await
+    .unwrap();
 
     // Register a DPML Block, in .dpml.zone
     info!("Creating DPML block");

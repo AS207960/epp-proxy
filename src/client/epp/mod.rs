@@ -15,6 +15,7 @@ pub mod eurid;
 pub mod fee;
 pub mod host;
 pub mod isnic;
+pub mod keysys;
 pub mod launch;
 pub mod maintenance;
 pub mod mark;
@@ -25,7 +26,6 @@ pub mod rgp;
 pub mod router;
 pub mod traficom;
 pub mod verisign;
-pub mod keysys;
 
 use crate::proto::EPPServiceExtension;
 

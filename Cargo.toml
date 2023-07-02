@@ -1,6 +1,6 @@
 [package]
 name = "epp-proxy"
-version = "0.5.4"
+version = "0.6.0"
 authors = ["Q <q@misell.cymru>"]
 edition = "2018"
 
@@ -10,12 +10,12 @@ edition = "2018"
 tokio = { version = "1", features = ["rt-multi-thread", "net", "macros", "time", "io-util", "fs", "signal", "parking_lot"] }
 futures = "0.3"
 log = "0.4"
-pretty_env_logger = "0.4"
+pretty_env_logger = "0.5"
 libc = "0.2"
 openssl = { version = "0.10", features = [] }
 openssl-sys = { version = "=0.9.85", features = [] }
 tokio-openssl = "0.6"
-quick-xml = { version = "0.23.0", features = ["serialize"]}
+quick-xml = { version = "0.29", features = ["serialize"]}
 serde = "1.0"
 serde_derive = "1.0"
 serde_json = "1.0"
@@ -24,12 +24,12 @@ time = "0.3"
 uuid = { version = "1.1", features = ["v4"] }
 hex = "0.4"
 regex = "1"
-tonic = { version = "0.8", features = ["transport", "tls"] }
-tonic-reflection = "0.5"
+tonic = { version = "0.9", features = ["transport", "tls"] }
+tonic-reflection = "0.9"
 prost = "0.11"
 prost-types = "0.11"
-clap = "3"
-base64 = "0.13"
+clap = "4"
+base64 = "0.21"
 xml_serde = "1"
 rust-keycloak = { git = "https://github.com/TheEnbyperor/rust-keycloak", rev = "1f81e41407a1fa123131c2f4d213609165ac8b34" }
 #rust-keycloak = { path = "../rust-keycloak" }
@@ -37,7 +37,7 @@ dotenv = "0.15.0"
 tower-service = "0.3"
 http = "0.2"
 sys-info = "0.9"
-sentry = { version = "0.27.0", features = ["log"] }
+sentry = { version = "0.31", features = ["log"] }
 foreign-types-shared = "0.1"
 lazy_static = "1"
 paste = "1"
@@ -45,15 +45,15 @@ reqwest = "0"
 nanoid = "0"
 
 [target.'cfg(target_os = "linux")'.dependencies]
-systemd-journal-logger = "0"
+systemd-journal-logger = "1"
 
 [build-dependencies]
-tonic-build = "0.8"
-built = { version = "0.5", features = ["git2"] }
+tonic-build = "0.9"
+built = { version = "0.6", features = ["git2"] }
 
 [dev-dependencies]
 test-log = "0.2"
-env_logger = "0.9"
+env_logger = "0.10"
 
 [patch.crates-io]
 openssl-sys = { git = "https://github.com/AS207960/rust-openssl", rev = "4d9f58286a60db8ea43a8682b4b05ace19f3a65e" }

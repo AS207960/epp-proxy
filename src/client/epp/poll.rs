@@ -216,12 +216,12 @@ pub fn handle_poll_response(response: proto::EPPResponse) -> Response<Option<Pol
                             proto::EPPResultDataValue::EURIDPollData(poll_data) => {
                                 PollData::EURIDPoll(poll_data.into())
                             }
-                            proto::EPPResultDataValue::EPPMaintenanceInfo(proto::maintenance::EPPMaintenanceInfoData::Maintenance(item)) => {
-                                PollData::MaintenanceData(item.into())
-                            }
-                            proto::EPPResultDataValue::EPPMaintenanceInfo02(proto::maintenance::EPPMaintenanceInfoData02::Maintenance(item)) => {
-                                PollData::MaintenanceData(item.into())
-                            }
+                            proto::EPPResultDataValue::EPPMaintenanceInfo(
+                                proto::maintenance::EPPMaintenanceInfoData::Maintenance(item),
+                            ) => PollData::MaintenanceData(item.into()),
+                            proto::EPPResultDataValue::EPPMaintenanceInfo02(
+                                proto::maintenance::EPPMaintenanceInfoData02::Maintenance(item),
+                            ) => PollData::MaintenanceData(item.into()),
                             _ => return Err(Error::ServerInternal),
                         },
                         None => PollData::None,

@@ -105,7 +105,7 @@ fn decode_line(data: &str, host: &str) -> Result<super::proto::DACResponse, ()> 
                                 registered,
                                 detagged: false,
                                 created: NaiveDate::from_ymd_opt(1970, 1, 1).unwrap(),
-                                expiry:  NaiveDate::from_ymd_opt(1970, 1, 1).unwrap(),
+                                expiry: NaiveDate::from_ymd_opt(1970, 1, 1).unwrap(),
                                 tag: String::default(),
                             },
                         ))

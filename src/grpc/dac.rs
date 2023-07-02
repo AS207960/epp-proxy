@@ -1,5 +1,5 @@
-use chrono::prelude::*;
 use super::{client, epp_proto};
+use chrono::prelude::*;
 
 pub fn env_from_i32(from: i32) -> Option<client::dac::DACEnv> {
     epp_proto::dac::Environment::from_i32(from).map(|e| match e {
@@ -36,10 +36,10 @@ impl From<client::dac::DACDomainResponse> for epp_proto::dac::DomainResponse {
             },
             detagged: res.detagged,
             created: super::utils::chrono_to_proto(Some(
-                Utc.from_utc_datetime(&res.created.and_hms_opt(0, 0, 0).unwrap())
+                Utc.from_utc_datetime(&res.created.and_hms_opt(0, 0, 0).unwrap()),
             )),
             expiry: super::utils::chrono_to_proto(Some(
-                Utc.from_utc_datetime(&res.expiry.and_hms_opt(0, 0, 0).unwrap())
+                Utc.from_utc_datetime(&res.expiry.and_hms_opt(0, 0, 0).unwrap()),
             )),
             status: match res.status {
                 client::dac::DomainStatus::Unknown => epp_proto::dac::DomainStatus::Unknown.into(),

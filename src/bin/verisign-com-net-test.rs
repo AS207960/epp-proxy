@@ -17,7 +17,7 @@ async fn main() {
             clap::Arg::new("acct1")
                 .short('1')
                 .long("account_1")
-                .takes_value(true)
+                .value_name("FILE")
                 .required(true)
                 .help("Config file for the first account"),
         )
@@ -25,7 +25,7 @@ async fn main() {
             clap::Arg::new("acct2")
                 .short('2')
                 .long("account_2")
-                .takes_value(true)
+                .value_name("FILE")
                 .required(true)
                 .help("Config file for the second account"),
         )
@@ -33,31 +33,34 @@ async fn main() {
             clap::Arg::new("domain")
                 .short('d')
                 .long("domain")
-                .takes_value(true)
+                .value_name("DOMAIN")
                 .required(true)
                 .help("Domain to use for testing"),
         )
         .arg(
             clap::Arg::new("hsm_conf")
-                .short('h')
+                .short('p')
                 .long("hsm-conf")
-                .takes_value(true)
+                .value_name("FILE")
                 .help("Where to read the HSM config file from"),
         )
         .arg(
             clap::Arg::new("log")
                 .long("log")
-                .takes_value(true)
+                .value_name("DIR")
                 .default_value("./log/")
+                .value_parser(clap::value_parser!(std::path::PathBuf))
                 .help("Directory to write command logs to"),
         )
         .get_matches();
 
-    let pkcs11_engine = epp_proxy::setup_pkcs11_engine(matches.value_of("hsm_conf")).await;
-    let domain = matches.value_of("domain").unwrap();
+    let pkcs11_engine =
+        epp_proxy::setup_pkcs11_engine(matches.get_one::<String>("hsm_conf").map(|x| x.as_str()))
+            .await;
+    let domain = matches.get_one::<String>("domain").unwrap();
 
-    let log_dir_path: &std::path::Path = matches.value_of("log").unwrap().as_ref();
-    match std::fs::create_dir_all(&log_dir_path) {
+    let log_dir_path = matches.get_one::<std::path::PathBuf>("log").unwrap();
+    match std::fs::create_dir_all(log_dir_path) {
         Ok(()) => {}
         Err(e) => {
             error!("Can't create log directory: {}", e);
@@ -65,8 +68,8 @@ async fn main() {
         }
     }
 
-    let conf_file_1_path = matches.value_of("acct1").unwrap();
-    let conf_file_2_path = matches.value_of("acct2").unwrap();
+    let conf_file_1_path = matches.get_one::<String>("acct1").unwrap();
+    let conf_file_2_path = matches.get_one::<String>("acct2").unwrap();
 
     let conf_file_1 = match std::fs::File::open(conf_file_1_path) {
         Ok(f) => f,

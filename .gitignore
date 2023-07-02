@@ -110,3 +110,4 @@ Cargo.lock
 /priv
 /log
 .DS_Store
+.env

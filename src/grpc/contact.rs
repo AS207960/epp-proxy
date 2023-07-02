@@ -1,6 +1,6 @@
-use chrono::prelude::*;
 use super::super::client;
 use super::epp_proto;
+use chrono::prelude::*;
 
 pub fn entity_type_from_i32(from: i32) -> Option<client::contact::EntityType> {
     match epp_proto::contact::EntityType::from_i32(from) {
@@ -242,9 +242,10 @@ impl From<client::contact::InfoResponse> for epp_proto::contact::ContactInfoRepl
             postal_code: a.postal_code,
             country_code: a.country_code,
             identity_number: a.identity_number,
-            birth_date: super::utils::chrono_to_proto(a.birth_date.map(|d|
-                Utc.from_utc_datetime(&d.and_hms_opt(0, 0, 0).unwrap())
-            )),
+            birth_date: super::utils::chrono_to_proto(
+                a.birth_date
+                    .map(|d| Utc.from_utc_datetime(&d.and_hms_opt(0, 0, 0).unwrap())),
+            ),
         };
 
         epp_proto::contact::ContactInfoReply {

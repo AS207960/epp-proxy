@@ -1,9 +1,9 @@
 //! Implements the gRPC interface for the EPP client
 
-use std::convert::TryInto;
-use futures::sink::SinkExt;
-use crate::grpc::utils::proto_to_chrono;
 use super::client;
+use crate::grpc::utils::proto_to_chrono;
+use futures::sink::SinkExt;
+use std::convert::TryInto;
 
 mod contact;
 mod dac;
@@ -12,6 +12,7 @@ mod eurid;
 mod fee;
 mod host;
 mod isnic;
+mod keysys;
 mod launch;
 mod maintenance;
 mod mark;
@@ -19,7 +20,6 @@ mod nominet;
 mod rgp;
 mod tmch;
 mod utils;
-mod keysys;
 
 pub mod epp_proto {
     tonic::include_proto!("epp");
@@ -163,9 +163,13 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
             client_by_domain_or_id(&self.client_router, &res.name, res.registry_name)?;
         let (res, cmd_resp) = utils::map_command_response(
             client::domain::check(
-                &res.name, res.fee_check.map(Into::into), None,
-                res.keysys.map(Into::into), &mut sender
-            ).await?,
+                &res.name,
+                res.fee_check.map(Into::into),
+                None,
+                res.keysys.map(Into::into),
+                &mut sender,
+            )
+            .await?,
         );
 
         let mut reply: epp_proto::domain::DomainCheckReply = res.into();
@@ -403,7 +407,10 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                             consent_id: p.consent_id,
                         }
                     }),
-                    keysys: request.keysys.map(TryInto::try_into).map_or(Ok(None), |v| v.map(Some))?,
+                    keysys: request
+                        .keysys
+                        .map(TryInto::try_into)
+                        .map_or(Ok(None), |v| v.map(Some))?,
                 },
                 &mut sender,
             )
@@ -879,15 +886,19 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                     post_data: &res.post_data,
                     deletion_time: match proto_to_chrono(res.delete_time) {
                         Some(t) => t,
-                        None => return Err(tonic::Status::invalid_argument(
-                            "Deletion time must be specified",
-                        ))
+                        None => {
+                            return Err(tonic::Status::invalid_argument(
+                                "Deletion time must be specified",
+                            ))
+                        }
                     },
                     restore_time: match proto_to_chrono(res.restore_time) {
                         Some(t) => t,
-                        None => return Err(tonic::Status::invalid_argument(
-                            "Restore time must be specified",
-                        ))
+                        None => {
+                            return Err(tonic::Status::invalid_argument(
+                                "Restore time must be specified",
+                            ))
+                        }
                     },
                     restore_reason: &res.restore_reason,
                     statement_1: &res.statement_1,
@@ -897,9 +908,10 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                     } else {
                         Some(&res.other_information)
                     },
-                    donuts_fee_agreement: res.donuts_fee_agreement
-                    .map(TryInto::try_into)
-                    .map_or(Ok(None), |v| v.map(Some))?,
+                    donuts_fee_agreement: res
+                        .donuts_fee_agreement
+                        .map(TryInto::try_into)
+                        .map_or(Ok(None), |v| v.map(Some))?,
                 },
                 &mut sender,
             )

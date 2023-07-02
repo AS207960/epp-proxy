@@ -340,7 +340,6 @@ impl From<&proto::fee::EPPFee06DeleteData> for FeeData {
     }
 }
 
-
 impl From<&proto::fee::EPPFee07DeleteData> for FeeData {
     fn from(f: &proto::fee::EPPFee07DeleteData) -> Self {
         FeeData {

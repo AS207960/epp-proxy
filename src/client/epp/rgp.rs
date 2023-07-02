@@ -1,6 +1,8 @@
 //! EPP commands relating to nominet specific features
 
-use super::super::rgp::{RGPState, RestoreRequest, RestoreResponse, RestoreReportRequest, RestoreReportResponse};
+use super::super::rgp::{
+    RGPState, RestoreReportRequest, RestoreReportResponse, RestoreRequest, RestoreResponse,
+};
 use super::super::{proto, Error, Response};
 use super::router::HandleReqReturn;
 use super::ServerFeatures;
@@ -114,7 +116,6 @@ pub fn handle_restore_response(response: proto::EPPResponse) -> Response<Restore
         None => None,
     };
 
-
     match &response.extension {
         Some(value) => match &value.value.first() {
             Some(proto::EPPResponseExtensionType::EPPRGPUpdate(rgp_info)) => {
@@ -165,12 +166,12 @@ pub fn handle_restore_report(
                 report: Some(proto::rgp::EPPRGPReport {
                     pre_data: req.pre_data.clone(),
                     post_data: req.post_data.clone(),
-                    delete_time: req.deletion_time.clone(),
-                    restore_time: req.restore_time.clone(),
+                    delete_time: req.deletion_time,
+                    restore_time: req.restore_time,
                     restore_reason: req.restore_reason.clone(),
                     statement: vec![req.statement_1.clone(), req.statement_2.clone()],
-                    other: req.other_information.clone()
-                })
+                    other: req.other_information.clone(),
+                }),
             },
         },
     )];
@@ -180,7 +181,9 @@ pub fn handle_restore_report(
     Ok((proto::EPPCommandType::Update(Box::new(command)), Some(exts)))
 }
 
-pub fn handle_restore_report_response(response: proto::EPPResponse) -> Response<RestoreReportResponse> {
+pub fn handle_restore_report_response(
+    response: proto::EPPResponse,
+) -> Response<RestoreReportResponse> {
     let fee_data = match &response.extension {
         Some(ext) => {
             let fee10 = ext.value.iter().find_map(|p| match p {

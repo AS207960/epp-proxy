@@ -65,18 +65,16 @@ pub struct ConfigFile {
 }
 
 #[derive(Debug, Deserialize)]
+#[derive(Default)]
 enum ConfigServerType {
     #[serde(rename = "EPP")]
+    #[default]
     Epp,
     #[serde(rename = "TMCH")]
     Tmch,
 }
 
-impl Default for ConfigServerType {
-    fn default() -> Self {
-        ConfigServerType::Epp
-    }
-}
+
 
 #[derive(Debug, Deserialize)]
 struct HSMConfigFile {

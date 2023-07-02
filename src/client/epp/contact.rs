@@ -419,7 +419,9 @@ impl
         let keysys = match extension {
             Some(ext) => {
                 let i = ext.value.iter().find_map(|p| match p {
-                    proto::EPPResponseExtensionType::KeysysResultData(proto::keysys::ResultData::Contact(i)) => Some(i),
+                    proto::EPPResponseExtensionType::KeysysResultData(
+                        proto::keysys::ResultData::Contact(i),
+                    ) => Some(i),
                     _ => None,
                 });
                 i.map(Into::into)
@@ -803,11 +805,13 @@ pub fn handle_create(
 
     if let Some(keysys) = &req.keysys {
         if client.keysys_supported {
-            ext.push(proto::EPPCommandExtensionType::KeysysCreate(proto::keysys::Create::Contact(proto::keysys::ContactCreate {
-                checkonly: Some(keysys.check_only),
-                force_duplication: Some(keysys.force_duplication),
-                pre_verify: Some(keysys.pre_verify),
-            })));
+            ext.push(proto::EPPCommandExtensionType::KeysysCreate(
+                proto::keysys::Create::Contact(proto::keysys::ContactCreate {
+                    checkonly: Some(keysys.check_only),
+                    force_duplication: Some(keysys.force_duplication),
+                    pre_verify: Some(keysys.pre_verify),
+                }),
+            ));
         } else {
             return Err(Err(Error::Unsupported));
         }
@@ -1196,11 +1200,13 @@ pub fn handle_update(
 
     if let Some(keysys) = &req.keysys {
         if client.keysys_supported {
-            ext.push(proto::EPPCommandExtensionType::KeysysUpdate(proto::keysys::Update::Contact(proto::keysys::ContactUpdate {
-                checkonly: Some(keysys.check_only),
-                pre_verify: Some(keysys.pre_verify),
-                trigger_foa: Some(keysys.trigger_foa),
-            })));
+            ext.push(proto::EPPCommandExtensionType::KeysysUpdate(
+                proto::keysys::Update::Contact(proto::keysys::ContactUpdate {
+                    checkonly: Some(keysys.check_only),
+                    pre_verify: Some(keysys.pre_verify),
+                    trigger_foa: Some(keysys.trigger_foa),
+                }),
+            ));
         } else {
             return Err(Err(Error::Unsupported));
         }

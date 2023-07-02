@@ -10,6 +10,7 @@ use super::super::{Error, Period, PeriodUnit, Response};
 use super::router::HandleReqReturn;
 use super::tmch_proto;
 use crate::client::tmch::CaseType;
+use base64::prelude::*;
 use std::convert::{TryFrom, TryInto};
 
 pub(crate) fn check_mark_id<T>(id: &str) -> Result<(), Response<T>> {
@@ -74,7 +75,7 @@ impl From<&Document> for tmch_proto::TMCHDocument {
                 FileType::Jpg => tmch_proto::TMCHFileType::Jpg,
                 FileType::Pdf => tmch_proto::TMCHFileType::Pdf,
             },
-            file_content: base64::encode(&from.contents),
+            file_content: BASE64_STANDARD.encode(&from.contents),
         }
     }
 }
@@ -93,7 +94,7 @@ impl From<&CaseDocument> for tmch_proto::TMCHCaseDocument {
                 FileType::Jpg => tmch_proto::TMCHFileType::Jpg,
                 FileType::Pdf => tmch_proto::TMCHFileType::Pdf,
             },
-            file_content: base64::encode(&from.contents),
+            file_content: BASE64_STANDARD.encode(&from.contents),
         }
     }
 }
