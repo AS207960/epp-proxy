@@ -90,3 +90,28 @@ spec:
   ports:
     - port: 50051
       targetPort: 50051
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: epp-proxy
+  annotations:
+    cert-manager.io/cluster-issuer: "gts"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/backend-protocol: "GRPCS"
+spec:
+  tls:
+    - hosts:
+        - epp-proxy.as207960.ltd.uk
+      secretName: epp-proxy-pub-tls
+  rules:
+    - host: epp-proxy.as207960.ltd.uk
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: epp-proxy
+                port:
+                  number: 50051

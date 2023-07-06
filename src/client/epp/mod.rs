@@ -124,9 +124,9 @@ pub struct ServerFeatures {
     maintenance_02_supported: bool,
     /// RFC8807 support
     login_sec_supported: bool,
-    /// http://www.eurid.eu/xml/epp/contact-ext-1.3 support
+    /// http://www.eurid.eu/xml/epp/contact-ext-1.4 support
     eurid_contact_support: bool,
-    /// http://www.eurid.eu/xml/epp/domain-ext-2.4 support
+    /// http://www.eurid.eu/xml/epp/domain-ext-2.5 support
     eurid_domain_support: bool,
     /// http://www.eurid.eu/xml/epp/dnsQuality-2.0 support
     eurid_dns_quality_support: bool,
@@ -890,10 +890,10 @@ impl EPPClient {
             .supports_ext("urn:ietf:params:xml:ns:epp:loginSec-1.0");
         self.features.eurid_contact_support = greeting
             .service_menu
-            .supports_ext("http://www.eurid.eu/xml/epp/contact-ext-1.3");
+            .supports_ext("http://www.eurid.eu/xml/epp/contact-ext-1.4");
         self.features.eurid_domain_support = greeting
             .service_menu
-            .supports_ext("http://www.eurid.eu/xml/epp/domain-ext-2.4");
+            .supports_ext("http://www.eurid.eu/xml/epp/domain-ext-2.5");
         self.features.eurid_hit_points_supported = greeting
             .service_menu
             .supports("http://www.eurid.eu/xml/epp/registrarHitPoints-1.0");
@@ -1080,10 +1080,10 @@ impl EPPClient {
                 objects.push("http://www.eurid.eu/xml/epp/dnssecEligibility-1.0".to_string())
             }
             if self.features.eurid_domain_support {
-                ext_objects.push("http://www.eurid.eu/xml/epp/contact-ext-1.3".to_string())
+                ext_objects.push("http://www.eurid.eu/xml/epp/contact-ext-1.4".to_string())
             }
             if self.features.eurid_contact_support {
-                ext_objects.push("http://www.eurid.eu/xml/epp/domain-ext-2.4".to_string())
+                ext_objects.push("http://www.eurid.eu/xml/epp/domain-ext-2.5".to_string())
             }
             if self.features.eurid_poll_supported {
                 ext_objects.push("http://www.eurid.eu/xml/epp/poll-1.2".to_string())

@@ -8,7 +8,7 @@ spec:
     - ReadWriteMany
   resources:
     requests:
-      storage: 50Gi
+      storage: 60Gi
 ---
 kind: ConfigMap
 apiVersion: v1
@@ -90,3 +90,28 @@ spec:
   ports:
     - port: 50051
       targetPort: 50051
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: epp-proxy
+  annotations:
+    cert-manager.io/cluster-issuer: "gts"
+    nginx.ingress.kubernetes.io/proxy-body-size: "0"
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+spec:
+  tls:
+    - hosts:
+        - test-primary.epp-proxy.as207960.ltd.uk
+      secretName: epp-proxy-tls
+  rules:
+    - host: test-primary.epp-proxy.as207960.ltd.uk
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: epp-proxy
+                port:
+                  number: 50051

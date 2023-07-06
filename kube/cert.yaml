@@ -4,7 +4,7 @@ metadata:
   name: epp-proxy-cert
 spec:
   secretName: epp-proxy-tls
-  duration: 2160h
+  duration: 8760h
   renewBefore: 360h
   commonName: epp-proxy
   subject:
@@ -31,7 +31,7 @@ metadata:
   name: epp-proxy-test-primary-cert
 spec:
   secretName: epp-proxy-test-primary-tls
-  duration: 2160h
+  duration: 8760h
   renewBefore: 360h
   commonName: epp-proxy-test-primary
   subject:
@@ -58,7 +58,7 @@ metadata:
   name: epp-proxy-test-secondary-cert
 spec:
   secretName: epp-proxy-test-secondary-tls
-  duration: 2160h
+  duration: 8760h
   renewBefore: 360h
   commonName: epp-proxy-test-secondary
   subject:
