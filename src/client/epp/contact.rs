@@ -660,7 +660,11 @@ pub fn handle_create(
         Ok(proto::contact::EPPContactPostalInfo {
             addr_type: t,
             name: Some(a.name.clone()),
-            organisation: a.organisation.clone(),
+            organisation: if client.eurid_contact_support && !super::super::eurid::is_entity_natural_person(req.entity_type.as_ref()) {
+                Some(a.organisation.clone().unwrap_or_else(|| a.name.clone()))
+            } else {
+                a.organisation.clone()
+            },
             traficom_last_name: if client.has_erratum("traficom") {
                 Some(format!("{:.<2}", name_parts.pop().unwrap_or_default()))
             } else {

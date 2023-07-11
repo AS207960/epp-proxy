@@ -94,6 +94,7 @@ pub fn is_entity_natural_person(entity: Option<&super::contact::EntityType>) -> 
             super::contact::EntityType::UkIndividual
                 | super::contact::EntityType::FinnishIndividual
                 | super::contact::EntityType::OtherIndividual
+                | super::contact::EntityType::Unknown
         ),
         None => true,
     }
