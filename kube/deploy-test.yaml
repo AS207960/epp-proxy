@@ -97,13 +97,13 @@ metadata:
   name: epp-proxy
   annotations:
     cert-manager.io/cluster-issuer: "gts"
-    nginx.ingress.kubernetes.io/proxy-body-size: "0"
-    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/backend-protocol: "GRPCS"
 spec:
   tls:
     - hosts:
         - test-primary.epp-proxy.as207960.ltd.uk
-      secretName: epp-proxy-tls
+      secretName: epp-proxy-test-primary-pub-tls
   rules:
     - host: test-primary.epp-proxy.as207960.ltd.uk
       http:
@@ -112,6 +112,6 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: epp-proxy
+                name: epp-proxy-test-primary
                 port:
                   number: 50051

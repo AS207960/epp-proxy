@@ -263,12 +263,6 @@ pub struct EURIDContactInfo {
     #[serde(rename = "{http://www.eurid.eu/xml/epp/contact-ext-1.4}contact-ext:type")]
     pub contact_type: EURIDContactType,
     #[serde(
-        rename = "{http://www.eurid.eu/xml/epp/contact-ext-1.4}contact-ext:whoisEmial",
-        skip_serializing_if = "Option::is_none",
-        default
-    )]
-    pub whois_email: Option<String>,
-    #[serde(
         rename = "{http://www.eurid.eu/xml/epp/contact-ext-1.4}contact-ext:vat",
         skip_serializing_if = "Option::is_none",
         default
@@ -276,6 +270,12 @@ pub struct EURIDContactInfo {
     pub vat: Option<String>,
     #[serde(rename = "{http://www.eurid.eu/xml/epp/contact-ext-1.4}contact-ext:lang")]
     pub language: String,
+    #[serde(
+        rename = "{http://www.eurid.eu/xml/epp/contact-ext-1.4}contact-ext:whoisEmial",
+        skip_serializing_if = "Option::is_none",
+        default
+    )]
+    pub whois_email: Option<String>,
     #[serde(rename = "{http://www.eurid.eu/xml/epp/contact-ext-1.4}contact-ext:naturalPerson")]
     pub natural_person: bool,
     #[serde(

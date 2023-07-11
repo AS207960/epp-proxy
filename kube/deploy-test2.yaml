@@ -34,7 +34,7 @@ spec:
   template:
     metadata:
       annotations:
-        cni.projectcalico.org/ipv6pools: "[\"epp-ip6-ippool\"]"
+        cni.projectcalico.org/ipv6pools: "[\"pi-epp-ip6-ippool\"]"
       labels:
         app: epp-proxy-test-secondary
     spec:
@@ -97,13 +97,13 @@ metadata:
   name: epp-proxy
   annotations:
     cert-manager.io/cluster-issuer: "gts"
-    nginx.ingress.kubernetes.io/proxy-body-size: "0"
-    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/backend-protocol: "GRPCS"
 spec:
   tls:
     - hosts:
         - test-secondary.epp-proxy.as207960.ltd.uk
-      secretName: epp-proxy-tls
+      secretName: epp-proxy-test-secondary-pub-tls
   rules:
     - host: test-secondary.epp-proxy.as207960.ltd.uk
       http:
