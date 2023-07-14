@@ -1,15 +1,3 @@
-kind: PersistentVolumeClaim
-apiVersion: v1
-metadata:
-  name: epp-proxy-test-primary-log
-spec:
-  storageClassName: standard
-  accessModes:
-    - ReadWriteMany
-  resources:
-    requests:
-      storage: 60Gi
----
 kind: ConfigMap
 apiVersion: v1
 metadata:
@@ -19,6 +7,10 @@ data:
   OAUTH_WELL_KNOWN: "https://sso.as207960.net/auth/realms/test/.well-known/openid-configuration"
   TLS_CERT_FILE: "/tls/tls.crt"
   TLS_KEY_FILE: "/tls/tls.key"
+  LOG_DRIVER: "s3"
+  S3_ENDPOINT: "https://s3.as207960.net"
+  S3_REGION: "garage"
+  S3_ACCESS_KEY_ID: "GK55245894566f49fd280eaa8a"
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -39,9 +31,6 @@ spec:
         app: epp-proxy-test-primary
     spec:
       volumes:
-        - name: logs
-          persistentVolumeClaim:
-            claimName: epp-proxy-test-primary-log
         - name: conf
           secret:
             secretName: epp-proxy-test-primary-conf
@@ -61,8 +50,6 @@ spec:
           volumeMounts:
             - mountPath: "/conf"
               name: conf
-            - mountPath: "/log"
-              name: logs
             - mountPath: "/tls"
               name: tls-keys
             - mountPath: "/priv"
@@ -72,6 +59,8 @@ spec:
               value: info
             - name: SSL_CERT_DIR
               value: /etc/ssl/certs
+            - name: S3_BUCKET
+              value: "epp-proxy-test-primary-logs"
           envFrom:
             - configMapRef:
                 name: epp-proxy-test-conf

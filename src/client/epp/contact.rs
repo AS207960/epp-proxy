@@ -660,8 +660,12 @@ pub fn handle_create(
         Ok(proto::contact::EPPContactPostalInfo {
             addr_type: t,
             name: Some(a.name.clone()),
-            organisation: if client.eurid_contact_support && !super::super::eurid::is_entity_natural_person(req.entity_type.as_ref()) {
-                Some(a.organisation.clone().unwrap_or_else(|| a.name.clone()))
+            organisation: if client.eurid_contact_support {
+                if super::eurid::is_entity_natural_person(req.entity_type.as_ref()) {
+                    None
+                } else {
+                    Some(a.organisation.clone().unwrap_or_else(|| a.name.clone()))
+                }
             } else {
                 a.organisation.clone()
             },
