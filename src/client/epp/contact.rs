@@ -661,7 +661,7 @@ pub fn handle_create(
             addr_type: t,
             name: Some(a.name.clone()),
             organisation: if client.eurid_contact_support {
-                if super::eurid::is_entity_natural_person(req.entity_type.as_ref()) {
+                if super::super::eurid::is_entity_natural_person(req.entity_type.as_ref()) {
                     None
                 } else {
                     Some(a.organisation.clone().unwrap_or_else(|| a.name.clone()))
