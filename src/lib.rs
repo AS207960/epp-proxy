@@ -370,6 +370,15 @@ impl Storage for FSStorage {
     }
 }
 
+#[derive(Debug)]
+pub struct TokioSleep;
+
+impl aws_sdk_s3::config::AsyncSleep for TokioSleep {
+    fn sleep(&self, duration: std::time::Duration) -> aws_sdk_s3::config::Sleep {
+        aws_sdk_s3::config::Sleep::new(tokio::time::sleep(duration))
+    }
+}
+
 #[derive(Debug, Clone)]
 pub struct S3Storage {
     client: aws_sdk_s3::Client,
@@ -384,6 +393,7 @@ impl S3Storage {
         bucket: impl Into<String>
     ) -> Self {
         let app_name = aws_sdk_s3::config::AppName::new("epp-proxy").unwrap();
+        let sleep_impl = std::sync::Arc::new(TokioSleep);
 
         let config =  aws_sdk_s3::config::Builder::new()
             .app_name(app_name)
@@ -391,6 +401,7 @@ impl S3Storage {
             .credentials_provider(credentials_provider)
             .region(region.into())
             .retry_config(aws_sdk_s3::config::retry::RetryConfig::standard())
+            .sleep_impl(sleep_impl)
             .build();
         let client = aws_sdk_s3::Client::from_conf(config);
 
