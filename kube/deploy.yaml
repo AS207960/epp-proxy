@@ -19,6 +19,11 @@ data:
   OAUTH_WELL_KNOWN: "https://sso.as207960.net/auth/realms/master/.well-known/openid-configuration"
   TLS_CERT_FILE: "/tls/tls.crt"
   TLS_KEY_FILE: "/tls/tls.key"
+  LOG_DRIVER: "s3"
+  S3_ENDPOINT: "https://s3.as207960.net"
+  S3_REGION: "garage"
+  S3_BUCKET: "epp-proxy-logs"
+  S3_ACCESS_KEY_ID: "GK55245894566f49fd280eaa8a"
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -51,8 +56,6 @@ spec:
         - name: priv-keys
           secret:
             secretName: epp-proxy-priv
-      #nodeSelector:
-      #    "kubernetes.io/hostname": "kubes2.fsn1.as207960.net"
       containers:
         - name: epp-proxy
           image: as207960/epp-proxy:(version)

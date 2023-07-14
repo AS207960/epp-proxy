@@ -57,8 +57,7 @@ pub struct ClientConf<'a, C: Into<Option<&'a str>>> {
     pub tag: &'a str,
     /// The password to login with
     pub password: &'a str,
-    /// Directory path to log commands to
-    pub log_dir: std::path::PathBuf,
+    pub log_storage: crate::StorageScoped,
     pub client_cert: Option<ClientCertConf<'a>>,
     /// Source address to bind the TLS connection to, for IP based ACLs etc.
     pub source_address: Option<&'a std::net::IpAddr>,

@@ -281,7 +281,7 @@ pub async fn setup_pkcs11_engine(hsm_conf_file: Option<&str>) -> Option<P11Engin
 }
 
 pub async fn create_client(
-    log_dir: std::path::PathBuf,
+    log_storage: StorageScoped,
     config: &ConfigFile,
     pkcs11_engine: &Option<P11Engine>,
     keepalive: bool,
@@ -291,7 +291,7 @@ pub async fn create_client(
         tag: &config.tag,
         password: &config.password,
         source_address: config.source_address.as_ref(),
-        log_dir,
+        log_storage,
         keepalive,
         client_cert: match &config.client_cert {
             Some(ClientCertConfig::PKCS12(s)) => Some(client::ClientCertConf::PKCS12(s)),
@@ -331,3 +331,126 @@ pub async fn create_client(
         }
     }
 }
+
+#[tonic::async_trait]
+pub trait Storage: std::fmt::Debug + Send + Sync {
+    async fn write_msg_log(&self, tag: &str, msg: &str, msg_type: &str) -> Result<(), Box<dyn std::error::Error>>;
+}
+
+#[derive(Debug, Clone)]
+pub struct FSStorage {
+    root: std::path::PathBuf,
+}
+
+impl FSStorage {
+    pub fn new(root: std::path::PathBuf) -> Self {
+        Self { root }
+    }
+}
+
+#[tonic::async_trait]
+impl Storage for FSStorage {
+    async fn write_msg_log(&self, tag: &str, msg: &str, msg_type: &str) -> Result<(), Box<dyn std::error::Error>> {
+        use chrono::prelude::*;
+        use tokio::io::AsyncWriteExt;
+
+        let now = Utc::now();
+        let time = now.format("%FT%H-%M-%S-%f").to_string();
+        let dir = self.root
+            .join(tag)
+            .join(format!("{:04}", now.year()))
+            .join(format!("{:02}", now.month()))
+            .join(format!("{:02}", now.day()))
+            .join(format!("{:02}", now.hour()));
+        let file_path = dir.join(format!("{}_{}.xml", time, msg_type));
+        tokio::fs::create_dir_all(&dir).await?;
+        let mut file = tokio::fs::File::create(file_path).await?;
+        file.write_all(msg.as_bytes()).await?;
+        Ok(())
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct S3Storage {
+    client: aws_sdk_s3::Client,
+    bucket: String
+}
+
+impl S3Storage {
+    pub fn new(
+        endpoint_url: impl Into<String>,
+        credentials_provider: impl aws_credential_types::provider::ProvideCredentials + 'static,
+        region: impl Into<aws_sdk_s3::config::Region>,
+        bucket: impl Into<String>
+    ) -> Self {
+        let app_name = aws_sdk_s3::config::AppName::new("epp-proxy").unwrap();
+
+        let config =  aws_sdk_s3::config::Builder::new()
+            .app_name(app_name)
+            .endpoint_url(endpoint_url)
+            .credentials_provider(credentials_provider)
+            .region(region.into())
+            .retry_config(aws_sdk_s3::config::retry::RetryConfig::standard())
+            .build();
+        let client = aws_sdk_s3::Client::from_conf(config);
+
+        Self {
+            client,
+            bucket: bucket.into()
+        }
+    }
+}
+
+#[tonic::async_trait]
+impl Storage for S3Storage {
+    async fn write_msg_log(&self, tag: &str, msg: &str, msg_type: &str) -> Result<(), Box<dyn std::error::Error>> {
+        use chrono::prelude::*;
+
+        let byte_stream = aws_sdk_s3::primitives::ByteStream::from(
+            msg.as_bytes().to_vec()
+        );
+
+        let now = Utc::now();
+        let time = now.format("%Y/%m/%d/%H/%FT%H-%M-%S-%f").to_string();
+        let key = format!("{}/{}_{}.xml", tag, time, msg_type);
+
+        self.client.put_object()
+            .bucket(&self.bucket)
+            .key(&key)
+            .body(byte_stream)
+            .send().await?;
+
+        Ok(())
+    }
+}
+
+#[derive(Clone, Debug)]
+pub struct StorageScoped {
+    storage: std::sync::Arc<Box<dyn Storage>>,
+    tag: String
+}
+
+impl StorageScoped {
+    pub fn new(storage: Box<dyn Storage>, tag: &str) -> Self {
+        Self {
+            storage: std::sync::Arc::new(storage),
+            tag: tag.to_string()
+        }
+    }
+
+    pub fn new_arc (storage: impl Into<std::sync::Arc<Box<dyn Storage>>>, tag: &str) -> Self {
+        Self {
+            storage: storage.into(),
+            tag: tag.to_string()
+        }
+    }
+
+    async fn write_msg_log(&self, msg: &str, msg_type: &str) -> Result<(), Box<dyn std::error::Error>> {
+        self.storage.write_msg_log(&self.tag, msg, msg_type).await
+    }
+}
+
+
+
+
+

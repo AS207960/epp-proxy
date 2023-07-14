@@ -180,7 +180,7 @@ impl ServerFeatures {
 /// Main client struct for the EEP client
 #[derive(Debug)]
 pub struct EPPClient {
-    log_dir: std::path::PathBuf,
+    log_storage: crate::StorageScoped,
     host: String,
     tag: String,
     password: String,
@@ -253,7 +253,7 @@ impl EPPClient {
             super::epp_like::tls_client::TLSClient::new((&conf).into(), pkcs11_engine).await?;
 
         Ok(Self {
-            log_dir: conf.log_dir,
+            log_storage: conf.log_storage,
             host: conf.host.to_string(),
             tag: conf.tag.to_string(),
             password: conf.password.to_string(),
@@ -349,7 +349,7 @@ impl EPPClient {
             let msg_receiver = super::epp_like::ClientReceiver {
                 host: self.host.clone(),
                 reader: sock_read,
-                root: self.log_dir.clone(),
+                log_storage: self.log_storage.clone(),
                 decode_fn: recv_msg,
             };
             let mut message_channel = msg_receiver.run().fuse();
@@ -453,7 +453,7 @@ impl EPPClient {
             let receiver = super::epp_like::send_msg(
                 &self.host,
                 sock_write,
-                &self.log_dir,
+                self.log_storage.clone(),
                 send_msg,
                 &message,
             )
@@ -577,7 +577,7 @@ impl EPPClient {
                 match super::epp_like::send_msg(
                     &self.host,
                     sock_write,
-                    &self.log_dir,
+                    self.log_storage.clone(),
                     send_msg,
                     &message,
                 )
@@ -720,7 +720,9 @@ impl EPPClient {
         &mut self,
         sock: &mut super::epp_like::tls_client::TLSConnection,
     ) -> Result<CommandTransactionID, bool> {
-        let msg = match super::epp_like::recv_msg(sock, &self.host, &self.log_dir, recv_msg).await {
+        let msg = match super::epp_like::recv_msg(
+            sock, &self.host, self.log_storage.clone(), recv_msg
+        ).await {
             Ok(m) => m,
             Err(_) => {
                 info!("Restarting connection...");
@@ -1130,7 +1132,7 @@ impl EPPClient {
                     tag: self.tag.clone(),
                     password: self.password.clone(),
                     nominet_tag_list_subordinate: true,
-                    log_dir: self.log_dir.clone(),
+                    log_storage: self.log_storage.clone(),
                     new_password: None,
                     pipelining: self.pipelining,
                     keepalive: self.keepalive,
@@ -1248,7 +1250,9 @@ impl EPPClient {
                 return Err(true);
             }
         };
-        let msg = match super::epp_like::recv_msg(sock, &self.host, &self.log_dir, recv_msg).await {
+        let msg = match super::epp_like::recv_msg(
+            sock, &self.host, self.log_storage.clone(), recv_msg
+        ).await {
             Ok(msg) => msg,
             Err(_) => {
                 error!("Failed to receive login response");
@@ -1332,7 +1336,9 @@ impl EPPClient {
         let message = proto::EPPMessage {
             message: proto::EPPMessageType::Command(Box::new(command)),
         };
-        match super::epp_like::send_msg(&self.host, sock, &self.log_dir, send_msg, &message).await {
+        match super::epp_like::send_msg(
+            &self.host, sock, self.log_storage.clone(), send_msg, &message
+        ).await {
             Ok(_) => Ok(message_id),
             Err(_) => Err(()),
         }

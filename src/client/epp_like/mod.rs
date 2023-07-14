@@ -1,27 +1,7 @@
-use chrono::prelude::*;
 use futures::sink::SinkExt;
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 
 pub(super) mod tls_client;
-
-pub(super) async fn write_msg_log(
-    msg: &str,
-    msg_type: &str,
-    root: &std::path::Path,
-) -> tokio::io::Result<()> {
-    let now = Utc::now();
-    let time = now.format("%FT%H-%M-%S-%f").to_string();
-    let dir = root
-        .join(format!("{:04}", now.year()))
-        .join(format!("{:02}", now.month()))
-        .join(format!("{:02}", now.day()))
-        .join(format!("{:02}", now.hour()));
-    let file_path = dir.join(format!("{}_{}.xml", time, msg_type));
-    tokio::fs::create_dir_all(&dir).await?;
-    let mut file = tokio::fs::File::create(file_path).await?;
-    file.write_all(msg.as_bytes()).await?;
-    Ok(())
-}
 
 /// Attempts to read a message where the first two bytes give length.
 ///
@@ -34,10 +14,10 @@ pub(super) async fn write_msg_log(
 /// * `sock` - A tokio async reader
 /// * `host` - Host name for error reporting
 /// * `root` - Root dir for storing message logs
-pub(super) async fn recv_length_msg<R: std::marker::Unpin + tokio::io::AsyncRead>(
+pub(super) async fn recv_length_msg<R: Unpin + tokio::io::AsyncRead>(
     sock: &mut R,
     host: &str,
-    root: &std::path::Path,
+    storage: crate::StorageScoped,
 ) -> Result<String, bool> {
     let data_len = match sock.read_u32().await {
         Ok(l) => l - 4,
@@ -75,30 +55,33 @@ pub(super) async fn recv_length_msg<R: std::marker::Unpin + tokio::io::AsyncRead
         }
     };
     debug!("Received message from {} with contents: {}", host, data);
-    match write_msg_log(&data, "recv", root).await {
-        Ok(_) => {}
-        Err(e) => {
-            error!("Failed writing received message to message log: {}", e);
+    let log_data = data.clone();
+    tokio::spawn(async move {
+        match storage.write_msg_log(&log_data, "recv").await {
+            Ok(_) => {}
+            Err(e) => {
+                error!("Failed writing received message to message log: {}", e);
+            }
         }
-    }
+    });
     Ok(data)
 }
 
-pub(super) async fn recv_msg<T, R: std::marker::Unpin + tokio::io::AsyncRead>(
+pub(super) async fn recv_msg<T, R: Unpin + tokio::io::AsyncRead>(
     sock: &mut R,
     host: &str,
-    root: &std::path::Path,
+    storage: crate::StorageScoped,
     decode_fn: fn(data: String, host: &str) -> Result<T, ()>,
 ) -> Result<T, bool> {
-    let data = recv_length_msg(sock, host, root).await?;
+    let data = recv_length_msg(sock, host, storage).await?;
     let msg = decode_fn(data, host).map_err(|_| false)?;
     Ok(msg)
 }
 
-pub(super) async fn send_msg<T, W: std::marker::Unpin + tokio::io::AsyncWrite>(
+pub(super) async fn send_msg<T, W: Unpin + tokio::io::AsyncWrite>(
     host: &str,
     sock: &mut W,
-    root: &std::path::Path,
+    storage: crate::StorageScoped,
     encode_fn: fn(message: &T, host: &str) -> Result<String, ()>,
     message: &T,
 ) -> Result<(), ()> {
@@ -120,12 +103,14 @@ pub(super) async fn send_msg<T, W: std::marker::Unpin + tokio::io::AsyncWrite>(
             return Err(());
         }
     }
-    match write_msg_log(&encoded_msg, "send", root).await {
-        Ok(_) => {}
-        Err(e) => {
-            error!("Failed writing sent message to message log: {}", e);
+    tokio::spawn(async move {
+        match storage.write_msg_log(&encoded_msg, "send").await {
+            Ok(_) => {}
+            Err(e) => {
+                error!("Failed writing sent message to message log: {}", e);
+            }
         }
-    }
+    });
     Ok(())
 }
 
@@ -135,8 +120,7 @@ pub(super) struct ClientReceiver<T, R: std::marker::Unpin + tokio::io::AsyncRead
     pub host: String,
     /// Read half of the TLS stream used to connect to the server
     pub reader: R,
-    /// Path to store received messages in
-    pub root: std::path::PathBuf,
+    pub log_storage: crate::StorageScoped,
     pub decode_fn: fn(data: String, host: &str) -> Result<T, ()>,
 }
 
@@ -150,7 +134,9 @@ impl<
         let (mut sender, receiver) = futures::channel::mpsc::channel::<Result<T, bool>>(16);
         tokio::spawn(async move {
             loop {
-                let msg = recv_msg(&mut self.reader, &self.host, &self.root, self.decode_fn).await;
+                let msg = recv_msg(
+                    &mut self.reader, &self.host, self.log_storage.clone(), self.decode_fn
+                ).await;
                 let is_close = if let Err(c) = &msg { *c } else { false };
                 match sender.send(msg).await {
                     Ok(_) => {}

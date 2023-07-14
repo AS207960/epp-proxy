@@ -121,12 +121,62 @@ async fn main() {
                 .help("Where to read the HSM config file from"),
         )
         .arg(
+            clap::Arg::new("log_driver")
+                .long("log-driver")
+                .value_name("DRIVER")
+                .default_value("fs")
+                .env("LOG_DRIVER")
+                .value_parser(["fs", "s3"])
+                .help("Which log driver to use, filesystem or s3"),
+        )
+        .arg(
             clap::Arg::new("log")
                 .long("log")
                 .value_name("DIR")
                 .default_value("./log/")
                 .value_parser(clap::value_parser!(std::path::PathBuf))
-                .help("Directory to write command logs to"),
+                .help("Directory to write command logs to")
+                .required_if_eq("log_driver", "fs"),
+        )
+        .arg(
+            clap::Arg::new("s3_endpoint")
+                .long("s3-endpoint")
+                .value_name("URL")
+                .env("S3_ENDPOINT")
+                .help("S3 endpoint to use")
+                .required_if_eq("log_driver", "s3"),
+        )
+        .arg(
+            clap::Arg::new("s3_region")
+                .long("s3-region")
+                .value_name("REGION")
+                .env("S3_REGION")
+                .help("S3 region name")
+                .required_if_eq("log_driver", "s3"),
+        )
+        .arg(
+            clap::Arg::new("s3_bucket")
+                .long("s3-bucket")
+                .value_name("BUCKET")
+                .env("S3_BUCKET")
+                .help("S3 bucket name")
+                .required_if_eq("log_driver", "s3"),
+        )
+        .arg(
+            clap::Arg::new("s3_access_key_id")
+                .long("s3-access-key-id")
+                .value_name("KEY_ID")
+                .env("S3_ACCESS_KEY_ID")
+                .help("S3 access key ID")
+                .required_if_eq("log_driver", "s3"),
+        )
+        .arg(
+            clap::Arg::new("s3_secret_access_key")
+                .long("s3-secret-access-key")
+                .value_name("SECRET_KEY")
+                .env("S3_SECRET_ACCESS_KEY")
+                .help("S3 secret access key")
+                .required_if_eq("log_driver", "s3"),
         )
         .arg(
             clap::Arg::new("auth")
@@ -191,27 +241,44 @@ async fn main() {
         }
     }
 
-    let log_dir_path = matches.get_one::<std::path::PathBuf>("log").unwrap();
-    match std::fs::create_dir_all(log_dir_path) {
-        Ok(()) => {}
-        Err(e) => {
-            error!("Can't create log directory: {}", e);
-            return;
+    let storage: std::sync::Arc<Box<dyn epp_proxy::Storage>> = match matches.get_one::<String>("log_driver").unwrap().as_str() {
+        "fs" => {
+            let log_dir_path = matches.get_one::<std::path::PathBuf>("log").unwrap();
+            match std::fs::create_dir_all(log_dir_path) {
+                Ok(()) => {}
+                Err(e) => {
+                    error!("Can't create log directory: {}", e);
+                    return;
+                }
+            }
+            std::sync::Arc::new(Box::new(epp_proxy::FSStorage::new(log_dir_path.to_owned())))
         }
-    }
+        "s3" => {
+            let endpoint = matches.get_one::<String>("s3_endpoint").unwrap();
+            let region = aws_sdk_s3::config::Region::new(
+                matches.get_one::<String>("s3_region").unwrap().clone()
+            );
+            let bucket = matches.get_one::<String>("s3_bucket").unwrap();
+            let access_key_id = matches.get_one::<String>("s3_access_key_id").unwrap();
+            let secret_access_key = matches.get_one::<String>("s3_secret_access_key").unwrap();
+
+            let creds = aws_credential_types::Credentials::new(
+                access_key_id.to_string(),
+                secret_access_key.to_string(),
+                None,
+                None,
+                "epp-proxy"
+            );
+            std::sync::Arc::new(Box::new(epp_proxy::S3Storage::new(endpoint, creds, region, bucket)))
+        },
+        _ => unreachable!()
+    };
 
     let mut router = epp_proxy::Router::new();
     let mut clients = vec![];
     for config in configs {
-        let log_dir = log_dir_path.join(&config.id);
-        match std::fs::create_dir_all(&log_dir) {
-            Ok(()) => {}
-            Err(e) => {
-                error!("Can't create log directory for {}: {}", config.id, e);
-                return;
-            }
-        }
-        let epp_client = epp_proxy::create_client(log_dir, &config, &pkcs11_engine, true).await;
+        let scoped_storage = epp_proxy::StorageScoped::new_arc(storage.clone(), &config.id);
+        let epp_client = epp_proxy::create_client(scoped_storage, &config, &pkcs11_engine, true).await;
         clients.push((epp_client, config))
     }
 

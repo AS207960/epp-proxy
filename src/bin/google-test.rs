@@ -168,37 +168,17 @@ async fn main() {
         }
     };
 
-    let log_dir_ga_1 = log_dir_path.join(&conf_ga_1.id);
-    match std::fs::create_dir_all(&log_dir_ga_1) {
-        Ok(()) => {}
-        Err(e) => {
-            error!("Can't create log directory for {}: {}", conf_ga_1.id, e);
-            return;
-        }
-    }
-    let log_dir_ga_2 = log_dir_path.join(&conf_ga_2.id);
-    match std::fs::create_dir_all(&log_dir_ga_2) {
-        Ok(()) => {}
-        Err(e) => {
-            error!("Can't create log directory for {}: {}", conf_ga_2.id, e);
-            return;
-        }
-    }
-    let log_dir_sunrise = log_dir_path.join(&conf_sunrise.id);
-    match std::fs::create_dir_all(&log_dir_sunrise) {
-        Ok(()) => {}
-        Err(e) => {
-            error!("Can't create log directory for {}: {}", conf_sunrise.id, e);
-            return;
-        }
-    }
+    let storage = epp_proxy::FSStorage::new(log_dir_path.clone());
+    let storage_ga_1 = epp_proxy::StorageScoped::new(Box::new(storage.clone()), &conf_ga_1.id);
+    let storage_ga_2 = epp_proxy::StorageScoped::new(Box::new(storage.clone()), &conf_ga_2.id);
+    let storage_sunrise = epp_proxy::StorageScoped::new(Box::new(storage.clone()), &conf_sunrise.id);
 
     let epp_client_ga_1 =
-        epp_proxy::create_client(log_dir_ga_1, &conf_ga_1, &pkcs11_engine, true).await;
+        epp_proxy::create_client(storage_ga_1, &conf_ga_1, &pkcs11_engine, true).await;
     let epp_client_ga_2 =
-        epp_proxy::create_client(log_dir_ga_2, &conf_ga_2, &pkcs11_engine, true).await;
+        epp_proxy::create_client(storage_ga_2, &conf_ga_2, &pkcs11_engine, true).await;
     let epp_client_sunrise =
-        epp_proxy::create_client(log_dir_sunrise, &conf_sunrise, &pkcs11_engine, true).await;
+        epp_proxy::create_client(storage_sunrise, &conf_sunrise, &pkcs11_engine, true).await;
 
     // 2.1 - Login
     let (mut cmd_tx_ga_1, mut ready_rx_ga_1) = epp_client_ga_1.start();

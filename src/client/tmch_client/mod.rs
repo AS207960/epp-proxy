@@ -36,7 +36,7 @@ fn send_msg(data: &tmch_proto::TMCHMessage, host: &str) -> Result<String, ()> {
 /// Main client struct for the TMCH client
 #[derive(Debug)]
 pub struct TMCHClient {
-    log_dir: std::path::PathBuf,
+    log_storage: crate::StorageScoped,
     host: String,
     client_id: String,
     password: String,
@@ -80,7 +80,7 @@ impl TMCHClient {
             super::epp_like::tls_client::TLSClient::new((&conf).into(), pkcs11_engine).await?;
 
         Ok(Self {
-            log_dir: conf.log_dir,
+            log_storage: conf.log_storage,
             host: conf.host.to_string(),
             client_id: conf.tag.to_string(),
             password: conf.password.to_string(),
@@ -168,7 +168,7 @@ impl TMCHClient {
             let msg_receiver = super::epp_like::ClientReceiver {
                 host: self.host.clone(),
                 reader: sock_read,
-                root: self.log_dir.clone(),
+                log_storage: self.log_storage.clone(),
                 decode_fn: recv_msg,
             };
             let mut message_channel = msg_receiver.run().fuse();
@@ -269,8 +269,9 @@ impl TMCHClient {
         };
         self.is_awaiting_response = true;
         let receiver =
-            super::epp_like::send_msg(&self.host, sock_write, &self.log_dir, send_msg, &message)
-                .fuse();
+            super::epp_like::send_msg(
+                &self.host, sock_write, self.log_storage.clone(), send_msg, &message
+            ).fuse();
         let mut delay = Box::pin(tokio::time::sleep(tokio::time::Duration::new(15, 0)).fuse());
         futures::pin_mut!(receiver);
         let resp = futures::select! {
@@ -360,7 +361,9 @@ impl TMCHClient {
         &mut self,
         sock: &mut super::epp_like::tls_client::TLSConnection,
     ) -> Result<outer_router::CommandTransactionID, bool> {
-        let msg = match super::epp_like::recv_msg(sock, &self.host, &self.log_dir, recv_msg).await {
+        let msg = match super::epp_like::recv_msg(
+            sock, &self.host, self.log_storage.clone(), recv_msg
+        ).await {
             Ok(m) => m,
             Err(_) => {
                 info!("Restarting connection...");
@@ -442,7 +445,9 @@ impl TMCHClient {
                 return Err(());
             }
         };
-        let msg = match super::epp_like::recv_msg(sock, &self.host, &self.log_dir, recv_msg).await {
+        let msg = match super::epp_like::recv_msg(
+            sock, &self.host, self.log_storage.clone(), recv_msg
+        ).await {
             Ok(msg) => msg,
             Err(_) => {
                 error!("Failed to receive login response");
@@ -491,7 +496,9 @@ impl TMCHClient {
         let message = tmch_proto::TMCHMessage {
             message: tmch_proto::TMCHMessageType::Command(Box::new(command)),
         };
-        match super::epp_like::send_msg(&self.host, sock, &self.log_dir, send_msg, &message).await {
+        match super::epp_like::send_msg(
+            &self.host, sock, self.log_storage.clone(), send_msg, &message
+        ).await {
             Ok(_) => Ok(message_id),
             Err(_) => Err(()),
         }

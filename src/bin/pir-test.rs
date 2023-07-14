@@ -69,21 +69,15 @@ async fn main() {
         }
     };
 
-    let log_dir = log_dir_path.join(&conf.id);
-    match std::fs::create_dir_all(&log_dir) {
-        Ok(()) => {}
-        Err(e) => {
-            error!("Can't create log directory for {}: {}", conf.id, e);
-            return;
-        }
-    }
+    let storage = epp_proxy::FSStorage::new(log_dir_path.clone());
+    let storage = epp_proxy::StorageScoped::new(Box::new(storage.clone()), &conf.id);
 
     conf.errata = Some("pir".to_string());
     conf.tag = "ClientX".to_string();
     conf.password = "foo-BAR2#123".to_string();
     conf.new_password = None;
 
-    let epp_client = epp_proxy::create_client(log_dir.clone(), &conf, &pkcs11_engine, true).await;
+    let epp_client = epp_proxy::create_client(storage.clone(), &conf, &pkcs11_engine, true).await;
 
     // 2.2.2 Authentication
     let (cmd_tx, mut ready_rx) = epp_client.start();
@@ -101,7 +95,7 @@ async fn main() {
 
     conf.new_password = Some("bar-FOO2#123".to_string());
 
-    let epp_client = epp_proxy::create_client(log_dir, &conf, &pkcs11_engine, true).await;
+    let epp_client = epp_proxy::create_client(storage.clone(), &conf, &pkcs11_engine, true).await;
     let (mut cmd_tx, mut ready_rx) = epp_client.start();
 
     info!("Awaiting client to become ready...");

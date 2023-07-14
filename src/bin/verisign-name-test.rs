@@ -48,7 +48,7 @@ async fn main() {
         epp_proxy::setup_pkcs11_engine(matches.get_one::<String>("hsm_conf").map(|x| x.as_str()))
             .await;
 
-    let log_dir_path: &std::path::Path = matches.get_one::<std::path::PathBuf>("log").unwrap();
+    let log_dir_path: &std::path::PathBuf = matches.get_one::<std::path::PathBuf>("log").unwrap();
     match std::fs::create_dir_all(log_dir_path) {
         Ok(()) => {}
         Err(e) => {
@@ -75,14 +75,8 @@ async fn main() {
         }
     };
 
-    let log_dir = log_dir_path.join(&conf.id);
-    match std::fs::create_dir_all(&log_dir) {
-        Ok(()) => {}
-        Err(e) => {
-            error!("Can't create log directory for {}: {}", conf.id, e);
-            return;
-        }
-    }
+    let storage = epp_proxy::FSStorage::new(log_dir_path.clone());
+    let storage = epp_proxy::StorageScoped::new(Box::new(storage), &conf.id);
 
     let test_2ld = format!("{}.name", nanoid::nanoid!(16, &ALPHABET));
     let test_3ld = format!("test.{}.name", nanoid::nanoid!(16, &ALPHABET));
@@ -90,7 +84,7 @@ async fn main() {
     let out_of_zone_ns = format!("ns1.{}.com", nanoid::nanoid!(16, &ALPHABET));
     let contact_id = nanoid::nanoid!(16, &ALPHABET);
 
-    let epp_client = epp_proxy::create_client(log_dir, &conf, &pkcs11_engine, false).await;
+    let epp_client = epp_proxy::create_client(storage, &conf, &pkcs11_engine, false).await;
 
     // 2.1.2.1 EPP login command
     let (mut cmd_tx, mut ready_rx) = epp_client.start();
