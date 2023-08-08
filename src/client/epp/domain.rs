@@ -2155,6 +2155,20 @@ pub fn handle_update(
         }
         None => true,
     };
+    let is_not_nominet_change = match &req.nominet_ext {
+        Some(e) => {
+            e.first_bill.whois_url.is_none()
+                && e.recur_bill.is_none()
+                && e.next_bill.is_empty()
+                && e.auto_bill.is_none()
+                && e.next_period.is_none()
+                && e.auto_period.is_none()
+                && e.renew_not_required.is_none()
+                && e.notes.is_none()
+                && e.reseller.is_none()
+        }
+        None => true,
+    };
 
     if req.add.is_empty()
         && req.remove.is_empty()
@@ -2163,6 +2177,7 @@ pub fn handle_update(
         && is_not_eurid_change
         && is_not_isnic_change
         && is_not_keysys_change
+        && is_not_nominet_change
     {
         return Err(Err(Error::Err(
             "at least one operation must be specified".to_string(),
