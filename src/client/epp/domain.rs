@@ -2157,14 +2157,14 @@ pub fn handle_update(
     };
     let is_not_nominet_change = match &req.nominet_ext {
         Some(e) => {
-            e.first_bill.whois_url.is_none()
+            e.first_bill.is_none()
                 && e.recur_bill.is_none()
-                && e.next_bill.is_empty()
+                && e.next_bill.is_none()
                 && e.auto_bill.is_none()
                 && e.next_period.is_none()
                 && e.auto_period.is_none()
                 && e.renew_not_required.is_none()
-                && e.notes.is_none()
+                && e.notes.is_empty()
                 && e.reseller.is_none()
         }
         None => true,
