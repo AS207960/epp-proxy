@@ -96,7 +96,8 @@ pub struct EPPDomainUpdate {
     pub next_period: Option<Option<u8>>,
     #[serde(
         rename = "{http://www.nominet.org.uk/epp/xml/domain-nom-ext-1.2}domain-nom-ext:renew-not-required",
-        skip_serializing_if = "Option::is_none"
+        skip_serializing_if = "Option::is_none",
+        serialize_with = "serialize_flag_bool"
     )]
     pub renew_not_required: Option<bool>,
     #[serde(
@@ -547,4 +548,21 @@ pub enum EPPLockObjectType {
 pub struct EPPUnrenew {
     #[serde(rename = "{http://www.nominet.org.uk/epp/xml/std-unrenew-1.0}unrenew:domainName")]
     pub domains: Vec<String>,
+}
+
+#[allow(clippy::trivially_copy_pass_by_ref)]
+fn serialize_flag_bool<S>(d: &Option<bool>, s: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::ser::Serializer,
+{
+    match d {
+        Some(d) => {
+            if *d {
+                s.serialize_str("Y")
+            } else {
+                s.serialize_str("N")
+            }
+        }
+        None => s.serialize_none(),
+    }
 }
