@@ -13,6 +13,7 @@ import "domain_common/domain_common.proto";
 import "isnic/isnic.proto";
 import "personal_registration/personal_registration.proto";
 import "keysys/keysys.proto";
+import "nominet_ext/nominet_ext.proto";
 
 message Contact {
     string id = 1;
@@ -114,6 +115,7 @@ message DomainInfoReply {
     isnic.DomainInfo isnic_info = 25;
     personal_registration.PersonalRegistrationInfo personal_registration = 26;
     keysys.DomainInfo keysys = 27;
+    nominet_ext.DomainInfo nominet_ext = 28;
 }
 
 message DomainCreateRequest {
@@ -132,6 +134,7 @@ message DomainCreateRequest {
     isnic.PaymentInfo isnic_payment = 13;
     personal_registration.PersonalRegistrationInfo personal_registration = 14;
     keysys.DomainCreate keysys = 15;
+    nominet_ext.DomainCreate nominet_ext = 28;
 }
 
 message DomainCreateReply {
@@ -189,6 +192,7 @@ message DomainUpdateRequest {
     eurid.DomainUpdateExtension eurid_data = 11;
     isnic.DomainUpdate isnic_info = 12;
     keysys.DomainUpdate keysys = 13;
+    nominet_ext.DomainUpdate nominet_ext = 28;
 }
 
 message DomainSyncRequest {

@@ -115,13 +115,21 @@ pub enum EPPCommandType {
 #[derive(Debug, Serialize)]
 pub enum EPPCommandExtensionType {
     #[serde(
-        rename = "{http://www.nominet.org.uk/epp/xml/contact-nom-ext-1.0}contact-nom-ext:create"
+    rename = "{http://www.nominet.org.uk/epp/xml/contact-nom-ext-1.0}contact-nom-ext:create"
     )]
     NominetContactExtCreate(nominet::EPPContactInfo),
     #[serde(
-        rename = "{http://www.nominet.org.uk/epp/xml/contact-nom-ext-1.0}contact-nom-ext:update"
+    rename = "{http://www.nominet.org.uk/epp/xml/contact-nom-ext-1.0}contact-nom-ext:update"
     )]
     NominetContactExtUpdate(nominet::EPPContactInfo),
+    #[serde(
+    rename = "{http://www.nominet.org.uk/epp/xml/domain-nom-ext-1.2}domain-nom-ext:create"
+    )]
+    NominetDomainExtCreate(nominet::EPPDomainCreate),
+    #[serde(
+    rename = "{http://www.nominet.org.uk/epp/xml/domain-nom-ext-1.2}domain-nom-ext:update"
+    )]
+    NominetDomainExtUpdate(nominet::EPPDomainUpdate),
     #[serde(
         rename = "{http://www.nominet.org.uk/epp/xml/nom-data-quality-1.0}nom-data-quality:update"
     )]
@@ -711,6 +719,8 @@ pub struct EPPLoginServices {
 pub enum EPPResponseExtensionType {
     #[serde(rename = "{http://www.nominet.org.uk/epp/xml/contact-nom-ext-1.0}infData")]
     NominetContactExtInfo(nominet::EPPContactInfo),
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/domain-nom-ext-1.2}infData")]
+    NominetDomainExtInfo(nominet::EPPDomainInfoData),
     #[serde(rename = "{http://www.nominet.org.uk/epp/xml/std-warning-1.1}ignored-field")]
     NominetIgnoredField(nominet::EPPIgnoredField),
     #[serde(rename = "{http://www.nominet.org.uk/epp/xml/std-warning-1.1}ignored-attribute")]

@@ -411,6 +411,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                         .keysys
                         .map(TryInto::try_into)
                         .map_or(Ok(None), |v| v.map(Some))?,
+                    nominet_ext: request.nominet_ext.map(Into::into),
                 },
                 &mut sender,
             )
@@ -659,6 +660,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                     eurid_data: request.eurid_data.map(Into::into),
                     isnic_info: request.isnic_info.map(Into::into),
                     keysys: request.keysys.map(Into::into),
+                    nominet_ext: request.nominet_ext.map(Into::into),
                 },
                 &mut sender,
             )

@@ -111,6 +111,7 @@ pub struct InfoResponse {
     pub eurid_idn: Option<super::eurid::Idn>,
     pub personal_registration: Option<super::personal_registration::PersonalRegistrationInfo>,
     pub keysys: Option<super::keysys::DomainInfo>,
+    pub nominet_ext: Option<super::nominet::DomainInfo>,
 }
 
 /// Additional contact associated with a domain
@@ -182,6 +183,7 @@ pub struct CreateRequest {
     pub(super) personal_registration:
         Option<super::personal_registration::PersonalRegistrationInfo>,
     pub(super) keysys: Option<super::keysys::DomainCreate>,
+    pub(super) nominet_ext: Option<super::nominet::DomainCreate>,
     pub return_path: Sender<CreateResponse>,
 }
 
@@ -241,6 +243,7 @@ pub struct UpdateRequest {
     pub(super) eurid_data: Option<super::eurid::DomainUpdate>,
     pub(super) isnic_info: Option<super::isnic::DomainUpdate>,
     pub(super) keysys: Option<super::keysys::DomainUpdate>,
+    pub(super) nominet_ext: Option<super::nominet::DomainUpdate>,
     pub return_path: Sender<UpdateResponse>,
 }
 
@@ -515,6 +518,7 @@ pub struct CreateInfo<'a> {
     pub isnic_payment: Option<super::isnic::PaymentInfo>,
     pub personal_registration: Option<super::personal_registration::PersonalRegistrationInfo>,
     pub keysys: Option<super::keysys::DomainCreate>,
+    pub nominet_ext: Option<super::nominet::DomainCreate>,
 }
 
 /// Registers a new domain
@@ -549,6 +553,7 @@ pub async fn create(
             isnic_payment: info.isnic_payment,
             personal_registration: info.personal_registration,
             keysys: info.keysys,
+            nominet_ext: info.nominet_ext,
             return_path: sender,
         })),
         receiver,
@@ -599,6 +604,7 @@ pub struct UpdateInfo<'a> {
     pub eurid_data: Option<super::eurid::DomainUpdate>,
     pub isnic_info: Option<super::isnic::DomainUpdate>,
     pub keysys: Option<super::keysys::DomainUpdate>,
+    pub nominet_ext: Option<super::nominet::DomainUpdate>,
 }
 
 /// Updates properties of a domain name
@@ -630,6 +636,7 @@ pub async fn update(
             eurid_data: info.eurid_data,
             isnic_info: info.isnic_info,
             keysys: info.keysys,
+            nominet_ext: info.nominet_ext,
             return_path: sender,
         })),
         receiver,

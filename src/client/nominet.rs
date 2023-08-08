@@ -4,6 +4,58 @@ use super::{CommandResponse, RequestMessage, Sender};
 use chrono::prelude::*;
 
 #[derive(Debug)]
+pub struct DomainCreate {
+    pub first_bill: Option<BillType>,
+    pub recur_bill: Option<BillType>,
+    pub auto_bill: Option<u32>,
+    pub next_bill: Option<u32>,
+    pub auto_period: Option<u32>,
+    pub next_period: Option<u32>,
+    pub notes: Vec<String>,
+    pub reseller: Option<String>,
+}
+
+#[derive(Debug)]
+pub struct DomainUpdate {
+    pub first_bill: Option<BillType>,
+    pub recur_bill: Option<BillType>,
+    pub auto_bill: Option<u32>,
+    pub next_bill: Option<u32>,
+    pub auto_period: Option<u32>,
+    pub next_period: Option<u32>,
+    pub renew_not_required: Option<bool>,
+    pub notes: Vec<String>,
+    pub reseller: Option<String>,
+}
+
+#[derive(Debug)]
+pub struct DomainInfo {
+    pub registration_status: RegistrationStatus,
+    pub first_bill: Option<BillType>,
+    pub recur_bill: Option<BillType>,
+    pub auto_bill: Option<u32>,
+    pub next_bill: Option<u32>,
+    pub auto_period: Option<u32>,
+    pub next_period: Option<u32>,
+    pub renew_not_required: Option<bool>,
+    pub notes: Vec<String>,
+    pub reseller: Option<String>,
+}
+
+#[derive(Debug, Copy, Clone)]
+pub enum BillType {
+    BillRegistrar,
+    BillCustomer,
+}
+
+#[derive(Debug, Copy, Clone)]
+pub enum RegistrationStatus {
+    RegisteredUntilExpiry,
+    RenewalRequired,
+    NoLongerRequired,
+}
+
+#[derive(Debug)]
 pub struct HandshakeAcceptRequest {
     pub(super) case_id: String,
     pub(super) registrant: Option<String>,

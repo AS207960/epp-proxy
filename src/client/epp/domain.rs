@@ -275,6 +275,16 @@ impl
             None => None,
         };
 
+        let nominet_ext = match extension {
+            Some(ext) => {
+                ext.value.iter().find_map(|p| match p {
+                    proto::EPPResponseExtensionType::NominetDomainExtInfo(i) => Some(i),
+                    _ => None,
+                }).map(Into::into)
+            }
+            None => None,
+        };
+
         Ok(InfoResponse {
             eurid_idn: super::eurid::extract_eurid_idn_singular(extension, domain_info.name.as_str())?,
             name: domain_info.name,
@@ -349,6 +359,7 @@ impl
             eurid_data: super::eurid::extract_eurid_domain_info(extension),
             personal_registration,
             keysys,
+            nominet_ext,
         })
     }
 }
@@ -1832,6 +1843,16 @@ pub fn handle_create(
         }
     }
 
+    if let Some(nominet_ext) = &req.nominet_ext {
+        if client.nominet_domain_ext {
+            exts.push(proto::EPPCommandExtensionType::NominetDomainExtCreate(
+                nominet_ext.into(),
+            ))
+        } else {
+            return Err(Err(Error::Unsupported));
+        }
+    }
+
     super::verisign::handle_verisign_namestore_erratum(client, &mut exts);
     super::fee::handle_donuts_fee_agreement(client, &req.donuts_fee_agreement, &mut exts)?;
 
@@ -2642,6 +2663,16 @@ pub fn handle_update(
             exts.push(proto::EPPCommandExtensionType::KeysysUpdate(
                 proto::keysys::Update::Domain(e),
             ));
+        } else {
+            return Err(Err(Error::Unsupported));
+        }
+    }
+
+    if let Some(nominet_ext) = &req.nominet_ext {
+        if client.nominet_domain_ext {
+            exts.push(proto::EPPCommandExtensionType::NominetDomainExtUpdate(
+                nominet_ext.into(),
+            ))
         } else {
             return Err(Err(Error::Unsupported));
         }

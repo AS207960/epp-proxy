@@ -76,6 +76,8 @@ pub struct ServerFeatures {
     nominet_tag_list: bool,
     /// http://www.nominet.org.uk/epp/xml/contact-nom-ext-1.0 support
     nominet_contact_ext: bool,
+    /// http://www.nominet.org.uk/epp/xml/domain-nom-ext-1.2 support
+    nominet_domain_ext: bool,
     /// http://www.nominet.org.uk/epp/xml/nom-data-quality-1.1 support
     nominet_data_quality: bool,
     /// http://www.nominet.org.uk/epp/xml/std-handshake-1.0 support
@@ -815,6 +817,9 @@ impl EPPClient {
         self.features.nominet_contact_ext = greeting
             .service_menu
             .supports_ext("http://www.nominet.org.uk/epp/xml/contact-nom-ext-1.0");
+        self.features.nominet_domain_ext = greeting
+            .service_menu
+            .supports_ext("http://www.nominet.org.uk/epp/xml/domain-nom-ext-1.2");
         self.features.nominet_data_quality = greeting
             .service_menu
             .supports_ext("http://www.nominet.org.uk/epp/xml/nom-data-quality-1.1");
@@ -998,6 +1003,10 @@ impl EPPClient {
             if self.features.nominet_contact_ext {
                 ext_objects
                     .push("http://www.nominet.org.uk/epp/xml/contact-nom-ext-1.0".to_string())
+            }
+            if self.features.nominet_domain_ext {
+                ext_objects
+                    .push("http://www.nominet.org.uk/epp/xml/domain-nom-ext-1.2".to_string())
             }
             if self.features.nominet_data_quality {
                 ext_objects

@@ -5,12 +5,103 @@ use super::super::nominet::{
     HandshakeRejectRequest, HandshakeResponse, HostCancelData, LockRequest, LockResponse, Object,
     ProcessData, ProcessStage, RegistrantTransferData, RegistrarChangeData, ReleaseData,
     ReleaseRequest, ReleaseResponse, SuspendData, Tag, TagListRequest, TagListResponse,
+    DomainInfo, RegistrationStatus, BillType, DomainCreate, DomainUpdate
 };
 use super::super::{proto, Error, Response};
 use super::router::HandleReqReturn;
 use super::ServerFeatures;
 use crate::client::nominet::{ContactValidateRequest, ContactValidateResponse};
 use std::convert::TryFrom;
+
+impl From<&proto::nominet::EPPDomainInfoData> for DomainInfo {
+    fn from(value: &proto::nominet::EPPDomainInfoData) -> Self {
+        DomainInfo {
+            registration_status: match value.reg_status {
+                proto::nominet::EPPDomainRegistrationStatus::RegisteredUntilExpiry => RegistrationStatus::RegisteredUntilExpiry,
+                proto::nominet::EPPDomainRegistrationStatus::RenewalRequired => RegistrationStatus::RenewalRequired,
+                proto::nominet::EPPDomainRegistrationStatus::NoLongerRequired => RegistrationStatus::NoLongerRequired,
+            },
+            first_bill: value.first_bill.as_ref().map(Into::into),
+            recur_bill: value.recur_bill.as_ref().map(Into::into),
+            auto_bill: value.auto_bill.map(|v| v as u32),
+            next_bill: value.next_bill.map(|v| v as u32),
+            auto_period: value.auto_period.map(|v| v as u32),
+            next_period: value.next_period.map(|v| v as u32),
+            renew_not_required: value.renewal_not_required,
+            notes: value.notes.clone(),
+            reseller: value.reseller.clone(),
+        }
+    }
+}
+
+impl From<&DomainCreate> for proto::nominet::EPPDomainCreate {
+    fn from(value: &DomainCreate) -> Self {
+        proto::nominet::EPPDomainCreate {
+            first_bill: value.first_bill.map(Into::into),
+            recur_bill: value.recur_bill.map(Into::into),
+            auto_bill: value.auto_bill.map(|v| v as u8),
+            next_bill: value.next_bill.map(|v| v as u8),
+            auto_period: value.auto_period.map(|v| v as u8),
+            next_period: value.next_period.map(|v| v as u8),
+            notes: value.notes.clone(),
+            reseller: value.reseller.clone(),
+        }
+    }
+}
+
+impl From<&DomainUpdate> for proto::nominet::EPPDomainUpdate {
+    fn from(value: &DomainUpdate) -> Self {
+        proto::nominet::EPPDomainUpdate {
+            first_bill: value.first_bill.map(Into::into).map(Some),
+            recur_bill: value.recur_bill.map(Into::into).map(Some),
+            auto_bill: match value.auto_bill {
+                Some(0) => Some(None),
+                Some(v) => Some(Some(v as u8)),
+                None => None,
+            },
+            next_bill: match value.next_bill {
+                Some(0) => Some(None),
+                Some(v) => Some(Some(v as u8)),
+                None => None,
+            },
+            auto_period: match value.auto_period {
+                Some(0) => Some(None),
+                Some(v) => Some(Some(v as u8)),
+                None => None,
+            },
+            next_period: match value.next_period {
+                Some(0) => Some(None),
+                Some(v) => Some(Some(v as u8)),
+                None => None,
+            },
+            renew_not_required: value.renew_not_required,
+            notes: value.notes.clone(),
+            reseller: match &value.reseller {
+                Some(v) if v.is_empty() => Some(None),
+                Some(v) => Some(Some(v.to_owned())),
+                None => None,
+            },
+        }
+    }
+}
+
+impl From<&proto::nominet::EPPDomainBillCode> for BillType {
+    fn from(value: &proto::nominet::EPPDomainBillCode) -> Self {
+        match value {
+            proto::nominet::EPPDomainBillCode::Customer => BillType::BillCustomer,
+            proto::nominet::EPPDomainBillCode::Registrar => BillType::BillRegistrar,
+        }
+    }
+}
+
+impl From<BillType> for proto::nominet::EPPDomainBillCode {
+    fn from(value: BillType) -> Self {
+        match value {
+            BillType::BillCustomer => proto::nominet::EPPDomainBillCode::Customer,
+            BillType::BillRegistrar => proto::nominet::EPPDomainBillCode::Registrar,
+        }
+    }
+}
 
 impl From<proto::nominet::EPPCancelData> for CancelData {
     fn from(from: proto::nominet::EPPCancelData) -> Self {

@@ -430,6 +430,7 @@ async fn main() {
             isnic_payment: None,
             personal_registration: None,
             keysys: None,
+            nominet_ext: None,
         },
         &mut cmd_tx,
     )
@@ -579,6 +580,7 @@ async fn main() {
             isnic_payment: None,
             personal_registration: None,
             keysys: None,
+            nominet_ext: None,
         },
         &mut cmd_tx,
     )
@@ -789,6 +791,7 @@ async fn main() {
             isnic_payment: None,
             personal_registration: None,
             keysys: None,
+            nominet_ext: None,
         },
         &mut cmd_tx
     )
@@ -832,6 +835,7 @@ async fn main() {
             isnic_payment: None,
             personal_registration: None,
             keysys: None,
+            nominet_ext: None,
         },
         &mut cmd_tx
     )
@@ -875,6 +879,7 @@ async fn main() {
             isnic_payment: None,
             personal_registration: None,
             keysys: None,
+            nominet_ext: None,
         },
         &mut cmd_tx
     )
@@ -936,6 +941,7 @@ async fn main() {
             isnic_payment: None,
             personal_registration: None,
             keysys: None,
+            nominet_ext: None,
         },
         &mut cmd_tx
     )
@@ -1015,6 +1021,7 @@ async fn main() {
             isnic_payment: None,
             personal_registration: None,
             keysys: None,
+            nominet_ext: None,
         },
         &mut cmd_tx,
     )
@@ -1076,6 +1083,7 @@ async fn main() {
             isnic_payment: None,
             personal_registration: None,
             keysys: None,
+            nominet_ext: None,
         },
         &mut cmd_tx,
     )

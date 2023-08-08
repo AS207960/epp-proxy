@@ -148,6 +148,7 @@ async fn main() {
             sec_dns: None,
             personal_registration: None,
             keysys: None,
+            nominet_ext: None,
         },
         &mut cmd_tx_1,
     )
@@ -229,6 +230,7 @@ async fn main() {
                 isnic_info: None,
                 eurid_data: None,
                 keysys: None,
+                nominet_ext: None,
             },
             &mut cmd_tx_1
         )
@@ -271,6 +273,7 @@ async fn main() {
                 isnic_info: None,
                 eurid_data: None,
                 keysys: None,
+                nominet_ext: None
             },
             &mut cmd_tx_1
         )
@@ -325,6 +328,7 @@ async fn main() {
                 isnic_info: None,
                 eurid_data: None,
                 keysys: None,
+                nominet_ext: None
             },
             &mut cmd_tx_1
         )
@@ -365,6 +369,7 @@ async fn main() {
                 isnic_info: None,
                 eurid_data: None,
                 keysys: None,
+                nominet_ext: None,
             },
             &mut cmd_tx_1
         )

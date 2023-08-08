@@ -23,7 +23,7 @@ message DomainUpdate {
     google.protobuf.UInt32Value next_bill = 4;
     google.protobuf.UInt32Value auto_period = 5;
     google.protobuf.UInt32Value next_period = 6;
-    bool renewal_not_required = 7;
+    google.protobuf.BoolValue renewal_not_required = 7;
     repeated string notes = 8;
     google.protobuf.StringValue reseller = 9;
 }

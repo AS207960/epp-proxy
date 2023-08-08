@@ -121,21 +121,23 @@ pub struct EPPDomainCheckData {
 pub struct EPPDomainInfoData {
     #[serde(rename = "{http://www.nominet.org.uk/epp/xml/domain-nom-ext-1.2}reg-status")]
     pub reg_status: EPPDomainRegistrationStatus,
-    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/domain-nom-ext-1.2}first-bill")]
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/domain-nom-ext-1.2}first-bill", default)]
     pub first_bill: Option<EPPDomainBillCode>,
-    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/domain-nom-ext-1.2}recur-bill")]
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/domain-nom-ext-1.2}recur-bill", default)]
     pub recur_bill: Option<EPPDomainBillCode>,
-    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/domain-nom-ext-1.2}auto-bill")]
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/domain-nom-ext-1.2}auto-bill", default)]
     pub auto_bill: Option<u8>,
-    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/domain-nom-ext-1.2}next-bill")]
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/domain-nom-ext-1.2}next-bill", default)]
     pub next_bill: Option<u8>,
-    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/domain-nom-ext-1.2}auto-period")]
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/domain-nom-ext-1.2}auto-period", default)]
     pub auto_period: Option<u8>,
-    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/domain-nom-ext-1.2}next-period")]
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/domain-nom-ext-1.2}next-period", default)]
     pub next_period: Option<u8>,
-    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/domain-nom-ext-1.2}notes")]
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/domain-nom-ext-1.2}renew-not-required", default)]
+    pub renewal_not_required: Option<bool>,
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/domain-nom-ext-1.2}notes", default)]
     pub notes: Vec<String>,
-    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/domain-nom-ext-1.2}reseller")]
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/domain-nom-ext-1.2}reseller", default)]
     pub reseller: Option<String>,
 }
 

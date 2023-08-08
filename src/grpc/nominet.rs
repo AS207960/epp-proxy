@@ -104,3 +104,83 @@ impl From<client::nominet::HandshakeResponse> for epp_proto::nominet::HandshakeR
         }
     }
 }
+
+impl From<client::nominet::DomainInfo> for epp_proto::nominet_ext::DomainInfo {
+    fn from(value: client::nominet::DomainInfo) -> Self {
+        epp_proto::nominet_ext::DomainInfo {
+            registration_status: match value.registration_status {
+                client::nominet::RegistrationStatus::RegisteredUntilExpiry => epp_proto::nominet_ext::RegistrationStatus::RegisteredUntilExpiry.into(),
+                client::nominet::RegistrationStatus::RenewalRequired => epp_proto::nominet_ext::RegistrationStatus::RenewalRequired.into(),
+                client::nominet::RegistrationStatus::NoLongerRequired => epp_proto::nominet_ext::RegistrationStatus::NoLongerRequired.into(),
+            },
+            first_bill: match value.first_bill {
+                Some(client::nominet::BillType::BillRegistrar) => epp_proto::nominet_ext::BillType::BillRegistrar.into(),
+                Some(client::nominet::BillType::BillCustomer) => epp_proto::nominet_ext::BillType::BillCustomer.into(),
+                None => epp_proto::nominet_ext::BillType::Unspecified.into(),
+            },
+            recur_bill: match value.recur_bill {
+                Some(client::nominet::BillType::BillRegistrar) => epp_proto::nominet_ext::BillType::BillRegistrar.into(),
+                Some(client::nominet::BillType::BillCustomer) => epp_proto::nominet_ext::BillType::BillCustomer.into(),
+                None => epp_proto::nominet_ext::BillType::Unspecified.into(),
+            },
+            auto_bill: value.auto_bill,
+            next_bill: value.next_bill,
+            auto_period: value.auto_period,
+            next_period: value.next_period,
+            renewal_not_required: value.renew_not_required.unwrap_or(false),
+            notes: value.notes,
+            reseller: value.reseller,
+        }
+    }
+}
+
+impl From<epp_proto::nominet_ext::DomainCreate> for client::nominet::DomainCreate {
+    fn from(value: epp_proto::nominet_ext::DomainCreate) -> Self {
+        client::nominet::DomainCreate {
+            first_bill: match epp_proto::nominet_ext::BillType::from_i32(value.first_bill) {
+                Some(epp_proto::nominet_ext::BillType::BillRegistrar) => Some(client::nominet::BillType::BillRegistrar),
+                Some(epp_proto::nominet_ext::BillType::BillCustomer) => Some(client::nominet::BillType::BillCustomer),
+                Some(epp_proto::nominet_ext::BillType::Unspecified) => None,
+                None => None
+            },
+            recur_bill: match epp_proto::nominet_ext::BillType::from_i32(value.recur_bill) {
+                Some(epp_proto::nominet_ext::BillType::BillRegistrar) => Some(client::nominet::BillType::BillRegistrar),
+                Some(epp_proto::nominet_ext::BillType::BillCustomer) => Some(client::nominet::BillType::BillCustomer),
+                Some(epp_proto::nominet_ext::BillType::Unspecified) => None,
+                None => None
+            },
+            auto_bill: value.auto_bill,
+            next_bill: value.next_bill,
+            auto_period: value.auto_period,
+            next_period: value.next_period,
+            notes: value.notes,
+            reseller: value.reseller,
+        }
+    }
+}
+
+impl From<epp_proto::nominet_ext::DomainUpdate> for client::nominet::DomainUpdate {
+    fn from(value: epp_proto::nominet_ext::DomainUpdate) -> Self {
+        client::nominet::DomainUpdate {
+            first_bill: match epp_proto::nominet_ext::BillType::from_i32(value.first_bill) {
+                Some(epp_proto::nominet_ext::BillType::BillRegistrar) => Some(client::nominet::BillType::BillRegistrar),
+                Some(epp_proto::nominet_ext::BillType::BillCustomer) => Some(client::nominet::BillType::BillCustomer),
+                Some(epp_proto::nominet_ext::BillType::Unspecified) => None,
+                None => None
+            },
+            recur_bill: match epp_proto::nominet_ext::BillType::from_i32(value.recur_bill) {
+                Some(epp_proto::nominet_ext::BillType::BillRegistrar) => Some(client::nominet::BillType::BillRegistrar),
+                Some(epp_proto::nominet_ext::BillType::BillCustomer) => Some(client::nominet::BillType::BillCustomer),
+                Some(epp_proto::nominet_ext::BillType::Unspecified) => None,
+                None => None
+            },
+            auto_bill: value.auto_bill,
+            next_bill: value.next_bill,
+            auto_period: value.auto_period,
+            next_period: value.next_period,
+            renew_not_required: value.renewal_not_required,
+            notes: value.notes,
+            reseller: value.reseller,
+        }
+    }
+}

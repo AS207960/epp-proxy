@@ -266,6 +266,7 @@ impl From<client::domain::InfoResponse> for epp_proto::domain::DomainInfoReply {
                 }
             }),
             keysys: res.keysys.map(Into::into),
+            nominet_ext: res.nominet_ext.map(Into::into),
         }
     }
 }
