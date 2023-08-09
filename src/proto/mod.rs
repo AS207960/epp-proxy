@@ -719,6 +719,8 @@ pub struct EPPLoginServices {
 pub enum EPPResponseExtensionType {
     #[serde(rename = "{http://www.nominet.org.uk/epp/xml/contact-nom-ext-1.0}infData")]
     NominetContactExtInfo(nominet::EPPContactInfo),
+    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/domain-nom-ext-1.2}chkData")]
+    NominetDomainExtCheckData(nominet::EPPDomainCheckData),
     #[serde(rename = "{http://www.nominet.org.uk/epp/xml/domain-nom-ext-1.2}infData")]
     NominetDomainExtInfo(nominet::EPPDomainInfoData),
     #[serde(rename = "{http://www.nominet.org.uk/epp/xml/std-warning-1.1}ignored-field")]
