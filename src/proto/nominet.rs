@@ -114,7 +114,7 @@ pub struct EPPDomainUpdate {
 
 #[derive(Debug, Deserialize)]
 pub struct EPPDomainCheckData {
-    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/domain-nom-ext-1.2}abuse-limit")]
+    #[serde(rename = "$attr:abuse-limit")]
     pub abuse_limit: u64,
 }
 
