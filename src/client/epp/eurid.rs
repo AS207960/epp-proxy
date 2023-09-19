@@ -295,11 +295,14 @@ impl From<&DomainTransfer> for proto::eurid::EURIDDomainTransfer {
                 contact_type: proto::eurid::EURIDContactType::Registrant,
                 contact_id: from.registrant.clone(),
             },
-            proto::eurid::EURIDDomainContact {
-                contact_type: proto::eurid::EURIDContactType::Registrant,
-                contact_id: from.registrant.clone(),
-            },
         ];
+
+        if let Some(billing) = &from.billing {
+            contacts.push(proto::eurid::EURIDDomainContact {
+                contact_type: proto::eurid::EURIDContactType::Billing,
+                contact_id: billing.clone(),
+            });
+        }
 
         if let Some(on_site) = &from.on_site {
             contacts.push(proto::eurid::EURIDDomainContact {

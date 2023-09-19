@@ -148,7 +148,7 @@ pub struct DomainTransfer {
     pub on_site: Option<String>,
     pub reseller: Option<String>,
     pub technical: Option<String>,
-    pub billing: String,
+    pub billing: Option<String>,
     pub registrant: String,
     pub registrar_reference: Option<String>,
 }

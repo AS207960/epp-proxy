@@ -101,7 +101,7 @@ message DomainDeleteExtension {
 
 message DomainTransferExtension {
     string registrant = 1;
-    string billing = 2;
+    google.protobuf.StringValue billing = 2;
     google.protobuf.StringValue technical = 3;
     google.protobuf.StringValue reseller = 4;
     google.protobuf.StringValue on_site = 5;
