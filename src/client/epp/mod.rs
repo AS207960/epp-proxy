@@ -670,8 +670,8 @@ impl EPPClient {
             proto::EPPMessageType::Response(response) => {
                 if !response.is_success() {
                     warn!(
-                        "Received failure result from {}: {}",
-                        self.server_id,
+                        "Received failure result from {} ({}): {}",
+                        self.server_id, self.host,
                         response.response_msg()
                     );
                 }
@@ -679,8 +679,8 @@ impl EPPClient {
                     Some(i) => i,
                     None => {
                         error!(
-                            "Received response without client transaction ID from {}",
-                            self.server_id
+                            "Received response without client transaction ID from {} ({})",
+                            self.server_id, self.host
                         );
                         return Err(());
                     }
@@ -690,8 +690,8 @@ impl EPPClient {
                     Ok(i) => i,
                     Err(e) => {
                         error!(
-                            "Received response with invalid transaction UUID from {}: {}",
-                            self.server_id, e
+                            "Received response with invalid transaction UUID from {} ({}): {}",
+                            self.server_id, self.host, e
                         );
                         return Err(());
                     }
@@ -702,16 +702,16 @@ impl EPPClient {
             proto::EPPMessageType::Greeting(greeting) => {
                 if (greeting.server_date - Utc::now()).num_minutes() >= 5 {
                     warn!(
-                        "Local time out by more than 5 minutes from time reported by {}",
-                        greeting.server_id
+                        "Local time out by more than 5 minutes from time reported by {} ({})",
+                        greeting.server_id, self.host
                     );
                 }
                 Ok(false)
             }
             o => {
                 warn!(
-                    "Received unexpected response from {}: {:?}",
-                    self.server_id, o
+                    "Received unexpected response from {} ({}): {:?}",
+                    self.server_id, self.host, o
                 );
                 Ok(false)
             }
@@ -735,7 +735,7 @@ impl EPPClient {
 
         if let proto::EPPMessageType::Greeting(greeting) = msg.message {
             self.server_id = greeting.server_id.clone();
-            info!("Connection open with: {}", self.server_id);
+            info!("Connection open with: {} ({})", self.server_id, self.host);
             match self._process_greeting(greeting).await {
                 Ok(_) => {}
                 Err(_) => {
@@ -1302,19 +1302,19 @@ impl EPPClient {
             }
             if !response.is_success() {
                 error!(
-                    "Login to {} failed with error: {}",
-                    self.server_id,
+                    "Login to {} ({}) failed with error: {}",
+                    self.server_id, self.host,
                     response.response_msg()
                 );
                 Err(false)
             } else {
-                info!("Successfully logged into {}", self.server_id);
+                info!("Successfully logged into {} ({})", self.server_id, self.host);
                 Ok(response.transaction_id)
             }
         } else {
             error!(
-                "Didn't receive response to login command from {}",
-                self.server_id
+                "Didn't receive response to login command from {} ({})",
+                self.server_id, self.host
             );
             Err(true)
         }

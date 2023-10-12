@@ -75,7 +75,6 @@ enum ConfigServerType {
 }
 
 
-
 #[derive(Debug, Deserialize)]
 struct HSMConfigFile {
     pin: String,

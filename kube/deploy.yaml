@@ -1,15 +1,3 @@
-kind: PersistentVolumeClaim
-apiVersion: v1
-metadata:
-  name: epp-proxy-log
-spec:
-  storageClassName: standard
-  accessModes:
-    - ReadWriteMany
-  resources:
-    requests:
-      storage: 400Gi
----
 kind: ConfigMap
 apiVersion: v1
 metadata:
@@ -44,9 +32,6 @@ spec:
         app: epp-proxy
     spec:
       volumes:
-        - name: logs
-          persistentVolumeClaim:
-            claimName: epp-proxy-log
         - name: conf
           secret:
             secretName: epp-proxy-conf
@@ -66,8 +51,6 @@ spec:
           volumeMounts:
             - mountPath: "/conf"
               name: conf
-            - mountPath: "/log"
-              name: logs
             - mountPath: "/tls"
               name: tls-keys
             - mountPath: "/priv"
