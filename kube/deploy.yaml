@@ -45,7 +45,7 @@ spec:
         - name: epp-proxy
           image: as207960/epp-proxy:(version)
           imagePullPolicy: Always
-          args: ["--log",  "/log", "--conf", "/conf", "--listen", "[::]:50051"]
+          args: ["--log",  "/log", "--conf", "/conf", "--listen", "[::]:50051", "--metrics_listen", "[::]:8000"]
           ports:
             - containerPort: 50051
           volumeMounts:
@@ -70,12 +70,50 @@ metadata:
   name: epp-proxy
   labels:
     app: epp-proxy
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "8000"
+    prometheus.io/path: "/metrics"
 spec:
   selector:
     app: epp-proxy
   ports:
     - port: 50051
       targetPort: 50051
+      name: grpc
+    - port: 8000
+      targetPort: 8000
+      name: metrics
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: epp-proxy
+spec:
+  podSelector:
+    matchLabels:
+      app: epp-proxy
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              app.kubernetes.io/name: ingress-nginx
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: ingress-nginx
+        - podSelector:
+            matchLabels:
+              app: domains
+      ports:
+        - protocol: TCP
+          port: 50051
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              role: metrics
+      ports:
+        - protocol: TCP
+          port: 8000
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress

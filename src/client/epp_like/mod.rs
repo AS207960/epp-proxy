@@ -121,6 +121,7 @@ pub(super) struct ClientReceiver<T, R: std::marker::Unpin + tokio::io::AsyncRead
     /// Read half of the TLS stream used to connect to the server
     pub reader: R,
     pub log_storage: crate::StorageScoped,
+    pub metrics_registry: crate::metrics::ScopedMetrics,
     pub decode_fn: fn(data: String, host: &str) -> Result<T, ()>,
 }
 
@@ -135,8 +136,13 @@ impl<
         tokio::spawn(async move {
             loop {
                 let msg = recv_msg(
-                    &mut self.reader, &self.host, self.log_storage.clone(), self.decode_fn
-                ).await;
+                    &mut self.reader,
+                    &self.host,
+                    self.log_storage.clone(),
+                    self.decode_fn,
+                )
+                .await;
+                self.metrics_registry.response_received();
                 let is_close = if let Err(c) = &msg { *c } else { false };
                 match sender.send(msg).await {
                     Ok(_) => {}

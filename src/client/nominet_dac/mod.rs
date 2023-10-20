@@ -4,12 +4,13 @@ use futures::stream::StreamExt;
 use futures::SinkExt;
 use tokio::io::AsyncWriteExt;
 
-pub(self) mod proto;
+mod proto;
 mod recv;
-pub(self) mod router;
+mod router;
 
 #[derive(Debug)]
 pub struct DACClient {
+    metrics_registry: crate::metrics::ScopedMetrics,
     router: outer_router::Router<router::Router, ()>,
     is_closing: bool,
     source_addr: Option<std::net::IpAddr>,
@@ -30,6 +31,7 @@ impl super::Client for DACClient {
             "DAC Client for {} and {} starting...",
             &self.rt_host, &self.td_host
         );
+        self.metrics_registry.connection_status(false);
         let (sender, receiver) = futures::channel::mpsc::channel::<RequestMessage>(16);
         let (ready_sender, ready_receiver) = futures::channel::mpsc::unbounded();
         tokio::spawn(async move {
@@ -49,9 +51,11 @@ impl DACClient {
         rt_host: &str,
         td_host: &str,
         source_addr: Option<&std::net::IpAddr>,
+        metrics_registry: crate::metrics::ScopedMetrics,
     ) -> std::io::Result<Self> {
         Ok(Self {
-            router: outer_router::Router::default(),
+            router: outer_router::Router::new(&metrics_registry),
+            metrics_registry,
             is_closing: false,
             rt_host: rt_host.to_string(),
             td_host: td_host.to_string(),
@@ -97,6 +101,7 @@ impl DACClient {
                 }
             };
             trace!("Got connection for {} and {}", self.rt_host, self.td_host);
+            self.metrics_registry.connection_status(true);
             let _ = ready_sender
                 .send(outer_router::CommandTransactionID {
                     client: "".to_string(),
@@ -111,10 +116,12 @@ impl DACClient {
             let rt_msg_receiver = recv::ClientReceiver {
                 host: self.rt_host.clone(),
                 reader: rt_sock_read,
+                metrics_registry: self.metrics_registry.clone(),
             };
             let td_msg_receiver = recv::ClientReceiver {
                 host: self.td_host.clone(),
                 reader: td_sock_read,
+                metrics_registry: self.metrics_registry.clone(),
             };
             let mut rt_message_channel = rt_msg_receiver.run().fuse();
             let mut td_message_channel = td_msg_receiver.run().fuse();
@@ -179,11 +186,12 @@ impl DACClient {
                     }
                 }
             }
+            self.metrics_registry.connection_status(false);
             tokio::time::sleep(tokio::time::Duration::new(5, 0)).await;
         }
     }
 
-    async fn _handle_request<W: std::marker::Unpin + tokio::io::AsyncWrite>(
+    async fn _handle_request<W: Unpin + tokio::io::AsyncWrite>(
         &mut self,
         req: outer_router::RequestMessage,
         rt_sock_write: &mut W,
@@ -218,7 +226,9 @@ impl DACClient {
         match sock.write_all(&data).await {
             Ok(_) => Ok(()),
             Err(_) => Err(()),
-        }
+        }?;
+        self.metrics_registry.request_sent();
+        Ok(())
     }
 
     fn _get_cmd_line_from_response(res: &proto::DACResponse) -> String {

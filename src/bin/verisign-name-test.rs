@@ -84,7 +84,14 @@ async fn main() {
     let out_of_zone_ns = format!("ns1.{}.com", nanoid::nanoid!(16, &ALPHABET));
     let contact_id = nanoid::nanoid!(16, &ALPHABET);
 
-    let epp_client = epp_proxy::create_client(storage, &conf, &pkcs11_engine, false).await;
+    let epp_client = epp_proxy::create_client(
+        storage,
+        &conf,
+        &pkcs11_engine,
+        epp_proxy::metrics::Metrics::null(),
+        false,
+    )
+    .await;
 
     // 2.1.2.1 EPP login command
     let (mut cmd_tx, mut ready_rx) = epp_client.start();

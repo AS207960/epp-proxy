@@ -183,6 +183,7 @@ impl ServerFeatures {
 #[derive(Debug)]
 pub struct EPPClient {
     log_storage: crate::StorageScoped,
+    metrics_registry: crate::metrics::ScopedMetrics,
     host: String,
     tag: String,
     password: String,
@@ -215,6 +216,7 @@ impl super::Client for EPPClient {
         if self.nominet_tag_list_subordinate {
             info!("This is a Nominet Tag list subordinate client");
         }
+        self.metrics_registry.connection_status(false);
         let (sender, receiver) = futures::channel::mpsc::channel::<RequestMessage>(16);
         let (ready_sender, ready_receiver) = futures::channel::mpsc::unbounded();
 
@@ -245,6 +247,7 @@ impl EPPClient {
                 nominet_dac_conf.real_time,
                 nominet_dac_conf.time_delay,
                 conf.source_address,
+                conf.metrics_registry.subordinate("dac"),
             )
         }) {
             Some(c) => Some(c.await?),
@@ -256,6 +259,8 @@ impl EPPClient {
 
         Ok(Self {
             log_storage: conf.log_storage,
+            router: outer_router::Router::new(&conf.metrics_registry),
+            metrics_registry: conf.metrics_registry,
             host: conf.host.to_string(),
             tag: conf.tag.to_string(),
             password: conf.password.to_string(),
@@ -273,7 +278,6 @@ impl EPPClient {
             nominet_tag_list_subordinate_client: None,
             nominet_dac_subordinate_client: None,
             nominet_dac_client,
-            router: outer_router::Router::default(),
             tls_client,
         })
     }
@@ -345,6 +349,7 @@ impl EPPClient {
                 }
             };
             trace!("Connection setup to {}", self.host);
+            self.metrics_registry.connection_status(true);
             let _ = ready_sender.send(setup_res).await;
 
             let (sock_read, mut sock_write) = tokio::io::split(sock);
@@ -352,6 +357,7 @@ impl EPPClient {
                 host: self.host.clone(),
                 reader: sock_read,
                 log_storage: self.log_storage.clone(),
+                metrics_registry: self.metrics_registry.clone(),
                 decode_fn: recv_msg,
             };
             let mut message_channel = msg_receiver.run().fuse();
@@ -439,6 +445,7 @@ impl EPPClient {
                     }
                 }
             }
+            self.metrics_registry.connection_status(false);
             tokio::time::sleep(tokio::time::Duration::new(5, 0)).await;
         }
     }
@@ -460,6 +467,7 @@ impl EPPClient {
                 &message,
             )
             .fuse();
+            self.metrics_registry.request_sent();
             let mut delay = Box::pin(tokio::time::sleep(tokio::time::Duration::new(15, 0)).fuse());
             futures::pin_mut!(receiver);
             let resp = futures::select! {
@@ -587,7 +595,9 @@ impl EPPClient {
                 {
                     Ok(_) => Ok(()),
                     Err(_) => Err(()),
-                }
+                }?;
+                self.metrics_registry.request_sent();
+                Ok(())
             }
             (outer_router::RequestMessage::Logout(t), _, _) => {
                 match &mut self.nominet_tag_list_subordinate_client {
@@ -671,7 +681,8 @@ impl EPPClient {
                 if !response.is_success() {
                     warn!(
                         "Received failure result from {} ({}): {}",
-                        self.server_id, self.host,
+                        self.server_id,
+                        self.host,
                         response.response_msg()
                     );
                 }
@@ -722,16 +733,18 @@ impl EPPClient {
         &mut self,
         sock: &mut super::epp_like::tls_client::TLSConnection,
     ) -> Result<CommandTransactionID, bool> {
-        let msg = match super::epp_like::recv_msg(
-            sock, &self.host, self.log_storage.clone(), recv_msg
-        ).await {
-            Ok(m) => m,
-            Err(_) => {
-                info!("Restarting connection...");
-                self._close(sock).await;
-                return Err(false);
-            }
-        };
+        let msg =
+            match super::epp_like::recv_msg(sock, &self.host, self.log_storage.clone(), recv_msg)
+                .await
+            {
+                Ok(m) => m,
+                Err(_) => {
+                    info!("Restarting connection...");
+                    self._close(sock).await;
+                    return Err(false);
+                }
+            };
+        self.metrics_registry.response_received();
 
         if let proto::EPPMessageType::Greeting(greeting) = msg.message {
             self.server_id = greeting.server_id.clone();
@@ -1005,8 +1018,7 @@ impl EPPClient {
                     .push("http://www.nominet.org.uk/epp/xml/contact-nom-ext-1.0".to_string())
             }
             if self.features.nominet_domain_ext {
-                ext_objects
-                    .push("http://www.nominet.org.uk/epp/xml/domain-nom-ext-1.2".to_string())
+                ext_objects.push("http://www.nominet.org.uk/epp/xml/domain-nom-ext-1.2".to_string())
             }
             if self.features.nominet_data_quality {
                 ext_objects
@@ -1136,12 +1148,15 @@ impl EPPClient {
                 ext_objects.push("http://www.key-systems.net/epp/keysys-1.0".to_string())
             }
             if self.features.nominet_tag_list {
+                let metrics_registry = self.metrics_registry.subordinate("tag_list");
+                let router = outer_router::Router::new(&metrics_registry);
                 let new_client = Self {
                     host: self.host.clone(),
                     tag: self.tag.clone(),
                     password: self.password.clone(),
                     nominet_tag_list_subordinate: true,
                     log_storage: self.log_storage.clone(),
+                    metrics_registry,
                     new_password: None,
                     pipelining: self.pipelining,
                     keepalive: self.keepalive,
@@ -1155,7 +1170,7 @@ impl EPPClient {
                     nominet_tag_list_subordinate_client: None,
                     nominet_dac_subordinate_client: None,
                     nominet_dac_client: None,
-                    router: outer_router::Router::default(),
+                    router,
                     tls_client: self.tls_client.clone(),
                 };
                 self.nominet_tag_list_subordinate_client = Some(Box::new(new_client).start().0);
@@ -1259,15 +1274,17 @@ impl EPPClient {
                 return Err(true);
             }
         };
-        let msg = match super::epp_like::recv_msg(
-            sock, &self.host, self.log_storage.clone(), recv_msg
-        ).await {
-            Ok(msg) => msg,
-            Err(_) => {
-                error!("Failed to receive login response");
-                return Err(true);
-            }
-        };
+        let msg =
+            match super::epp_like::recv_msg(sock, &self.host, self.log_storage.clone(), recv_msg)
+                .await
+            {
+                Ok(msg) => msg,
+                Err(_) => {
+                    error!("Failed to receive login response");
+                    return Err(true);
+                }
+            };
+        self.metrics_registry.response_received();
         if let proto::EPPMessageType::Response(response) = msg.message {
             let login_sec_info = match &response.extension {
                 Some(ext) => ext.value.iter().find_map(|p| match p {
@@ -1303,12 +1320,16 @@ impl EPPClient {
             if !response.is_success() {
                 error!(
                     "Login to {} ({}) failed with error: {}",
-                    self.server_id, self.host,
+                    self.server_id,
+                    self.host,
                     response.response_msg()
                 );
                 Err(false)
             } else {
-                info!("Successfully logged into {} ({})", self.server_id, self.host);
+                info!(
+                    "Successfully logged into {} ({})",
+                    self.server_id, self.host
+                );
                 Ok(response.transaction_id)
             }
         } else {
@@ -1346,11 +1367,19 @@ impl EPPClient {
             message: proto::EPPMessageType::Command(Box::new(command)),
         };
         match super::epp_like::send_msg(
-            &self.host, sock, self.log_storage.clone(), send_msg, &message
-        ).await {
-            Ok(_) => Ok(message_id),
+            &self.host,
+            sock,
+            self.log_storage.clone(),
+            send_msg,
+            &message,
+        )
+        .await
+        {
+            Ok(_) => Ok(()),
             Err(_) => Err(()),
-        }
+        }?;
+        self.metrics_registry.request_sent();
+        Ok(message_id)
     }
 
     async fn _close(&mut self, sock: &mut super::epp_like::tls_client::TLSConnection) {

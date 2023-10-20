@@ -77,7 +77,14 @@ async fn main() {
     conf.password = "foo-BAR2#123".to_string();
     conf.new_password = None;
 
-    let epp_client = epp_proxy::create_client(storage.clone(), &conf, &pkcs11_engine, true).await;
+    let epp_client = epp_proxy::create_client(
+        storage.clone(),
+        &conf,
+        &pkcs11_engine,
+        epp_proxy::metrics::Metrics::null(),
+        true,
+    )
+    .await;
 
     // 2.2.2 Authentication
     let (cmd_tx, mut ready_rx) = epp_client.start();
@@ -95,7 +102,14 @@ async fn main() {
 
     conf.new_password = Some("bar-FOO2#123".to_string());
 
-    let epp_client = epp_proxy::create_client(storage.clone(), &conf, &pkcs11_engine, true).await;
+    let epp_client = epp_proxy::create_client(
+        storage.clone(),
+        &conf,
+        &pkcs11_engine,
+        epp_proxy::metrics::Metrics::null(),
+        true,
+    )
+    .await;
     let (mut cmd_tx, mut ready_rx) = epp_client.start();
 
     info!("Awaiting client to become ready...");

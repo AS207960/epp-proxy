@@ -45,10 +45,14 @@
 #[macro_use]
 extern crate log;
 
+use warp::Filter;
+
 #[cfg(target_os = "linux")]
 fn setup_logging() {
     if systemd_journal_logger::connected_to_journal() {
-        systemd_journal_logger::JournalLog::default().install().unwrap();
+        systemd_journal_logger::JournalLog::default()
+            .install()
+            .unwrap();
         log::set_max_level(log::LevelFilter::Info);
     } else {
         let mut log_builder = pretty_env_logger::formatted_builder();
@@ -103,7 +107,16 @@ async fn main() {
                 .value_name("ADDR")
                 .default_value("[::1]:50051")
                 .value_parser(clap::value_parser!(std::net::SocketAddr))
-                .help("Which address for gRPC to listen on"),
+                .help("Address for gRPC to listen on"),
+        )
+        .arg(
+            clap::Arg::new("metrics_listen")
+                .short('m')
+                .long("metrics_listen")
+                .value_name("ADDR")
+                .default_value("[::1]:8000")
+                .value_parser(clap::value_parser!(std::net::SocketAddr))
+                .help("Address for Prometheus metrics to listen on"),
         )
         .arg(
             clap::Arg::new("conf")
@@ -241,44 +254,57 @@ async fn main() {
         }
     }
 
-    let storage: std::sync::Arc<Box<dyn epp_proxy::Storage>> = match matches.get_one::<String>("log_driver").unwrap().as_str() {
-        "fs" => {
-            let log_dir_path = matches.get_one::<std::path::PathBuf>("log").unwrap();
-            match std::fs::create_dir_all(log_dir_path) {
-                Ok(()) => {}
-                Err(e) => {
-                    error!("Can't create log directory: {}", e);
-                    return;
+    let storage: std::sync::Arc<Box<dyn epp_proxy::Storage>> =
+        match matches.get_one::<String>("log_driver").unwrap().as_str() {
+            "fs" => {
+                let log_dir_path = matches.get_one::<std::path::PathBuf>("log").unwrap();
+                match std::fs::create_dir_all(log_dir_path) {
+                    Ok(()) => {}
+                    Err(e) => {
+                        error!("Can't create log directory: {}", e);
+                        return;
+                    }
                 }
+                std::sync::Arc::new(Box::new(epp_proxy::FSStorage::new(log_dir_path.to_owned())))
             }
-            std::sync::Arc::new(Box::new(epp_proxy::FSStorage::new(log_dir_path.to_owned())))
-        }
-        "s3" => {
-            let endpoint = matches.get_one::<String>("s3_endpoint").unwrap();
-            let region = aws_sdk_s3::config::Region::new(
-                matches.get_one::<String>("s3_region").unwrap().clone()
-            );
-            let bucket = matches.get_one::<String>("s3_bucket").unwrap();
-            let access_key_id = matches.get_one::<String>("s3_access_key_id").unwrap();
-            let secret_access_key = matches.get_one::<String>("s3_secret_access_key").unwrap();
+            "s3" => {
+                let endpoint = matches.get_one::<String>("s3_endpoint").unwrap();
+                let region = aws_sdk_s3::config::Region::new(
+                    matches.get_one::<String>("s3_region").unwrap().clone(),
+                );
+                let bucket = matches.get_one::<String>("s3_bucket").unwrap();
+                let access_key_id = matches.get_one::<String>("s3_access_key_id").unwrap();
+                let secret_access_key = matches.get_one::<String>("s3_secret_access_key").unwrap();
 
-            let creds = aws_credential_types::Credentials::new(
-                access_key_id.to_string(),
-                secret_access_key.to_string(),
-                None,
-                None,
-                "epp-proxy"
-            );
-            std::sync::Arc::new(Box::new(epp_proxy::S3Storage::new(endpoint, creds, region, bucket)))
-        },
-        _ => unreachable!()
-    };
+                let creds = aws_credential_types::Credentials::new(
+                    access_key_id.to_string(),
+                    secret_access_key.to_string(),
+                    None,
+                    None,
+                    "epp-proxy",
+                );
+                std::sync::Arc::new(Box::new(epp_proxy::S3Storage::new(
+                    endpoint, creds, region, bucket,
+                )))
+            }
+            _ => unreachable!(),
+        };
 
     let mut router = epp_proxy::Router::new();
     let mut clients = vec![];
+    let metrics =
+        std::sync::Arc::new(epp_proxy::metrics::Metrics::new().expect("create metrics registry"));
     for config in configs {
         let scoped_storage = epp_proxy::StorageScoped::new_arc(storage.clone(), &config.id);
-        let epp_client = epp_proxy::create_client(scoped_storage, &config, &pkcs11_engine, true).await;
+        let metrics_registry = metrics.new_scope(config.id.clone());
+        let epp_client = epp_proxy::create_client(
+            scoped_storage,
+            &config,
+            &pkcs11_engine,
+            metrics_registry,
+            true,
+        )
+        .await;
         clients.push((epp_client, config))
     }
 
@@ -316,7 +342,10 @@ async fn main() {
     let server = epp_proxy::grpc::EPPProxy {
         client_router: router,
     };
-    let addr = matches.get_one::<std::net::SocketAddr>("listen").unwrap();
+    let addr = *matches.get_one::<std::net::SocketAddr>("listen").unwrap();
+    let metrics_addr = *matches
+        .get_one::<std::net::SocketAddr>("metrics_listen")
+        .unwrap();
 
     let svc = epp_proxy::grpc::epp_proto::epp_proxy_server::EppProxyServer::new(server);
     let w_svc = AuthService {
@@ -329,15 +358,42 @@ async fn main() {
         .build()
         .unwrap();
 
+    let metrics_route = warp::path!("metrics").and_then(metrics_handler);
+
+    info!("Starting metrics server on {}", metrics_addr);
+    tokio::task::spawn(async move {
+        warp::serve(metrics_route).run(metrics_addr).await;
+    });
+
     info!("Listening for gRPC commands on {}...", addr);
     tonic::transport::Server::builder()
         .tls_config(tonic::transport::ServerTlsConfig::new().identity(identity))
         .unwrap()
         .add_service(reflection_svc)
         .add_service(w_svc)
-        .serve(*addr)
+        .serve(addr)
         .await
         .unwrap();
+}
+
+async fn metrics_handler() -> Result<impl warp::Reply, warp::Rejection> {
+    use prometheus::Encoder;
+
+    let mut buffer = Vec::new();
+    let encoder = prometheus::TextEncoder::new();
+    if let Err(e) = encoder.encode(&prometheus::gather(), &mut buffer) {
+        eprintln!("could not encode custom metrics: {}", e);
+    };
+
+    let res = match String::from_utf8(buffer.clone()) {
+        Ok(v) => v,
+        Err(e) => {
+            eprintln!("custom metrics could not be from_utf8'd: {}", e);
+            String::default()
+        }
+    };
+
+    Ok(res)
 }
 
 #[tonic::async_trait]

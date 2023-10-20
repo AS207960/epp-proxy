@@ -340,8 +340,7 @@ pub enum EPPMaintenanceImpact {
     None,
 }
 
-#[derive(Debug, Deserialize)]
-#[derive(Default)]
+#[derive(Debug, Deserialize, Default)]
 pub enum EPPMaintenanceDescriptionType {
     #[serde(rename = "plain")]
     #[default]
@@ -349,5 +348,3 @@ pub enum EPPMaintenanceDescriptionType {
     #[serde(rename = "html")]
     Html,
 }
-
-

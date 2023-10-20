@@ -276,12 +276,14 @@ impl
         };
 
         let nominet_ext = match extension {
-            Some(ext) => {
-                ext.value.iter().find_map(|p| match p {
+            Some(ext) => ext
+                .value
+                .iter()
+                .find_map(|p| match p {
                     proto::EPPResponseExtensionType::NominetDomainExtInfo(i) => Some(i),
                     _ => None,
-                }).map(Into::into)
-            }
+                })
+                .map(Into::into),
             None => None,
         };
 

@@ -810,8 +810,7 @@ pub struct EPPFee011Fee {
     pub value: String,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
-#[derive(Default)]
+#[derive(Debug, Deserialize, Serialize, Default)]
 pub enum EPPFee10Applied {
     #[serde(rename = "immediate")]
     #[default]
@@ -819,8 +818,6 @@ pub enum EPPFee10Applied {
     #[serde(rename = "delayed")]
     Delayed,
 }
-
-
 
 #[derive(Debug, Deserialize)]
 pub struct EPPFee10Credit {

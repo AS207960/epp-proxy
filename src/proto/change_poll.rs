@@ -21,8 +21,7 @@ pub struct EPPChangeData {
     pub reason: Option<String>,
 }
 
-#[derive(Debug, Deserialize)]
-#[derive(Default)]
+#[derive(Debug, Deserialize, Default)]
 pub enum EPPChangeState {
     #[serde(rename = "before")]
     Before,
@@ -30,8 +29,6 @@ pub enum EPPChangeState {
     #[default]
     After,
 }
-
-
 
 #[derive(Debug, Deserialize)]
 pub struct EPPChangeOperation {

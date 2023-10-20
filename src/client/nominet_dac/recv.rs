@@ -274,6 +274,7 @@ pub(super) struct ClientReceiver<R: std::marker::Unpin + tokio::io::AsyncBufRead
     pub host: String,
     /// Read half of the TCP stream used to connect to the server
     pub reader: R,
+    pub metrics_registry: crate::metrics::ScopedMetrics,
 }
 
 impl<R: 'static + std::marker::Unpin + tokio::io::AsyncBufRead + std::marker::Send>
@@ -287,6 +288,7 @@ impl<R: 'static + std::marker::Unpin + tokio::io::AsyncBufRead + std::marker::Se
             let mut lines = self.reader.lines();
             loop {
                 let msg = recv_msg(&mut lines, &self.host).await;
+                self.metrics_registry.response_received();
                 let is_close = if let Err(c) = &msg { *c } else { false };
                 match sender.send(msg).await {
                     Ok(_) => {}

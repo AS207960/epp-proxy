@@ -37,6 +37,7 @@ fn send_msg(data: &tmch_proto::TMCHMessage, host: &str) -> Result<String, ()> {
 #[derive(Debug)]
 pub struct TMCHClient {
     log_storage: crate::StorageScoped,
+    metrics_registry: crate::metrics::ScopedMetrics,
     host: String,
     client_id: String,
     password: String,
@@ -58,6 +59,7 @@ impl super::Client for TMCHClient {
         futures::channel::mpsc::UnboundedReceiver<outer_router::CommandTransactionID>,
     ) {
         info!("TMCH Client for {} starting...", &self.host);
+        self.metrics_registry.connection_status(false);
         let (sender, receiver) = futures::channel::mpsc::channel::<RequestMessage>(16);
         let (ready_sender, ready_receiver) = futures::channel::mpsc::unbounded();
         tokio::spawn(async move {
@@ -81,6 +83,8 @@ impl TMCHClient {
 
         Ok(Self {
             log_storage: conf.log_storage,
+            router: outer_router::Router::new(&conf.metrics_registry),
+            metrics_registry: conf.metrics_registry,
             host: conf.host.to_string(),
             client_id: conf.tag.to_string(),
             password: conf.password.to_string(),
@@ -88,7 +92,6 @@ impl TMCHClient {
             server_id: String::new(),
             is_awaiting_response: false,
             is_closing: false,
-            router: outer_router::Router::default(),
             tls_client,
         })
     }
@@ -162,6 +165,7 @@ impl TMCHClient {
                 }
             };
             trace!("Connection setup to {}", self.host);
+            self.metrics_registry.connection_status(true);
             let _ = ready_sender.send(setup_res).await;
 
             let (sock_read, mut sock_write) = tokio::io::split(sock);
@@ -169,6 +173,7 @@ impl TMCHClient {
                 host: self.host.clone(),
                 reader: sock_read,
                 log_storage: self.log_storage.clone(),
+                metrics_registry: self.metrics_registry.clone(),
                 decode_fn: recv_msg,
             };
             let mut message_channel = msg_receiver.run().fuse();
@@ -256,6 +261,7 @@ impl TMCHClient {
                     }
                 }
             }
+            self.metrics_registry.connection_status(false);
             tokio::time::sleep(tokio::time::Duration::new(5, 0)).await;
         }
     }
@@ -268,10 +274,15 @@ impl TMCHClient {
             message: tmch_proto::TMCHMessageType::Hello {},
         };
         self.is_awaiting_response = true;
-        let receiver =
-            super::epp_like::send_msg(
-                &self.host, sock_write, self.log_storage.clone(), send_msg, &message
-            ).fuse();
+        let receiver = super::epp_like::send_msg(
+            &self.host,
+            sock_write,
+            self.log_storage.clone(),
+            send_msg,
+            &message,
+        )
+        .fuse();
+        self.metrics_registry.request_sent();
         let mut delay = Box::pin(tokio::time::sleep(tokio::time::Duration::new(15, 0)).fuse());
         futures::pin_mut!(receiver);
         let resp = futures::select! {
@@ -361,16 +372,18 @@ impl TMCHClient {
         &mut self,
         sock: &mut super::epp_like::tls_client::TLSConnection,
     ) -> Result<outer_router::CommandTransactionID, bool> {
-        let msg = match super::epp_like::recv_msg(
-            sock, &self.host, self.log_storage.clone(), recv_msg
-        ).await {
-            Ok(m) => m,
-            Err(_) => {
-                info!("Restarting connection...");
-                self._close(sock).await;
-                return Err(false);
-            }
-        };
+        let msg =
+            match super::epp_like::recv_msg(sock, &self.host, self.log_storage.clone(), recv_msg)
+                .await
+            {
+                Ok(m) => m,
+                Err(_) => {
+                    info!("Restarting connection...");
+                    self._close(sock).await;
+                    return Err(false);
+                }
+            };
+        self.metrics_registry.response_received();
 
         if let tmch_proto::TMCHMessageType::Greeting(greeting) = msg.message {
             self.server_id = greeting.server_id.clone();
@@ -445,15 +458,17 @@ impl TMCHClient {
                 return Err(());
             }
         };
-        let msg = match super::epp_like::recv_msg(
-            sock, &self.host, self.log_storage.clone(), recv_msg
-        ).await {
-            Ok(msg) => msg,
-            Err(_) => {
-                error!("Failed to receive login response");
-                return Err(());
-            }
-        };
+        let msg =
+            match super::epp_like::recv_msg(sock, &self.host, self.log_storage.clone(), recv_msg)
+                .await
+            {
+                Ok(msg) => msg,
+                Err(_) => {
+                    error!("Failed to receive login response");
+                    return Err(());
+                }
+            };
+        self.metrics_registry.response_received();
         if let tmch_proto::TMCHMessageType::Response(response) = msg.message {
             if !response.is_success() {
                 error!(
@@ -497,11 +512,19 @@ impl TMCHClient {
             message: tmch_proto::TMCHMessageType::Command(Box::new(command)),
         };
         match super::epp_like::send_msg(
-            &self.host, sock, self.log_storage.clone(), send_msg, &message
-        ).await {
-            Ok(_) => Ok(message_id),
+            &self.host,
+            sock,
+            self.log_storage.clone(),
+            send_msg,
+            &message,
+        )
+        .await
+        {
+            Ok(_) => Ok(()),
             Err(_) => Err(()),
-        }
+        }?;
+        self.metrics_registry.request_sent();
+        Ok(message_id)
     }
 
     async fn _close(&mut self, sock: &mut super::epp_like::tls_client::TLSConnection) {

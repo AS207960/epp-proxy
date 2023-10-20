@@ -2,6 +2,7 @@ pub use super::Error;
 use paste::paste;
 
 use std::collections::HashMap;
+
 pub type Response<T> = Result<T, Error>;
 pub type Sender<T> = futures::channel::oneshot::Sender<Result<CommandResponse<T>, Error>>;
 pub type RequestSender = futures::channel::mpsc::Sender<RequestMessage>;
@@ -33,11 +34,12 @@ macro_rules! router {
         }
 
         #[allow(non_snake_case)]
-        #[derive(Default, Debug)]
+        #[derive(Debug)]
         pub struct Router<I: InnerRouter<T>, T> {
             _marker: std::marker::PhantomData<T>,
             pub inner: Box<I>,
-            $($n: HashMap<uuid::Uuid, Sender<$res>>,)*
+            metrics_registry: crate::metrics::ScopedMetrics,
+            $($n: HashMap<uuid::Uuid, (Sender<$res>, Option<prometheus::HistogramTimer>)>,)*
         }
 
         paste! {
@@ -56,7 +58,16 @@ macro_rules! router {
             }
         }
 
-        impl<T, I: InnerRouter<T>> Router<I, T> {
+        impl<T, I: Default + InnerRouter<T>> Router<I, T> {
+            pub fn new(metrics_registry: &crate::metrics::ScopedMetrics) -> Self {
+                Self {
+                    _marker: Default::default(),
+                    metrics_registry: metrics_registry.clone(),
+                    inner: Box::new(I::default()),
+                    $($n: Default::default(),)*
+                }
+            }
+
             pub fn reject_request(req: RequestMessage) {
                 match req {
                     $(RequestMessage::$n(req) => {let _ = req.return_path.send(Err(Error::NotReady));},)*
@@ -65,7 +76,7 @@ macro_rules! router {
 
             pub fn drain(&mut self) {
                 $(for r in self.$n.drain() {
-                    let _ = r.1.send(Err(Error::NotReady));
+                    let _ = r.1.0.send(Err(Error::NotReady));
                 })*
             }
 
@@ -74,6 +85,7 @@ macro_rules! router {
                 match req {
                     $(RequestMessage::$n(req) => {
                         let command_id = uuid::Uuid::new_v4();
+                        let timer =  self.metrics_registry.record_response_time(stringify!($n));
                         paste! {
                             let res = match I::[<$n _request>](&mut self.inner, client, &req, command_id.clone()) {
                                 Ok(c) => c,
@@ -90,15 +102,18 @@ macro_rules! router {
                                 }
                             };
                         }
-                        self.$n.insert(command_id, req.return_path);
+                        self.$n.insert(command_id, (req.return_path, timer));
                         Some((res, command_id))
                     },)*
                 }
             }
 
             pub fn handle_response(&mut self, transaction_id: &uuid::Uuid, response: I::Response) {
-                $(if let Some(return_path) = self.$n.remove(transaction_id) {
+                $(if let Some((return_path, timer)) = self.$n.remove(transaction_id) {
                     paste! {
+                        if let Some(timer) = timer {
+                            timer.observe_duration();
+                        }
                         I::[<$n _response>](&mut self.inner, return_path, response);
                     }
                 } else)* {}

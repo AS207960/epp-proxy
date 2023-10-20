@@ -290,12 +290,10 @@ impl From<&DomainDelete> for proto::eurid::EURIDDomainDelete {
 
 impl From<&DomainTransfer> for proto::eurid::EURIDDomainTransfer {
     fn from(from: &DomainTransfer) -> Self {
-        let mut contacts = vec![
-            proto::eurid::EURIDDomainContact {
-                contact_type: proto::eurid::EURIDContactType::Registrant,
-                contact_id: from.registrant.clone(),
-            },
-        ];
+        let mut contacts = vec![proto::eurid::EURIDDomainContact {
+            contact_type: proto::eurid::EURIDContactType::Registrant,
+            contact_id: from.registrant.clone(),
+        }];
 
         if let Some(billing) = &from.billing {
             contacts.push(proto::eurid::EURIDDomainContact {

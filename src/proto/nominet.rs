@@ -122,23 +122,50 @@ pub struct EPPDomainCheckData {
 pub struct EPPDomainInfoData {
     #[serde(rename = "{http://www.nominet.org.uk/epp/xml/domain-nom-ext-1.2}reg-status")]
     pub reg_status: EPPDomainRegistrationStatus,
-    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/domain-nom-ext-1.2}first-bill", default)]
+    #[serde(
+        rename = "{http://www.nominet.org.uk/epp/xml/domain-nom-ext-1.2}first-bill",
+        default
+    )]
     pub first_bill: Option<EPPDomainBillCode>,
-    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/domain-nom-ext-1.2}recur-bill", default)]
+    #[serde(
+        rename = "{http://www.nominet.org.uk/epp/xml/domain-nom-ext-1.2}recur-bill",
+        default
+    )]
     pub recur_bill: Option<EPPDomainBillCode>,
-    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/domain-nom-ext-1.2}auto-bill", default)]
+    #[serde(
+        rename = "{http://www.nominet.org.uk/epp/xml/domain-nom-ext-1.2}auto-bill",
+        default
+    )]
     pub auto_bill: Option<u8>,
-    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/domain-nom-ext-1.2}next-bill", default)]
+    #[serde(
+        rename = "{http://www.nominet.org.uk/epp/xml/domain-nom-ext-1.2}next-bill",
+        default
+    )]
     pub next_bill: Option<u8>,
-    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/domain-nom-ext-1.2}auto-period", default)]
+    #[serde(
+        rename = "{http://www.nominet.org.uk/epp/xml/domain-nom-ext-1.2}auto-period",
+        default
+    )]
     pub auto_period: Option<u8>,
-    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/domain-nom-ext-1.2}next-period", default)]
+    #[serde(
+        rename = "{http://www.nominet.org.uk/epp/xml/domain-nom-ext-1.2}next-period",
+        default
+    )]
     pub next_period: Option<u8>,
-    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/domain-nom-ext-1.2}renew-not-required", default)]
+    #[serde(
+        rename = "{http://www.nominet.org.uk/epp/xml/domain-nom-ext-1.2}renew-not-required",
+        default
+    )]
     pub renewal_not_required: Option<bool>,
-    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/domain-nom-ext-1.2}notes", default)]
+    #[serde(
+        rename = "{http://www.nominet.org.uk/epp/xml/domain-nom-ext-1.2}notes",
+        default
+    )]
     pub notes: Vec<String>,
-    #[serde(rename = "{http://www.nominet.org.uk/epp/xml/domain-nom-ext-1.2}reseller", default)]
+    #[serde(
+        rename = "{http://www.nominet.org.uk/epp/xml/domain-nom-ext-1.2}reseller",
+        default
+    )]
     pub reseller: Option<String>,
 }
 
@@ -552,8 +579,8 @@ pub struct EPPUnrenew {
 
 #[allow(clippy::trivially_copy_pass_by_ref)]
 fn serialize_flag_bool<S>(d: &Option<bool>, s: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::ser::Serializer,
+where
+    S: serde::ser::Serializer,
 {
     match d {
         Some(d) => {

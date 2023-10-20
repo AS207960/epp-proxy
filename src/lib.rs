@@ -9,6 +9,7 @@ use std::collections::HashMap;
 
 pub mod client;
 pub mod grpc;
+pub mod metrics;
 pub mod proto;
 
 #[allow(missing_docs)]
@@ -64,8 +65,7 @@ pub struct ConfigFile {
     nominet_dac: Option<NominetDACConfig>,
 }
 
-#[derive(Debug, Deserialize)]
-#[derive(Default)]
+#[derive(Debug, Deserialize, Default)]
 enum ConfigServerType {
     #[serde(rename = "EPP")]
     #[default]
@@ -73,7 +73,6 @@ enum ConfigServerType {
     #[serde(rename = "TMCH")]
     Tmch,
 }
-
 
 #[derive(Debug, Deserialize)]
 struct HSMConfigFile {
@@ -283,6 +282,7 @@ pub async fn create_client(
     log_storage: StorageScoped,
     config: &ConfigFile,
     pkcs11_engine: &Option<P11Engine>,
+    metrics_registry: metrics::ScopedMetrics,
     keepalive: bool,
 ) -> Box<dyn client::Client> {
     let client_conf = client::ClientConf {
@@ -291,6 +291,7 @@ pub async fn create_client(
         password: &config.password,
         source_address: config.source_address.as_ref(),
         log_storage,
+        metrics_registry,
         keepalive,
         client_cert: match &config.client_cert {
             Some(ClientCertConfig::PKCS12(s)) => Some(client::ClientCertConf::PKCS12(s)),
@@ -333,7 +334,12 @@ pub async fn create_client(
 
 #[tonic::async_trait]
 pub trait Storage: std::fmt::Debug + Send + Sync {
-    async fn write_msg_log(&self, tag: &str, msg: &str, msg_type: &str) -> Result<(), Box<dyn std::error::Error>>;
+    async fn write_msg_log(
+        &self,
+        tag: &str,
+        msg: &str,
+        msg_type: &str,
+    ) -> Result<(), Box<dyn std::error::Error>>;
 }
 
 #[derive(Debug, Clone)]
@@ -349,13 +355,19 @@ impl FSStorage {
 
 #[tonic::async_trait]
 impl Storage for FSStorage {
-    async fn write_msg_log(&self, tag: &str, msg: &str, msg_type: &str) -> Result<(), Box<dyn std::error::Error>> {
+    async fn write_msg_log(
+        &self,
+        tag: &str,
+        msg: &str,
+        msg_type: &str,
+    ) -> Result<(), Box<dyn std::error::Error>> {
         use chrono::prelude::*;
         use tokio::io::AsyncWriteExt;
 
         let now = Utc::now();
         let time = now.format("%FT%H-%M-%S-%f").to_string();
-        let dir = self.root
+        let dir = self
+            .root
             .join(tag)
             .join(format!("{:04}", now.year()))
             .join(format!("{:02}", now.month()))
@@ -381,7 +393,7 @@ impl aws_sdk_s3::config::AsyncSleep for TokioSleep {
 #[derive(Debug, Clone)]
 pub struct S3Storage {
     client: aws_sdk_s3::Client,
-    bucket: String
+    bucket: String,
 }
 
 impl S3Storage {
@@ -389,12 +401,12 @@ impl S3Storage {
         endpoint_url: impl Into<String>,
         credentials_provider: impl aws_credential_types::provider::ProvideCredentials + 'static,
         region: impl Into<aws_sdk_s3::config::Region>,
-        bucket: impl Into<String>
+        bucket: impl Into<String>,
     ) -> Self {
         let app_name = aws_sdk_s3::config::AppName::new("epp-proxy").unwrap();
         let sleep_impl = std::sync::Arc::new(TokioSleep);
 
-        let config =  aws_sdk_s3::config::Builder::new()
+        let config = aws_sdk_s3::config::Builder::new()
             .app_name(app_name)
             .endpoint_url(endpoint_url)
             .credentials_provider(credentials_provider)
@@ -406,29 +418,34 @@ impl S3Storage {
 
         Self {
             client,
-            bucket: bucket.into()
+            bucket: bucket.into(),
         }
     }
 }
 
 #[tonic::async_trait]
 impl Storage for S3Storage {
-    async fn write_msg_log(&self, tag: &str, msg: &str, msg_type: &str) -> Result<(), Box<dyn std::error::Error>> {
+    async fn write_msg_log(
+        &self,
+        tag: &str,
+        msg: &str,
+        msg_type: &str,
+    ) -> Result<(), Box<dyn std::error::Error>> {
         use chrono::prelude::*;
 
-        let byte_stream = aws_sdk_s3::primitives::ByteStream::from(
-            msg.as_bytes().to_vec()
-        );
+        let byte_stream = aws_sdk_s3::primitives::ByteStream::from(msg.as_bytes().to_vec());
 
         let now = Utc::now();
         let time = now.format("%Y/%m/%d/%H/%FT%H-%M-%S-%f").to_string();
         let key = format!("{}/{}_{}.xml", tag, time, msg_type);
 
-        self.client.put_object()
+        self.client
+            .put_object()
             .bucket(&self.bucket)
             .key(&key)
             .body(byte_stream)
-            .send().await?;
+            .send()
+            .await?;
 
         Ok(())
     }
@@ -437,30 +454,29 @@ impl Storage for S3Storage {
 #[derive(Clone, Debug)]
 pub struct StorageScoped {
     storage: std::sync::Arc<Box<dyn Storage>>,
-    tag: String
+    tag: String,
 }
 
 impl StorageScoped {
     pub fn new(storage: Box<dyn Storage>, tag: &str) -> Self {
         Self {
             storage: std::sync::Arc::new(storage),
-            tag: tag.to_string()
+            tag: tag.to_string(),
         }
     }
 
-    pub fn new_arc (storage: impl Into<std::sync::Arc<Box<dyn Storage>>>, tag: &str) -> Self {
+    pub fn new_arc(storage: impl Into<std::sync::Arc<Box<dyn Storage>>>, tag: &str) -> Self {
         Self {
             storage: storage.into(),
-            tag: tag.to_string()
+            tag: tag.to_string(),
         }
     }
 
-    async fn write_msg_log(&self, msg: &str, msg_type: &str) -> Result<(), Box<dyn std::error::Error>> {
+    async fn write_msg_log(
+        &self,
+        msg: &str,
+        msg_type: &str,
+    ) -> Result<(), Box<dyn std::error::Error>> {
         self.storage.write_msg_log(&self.tag, msg, msg_type).await
     }
 }
-
-
-
-
-

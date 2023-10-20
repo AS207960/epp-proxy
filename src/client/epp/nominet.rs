@@ -1,11 +1,11 @@
 //! EPP commands relating to nominet specific features
 
 use super::super::nominet::{
-    CancelData, DataQualityData, DataQualityStatus, DomainFailData, HandshakeAcceptRequest,
-    HandshakeRejectRequest, HandshakeResponse, HostCancelData, LockRequest, LockResponse, Object,
-    ProcessData, ProcessStage, RegistrantTransferData, RegistrarChangeData, ReleaseData,
-    ReleaseRequest, ReleaseResponse, SuspendData, Tag, TagListRequest, TagListResponse,
-    DomainInfo, RegistrationStatus, BillType, DomainCreate, DomainUpdate
+    BillType, CancelData, DataQualityData, DataQualityStatus, DomainCreate, DomainFailData,
+    DomainInfo, DomainUpdate, HandshakeAcceptRequest, HandshakeRejectRequest, HandshakeResponse,
+    HostCancelData, LockRequest, LockResponse, Object, ProcessData, ProcessStage,
+    RegistrantTransferData, RegistrarChangeData, RegistrationStatus, ReleaseData, ReleaseRequest,
+    ReleaseResponse, SuspendData, Tag, TagListRequest, TagListResponse,
 };
 use super::super::{proto, Error, Response};
 use super::router::HandleReqReturn;
@@ -17,9 +17,15 @@ impl From<&proto::nominet::EPPDomainInfoData> for DomainInfo {
     fn from(value: &proto::nominet::EPPDomainInfoData) -> Self {
         DomainInfo {
             registration_status: match value.reg_status {
-                proto::nominet::EPPDomainRegistrationStatus::RegisteredUntilExpiry => RegistrationStatus::RegisteredUntilExpiry,
-                proto::nominet::EPPDomainRegistrationStatus::RenewalRequired => RegistrationStatus::RenewalRequired,
-                proto::nominet::EPPDomainRegistrationStatus::NoLongerRequired => RegistrationStatus::NoLongerRequired,
+                proto::nominet::EPPDomainRegistrationStatus::RegisteredUntilExpiry => {
+                    RegistrationStatus::RegisteredUntilExpiry
+                }
+                proto::nominet::EPPDomainRegistrationStatus::RenewalRequired => {
+                    RegistrationStatus::RenewalRequired
+                }
+                proto::nominet::EPPDomainRegistrationStatus::NoLongerRequired => {
+                    RegistrationStatus::NoLongerRequired
+                }
             },
             first_bill: value.first_bill.as_ref().map(Into::into),
             recur_bill: value.recur_bill.as_ref().map(Into::into),
