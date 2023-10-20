@@ -76,16 +76,10 @@ impl ScopedMetrics {
     }
 
     pub(crate) fn record_response_time(&self, command: &str) -> Option<prometheus::HistogramTimer> {
-        if let Some(metrics) = &self.metrics {
-            Some(
-                metrics
+        self.metrics.as_ref().map(|metrics| metrics
                     .response_time
                     .with_label_values(&[&self.id, command])
-                    .start_timer(),
-            )
-        } else {
-            None
-        }
+                    .start_timer())
     }
 
     pub(crate) fn subordinate(&self, extra: &str) -> ScopedMetrics {

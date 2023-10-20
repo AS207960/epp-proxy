@@ -63,7 +63,7 @@ macro_rules! router {
                 Self {
                     _marker: Default::default(),
                     metrics_registry: metrics_registry.clone(),
-                    inner: Box::new(I::default()),
+                    inner: Box::<I>::default(),
                     $($n: Default::default(),)*
                 }
             }

@@ -1488,11 +1488,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                     Ok(resp) => {
                         let (resp, cmd_resp) = utils::map_command_response(resp);
                         if let Some(message) = resp {
-                            if message.count > 0 {
-                                should_delay = false;
-                            } else {
-                                should_delay = true;
-                            }
+                            should_delay = message.count <= 0;
                             let change_data = match message.data {
                                 client::poll::PollData::DomainInfoData {
                                     change_data: ref c,
@@ -1692,11 +1688,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                                         Ok(resp) => {
                                             let (resp, _cmd_resp) = utils::map_command_response(resp);
                                             if let Some(count) = resp.count {
-                                                if count > 0 {
-                                                    should_delay = false;
-                                                } else {
-                                                    should_delay = true;
-                                                }
+                                                should_delay = count <= 0;
                                             } else {
                                                 should_delay = true;
                                             }
