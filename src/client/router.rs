@@ -54,7 +54,7 @@ macro_rules! router {
                 type Response;
 
                 $(fn [<$n _request>](&mut self, client: &T, req: &$req, command_id: uuid::Uuid) -> Result<Self::Request, Response<$res>>;)*
-                $(fn [<$n _response>](&mut self, return_path: Sender<$res>, response: Self::Response);)*
+                $(fn [<$n _response>](&mut self, return_path: Sender<$res>, response: Self::Response, metrics: &crate::metrics::ScopedMetrics);)*
             }
         }
 
@@ -114,7 +114,7 @@ macro_rules! router {
                         if let Some(timer) = timer {
                             timer.observe_duration();
                         }
-                        I::[<$n _response>](&mut self.inner, return_path, response);
+                        I::[<$n _response>](&mut self.inner, return_path, response, &self.metrics_registry);
                     }
                 } else)* {}
             }

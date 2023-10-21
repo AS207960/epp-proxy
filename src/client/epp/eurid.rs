@@ -463,7 +463,9 @@ pub fn handle_hit_points(
     }
 }
 
-pub fn handle_hit_points_response(response: proto::EPPResponse) -> Response<HitPointsResponse> {
+pub fn handle_hit_points_response(
+    response: proto::EPPResponse, _metrics: &crate::metrics::ScopedMetrics
+) -> Response<HitPointsResponse> {
     match response.data {
         Some(value) => match value.value {
             proto::EPPResultDataValue::EURIDRegistrarHitPointsData(hit_points) => {
@@ -494,7 +496,7 @@ pub fn handle_registration_limits(
 }
 
 pub fn handle_registration_limits_response(
-    response: proto::EPPResponse,
+    response: proto::EPPResponse, _metrics: &crate::metrics::ScopedMetrics
 ) -> Response<RegistrationLimitResponse> {
     match response.data {
         Some(value) => match value.value {
@@ -530,7 +532,7 @@ pub fn handle_dnssec_eligibility(
 }
 
 pub fn handle_dnssec_eligibility_response(
-    response: proto::EPPResponse,
+    response: proto::EPPResponse, _metrics: &crate::metrics::ScopedMetrics
 ) -> Response<DNSSECEligibilityResponse> {
     match response.data {
         Some(value) => match value.value {
@@ -569,7 +571,9 @@ pub fn handle_dns_quality(
     }
 }
 
-pub fn handle_dns_quality_response(response: proto::EPPResponse) -> Response<DNSQualityResponse> {
+pub fn handle_dns_quality_response(
+    response: proto::EPPResponse, _metrics: &crate::metrics::ScopedMetrics
+) -> Response<DNSQualityResponse> {
     match response.data {
         Some(value) => match value.value {
             proto::EPPResultDataValue::EURIDDNSQualityData(dns_quality) => {

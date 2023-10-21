@@ -45,7 +45,10 @@ macro_rules! router {
                 Ok((super::proto::DACRequest::Exit, DACEnv::Both))
             }
 
-            fn Logout_response(&mut self, return_path: router::Sender<router::LogoutResponse>, _response: Self::Response) {
+            fn Logout_response(
+                &mut self, return_path: router::Sender<router::LogoutResponse>,
+                _response: Self::Response, _metrics: &crate::metrics::ScopedMetrics
+            ) {
                 let _ = return_path.send(Ok(router::CommandResponse {
                     response: (),
                     extra_values: vec![],
@@ -68,7 +71,10 @@ macro_rules! router {
                 Ok((super::proto::DACRequest::Domain(req.name.clone()), DACEnv::RealTime))
             }
 
-            fn DomainCheck_response(&mut self, return_path: router::Sender<router::DomainCheckResponse>, response: Self::Response) {
+            fn DomainCheck_response(
+                &mut self, return_path: router::Sender<router::DomainCheckResponse>,
+                response: Self::Response, _metrics: &crate::metrics::ScopedMetrics
+            ) {
                 match response {
                     super::proto::DACResponse::DomainRT(d) => {
                         let _ = return_path.send(Ok(router::CommandResponse {
@@ -125,7 +131,10 @@ macro_rules! router {
                 Ok((super::proto::DACRequest::Domain(req.domain.clone()), req.env.into()))
             }
 
-            fn DACDomain_response(&mut self, return_path: router::Sender<router::DACDomainResponse>, response: Self::Response) {
+            fn DACDomain_response(
+                &mut self, return_path: router::Sender<router::DACDomainResponse>,
+                response: Self::Response, _metrics: &crate::metrics::ScopedMetrics
+            ) {
                 match response {
                     super::proto::DACResponse::DomainRT(d) => {
                         let _ = return_path.send(Ok(router::CommandResponse {
@@ -188,7 +197,10 @@ macro_rules! router {
                 Ok((super::proto::DACRequest::Usage, req.env.into()))
             }
 
-            fn DACUsage_response(&mut self, return_path: router::Sender<router::DACUsageResponse>, response: Self::Response) {
+            fn DACUsage_response(
+                &mut self, return_path: router::Sender<router::DACUsageResponse>,
+                response: Self::Response, _metrics: &crate::metrics::ScopedMetrics
+            ) {
                 match response {
                     super::proto::DACResponse::Usage(u) => {
                         let _ = return_path.send(Ok(router::CommandResponse {
@@ -217,7 +229,10 @@ macro_rules! router {
                 Ok((super::proto::DACRequest::Limits, req.env.into()))
             }
 
-            fn DACLimits_response(&mut self, return_path: router::Sender<router::DACLimitsResponse>, response: Self::Response) {
+            fn DACLimits_response(
+                &mut self, return_path: router::Sender<router::DACLimitsResponse>,
+                response: Self::Response, _metrics: &crate::metrics::ScopedMetrics
+            ) {
                 match response {
                     super::proto::DACResponse::Limits(u) => {
                         let _ = return_path.send(Ok(router::CommandResponse {
@@ -243,7 +258,10 @@ macro_rules! router {
                     Err(Response::Err(Error::Unsupported))
                 })*
 
-                $(fn [<$n _response>](&mut self, return_path: router::Sender<router::[<$n Response>]>, _response: Self::Response) {
+                $(fn [<$n _response>](
+                    &mut self, return_path: router::Sender<router::[<$n Response>]>,
+                    _response: Self::Response, _metrics: &crate::metrics::ScopedMetrics
+                ) {
                     let _ = return_path.send(Err(Error::Unsupported));
                 })*
             }

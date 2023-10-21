@@ -108,7 +108,9 @@ pub fn handle_check(client: &ServerFeatures, req: &CheckRequest) -> HandleReqRet
     ))
 }
 
-pub fn handle_check_response(response: proto::EPPResponse) -> Response<CheckResponse> {
+pub fn handle_check_response(
+    response: proto::EPPResponse, _metrics: &crate::metrics::ScopedMetrics
+) -> Response<CheckResponse> {
     match response.data {
         Some(value) => match value.value {
             proto::EPPResultDataValue::EPPHostCheckResult(host_check) => {
@@ -146,7 +148,9 @@ pub fn handle_info(client: &ServerFeatures, req: &InfoRequest) -> HandleReqRetur
     ))
 }
 
-pub fn handle_info_response(response: proto::EPPResponse) -> Response<InfoResponse> {
+pub fn handle_info_response(
+    response: proto::EPPResponse, _metrics: &crate::metrics::ScopedMetrics
+) -> Response<InfoResponse> {
     match response.data {
         Some(value) => match value.value {
             proto::EPPResultDataValue::EPPHostInfoResult(host_info) => (*host_info).try_into(),
@@ -211,7 +215,9 @@ pub fn handle_create(
     ))
 }
 
-pub fn handle_create_response(response: proto::EPPResponse) -> Response<CreateResponse> {
+pub fn handle_create_response(
+    response: proto::EPPResponse, _metrics: &crate::metrics::ScopedMetrics
+) -> Response<CreateResponse> {
     match response.data {
         Some(ref value) => match &value.value {
             proto::EPPResultDataValue::EPPHostCreateResult(host_create) => {
@@ -261,7 +267,9 @@ pub fn handle_delete(
     ))
 }
 
-pub fn handle_delete_response(response: proto::EPPResponse) -> Response<DeleteResponse> {
+pub fn handle_delete_response(
+    response: proto::EPPResponse, _metrics: &crate::metrics::ScopedMetrics
+) -> Response<DeleteResponse> {
     Response::Ok(DeleteResponse {
         pending: response.is_pending(),
         transaction_id: response
@@ -371,7 +379,9 @@ pub fn handle_update(
     ))
 }
 
-pub fn handle_update_response(response: proto::EPPResponse) -> Response<UpdateResponse> {
+pub fn handle_update_response(
+    response: proto::EPPResponse, _metrics: &crate::metrics::ScopedMetrics
+) -> Response<UpdateResponse> {
     Response::Ok(UpdateResponse {
         pending: response.is_pending(),
         transaction_id: response

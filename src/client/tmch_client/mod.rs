@@ -537,6 +537,8 @@ pub fn handle_logout(_client: &(), _req: &BlankRequest) -> router::HandleReqRetu
     Ok(tmch_proto::TMCHCommandType::Logout {})
 }
 
-pub fn handle_logout_response(_response: tmch_proto::TMCHResponse) -> super::Response<()> {
+pub fn handle_logout_response(
+    _response: tmch_proto::TMCHResponse, _metrics: &crate::metrics::ScopedMetrics
+) -> super::Response<()> {
     super::Response::Ok(())
 }

@@ -18,7 +18,10 @@ macro_rules! router {
                     $req_handle(client, &req)
                 })*
 
-                $(fn [<$n _response>](&mut self, return_path: router::Sender<router::[<$n Response>]>, response: Self::Response) {
+                $(fn [<$n _response>](
+                    &mut self, return_path: router::Sender<router::[<$n Response>]>,
+                    response: Self::Response, metrics: &crate::metrics::ScopedMetrics
+                ) {
                     let _ = if !response.is_success() {
                         if response.is_server_error() {
                             return_path.send(Err(Error::Err(format!("Server error: {}", response.response_msg()))))
@@ -30,7 +33,7 @@ macro_rules! router {
                             client: response.transaction_id.client_transaction_id.as_deref().unwrap_or_default().to_owned(),
                             server: response.transaction_id.server_transaction_id.to_owned(),
                         };
-                        match $res_handle(response) {
+                        match $res_handle(response, metrics) {
                             Ok(r) => return_path.send(Ok(router::CommandResponse {
                                 response: r,
                                 extra_values: vec![],
@@ -49,7 +52,7 @@ fn request_nop<T, R>(_client: &(), _req: &T) -> HandleReqReturn<R> {
     Err(Response::Err(Error::Unsupported))
 }
 
-fn response_nop<T, R>(_response: T) -> Result<R, Error> {
+fn response_nop<T, R>(_response: T, _metrics: &crate::metrics::ScopedMetrics) -> Result<R, Error> {
     Err(Error::Unsupported)
 }
 

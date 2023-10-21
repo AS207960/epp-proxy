@@ -65,7 +65,9 @@ pub fn handle_restore(
     }
 }
 
-pub fn handle_restore_response(response: proto::EPPResponse) -> Response<RestoreResponse> {
+pub fn handle_restore_response(
+    response: proto::EPPResponse, _metrics: &crate::metrics::ScopedMetrics
+) -> Response<RestoreResponse> {
     let fee_data = match &response.extension {
         Some(ext) => {
             let fee10 = ext.value.iter().find_map(|p| match p {
@@ -182,7 +184,7 @@ pub fn handle_restore_report(
 }
 
 pub fn handle_restore_report_response(
-    response: proto::EPPResponse,
+    response: proto::EPPResponse, _metrics: &crate::metrics::ScopedMetrics
 ) -> Response<RestoreReportResponse> {
     let fee_data = match &response.extension {
         Some(ext) => {

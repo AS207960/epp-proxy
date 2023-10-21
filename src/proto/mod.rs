@@ -671,6 +671,59 @@ pub enum EPPResultDataValue {
     ISNICAccountInfo(isnic::AccountInfo),
 }
 
+impl EPPResultDataValue {
+    pub fn name(&self) -> &'static str {
+        match self {
+            Self::EPPDomainCheckResult(_) => "DomainCheck",
+            Self::EPPDomainInfoResult(_) => "DomainInfo",
+            Self::EPPDomainTransferResult(_) => "DomainTransfer",
+            Self::EPPDomainCreateResult(_) => "DomainCreate",
+            Self::EPPDomainRenewResult(_) => "DomainRenew",
+            Self::EPPDomainPendingActionNotification(_) => "DomainPAN",
+            Self::EPPHostCheckResult(_) => "HostCheck",
+            Self::EPPHostInfoResult(_) => "HostInfo",
+            Self::EPPHostCreateResult(_) => "HostCreate",
+            Self::EPPEmailForwardCheckResult(_) => "EmailForwardCheck",
+            Self::EPPEmailForwardInfoResult(_) => "EmailForwardInfo",
+            Self::EPPEmailForwardCreateResult(_) => "EmailForwardCreate",
+            Self::EPPEmailForwardRenewResult(_) => "EmailForwardRenew",
+            Self::EPPEmailForwardTransferResult(_) => "EmailForwardTransfer",
+            Self::EPPEmailForwardPendingActionNotification(_) => "EmailForwardPAN",
+            Self::EPPContactCheckResult(_) => "ContactCheck",
+            Self::EPPContactInfoResult(_) => "ContactInfo",
+            Self::EPPContactTransferResult(_) => "ContactTransfer",
+            Self::EPPContactCreateResult(_) => "ContactCreate",
+            Self::EPPContactPendingActionNotification(_) => "ContactPAN",
+            Self::TraficomTrnData(_) => "TraficomTransfer",
+            Self::EPPMaintenanceInfo(_) => "MaintenanceInfo",
+            Self::EPPMaintenanceInfo02(_) => "MaintenanceInfo",
+            Self::NominetTagInfoResult(_) => "NominetTagInfo",
+            Self::NominetCancelData(_) => "NominetCancel",
+            Self::NominetDomainFailData(_) => "NominetDomainFail",
+            Self::NominetHandshakeData(_) => "NominetHandshake",
+            Self::NominetHostCancelData(_) => "NominetHostCancel",
+            Self::NominetProcessData(_) => "NominetProcess",
+            Self::NominetRegistrarChangeData(_) => "NominetRegistrarChange",
+            Self::NominetReleaseData(_) => "NominetRelease",
+            Self::NominetReleasePending(_) => "NominetReleasePending",
+            Self::NominetSuspendData(_) => "NominetSuspend",
+            Self::NominetTransferData(_) => "NominetTransfer",
+            Self::SwitchBalanceInfoResult(_) => "SwitchBalance",
+            Self::VerisignBalanceInfoResult(_) => "VerisignBalance",
+            Self::UnitedTLDBalaceInfoResult(_) => "UnitedTLDBalance",
+            Self::VerisignLowBalanceData(_) => "VerisignLowBalance",
+            Self::VerisignRGPPollData(_) => "VerisignRGP",
+            Self::EURIDRegistrarFinanceData(_) => "EURIDFinance",
+            Self::EURIDDNSQualityData(_) => "EURIDDNSQuality",
+            Self::EURIDDNSSECEligibilityInfoData(_) => "EURIDDNSSECEligibility",
+            Self::EURIDRegistrarHitPointsData(_) => "EURIDHitPoints",
+            Self::EURIDRegistrationLimitData(_) => "EURIDRegistrationLimit",
+            Self::EURIDPollData(_) => "EURIDPoll",
+            Self::ISNICAccountInfo(_) => "ISNICAccountInfo",
+        }
+    }
+}
+
 #[derive(Debug, Deserialize)]
 pub struct EPPTransactionIdentifier {
     #[serde(rename = "{urn:ietf:params:xml:ns:epp-1.0}clTRID")]

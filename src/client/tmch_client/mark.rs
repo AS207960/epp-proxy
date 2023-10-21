@@ -153,7 +153,9 @@ pub fn handle_check(_client: &(), req: &CheckRequest) -> HandleReqReturn<CheckRe
     Ok(tmch_proto::TMCHCommandType::Check(command))
 }
 
-pub fn handle_check_response(response: tmch_proto::TMCHResponse) -> Response<CheckResponse> {
+pub fn handle_check_response(
+    response: tmch_proto::TMCHResponse, _metrics: &crate::metrics::ScopedMetrics
+) -> Response<CheckResponse> {
     match response.data {
         Some(value) => match value.value {
             tmch_proto::TMCHResultDataValue::TMCHCheck(msg) => {
@@ -202,7 +204,9 @@ pub fn handle_create(_client: &(), req: &CreateRequest) -> HandleReqReturn<Creat
     Ok(tmch_proto::TMCHCommandType::Create(Box::new(command)))
 }
 
-pub fn handle_create_response(response: tmch_proto::TMCHResponse) -> Response<CreateResponse> {
+pub fn handle_create_response(
+    response: tmch_proto::TMCHResponse, _metrics: &crate::metrics::ScopedMetrics
+) -> Response<CreateResponse> {
     match response.data {
         Some(value) => match value.value {
             tmch_proto::TMCHResultDataValue::TMCHCreate(msg) => Response::Ok(CreateResponse {
@@ -364,7 +368,9 @@ impl TryFrom<&Period> for tmch_proto::TMCHPeriod {
     }
 }
 
-pub fn handle_mark_info_response(response: tmch_proto::TMCHResponse) -> Response<MarkInfoResponse> {
+pub fn handle_mark_info_response(
+    response: tmch_proto::TMCHResponse, _metrics: &crate::metrics::ScopedMetrics
+) -> Response<MarkInfoResponse> {
     match response.data {
         Some(value) => match value.value {
             tmch_proto::TMCHResultDataValue::TMCHInfo(msg) => match (msg.pou_status, msg.mark) {
@@ -400,7 +406,7 @@ struct SMDInfo {
 }
 
 pub fn handle_mark_smd_info_response(
-    response: tmch_proto::TMCHResponse,
+    response: tmch_proto::TMCHResponse, _metrics: &crate::metrics::ScopedMetrics
 ) -> Response<MarkSMDInfoResponse> {
     match response.data {
         Some(value) => match value.value {
@@ -424,7 +430,7 @@ pub fn handle_mark_smd_info_response(
 }
 
 pub fn handle_mark_encoded_smd_info_response(
-    response: tmch_proto::TMCHResponse,
+    response: tmch_proto::TMCHResponse, _metrics: &crate::metrics::ScopedMetrics
 ) -> Response<MarkSMDInfoResponse> {
     match response.data {
         Some(value) => match value.value {
@@ -446,7 +452,7 @@ pub fn handle_mark_encoded_smd_info_response(
 }
 
 pub fn handle_mark_file_info_response(
-    response: tmch_proto::TMCHResponse,
+    response: tmch_proto::TMCHResponse, _metrics: &crate::metrics::ScopedMetrics
 ) -> Response<MarkSMDInfoResponse> {
     match response.data {
         Some(value) => match value.value {
@@ -629,7 +635,9 @@ pub fn handle_update(_client: &(), req: &UpdateRequest) -> HandleReqReturn<Updat
     Ok(tmch_proto::TMCHCommandType::Update(Box::new(command)))
 }
 
-pub fn handle_update_response(response: tmch_proto::TMCHResponse) -> Response<UpdateResponse> {
+pub fn handle_update_response(
+    response: tmch_proto::TMCHResponse, _metrics: &crate::metrics::ScopedMetrics
+) -> Response<UpdateResponse> {
     match response.data {
         Some(_) => Err(Error::ServerInternal),
         None => Response::Ok(UpdateResponse {}),
@@ -649,7 +657,9 @@ pub fn handle_renew(_client: &(), req: &RenewRequest) -> HandleReqReturn<RenewRe
     Ok(tmch_proto::TMCHCommandType::Renew(command))
 }
 
-pub fn handle_renew_response(response: tmch_proto::TMCHResponse) -> Response<RenewResponse> {
+pub fn handle_renew_response(
+    response: tmch_proto::TMCHResponse, _metrics: &crate::metrics::ScopedMetrics
+) -> Response<RenewResponse> {
     match response.data {
         Some(value) => match value.value {
             tmch_proto::TMCHResultDataValue::TMCHRenew(msg) => Response::Ok(RenewResponse {
@@ -677,7 +687,7 @@ pub fn handle_transfer_initiate(
 }
 
 pub fn handle_transfer_initiate_response(
-    response: tmch_proto::TMCHResponse,
+    response: tmch_proto::TMCHResponse, _metrics: &crate::metrics::ScopedMetrics
 ) -> Response<TransferInitiateResponse> {
     match response.data {
         Some(value) => match value.value {
@@ -704,7 +714,9 @@ pub fn handle_transfer(_client: &(), req: &TransferRequest) -> HandleReqReturn<T
     Ok(tmch_proto::TMCHCommandType::Transfer(command))
 }
 
-pub fn handle_transfer_response(response: tmch_proto::TMCHResponse) -> Response<TransferResponse> {
+pub fn handle_transfer_response(
+    response: tmch_proto::TMCHResponse, _metrics: &crate::metrics::ScopedMetrics
+) -> Response<TransferResponse> {
     match response.data {
         Some(value) => match value.value {
             tmch_proto::TMCHResultDataValue::TMCHTransfer(msg) => Response::Ok(TransferResponse {

@@ -64,7 +64,7 @@ pub fn handle_trex_activate(
 }
 
 pub fn handle_trex_activate_response(
-    response: tmch_proto::TMCHResponse,
+    response: tmch_proto::TMCHResponse, _metrics: &crate::metrics::ScopedMetrics
 ) -> Response<TrexActivateResponse> {
     match response.data {
         Some(_) => Err(Error::ServerInternal),
@@ -110,7 +110,7 @@ pub fn handle_trex_renew(
 }
 
 pub fn handle_trex_renew_response(
-    response: tmch_proto::TMCHResponse,
+    response: tmch_proto::TMCHResponse, _metrics: &crate::metrics::ScopedMetrics
 ) -> Response<TrexRenewResponse> {
     match response.data {
         Some(_) => Err(Error::ServerInternal),

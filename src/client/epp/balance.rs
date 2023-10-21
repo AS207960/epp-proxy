@@ -34,7 +34,9 @@ pub fn handle_balance(
     }
 }
 
-pub fn handle_balance_response(response: proto::EPPResponse) -> Response<BalanceResponse> {
+pub fn handle_balance_response(
+    response: proto::EPPResponse, _metrics: &crate::metrics::ScopedMetrics
+) -> Response<BalanceResponse> {
     match response.data {
         Some(value) => match value.value {
             proto::EPPResultDataValue::SwitchBalanceInfoResult(switch_balance) => {
@@ -297,7 +299,7 @@ mod balance_tests {
             super::proto::EPPMessageType::Response(r) => r,
             _ => unreachable!(),
         };
-        let data = super::handle_balance_response(*res).unwrap();
+        let data = super::handle_balance_response(*res, &crate::metrics::Metrics::null()).unwrap();
         assert_eq!(data.balance, "10000.00");
         assert_eq!(data.currency, "EUR");
         assert!(data.available_credit.is_none());

@@ -1392,7 +1392,9 @@ pub fn handle_logout(_client: &ServerFeatures, _req: &BlankRequest) -> router::H
     Ok((proto::EPPCommandType::Logout {}, None))
 }
 
-pub fn handle_logout_response(_response: proto::EPPResponse) -> super::Response<()> {
+pub fn handle_logout_response(
+    _response: proto::EPPResponse, _metrics: &crate::metrics::ScopedMetrics
+) -> super::Response<()> {
     super::Response::Ok(())
 }
 

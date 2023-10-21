@@ -303,7 +303,9 @@ pub fn handle_reject(
     ))
 }
 
-pub fn handle_handshake_response(response: proto::EPPResponse) -> Response<HandshakeResponse> {
+pub fn handle_handshake_response(
+    response: proto::EPPResponse, _metrics: &crate::metrics::ScopedMetrics
+) -> Response<HandshakeResponse> {
     match response.data {
         Some(value) => match value.value {
             proto::EPPResultDataValue::NominetHandshakeData(msg) => {
@@ -341,7 +343,9 @@ pub fn handle_release(
     ))
 }
 
-pub fn handle_release_response(response: proto::EPPResponse) -> Response<ReleaseResponse> {
+pub fn handle_release_response(
+    response: proto::EPPResponse, _metrics: &crate::metrics::ScopedMetrics
+) -> Response<ReleaseResponse> {
     let pending = response.is_pending();
     match response.data {
         Some(value) => match value.value {
@@ -371,7 +375,9 @@ pub fn handle_tag_list(
     Ok((proto::EPPCommandType::Info(command), None))
 }
 
-pub fn handle_tag_list_response(response: proto::EPPResponse) -> Response<TagListResponse> {
+pub fn handle_tag_list_response(
+    response: proto::EPPResponse, _metrics: &crate::metrics::ScopedMetrics
+) -> Response<TagListResponse> {
     match response.data {
         Some(value) => match value.value {
             proto::EPPResultDataValue::NominetTagInfoResult(tag_list) => {
@@ -425,7 +431,7 @@ pub fn handle_contact_validate(
 }
 
 pub fn handle_contact_validate_response(
-    response: proto::EPPResponse,
+    response: proto::EPPResponse, _metrics: &crate::metrics::ScopedMetrics
 ) -> Response<ContactValidateResponse> {
     match response.data {
         Some(_) => Err(Error::ServerInternal),
@@ -469,7 +475,9 @@ pub fn handle_unlock(client: &ServerFeatures, req: &LockRequest) -> HandleReqRet
     Ok((proto::EPPCommandType::Update(Box::new(command)), None))
 }
 
-pub fn handle_lock_response(response: proto::EPPResponse) -> Response<LockResponse> {
+pub fn handle_lock_response(
+    response: proto::EPPResponse, _metrics: &crate::metrics::ScopedMetrics
+) -> Response<LockResponse> {
     match response.data {
         Some(_) => Err(Error::ServerInternal),
         None => Response::Ok(LockResponse {}),

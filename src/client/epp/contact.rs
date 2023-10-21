@@ -556,7 +556,9 @@ pub fn handle_check(client: &ServerFeatures, req: &CheckRequest) -> HandleReqRet
     ))
 }
 
-pub fn handle_check_response(response: proto::EPPResponse) -> Response<CheckResponse> {
+pub fn handle_check_response(
+    response: proto::EPPResponse, _metrics: &crate::metrics::ScopedMetrics
+) -> Response<CheckResponse> {
     match response.data {
         Some(value) => match value.value {
             proto::EPPResultDataValue::EPPContactCheckResult(contact_check) => {
@@ -592,7 +594,9 @@ pub fn handle_info(client: &ServerFeatures, req: &InfoRequest) -> HandleReqRetur
     ))
 }
 
-pub fn handle_info_response(response: proto::EPPResponse) -> Response<InfoResponse> {
+pub fn handle_info_response(
+    response: proto::EPPResponse, _metrics: &crate::metrics::ScopedMetrics
+) -> Response<InfoResponse> {
     match response.data {
         Some(value) => match value.value {
             proto::EPPResultDataValue::EPPContactInfoResult(contact_info) => {
@@ -933,7 +937,9 @@ pub fn handle_create(
     ))
 }
 
-pub fn handle_create_response(response: proto::EPPResponse) -> Response<CreateResponse> {
+pub fn handle_create_response(
+    response: proto::EPPResponse, _metrics: &crate::metrics::ScopedMetrics
+) -> Response<CreateResponse> {
     match response.data {
         Some(ref value) => match &value.value {
             proto::EPPResultDataValue::EPPContactCreateResult(contact_create) => {
@@ -972,7 +978,9 @@ pub fn handle_delete(
     ))
 }
 
-pub fn handle_delete_response(response: proto::EPPResponse) -> Response<DeleteResponse> {
+pub fn handle_delete_response(
+    response: proto::EPPResponse, _metrics: &crate::metrics::ScopedMetrics
+) -> Response<DeleteResponse> {
     Response::Ok(DeleteResponse {
         pending: response.is_pending(),
     })
@@ -1231,7 +1239,9 @@ pub fn handle_update(
     ))
 }
 
-pub fn handle_update_response(response: proto::EPPResponse) -> Response<UpdateResponse> {
+pub fn handle_update_response(
+    response: proto::EPPResponse, _metrics: &crate::metrics::ScopedMetrics
+) -> Response<UpdateResponse> {
     Response::Ok(UpdateResponse {
         pending: response.is_pending(),
     })
@@ -1377,7 +1387,9 @@ pub fn handle_transfer_reject(
     ))
 }
 
-pub fn handle_transfer_response(response: proto::EPPResponse) -> Response<TransferResponse> {
+pub fn handle_transfer_response(
+    response: proto::EPPResponse, _metrics: &crate::metrics::ScopedMetrics
+) -> Response<TransferResponse> {
     let pending = response.is_pending();
     match &response.data {
         Some(value) => match &value.value {

@@ -166,7 +166,9 @@ pub fn handle_list(client: &ServerFeatures, _req: &ListRequest) -> HandleReqRetu
     }
 }
 
-pub fn handle_list_response(response: proto::EPPResponse) -> Response<ListResponse> {
+pub fn handle_list_response(
+    response: proto::EPPResponse, _metrics: &crate::metrics::ScopedMetrics
+) -> Response<ListResponse> {
     match response.data {
         Some(value) => match value.value {
             proto::EPPResultDataValue::EPPMaintenanceInfo(
@@ -227,7 +229,9 @@ pub fn handle_info(client: &ServerFeatures, req: &InfoRequest) -> HandleReqRetur
     }
 }
 
-pub fn handle_info_response(response: proto::EPPResponse) -> Response<InfoResponse> {
+pub fn handle_info_response(
+    response: proto::EPPResponse, _metrics: &crate::metrics::ScopedMetrics
+) -> Response<InfoResponse> {
     match response.data {
         Some(value) => match value.value {
             proto::EPPResultDataValue::EPPMaintenanceInfo(

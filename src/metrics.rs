@@ -3,6 +3,7 @@ pub struct Metrics {
     connection_up: prometheus::IntGaugeVec,
     request_count: prometheus::IntCounterVec,
     response_count: prometheus::IntCounterVec,
+    poll_result_count: prometheus::IntCounterVec,
     response_time: prometheus::HistogramVec,
 }
 
@@ -23,6 +24,11 @@ impl Metrics {
                 "response_count",
                 "Number of responses received from the EPP server",
                 &["id"]
+            )?,
+            poll_result_count: prometheus::register_int_counter_vec!(
+                "poll_result_count",
+                "Number and type of responses received to poll commands",
+                &["id", "command"]
             )?,
             response_time: prometheus::register_histogram_vec!(
                 "response_time",
@@ -72,6 +78,12 @@ impl ScopedMetrics {
     pub(crate) fn response_received(&self) {
         if let Some(metrics) = &self.metrics {
             metrics.response_count.with_label_values(&[&self.id]).inc();
+        }
+    }
+
+    pub(crate) fn poll_received(&self, command: &str) {
+        if let Some(metrics) = &self.metrics {
+            metrics.poll_result_count.with_label_values(&[&self.id, command]).inc();
         }
     }
 

@@ -91,7 +91,9 @@ pub fn handle_poll(
     Ok((proto::EPPCommandType::Poll(command), None))
 }
 
-pub fn handle_poll_response(response: proto::EPPResponse) -> Response<Option<PollResponse>> {
+pub fn handle_poll_response(
+    response: proto::EPPResponse, metrics: &crate::metrics::ScopedMetrics
+) -> Response<Option<PollResponse>> {
     match response.results.first() {
         Some(result) => match result.code {
             proto::EPPResultCode::SuccessNoMessages => Response::Ok(None),
@@ -102,127 +104,130 @@ pub fn handle_poll_response(response: proto::EPPResponse) -> Response<Option<Pol
                     enqueue_time: value.enqueue_date.unwrap_or_else(Utc::now),
                     message: value.message.unwrap_or_default(),
                     data: match response.data {
-                        Some(value) => match value.value {
-                            proto::EPPResultDataValue::EPPDomainInfoResult(domain_info) => {
-                                PollData::DomainInfoData {
-                                    data: Box::new((*domain_info, &response.extension).try_into()?),
-                                    change_data: change_data_from_response(&response.extension)?,
+                        Some(value) => {
+                            metrics.poll_received(value.value.name());
+                            match value.value {
+                                proto::EPPResultDataValue::EPPDomainInfoResult(domain_info) => {
+                                    PollData::DomainInfoData {
+                                        data: Box::new((*domain_info, &response.extension).try_into()?),
+                                        change_data: change_data_from_response(&response.extension)?,
+                                    }
                                 }
-                            }
-                            proto::EPPResultDataValue::EPPContactInfoResult(contact_info) => {
-                                PollData::ContactInfoData {
-                                    data: Box::new(
-                                        (*contact_info, &response.extension).try_into()?,
-                                    ),
-                                    change_data: change_data_from_response(&response.extension)?,
+                                proto::EPPResultDataValue::EPPContactInfoResult(contact_info) => {
+                                    PollData::ContactInfoData {
+                                        data: Box::new(
+                                            (*contact_info, &response.extension).try_into()?,
+                                        ),
+                                        change_data: change_data_from_response(&response.extension)?,
+                                    }
                                 }
-                            }
-                            proto::EPPResultDataValue::EPPHostInfoResult(host_info) => {
-                                PollData::HostInfoData {
-                                    data: Box::new((*host_info).try_into()?),
-                                    change_data: change_data_from_response(&response.extension)?,
+                                proto::EPPResultDataValue::EPPHostInfoResult(host_info) => {
+                                    PollData::HostInfoData {
+                                        data: Box::new((*host_info).try_into()?),
+                                        change_data: change_data_from_response(&response.extension)?,
+                                    }
                                 }
-                            }
-                            proto::EPPResultDataValue::EPPDomainTransferResult(domain_transfer) => {
-                                PollData::DomainTransferData {
-                                    data: (domain_transfer, &response.extension).try_into()?,
-                                    change_data: change_data_from_response(&response.extension)?,
+                                proto::EPPResultDataValue::EPPDomainTransferResult(domain_transfer) => {
+                                    PollData::DomainTransferData {
+                                        data: (domain_transfer, &response.extension).try_into()?,
+                                        change_data: change_data_from_response(&response.extension)?,
+                                    }
                                 }
-                            }
-                            proto::EPPResultDataValue::EPPContactTransferResult(
-                                contact_transfer,
-                            ) => PollData::ContactTransferData {
-                                data: (&contact_transfer).into(),
-                                change_data: change_data_from_response(&response.extension)?,
-                            },
-                            proto::EPPResultDataValue::EPPDomainCreateResult(domain_create) => {
-                                PollData::DomainCreateData {
-                                    data: (Some(domain_create), &response.extension).try_into()?,
+                                proto::EPPResultDataValue::EPPContactTransferResult(
+                                    contact_transfer,
+                                ) => PollData::ContactTransferData {
+                                    data: (&contact_transfer).into(),
                                     change_data: change_data_from_response(&response.extension)?,
+                                },
+                                proto::EPPResultDataValue::EPPDomainCreateResult(domain_create) => {
+                                    PollData::DomainCreateData {
+                                        data: (Some(domain_create), &response.extension).try_into()?,
+                                        change_data: change_data_from_response(&response.extension)?,
+                                    }
                                 }
-                            }
-                            proto::EPPResultDataValue::EPPDomainRenewResult(domain_renew) => {
-                                PollData::DomainRenewData {
-                                    data: (domain_renew, &response.extension).try_into()?,
+                                proto::EPPResultDataValue::EPPDomainRenewResult(domain_renew) => {
+                                    PollData::DomainRenewData {
+                                        data: (domain_renew, &response.extension).try_into()?,
+                                        change_data: change_data_from_response(&response.extension)?,
+                                    }
+                                }
+                                proto::EPPResultDataValue::EPPDomainPendingActionNotification(
+                                    domain_data,
+                                ) => PollData::DomainPanData {
+                                    data: (&domain_data).into(),
                                     change_data: change_data_from_response(&response.extension)?,
-                                }
-                            }
-                            proto::EPPResultDataValue::EPPDomainPendingActionNotification(
-                                domain_data,
-                            ) => PollData::DomainPanData {
-                                data: (&domain_data).into(),
-                                change_data: change_data_from_response(&response.extension)?,
-                            },
-                            proto::EPPResultDataValue::EPPContactPendingActionNotification(
-                                contact_data,
-                            ) => PollData::ContactPanData {
-                                data: (&contact_data).into(),
-                                change_data: change_data_from_response(&response.extension)?,
-                            },
-                            proto::EPPResultDataValue::NominetCancelData(canc_data) => {
-                                PollData::NominetDomainCancelData {
-                                    data: canc_data.into(),
+                                },
+                                proto::EPPResultDataValue::EPPContactPendingActionNotification(
+                                    contact_data,
+                                ) => PollData::ContactPanData {
+                                    data: (&contact_data).into(),
                                     change_data: change_data_from_response(&response.extension)?,
+                                },
+                                proto::EPPResultDataValue::NominetCancelData(canc_data) => {
+                                    PollData::NominetDomainCancelData {
+                                        data: canc_data.into(),
+                                        change_data: change_data_from_response(&response.extension)?,
+                                    }
                                 }
-                            }
-                            proto::EPPResultDataValue::NominetReleaseData(rel_data) => {
-                                PollData::NominetDomainReleaseData {
-                                    data: rel_data.into(),
-                                    change_data: change_data_from_response(&response.extension)?,
+                                proto::EPPResultDataValue::NominetReleaseData(rel_data) => {
+                                    PollData::NominetDomainReleaseData {
+                                        data: rel_data.into(),
+                                        change_data: change_data_from_response(&response.extension)?,
+                                    }
                                 }
-                            }
-                            proto::EPPResultDataValue::NominetRegistrarChangeData(rc_data) => {
-                                PollData::NominetDomainRegistrarChangeData {
-                                    data: (rc_data, &response.extension).try_into()?,
-                                    change_data: change_data_from_response(&response.extension)?,
+                                proto::EPPResultDataValue::NominetRegistrarChangeData(rc_data) => {
+                                    PollData::NominetDomainRegistrarChangeData {
+                                        data: (rc_data, &response.extension).try_into()?,
+                                        change_data: change_data_from_response(&response.extension)?,
+                                    }
                                 }
-                            }
-                            proto::EPPResultDataValue::NominetHostCancelData(canc_data) => {
-                                PollData::NominetHostCancelData {
-                                    data: canc_data.into(),
-                                    change_data: change_data_from_response(&response.extension)?,
+                                proto::EPPResultDataValue::NominetHostCancelData(canc_data) => {
+                                    PollData::NominetHostCancelData {
+                                        data: canc_data.into(),
+                                        change_data: change_data_from_response(&response.extension)?,
+                                    }
                                 }
-                            }
-                            proto::EPPResultDataValue::NominetProcessData(p_data) => {
-                                PollData::NominetProcessData {
-                                    data: (p_data, &response.extension).try_into()?,
-                                    change_data: change_data_from_response(&response.extension)?,
+                                proto::EPPResultDataValue::NominetProcessData(p_data) => {
+                                    PollData::NominetProcessData {
+                                        data: (p_data, &response.extension).try_into()?,
+                                        change_data: change_data_from_response(&response.extension)?,
+                                    }
                                 }
-                            }
-                            proto::EPPResultDataValue::NominetSuspendData(sus_data) => {
-                                PollData::NominetSuspendData {
-                                    data: sus_data.into(),
-                                    change_data: change_data_from_response(&response.extension)?,
+                                proto::EPPResultDataValue::NominetSuspendData(sus_data) => {
+                                    PollData::NominetSuspendData {
+                                        data: sus_data.into(),
+                                        change_data: change_data_from_response(&response.extension)?,
+                                    }
                                 }
-                            }
-                            proto::EPPResultDataValue::NominetDomainFailData(fail_data) => {
-                                PollData::NominetDomainFailData {
-                                    data: fail_data.into(),
-                                    change_data: change_data_from_response(&response.extension)?,
+                                proto::EPPResultDataValue::NominetDomainFailData(fail_data) => {
+                                    PollData::NominetDomainFailData {
+                                        data: fail_data.into(),
+                                        change_data: change_data_from_response(&response.extension)?,
+                                    }
                                 }
-                            }
-                            proto::EPPResultDataValue::NominetTransferData(trn_data) => {
-                                PollData::NominetRegistrantTransferData {
-                                    data: (trn_data, &response.extension).try_into()?,
-                                    change_data: change_data_from_response(&response.extension)?,
+                                proto::EPPResultDataValue::NominetTransferData(trn_data) => {
+                                    PollData::NominetRegistrantTransferData {
+                                        data: (trn_data, &response.extension).try_into()?,
+                                        change_data: change_data_from_response(&response.extension)?,
+                                    }
                                 }
+                                proto::EPPResultDataValue::VerisignLowBalanceData(bal_data) => {
+                                    PollData::VerisignLowBalanceData(bal_data.try_into()?)
+                                }
+                                proto::EPPResultDataValue::TraficomTrnData(trn_data) => {
+                                    PollData::TraficomTrnData(trn_data.into())
+                                }
+                                proto::EPPResultDataValue::EURIDPollData(poll_data) => {
+                                    PollData::EURIDPoll(poll_data.into())
+                                }
+                                proto::EPPResultDataValue::EPPMaintenanceInfo(
+                                    proto::maintenance::EPPMaintenanceInfoData::Maintenance(item),
+                                ) => PollData::MaintenanceData(item.into()),
+                                proto::EPPResultDataValue::EPPMaintenanceInfo02(
+                                    proto::maintenance::EPPMaintenanceInfoData02::Maintenance(item),
+                                ) => PollData::MaintenanceData(item.into()),
+                                _ => return Err(Error::ServerInternal),
                             }
-                            proto::EPPResultDataValue::VerisignLowBalanceData(bal_data) => {
-                                PollData::VerisignLowBalanceData(bal_data.try_into()?)
-                            }
-                            proto::EPPResultDataValue::TraficomTrnData(trn_data) => {
-                                PollData::TraficomTrnData(trn_data.into())
-                            }
-                            proto::EPPResultDataValue::EURIDPollData(poll_data) => {
-                                PollData::EURIDPoll(poll_data.into())
-                            }
-                            proto::EPPResultDataValue::EPPMaintenanceInfo(
-                                proto::maintenance::EPPMaintenanceInfoData::Maintenance(item),
-                            ) => PollData::MaintenanceData(item.into()),
-                            proto::EPPResultDataValue::EPPMaintenanceInfo02(
-                                proto::maintenance::EPPMaintenanceInfoData02::Maintenance(item),
-                            ) => PollData::MaintenanceData(item.into()),
-                            _ => return Err(Error::ServerInternal),
                         },
                         None => PollData::None,
                     },
@@ -246,7 +251,9 @@ pub fn handle_poll_ack(
     Ok((proto::EPPCommandType::Poll(command), None))
 }
 
-pub fn handle_poll_ack_response(response: proto::EPPResponse) -> Response<PollAckResponse> {
+pub fn handle_poll_ack_response(
+    response: proto::EPPResponse, _metrics: &crate::metrics::ScopedMetrics
+) -> Response<PollAckResponse> {
     match response.message_queue {
         Some(value) => Response::Ok(PollAckResponse {
             count: Some(value.count),
