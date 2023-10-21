@@ -13,7 +13,7 @@ log = "0.4"
 pretty_env_logger = "0.5"
 libc = "0.2"
 openssl = { version = "0.10", features = [] }
-openssl-sys = { version = "=0.9.85", features = [] }
+openssl-sys = { version = "=0.9.93", features = [] }
 tokio-openssl = "0.6"
 quick-xml = { version = "0.30", features = ["serialize"]}
 serde = "1.0"
@@ -60,7 +60,8 @@ test-log = "0.2"
 env_logger = "0.10"
 
 [patch.crates-io]
-openssl-sys = { git = "https://github.com/AS207960/rust-openssl", rev = "4d9f58286a60db8ea43a8682b4b05ace19f3a65e" }
+openssl-sys = { git = "https://github.com/AS207960/rust-openssl", rev = "1da47a7e9af19a40d5752cb7f5bd25af982b6541" }
+#openssl-sys = { path = "../rust-openssl/openssl-sys" }
 
 [lib]
 name = "epp_proxy"
