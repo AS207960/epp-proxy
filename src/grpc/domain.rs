@@ -1,8 +1,9 @@
+use std::convert::TryFrom;
 use super::super::client;
 use super::epp_proto;
 
 pub fn domain_status_from_i32(from: i32) -> Option<client::domain::Status> {
-    epp_proto::domain_common::DomainStatus::from_i32(from).map(|e| match e {
+    epp_proto::domain_common::DomainStatus::try_from(from).ok().map(|e| match e {
         epp_proto::domain_common::DomainStatus::ClientDeleteProhibited => {
             client::domain::Status::ClientDeleteProhibited
         }

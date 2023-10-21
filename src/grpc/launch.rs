@@ -5,8 +5,8 @@ use std::convert::TryFrom;
 impl From<epp_proto::launch::Phase> for client::launch::LaunchPhase {
     fn from(from: epp_proto::launch::Phase) -> Self {
         client::launch::LaunchPhase {
-            phase_type: match epp_proto::launch::phase::PhaseType::from_i32(from.phase_type) {
-                Some(p) => match p {
+            phase_type: match epp_proto::launch::phase::PhaseType::try_from(from.phase_type) {
+                Ok(p) => match p {
                     epp_proto::launch::phase::PhaseType::Open => client::launch::PhaseType::Open,
                     epp_proto::launch::phase::PhaseType::Sunrise => {
                         client::launch::PhaseType::Sunrise
@@ -21,7 +21,7 @@ impl From<epp_proto::launch::Phase> for client::launch::LaunchPhase {
                         client::launch::PhaseType::Custom
                     }
                 },
-                None => client::launch::PhaseType::Custom,
+                Err(_) => client::launch::PhaseType::Custom,
             },
             phase_name: from.phase_name,
         }
@@ -90,16 +90,16 @@ impl TryFrom<epp_proto::launch::LaunchCreate> for client::launch::LaunchCreate {
 
     fn try_from(from: epp_proto::launch::LaunchCreate) -> Result<Self, Self::Error> {
         Ok(client::launch::LaunchCreate {
-            create_type: match epp_proto::launch::launch_create::CreateType::from_i32(
+            create_type: match epp_proto::launch::launch_create::CreateType::try_from(
                 from.create_type,
             ) {
-                Some(epp_proto::launch::launch_create::CreateType::Registration) => {
+                Ok(epp_proto::launch::launch_create::CreateType::Registration) => {
                     client::launch::LaunchCreateType::Registration
                 }
-                Some(epp_proto::launch::launch_create::CreateType::Application) => {
+                Ok(epp_proto::launch::launch_create::CreateType::Application) => {
                     client::launch::LaunchCreateType::Application
                 }
-                None => client::launch::LaunchCreateType::Registration,
+                Err(_) => client::launch::LaunchCreateType::Registration,
             },
             phase: match from.phase {
                 Some(p) => p.into(),

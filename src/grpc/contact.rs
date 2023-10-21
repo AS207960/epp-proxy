@@ -1,10 +1,11 @@
+use std::convert::TryFrom;
 use super::super::client;
 use super::epp_proto;
 use chrono::prelude::*;
 
 pub fn entity_type_from_i32(from: i32) -> Option<client::contact::EntityType> {
-    match epp_proto::contact::EntityType::from_i32(from) {
-        Some(e) => match e {
+    match epp_proto::contact::EntityType::try_from(from) {
+        Ok(e) => match e {
             epp_proto::contact::EntityType::UkLimitedCompany => {
                 Some(client::contact::EntityType::UkLimitedCompany)
             }
@@ -98,14 +99,14 @@ pub fn entity_type_from_i32(from: i32) -> Option<client::contact::EntityType> {
             }
             epp_proto::contact::EntityType::NotSet => None,
         },
-        None => None,
+        Err(_) => None,
     }
 }
 
 pub fn disclosure_type_from_i32(from: Vec<i32>) -> Vec<client::contact::DisclosureType> {
     let mut out = vec![];
     for i in from {
-        if let Some(e) = epp_proto::contact::DisclosureType::from_i32(i) {
+        if let Ok(e) = epp_proto::contact::DisclosureType::try_from(i) {
             out.push(match e {
                 epp_proto::contact::DisclosureType::LocalName => {
                     client::contact::DisclosureType::LocalName
@@ -137,7 +138,7 @@ pub fn disclosure_type_from_i32(from: Vec<i32>) -> Vec<client::contact::Disclosu
 pub fn contact_status_from_i32(from: Vec<i32>) -> Vec<client::contact::Status> {
     let mut out = vec![];
     for i in from {
-        if let Some(e) = epp_proto::contact::ContactStatus::from_i32(i) {
+        if let Ok(e) = epp_proto::contact::ContactStatus::try_from(i) {
             out.push(match e {
                 epp_proto::contact::ContactStatus::ClientDeleteProhibited => {
                     client::contact::Status::ClientDeleteProhibited

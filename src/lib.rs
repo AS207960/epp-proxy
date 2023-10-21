@@ -412,7 +412,7 @@ impl S3Storage {
             .credentials_provider(credentials_provider)
             .region(region.into())
             .retry_config(aws_sdk_s3::config::retry::RetryConfig::standard())
-            .sleep_impl(sleep_impl)
+            .sleep_impl(aws_sdk_s3::config::SharedAsyncSleep::new(sleep_impl))
             .build();
         let client = aws_sdk_s3::Client::from_conf(config);
 

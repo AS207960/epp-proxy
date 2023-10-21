@@ -61,21 +61,21 @@ impl From<epp_proto::keysys::DomainRenew> for client::keysys::DomainRenew {
 impl From<epp_proto::keysys::DomainDelete> for client::keysys::DomainDelete {
     fn from(res: epp_proto::keysys::DomainDelete) -> Self {
         client::keysys::DomainDelete {
-            action: match epp_proto::keysys::DomainDeleteAction::from_i32(res.action) {
-                Some(epp_proto::keysys::DomainDeleteAction::DefaultDelete) => {
+            action: match epp_proto::keysys::DomainDeleteAction::try_from(res.action) {
+                Ok(epp_proto::keysys::DomainDeleteAction::DefaultDelete) => {
                     client::keysys::DomainDeleteAction::Default
                 }
-                None => client::keysys::DomainDeleteAction::Default,
-                Some(epp_proto::keysys::DomainDeleteAction::SetAutoExpire) => {
+                Err(_) => client::keysys::DomainDeleteAction::Default,
+                Ok(epp_proto::keysys::DomainDeleteAction::SetAutoExpire) => {
                     client::keysys::DomainDeleteAction::AutoExpire
                 }
-                Some(epp_proto::keysys::DomainDeleteAction::SetAutoDelete) => {
+                Ok(epp_proto::keysys::DomainDeleteAction::SetAutoDelete) => {
                     client::keysys::DomainDeleteAction::AutoDelete
                 }
-                Some(epp_proto::keysys::DomainDeleteAction::Instant) => {
+                Ok(epp_proto::keysys::DomainDeleteAction::Instant) => {
                     client::keysys::DomainDeleteAction::Instant
                 }
-                Some(epp_proto::keysys::DomainDeleteAction::Push) => {
+                Ok(epp_proto::keysys::DomainDeleteAction::Push) => {
                     client::keysys::DomainDeleteAction::Push
                 }
             },
@@ -111,228 +111,228 @@ impl From<epp_proto::keysys::DomainTransfer> for client::keysys::DomainTransfer 
 }
 
 fn map_renewal_mode(renewal_mode: i32) -> Option<client::keysys::RenewalMode> {
-    match epp_proto::keysys::RenewalMode::from_i32(renewal_mode) {
-        None => None,
-        Some(epp_proto::keysys::RenewalMode::UnknownRenew) => None,
-        Some(epp_proto::keysys::RenewalMode::DefaultRenew) => {
+    match epp_proto::keysys::RenewalMode::try_from(renewal_mode) {
+        Err(_) => None,
+        Ok(epp_proto::keysys::RenewalMode::UnknownRenew) => None,
+        Ok(epp_proto::keysys::RenewalMode::DefaultRenew) => {
             Some(client::keysys::RenewalMode::Default)
         }
-        Some(epp_proto::keysys::RenewalMode::AutoRenew) => {
+        Ok(epp_proto::keysys::RenewalMode::AutoRenew) => {
             Some(client::keysys::RenewalMode::AutoRenew)
         }
-        Some(epp_proto::keysys::RenewalMode::AutoExpire) => {
+        Ok(epp_proto::keysys::RenewalMode::AutoExpire) => {
             Some(client::keysys::RenewalMode::AutoExpire)
         }
-        Some(epp_proto::keysys::RenewalMode::AutoDelete) => {
+        Ok(epp_proto::keysys::RenewalMode::AutoDelete) => {
             Some(client::keysys::RenewalMode::AutoDelete)
         }
-        Some(epp_proto::keysys::RenewalMode::AutoRenewMonthly) => {
+        Ok(epp_proto::keysys::RenewalMode::AutoRenewMonthly) => {
             Some(client::keysys::RenewalMode::AutoRenewMonthly)
         }
-        Some(epp_proto::keysys::RenewalMode::AutoRenewQuarterly) => {
+        Ok(epp_proto::keysys::RenewalMode::AutoRenewQuarterly) => {
             Some(client::keysys::RenewalMode::AutoRenewQuarterly)
         }
-        Some(epp_proto::keysys::RenewalMode::ExpireAuction) => {
+        Ok(epp_proto::keysys::RenewalMode::ExpireAuction) => {
             Some(client::keysys::RenewalMode::ExpireAuction)
         }
-        Some(epp_proto::keysys::RenewalMode::RenewOnce) => {
+        Ok(epp_proto::keysys::RenewalMode::RenewOnce) => {
             Some(client::keysys::RenewalMode::RenewOnce)
         }
     }
 }
 
 fn map_transfer_mode(transfer_mode: i32) -> Option<client::keysys::TransferMode> {
-    match epp_proto::keysys::TransferMode::from_i32(transfer_mode) {
-        None => None,
-        Some(epp_proto::keysys::TransferMode::UnknownTransfer) => None,
-        Some(epp_proto::keysys::TransferMode::DefaultTransfer) => {
+    match epp_proto::keysys::TransferMode::try_from(transfer_mode) {
+        Err(_) => None,
+        Ok(epp_proto::keysys::TransferMode::UnknownTransfer) => None,
+        Ok(epp_proto::keysys::TransferMode::DefaultTransfer) => {
             Some(client::keysys::TransferMode::Default)
         }
-        Some(epp_proto::keysys::TransferMode::AutoApprove) => {
+        Ok(epp_proto::keysys::TransferMode::AutoApprove) => {
             Some(client::keysys::TransferMode::AutoApprove)
         }
-        Some(epp_proto::keysys::TransferMode::AutoDeny) => {
+        Ok(epp_proto::keysys::TransferMode::AutoDeny) => {
             Some(client::keysys::TransferMode::AutoDeny)
         }
     }
 }
 
 fn map_eu_language(eu_language: i32) -> Option<client::keysys::EULanguage> {
-    match epp_proto::keysys::EuLanguage::from_i32(eu_language) {
-        None => None,
-        Some(epp_proto::keysys::EuLanguage::UnknownLanguage) => None,
-        Some(epp_proto::keysys::EuLanguage::Bulgarian) => {
+    match epp_proto::keysys::EuLanguage::try_from(eu_language) {
+        Err(_) => None,
+        Ok(epp_proto::keysys::EuLanguage::UnknownLanguage) => None,
+        Ok(epp_proto::keysys::EuLanguage::Bulgarian) => {
             Some(client::keysys::EULanguage::Bulgarian)
         }
-        Some(epp_proto::keysys::EuLanguage::Czech) => Some(client::keysys::EULanguage::Czech),
-        Some(epp_proto::keysys::EuLanguage::Danish) => Some(client::keysys::EULanguage::Danish),
-        Some(epp_proto::keysys::EuLanguage::German) => Some(client::keysys::EULanguage::German),
-        Some(epp_proto::keysys::EuLanguage::ModernGreek) => {
+        Ok(epp_proto::keysys::EuLanguage::Czech) => Some(client::keysys::EULanguage::Czech),
+        Ok(epp_proto::keysys::EuLanguage::Danish) => Some(client::keysys::EULanguage::Danish),
+        Ok(epp_proto::keysys::EuLanguage::German) => Some(client::keysys::EULanguage::German),
+        Ok(epp_proto::keysys::EuLanguage::ModernGreek) => {
             Some(client::keysys::EULanguage::ModernGreek)
         }
-        Some(epp_proto::keysys::EuLanguage::English) => Some(client::keysys::EULanguage::English),
-        Some(epp_proto::keysys::EuLanguage::Spanish) => Some(client::keysys::EULanguage::Spanish),
-        Some(epp_proto::keysys::EuLanguage::Estonian) => Some(client::keysys::EULanguage::Estonian),
-        Some(epp_proto::keysys::EuLanguage::Finnish) => Some(client::keysys::EULanguage::Finnish),
-        Some(epp_proto::keysys::EuLanguage::French) => Some(client::keysys::EULanguage::French),
-        Some(epp_proto::keysys::EuLanguage::Gaelic) => Some(client::keysys::EULanguage::Gaelic),
-        Some(epp_proto::keysys::EuLanguage::Croatian) => Some(client::keysys::EULanguage::Croatian),
-        Some(epp_proto::keysys::EuLanguage::Hungarian) => {
+        Ok(epp_proto::keysys::EuLanguage::English) => Some(client::keysys::EULanguage::English),
+        Ok(epp_proto::keysys::EuLanguage::Spanish) => Some(client::keysys::EULanguage::Spanish),
+        Ok(epp_proto::keysys::EuLanguage::Estonian) => Some(client::keysys::EULanguage::Estonian),
+        Ok(epp_proto::keysys::EuLanguage::Finnish) => Some(client::keysys::EULanguage::Finnish),
+        Ok(epp_proto::keysys::EuLanguage::French) => Some(client::keysys::EULanguage::French),
+        Ok(epp_proto::keysys::EuLanguage::Gaelic) => Some(client::keysys::EULanguage::Gaelic),
+        Ok(epp_proto::keysys::EuLanguage::Croatian) => Some(client::keysys::EULanguage::Croatian),
+        Ok(epp_proto::keysys::EuLanguage::Hungarian) => {
             Some(client::keysys::EULanguage::Hungarian)
         }
-        Some(epp_proto::keysys::EuLanguage::Italian) => Some(client::keysys::EULanguage::Italian),
-        Some(epp_proto::keysys::EuLanguage::Lithuanian) => {
+        Ok(epp_proto::keysys::EuLanguage::Italian) => Some(client::keysys::EULanguage::Italian),
+        Ok(epp_proto::keysys::EuLanguage::Lithuanian) => {
             Some(client::keysys::EULanguage::Lithuanian)
         }
-        Some(epp_proto::keysys::EuLanguage::Latvian) => Some(client::keysys::EULanguage::Latvian),
-        Some(epp_proto::keysys::EuLanguage::Maltese) => Some(client::keysys::EULanguage::Maltese),
-        Some(epp_proto::keysys::EuLanguage::DutchFlemish) => {
+        Ok(epp_proto::keysys::EuLanguage::Latvian) => Some(client::keysys::EULanguage::Latvian),
+        Ok(epp_proto::keysys::EuLanguage::Maltese) => Some(client::keysys::EULanguage::Maltese),
+        Ok(epp_proto::keysys::EuLanguage::DutchFlemish) => {
             Some(client::keysys::EULanguage::DutchFlemish)
         }
-        Some(epp_proto::keysys::EuLanguage::Polish) => Some(client::keysys::EULanguage::Polish),
-        Some(epp_proto::keysys::EuLanguage::Portuguese) => {
+        Ok(epp_proto::keysys::EuLanguage::Polish) => Some(client::keysys::EULanguage::Polish),
+        Ok(epp_proto::keysys::EuLanguage::Portuguese) => {
             Some(client::keysys::EULanguage::Portuguese)
         }
-        Some(epp_proto::keysys::EuLanguage::Romanian) => Some(client::keysys::EULanguage::Romanian),
-        Some(epp_proto::keysys::EuLanguage::Slovak) => Some(client::keysys::EULanguage::Slovak),
-        Some(epp_proto::keysys::EuLanguage::Slovene) => Some(client::keysys::EULanguage::Slovene),
-        Some(epp_proto::keysys::EuLanguage::Swedish) => Some(client::keysys::EULanguage::Swedish),
+        Ok(epp_proto::keysys::EuLanguage::Romanian) => Some(client::keysys::EULanguage::Romanian),
+        Ok(epp_proto::keysys::EuLanguage::Slovak) => Some(client::keysys::EULanguage::Slovak),
+        Ok(epp_proto::keysys::EuLanguage::Slovene) => Some(client::keysys::EULanguage::Slovene),
+        Ok(epp_proto::keysys::EuLanguage::Swedish) => Some(client::keysys::EULanguage::Swedish),
     }
 }
 
 fn map_eu_country(eu_country: i32) -> Option<client::keysys::EUCountry> {
-    match epp_proto::keysys::EuCountry::from_i32(eu_country) {
-        None => None,
-        Some(epp_proto::keysys::EuCountry::UnknownCountry) => None,
-        Some(epp_proto::keysys::EuCountry::Austria) => Some(client::keysys::EUCountry::Austria),
-        Some(epp_proto::keysys::EuCountry::Belgium) => Some(client::keysys::EUCountry::Belgium),
-        Some(epp_proto::keysys::EuCountry::Bulgaria) => Some(client::keysys::EUCountry::Bulgaria),
-        Some(epp_proto::keysys::EuCountry::CzechRepublic) => Some(client::keysys::EUCountry::Czech),
-        Some(epp_proto::keysys::EuCountry::Cyprus) => Some(client::keysys::EUCountry::Cyprus),
-        Some(epp_proto::keysys::EuCountry::Germany) => Some(client::keysys::EUCountry::Germany),
-        Some(epp_proto::keysys::EuCountry::Denmark) => Some(client::keysys::EUCountry::Denmark),
-        Some(epp_proto::keysys::EuCountry::Spain) => Some(client::keysys::EUCountry::Spain),
-        Some(epp_proto::keysys::EuCountry::Estonia) => Some(client::keysys::EUCountry::Estonia),
-        Some(epp_proto::keysys::EuCountry::Finland) => Some(client::keysys::EUCountry::Finland),
-        Some(epp_proto::keysys::EuCountry::France) => Some(client::keysys::EUCountry::France),
-        Some(epp_proto::keysys::EuCountry::Greece) => Some(client::keysys::EUCountry::Greece),
-        Some(epp_proto::keysys::EuCountry::Hungary) => Some(client::keysys::EUCountry::Hungary),
-        Some(epp_proto::keysys::EuCountry::Ireland) => Some(client::keysys::EUCountry::Ireland),
-        Some(epp_proto::keysys::EuCountry::Italy) => Some(client::keysys::EUCountry::Italy),
-        Some(epp_proto::keysys::EuCountry::Liechtenstein) => {
+    match epp_proto::keysys::EuCountry::try_from(eu_country) {
+        Err(_) => None,
+        Ok(epp_proto::keysys::EuCountry::UnknownCountry) => None,
+        Ok(epp_proto::keysys::EuCountry::Austria) => Some(client::keysys::EUCountry::Austria),
+        Ok(epp_proto::keysys::EuCountry::Belgium) => Some(client::keysys::EUCountry::Belgium),
+        Ok(epp_proto::keysys::EuCountry::Bulgaria) => Some(client::keysys::EUCountry::Bulgaria),
+        Ok(epp_proto::keysys::EuCountry::CzechRepublic) => Some(client::keysys::EUCountry::Czech),
+        Ok(epp_proto::keysys::EuCountry::Cyprus) => Some(client::keysys::EUCountry::Cyprus),
+        Ok(epp_proto::keysys::EuCountry::Germany) => Some(client::keysys::EUCountry::Germany),
+        Ok(epp_proto::keysys::EuCountry::Denmark) => Some(client::keysys::EUCountry::Denmark),
+        Ok(epp_proto::keysys::EuCountry::Spain) => Some(client::keysys::EUCountry::Spain),
+        Ok(epp_proto::keysys::EuCountry::Estonia) => Some(client::keysys::EUCountry::Estonia),
+        Ok(epp_proto::keysys::EuCountry::Finland) => Some(client::keysys::EUCountry::Finland),
+        Ok(epp_proto::keysys::EuCountry::France) => Some(client::keysys::EUCountry::France),
+        Ok(epp_proto::keysys::EuCountry::Greece) => Some(client::keysys::EUCountry::Greece),
+        Ok(epp_proto::keysys::EuCountry::Hungary) => Some(client::keysys::EUCountry::Hungary),
+        Ok(epp_proto::keysys::EuCountry::Ireland) => Some(client::keysys::EUCountry::Ireland),
+        Ok(epp_proto::keysys::EuCountry::Italy) => Some(client::keysys::EUCountry::Italy),
+        Ok(epp_proto::keysys::EuCountry::Liechtenstein) => {
             Some(client::keysys::EUCountry::Liechtenstein)
         }
-        Some(epp_proto::keysys::EuCountry::Lithuania) => Some(client::keysys::EUCountry::Lithuania),
-        Some(epp_proto::keysys::EuCountry::Luxembourg) => {
+        Ok(epp_proto::keysys::EuCountry::Lithuania) => Some(client::keysys::EUCountry::Lithuania),
+        Ok(epp_proto::keysys::EuCountry::Luxembourg) => {
             Some(client::keysys::EUCountry::Luxembourg)
         }
-        Some(epp_proto::keysys::EuCountry::Latvia) => Some(client::keysys::EUCountry::Latvia),
-        Some(epp_proto::keysys::EuCountry::Malta) => Some(client::keysys::EUCountry::Malta),
-        Some(epp_proto::keysys::EuCountry::Netherlands) => {
+        Ok(epp_proto::keysys::EuCountry::Latvia) => Some(client::keysys::EUCountry::Latvia),
+        Ok(epp_proto::keysys::EuCountry::Malta) => Some(client::keysys::EUCountry::Malta),
+        Ok(epp_proto::keysys::EuCountry::Netherlands) => {
             Some(client::keysys::EUCountry::Netherlands)
         }
-        Some(epp_proto::keysys::EuCountry::Poland) => Some(client::keysys::EUCountry::Poland),
-        Some(epp_proto::keysys::EuCountry::Portugal) => Some(client::keysys::EUCountry::Portugal),
-        Some(epp_proto::keysys::EuCountry::Romania) => Some(client::keysys::EUCountry::Romania),
-        Some(epp_proto::keysys::EuCountry::Sweden) => Some(client::keysys::EUCountry::Sweden),
-        Some(epp_proto::keysys::EuCountry::Slovakia) => Some(client::keysys::EUCountry::Slovakia),
-        Some(epp_proto::keysys::EuCountry::Slovenia) => Some(client::keysys::EUCountry::Slovenia),
-        Some(epp_proto::keysys::EuCountry::Croatia) => Some(client::keysys::EUCountry::Croatia),
+        Ok(epp_proto::keysys::EuCountry::Poland) => Some(client::keysys::EUCountry::Poland),
+        Ok(epp_proto::keysys::EuCountry::Portugal) => Some(client::keysys::EUCountry::Portugal),
+        Ok(epp_proto::keysys::EuCountry::Romania) => Some(client::keysys::EUCountry::Romania),
+        Ok(epp_proto::keysys::EuCountry::Sweden) => Some(client::keysys::EUCountry::Sweden),
+        Ok(epp_proto::keysys::EuCountry::Slovakia) => Some(client::keysys::EUCountry::Slovakia),
+        Ok(epp_proto::keysys::EuCountry::Slovenia) => Some(client::keysys::EUCountry::Slovenia),
+        Ok(epp_proto::keysys::EuCountry::Croatia) => Some(client::keysys::EUCountry::Croatia),
     }
 }
 
 fn map_us_purpose(us_purpose: i32) -> Option<client::keysys::USPurpose> {
-    match epp_proto::keysys::UsPurpose::from_i32(us_purpose) {
-        None => None,
-        Some(epp_proto::keysys::UsPurpose::UnknownPurpose) => None,
-        Some(epp_proto::keysys::UsPurpose::Business) => Some(client::keysys::USPurpose::Business),
-        Some(epp_proto::keysys::UsPurpose::Personal) => Some(client::keysys::USPurpose::Personal),
-        Some(epp_proto::keysys::UsPurpose::NonProfit) => Some(client::keysys::USPurpose::NonProfit),
-        Some(epp_proto::keysys::UsPurpose::Educational) => {
+    match epp_proto::keysys::UsPurpose::try_from(us_purpose) {
+        Err(_) => None,
+        Ok(epp_proto::keysys::UsPurpose::UnknownPurpose) => None,
+        Ok(epp_proto::keysys::UsPurpose::Business) => Some(client::keysys::USPurpose::Business),
+        Ok(epp_proto::keysys::UsPurpose::Personal) => Some(client::keysys::USPurpose::Personal),
+        Ok(epp_proto::keysys::UsPurpose::NonProfit) => Some(client::keysys::USPurpose::NonProfit),
+        Ok(epp_proto::keysys::UsPurpose::Educational) => {
             Some(client::keysys::USPurpose::Educational)
         }
-        Some(epp_proto::keysys::UsPurpose::UsGovernment) => {
+        Ok(epp_proto::keysys::UsPurpose::UsGovernment) => {
             Some(client::keysys::USPurpose::Government)
         }
     }
 }
 
 fn map_us_category(us_category: i32) -> Option<client::keysys::USCategory> {
-    match epp_proto::keysys::UsCategory::from_i32(us_category) {
-        None => None,
-        Some(epp_proto::keysys::UsCategory::UnknownCategory) => None,
-        Some(epp_proto::keysys::UsCategory::UsCitizen) => Some(client::keysys::USCategory::Citizen),
-        Some(epp_proto::keysys::UsCategory::UsPermanentResident) => {
+    match epp_proto::keysys::UsCategory::try_from(us_category) {
+        Err(_) => None,
+        Ok(epp_proto::keysys::UsCategory::UnknownCategory) => None,
+        Ok(epp_proto::keysys::UsCategory::UsCitizen) => Some(client::keysys::USCategory::Citizen),
+        Ok(epp_proto::keysys::UsCategory::UsPermanentResident) => {
             Some(client::keysys::USCategory::PermanentResident)
         }
-        Some(epp_proto::keysys::UsCategory::UsOrganisation) => {
+        Ok(epp_proto::keysys::UsCategory::UsOrganisation) => {
             Some(client::keysys::USCategory::USOrganisation)
         }
-        Some(epp_proto::keysys::UsCategory::OfficeOrFacility) => {
+        Ok(epp_proto::keysys::UsCategory::OfficeOrFacility) => {
             Some(client::keysys::USCategory::OfficeOrFacility)
         }
-        Some(epp_proto::keysys::UsCategory::RegularActivity) => {
+        Ok(epp_proto::keysys::UsCategory::RegularActivity) => {
             Some(client::keysys::USCategory::RegularActivity)
         }
     }
 }
 
 fn map_ca_legal_type(legal_type: i32) -> Option<client::keysys::CALegalType> {
-    match epp_proto::keysys::CaLegalType::from_i32(legal_type) {
-        None => None,
-        Some(epp_proto::keysys::CaLegalType::UnknownCaLegalType) => None,
-        Some(epp_proto::keysys::CaLegalType::AboriginalPeoples) => {
+    match epp_proto::keysys::CaLegalType::try_from(legal_type) {
+        Err(_) => None,
+        Ok(epp_proto::keysys::CaLegalType::UnknownCaLegalType) => None,
+        Ok(epp_proto::keysys::CaLegalType::AboriginalPeoples) => {
             Some(client::keysys::CALegalType::AboriginalPeoples)
         }
-        Some(epp_proto::keysys::CaLegalType::CanadianUnincorporatedAssociation) => {
+        Ok(epp_proto::keysys::CaLegalType::CanadianUnincorporatedAssociation) => {
             Some(client::keysys::CALegalType::CanadianUnincorporatedAssociation)
         }
-        Some(epp_proto::keysys::CaLegalType::CanadianCorporation) => {
+        Ok(epp_proto::keysys::CaLegalType::CanadianCorporation) => {
             Some(client::keysys::CALegalType::Corporation)
         }
-        Some(epp_proto::keysys::CaLegalType::CanadianCitizen) => {
+        Ok(epp_proto::keysys::CaLegalType::CanadianCitizen) => {
             Some(client::keysys::CALegalType::Citizen)
         }
-        Some(epp_proto::keysys::CaLegalType::CanadianEducationalInstitution) => {
+        Ok(epp_proto::keysys::CaLegalType::CanadianEducationalInstitution) => {
             Some(client::keysys::CALegalType::CanadianEducationalInstitution)
         }
-        Some(epp_proto::keysys::CaLegalType::CanadianGovernment) => {
+        Ok(epp_proto::keysys::CaLegalType::CanadianGovernment) => {
             Some(client::keysys::CALegalType::Government)
         }
-        Some(epp_proto::keysys::CaLegalType::CanadianHospital) => {
+        Ok(epp_proto::keysys::CaLegalType::CanadianHospital) => {
             Some(client::keysys::CALegalType::CanadianHospital)
         }
-        Some(epp_proto::keysys::CaLegalType::IndianBand) => {
+        Ok(epp_proto::keysys::CaLegalType::IndianBand) => {
             Some(client::keysys::CALegalType::IndianBand)
         }
-        Some(epp_proto::keysys::CaLegalType::CanadianLibraryArchiveMuseum) => {
+        Ok(epp_proto::keysys::CaLegalType::CanadianLibraryArchiveMuseum) => {
             Some(client::keysys::CALegalType::CanadianLibraryArchiveMuseum)
         }
-        Some(epp_proto::keysys::CaLegalType::LegalRepOfCanadianCitizenOrPermanentResident) => {
+        Ok(epp_proto::keysys::CaLegalType::LegalRepOfCanadianCitizenOrPermanentResident) => {
             Some(client::keysys::CALegalType::LegalRepOfCanadianCitizenOrPermanentResident)
         }
-        Some(epp_proto::keysys::CaLegalType::TheQueen) => {
+        Ok(epp_proto::keysys::CaLegalType::TheQueen) => {
             Some(client::keysys::CALegalType::TheQueen)
         }
-        Some(epp_proto::keysys::CaLegalType::OfficialMark) => {
+        Ok(epp_proto::keysys::CaLegalType::OfficialMark) => {
             Some(client::keysys::CALegalType::OfficialMark)
         }
-        Some(epp_proto::keysys::CaLegalType::CanadianPoliticalParty) => {
+        Ok(epp_proto::keysys::CaLegalType::CanadianPoliticalParty) => {
             Some(client::keysys::CALegalType::CanadianPoliticalParty)
         }
-        Some(epp_proto::keysys::CaLegalType::Partnership) => {
+        Ok(epp_proto::keysys::CaLegalType::Partnership) => {
             Some(client::keysys::CALegalType::Partnership)
         }
-        Some(epp_proto::keysys::CaLegalType::CanadianPermanentResident) => {
+        Ok(epp_proto::keysys::CaLegalType::CanadianPermanentResident) => {
             Some(client::keysys::CALegalType::PermanentResident)
         }
-        Some(epp_proto::keysys::CaLegalType::TradeMark) => {
+        Ok(epp_proto::keysys::CaLegalType::TradeMark) => {
             Some(client::keysys::CALegalType::TradeMark)
         }
-        Some(epp_proto::keysys::CaLegalType::TradeUnion) => {
+        Ok(epp_proto::keysys::CaLegalType::TradeUnion) => {
             Some(client::keysys::CALegalType::TradeUnion)
         }
-        Some(epp_proto::keysys::CaLegalType::Trust) => Some(client::keysys::CALegalType::Trust),
+        Ok(epp_proto::keysys::CaLegalType::Trust) => Some(client::keysys::CALegalType::Trust),
     }
 }
 
@@ -383,20 +383,20 @@ impl TryFrom<epp_proto::keysys::DomainCreate> for client::keysys::DomainCreate {
                             abuse_contact: t.abuse_contact,
                             general_request: t.general_contact,
                             holder_person: t.holder_person,
-                            accept_trustee_tac: match epp_proto::keysys::DeTrustee::from_i32(
+                            accept_trustee_tac: match epp_proto::keysys::DeTrustee::try_from(
                                 t.trustee,
                             ) {
-                                None => client::keysys::DETrustee::None,
-                                Some(epp_proto::keysys::DeTrustee::None) => {
+                                Err(_) => client::keysys::DETrustee::None,
+                                Ok(epp_proto::keysys::DeTrustee::None) => {
                                     client::keysys::DETrustee::None
                                 }
-                                Some(epp_proto::keysys::DeTrustee::Disable) => {
+                                Ok(epp_proto::keysys::DeTrustee::Disable) => {
                                     client::keysys::DETrustee::None
                                 }
-                                Some(epp_proto::keysys::DeTrustee::Monthly) => {
+                                Ok(epp_proto::keysys::DeTrustee::Monthly) => {
                                     client::keysys::DETrustee::Monthly
                                 }
-                                Some(epp_proto::keysys::DeTrustee::Annually) => {
+                                Ok(epp_proto::keysys::DeTrustee::Annually) => {
                                     client::keysys::DETrustee::Annually
                                 }
                             },
@@ -512,17 +512,17 @@ impl From<epp_proto::keysys::DomainUpdate> for client::keysys::DomainUpdate {
                         abuse_contact: t.abuse_contact,
                         general_request: t.general_contact,
                         holder_person: t.holder_person,
-                        accept_trustee_tac: match epp_proto::keysys::DeTrustee::from_i32(t.trustee)
+                        accept_trustee_tac: match epp_proto::keysys::DeTrustee::try_from(t.trustee)
                         {
-                            None => None,
-                            Some(epp_proto::keysys::DeTrustee::None) => None,
-                            Some(epp_proto::keysys::DeTrustee::Monthly) => {
+                            Err(_) => None,
+                            Ok(epp_proto::keysys::DeTrustee::None) => None,
+                            Ok(epp_proto::keysys::DeTrustee::Monthly) => {
                                 Some(client::keysys::DETrustee::Monthly)
                             }
-                            Some(epp_proto::keysys::DeTrustee::Annually) => {
+                            Ok(epp_proto::keysys::DeTrustee::Annually) => {
                                 Some(client::keysys::DETrustee::Annually)
                             }
-                            Some(epp_proto::keysys::DeTrustee::Disable) => {
+                            Ok(epp_proto::keysys::DeTrustee::Disable) => {
                                 Some(client::keysys::DETrustee::None)
                             }
                         },

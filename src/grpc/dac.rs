@@ -1,8 +1,9 @@
+use std::convert::TryFrom;
 use super::{client, epp_proto};
 use chrono::prelude::*;
 
 pub fn env_from_i32(from: i32) -> Option<client::dac::DACEnv> {
-    epp_proto::dac::Environment::from_i32(from).map(|e| match e {
+    epp_proto::dac::Environment::try_from(from).ok().map(|e| match e {
         epp_proto::dac::Environment::RealTime => client::dac::DACEnv::RealTime,
         epp_proto::dac::Environment::TimeDelay => client::dac::DACEnv::TimeDelay,
     })

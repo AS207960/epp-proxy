@@ -3,7 +3,7 @@
 use super::client;
 use crate::grpc::utils::proto_to_chrono;
 use futures::sink::SinkExt;
-use std::convert::TryInto;
+use std::convert::{TryFrom, TryInto};
 
 mod contact;
 mod dac;
@@ -242,20 +242,20 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                 &req.name,
                 req.auth_info.as_deref(),
                 req.hosts.map(
-                    |h| match epp_proto::domain::DomainHostsType::from_i32(h.hosts) {
-                        Some(epp_proto::domain::DomainHostsType::All) => {
+                    |h| match epp_proto::domain::DomainHostsType::try_from(h.hosts) {
+                        Ok(epp_proto::domain::DomainHostsType::All) => {
                             client::domain::InfoHost::All
                         }
-                        Some(epp_proto::domain::DomainHostsType::Delegated) => {
+                        Ok(epp_proto::domain::DomainHostsType::Delegated) => {
                             client::domain::InfoHost::Delegated
                         }
-                        Some(epp_proto::domain::DomainHostsType::Subordinate) => {
+                        Ok(epp_proto::domain::DomainHostsType::Subordinate) => {
                             client::domain::InfoHost::Subordinate
                         }
-                        Some(epp_proto::domain::DomainHostsType::None) => {
+                        Ok(epp_proto::domain::DomainHostsType::None) => {
                             client::domain::InfoHost::None
                         }
-                        None => client::domain::InfoHost::All,
+                        Err(_) => client::domain::InfoHost::All,
                     },
                 ),
                 match req.launch_info {
@@ -301,17 +301,17 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                                 Ok(client::host::Address {
                                     address: addr.address.clone(),
                                     ip_version:
-                                        match epp_proto::common::ip_address::IpVersion::from_i32(
+                                        match epp_proto::common::ip_address::IpVersion::try_from(
                                             addr.r#type,
                                         ) {
-                                            Some(
+                                            Ok(
                                                 epp_proto::common::ip_address::IpVersion::IPv4,
                                             ) => client::host::AddressVersion::IPv4,
-                                            Some(
+                                            Ok(
                                                 epp_proto::common::ip_address::IpVersion::IPv6,
                                             ) => client::host::AddressVersion::IPv6,
-                                            None
-                                            | Some(
+                                            Err(_)
+                                            | Ok(
                                                 epp_proto::common::ip_address::IpVersion::Unknown,
                                             ) => {
                                                 return Err(tonic::Status::invalid_argument(
@@ -488,17 +488,17 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                                 Ok(client::host::Address {
                                     address: addr.address.clone(),
                                     ip_version:
-                                        match epp_proto::common::ip_address::IpVersion::from_i32(
+                                        match epp_proto::common::ip_address::IpVersion::try_from(
                                             addr.r#type,
                                         ) {
-                                            Some(
+                                            Ok(
                                                 epp_proto::common::ip_address::IpVersion::IPv4,
                                             ) => client::host::AddressVersion::IPv4,
-                                            Some(
+                                            Ok(
                                                 epp_proto::common::ip_address::IpVersion::IPv6,
                                             ) => client::host::AddressVersion::IPv6,
-                                            None
-                                            | Some(
+                                            Err(_)
+                                            | Ok(
                                                 epp_proto::common::ip_address::IpVersion::Unknown,
                                             ) => {
                                                 return Err(tonic::Status::invalid_argument(
@@ -977,14 +977,14 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
             .map(|a| {
                 Ok(client::host::Address {
                     address: a.address,
-                    ip_version: match epp_proto::common::ip_address::IpVersion::from_i32(a.r#type) {
-                        Some(epp_proto::common::ip_address::IpVersion::IPv4) => {
+                    ip_version: match epp_proto::common::ip_address::IpVersion::try_from(a.r#type) {
+                        Ok(epp_proto::common::ip_address::IpVersion::IPv4) => {
                             client::host::AddressVersion::IPv4
                         }
-                        Some(epp_proto::common::ip_address::IpVersion::IPv6) => {
+                        Ok(epp_proto::common::ip_address::IpVersion::IPv6) => {
                             client::host::AddressVersion::IPv6
                         }
-                        None | Some(epp_proto::common::ip_address::IpVersion::Unknown) => {
+                        Err(_) | Ok(epp_proto::common::ip_address::IpVersion::Unknown) => {
                             return Err(tonic::Status::invalid_argument(
                                 "unknown IP address version",
                             ));
@@ -1046,14 +1046,14 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let map_addr = |addr: epp_proto::common::IpAddress| {
             Ok(client::host::Address {
                 address: addr.address,
-                ip_version: match epp_proto::common::ip_address::IpVersion::from_i32(addr.r#type) {
-                    Some(epp_proto::common::ip_address::IpVersion::IPv4) => {
+                ip_version: match epp_proto::common::ip_address::IpVersion::try_from(addr.r#type) {
+                    Ok(epp_proto::common::ip_address::IpVersion::IPv4) => {
                         client::host::AddressVersion::IPv4
                     }
-                    Some(epp_proto::common::ip_address::IpVersion::IPv6) => {
+                    Ok(epp_proto::common::ip_address::IpVersion::IPv6) => {
                         client::host::AddressVersion::IPv6
                     }
-                    None | Some(epp_proto::common::ip_address::IpVersion::Unknown) => {
+                    Err(_) | Ok(epp_proto::common::ip_address::IpVersion::Unknown) => {
                         return Err(tonic::Status::invalid_argument(
                             "unknown IP address version",
                         ));

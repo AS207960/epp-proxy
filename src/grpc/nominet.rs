@@ -1,3 +1,4 @@
+use std::convert::TryFrom;
 use super::super::client;
 use super::epp_proto;
 
@@ -151,25 +152,25 @@ impl From<client::nominet::DomainInfo> for epp_proto::nominet_ext::DomainInfo {
 impl From<epp_proto::nominet_ext::DomainCreate> for client::nominet::DomainCreate {
     fn from(value: epp_proto::nominet_ext::DomainCreate) -> Self {
         client::nominet::DomainCreate {
-            first_bill: match epp_proto::nominet_ext::BillType::from_i32(value.first_bill) {
-                Some(epp_proto::nominet_ext::BillType::BillRegistrar) => {
+            first_bill: match epp_proto::nominet_ext::BillType::try_from(value.first_bill) {
+                Ok(epp_proto::nominet_ext::BillType::BillRegistrar) => {
                     Some(client::nominet::BillType::BillRegistrar)
                 }
-                Some(epp_proto::nominet_ext::BillType::BillCustomer) => {
+                Ok(epp_proto::nominet_ext::BillType::BillCustomer) => {
                     Some(client::nominet::BillType::BillCustomer)
                 }
-                Some(epp_proto::nominet_ext::BillType::Unspecified) => None,
-                None => None,
+                Ok(epp_proto::nominet_ext::BillType::Unspecified) => None,
+                Err(_) => None,
             },
-            recur_bill: match epp_proto::nominet_ext::BillType::from_i32(value.recur_bill) {
-                Some(epp_proto::nominet_ext::BillType::BillRegistrar) => {
+            recur_bill: match epp_proto::nominet_ext::BillType::try_from(value.recur_bill) {
+                Ok(epp_proto::nominet_ext::BillType::BillRegistrar) => {
                     Some(client::nominet::BillType::BillRegistrar)
                 }
-                Some(epp_proto::nominet_ext::BillType::BillCustomer) => {
+                Ok(epp_proto::nominet_ext::BillType::BillCustomer) => {
                     Some(client::nominet::BillType::BillCustomer)
                 }
-                Some(epp_proto::nominet_ext::BillType::Unspecified) => None,
-                None => None,
+                Ok(epp_proto::nominet_ext::BillType::Unspecified) => None,
+                Err(_) => None,
             },
             auto_bill: value.auto_bill,
             next_bill: value.next_bill,
@@ -184,25 +185,25 @@ impl From<epp_proto::nominet_ext::DomainCreate> for client::nominet::DomainCreat
 impl From<epp_proto::nominet_ext::DomainUpdate> for client::nominet::DomainUpdate {
     fn from(value: epp_proto::nominet_ext::DomainUpdate) -> Self {
         client::nominet::DomainUpdate {
-            first_bill: match epp_proto::nominet_ext::BillType::from_i32(value.first_bill) {
-                Some(epp_proto::nominet_ext::BillType::BillRegistrar) => {
+            first_bill: match epp_proto::nominet_ext::BillType::try_from(value.first_bill) {
+                Ok(epp_proto::nominet_ext::BillType::BillRegistrar) => {
                     Some(client::nominet::BillType::BillRegistrar)
                 }
-                Some(epp_proto::nominet_ext::BillType::BillCustomer) => {
+                Ok(epp_proto::nominet_ext::BillType::BillCustomer) => {
                     Some(client::nominet::BillType::BillCustomer)
                 }
-                Some(epp_proto::nominet_ext::BillType::Unspecified) => None,
-                None => None,
+                Ok(epp_proto::nominet_ext::BillType::Unspecified) => None,
+                Err(_) => None,
             },
-            recur_bill: match epp_proto::nominet_ext::BillType::from_i32(value.recur_bill) {
-                Some(epp_proto::nominet_ext::BillType::BillRegistrar) => {
+            recur_bill: match epp_proto::nominet_ext::BillType::try_from(value.recur_bill) {
+                Ok(epp_proto::nominet_ext::BillType::BillRegistrar) => {
                     Some(client::nominet::BillType::BillRegistrar)
                 }
-                Some(epp_proto::nominet_ext::BillType::BillCustomer) => {
+                Ok(epp_proto::nominet_ext::BillType::BillCustomer) => {
                     Some(client::nominet::BillType::BillCustomer)
                 }
-                Some(epp_proto::nominet_ext::BillType::Unspecified) => None,
-                None => None,
+                Ok(epp_proto::nominet_ext::BillType::Unspecified) => None,
+                Err(_) => None,
             },
             auto_bill: value.auto_bill,
             next_bill: value.next_bill,

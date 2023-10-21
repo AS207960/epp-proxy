@@ -1,8 +1,9 @@
+use std::convert::TryFrom;
 use super::super::client;
 use super::epp_proto;
 
 pub fn host_status_from_i32(from: i32) -> Option<client::host::Status> {
-    epp_proto::host::HostStatus::from_i32(from).map(|e| match e {
+    epp_proto::host::HostStatus::try_from(from).ok().map(|e| match e {
         epp_proto::host::HostStatus::ClientDeleteProhibited => {
             client::host::Status::ClientDeleteProhibited
         }

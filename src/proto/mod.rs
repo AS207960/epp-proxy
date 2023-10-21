@@ -1135,9 +1135,10 @@ impl<'de> serde::de::Visitor<'de> for DateTimeVisitor {
     {
         match value.parse::<DateTime<Utc>>() {
             Ok(v) => Ok(v.with_timezone(&Utc)),
-            Err(_) => match Utc.datetime_from_str(value, "%FT%T%.f") {
-                Ok(t) => Ok(t),
-                Err(_) => Utc.datetime_from_str(value, "%FT%T").map_err(E::custom),
+            Err(_) => match NaiveDateTime::parse_from_str(value, "%FT%T%.f") {
+                Ok(t) => Ok(DateTime::from_naive_utc_and_offset(t, Utc)),
+                Err(_) => NaiveDateTime::parse_from_str(value, "%FT%T").map_err(E::custom)
+                    .map(|t| DateTime::from_naive_utc_and_offset(t, Utc)),
             },
         }
     }

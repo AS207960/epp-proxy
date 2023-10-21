@@ -1,3 +1,4 @@
+use std::convert::TryFrom;
 use super::super::client;
 use super::epp_proto;
 
@@ -125,12 +126,12 @@ pub fn map_command_response<T>(
 }
 
 pub fn period_unit_from_i32(from: i32) -> client::PeriodUnit {
-    match epp_proto::common::period::Unit::from_i32(from) {
-        Some(e) => match e {
+    match epp_proto::common::period::Unit::try_from(from) {
+        Ok(e) => match e {
             epp_proto::common::period::Unit::Months => client::PeriodUnit::Months,
             epp_proto::common::period::Unit::Years => client::PeriodUnit::Years,
         },
-        None => client::PeriodUnit::Years,
+        Err(_) => client::PeriodUnit::Years,
     }
 }
 

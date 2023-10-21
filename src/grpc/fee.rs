@@ -3,8 +3,8 @@ use super::epp_proto;
 use std::convert::TryFrom;
 
 fn fee_command_from_i32(from: i32) -> client::fee::Command {
-    match epp_proto::fee::Command::from_i32(from) {
-        Some(e) => match e {
+    match epp_proto::fee::Command::try_from(from) {
+        Ok(e) => match e {
             epp_proto::fee::Command::Create => client::fee::Command::Create,
             epp_proto::fee::Command::Renew => client::fee::Command::Renew,
             epp_proto::fee::Command::Transfer => client::fee::Command::Transfer,
@@ -15,7 +15,7 @@ fn fee_command_from_i32(from: i32) -> client::fee::Command {
             epp_proto::fee::Command::Info => client::fee::Command::Info,
             epp_proto::fee::Command::Custom => client::fee::Command::Custom,
         },
-        None => client::fee::Command::Create,
+        Err(_) => client::fee::Command::Create,
     }
 }
 
@@ -184,19 +184,19 @@ impl TryFrom<epp_proto::fee::DonutsFeeData> for client::fee::DonutsFeeData {
                         },
                         fee_type: match f.fee_type {
                             Some(f) => client::fee::DonutsFeeType {
-                                fee_type: match epp_proto::fee::donuts_fee_type::FeeTypes::from_i32(
+                                fee_type: match epp_proto::fee::donuts_fee_type::FeeTypes::try_from(
                                     f.fee_type,
                                 ) {
-                                    Some(epp_proto::fee::donuts_fee_type::FeeTypes::Fee) => {
+                                    Ok(epp_proto::fee::donuts_fee_type::FeeTypes::Fee) => {
                                         client::fee::DonutsFeeTypes::Fee
                                     }
-                                    Some(epp_proto::fee::donuts_fee_type::FeeTypes::Price) => {
+                                    Ok(epp_proto::fee::donuts_fee_type::FeeTypes::Price) => {
                                         client::fee::DonutsFeeTypes::Price
                                     }
-                                    Some(epp_proto::fee::donuts_fee_type::FeeTypes::Custom) => {
+                                    Ok(epp_proto::fee::donuts_fee_type::FeeTypes::Custom) => {
                                         client::fee::DonutsFeeTypes::Custom
                                     }
-                                    None => {
+                                    Err(_) => {
                                         return Err(tonic::Status::invalid_argument(
                                             "Unknown fee type",
                                         ))
@@ -238,15 +238,15 @@ impl From<epp_proto::fee::FeeAgreement> for client::fee::FeeAgreement {
                     description: f.description,
                     refundable: f.refundable,
                     grace_period: f.grace_period,
-                    applied: match epp_proto::fee::Applied::from_i32(f.applied) {
-                        Some(e) => match e {
+                    applied: match epp_proto::fee::Applied::try_from(f.applied) {
+                        Ok(e) => match e {
                             epp_proto::fee::Applied::Immediate => client::fee::Applied::Immediate,
                             epp_proto::fee::Applied::Delayed => client::fee::Applied::Delayed,
                             epp_proto::fee::Applied::Unspecified => {
                                 client::fee::Applied::Unspecified
                             }
                         },
-                        None => client::fee::Applied::Unspecified,
+                        Err(_) => client::fee::Applied::Unspecified,
                     },
                 })
                 .collect(),

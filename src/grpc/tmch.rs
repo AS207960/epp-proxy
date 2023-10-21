@@ -133,30 +133,30 @@ impl From<client::tmch::BalanceData> for epp_proto::tmch::BalanceData {
 impl From<epp_proto::tmch::Document> for client::tmch::Document {
     fn from(res: epp_proto::tmch::Document) -> Self {
         client::tmch::Document {
-            class: match epp_proto::tmch::DocumentClass::from_i32(res.document_class) {
-                Some(epp_proto::tmch::DocumentClass::Other) => client::tmch::DocumentClass::Other,
-                None => client::tmch::DocumentClass::Other,
-                Some(epp_proto::tmch::DocumentClass::LicenseeDeclaration) => {
+            class: match epp_proto::tmch::DocumentClass::try_from(res.document_class) {
+                Ok(epp_proto::tmch::DocumentClass::Other) => client::tmch::DocumentClass::Other,
+                Err(_) => client::tmch::DocumentClass::Other,
+                Ok(epp_proto::tmch::DocumentClass::LicenseeDeclaration) => {
                     client::tmch::DocumentClass::LicenseeDeclaration
                 }
-                Some(epp_proto::tmch::DocumentClass::AssigneeDeclaration) => {
+                Ok(epp_proto::tmch::DocumentClass::AssigneeDeclaration) => {
                     client::tmch::DocumentClass::AssigneeDeclaration
                 }
-                Some(epp_proto::tmch::DocumentClass::DeclarationProofOfUseOneSample) => {
+                Ok(epp_proto::tmch::DocumentClass::DeclarationProofOfUseOneSample) => {
                     client::tmch::DocumentClass::DeclarationProofOfUseOneSample
                 }
-                Some(epp_proto::tmch::DocumentClass::OtherProofOfUse) => {
+                Ok(epp_proto::tmch::DocumentClass::OtherProofOfUse) => {
                     client::tmch::DocumentClass::OtherProofOfUse
                 }
-                Some(epp_proto::tmch::DocumentClass::CopyOfCourtOrder) => {
+                Ok(epp_proto::tmch::DocumentClass::CopyOfCourtOrder) => {
                     client::tmch::DocumentClass::CopyOfCourtOrder
                 }
             },
             file_name: res.file_name,
-            file_type: match epp_proto::tmch::FileType::from_i32(res.file_type) {
-                Some(epp_proto::tmch::FileType::Pdf) => client::tmch::FileType::Pdf,
-                None => client::tmch::FileType::Pdf,
-                Some(epp_proto::tmch::FileType::Jpg) => client::tmch::FileType::Jpg,
+            file_type: match epp_proto::tmch::FileType::try_from(res.file_type) {
+                Ok(epp_proto::tmch::FileType::Pdf) => client::tmch::FileType::Pdf,
+                Err(_) => client::tmch::FileType::Pdf,
+                Ok(epp_proto::tmch::FileType::Jpg) => client::tmch::FileType::Jpg,
             },
             contents: res.contents,
         }
@@ -166,20 +166,20 @@ impl From<epp_proto::tmch::Document> for client::tmch::Document {
 impl From<epp_proto::tmch::CaseDocument> for client::tmch::CaseDocument {
     fn from(res: epp_proto::tmch::CaseDocument) -> Self {
         client::tmch::CaseDocument {
-            class: match epp_proto::tmch::CourtDocumentClass::from_i32(res.document_class) {
-                Some(epp_proto::tmch::CourtDocumentClass::CourtOther) => {
+            class: match epp_proto::tmch::CourtDocumentClass::try_from(res.document_class) {
+                Ok(epp_proto::tmch::CourtDocumentClass::CourtOther) => {
                     client::tmch::CaseDocumentClass::Other
                 }
-                None => client::tmch::CaseDocumentClass::Other,
-                Some(epp_proto::tmch::CourtDocumentClass::CourtDecision) => {
+                Err(_) => client::tmch::CaseDocumentClass::Other,
+                Ok(epp_proto::tmch::CourtDocumentClass::CourtDecision) => {
                     client::tmch::CaseDocumentClass::CourtDecision
                 }
             },
             file_name: res.file_name,
-            file_type: match epp_proto::tmch::FileType::from_i32(res.file_type) {
-                Some(epp_proto::tmch::FileType::Pdf) => client::tmch::FileType::Pdf,
-                None => client::tmch::FileType::Pdf,
-                Some(epp_proto::tmch::FileType::Jpg) => client::tmch::FileType::Jpg,
+            file_type: match epp_proto::tmch::FileType::try_from(res.file_type) {
+                Ok(epp_proto::tmch::FileType::Pdf) => client::tmch::FileType::Pdf,
+                Err(_) => client::tmch::FileType::Pdf,
+                Ok(epp_proto::tmch::FileType::Jpg) => client::tmch::FileType::Jpg,
             },
             contents: res.contents,
         }

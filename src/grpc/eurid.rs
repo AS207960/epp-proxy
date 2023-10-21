@@ -1,3 +1,4 @@
+use std::convert::TryFrom;
 use super::super::client;
 use super::epp_proto;
 
@@ -12,15 +13,15 @@ fn i32_from_eurid_contact_type(from: client::eurid::ContactType) -> i32 {
 }
 
 fn eurid_contact_type_from_i32(from: i32) -> client::eurid::ContactType {
-    match epp_proto::eurid::ContactType::from_i32(from) {
-        Some(e) => match e {
+    match epp_proto::eurid::ContactType::try_from(from) {
+        Ok(e) => match e {
             epp_proto::eurid::ContactType::Registrant => client::eurid::ContactType::Registrant,
             epp_proto::eurid::ContactType::Tech => client::eurid::ContactType::Tech,
             epp_proto::eurid::ContactType::Billing => client::eurid::ContactType::Billing,
             epp_proto::eurid::ContactType::OnSite => client::eurid::ContactType::OnSite,
             epp_proto::eurid::ContactType::Reseller => client::eurid::ContactType::Reseller,
         },
-        None => client::eurid::ContactType::Registrant,
+        Err(_) => client::eurid::ContactType::Registrant,
     }
 }
 

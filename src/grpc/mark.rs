@@ -199,13 +199,13 @@ impl TryFrom<epp_proto::marks::Holder> for client::mark::Holder {
             voice: from.voice.map(Into::into),
             fax: from.fax.map(Into::into),
             email: from.email,
-            entitlement: match epp_proto::marks::Entitlement::from_i32(from.entitlement) {
-                None => client::mark::Entitlement::Owner,
-                Some(epp_proto::marks::Entitlement::Owner) => client::mark::Entitlement::Owner,
-                Some(epp_proto::marks::Entitlement::Licensee) => {
+            entitlement: match epp_proto::marks::Entitlement::try_from(from.entitlement) {
+                Err(_) => client::mark::Entitlement::Owner,
+                Ok(epp_proto::marks::Entitlement::Owner) => client::mark::Entitlement::Owner,
+                Ok(epp_proto::marks::Entitlement::Licensee) => {
                     client::mark::Entitlement::Licensee
                 }
-                Some(epp_proto::marks::Entitlement::Assignee) => {
+                Ok(epp_proto::marks::Entitlement::Assignee) => {
                     client::mark::Entitlement::Assignee
                 }
             },
@@ -252,13 +252,13 @@ impl TryFrom<epp_proto::marks::Contact> for client::mark::Contact {
             },
             fax: from.fax.map(Into::into),
             email: from.email,
-            contact_type: match epp_proto::marks::ContactType::from_i32(from.contact_type) {
-                None => client::mark::ContactType::Owner,
-                Some(epp_proto::marks::ContactType::OwnerContact) => {
+            contact_type: match epp_proto::marks::ContactType::try_from(from.contact_type) {
+                Err(_) => client::mark::ContactType::Owner,
+                Ok(epp_proto::marks::ContactType::OwnerContact) => {
                     client::mark::ContactType::Owner
                 }
-                Some(epp_proto::marks::ContactType::Agent) => client::mark::ContactType::Agent,
-                Some(epp_proto::marks::ContactType::ThirdParty) => {
+                Ok(epp_proto::marks::ContactType::Agent) => client::mark::ContactType::Agent,
+                Ok(epp_proto::marks::ContactType::ThirdParty) => {
                     client::mark::ContactType::ThirdParty
                 }
             },
