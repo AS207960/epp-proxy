@@ -35,9 +35,9 @@ fn send_msg(data: &tmch_proto::TMCHMessage, host: &str) -> Result<String, ()> {
 
 /// Main client struct for the TMCH client
 #[derive(Debug)]
-pub struct TMCHClient {
+pub struct TMCHClient<M: crate::metrics::Metrics> {
     log_storage: crate::StorageScoped,
-    metrics_registry: crate::metrics::ScopedMetrics,
+    metrics_registry: M,
     host: String,
     client_id: String,
     password: String,
@@ -45,11 +45,11 @@ pub struct TMCHClient {
     pipelining: bool,
     is_awaiting_response: bool,
     is_closing: bool,
-    router: outer_router::Router<router::Router, ()>,
+    router: outer_router::Router<router::Router, (), M>,
     tls_client: super::epp_like::tls_client::TLSClient,
 }
 
-impl super::Client for TMCHClient {
+impl<M: crate::metrics::Metrics + 'static> super::Client for TMCHClient<M> {
     // Starts up the TMCH client and returns the sending end of a tokio channel to inject
     // commands into the client to be processed
     fn start(
@@ -69,13 +69,13 @@ impl super::Client for TMCHClient {
     }
 }
 
-impl TMCHClient {
+impl<M: crate::metrics::Metrics + 'static> TMCHClient<M> {
     /// Creates a new TMCH client ready to be started
     ///
     /// # Arguments
     /// * `conf` - Configuration to use for this client
     pub async fn new<'a, C: Into<Option<&'a str>>>(
-        conf: super::ClientConf<'a, C>,
+        conf: super::ClientConf<'a, C, M>,
         pkcs11_engine: Option<crate::P11Engine>,
     ) -> std::io::Result<Self> {
         let tls_client =
@@ -117,7 +117,7 @@ impl TMCHClient {
                     futures::select! {
                         x = receiver.next() => {
                             match x {
-                                Some(x) => outer_router::Router::<router::Router, ()>::reject_request(x),
+                                Some(x) => outer_router::Router::<router::Router, (), M>::reject_request(x),
                                 None => {
                                     info!("All senders for {} dropped, exiting...", self.host);
                                     return
@@ -141,7 +141,7 @@ impl TMCHClient {
                     futures::select! {
                         x = receiver.next() => {
                             match x {
-                                Some(x) => outer_router::Router::<router::Router, ()>::reject_request(x),
+                                Some(x) => outer_router::Router::<router::Router, (), M>::reject_request(x),
                                 None => {
                                     info!("{}", exit_str);
                                     return
@@ -492,12 +492,12 @@ impl TMCHClient {
 
     async fn _send_command<
         W: std::marker::Unpin + tokio::io::AsyncWrite,
-        M: Into<Option<uuid::Uuid>>,
+        I: Into<Option<uuid::Uuid>>,
     >(
         &self,
         command: tmch_proto::TMCHCommandType,
         sock: &mut W,
-        message_id: M,
+        message_id: I,
     ) -> Result<uuid::Uuid, ()> {
         let message_id = match message_id.into() {
             Some(m) => m,
@@ -537,8 +537,8 @@ pub fn handle_logout(_client: &(), _req: &BlankRequest) -> router::HandleReqRetu
     Ok(tmch_proto::TMCHCommandType::Logout {})
 }
 
-pub fn handle_logout_response(
-    _response: tmch_proto::TMCHResponse, _metrics: &crate::metrics::ScopedMetrics
+pub fn handle_logout_response<M: crate::metrics::Metrics>(
+    _response: tmch_proto::TMCHResponse, _metrics: &M
 ) -> super::Response<()> {
     super::Response::Ok(())
 }

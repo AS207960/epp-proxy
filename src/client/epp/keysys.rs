@@ -449,12 +449,13 @@ mod domain_tests {
     </trID>
   </response>
 </epp>"#;
-        let res: super::super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
+        let res: super::super::proto::EPPMessage = xml_serde::from_str(XML_DATA.trim()).unwrap();
         let res = match res.message {
             super::super::proto::EPPMessageType::Response(r) => r,
             _ => unreachable!(),
         };
-        let data = super::super::domain::handle_info_response(*res).unwrap();
+        let data = super::super::domain::handle_info_response(
+            *res, &crate::metrics::DummyMetrics::default()).unwrap();
         assert_eq!(data.name, "fedi.monster");
         assert_eq!(data.registry_id, "19787813119534_DOMAIN-KEYSYS");
         assert_eq!(data.registrant, "P-AYI1850");

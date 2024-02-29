@@ -278,11 +278,11 @@ pub async fn setup_pkcs11_engine(hsm_conf_file: Option<&str>) -> Option<P11Engin
     }
 }
 
-pub async fn create_client(
+pub async fn create_client<M: metrics::Metrics<Subordinate = M> + 'static>(
     log_storage: StorageScoped,
     config: &ConfigFile,
     pkcs11_engine: &Option<P11Engine>,
-    metrics_registry: metrics::ScopedMetrics,
+    metrics_registry: M,
     keepalive: bool,
 ) -> Box<dyn client::Client> {
     let client_conf = client::ClientConf {

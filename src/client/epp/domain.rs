@@ -966,8 +966,8 @@ pub fn handle_check(client: &ServerFeatures, req: &CheckRequest) -> HandleReqRet
     ))
 }
 
-pub fn handle_check_response(
-    response: proto::EPPResponse, _metrics: &crate::metrics::ScopedMetrics
+pub fn handle_check_response<M: crate::metrics::Metrics>(
+    response: proto::EPPResponse, _metrics: &M
 ) -> Response<CheckResponse> {
     let fee_check = match &response.extension {
         Some(ext) => {
@@ -1245,8 +1245,8 @@ pub fn handle_trademark_check(
     ))
 }
 
-pub fn handle_claims_check_response(
-    response: proto::EPPResponse, _metrics: &crate::metrics::ScopedMetrics
+pub fn handle_claims_check_response<M: crate::metrics::Metrics>(
+    response: proto::EPPResponse, _metrics: &M
 ) -> Response<ClaimsCheckResponse> {
     let claims_check = match response.extension {
         Some(ext) => {
@@ -1337,8 +1337,8 @@ pub fn handle_info(client: &ServerFeatures, req: &InfoRequest) -> HandleReqRetur
     ))
 }
 
-pub fn handle_info_response(
-    response: proto::EPPResponse, _metrics: &crate::metrics::ScopedMetrics
+pub fn handle_info_response<M: crate::metrics::Metrics>(
+    response: proto::EPPResponse, _metrics: &M
 ) -> Response<InfoResponse> {
     match response.data {
         Some(value) => match value.value {
@@ -1463,8 +1463,12 @@ pub fn handle_create(
     }
 
     if let Some(eurid_data) = &req.eurid_data {
-        if client.eurid_domain_support {
-            exts.push(proto::EPPCommandExtensionType::EURIDDomainCreate(
+        if client.eurid_domain_26_support {
+            exts.push(proto::EPPCommandExtensionType::EURIDDomain26Create(
+                eurid_data.into(),
+            ))
+        } else if client.eurid_domain_25_support {
+            exts.push(proto::EPPCommandExtensionType::EURIDDomain25Create(
                 eurid_data.into(),
             ))
         } else {
@@ -1907,8 +1911,8 @@ pub fn handle_create(
     ))
 }
 
-pub fn handle_create_response(
-    response: proto::EPPResponse, _metrics: &crate::metrics::ScopedMetrics
+pub fn handle_create_response<M: crate::metrics::Metrics>(
+    response: proto::EPPResponse, _metrics: &M
 ) -> Response<CreateResponse> {
     let pending = response.is_pending();
     match response.data {
@@ -1948,8 +1952,12 @@ pub fn handle_delete(
     let mut ext = vec![];
 
     if let Some(eurid_data) = &req.eurid_data {
-        if client.eurid_domain_support {
-            ext.push(proto::EPPCommandExtensionType::EURIDDomainDelete(
+        if client.eurid_domain_26_support {
+            ext.push(proto::EPPCommandExtensionType::EURIDDomain26Delete(
+                eurid_data.into(),
+            ))
+        } else if client.eurid_domain_25_support {
+            ext.push(proto::EPPCommandExtensionType::EURIDDomain25Delete(
                 eurid_data.into(),
             ))
         } else {
@@ -2005,8 +2013,8 @@ pub fn handle_delete(
     ))
 }
 
-pub fn handle_delete_response(
-    response: proto::EPPResponse, _metrics: &crate::metrics::ScopedMetrics
+pub fn handle_delete_response<M: crate::metrics::Metrics>(
+    response: proto::EPPResponse, _metrics: &M
 ) -> Response<DeleteResponse> {
     let fee_data = match &response.extension {
         Some(ext) => {
@@ -2321,8 +2329,12 @@ pub fn handle_update(
     }
 
     if let Some(eurid_data) = &req.eurid_data {
-        if client.eurid_domain_support {
-            exts.push(proto::EPPCommandExtensionType::EURIDDomainUpdate(
+        if client.eurid_domain_26_support {
+            exts.push(proto::EPPCommandExtensionType::EURIDDomain26Update(
+                eurid_data.into(),
+            ))
+        } else if client.eurid_domain_25_support {
+            exts.push(proto::EPPCommandExtensionType::EURIDDomain25Update(
                 eurid_data.into(),
             ))
         } else {
@@ -2787,8 +2799,8 @@ pub fn handle_verisign_sync(
     ))
 }
 
-pub fn handle_update_response(
-    response: proto::EPPResponse, _metrics: &crate::metrics::ScopedMetrics
+pub fn handle_update_response<M: crate::metrics::Metrics>(
+    response: proto::EPPResponse, _metrics: &M
 ) -> Response<UpdateResponse> {
     let fee_data = match &response.extension {
         Some(ext) => {
@@ -2921,8 +2933,8 @@ pub fn handle_renew(client: &ServerFeatures, req: &RenewRequest) -> HandleReqRet
     ))
 }
 
-pub fn handle_renew_response(
-    response: proto::EPPResponse, _metrics: &crate::metrics::ScopedMetrics
+pub fn handle_renew_response<M: crate::metrics::Metrics>(
+    response: proto::EPPResponse, _metrics: &M
 ) -> Response<RenewResponse> {
     let pending = response.is_pending();
     match response.data {
@@ -3054,8 +3066,12 @@ pub fn handle_transfer_request(
     super::fee::handle_donuts_fee_agreement(client, &req.donuts_fee_agreement, &mut ext)?;
 
     if let Some(eurid_data) = &req.eurid_data {
-        if client.eurid_domain_support {
-            ext.push(proto::EPPCommandExtensionType::EURIDDomainTransfer(
+        if client.eurid_domain_26_support {
+            ext.push(proto::EPPCommandExtensionType::EURIDDomain26Transfer(
+                eurid_data.into(),
+            ))
+        } if client.eurid_domain_25_support {
+            ext.push(proto::EPPCommandExtensionType::EURIDDomain25Transfer(
                 eurid_data.into(),
             ))
         } else {
@@ -3082,7 +3098,10 @@ pub fn handle_transfer_cancel(
     if client.isnic_contact_supported {
         return Err(Err(Error::Unsupported));
     }
-    if client.eurid_domain_support {
+    if client.eurid_domain_26_support {
+        return Err(Err(Error::Unsupported));
+    }
+    if client.eurid_domain_25_support {
         return Err(Err(Error::Unsupported));
     }
 
@@ -3128,7 +3147,10 @@ pub fn handle_transfer_accept(
     if client.isnic_contact_supported {
         return Err(Err(Error::Unsupported));
     }
-    if client.eurid_domain_support {
+    if client.eurid_domain_26_support {
+        return Err(Err(Error::Unsupported));
+    }
+    if client.eurid_domain_25_support {
         return Err(Err(Error::Unsupported));
     }
 
@@ -3174,7 +3196,10 @@ pub fn handle_transfer_reject(
     if client.isnic_contact_supported {
         return Err(Err(Error::Unsupported));
     }
-    if client.eurid_domain_support {
+    if client.eurid_domain_26_support {
+        return Err(Err(Error::Unsupported));
+    }
+    if client.eurid_domain_25_support {
         return Err(Err(Error::Unsupported));
     }
 
@@ -3211,8 +3236,8 @@ pub fn handle_transfer_reject(
     ))
 }
 
-pub fn handle_transfer_response(
-    response: proto::EPPResponse, _metrics: &crate::metrics::ScopedMetrics
+pub fn handle_transfer_response<M: crate::metrics::Metrics>(
+    response: proto::EPPResponse, _metrics: &M
 ) -> Response<TransferResponse> {
     let pending = response.is_pending();
     match response.data {
@@ -3261,12 +3286,13 @@ mod domain_tests {
     </trID>
   </response>
 </epp>"#;
-        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
+        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA.trim()).unwrap();
         let res = match res.message {
             super::proto::EPPMessageType::Response(r) => r,
             _ => unreachable!(),
         };
-        let data = super::handle_claims_check_response(*res).unwrap();
+        let data = super::handle_claims_check_response(
+            *res, &crate::metrics::DummyMetrics::default()).unwrap();
         assert!(data.exists);
         assert_eq!(data.claims_key.len(), 2);
         let claims_key_1 = data.claims_key.get(0).unwrap();
@@ -3327,12 +3353,13 @@ mod domain_tests {
     </trID>
   </response>
 </epp>"#;
-        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
+        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA.trim()).unwrap();
         let res = match res.message {
             super::proto::EPPMessageType::Response(r) => r,
             _ => unreachable!(),
         };
-        let data = super::handle_info_response(*res).unwrap();
+        let data = super::handle_info_response(
+            *res, &crate::metrics::DummyMetrics::default()).unwrap();
         assert_eq!(data.name, "domain.example");
         let launch_info = data.launch_info.unwrap();
         assert_eq!(
@@ -3380,12 +3407,13 @@ mod domain_tests {
     </trID>
   </response>
 </epp>"#;
-        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
+        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA.trim()).unwrap();
         let res = match res.message {
             super::proto::EPPMessageType::Response(r) => r,
             _ => unreachable!(),
         };
-        let data = super::handle_create_response(*res).unwrap();
+        let data = super::handle_create_response(
+            *res, &crate::metrics::DummyMetrics::default()).unwrap();
         assert!(data.pending);
         let launch_create = data.launch_create.unwrap();
         assert_eq!(
@@ -3431,12 +3459,13 @@ mod domain_tests {
     </trID>
   </response>
 </epp>"#;
-        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
+        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA.trim()).unwrap();
         let res = match res.message {
             super::proto::EPPMessageType::Response(r) => r,
             _ => unreachable!(),
         };
-        let data = super::handle_check_response(*res).unwrap();
+        let data = super::handle_check_response(
+            *res, &crate::metrics::DummyMetrics::default()).unwrap();
         assert!(!data.avail);
         assert_eq!(data.reason.unwrap(), "In use");
         let fee_check = data.fee_check.unwrap();

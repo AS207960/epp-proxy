@@ -249,6 +249,8 @@ impl From<client::domain::InfoResponse> for epp_proto::domain::DomainInfoReply {
                 suspended: d.suspended,
                 delayed: d.delayed,
                 seized: d.seized,
+                available_date: super::utils::chrono_to_proto(d.available_date),
+                scheduled_suspension_date: super::utils::chrono_to_proto(d.scheduled_suspension_date),
                 deletion_date: super::utils::chrono_to_proto(d.deletion_date),
                 on_site: d.on_site,
                 reseller: d.reseller,

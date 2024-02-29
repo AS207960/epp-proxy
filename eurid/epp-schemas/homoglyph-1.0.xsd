@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema targetNamespace="http://www.eurid.eu/xml/epp/homoglyph-1.0"
+        xmlns:homoglyph="http://www.eurid.eu/xml/epp/homoglyph-1.0"
+        xmlns:eppcom="urn:ietf:params:xml:ns:eppcom-1.0"
+        xmlns="http://www.w3.org/2001/XMLSchema"
+        elementFormDefault="qualified">
+
+  <!--
+  Import common element types.
+  -->
+  <import namespace="urn:ietf:params:xml:ns:eppcom-1.0"/>
+
+  <annotation>
+    <documentation>
+      Extensible Provisioning Protocol v1.0
+      EURid specific extension for displaying homoglyphs.
+    </documentation>
+  </annotation>
+
+  <!--
+  Child response elements.
+  -->
+  <element name="chkData" type="homoglyph:chkDataType"/>
+
+  <!--
+  <check> response elements.
+  -->
+  <complexType name="chkDataType">
+    <sequence>
+      <element name="domain" type="homoglyph:domainType" maxOccurs="unbounded"/>
+    </sequence>
+  </complexType>
+
+  <!--
+  <mapping> response elements.
+  -->
+  <complexType name="domainType">
+    <sequence>
+      <element name="name" type="eppcom:labelType"/>
+      <element name="blockedBy" type="eppcom:labelType" maxOccurs="unbounded"/>
+    </sequence>
+  </complexType>
+
+  <!--
+  End of schema.
+  -->
+</schema>

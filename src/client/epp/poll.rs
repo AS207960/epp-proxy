@@ -91,8 +91,8 @@ pub fn handle_poll(
     Ok((proto::EPPCommandType::Poll(command), None))
 }
 
-pub fn handle_poll_response(
-    response: proto::EPPResponse, metrics: &crate::metrics::ScopedMetrics
+pub fn handle_poll_response<M: crate::metrics::Metrics>(
+    response: proto::EPPResponse, metrics: &M
 ) -> Response<Option<PollResponse>> {
     match response.results.first() {
         Some(result) => match result.code {
@@ -251,8 +251,8 @@ pub fn handle_poll_ack(
     Ok((proto::EPPCommandType::Poll(command), None))
 }
 
-pub fn handle_poll_ack_response(
-    response: proto::EPPResponse, _metrics: &crate::metrics::ScopedMetrics
+pub fn handle_poll_ack_response<M: crate::metrics::Metrics>(
+    response: proto::EPPResponse, _metrics: &M
 ) -> Response<PollAckResponse> {
     match response.message_queue {
         Some(value) => Response::Ok(PollAckResponse {
@@ -297,12 +297,13 @@ mod poll_tests {
     </trID>
   </response>
 </epp>"#;
-        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
+        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA.trim()).unwrap();
         let res = match res.message {
             super::proto::EPPMessageType::Response(r) => r,
             _ => unreachable!(),
         };
-        let data = super::handle_poll_response(*res).unwrap().unwrap();
+        let data = super::handle_poll_response(
+            *res, &crate::metrics::DummyMetrics::default()).unwrap().unwrap();
         assert_eq!(data.message, "Domain transfer completed successfully");
         match data.data {
             super::PollData::DomainTransferData {
@@ -353,12 +354,13 @@ mod poll_tests {
     </trID>
   </response>
 </epp>"#;
-        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
+        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA.trim()).unwrap();
         let res = match res.message {
             super::proto::EPPMessageType::Response(r) => r,
             _ => unreachable!(),
         };
-        let data = super::handle_poll_response(*res).unwrap().unwrap();
+        let data = super::handle_poll_response(
+            *res, &crate::metrics::DummyMetrics::default()).unwrap().unwrap();
         assert_eq!(data.message, "");
         match data.data {
             super::PollData::DomainInfoData { data, change_data } => {
@@ -427,12 +429,13 @@ mod poll_tests {
         </trID>
     </response>
 </epp>"#;
-        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
+        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA.trim()).unwrap();
         let res = match res.message {
             super::proto::EPPMessageType::Response(r) => r,
             _ => unreachable!(),
         };
-        let data = super::handle_poll_response(*res).unwrap().unwrap();
+        let data = super::handle_poll_response(
+            *res, &crate::metrics::DummyMetrics::default()).unwrap().unwrap();
         assert_eq!(data.message, "");
         match data.data {
             super::PollData::DomainInfoData { data, change_data } => {
@@ -487,12 +490,13 @@ mod poll_tests {
         </trID>
     </response>
 </epp>"#;
-        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
+        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA.trim()).unwrap();
         let res = match res.message {
             super::proto::EPPMessageType::Response(r) => r,
             _ => unreachable!(),
         };
-        let data = super::handle_poll_response(*res).unwrap().unwrap();
+        let data = super::handle_poll_response(
+            *res, &crate::metrics::DummyMetrics::default()).unwrap().unwrap();
         assert_eq!(data.message, "");
         match data.data {
             super::PollData::DomainInfoData { data, change_data } => {
@@ -559,12 +563,13 @@ mod poll_tests {
     </trID>
   </response>
 </epp>"#;
-        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
+        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA.trim()).unwrap();
         let res = match res.message {
             super::proto::EPPMessageType::Response(r) => r,
             _ => unreachable!(),
         };
-        let data = super::handle_poll_response(*res).unwrap().unwrap();
+        let data = super::handle_poll_response(
+            *res, &crate::metrics::DummyMetrics::default()).unwrap().unwrap();
         assert_eq!(data.message, "Account Details Change Notification");
         match data.data {
             super::PollData::ContactInfoData { data, change_data } => {
@@ -600,12 +605,13 @@ mod poll_tests {
      </trID>
    </response>
 </epp>"#;
-        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
+        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA.trim()).unwrap();
         let res = match res.message {
             super::proto::EPPMessageType::Response(r) => r,
             _ => unreachable!(),
         };
-        let data = super::handle_poll_response(*res).unwrap().unwrap();
+        let data = super::handle_poll_response(
+            *res, &crate::metrics::DummyMetrics::default()).unwrap().unwrap();
         assert_eq!(data.message, "Domain name Cancellation Notification");
         match data.data {
             super::PollData::NominetDomainCancelData {
@@ -653,12 +659,13 @@ mod poll_tests {
     </trID>
   </response>
 </epp>"#;
-        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
+        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA.trim()).unwrap();
         let res = match res.message {
             super::proto::EPPMessageType::Response(r) => r,
             _ => unreachable!(),
         };
-        let data = super::handle_poll_response(*res).unwrap().unwrap();
+        let data = super::handle_poll_response(
+            *res, &crate::metrics::DummyMetrics::default()).unwrap().unwrap();
         assert_eq!(data.message, "Domains Released Notification");
         match data.data {
             super::PollData::NominetDomainReleaseData {
@@ -743,12 +750,13 @@ mod poll_tests {
      </trID>
    </response>
 </epp>"#;
-        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
+        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA.trim()).unwrap();
         let res = match res.message {
             super::proto::EPPMessageType::Response(r) => r,
             _ => unreachable!(),
         };
-        let data = super::handle_poll_response(*res).unwrap().unwrap();
+        let data = super::handle_poll_response(
+            *res, &crate::metrics::DummyMetrics::default()).unwrap().unwrap();
         assert_eq!(data.message, "Registrar Change Authorisation Request");
         match data.data {
             super::PollData::NominetDomainRegistrarChangeData {
@@ -798,12 +806,13 @@ mod poll_tests {
     </trID>
   </response>
 </epp>"#;
-        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
+        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA.trim()).unwrap();
         let res = match res.message {
             super::proto::EPPMessageType::Response(r) => r,
             _ => unreachable!(),
         };
-        let data = super::handle_poll_response(*res).unwrap().unwrap();
+        let data = super::handle_poll_response(
+            *res, &crate::metrics::DummyMetrics::default()).unwrap().unwrap();
         assert_eq!(data.message, "Host cancellation notification");
         match data.data {
             super::PollData::NominetHostCancelData {
@@ -869,12 +878,13 @@ mod poll_tests {
     </trID>
   </response>
 </epp>"#;
-        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
+        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA.trim()).unwrap();
         let res = match res.message {
             super::proto::EPPMessageType::Response(r) => r,
             _ => unreachable!(),
         };
-        let data = super::handle_poll_response(*res).unwrap().unwrap();
+        let data = super::handle_poll_response(
+            *res, &crate::metrics::DummyMetrics::default()).unwrap().unwrap();
         assert_eq!(
             data.message,
             "Data Quality - {{Workflow type}} process commenced notification"
@@ -943,12 +953,13 @@ mod poll_tests {
     </trID>
   </response>
 </epp>"#;
-        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
+        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA.trim()).unwrap();
         let res = match res.message {
             super::proto::EPPMessageType::Response(r) => r,
             _ => unreachable!(),
         };
-        let data = super::handle_poll_response(*res).unwrap().unwrap();
+        let data = super::handle_poll_response(
+            *res, &crate::metrics::DummyMetrics::default()).unwrap().unwrap();
         assert_eq!(data.message, "DQ Workflow process lifted notification");
         match data.data {
             super::PollData::NominetProcessData {
@@ -992,12 +1003,13 @@ mod poll_tests {
         </trID>
     </response>
 </epp>"#;
-        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
+        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA.trim()).unwrap();
         let res = match res.message {
             super::proto::EPPMessageType::Response(r) => r,
             _ => unreachable!(),
         };
-        let data = super::handle_poll_response(*res).unwrap().unwrap();
+        let data = super::handle_poll_response(
+            *res, &crate::metrics::DummyMetrics::default()).unwrap().unwrap();
         assert_eq!(data.message, "Domains Suspended Notification");
         match data.data {
             super::PollData::NominetSuspendData {
@@ -1037,12 +1049,13 @@ mod poll_tests {
      </trID>
    </response>
  </epp>"#;
-        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
+        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA.trim()).unwrap();
         let res = match res.message {
             super::proto::EPPMessageType::Response(r) => r,
             _ => unreachable!(),
         };
-        let data = super::handle_poll_response(*res).unwrap().unwrap();
+        let data = super::handle_poll_response(
+            *res, &crate::metrics::DummyMetrics::default()).unwrap().unwrap();
         assert_eq!(data.message, "Referral Accepted Notification");
         match data.data {
             super::PollData::DomainCreateData {
@@ -1080,12 +1093,13 @@ mod poll_tests {
      </trID>
    </response>
  </epp>"#;
-        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
+        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA.trim()).unwrap();
         let res = match res.message {
             super::proto::EPPMessageType::Response(r) => r,
             _ => unreachable!(),
         };
-        let data = super::handle_poll_response(*res).unwrap().unwrap();
+        let data = super::handle_poll_response(
+            *res, &crate::metrics::DummyMetrics::default()).unwrap().unwrap();
         assert_eq!(data.message, "Referral Rejected Notification");
         match data.data {
             super::PollData::NominetDomainFailData {
@@ -1153,12 +1167,13 @@ mod poll_tests {
     </trID>
   </response>
 </epp>"#;
-        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
+        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA.trim()).unwrap();
         let res = match res.message {
             super::proto::EPPMessageType::Response(r) => r,
             _ => unreachable!(),
         };
-        let data = super::handle_poll_response(*res).unwrap().unwrap();
+        let data = super::handle_poll_response(
+            *res, &crate::metrics::DummyMetrics::default()).unwrap().unwrap();
         assert_eq!(data.message, "Registrant Transfer Notification");
         match data.data {
             super::PollData::NominetRegistrantTransferData {
@@ -1201,12 +1216,13 @@ mod poll_tests {
         </trID>
     </response>
 </epp>"#;
-        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
+        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA.trim()).unwrap();
         let res = match res.message {
             super::proto::EPPMessageType::Response(r) => r,
             _ => unreachable!(),
         };
-        let data = super::handle_poll_response(*res).unwrap().unwrap();
+        let data = super::handle_poll_response(
+            *res, &crate::metrics::DummyMetrics::default()).unwrap().unwrap();
         assert_eq!(data.message, "");
         match data.data {
             super::PollData::DomainTransferData {
@@ -1251,12 +1267,13 @@ mod poll_tests {
         </trID>
     </response>
 </epp>"#;
-        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
+        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA.trim()).unwrap();
         let res = match res.message {
             super::proto::EPPMessageType::Response(r) => r,
             _ => unreachable!(),
         };
-        let data = super::handle_poll_response(*res).unwrap().unwrap();
+        let data = super::handle_poll_response(
+            *res, &crate::metrics::DummyMetrics::default()).unwrap().unwrap();
         assert_eq!(data.message, "");
         match data.data {
             super::PollData::DomainTransferData {
@@ -1304,12 +1321,13 @@ mod poll_tests {
     </trID>
   </response>
 </epp>"#;
-        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
+        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA.trim()).unwrap();
         let res = match res.message {
             super::proto::EPPMessageType::Response(r) => r,
             _ => unreachable!(),
         };
-        let data = super::handle_poll_response(*res).unwrap().unwrap();
+        let data = super::handle_poll_response(
+            *res, &crate::metrics::DummyMetrics::default()).unwrap().unwrap();
         assert_eq!(data.message, "Low Account Balance");
         match data.data {
             super::PollData::VerisignLowBalanceData(bal_data) => {
@@ -1349,12 +1367,13 @@ mod poll_tests {
    </trID>
  </response>
 </epp>"#;
-        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
+        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA.trim()).unwrap();
         let res = match res.message {
             super::proto::EPPMessageType::Response(r) => r,
             _ => unreachable!(),
         };
-        let data = super::handle_poll_response(*res).unwrap().unwrap();
+        let data = super::handle_poll_response(
+            *res, &crate::metrics::DummyMetrics::default()).unwrap().unwrap();
         assert_eq!(data.message, "DOMAIN_RENEWAL_SUCCESSFUL");
         match data.data {
             super::PollData::DomainRenewData {
@@ -1396,12 +1415,13 @@ mod poll_tests {
     </trID>
   </response>
 </epp>"#;
-        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
+        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA.trim()).unwrap();
         let res = match res.message {
             super::proto::EPPMessageType::Response(r) => r,
             _ => unreachable!(),
         };
-        let data = super::handle_poll_response(*res).unwrap().unwrap();
+        let data = super::handle_poll_response(
+            *res, &crate::metrics::DummyMetrics::default()).unwrap().unwrap();
         assert_eq!(data.message, "DOMAIN_RESTORE_FAILED");
         match data.data {
             super::PollData::DomainPanData {
@@ -1454,12 +1474,13 @@ mod poll_tests {
   </response>
 </epp>
 "#;
-        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
+        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA.trim()).unwrap();
         let res = match res.message {
             super::proto::EPPMessageType::Response(r) => r,
             _ => unreachable!(),
         };
-        let data = super::handle_poll_response(*res).unwrap().unwrap();
+        let data = super::handle_poll_response(
+            *res, &crate::metrics::DummyMetrics::default()).unwrap().unwrap();
         assert_eq!(
             data.message,
             "Suspended domain name: abcabc-1573042768420.eu"
@@ -1508,12 +1529,13 @@ mod poll_tests {
     </trID>
   </response>
 </epp>"#;
-        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
+        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA.trim()).unwrap();
         let res = match res.message {
             super::proto::EPPMessageType::Response(r) => r,
             _ => unreachable!(),
         };
-        let data = super::handle_poll_response(*res).unwrap().unwrap();
+        let data = super::handle_poll_response(
+            *res, &crate::metrics::DummyMetrics::default()).unwrap().unwrap();
         assert_eq!(
             data.message,
             "Domain name quarantined: abcabc-1573042778986.eu"
@@ -1562,12 +1584,13 @@ mod poll_tests {
     </trID>
   </response>
 </epp>"#;
-        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
+        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA.trim()).unwrap();
         let res = match res.message {
             super::proto::EPPMessageType::Response(r) => r,
             _ => unreachable!(),
         };
-        let data = super::handle_poll_response(*res).unwrap().unwrap();
+        let data = super::handle_poll_response(
+            *res, &crate::metrics::DummyMetrics::default()).unwrap().unwrap();
         assert_eq!(data.message, "Watermark level reached: 7");
         match data.data {
             super::PollData::EURIDPoll(data) => {

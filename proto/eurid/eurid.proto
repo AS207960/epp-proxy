@@ -43,6 +43,8 @@ message DomainInfo {
     bool suspended = 3;
     bool delayed = 4;
     bool seized = 5;
+    google.protobuf.Timestamp available_date = 15;
+    google.protobuf.Timestamp scheduled_suspension_date = 16;
     google.protobuf.Timestamp deletion_date = 6;
     google.protobuf.StringValue on_site = 7;
     google.protobuf.StringValue reseller = 8;
@@ -82,6 +84,7 @@ message DomainCreateExtension {
     google.protobuf.StringValue on_site = 1;
     google.protobuf.StringValue reseller = 2;
     google.protobuf.StringValue registrar_reference = 3;
+    google.protobuf.StringValue voucher = 4;
 }
 
 message DomainUpdateExtension {

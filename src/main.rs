@@ -294,7 +294,7 @@ async fn main() {
     let mut router = epp_proxy::Router::new();
     let mut clients = vec![];
     let metrics =
-        std::sync::Arc::new(epp_proxy::metrics::Metrics::new().expect("create metrics registry"));
+        std::sync::Arc::new(epp_proxy::metrics::PrometheusMetrics::new().expect("create metrics registry"));
     for config in configs {
         let scoped_storage = epp_proxy::StorageScoped::new_arc(storage.clone(), &config.id);
         let metrics_registry = metrics.new_scope(config.id.clone());
@@ -510,9 +510,9 @@ where
     }
 }
 
-impl<T> tonic::transport::server::NamedService for AuthService<T>
+impl<T> tonic::server::NamedService for AuthService<T>
 where
-    T: tonic::transport::server::NamedService,
+    T: tonic::server::NamedService,
 {
     const NAME: &'static str = T::NAME;
 }

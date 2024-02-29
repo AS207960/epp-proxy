@@ -20,8 +20,8 @@ pub struct TLSConfig {
     pub danger_accept_invalid_hostname: bool,
 }
 
-impl<'a, C: Into<Option<&'a str>>> From<&super::super::ClientConf<'a, C>> for TLSConfig {
-    fn from(conf: &super::super::ClientConf<'a, C>) -> Self {
+impl<'a, C: Into<Option<&'a str>>, M: crate::metrics::Metrics> From<&super::super::ClientConf<'a, C, M>> for TLSConfig {
+    fn from(conf: &super::super::ClientConf<'a, C, M>) -> Self {
         Self {
             host: conf.host.to_string(),
             client_cert: conf.client_cert.as_ref().map(|c| match c {

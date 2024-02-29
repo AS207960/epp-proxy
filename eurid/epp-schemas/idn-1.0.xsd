@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema targetNamespace="http://www.eurid.eu/xml/epp/idn-1.0"
+        xmlns:idn="http://www.eurid.eu/xml/epp/idn-1.0"
+        xmlns:eppcom="urn:ietf:params:xml:ns:eppcom-1.0"
+        xmlns="http://www.w3.org/2001/XMLSchema"
+        elementFormDefault="qualified">
+
+  <!--
+  Import common element types.
+  -->
+  <import namespace="urn:ietf:params:xml:ns:eppcom-1.0"/>
+
+  <annotation>
+    <documentation>
+      Extensible Provisioning Protocol v1.0
+      EURid specific extension for displaying host names in ASCII and Unicode formats.
+    </documentation>
+  </annotation>
+
+  <!--
+  Child response elements.
+  -->
+  <element name="mapping" type="idn:mappingType"/>
+
+  <!--
+  <mapping> response elements.
+  -->
+  <complexType name="mappingType">
+    <sequence>
+      <element name="name" type="idn:nameType" maxOccurs="unbounded"/>
+    </sequence>
+  </complexType>
+
+  <complexType name="nameType">
+    <sequence>
+      <element name="ace" type="eppcom:labelType"/>
+      <element name="unicode" type="eppcom:labelType"/>
+    </sequence>
+  </complexType>
+
+  <!--
+  End of schema.
+  -->
+</schema>

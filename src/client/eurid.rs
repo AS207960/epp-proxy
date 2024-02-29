@@ -126,6 +126,7 @@ pub struct DomainCreate {
     pub on_site: Option<String>,
     pub reseller: Option<String>,
     pub registrar_reference: Option<String>,
+    pub voucher: Option<String>,
 }
 
 #[derive(Debug)]
@@ -172,6 +173,8 @@ pub struct DomainInfo {
     pub suspended: bool,
     pub delayed: bool,
     pub seized: bool,
+    pub available_date: Option<DateTime<Utc>>,
+    pub scheduled_suspension_date: Option<DateTime<Utc>>,
     pub deletion_date: Option<DateTime<Utc>>,
     pub on_site: Option<String>,
     pub reseller: Option<String>,

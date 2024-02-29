@@ -303,8 +303,8 @@ pub fn handle_reject(
     ))
 }
 
-pub fn handle_handshake_response(
-    response: proto::EPPResponse, _metrics: &crate::metrics::ScopedMetrics
+pub fn handle_handshake_response<M: crate::metrics::Metrics>(
+    response: proto::EPPResponse, _metrics: &M
 ) -> Response<HandshakeResponse> {
     match response.data {
         Some(value) => match value.value {
@@ -343,8 +343,8 @@ pub fn handle_release(
     ))
 }
 
-pub fn handle_release_response(
-    response: proto::EPPResponse, _metrics: &crate::metrics::ScopedMetrics
+pub fn handle_release_response<M: crate::metrics::Metrics>(
+    response: proto::EPPResponse, _metrics: &M
 ) -> Response<ReleaseResponse> {
     let pending = response.is_pending();
     match response.data {
@@ -375,8 +375,8 @@ pub fn handle_tag_list(
     Ok((proto::EPPCommandType::Info(command), None))
 }
 
-pub fn handle_tag_list_response(
-    response: proto::EPPResponse, _metrics: &crate::metrics::ScopedMetrics
+pub fn handle_tag_list_response<M: crate::metrics::Metrics>(
+    response: proto::EPPResponse, _metrics: &M
 ) -> Response<TagListResponse> {
     match response.data {
         Some(value) => match value.value {
@@ -430,8 +430,8 @@ pub fn handle_contact_validate(
     ))
 }
 
-pub fn handle_contact_validate_response(
-    response: proto::EPPResponse, _metrics: &crate::metrics::ScopedMetrics
+pub fn handle_contact_validate_response<M: crate::metrics::Metrics>(
+    response: proto::EPPResponse, _metrics: &M
 ) -> Response<ContactValidateResponse> {
     match response.data {
         Some(_) => Err(Error::ServerInternal),
@@ -475,8 +475,8 @@ pub fn handle_unlock(client: &ServerFeatures, req: &LockRequest) -> HandleReqRet
     Ok((proto::EPPCommandType::Update(Box::new(command)), None))
 }
 
-pub fn handle_lock_response(
-    response: proto::EPPResponse, _metrics: &crate::metrics::ScopedMetrics
+pub fn handle_lock_response<M: crate::metrics::Metrics>(
+    response: proto::EPPResponse, _metrics: &M
 ) -> Response<LockResponse> {
     match response.data {
         Some(_) => Err(Error::ServerInternal),

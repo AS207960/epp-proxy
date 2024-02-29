@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<schema targetNamespace="http://www.eurid.eu/xml/epp/domain-ext-2.6"
+        xmlns:domain-ext="http://www.eurid.eu/xml/epp/domain-ext-2.6"
+        xmlns:eppcom="urn:ietf:params:xml:ns:eppcom-1.0"
+        xmlns:euridcom="http://www.eurid.eu/xml/epp/euridcom-1.0"
+        xmlns:domain="urn:ietf:params:xml:ns:domain-1.0"
+        xmlns="http://www.w3.org/2001/XMLSchema"
+        elementFormDefault="qualified">
+
+  <!--
+  Import common element types.
+  -->
+  <import namespace="urn:ietf:params:xml:ns:eppcom-1.0"/>
+  <import namespace="http://www.eurid.eu/xml/epp/euridcom-1.0"/>
+  <import namespace="urn:ietf:params:xml:ns:domain-1.0"/>
+
+  <annotation>
+    <documentation>
+      Extensible Provisioning Protocol v1.0
+      EURid specific extension for domain handling.
+    </documentation>
+  </annotation>
+
+  <!--
+  Child elements found in EPP commands.
+  -->
+  <element name="create" type="domain-ext:createType"/>
+  <element name="delete" type="domain-ext:deleteType"/>
+  <element name="transfer" type="domain-ext:transferType"/>
+  <element name="update" type="domain-ext:updateType"/>
+
+  <!--
+  Child elements of the <create> command.
+  -->
+  <complexType name="createType">
+    <sequence>
+      <element name="contact" type="domain-ext:contactType" minOccurs="0" maxOccurs="unbounded"/>
+      <element name="nsgroup" type="euridcom:nsgType" minOccurs="0" maxOccurs="9"/>
+      <element name="keygroup" type="euridcom:keyGroupType" minOccurs="0"/>
+      <element name="voucher" type="domain-ext:voucherType" minOccurs="0"/>
+      <element name="registrarReference" type="domain-ext:registrarReferenceType" minOccurs="0"/>
+    </sequence>
+  </complexType>
+
+  <complexType name="contactType">
+    <simpleContent>
+      <extension base="eppcom:clIDType">
+        <attribute name="type" type="euridcom:contactType"/>
+      </extension>
+    </simpleContent>
+  </complexType>
+
+  <simpleType name="voucherType">
+    <restriction base="token">
+      <minLength value="1"/>
+      <maxLength value="255"/>
+    </restriction>
+  </simpleType>
+
+  <simpleType name="registrarReferenceType">
+    <restriction base="token">
+      <maxLength value="255"/>
+    </restriction>
+  </simpleType>
+
+  <!--
+  Child elements of the <delete> command.
+  -->
+  <complexType name="deleteType">
+    <choice>
+      <element name="schedule" type="domain-ext:scheduleDomainDType"/>
+      <element name="cancel"/>
+    </choice>
+  </complexType>
+
+  <complexType name="scheduleDomainDType">
+    <sequence>
+      <element name="delDate" type="dateTime"/>
+    </sequence>
+  </complexType>
+
+  <!--
+  Child elements of the <transfer> command.
+  -->
+  <complexType name="transferType">
+    <choice>
+      <element name="request" type="domain-ext:requestTransferType"/>
+    </choice>
+  </complexType>
+
+  <complexType name="requestTransferType">
+    <sequence>
+      <element name="registrant" type="eppcom:clIDType"/>
+      <element name="contact" type="domain-ext:contactType" minOccurs="0" maxOccurs="unbounded"/>
+      <element name="ns" type="domain:nsType" minOccurs="0"/>
+      <element name="nsgroup" type="euridcom:nsgType" minOccurs="0" maxOccurs="9"/>
+      <element name="keygroup" type="euridcom:keyGroupType" minOccurs="0"/>
+      <element name="registrarReference" type="domain-ext:registrarReferenceType" minOccurs="0"/>
+    </sequence>
+  </complexType>
+
+  <!--
+  Child elements of the <update> command.
+  -->
+  <complexType name="updateType">
+    <sequence>
+      <element name="add" type="domain-ext:addRemType" minOccurs="0"/>
+      <element name="rem" type="domain-ext:addRemType" minOccurs="0"/>
+      <element name="chg" type="domain-ext:chgType" minOccurs="0"/>
+    </sequence>
+  </complexType>
+
+  <!--
+  Data elements that can be added or removed.
+  -->
+  <complexType name="addRemType">
+    <sequence>
+      <element name="contact" type="domain-ext:contactType" minOccurs="0" maxOccurs="unbounded"/>
+      <element name="nsgroup" type="euridcom:nsgType" minOccurs="0" maxOccurs="9"/>
+      <element name="keygroup" type="euridcom:keyGroupType" minOccurs="0"/>
+    </sequence>
+  </complexType>
+
+  <!--
+  Data elements that can be changed.
+  -->
+  <complexType name="chgType">
+    <sequence>
+      <element name="registrarReference" type="domain-ext:registrarReferenceType" minOccurs="0"/>
+    </sequence>
+  </complexType>
+
+  <!--
+  Child response elements.
+  -->
+  <element name="chkData" type="domain-ext:chkDataType"/>
+  <element name="infData" type="domain-ext:infDataType"/>
+  <element name="renData" type="domain-ext:renDataType"/>
+  <element name="trnData" type="domain-ext:trnDataType"/>
+
+  <!--
+  <check> response elements.
+  -->
+  <complexType name="chkDataType">
+    <sequence>
+      <element name="domain" type="domain-ext:domainCheckType" maxOccurs="unbounded"/>
+    </sequence>
+  </complexType>
+
+  <complexType name="domainCheckType">
+    <sequence>
+      <element name="name" type="eppcom:labelType"/>
+      <element name="availableDate" type="dateTime" minOccurs="0"/>
+      <element name="status" type="domain:statusType" minOccurs="0" maxOccurs="11"/>
+    </sequence>
+  </complexType>
+
+  <!--
+  <info> response elements.
+  -->
+  <complexType name="infDataType">
+    <sequence>
+      <element name="onHold" type="boolean"/>
+      <element name="reserved" type="boolean"/>
+      <element name="quarantined" type="boolean"/>
+      <element name="suspended" type="boolean"/>
+      <element name="seized" type="boolean"/>
+      <element name="availableDate" type="dateTime" minOccurs="0"/>
+      <element name="scheduledSuspensionDate" type="dateTime" minOccurs="0"/>
+      <element name="deletionDate" type="dateTime" minOccurs="0"/>
+      <element name="contact" type="domain-ext:contactType" minOccurs="0" maxOccurs="unbounded"/>
+      <element name="nsgroup" type="euridcom:nsgType" minOccurs="0" maxOccurs="9"/>
+      <element name="keygroup" type="euridcom:keyGroupType" minOccurs="0"/>
+      <element name="delayed" type="boolean"/>
+      <element name="maxExtensionPeriod" type="unsignedShort"/>
+      <element name="registrantCountry" type="domain-ext:registrantCountryType"/>
+      <element name="registrantCountryOfCitizenship" type="domain-ext:registrantCountryType" minOccurs="0"/>
+      <element name="registrarReference" type="domain-ext:registrarReferenceType" minOccurs="0"/>
+    </sequence>
+  </complexType>
+
+  <!--
+  <renew> response elements.
+  -->
+  <complexType name="renDataType">
+    <sequence>
+      <element name="removedDeletionDate" type="domain-ext:removedDeletionDateType"/>
+    </sequence>
+  </complexType>
+
+  <complexType name="removedDeletionDateType"/>
+
+  <!--
+  <transfer> response elements.
+  -->
+  <complexType name="trnDataType">
+    <sequence>
+      <element name="onHold" type="boolean"/>
+      <element name="reserved" type="boolean"/>
+      <element name="quarantined" type="boolean"/>
+      <element name="suspended" type="boolean"/>
+      <element name="availableDate" type="dateTime" minOccurs="0"/>
+      <element name="deletionDate" type="dateTime" minOccurs="0"/>
+      <element name="registrant" type="eppcom:clIDType"/>
+      <element name="contact" type="domain-ext:contactType" minOccurs="0" maxOccurs="unbounded"/>
+      <element name="ns" type="domain:nsType" minOccurs="0"/>
+      <element name="nsgroup" type="euridcom:nsgType" minOccurs="0" maxOccurs="9"/>
+      <element name="keygroup" type="euridcom:keyGroupType" minOccurs="0"/>
+      <element name="delayed" type="boolean"/>
+      <element name="reason" type="string"/>
+      <element name="registrantCountry" type="domain-ext:registrantCountryType"/>
+      <element name="registrantCountryOfCitizenship" type="domain-ext:registrantCountryType" minOccurs="0"/>
+      <element name="registrarReference" type="domain-ext:registrarReferenceType" minOccurs="0"/>
+    </sequence>
+  </complexType>
+
+  <simpleType name="registrantCountryType">
+    <restriction base="token">
+      <length value="2"/>
+    </restriction>
+  </simpleType>
+
+  <!--
+  End of schema.
+  -->
+</schema>

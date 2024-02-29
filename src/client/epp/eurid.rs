@@ -156,14 +156,14 @@ pub fn extract_eurid_idn_singular<'o, O: Into<Option<&'o str>>>(
 pub fn extract_eurid_domain_check_singular(
     from: &Option<proto::EPPResponseExtension>,
 ) -> Result<Option<DomainCheck>, Error> {
-    let eurid_ext_check = match from {
+    let eurid_25_ext_check = match from {
         Some(e) => match e
             .value
             .iter()
-            .find(|e| matches!(e, proto::EPPResponseExtensionType::EURIDDomainCheckData(_)))
+            .find(|e| matches!(e, proto::EPPResponseExtensionType::EURIDDomain25CheckData(_)))
         {
             Some(e) => match e {
-                proto::EPPResponseExtensionType::EURIDDomainCheckData(e) => Some(e),
+                proto::EPPResponseExtensionType::EURIDDomain25CheckData(e) => Some(e),
                 _ => unreachable!(),
             },
             None => None,
@@ -171,25 +171,51 @@ pub fn extract_eurid_domain_check_singular(
         None => None,
     };
 
-    match eurid_ext_check {
-        Some(e) => {
-            let mut d = e.domains.clone();
-            match d.len() {
-                1 => {
-                    let c = d.pop().unwrap();
-                    Ok(Some(DomainCheck {
-                        available_date: c.available_date,
-                        status: c.status.into_iter().map(|s| s.status.into()).collect(),
-                    }))
-                }
-                _ => Err(Error::ServerInternal),
+    let eurid_26_ext_check = match from {
+        Some(e) => match e
+            .value
+            .iter()
+            .find(|e| matches!(e, proto::EPPResponseExtensionType::EURIDDomain26CheckData(_)))
+        {
+            Some(e) => match e {
+                proto::EPPResponseExtensionType::EURIDDomain26CheckData(e) => Some(e),
+                _ => unreachable!(),
+            },
+            None => None,
+        },
+        None => None,
+    };
+
+    if let Some(e) = eurid_26_ext_check {
+        let mut d = e.domains.clone();
+        match d.len() {
+            1 => {
+                let c = d.pop().unwrap();
+                Ok(Some(DomainCheck {
+                    available_date: c.available_date,
+                    status: c.status.into_iter().map(|s| s.status.into()).collect(),
+                }))
             }
+            _ => Err(Error::ServerInternal),
         }
-        None => Ok(None),
+    } else if let Some(e) = eurid_25_ext_check {
+        let mut d = e.domains.clone();
+        match d.len() {
+            1 => {
+                let c = d.pop().unwrap();
+                Ok(Some(DomainCheck {
+                    available_date: c.available_date,
+                    status: c.status.into_iter().map(|s| s.status.into()).collect(),
+                }))
+            }
+            _ => Err(Error::ServerInternal),
+        }
+    } else {
+        Ok(None)
     }
 }
 
-impl From<&DomainCreate> for proto::eurid::EURIDDomainCreate {
+impl From<&DomainCreate> for proto::eurid::EURIDDomain25Create {
     fn from(from: &DomainCreate) -> Self {
         let mut contacts = vec![];
 
@@ -207,16 +233,45 @@ impl From<&DomainCreate> for proto::eurid::EURIDDomainCreate {
             });
         }
 
-        proto::eurid::EURIDDomainCreate {
+        proto::eurid::EURIDDomain25Create {
             contacts,
             nsgroups: vec![],
             keygroup: None,
             registrar_reference: from.registrar_reference.as_ref().map(Into::into),
+            voucher: from.voucher.as_ref().map(Into::into)
         }
     }
 }
 
-impl From<&DomainUpdate> for proto::eurid::EURIDDomainUpdate {
+impl From<&DomainCreate> for proto::eurid::EURIDDomain26Create {
+    fn from(from: &DomainCreate) -> Self {
+        let mut contacts = vec![];
+
+        if let Some(on_site) = &from.on_site {
+            contacts.push(proto::eurid::EURIDDomainContact {
+                contact_type: proto::eurid::EURIDContactType::OnSite,
+                contact_id: on_site.to_string(),
+            });
+        }
+
+        if let Some(reseller) = &from.reseller {
+            contacts.push(proto::eurid::EURIDDomainContact {
+                contact_type: proto::eurid::EURIDContactType::Reseller,
+                contact_id: reseller.to_string(),
+            });
+        }
+
+        proto::eurid::EURIDDomain26Create {
+            contacts,
+            nsgroups: vec![],
+            keygroup: None,
+            registrar_reference: from.registrar_reference.as_ref().map(Into::into),
+            voucher: from.voucher.as_ref().map(Into::into)
+        }
+    }
+}
+
+impl From<&DomainUpdate> for proto::eurid::EURIDDomain25Update {
     fn from(from: &DomainUpdate) -> Self {
         let mut add_contacts = vec![];
         let mut rem_contacts = vec![];
@@ -247,10 +302,10 @@ impl From<&DomainUpdate> for proto::eurid::EURIDDomainUpdate {
             });
         }
 
-        proto::eurid::EURIDDomainUpdate {
+        proto::eurid::EURIDDomain25Update {
             add: match add_contacts.is_empty() {
                 true => None,
-                false => Some(proto::eurid::EURIDDomainUpdateAddRemove {
+                false => Some(proto::eurid::EURIDDomain25UpdateAddRemove {
                     contacts: add_contacts,
                     nsgroups: vec![],
                     keygroup: None,
@@ -258,14 +313,14 @@ impl From<&DomainUpdate> for proto::eurid::EURIDDomainUpdate {
             },
             remove: match rem_contacts.is_empty() {
                 true => None,
-                false => Some(proto::eurid::EURIDDomainUpdateAddRemove {
+                false => Some(proto::eurid::EURIDDomain25UpdateAddRemove {
                     contacts: rem_contacts,
                     nsgroups: vec![],
                     keygroup: None,
                 }),
             },
             change: if from.registrar_reference.is_some() {
-                Some(proto::eurid::EURIDDomainUpdateChange {
+                Some(proto::eurid::EURIDDomain25UpdateChange {
                     registrar_reference: from.registrar_reference.as_ref().map(Into::into),
                 })
             } else {
@@ -275,20 +330,92 @@ impl From<&DomainUpdate> for proto::eurid::EURIDDomainUpdate {
     }
 }
 
-impl From<&DomainDelete> for proto::eurid::EURIDDomainDelete {
-    fn from(from: &DomainDelete) -> Self {
-        match from {
-            DomainDelete::Schedule(t) => {
-                proto::eurid::EURIDDomainDelete::Schedule(proto::eurid::EURIDDomainDeleteSchedule {
-                    delete_date: t.to_owned(),
+impl From<&DomainUpdate> for proto::eurid::EURIDDomain26Update {
+    fn from(from: &DomainUpdate) -> Self {
+        let mut add_contacts = vec![];
+        let mut rem_contacts = vec![];
+
+        if let Some(on_site) = &from.add_on_site {
+            add_contacts.push(proto::eurid::EURIDDomainContact {
+                contact_type: proto::eurid::EURIDContactType::OnSite,
+                contact_id: on_site.to_string(),
+            });
+        }
+        if let Some(on_site) = &from.remove_on_site {
+            rem_contacts.push(proto::eurid::EURIDDomainContact {
+                contact_type: proto::eurid::EURIDContactType::OnSite,
+                contact_id: on_site.to_string(),
+            });
+        }
+
+        if let Some(reseller) = &from.add_reseller {
+            add_contacts.push(proto::eurid::EURIDDomainContact {
+                contact_type: proto::eurid::EURIDContactType::Reseller,
+                contact_id: reseller.to_string(),
+            });
+        }
+        if let Some(reseller) = &from.remove_reseller {
+            rem_contacts.push(proto::eurid::EURIDDomainContact {
+                contact_type: proto::eurid::EURIDContactType::Reseller,
+                contact_id: reseller.to_string(),
+            });
+        }
+
+        proto::eurid::EURIDDomain26Update {
+            add: match add_contacts.is_empty() {
+                true => None,
+                false => Some(proto::eurid::EURIDDomain26UpdateAddRemove {
+                    contacts: add_contacts,
+                    nsgroups: vec![],
+                    keygroup: None,
+                }),
+            },
+            remove: match rem_contacts.is_empty() {
+                true => None,
+                false => Some(proto::eurid::EURIDDomain26UpdateAddRemove {
+                    contacts: rem_contacts,
+                    nsgroups: vec![],
+                    keygroup: None,
+                }),
+            },
+            change: if from.registrar_reference.is_some() {
+                Some(proto::eurid::EURIDDomain26UpdateChange {
+                    registrar_reference: from.registrar_reference.as_ref().map(Into::into),
                 })
-            }
-            DomainDelete::Cancel => proto::eurid::EURIDDomainDelete::Cancel {},
+            } else {
+                None
+            },
         }
     }
 }
 
-impl From<&DomainTransfer> for proto::eurid::EURIDDomainTransfer {
+impl From<&DomainDelete> for proto::eurid::EURIDDomain25Delete {
+    fn from(from: &DomainDelete) -> Self {
+        match from {
+            DomainDelete::Schedule(t) => {
+                proto::eurid::EURIDDomain25Delete::Schedule(proto::eurid::EURIDDomain25DeleteSchedule {
+                    delete_date: t.to_owned(),
+                })
+            }
+            DomainDelete::Cancel => proto::eurid::EURIDDomain25Delete::Cancel {},
+        }
+    }
+}
+
+impl From<&DomainDelete> for proto::eurid::EURIDDomain26Delete {
+    fn from(from: &DomainDelete) -> Self {
+        match from {
+            DomainDelete::Schedule(t) => {
+                proto::eurid::EURIDDomain26Delete::Schedule(proto::eurid::EURIDDomain26DeleteSchedule {
+                    delete_date: t.to_owned(),
+                })
+            }
+            DomainDelete::Cancel => proto::eurid::EURIDDomain26Delete::Cancel {},
+        }
+    }
+}
+
+impl From<&DomainTransfer> for proto::eurid::EURIDDomain25Transfer {
     fn from(from: &DomainTransfer) -> Self {
         let mut contacts = vec![proto::eurid::EURIDDomainContact {
             contact_type: proto::eurid::EURIDContactType::Registrant,
@@ -323,8 +450,56 @@ impl From<&DomainTransfer> for proto::eurid::EURIDDomainTransfer {
             });
         }
 
-        proto::eurid::EURIDDomainTransfer {
-            transfer_request: Some(proto::eurid::EURIDDomainTransferRequest {
+        proto::eurid::EURIDDomain25Transfer {
+            transfer_request: Some(proto::eurid::EURIDDomain25TransferRequest {
+                registrant: from.registrant.clone(),
+                contacts,
+                nameservers: None,
+                nsgroups: vec![],
+                keygroup: None,
+                registrar_reference: from.registrar_reference.as_ref().map(Into::into),
+            }),
+        }
+    }
+}
+
+impl From<&DomainTransfer> for proto::eurid::EURIDDomain26Transfer {
+    fn from(from: &DomainTransfer) -> Self {
+        let mut contacts = vec![proto::eurid::EURIDDomainContact {
+            contact_type: proto::eurid::EURIDContactType::Registrant,
+            contact_id: from.registrant.clone(),
+        }];
+
+        if let Some(billing) = &from.billing {
+            contacts.push(proto::eurid::EURIDDomainContact {
+                contact_type: proto::eurid::EURIDContactType::Billing,
+                contact_id: billing.clone(),
+            });
+        }
+
+        if let Some(on_site) = &from.on_site {
+            contacts.push(proto::eurid::EURIDDomainContact {
+                contact_type: proto::eurid::EURIDContactType::OnSite,
+                contact_id: on_site.clone(),
+            });
+        }
+
+        if let Some(technical) = &from.technical {
+            contacts.push(proto::eurid::EURIDDomainContact {
+                contact_type: proto::eurid::EURIDContactType::Tech,
+                contact_id: technical.clone(),
+            });
+        }
+
+        if let Some(reseller) = &from.reseller {
+            contacts.push(proto::eurid::EURIDDomainContact {
+                contact_type: proto::eurid::EURIDContactType::Reseller,
+                contact_id: reseller.clone(),
+            });
+        }
+
+        proto::eurid::EURIDDomain26Transfer {
+            transfer_request: Some(proto::eurid::EURIDDomain26TransferRequest {
                 registrant: from.registrant.clone(),
                 contacts,
                 nameservers: None,
@@ -346,9 +521,16 @@ impl From<&DomainInfoRequest> for Option<proto::eurid::EURIDAuthInfo> {
 }
 
 pub fn extract_eurid_domain_info(from: &Option<proto::EPPResponseExtension>) -> Option<DomainInfo> {
-    let eurid_ext_info = match from {
+    let eurid_25_ext_info = match from {
         Some(e) => e.value.iter().find_map(|e| match e {
-            proto::EPPResponseExtensionType::EURIDDomainInfoData(e) => Some(e),
+            proto::EPPResponseExtensionType::EURIDDomain25InfoData(e) => Some(e),
+            _ => None,
+        }),
+        None => None,
+    };
+    let eurid_26_ext_info = match from {
+        Some(e) => e.value.iter().find_map(|e| match e {
+            proto::EPPResponseExtensionType::EURIDDomain26InfoData(e) => Some(e),
             _ => None,
         }),
         None => None,
@@ -362,91 +544,185 @@ pub fn extract_eurid_domain_info(from: &Option<proto::EPPResponseExtension>) -> 
         None => None,
     };
 
-    eurid_ext_info.map(|e| DomainInfo {
-        on_hold: e.on_hold,
-        reserved: e.reserved,
-        quarantined: e.quarantined,
-        suspended: e.suspended,
-        delayed: e.delayed,
-        seized: e.seized,
-        deletion_date: e.deletion_date,
-        max_extension_period: e.max_extension_period,
-        registrant_country: e.registrant_country.to_string(),
-        registrant_country_of_citizenship: e
-            .registrant_country_of_citizenship
-            .as_deref()
-            .map(Into::into),
-        on_site: e.contacts.iter().find_map(|c| match c.contact_type {
-            proto::eurid::EURIDContactType::OnSite => Some(c.contact_id.to_owned()),
-            _ => None,
-        }),
-        reseller: e.contacts.iter().find_map(|c| match c.contact_type {
-            proto::eurid::EURIDContactType::Reseller => Some(c.contact_id.to_string()),
-            _ => None,
-        }),
-        auth_info_valid_until: eurid_auth_info.map(|a| a.valid_until),
-        registrar_reference: e.registrar_reference.as_ref().map(Into::into),
-    })
+    if let Some(e) = eurid_26_ext_info {
+        Some(DomainInfo {
+            on_hold: e.on_hold,
+            reserved: e.reserved,
+            quarantined: e.quarantined,
+            suspended: e.suspended,
+            delayed: e.delayed,
+            seized: e.seized,
+            available_date: e.available_date,
+            scheduled_suspension_date: e.scheduled_suspension_date,
+            deletion_date: e.deletion_date,
+            max_extension_period: e.max_extension_period,
+            registrant_country: e.registrant_country.to_string(),
+            registrant_country_of_citizenship: e
+                .registrant_country_of_citizenship
+                .as_deref()
+                .map(Into::into),
+            on_site: e.contacts.iter().find_map(|c| match c.contact_type {
+                proto::eurid::EURIDContactType::OnSite => Some(c.contact_id.to_owned()),
+                _ => None,
+            }),
+            reseller: e.contacts.iter().find_map(|c| match c.contact_type {
+                proto::eurid::EURIDContactType::Reseller => Some(c.contact_id.to_string()),
+                _ => None,
+            }),
+            auth_info_valid_until: eurid_auth_info.map(|a| a.valid_until),
+            registrar_reference: e.registrar_reference.as_ref().map(Into::into),
+        })
+    } else if let Some(e) = eurid_25_ext_info {
+        Some(DomainInfo {
+            on_hold: e.on_hold,
+            reserved: e.reserved,
+            quarantined: e.quarantined,
+            suspended: e.suspended,
+            delayed: e.delayed,
+            seized: e.seized,
+            available_date: e.available_date,
+            scheduled_suspension_date: None,
+            deletion_date: e.deletion_date,
+            max_extension_period: e.max_extension_period,
+            registrant_country: e.registrant_country.to_string(),
+            registrant_country_of_citizenship: e
+                .registrant_country_of_citizenship
+                .as_deref()
+                .map(Into::into),
+            on_site: e.contacts.iter().find_map(|c| match c.contact_type {
+                proto::eurid::EURIDContactType::OnSite => Some(c.contact_id.to_owned()),
+                _ => None,
+            }),
+            reseller: e.contacts.iter().find_map(|c| match c.contact_type {
+                proto::eurid::EURIDContactType::Reseller => Some(c.contact_id.to_string()),
+                _ => None,
+            }),
+            auth_info_valid_until: eurid_auth_info.map(|a| a.valid_until),
+            registrar_reference: e.registrar_reference.as_ref().map(Into::into),
+        })
+    } else {
+        None
+    }
 }
 
 pub fn extract_eurid_domain_transfer_info(
     from: &Option<proto::EPPResponseExtension>,
 ) -> Option<DomainTransferInfo> {
-    let eurid_ext_info = match from {
+    let eurid_25_ext_info = match from {
         Some(e) => e.value.iter().find_map(|e| match e {
-            proto::EPPResponseExtensionType::EURIDDomainTransferData(e) => Some(e),
+            proto::EPPResponseExtensionType::EURIDDomain25TransferData(e) => Some(e),
             _ => None,
         }),
         None => None,
     };
 
-    eurid_ext_info.map(|e| DomainTransferInfo {
-        on_hold: e.on_hold,
-        reserved: e.reserved,
-        quarantined: e.quarantined,
-        delayed: e.delayed,
-        on_site: e.contacts.iter().find_map(|c| match c.contact_type {
-            proto::eurid::EURIDContactType::OnSite => Some(c.contact_id.to_owned()),
+    let eurid_26_ext_info = match from {
+        Some(e) => e.value.iter().find_map(|e| match e {
+            proto::EPPResponseExtensionType::EURIDDomain26TransferData(e) => Some(e),
             _ => None,
         }),
-        reseller: e.contacts.iter().find_map(|c| match c.contact_type {
-            proto::eurid::EURIDContactType::Reseller => Some(c.contact_id.to_string()),
-            _ => None,
-        }),
-        billing: e
-            .contacts
-            .iter()
-            .find_map(|c| match c.contact_type {
-                proto::eurid::EURIDContactType::Billing => Some(c.contact_id.to_string()),
+        None => None,
+    };
+
+    if let Some(e) = eurid_26_ext_info {
+        Some(DomainTransferInfo {
+            on_hold: e.on_hold,
+            reserved: e.reserved,
+            quarantined: e.quarantined,
+            delayed: e.delayed,
+            on_site: e.contacts.iter().find_map(|c| match c.contact_type {
+                proto::eurid::EURIDContactType::OnSite => Some(c.contact_id.to_owned()),
                 _ => None,
-            })
-            .unwrap_or_default(),
-        technical: e.contacts.iter().find_map(|c| match c.contact_type {
-            proto::eurid::EURIDContactType::Tech => Some(c.contact_id.to_string()),
-            _ => None,
-        }),
-        registrant: e.registrant.to_string(),
-        reason: e.reason.to_string(),
-        registrar_reference: e.registrar_reference.as_ref().map(Into::into),
-    })
+            }),
+            reseller: e.contacts.iter().find_map(|c| match c.contact_type {
+                proto::eurid::EURIDContactType::Reseller => Some(c.contact_id.to_string()),
+                _ => None,
+            }),
+            billing: e
+                .contacts
+                .iter()
+                .find_map(|c| match c.contact_type {
+                    proto::eurid::EURIDContactType::Billing => Some(c.contact_id.to_string()),
+                    _ => None,
+                })
+                .unwrap_or_default(),
+            technical: e.contacts.iter().find_map(|c| match c.contact_type {
+                proto::eurid::EURIDContactType::Tech => Some(c.contact_id.to_string()),
+                _ => None,
+            }),
+            registrant: e.registrant.to_string(),
+            reason: e.reason.to_string(),
+            registrar_reference: e.registrar_reference.as_ref().map(Into::into),
+        })
+    } else if let Some(e) = eurid_25_ext_info {
+        Some(DomainTransferInfo {
+            on_hold: e.on_hold,
+            reserved: e.reserved,
+            quarantined: e.quarantined,
+            delayed: e.delayed,
+            on_site: e.contacts.iter().find_map(|c| match c.contact_type {
+                proto::eurid::EURIDContactType::OnSite => Some(c.contact_id.to_owned()),
+                _ => None,
+            }),
+            reseller: e.contacts.iter().find_map(|c| match c.contact_type {
+                proto::eurid::EURIDContactType::Reseller => Some(c.contact_id.to_string()),
+                _ => None,
+            }),
+            billing: e
+                .contacts
+                .iter()
+                .find_map(|c| match c.contact_type {
+                    proto::eurid::EURIDContactType::Billing => Some(c.contact_id.to_string()),
+                    _ => None,
+                })
+                .unwrap_or_default(),
+            technical: e.contacts.iter().find_map(|c| match c.contact_type {
+                proto::eurid::EURIDContactType::Tech => Some(c.contact_id.to_string()),
+                _ => None,
+            }),
+            registrant: e.registrant.to_string(),
+            reason: e.reason.to_string(),
+            registrar_reference: e.registrar_reference.as_ref().map(Into::into),
+        })
+    } else {
+        None
+    }
 }
 
 pub fn extract_eurid_domain_renew_info(
     from: &Option<proto::EPPResponseExtension>,
 ) -> Option<DomainRenewInfo> {
-    let eurid_ext_info = match from {
+    let eurid_25_ext_info = match from {
         Some(e) => e.value.iter().find_map(|e| match e {
-            proto::EPPResponseExtensionType::EURIDDomainRenewData(e) => Some(e),
+            proto::EPPResponseExtensionType::EURIDDomain25RenewData(e) => Some(e),
             _ => None,
         }),
         None => None,
     };
 
-    eurid_ext_info.map(|e| DomainRenewInfo {
-        removed_deletion: e
-            .data
-            .contains(&proto::eurid::EURIDDomainRenewDataType::RemovedDeletionDate),
-    })
+    let eurid_26_ext_info = match from {
+        Some(e) => e.value.iter().find_map(|e| match e {
+            proto::EPPResponseExtensionType::EURIDDomain26RenewData(e) => Some(e),
+            _ => None,
+        }),
+        None => None,
+    };
+
+    if let Some(e) = eurid_26_ext_info {
+        Some(DomainRenewInfo {
+            removed_deletion: e
+                .data
+                .contains(&proto::eurid::EURIDDomain26RenewDataType::RemovedDeletionDate),
+        })
+    } else if let Some(e) = eurid_25_ext_info {
+        Some(DomainRenewInfo {
+            removed_deletion: e
+                .data
+                .contains(&proto::eurid::EURIDDomain25RenewDataType::RemovedDeletionDate),
+        })
+    } else {
+        None
+    }
 }
 
 pub fn handle_hit_points(
@@ -463,8 +739,8 @@ pub fn handle_hit_points(
     }
 }
 
-pub fn handle_hit_points_response(
-    response: proto::EPPResponse, _metrics: &crate::metrics::ScopedMetrics
+pub fn handle_hit_points_response<M: crate::metrics::Metrics>(
+    response: proto::EPPResponse, _metrics: &M
 ) -> Response<HitPointsResponse> {
     match response.data {
         Some(value) => match value.value {
@@ -495,8 +771,8 @@ pub fn handle_registration_limits(
     }
 }
 
-pub fn handle_registration_limits_response(
-    response: proto::EPPResponse, _metrics: &crate::metrics::ScopedMetrics
+pub fn handle_registration_limits_response<M: crate::metrics::Metrics>(
+    response: proto::EPPResponse, _metrics: &M
 ) -> Response<RegistrationLimitResponse> {
     match response.data {
         Some(value) => match value.value {
@@ -531,8 +807,8 @@ pub fn handle_dnssec_eligibility(
     }
 }
 
-pub fn handle_dnssec_eligibility_response(
-    response: proto::EPPResponse, _metrics: &crate::metrics::ScopedMetrics
+pub fn handle_dnssec_eligibility_response<M: crate::metrics::Metrics>(
+    response: proto::EPPResponse, _metrics: &M
 ) -> Response<DNSSECEligibilityResponse> {
     match response.data {
         Some(value) => match value.value {
@@ -571,8 +847,8 @@ pub fn handle_dns_quality(
     }
 }
 
-pub fn handle_dns_quality_response(
-    response: proto::EPPResponse, _metrics: &crate::metrics::ScopedMetrics
+pub fn handle_dns_quality_response<M: crate::metrics::Metrics>(
+    response: proto::EPPResponse, _metrics: &M
 ) -> Response<DNSQualityResponse> {
     match response.data {
         Some(value) => match value.value {
@@ -615,12 +891,13 @@ mod eurid_tests {
     </trID>
   </response>
 </epp>"#;
-        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
+        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA.trim()).unwrap();
         let res = match res.message {
             super::proto::EPPMessageType::Response(r) => r,
             _ => unreachable!(),
         };
-        let data = super::handle_hit_points_response(*res).unwrap();
+        let data = super::handle_hit_points_response(
+            *res, &crate::metrics::DummyMetrics::default()).unwrap();
         assert_eq!(data.hit_points, 0);
         assert_eq!(data.max_hit_points, 2000);
         assert!(data.blocked_until.is_none());
@@ -649,12 +926,13 @@ mod eurid_tests {
   </response>
 </epp>
 "#;
-        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
+        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA.trim()).unwrap();
         let res = match res.message {
             super::proto::EPPMessageType::Response(r) => r,
             _ => unreachable!(),
         };
-        let data = super::handle_hit_points_response(*res).unwrap();
+        let data = super::handle_hit_points_response(
+            *res, &crate::metrics::DummyMetrics::default()).unwrap();
         assert_eq!(data.hit_points, 6);
         assert_eq!(data.max_hit_points, 5);
         assert!(data.blocked_until.is_some());
@@ -681,12 +959,13 @@ mod eurid_tests {
     </trID>
   </response>
 </epp>"#;
-        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
+        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA.trim()).unwrap();
         let res = match res.message {
             super::proto::EPPMessageType::Response(r) => r,
             _ => unreachable!(),
         };
-        let data = super::handle_registration_limits_response(*res).unwrap();
+        let data = super::handle_registration_limits_response(
+            *res, &crate::metrics::DummyMetrics::default()).unwrap();
         assert_eq!(data.monthly_registrations, 0);
         assert_eq!(data.max_monthly_registrations.unwrap(), 1000);
         assert!(data.limited_until.is_none());
@@ -712,12 +991,13 @@ mod eurid_tests {
     </trID>
   </response>
 </epp>"#;
-        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
+        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA.trim()).unwrap();
         let res = match res.message {
             super::proto::EPPMessageType::Response(r) => r,
             _ => unreachable!(),
         };
-        let data = super::handle_registration_limits_response(*res).unwrap();
+        let data = super::handle_registration_limits_response(
+            *res, &crate::metrics::DummyMetrics::default()).unwrap();
         assert_eq!(data.monthly_registrations, 0);
         assert!(data.max_monthly_registrations.is_none());
         assert!(data.limited_until.is_none());
@@ -745,12 +1025,13 @@ mod eurid_tests {
     </trID>
   </response>
 </epp>"#;
-        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
+        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA.trim()).unwrap();
         let res = match res.message {
             super::proto::EPPMessageType::Response(r) => r,
             _ => unreachable!(),
         };
-        let data = super::handle_registration_limits_response(*res).unwrap();
+        let data = super::handle_registration_limits_response(
+            *res, &crate::metrics::DummyMetrics::default()).unwrap();
         assert_eq!(data.monthly_registrations, 1);
         assert_eq!(data.max_monthly_registrations.unwrap(), 1);
         assert!(data.limited_until.is_some());
@@ -780,12 +1061,13 @@ mod eurid_tests {
   </response>
 </epp>
 "#;
-        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
+        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA.trim()).unwrap();
         let res = match res.message {
             super::proto::EPPMessageType::Response(r) => r,
             _ => unreachable!(),
         };
-        let data = super::handle_dnssec_eligibility_response(*res).unwrap();
+        let data = super::handle_dnssec_eligibility_response(
+            *res, &crate::metrics::DummyMetrics::default()).unwrap();
         assert!(data.eligible);
         assert_eq!(data.message, "Eligible for DNSSEC discount");
         assert_eq!(data.code, 1001);
@@ -823,12 +1105,13 @@ mod eurid_tests {
     </trID>
   </response>
 </epp>"#;
-        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
+        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA.trim()).unwrap();
         let res = match res.message {
             super::proto::EPPMessageType::Response(r) => r,
             _ => unreachable!(),
         };
-        let data = super::handle_dnssec_eligibility_response(*res).unwrap();
+        let data = super::handle_dnssec_eligibility_response(
+            *res, &crate::metrics::DummyMetrics::default()).unwrap();
         assert!(!data.eligible);
         assert_eq!(data.message, "Not eligible for DNSSEC discount");
         assert_eq!(data.code, 2000);
@@ -859,12 +1142,13 @@ mod eurid_tests {
     </trID>
   </response>
 </epp>"#;
-        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
+        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA.trim()).unwrap();
         let res = match res.message {
             super::proto::EPPMessageType::Response(r) => r,
             _ => unreachable!(),
         };
-        let data = super::handle_dns_quality_response(*res).unwrap();
+        let data = super::handle_dns_quality_response(
+            *res, &crate::metrics::DummyMetrics::default()).unwrap();
         assert!(data.check_time.is_some());
         assert_eq!(data.score, "10000");
         assert!(data.idn.is_none());
@@ -916,12 +1200,13 @@ mod eurid_tests {
     </trID>
   </response>
 </epp>"#;
-        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
+        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA.trim()).unwrap();
         let res = match res.message {
             super::proto::EPPMessageType::Response(r) => r,
             _ => unreachable!(),
         };
-        let data = super::super::contact::handle_info_response(*res).unwrap();
+        let data = super::super::contact::handle_info_response(
+            *res, &crate::metrics::DummyMetrics::default()).unwrap();
         let eurid_extension = data.eurid_contact_extension.unwrap();
         assert_eq!(
             data.entity_type,
@@ -979,12 +1264,13 @@ mod eurid_tests {
     </trID>
   </response>
 </epp>"#;
-        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
+        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA.trim()).unwrap();
         let res = match res.message {
             super::proto::EPPMessageType::Response(r) => r,
             _ => unreachable!(),
         };
-        let data = super::super::contact::handle_info_response(*res).unwrap();
+        let data = super::super::contact::handle_info_response(
+            *res, &crate::metrics::DummyMetrics::default()).unwrap();
         let eurid_extension = data.eurid_contact_extension.unwrap();
         assert_eq!(
             data.entity_type,
@@ -1046,12 +1332,13 @@ mod eurid_tests {
     </trID>
   </response>
 </epp>"#;
-        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
+        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA.trim()).unwrap();
         let res = match res.message {
             super::proto::EPPMessageType::Response(r) => r,
             _ => unreachable!(),
         };
-        let data = super::super::contact::handle_info_response(*res).unwrap();
+        let data = super::super::contact::handle_info_response(
+            *res, &crate::metrics::DummyMetrics::default()).unwrap();
         let eurid_extension = data.eurid_contact_extension.unwrap();
         assert_eq!(
             data.entity_type,
@@ -1109,12 +1396,13 @@ mod eurid_tests {
     </trID>
   </response>
 </epp>"#;
-        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
+        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA.trim()).unwrap();
         let res = match res.message {
             super::proto::EPPMessageType::Response(r) => r,
             _ => unreachable!(),
         };
-        let data = super::super::contact::handle_info_response(*res).unwrap();
+        let data = super::super::contact::handle_info_response(
+            *res, &crate::metrics::DummyMetrics::default()).unwrap();
         let eurid_extension = data.eurid_contact_extension.unwrap();
         assert_eq!(
             data.entity_type,
@@ -1158,12 +1446,13 @@ mod eurid_tests {
     </trID>
   </response>
 </epp>"#;
-        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
+        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA.trim()).unwrap();
         let res = match res.message {
             super::proto::EPPMessageType::Response(r) => r,
             _ => unreachable!(),
         };
-        let data = super::super::domain::handle_check_response(*res).unwrap();
+        let data = super::super::domain::handle_check_response(
+            *res, &crate::metrics::DummyMetrics::default()).unwrap();
         let eurid_extension = data.eurid_check.unwrap();
         assert!(!data.avail);
         assert_eq!(data.reason.unwrap(), "registered");
@@ -1206,12 +1495,13 @@ mod eurid_tests {
     </trID>
   </response>
 </epp>"#;
-        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
+        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA.trim()).unwrap();
         let res = match res.message {
             super::proto::EPPMessageType::Response(r) => r,
             _ => unreachable!(),
         };
-        let data = super::super::domain::handle_check_response(*res).unwrap();
+        let data = super::super::domain::handle_check_response(
+            *res, &crate::metrics::DummyMetrics::default()).unwrap();
         let idn = data.eurid_idn.unwrap();
         assert!(!data.avail);
         assert_eq!(data.reason.unwrap(), "registered");
@@ -1276,12 +1566,13 @@ mod eurid_tests {
     </trID>
   </response>
 </epp>"#;
-        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
+        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA.trim()).unwrap();
         let res = match res.message {
             super::proto::EPPMessageType::Response(r) => r,
             _ => unreachable!(),
         };
-        let data = super::super::domain::handle_info_response(*res).unwrap();
+        let data = super::super::domain::handle_info_response(
+            *res, &crate::metrics::DummyMetrics::default()).unwrap();
         let eurid_data = data.eurid_data.unwrap();
         assert_eq!(data.name, "somedomain.eu");
         assert!(!eurid_data.on_hold);
@@ -1367,12 +1658,13 @@ mod eurid_tests {
     </trID>
   </response>
 </epp>"#;
-        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
+        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA.trim()).unwrap();
         let res = match res.message {
             super::proto::EPPMessageType::Response(r) => r,
             _ => unreachable!(),
         };
-        let data = super::super::domain::handle_info_response(*res).unwrap();
+        let data = super::super::domain::handle_info_response(
+            *res, &crate::metrics::DummyMetrics::default()).unwrap();
         let eurid_data = data.eurid_data.unwrap();
         let eurid_idn = data.eurid_idn.unwrap();
         for ns in &data.nameservers {
@@ -1429,12 +1721,13 @@ mod eurid_tests {
     </trID>
   </response>
 </epp>"#;
-        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
+        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA.trim()).unwrap();
         let res = match res.message {
             super::proto::EPPMessageType::Response(r) => r,
             _ => unreachable!(),
         };
-        let data = super::super::domain::handle_renew_response(*res).unwrap();
+        let data = super::super::domain::handle_renew_response(
+            *res, &crate::metrics::DummyMetrics::default()).unwrap();
         let eurid_data = data.data.eurid_data.unwrap();
         assert!(data.data.eurid_idn.is_none());
         assert_eq!(data.data.name, "somedomain.eu");
@@ -1466,12 +1759,13 @@ mod eurid_tests {
     </trID>
   </response>
 </epp>"#;
-        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
+        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA.trim()).unwrap();
         let res = match res.message {
             super::proto::EPPMessageType::Response(r) => r,
             _ => unreachable!(),
         };
-        let data = super::super::domain::handle_renew_response(*res).unwrap();
+        let data = super::super::domain::handle_renew_response(
+            *res, &crate::metrics::DummyMetrics::default()).unwrap();
         let eurid_data = data.data.eurid_data.unwrap();
         assert!(data.data.eurid_idn.is_none());
         assert_eq!(data.data.name, "somedomain.eu");
@@ -1522,12 +1816,13 @@ mod eurid_tests {
     </trID>
   </response>
 </epp>"#;
-        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
+        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA.trim()).unwrap();
         let res = match res.message {
             super::proto::EPPMessageType::Response(r) => r,
             _ => unreachable!(),
         };
-        let data = super::super::domain::handle_transfer_response(*res).unwrap();
+        let data = super::super::domain::handle_transfer_response(
+            *res, &crate::metrics::DummyMetrics::default()).unwrap();
         let eurid_data = data.data.eurid_data.unwrap();
         let eurid_idn = data.data.eurid_idn.unwrap();
         assert_eq!(data.data.name, "вмкйршаудхыийведйкгг.ею");

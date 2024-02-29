@@ -48,7 +48,7 @@ pub(super) async fn recv_length_msg<R: Unpin + tokio::io::AsyncRead>(
         }
     }
     let data = match String::from_utf8(data_buf) {
-        Ok(s) => s,
+        Ok(s) => s.trim().to_string(),
         Err(err) => {
             error!("Invalid UTF8 from {}: {}", host, err);
             return Err(false);
@@ -115,21 +115,17 @@ pub(super) async fn send_msg<T, W: Unpin + tokio::io::AsyncWrite>(
 }
 
 /// Tokio task that attemps to read in messages and push them onto a tokio channel as received.
-pub(super) struct ClientReceiver<T, R: std::marker::Unpin + tokio::io::AsyncRead> {
+pub(super) struct ClientReceiver<T, R: std::marker::Unpin + tokio::io::AsyncRead, M: crate::metrics::Metrics> {
     /// Host name for error reporting
     pub host: String,
     /// Read half of the TLS stream used to connect to the server
     pub reader: R,
     pub log_storage: crate::StorageScoped,
-    pub metrics_registry: crate::metrics::ScopedMetrics,
+    pub metrics_registry: M,
     pub decode_fn: fn(data: String, host: &str) -> Result<T, ()>,
 }
 
-impl<
-        T: 'static + std::marker::Send,
-        R: 'static + std::marker::Unpin + tokio::io::AsyncRead + std::marker::Send,
-    > ClientReceiver<T, R>
-{
+impl<T: 'static + Send, R: 'static + Unpin + tokio::io::AsyncRead + Send, M: crate::metrics::Metrics + 'static> ClientReceiver<T, R, M> {
     /// Starts the tokio task, and returns the receiving end of the channel to read messages from.
     pub fn run(mut self) -> futures::channel::mpsc::Receiver<Result<T, bool>> {
         let (mut sender, receiver) = futures::channel::mpsc::channel::<Result<T, bool>>(16);

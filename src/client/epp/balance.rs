@@ -34,8 +34,8 @@ pub fn handle_balance(
     }
 }
 
-pub fn handle_balance_response(
-    response: proto::EPPResponse, _metrics: &crate::metrics::ScopedMetrics
+pub fn handle_balance_response<M: crate::metrics::Metrics>(
+    response: proto::EPPResponse, _metrics: &M
 ) -> Response<BalanceResponse> {
     match response.data {
         Some(value) => match value.value {
@@ -114,12 +114,13 @@ mod balance_tests {
         </trID>
     </response>
 </epp>"#;
-        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
+        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA.trim()).unwrap();
         let res = match res.message {
             super::proto::EPPMessageType::Response(r) => r,
             _ => unreachable!(),
         };
-        let data = super::handle_balance_response(*res).unwrap();
+        let data = super::handle_balance_response(
+            *res, &crate::metrics::DummyMetrics::default()).unwrap();
         assert_eq!(data.balance, "27.05");
         assert_eq!(data.currency, "CHF");
     }
@@ -144,12 +145,13 @@ mod balance_tests {
     </trID>
   </response>
 </epp>"#;
-        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
+        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA.trim()).unwrap();
         let res = match res.message {
             super::proto::EPPMessageType::Response(r) => r,
             _ => unreachable!(),
         };
-        let data = super::handle_balance_response(*res).unwrap();
+        let data = super::handle_balance_response(
+            *res, &crate::metrics::DummyMetrics::default()).unwrap();
         assert_eq!(data.balance, "99939047.94");
         assert_eq!(data.currency, "USD");
     }
@@ -180,12 +182,13 @@ mod balance_tests {
     </trID>
   </response>
 </epp>"#;
-        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
+        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA.trim()).unwrap();
         let res = match res.message {
             super::proto::EPPMessageType::Response(r) => r,
             _ => unreachable!(),
         };
-        let data = super::handle_balance_response(*res).unwrap();
+        let data = super::handle_balance_response(
+            *res, &crate::metrics::DummyMetrics::default()).unwrap();
         assert_eq!(data.balance, "200.00");
         assert_eq!(data.currency, "USD");
         assert_eq!(data.credit_limit.unwrap(), "1000.00");
@@ -222,12 +225,13 @@ mod balance_tests {
     </trID>
   </response>
 </epp>"#;
-        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
+        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA.trim()).unwrap();
         let res = match res.message {
             super::proto::EPPMessageType::Response(r) => r,
             _ => unreachable!(),
         };
-        let data = super::handle_balance_response(*res).unwrap();
+        let data = super::handle_balance_response(
+            *res, &crate::metrics::DummyMetrics::default()).unwrap();
         assert_eq!(data.balance, "200.00");
         assert_eq!(data.currency, "USD");
         assert_eq!(data.credit_limit.unwrap(), "1000.00");
@@ -260,12 +264,13 @@ mod balance_tests {
     </trID>
   </response>
 </epp>"#;
-        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
+        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA.trim()).unwrap();
         let res = match res.message {
             super::proto::EPPMessageType::Response(r) => r,
             _ => unreachable!(),
         };
-        let data = super::handle_balance_response(*res).unwrap();
+        let data = super::handle_balance_response(
+            *res, &crate::metrics::DummyMetrics::default()).unwrap();
         assert_eq!(data.balance, "3950.00");
         assert_eq!(data.currency, "EUR");
         assert_eq!(data.available_credit.unwrap(), "10000.00");
@@ -294,12 +299,13 @@ mod balance_tests {
     </trID>
   </response>
 </epp>"#;
-        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA).unwrap();
+        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA.trim()).unwrap();
         let res = match res.message {
             super::proto::EPPMessageType::Response(r) => r,
             _ => unreachable!(),
         };
-        let data = super::handle_balance_response(*res, &crate::metrics::Metrics::null()).unwrap();
+        let data = super::handle_balance_response(
+            *res, &crate::metrics::DummyMetrics::default()).unwrap();
         assert_eq!(data.balance, "10000.00");
         assert_eq!(data.currency, "EUR");
         assert!(data.available_credit.is_none());

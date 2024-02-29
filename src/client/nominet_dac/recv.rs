@@ -269,17 +269,15 @@ async fn recv_msg<R: std::marker::Unpin + tokio::io::AsyncBufRead>(
 }
 
 /// Tokio task that attemps to read in messages and push them onto a tokio channel as received.
-pub(super) struct ClientReceiver<R: std::marker::Unpin + tokio::io::AsyncBufRead> {
+pub(super) struct ClientReceiver<R: Unpin + tokio::io::AsyncBufRead, M: crate::metrics::Metrics> {
     /// Host name for error reporting
     pub host: String,
     /// Read half of the TCP stream used to connect to the server
     pub reader: R,
-    pub metrics_registry: crate::metrics::ScopedMetrics,
+    pub metrics_registry: M
 }
 
-impl<R: 'static + std::marker::Unpin + tokio::io::AsyncBufRead + std::marker::Send>
-    ClientReceiver<R>
-{
+impl<R: 'static + Unpin + tokio::io::AsyncBufRead + Send, M: crate::metrics::Metrics + 'static> ClientReceiver<R, M> {
     /// Starts the tokio task, and returns the receiving end of the channel to read messages from.
     pub fn run(self) -> futures::channel::mpsc::Receiver<Result<super::proto::DACResponse, bool>> {
         let (mut sender, receiver) =

@@ -50,7 +50,7 @@ pub struct NominetDACConf<'a> {
     pub time_delay: &'a str,
 }
 
-pub struct ClientConf<'a, C: Into<Option<&'a str>>> {
+pub struct ClientConf<'a, C: Into<Option<&'a str>>, M: crate::metrics::Metrics> {
     /// The server connection string, in the form `domain:port`
     pub host: &'a str,
     /// The client ID/tag to login with
@@ -58,7 +58,7 @@ pub struct ClientConf<'a, C: Into<Option<&'a str>>> {
     /// The password to login with
     pub password: &'a str,
     pub log_storage: crate::StorageScoped,
-    pub metrics_registry: crate::metrics::ScopedMetrics,
+    pub metrics_registry: M,
     pub client_cert: Option<ClientCertConf<'a>>,
     /// Source address to bind the TLS connection to, for IP based ACLs etc.
     pub source_address: Option<&'a std::net::IpAddr>,

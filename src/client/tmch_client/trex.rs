@@ -63,8 +63,8 @@ pub fn handle_trex_activate(
     Ok(tmch_proto::TMCHCommandType::Update(Box::new(command)))
 }
 
-pub fn handle_trex_activate_response(
-    response: tmch_proto::TMCHResponse, _metrics: &crate::metrics::ScopedMetrics
+pub fn handle_trex_activate_response<M: crate::metrics::Metrics>(
+    response: tmch_proto::TMCHResponse, _metrics: &M
 ) -> Response<TrexActivateResponse> {
     match response.data {
         Some(_) => Err(Error::ServerInternal),
@@ -109,8 +109,8 @@ pub fn handle_trex_renew(
     Ok(tmch_proto::TMCHCommandType::Update(Box::new(command)))
 }
 
-pub fn handle_trex_renew_response(
-    response: tmch_proto::TMCHResponse, _metrics: &crate::metrics::ScopedMetrics
+pub fn handle_trex_renew_response<M: crate::metrics::Metrics>(
+    response: tmch_proto::TMCHResponse, _metrics: &M
 ) -> Response<TrexRenewResponse> {
     match response.data {
         Some(_) => Err(Error::ServerInternal),

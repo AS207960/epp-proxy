@@ -9,7 +9,7 @@ macro_rules! router {
         #[derive(Default, Debug)]
         pub struct Router {}
 
-        impl router::InnerRouter<()> for Router {
+        impl<M: crate::metrics::Metrics> router::InnerRouter<(), M> for Router {
             type Request = super::tmch_proto::TMCHCommandType;
             type Response = super::tmch_proto::TMCHResponse;
 
@@ -20,7 +20,7 @@ macro_rules! router {
 
                 $(fn [<$n _response>](
                     &mut self, return_path: router::Sender<router::[<$n Response>]>,
-                    response: Self::Response, metrics: &crate::metrics::ScopedMetrics
+                    response: Self::Response, metrics: &M
                 ) {
                     let _ = if !response.is_success() {
                         if response.is_server_error() {
@@ -52,7 +52,7 @@ fn request_nop<T, R>(_client: &(), _req: &T) -> HandleReqReturn<R> {
     Err(Response::Err(Error::Unsupported))
 }
 
-fn response_nop<T, R>(_response: T, _metrics: &crate::metrics::ScopedMetrics) -> Result<R, Error> {
+fn response_nop<T, R, M: crate::metrics::Metrics>(_response: T, _metrics: &M) -> Result<R, Error> {
     Err(Error::Unsupported)
 }
 

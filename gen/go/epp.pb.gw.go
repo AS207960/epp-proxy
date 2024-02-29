@@ -992,6 +992,74 @@ func local_request_EPPProxy_DomainRestoreRequest_0(ctx context.Context, marshale
 
 }
 
+func request_EPPProxy_DomainRestoreReport_0(ctx context.Context, marshaler runtime.Marshaler, client EPPProxyClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq rgp.ReportRequest
+	var metadata runtime.ServerMetadata
+
+	newReader, berr := utilities.IOReaderFactory(req.Body)
+	if berr != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
+	}
+	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq); err != nil && err != io.EOF {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+
+	var (
+		val string
+		ok  bool
+		err error
+		_   = err
+	)
+
+	val, ok = pathParams["name"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "name")
+	}
+
+	protoReq.Name, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "name", err)
+	}
+
+	msg, err := client.DomainRestoreReport(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+
+}
+
+func local_request_EPPProxy_DomainRestoreReport_0(ctx context.Context, marshaler runtime.Marshaler, server EPPProxyServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq rgp.ReportRequest
+	var metadata runtime.ServerMetadata
+
+	newReader, berr := utilities.IOReaderFactory(req.Body)
+	if berr != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
+	}
+	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq); err != nil && err != io.EOF {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+
+	var (
+		val string
+		ok  bool
+		err error
+		_   = err
+	)
+
+	val, ok = pathParams["name"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "name")
+	}
+
+	protoReq.Name, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "name", err)
+	}
+
+	msg, err := server.DomainRestoreReport(ctx, &protoReq)
+	return msg, metadata, err
+
+}
+
 func request_EPPProxy_DomainSync_0(ctx context.Context, marshaler runtime.Marshaler, client EPPProxyClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq domain.DomainSyncRequest
 	var metadata runtime.ServerMetadata
@@ -4499,6 +4567,30 @@ func RegisterEPPProxyHandlerServer(ctx context.Context, mux *runtime.ServeMux, s
 
 	})
 
+	mux.Handle("POST", pattern_EPPProxy_DomainRestoreReport_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		var err error
+		ctx, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/epp.EPPProxy/DomainRestoreReport", runtime.WithHTTPPathPattern("/domain/{name}/restore/report"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_EPPProxy_DomainRestoreReport_0(ctx, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_EPPProxy_DomainRestoreReport_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
 	mux.Handle("POST", pattern_EPPProxy_DomainSync_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
@@ -4650,7 +4742,7 @@ func RegisterEPPProxyHandlerServer(ctx context.Context, mux *runtime.ServeMux, s
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
-		ctx, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/epp.EPPProxy/ContactCheck", runtime.WithHTTPPathPattern("/host/{registry_name}/{id}/check"))
+		ctx, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/epp.EPPProxy/ContactCheck", runtime.WithHTTPPathPattern("/contact/{registry_name}/{id}/check"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -4674,7 +4766,7 @@ func RegisterEPPProxyHandlerServer(ctx context.Context, mux *runtime.ServeMux, s
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
-		ctx, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/epp.EPPProxy/ContactInfo", runtime.WithHTTPPathPattern("/host/{registry_name}/{id}"))
+		ctx, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/epp.EPPProxy/ContactInfo", runtime.WithHTTPPathPattern("/contact/{registry_name}/{id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -4698,7 +4790,7 @@ func RegisterEPPProxyHandlerServer(ctx context.Context, mux *runtime.ServeMux, s
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
-		ctx, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/epp.EPPProxy/ContactCreate", runtime.WithHTTPPathPattern("/host/{registry_name}/{id}/create"))
+		ctx, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/epp.EPPProxy/ContactCreate", runtime.WithHTTPPathPattern("/contact/{registry_name}/{id}/create"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -4722,7 +4814,7 @@ func RegisterEPPProxyHandlerServer(ctx context.Context, mux *runtime.ServeMux, s
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
-		ctx, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/epp.EPPProxy/ContactDelete", runtime.WithHTTPPathPattern("/host/{registry_name}/{id}/delete"))
+		ctx, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/epp.EPPProxy/ContactDelete", runtime.WithHTTPPathPattern("/contact/{registry_name}/{id}/delete"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -4746,7 +4838,7 @@ func RegisterEPPProxyHandlerServer(ctx context.Context, mux *runtime.ServeMux, s
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
-		ctx, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/epp.EPPProxy/ContactUpdate", runtime.WithHTTPPathPattern("/host/{registry_name}/{id}/update"))
+		ctx, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/epp.EPPProxy/ContactUpdate", runtime.WithHTTPPathPattern("/contact/{registry_name}/{id}/update"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -4770,7 +4862,7 @@ func RegisterEPPProxyHandlerServer(ctx context.Context, mux *runtime.ServeMux, s
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
-		ctx, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/epp.EPPProxy/ContactTransferQuery", runtime.WithHTTPPathPattern("/host/{registry_name}/{id}/transfer"))
+		ctx, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/epp.EPPProxy/ContactTransferQuery", runtime.WithHTTPPathPattern("/contact/{registry_name}/{id}/transfer"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -4794,7 +4886,7 @@ func RegisterEPPProxyHandlerServer(ctx context.Context, mux *runtime.ServeMux, s
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
-		ctx, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/epp.EPPProxy/ContactTransferRequest", runtime.WithHTTPPathPattern("/host/{registry_name}/{id}/transfer/request"))
+		ctx, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/epp.EPPProxy/ContactTransferRequest", runtime.WithHTTPPathPattern("/contact/{registry_name}/{id}/transfer/request"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -4818,7 +4910,7 @@ func RegisterEPPProxyHandlerServer(ctx context.Context, mux *runtime.ServeMux, s
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
-		ctx, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/epp.EPPProxy/ContactTransferAccept", runtime.WithHTTPPathPattern("/host/{registry_name}/{id}/transfer/accept"))
+		ctx, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/epp.EPPProxy/ContactTransferAccept", runtime.WithHTTPPathPattern("/contact/{registry_name}/{id}/transfer/accept"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -4842,7 +4934,7 @@ func RegisterEPPProxyHandlerServer(ctx context.Context, mux *runtime.ServeMux, s
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
-		ctx, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/epp.EPPProxy/ContactTransferReject", runtime.WithHTTPPathPattern("/host/{registry_name}/{id}/transfer/reject"))
+		ctx, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/epp.EPPProxy/ContactTransferReject", runtime.WithHTTPPathPattern("/contact/{registry_name}/{id}/transfer/reject"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -5849,6 +5941,27 @@ func RegisterEPPProxyHandlerClient(ctx context.Context, mux *runtime.ServeMux, c
 
 	})
 
+	mux.Handle("POST", pattern_EPPProxy_DomainRestoreReport_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		var err error
+		ctx, err = runtime.AnnotateContext(ctx, mux, req, "/epp.EPPProxy/DomainRestoreReport", runtime.WithHTTPPathPattern("/domain/{name}/restore/report"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_EPPProxy_DomainRestoreReport_0(ctx, inboundMarshaler, client, req, pathParams)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_EPPProxy_DomainRestoreReport_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
 	mux.Handle("POST", pattern_EPPProxy_DomainSync_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
@@ -5980,7 +6093,7 @@ func RegisterEPPProxyHandlerClient(ctx context.Context, mux *runtime.ServeMux, c
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
-		ctx, err = runtime.AnnotateContext(ctx, mux, req, "/epp.EPPProxy/ContactCheck", runtime.WithHTTPPathPattern("/host/{registry_name}/{id}/check"))
+		ctx, err = runtime.AnnotateContext(ctx, mux, req, "/epp.EPPProxy/ContactCheck", runtime.WithHTTPPathPattern("/contact/{registry_name}/{id}/check"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -6001,7 +6114,7 @@ func RegisterEPPProxyHandlerClient(ctx context.Context, mux *runtime.ServeMux, c
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
-		ctx, err = runtime.AnnotateContext(ctx, mux, req, "/epp.EPPProxy/ContactInfo", runtime.WithHTTPPathPattern("/host/{registry_name}/{id}"))
+		ctx, err = runtime.AnnotateContext(ctx, mux, req, "/epp.EPPProxy/ContactInfo", runtime.WithHTTPPathPattern("/contact/{registry_name}/{id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -6022,7 +6135,7 @@ func RegisterEPPProxyHandlerClient(ctx context.Context, mux *runtime.ServeMux, c
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
-		ctx, err = runtime.AnnotateContext(ctx, mux, req, "/epp.EPPProxy/ContactCreate", runtime.WithHTTPPathPattern("/host/{registry_name}/{id}/create"))
+		ctx, err = runtime.AnnotateContext(ctx, mux, req, "/epp.EPPProxy/ContactCreate", runtime.WithHTTPPathPattern("/contact/{registry_name}/{id}/create"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -6043,7 +6156,7 @@ func RegisterEPPProxyHandlerClient(ctx context.Context, mux *runtime.ServeMux, c
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
-		ctx, err = runtime.AnnotateContext(ctx, mux, req, "/epp.EPPProxy/ContactDelete", runtime.WithHTTPPathPattern("/host/{registry_name}/{id}/delete"))
+		ctx, err = runtime.AnnotateContext(ctx, mux, req, "/epp.EPPProxy/ContactDelete", runtime.WithHTTPPathPattern("/contact/{registry_name}/{id}/delete"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -6064,7 +6177,7 @@ func RegisterEPPProxyHandlerClient(ctx context.Context, mux *runtime.ServeMux, c
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
-		ctx, err = runtime.AnnotateContext(ctx, mux, req, "/epp.EPPProxy/ContactUpdate", runtime.WithHTTPPathPattern("/host/{registry_name}/{id}/update"))
+		ctx, err = runtime.AnnotateContext(ctx, mux, req, "/epp.EPPProxy/ContactUpdate", runtime.WithHTTPPathPattern("/contact/{registry_name}/{id}/update"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -6085,7 +6198,7 @@ func RegisterEPPProxyHandlerClient(ctx context.Context, mux *runtime.ServeMux, c
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
-		ctx, err = runtime.AnnotateContext(ctx, mux, req, "/epp.EPPProxy/ContactTransferQuery", runtime.WithHTTPPathPattern("/host/{registry_name}/{id}/transfer"))
+		ctx, err = runtime.AnnotateContext(ctx, mux, req, "/epp.EPPProxy/ContactTransferQuery", runtime.WithHTTPPathPattern("/contact/{registry_name}/{id}/transfer"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -6106,7 +6219,7 @@ func RegisterEPPProxyHandlerClient(ctx context.Context, mux *runtime.ServeMux, c
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
-		ctx, err = runtime.AnnotateContext(ctx, mux, req, "/epp.EPPProxy/ContactTransferRequest", runtime.WithHTTPPathPattern("/host/{registry_name}/{id}/transfer/request"))
+		ctx, err = runtime.AnnotateContext(ctx, mux, req, "/epp.EPPProxy/ContactTransferRequest", runtime.WithHTTPPathPattern("/contact/{registry_name}/{id}/transfer/request"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -6127,7 +6240,7 @@ func RegisterEPPProxyHandlerClient(ctx context.Context, mux *runtime.ServeMux, c
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
-		ctx, err = runtime.AnnotateContext(ctx, mux, req, "/epp.EPPProxy/ContactTransferAccept", runtime.WithHTTPPathPattern("/host/{registry_name}/{id}/transfer/accept"))
+		ctx, err = runtime.AnnotateContext(ctx, mux, req, "/epp.EPPProxy/ContactTransferAccept", runtime.WithHTTPPathPattern("/contact/{registry_name}/{id}/transfer/accept"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -6148,7 +6261,7 @@ func RegisterEPPProxyHandlerClient(ctx context.Context, mux *runtime.ServeMux, c
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
-		ctx, err = runtime.AnnotateContext(ctx, mux, req, "/epp.EPPProxy/ContactTransferReject", runtime.WithHTTPPathPattern("/host/{registry_name}/{id}/transfer/reject"))
+		ctx, err = runtime.AnnotateContext(ctx, mux, req, "/epp.EPPProxy/ContactTransferReject", runtime.WithHTTPPathPattern("/contact/{registry_name}/{id}/transfer/reject"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -6784,6 +6897,8 @@ var (
 
 	pattern_EPPProxy_DomainRestoreRequest_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"domain", "name", "restore"}, ""))
 
+	pattern_EPPProxy_DomainRestoreReport_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 2, 3}, []string{"domain", "name", "restore", "report"}, ""))
+
 	pattern_EPPProxy_DomainSync_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"domain", "name", "sync"}, ""))
 
 	pattern_EPPProxy_HostCheck_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"host", "registry_name", "name", "check"}, ""))
@@ -6796,23 +6911,23 @@ var (
 
 	pattern_EPPProxy_HostUpdate_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"host", "registry_name", "name", "update"}, ""))
 
-	pattern_EPPProxy_ContactCheck_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"host", "registry_name", "id", "check"}, ""))
+	pattern_EPPProxy_ContactCheck_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"contact", "registry_name", "id", "check"}, ""))
 
-	pattern_EPPProxy_ContactInfo_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 1, 0, 4, 1, 5, 2}, []string{"host", "registry_name", "id"}, ""))
+	pattern_EPPProxy_ContactInfo_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 1, 0, 4, 1, 5, 2}, []string{"contact", "registry_name", "id"}, ""))
 
-	pattern_EPPProxy_ContactCreate_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"host", "registry_name", "id", "create"}, ""))
+	pattern_EPPProxy_ContactCreate_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"contact", "registry_name", "id", "create"}, ""))
 
-	pattern_EPPProxy_ContactDelete_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"host", "registry_name", "id", "delete"}, ""))
+	pattern_EPPProxy_ContactDelete_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"contact", "registry_name", "id", "delete"}, ""))
 
-	pattern_EPPProxy_ContactUpdate_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"host", "registry_name", "id", "update"}, ""))
+	pattern_EPPProxy_ContactUpdate_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"contact", "registry_name", "id", "update"}, ""))
 
-	pattern_EPPProxy_ContactTransferQuery_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"host", "registry_name", "id", "transfer"}, ""))
+	pattern_EPPProxy_ContactTransferQuery_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"contact", "registry_name", "id", "transfer"}, ""))
 
-	pattern_EPPProxy_ContactTransferRequest_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 1, 0, 4, 1, 5, 2, 2, 3, 2, 4}, []string{"host", "registry_name", "id", "transfer", "request"}, ""))
+	pattern_EPPProxy_ContactTransferRequest_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 1, 0, 4, 1, 5, 2, 2, 3, 2, 4}, []string{"contact", "registry_name", "id", "transfer", "request"}, ""))
 
-	pattern_EPPProxy_ContactTransferAccept_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 1, 0, 4, 1, 5, 2, 2, 3, 2, 4}, []string{"host", "registry_name", "id", "transfer", "accept"}, ""))
+	pattern_EPPProxy_ContactTransferAccept_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 1, 0, 4, 1, 5, 2, 2, 3, 2, 4}, []string{"contact", "registry_name", "id", "transfer", "accept"}, ""))
 
-	pattern_EPPProxy_ContactTransferReject_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 1, 0, 4, 1, 5, 2, 2, 3, 2, 4}, []string{"host", "registry_name", "id", "transfer", "reject"}, ""))
+	pattern_EPPProxy_ContactTransferReject_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 1, 0, 4, 1, 5, 2, 2, 3, 2, 4}, []string{"contact", "registry_name", "id", "transfer", "reject"}, ""))
 
 	pattern_EPPProxy_MaintenanceList_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"maintenance", "registry_name"}, ""))
 
@@ -6899,6 +7014,8 @@ var (
 	forward_EPPProxy_DomainTransferReject_0 = runtime.ForwardResponseMessage
 
 	forward_EPPProxy_DomainRestoreRequest_0 = runtime.ForwardResponseMessage
+
+	forward_EPPProxy_DomainRestoreReport_0 = runtime.ForwardResponseMessage
 
 	forward_EPPProxy_DomainSync_0 = runtime.ForwardResponseMessage
 

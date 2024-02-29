@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema targetNamespace="http://www.eurid.eu/xml/epp/dnsQuality-2.0"
+        xmlns:dnsQuality="http://www.eurid.eu/xml/epp/dnsQuality-2.0"
+        xmlns:eppcom="urn:ietf:params:xml:ns:eppcom-1.0"
+        xmlns="http://www.w3.org/2001/XMLSchema"
+        elementFormDefault="qualified">
+  <!--
+    Import common element types.
+  -->
+  <import namespace="urn:ietf:params:xml:ns:eppcom-1.0"/>
+
+  <annotation>
+    <documentation>
+      Extensible Provisioning Protocol v1.0
+      EURid specific extension for DNS quality.
+    </documentation>
+  </annotation>
+  <!--
+    Child elements found in EPP commands.
+    -->
+  <element name="info" type="dnsQuality:authIDType"/>
+
+  <!--
+  Child elements of the <info> command.
+  -->
+  <complexType name="authIDType">
+    <sequence>
+      <element name="name" type="eppcom:labelType"/>
+    </sequence>
+  </complexType>
+
+  <!--
+  Child response elements.
+  -->
+  <element name="infData" type="dnsQuality:infDataType"/>
+
+  <!--
+  <info> response elements.
+  -->
+  <complexType name="infDataType">
+    <sequence>
+      <element name="name" type="string"/>
+      <element name="checkTime" type="dateTime" minOccurs="0"/>
+      <element name="score" type="string"/>
+    </sequence>
+  </complexType>
+
+
+  <!--
+  End of schema.
+  -->
+</schema>

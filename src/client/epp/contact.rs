@@ -556,8 +556,8 @@ pub fn handle_check(client: &ServerFeatures, req: &CheckRequest) -> HandleReqRet
     ))
 }
 
-pub fn handle_check_response(
-    response: proto::EPPResponse, _metrics: &crate::metrics::ScopedMetrics
+pub fn handle_check_response<M: crate::metrics::Metrics>(
+    response: proto::EPPResponse, _metrics: &M
 ) -> Response<CheckResponse> {
     match response.data {
         Some(value) => match value.value {
@@ -594,8 +594,8 @@ pub fn handle_info(client: &ServerFeatures, req: &InfoRequest) -> HandleReqRetur
     ))
 }
 
-pub fn handle_info_response(
-    response: proto::EPPResponse, _metrics: &crate::metrics::ScopedMetrics
+pub fn handle_info_response<M: crate::metrics::Metrics>(
+    response: proto::EPPResponse, _metrics: &M
 ) -> Response<InfoResponse> {
     match response.data {
         Some(value) => match value.value {
@@ -937,8 +937,8 @@ pub fn handle_create(
     ))
 }
 
-pub fn handle_create_response(
-    response: proto::EPPResponse, _metrics: &crate::metrics::ScopedMetrics
+pub fn handle_create_response<M: crate::metrics::Metrics>(
+    response: proto::EPPResponse, _metrics: &M
 ) -> Response<CreateResponse> {
     match response.data {
         Some(ref value) => match &value.value {
@@ -978,8 +978,8 @@ pub fn handle_delete(
     ))
 }
 
-pub fn handle_delete_response(
-    response: proto::EPPResponse, _metrics: &crate::metrics::ScopedMetrics
+pub fn handle_delete_response<M: crate::metrics::Metrics>(
+    response: proto::EPPResponse, _metrics: &M
 ) -> Response<DeleteResponse> {
     Response::Ok(DeleteResponse {
         pending: response.is_pending(),
@@ -1239,8 +1239,8 @@ pub fn handle_update(
     ))
 }
 
-pub fn handle_update_response(
-    response: proto::EPPResponse, _metrics: &crate::metrics::ScopedMetrics
+pub fn handle_update_response<M: crate::metrics::Metrics>(
+    response: proto::EPPResponse, _metrics: &M
 ) -> Response<UpdateResponse> {
     Response::Ok(UpdateResponse {
         pending: response.is_pending(),
@@ -1387,8 +1387,8 @@ pub fn handle_transfer_reject(
     ))
 }
 
-pub fn handle_transfer_response(
-    response: proto::EPPResponse, _metrics: &crate::metrics::ScopedMetrics
+pub fn handle_transfer_response<M: crate::metrics::Metrics>(
+    response: proto::EPPResponse, _metrics: &M
 ) -> Response<TransferResponse> {
     let pending = response.is_pending();
     match &response.data {
@@ -1463,7 +1463,8 @@ mod test {
             super::proto::EPPMessageType::Response(r) => r,
             _ => unreachable!(),
         };
-        let data = super::handle_info_response(*res).unwrap();
+        let data = super::handle_info_response(
+            *res, &crate::metrics::DummyMetrics::default()).unwrap();
         let qualified_lawyer = data.qualified_lawyer.unwrap();
         assert_eq!(data.id, "aw2015");
         assert_eq!(qualified_lawyer.accreditation_id, "KS-123456");

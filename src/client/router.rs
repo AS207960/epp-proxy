@@ -35,10 +35,10 @@ macro_rules! router {
 
         #[allow(non_snake_case)]
         #[derive(Debug)]
-        pub struct Router<I: InnerRouter<T>, T> {
+        pub struct Router<I: InnerRouter<T, M>, T, M: crate::metrics::Metrics> {
             _marker: std::marker::PhantomData<T>,
             pub inner: Box<I>,
-            metrics_registry: crate::metrics::ScopedMetrics,
+            metrics_registry: M,
             $($n: HashMap<uuid::Uuid, (Sender<$res>, Option<prometheus::HistogramTimer>)>,)*
         }
 
@@ -49,17 +49,17 @@ macro_rules! router {
 
         paste! {
             #[allow(non_snake_case)]
-            pub trait InnerRouter<T> {
+            pub trait InnerRouter<T, M: crate::metrics::Metrics> {
                 type Request;
                 type Response;
 
                 $(fn [<$n _request>](&mut self, client: &T, req: &$req, command_id: uuid::Uuid) -> Result<Self::Request, Response<$res>>;)*
-                $(fn [<$n _response>](&mut self, return_path: Sender<$res>, response: Self::Response, metrics: &crate::metrics::ScopedMetrics);)*
+                $(fn [<$n _response>](&mut self, return_path: Sender<$res>, response: Self::Response, metrics: &M);)*
             }
         }
 
-        impl<T, I: Default + InnerRouter<T>> Router<I, T> {
-            pub fn new(metrics_registry: &crate::metrics::ScopedMetrics) -> Self {
+        impl<T, I: Default + InnerRouter<T, M>, M: crate::metrics::Metrics> Router<I, T, M> {
+            pub fn new(metrics_registry: &M) -> Self {
                 Self {
                     _marker: Default::default(),
                     metrics_registry: metrics_registry.clone(),

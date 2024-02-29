@@ -1,5 +1,5 @@
 #[derive(Debug)]
-pub struct Metrics {
+pub struct PrometheusMetrics {
     connection_up: prometheus::IntGaugeVec,
     request_count: prometheus::IntCounterVec,
     response_count: prometheus::IntCounterVec,
@@ -7,7 +7,7 @@ pub struct Metrics {
     response_time: prometheus::HistogramVec,
 }
 
-impl Metrics {
+impl PrometheusMetrics {
     pub fn new() -> Result<Self, prometheus::Error> {
         Ok(Self {
             connection_up: prometheus::register_int_gauge_vec!(
@@ -40,64 +40,79 @@ impl Metrics {
 
     pub fn new_scope(self: &std::sync::Arc<Self>, id: String) -> ScopedMetrics {
         ScopedMetrics {
-            metrics: Some(self.clone()),
+            metrics: self.clone(),
             id,
         }
     }
+}
 
-    pub fn null() -> ScopedMetrics {
-        ScopedMetrics {
-            metrics: None,
-            id: String::new(),
-        }
-    }
+pub trait Metrics: Clone + Send + Sync {
+    type Subordinate: Metrics;
+
+    fn connection_status(&self, up: bool);
+    fn request_sent(&self);
+    fn response_received(&self);
+    fn poll_received(&self, command: &str);
+    fn record_response_time(&self, command: &str) -> Option<prometheus::HistogramTimer>;
+    fn subordinate(&self, extra: &str) -> Self::Subordinate;
 }
 
 #[derive(Debug, Clone)]
 pub struct ScopedMetrics {
-    metrics: Option<std::sync::Arc<Metrics>>,
+    metrics: std::sync::Arc<PrometheusMetrics>,
     id: String,
 }
 
-impl ScopedMetrics {
-    pub(crate) fn connection_status(&self, up: bool) {
-        if let Some(metrics) = &self.metrics {
-            metrics
-                .connection_up
-                .with_label_values(&[&self.id])
-                .set(if up { 1 } else { 0 })
-        }
+impl Metrics for ScopedMetrics {
+    type Subordinate = ScopedMetrics;
+
+    fn connection_status(&self, up: bool) {
+        self.metrics
+            .connection_up
+            .with_label_values(&[&self.id])
+            .set(if up { 1 } else { 0 });
     }
 
-    pub(crate) fn request_sent(&self) {
-        if let Some(metrics) = &self.metrics {
-            metrics.request_count.with_label_values(&[&self.id]).inc();
-        }
+    fn request_sent(&self) {
+        self.metrics.request_count.with_label_values(&[&self.id]).inc();
     }
 
-    pub(crate) fn response_received(&self) {
-        if let Some(metrics) = &self.metrics {
-            metrics.response_count.with_label_values(&[&self.id]).inc();
-        }
+    fn response_received(&self) {
+        self.metrics.response_count.with_label_values(&[&self.id]).inc();
     }
 
-    pub(crate) fn poll_received(&self, command: &str) {
-        if let Some(metrics) = &self.metrics {
-            metrics.poll_result_count.with_label_values(&[&self.id, command]).inc();
-        }
+    fn poll_received(&self, command: &str) {
+        self.metrics.poll_result_count.with_label_values(&[&self.id, command]).inc();
     }
 
-    pub(crate) fn record_response_time(&self, command: &str) -> Option<prometheus::HistogramTimer> {
-        self.metrics.as_ref().map(|metrics| metrics
-                    .response_time
-                    .with_label_values(&[&self.id, command])
-                    .start_timer())
+    fn record_response_time(&self, command: &str) -> Option<prometheus::HistogramTimer> {
+        Some(self.metrics.response_time
+            .with_label_values(&[&self.id, command])
+            .start_timer())
     }
 
-    pub(crate) fn subordinate(&self, extra: &str) -> ScopedMetrics {
+    fn subordinate(&self, extra: &str) -> Self {
         ScopedMetrics {
             metrics: self.metrics.clone(),
             id: format!("{}_{}", self.id, extra),
         }
+    }
+}
+
+#[derive(Default, Clone)]
+pub struct DummyMetrics {}
+
+impl Metrics for DummyMetrics {
+    type Subordinate = DummyMetrics;
+
+    fn connection_status(&self, _up: bool) {}
+    fn request_sent(&self) {}
+    fn response_received(&self) {}
+    fn poll_received(&self, _command: &str) {}
+    fn record_response_time(&self, _command: &str) -> Option<prometheus::HistogramTimer> {
+        None
+    }
+    fn subordinate(&self, _extra: &str) -> Self {
+        DummyMetrics::default()
     }
 }

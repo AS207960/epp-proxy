@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<schema targetNamespace="http://www.eurid.eu/xml/epp/registrationLimit-1.1"
+        xmlns:registrationLimit="http://www.eurid.eu/xml/epp/registrationLimit-1.1"
+        xmlns="http://www.w3.org/2001/XMLSchema"
+        elementFormDefault="qualified">
+
+  <annotation>
+    <documentation>
+      Extensible Provisioning Protocol v1.0
+      EURid specific extension for displaying registration limit.
+    </documentation>
+  </annotation>
+
+  <!--
+  Child elements found in EPP commands.
+  -->
+  <element name="info"/>
+
+  <!--
+  Child response elements.
+  -->
+  <element name="infData" type="registrationLimit:infDataType"/>
+
+  <!--
+  <info> response elements.
+  -->
+  <complexType name="infDataType">
+    <sequence>
+      <element name="monthlyRegistrations" type="int"/>
+      <element name="maxMonthlyRegistrations" type="int" minOccurs="0"/>
+      <element name="limitedUntil" type="dateTime" minOccurs="0"/>
+    </sequence>
+  </complexType>
+
+  <!--
+  End of schema.
+  -->
+</schema>

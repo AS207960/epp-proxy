@@ -83,6 +83,7 @@ impl From<epp_proto::eurid::DomainCreateExtension> for client::eurid::DomainCrea
             on_site: from.on_site,
             reseller: from.reseller,
             registrar_reference: from.registrar_reference,
+            voucher: from.voucher,
         }
     }
 }

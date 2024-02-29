@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema targetNamespace="http://www.eurid.eu/xml/epp/nsgroup-1.1"
+        xmlns:nsgroup="http://www.eurid.eu/xml/epp/nsgroup-1.1"
+        xmlns:eppcom="urn:ietf:params:xml:ns:eppcom-1.0"
+        xmlns:euridcom="http://www.eurid.eu/xml/epp/euridcom-1.0"
+        xmlns="http://www.w3.org/2001/XMLSchema"
+        elementFormDefault="qualified">
+
+  <!--
+  Import common element types.
+  -->
+  <import namespace="urn:ietf:params:xml:ns:eppcom-1.0"/>
+  <import namespace="http://www.eurid.eu/xml/epp/euridcom-1.0"/>
+
+  <annotation>
+    <documentation>
+      Extensible Provisioning Protocol v1.0
+      EURid specific extension for nsgroup handling.
+    </documentation>
+  </annotation>
+
+  <!--
+  Child elements found in EPP commands.
+  -->
+  <element name="check" type="nsgroup:mNameType"/>
+  <element name="create" type="nsgroup:creUpdType"/>
+  <element name="delete" type="nsgroup:sIDType"/>
+  <element name="info" type="nsgroup:authIDType"/>
+  <element name="update" type="nsgroup:creUpdType"/>
+
+  <!--
+  Child elements of the <create> or <update> command.
+  -->
+  <complexType name="creUpdType">
+    <sequence>
+      <element name="name" type="euridcom:nsgType"/>
+      <element name="ns" type="eppcom:labelType" minOccurs="0" maxOccurs="9"/>
+    </sequence>
+  </complexType>
+
+  <!--
+  Child elements of commands that require only an identifier.
+  -->
+  <complexType name="sIDType">
+    <sequence>
+      <element name="name" type="euridcom:nsgType"/>
+    </sequence>
+  </complexType>
+
+  <!--
+  Child elements of the <info> command.
+  -->
+  <complexType name="authIDType">
+    <sequence>
+      <element name="name" type="euridcom:nsgType"/>
+      <element name="authInfo" type="nsgroup:authInfoType" minOccurs="0"/>
+    </sequence>
+  </complexType>
+
+  <!--
+  Child elements of <check> command.
+  -->
+  <complexType name="mNameType">
+    <sequence>
+      <element name="name" type="euridcom:nsgType" maxOccurs="unbounded"/>
+    </sequence>
+  </complexType>
+
+  <!--
+  Child response elements.
+  -->
+  <element name="chkData" type="nsgroup:chkDataType"/>
+  <element name="infData" type="nsgroup:creUpdType"/>
+
+  <!--
+  <check> response elements.
+  -->
+  <complexType name="chkDataType">
+    <sequence>
+      <element name="cd" type="nsgroup:checkType"
+               maxOccurs="unbounded"/>
+    </sequence>
+  </complexType>
+
+  <complexType name="checkType">
+    <sequence>
+      <element name="name" type="nsgroup:checkNameType"/>
+      <element name="reason" type="eppcom:reasonType"
+               minOccurs="0"/>
+    </sequence>
+  </complexType>
+
+  <complexType name="checkNameType">
+    <simpleContent>
+      <extension base="euridcom:nsgType">
+        <attribute name="avail" type="boolean" use="required"/>
+      </extension>
+    </simpleContent>
+  </complexType>
+
+  <complexType name="authInfoType">
+    <choice>
+      <element name="pw" type="eppcom:pwAuthInfoType"/>
+      <element name="ext" type="eppcom:extAuthInfoType"/>
+    </choice>
+  </complexType>
+
+  <!--
+  End of schema.
+  -->
+</schema>

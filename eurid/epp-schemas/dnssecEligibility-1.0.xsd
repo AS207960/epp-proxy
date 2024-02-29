@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema targetNamespace="http://www.eurid.eu/xml/epp/dnssecEligibility-1.0"
+        xmlns:dnssecEligibility="http://www.eurid.eu/xml/epp/dnssecEligibility-1.0"
+        xmlns:eppcom="urn:ietf:params:xml:ns:eppcom-1.0"
+        xmlns="http://www.w3.org/2001/XMLSchema"
+        elementFormDefault="qualified">
+  <!--
+    Import common element types.
+  -->
+  <import namespace="urn:ietf:params:xml:ns:eppcom-1.0"/>
+
+  <annotation>
+    <documentation>
+      Extensible Provisioning Protocol v1.0
+      EURid specific extension for DNSSEC eligibility.
+    </documentation>
+  </annotation>
+  <!--
+    Child elements found in EPP commands.
+    -->
+  <element name="info" type="dnssecEligibility:authIDType"/>
+
+  <!--
+  Child elements of the <info> command.
+  -->
+  <complexType name="authIDType">
+    <sequence>
+      <element name="name" type="eppcom:labelType"/>
+    </sequence>
+  </complexType>
+
+  <!--
+  Child response elements.
+  -->
+  <element name="infData" type="dnssecEligibility:infDataType"/>
+
+  <!--
+  <info> response elements.
+  -->
+  <complexType name="infDataType">
+    <sequence>
+      <element name="name" type="eppcom:labelType"/>
+      <element name="eligible" type="boolean"/>
+      <element name="msg" type="string"/>
+      <element name="code" type="int"/>
+    </sequence>
+  </complexType>
+
+
+  <!--
+  End of schema.
+  -->
+</schema>

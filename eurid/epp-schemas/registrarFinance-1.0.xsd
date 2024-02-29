@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<schema targetNamespace="http://www.eurid.eu/xml/epp/registrarFinance-1.0"
+        xmlns:registrarFinance="http://www.eurid.eu/xml/epp/registrarFinance-1.0"
+        xmlns="http://www.w3.org/2001/XMLSchema"
+        elementFormDefault="qualified">
+
+  <annotation>
+    <documentation>
+      Extensible Provisioning Protocol v1.0
+      EURid specific extension for displaying registrar finance data.
+    </documentation>
+  </annotation>
+
+  <!--
+  Child elements found in EPP commands.
+  -->
+  <element name="info"/>
+
+  <!--
+  Child response elements.
+  -->
+  <element name="infData" type="registrarFinance:infDataType"/>
+
+  <!--
+  <info> response elements.
+  -->
+  <complexType name="infDataType">
+    <sequence>
+      <element name="paymentMode" type="registrarFinance:paymentModeType"/>
+      <element name="availableAmount" type="decimal" minOccurs="0"/>
+      <element name="accountBalance" type="decimal"/>
+      <element name="overdueAmount" type="decimal" minOccurs="0"/>
+      <element name="dueAmount" type="decimal" minOccurs="0"/>
+    </sequence>
+  </complexType>
+
+  <simpleType name="paymentModeType">
+    <restriction base="token">
+      <minLength value="1"/>
+      <maxLength value="32"/>
+    </restriction>
+  </simpleType>
+
+  <!--
+  End of schema.
+  -->
+</schema>

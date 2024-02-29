@@ -9,16 +9,16 @@ mod recv;
 mod router;
 
 #[derive(Debug)]
-pub struct DACClient {
-    metrics_registry: crate::metrics::ScopedMetrics,
-    router: outer_router::Router<router::Router, ()>,
+pub struct DACClient<M: crate::metrics::Metrics> {
+    metrics_registry: M,
+    router: outer_router::Router<router::Router, (), M>,
     is_closing: bool,
     source_addr: Option<std::net::IpAddr>,
     rt_host: String,
     td_host: String,
 }
 
-impl super::Client for DACClient {
+impl<M: crate::metrics::Metrics + 'static> super::Client for DACClient<M> {
     // Starts up the DAC client and returns the sending end of a tokio channel to inject
     // commands into the client to be processed
     fn start(
@@ -41,7 +41,7 @@ impl super::Client for DACClient {
     }
 }
 
-impl DACClient {
+impl<M: crate::metrics::Metrics + 'static> DACClient<M> {
     /// Creates a new DAC client ready to be started
     ///
     /// # Arguments
@@ -51,7 +51,7 @@ impl DACClient {
         rt_host: &str,
         td_host: &str,
         source_addr: Option<&std::net::IpAddr>,
-        metrics_registry: crate::metrics::ScopedMetrics,
+        metrics_registry: M,
     ) -> std::io::Result<Self> {
         Ok(Self {
             router: outer_router::Router::new(&metrics_registry),
@@ -87,7 +87,7 @@ impl DACClient {
                     futures::select! {
                         x = receiver.next() => {
                             match x {
-                                Some(x) => outer_router::Router::<router::Router, ()>::reject_request(x),
+                                Some(x) => outer_router::Router::<router::Router, (), M>::reject_request(x),
                                 None => {
                                     info!("All senders for {}/{} dropped, exiting...", self.rt_host, self.td_host);
                                     return

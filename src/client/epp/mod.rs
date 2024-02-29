@@ -1,7 +1,7 @@
-use super::Client;
 use super::{router as outer_router, BlankRequest, RequestMessage};
 use crate::client::router::CommandTransactionID;
-use crate::proto;
+use crate::{proto};
+use super::Client;
 use chrono::prelude::*;
 use futures::future::FutureExt;
 use futures::stream::StreamExt;
@@ -129,7 +129,9 @@ pub struct ServerFeatures {
     /// http://www.eurid.eu/xml/epp/contact-ext-1.4 support
     eurid_contact_support: bool,
     /// http://www.eurid.eu/xml/epp/domain-ext-2.5 support
-    eurid_domain_support: bool,
+    eurid_domain_25_support: bool,
+    /// http://www.eurid.eu/xml/epp/domain-ext-2.6 support
+    eurid_domain_26_support: bool,
     /// http://www.eurid.eu/xml/epp/dnsQuality-2.0 support
     eurid_dns_quality_support: bool,
     /// http://www.eurid.eu/xml/epp/dnssecEligibility-1.0 support
@@ -181,9 +183,9 @@ impl ServerFeatures {
 
 /// Main client struct for the EEP client
 #[derive(Debug)]
-pub struct EPPClient {
+pub struct EPPClient<M: crate::metrics::Metrics> {
     log_storage: crate::StorageScoped,
-    metrics_registry: crate::metrics::ScopedMetrics,
+    metrics_registry: M,
     host: String,
     tag: String,
     password: String,
@@ -193,17 +195,17 @@ pub struct EPPClient {
     keepalive: bool,
     is_awaiting_response: bool,
     is_closing: bool,
-    router: outer_router::Router<router::Router, ServerFeatures>,
+    router: outer_router::Router<router::Router, ServerFeatures, M>,
     /// What features does the server support
     features: ServerFeatures,
     nominet_tag_list_subordinate: bool,
     nominet_tag_list_subordinate_client: Option<futures::channel::mpsc::Sender<RequestMessage>>,
     nominet_dac_subordinate_client: Option<futures::channel::mpsc::Sender<RequestMessage>>,
-    nominet_dac_client: Option<super::nominet_dac::DACClient>,
+    nominet_dac_client: Option<super::nominet_dac::DACClient<M::Subordinate>>,
     tls_client: super::epp_like::tls_client::TLSClient,
 }
 
-impl super::Client for EPPClient {
+impl<M: crate::metrics::Metrics<Subordinate = M> + 'static> Client for EPPClient<M> {
     // Starts up the EPP client and returns the sending end of a tokio channel to inject
     // commands into the client to be processed
     fn start(
@@ -233,13 +235,13 @@ impl super::Client for EPPClient {
     }
 }
 
-impl EPPClient {
+impl<M: crate::metrics::Metrics<Subordinate = M> + 'static> EPPClient<M> {
     /// Creates a new EPP client ready to be started
     ///
     /// # Arguments
     /// * `conf` - Configuration to use for this client
     pub async fn new<'a, C: Into<Option<&'a str>>>(
-        conf: super::ClientConf<'a, C>,
+        conf: super::ClientConf<'a, C, M>,
         pkcs11_engine: Option<crate::P11Engine>,
     ) -> std::io::Result<Self> {
         let nominet_dac_client = match conf.nominet_dac.as_ref().map(|nominet_dac_conf| {
@@ -301,7 +303,7 @@ impl EPPClient {
                     futures::select! {
                         x = receiver.next() => {
                             match x {
-                                Some(x) => outer_router::Router::<router::Router, ServerFeatures>::reject_request(x),
+                                Some(x) => outer_router::Router::<router::Router, ServerFeatures, M>::reject_request(x),
                                 None => {
                                     info!("All senders for {} dropped, exiting...", self.host);
                                     return
@@ -325,7 +327,7 @@ impl EPPClient {
                     futures::select! {
                         x = receiver.next() => {
                             match x {
-                                Some(x) => outer_router::Router::<router::Router, ServerFeatures>::reject_request(x),
+                                Some(x) => outer_router::Router::<router::Router, ServerFeatures, M>::reject_request(x),
                                 None => {
                                     info!("{}", exit_str);
                                     return
@@ -911,9 +913,12 @@ impl EPPClient {
         self.features.eurid_contact_support = greeting
             .service_menu
             .supports_ext("http://www.eurid.eu/xml/epp/contact-ext-1.4");
-        self.features.eurid_domain_support = greeting
+        self.features.eurid_domain_25_support = greeting
             .service_menu
             .supports_ext("http://www.eurid.eu/xml/epp/domain-ext-2.5");
+        self.features.eurid_domain_26_support = greeting
+            .service_menu
+            .supports_ext("http://www.eurid.eu/xml/epp/domain-ext-2.6");
         self.features.eurid_hit_points_supported = greeting
             .service_menu
             .supports("http://www.eurid.eu/xml/epp/registrarHitPoints-1.0");
@@ -1010,19 +1015,16 @@ impl EPPClient {
                 ext_objects.push("urn:ietf:params:xml:ns:secDNS-1.1".to_string())
             }
             if self.features.nominet_notifications {
-                ext_objects
-                    .push("http://www.nominet.org.uk/epp/xml/std-notifications-1.2".to_string())
+                ext_objects.push("http://www.nominet.org.uk/epp/xml/std-notifications-1.2".to_string())
             }
             if self.features.nominet_contact_ext {
-                ext_objects
-                    .push("http://www.nominet.org.uk/epp/xml/contact-nom-ext-1.0".to_string())
+                ext_objects.push("http://www.nominet.org.uk/epp/xml/contact-nom-ext-1.0".to_string())
             }
             if self.features.nominet_domain_ext {
                 ext_objects.push("http://www.nominet.org.uk/epp/xml/domain-nom-ext-1.2".to_string())
             }
             if self.features.nominet_data_quality {
-                ext_objects
-                    .push("http://www.nominet.org.uk/epp/xml/nom-data-quality-1.1".to_string())
+                ext_objects.push("http://www.nominet.org.uk/epp/xml/nom-data-quality-1.1".to_string())
             }
             if self.features.nominet_handshake {
                 ext_objects.push("http://www.nominet.org.uk/epp/xml/std-handshake-1.0".to_string())
@@ -1102,10 +1104,12 @@ impl EPPClient {
             if self.features.eurid_dnssec_eligibility_support {
                 objects.push("http://www.eurid.eu/xml/epp/dnssecEligibility-1.0".to_string())
             }
-            if self.features.eurid_domain_support {
+            if self.features.eurid_contact_support {
                 ext_objects.push("http://www.eurid.eu/xml/epp/contact-ext-1.4".to_string())
             }
-            if self.features.eurid_contact_support {
+            if self.features.eurid_domain_26_support {
+                ext_objects.push("http://www.eurid.eu/xml/epp/domain-ext-2.6".to_string())
+            } else if self.features.eurid_domain_25_support {
                 ext_objects.push("http://www.eurid.eu/xml/epp/domain-ext-2.5".to_string())
             }
             if self.features.eurid_poll_supported {
@@ -1343,14 +1347,14 @@ impl EPPClient {
 
     async fn _send_command<
         W: std::marker::Unpin + tokio::io::AsyncWrite,
-        M: Into<Option<uuid::Uuid>>,
+        I: Into<Option<uuid::Uuid>>,
         E: Into<Option<Vec<proto::EPPCommandExtensionType>>>,
     >(
         &self,
         command: proto::EPPCommandType,
         extension: E,
         sock: &mut W,
-        message_id: M,
+        message_id: I,
     ) -> Result<uuid::Uuid, ()> {
         let message_id = match message_id.into() {
             Some(m) => m,
@@ -1392,8 +1396,8 @@ pub fn handle_logout(_client: &ServerFeatures, _req: &BlankRequest) -> router::H
     Ok((proto::EPPCommandType::Logout {}, None))
 }
 
-pub fn handle_logout_response(
-    _response: proto::EPPResponse, _metrics: &crate::metrics::ScopedMetrics
+pub fn handle_logout_response<M: crate::metrics::Metrics>(
+    _response: proto::EPPResponse, _metrics: &M
 ) -> super::Response<()> {
     super::Response::Ok(())
 }

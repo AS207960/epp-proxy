@@ -16,7 +16,7 @@ macro_rules! router {
         #[derive(Default, Debug)]
         pub struct Router {}
 
-        impl router::InnerRouter<ServerFeatures> for Router {
+        impl<M: crate::metrics::Metrics> router::InnerRouter<ServerFeatures, M> for Router {
             type Request = (super::proto::EPPCommandType, Option<Vec<super::proto::EPPCommandExtensionType>>);
             type Response = super::proto::EPPResponse;
 
@@ -27,7 +27,7 @@ macro_rules! router {
 
                 $(fn [<$n _response>](
                     &mut self, return_path: router::Sender<router::[<$n Response>]>,
-                    response: Self::Response, metrics: &crate::metrics::ScopedMetrics
+                    response: Self::Response, metrics: &M
                 ) {
                     let _ = if !response.is_success() {
                         if response.is_server_error() {
@@ -55,11 +55,11 @@ macro_rules! router {
     }
 }
 
-fn request_nop<T, R>(_client: &super::ServerFeatures, _req: &T) -> HandleReqReturn<R> {
-    Err(Response::Err(Error::Unsupported))
+fn request_nop<T, R>(_client: &ServerFeatures, _req: &T) -> HandleReqReturn<R> {
+    Err(Err(Error::Unsupported))
 }
 
-fn response_nop<T, R>(_response: T, _metrics: &crate::metrics::ScopedMetrics) -> Result<R, Error> {
+fn response_nop<T, R, M: crate::metrics::Metrics>(_response: T, _metrics: &M) -> Result<R, Error> {
     Err(Error::Unsupported)
 }
 

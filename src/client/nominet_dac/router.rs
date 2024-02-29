@@ -33,7 +33,7 @@ macro_rules! router {
             pub(super) command_map: std::collections::HashMap<DACKey, uuid::Uuid>
         }
 
-        impl router::InnerRouter<()> for Router {
+        impl<M: crate::metrics::Metrics> router::InnerRouter<(), M> for Router {
             type Request = (super::proto::DACRequest, DACEnv);
             type Response = super::proto::DACResponse;
 
@@ -47,7 +47,7 @@ macro_rules! router {
 
             fn Logout_response(
                 &mut self, return_path: router::Sender<router::LogoutResponse>,
-                _response: Self::Response, _metrics: &crate::metrics::ScopedMetrics
+                _response: Self::Response, _metrics: &M
             ) {
                 let _ = return_path.send(Ok(router::CommandResponse {
                     response: (),
@@ -73,7 +73,7 @@ macro_rules! router {
 
             fn DomainCheck_response(
                 &mut self, return_path: router::Sender<router::DomainCheckResponse>,
-                response: Self::Response, _metrics: &crate::metrics::ScopedMetrics
+                response: Self::Response, _metrics: &M
             ) {
                 match response {
                     super::proto::DACResponse::DomainRT(d) => {
@@ -133,7 +133,7 @@ macro_rules! router {
 
             fn DACDomain_response(
                 &mut self, return_path: router::Sender<router::DACDomainResponse>,
-                response: Self::Response, _metrics: &crate::metrics::ScopedMetrics
+                response: Self::Response, _metrics: &M
             ) {
                 match response {
                     super::proto::DACResponse::DomainRT(d) => {
@@ -199,7 +199,7 @@ macro_rules! router {
 
             fn DACUsage_response(
                 &mut self, return_path: router::Sender<router::DACUsageResponse>,
-                response: Self::Response, _metrics: &crate::metrics::ScopedMetrics
+                response: Self::Response, _metrics: &M
             ) {
                 match response {
                     super::proto::DACResponse::Usage(u) => {
@@ -231,7 +231,7 @@ macro_rules! router {
 
             fn DACLimits_response(
                 &mut self, return_path: router::Sender<router::DACLimitsResponse>,
-                response: Self::Response, _metrics: &crate::metrics::ScopedMetrics
+                response: Self::Response, _metrics: &M
             ) {
                 match response {
                     super::proto::DACResponse::Limits(u) => {
@@ -260,7 +260,7 @@ macro_rules! router {
 
                 $(fn [<$n _response>](
                     &mut self, return_path: router::Sender<router::[<$n Response>]>,
-                    _response: Self::Response, _metrics: &crate::metrics::ScopedMetrics
+                    _response: Self::Response, _metrics: &M
                 ) {
                     let _ = return_path.send(Err(Error::Unsupported));
                 })*

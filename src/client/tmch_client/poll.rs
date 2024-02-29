@@ -12,8 +12,8 @@ pub fn handle_poll(_client: &(), _req: &PollRequest) -> HandleReqReturn<Option<P
     Ok(tmch_proto::TMCHCommandType::Poll(command))
 }
 
-pub fn handle_poll_response(
-    response: tmch_proto::TMCHResponse, _metrics: &crate::metrics::ScopedMetrics
+pub fn handle_poll_response<M: crate::metrics::Metrics>(
+    response: tmch_proto::TMCHResponse, _metrics: &M
 ) -> Response<Option<PollResponse>> {
     match response.results.first() {
         Some(result) => match result.code {
@@ -45,8 +45,8 @@ pub fn handle_poll_ack(_client: &(), req: &PollAckRequest) -> HandleReqReturn<Po
     Ok(tmch_proto::TMCHCommandType::Poll(command))
 }
 
-pub fn handle_poll_ack_response(
-    response: tmch_proto::TMCHResponse, _metrics: &crate::metrics::ScopedMetrics
+pub fn handle_poll_ack_response<M: crate::metrics::Metrics>(
+    response: tmch_proto::TMCHResponse, _metrics: &M
 ) -> Response<PollAckResponse> {
     match response.message_queue {
         Some(value) => Response::Ok(PollAckResponse {

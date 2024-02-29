@@ -178,7 +178,7 @@ async fn main() {
         storage_ga_1,
         &conf_ga_1,
         &pkcs11_engine,
-        epp_proxy::metrics::Metrics::null(),
+        epp_proxy::metrics::DummyMetrics::default(),
         true,
     )
     .await;
@@ -186,7 +186,7 @@ async fn main() {
         storage_ga_2,
         &conf_ga_2,
         &pkcs11_engine,
-        epp_proxy::metrics::Metrics::null(),
+        epp_proxy::metrics::DummyMetrics::default(),
         true,
     )
     .await;
@@ -194,7 +194,7 @@ async fn main() {
         storage_sunrise,
         &conf_sunrise,
         &pkcs11_engine,
-        epp_proxy::metrics::Metrics::null(),
+        epp_proxy::metrics::DummyMetrics::default(),
         true,
     )
     .await;

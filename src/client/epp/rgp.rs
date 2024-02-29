@@ -65,8 +65,8 @@ pub fn handle_restore(
     }
 }
 
-pub fn handle_restore_response(
-    response: proto::EPPResponse, _metrics: &crate::metrics::ScopedMetrics
+pub fn handle_restore_response<M: crate::metrics::Metrics>(
+    response: proto::EPPResponse, _metrics: &M
 ) -> Response<RestoreResponse> {
     let fee_data = match &response.extension {
         Some(ext) => {
@@ -183,8 +183,8 @@ pub fn handle_restore_report(
     Ok((proto::EPPCommandType::Update(Box::new(command)), Some(exts)))
 }
 
-pub fn handle_restore_report_response(
-    response: proto::EPPResponse, _metrics: &crate::metrics::ScopedMetrics
+pub fn handle_restore_report_response<M: crate::metrics::Metrics>(
+    response: proto::EPPResponse, _metrics: &M
 ) -> Response<RestoreReportResponse> {
     let fee_data = match &response.extension {
         Some(ext) => {

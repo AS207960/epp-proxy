@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema targetNamespace="http://www.eurid.eu/xml/epp/contact-ext-1.4"
+        xmlns:contact-ext="http://www.eurid.eu/xml/epp/contact-ext-1.4"
+        xmlns:contact="urn:ietf:params:xml:ns:contact-1.0"
+        xmlns:euridcom="http://www.eurid.eu/xml/epp/euridcom-1.0"
+        xmlns="http://www.w3.org/2001/XMLSchema"
+        elementFormDefault="qualified">
+
+  <!--
+    Import common element types.
+  -->
+  <import namespace="http://www.eurid.eu/xml/epp/euridcom-1.0"/>
+  <import namespace="urn:ietf:params:xml:ns:contact-1.0"/>
+
+  <annotation>
+    <documentation>
+      Extensible Provisioning Protocol v1.0
+      EURid specific extension for contact handling.
+    </documentation>
+  </annotation>
+
+  <!--
+    Child elements found in EPP commands.
+  -->
+  <element name="create" type="contact-ext:createType"/>
+  <element name="update" type="contact-ext:updateType"/>
+
+  <!--
+    Child elements of the <create> command.
+  -->
+  <complexType name="createType">
+    <sequence>
+      <element name="type" type="euridcom:contactType"/>
+      <element name="vat" type="contact-ext:vatType" minOccurs="0"/>
+      <element name="lang" type="contact-ext:contactLangType"/>
+      <element name="whoisEmail" type="contact-ext:whoisEmailType" minOccurs="0"/>
+      <element name="naturalPerson" type="boolean"/>
+      <element name="countryOfCitizenship" type="contact:ccType"  minOccurs="0"/>
+    </sequence>
+  </complexType>
+
+  <!--
+    Child elements of the <update> command.
+  -->
+  <complexType name="updateType">
+    <sequence>
+      <element name="chg" type="contact-ext:updateChgType" minOccurs="0"/>
+    </sequence>
+  </complexType>
+
+  <!--
+    Child elements supporting the <chg> element.
+  -->
+  <complexType name="updateChgType">
+    <sequence>
+      <element name="vat" type="contact-ext:vatType" minOccurs="0"/>
+      <element name="lang" type="contact-ext:contactLangType" minOccurs="0"/>
+      <element name="whoisEmail" type="contact-ext:whoisEmailType" minOccurs="0"/>
+      <element name="naturalPerson" type="boolean" minOccurs="0"/>
+      <element name="countryOfCitizenship" type="contact-ext:citizenshipCcType" minOccurs="0"/>
+    </sequence>
+  </complexType>
+
+  <!--
+    Child response elements.
+  -->
+  <element name="infData" type="contact-ext:infDataType"/>
+
+  <!--
+    <info> response elements.
+  -->
+  <complexType name="infDataType">
+    <sequence>
+      <element name="type" type="euridcom:contactType"/>
+      <element name="vat" type="contact-ext:vatType" minOccurs="0"/>
+      <element name="lang" type="contact-ext:contactLangType"/>
+      <element name="whoisEmail" type="contact-ext:whoisEmailType" minOccurs="0"/>
+      <element name="naturalPerson" type="boolean" minOccurs="0"/>
+      <element name="countryOfCitizenship" type="contact:ccType" minOccurs="0"/>
+      <element name="hasReservedDomain" type="boolean" minOccurs="0"/>
+      <element name="hasDomainOnHold" type="boolean" minOccurs="0"/>
+      <element name="hasDomainRegistryLock" type="boolean" minOccurs="0"/>
+      <element name="hasDomainRegistrarLock" type="boolean" minOccurs="0"/>
+    </sequence>
+  </complexType>
+
+  <!--
+   Definition for the VAT number
+ -->
+  <simpleType name="vatType">
+    <restriction base="token">
+      <maxLength value="20"/>
+    </restriction>
+  </simpleType>
+
+  <!--
+    Definition for the contact language
+  -->
+  <simpleType name="contactLangType">
+    <restriction base="token">
+      <length value="2"/>
+    </restriction>
+  </simpleType>
+
+  <!--
+    Definition for the WHOIS email address
+  -->
+  <simpleType name="whoisEmailType">
+    <restriction base="token">
+      <maxLength value="255"/>
+    </restriction>
+  </simpleType>
+
+  <!--
+  Definition for the Country of Citizenship country code
+  -->
+  <simpleType name="citizenshipCcType">
+    <restriction base="token">
+      <maxLength value="2"/>
+    </restriction>
+  </simpleType>
+
+  <!--
+    End of schema.
+  -->
+</schema>

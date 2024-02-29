@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema targetNamespace="http://www.eurid.eu/xml/epp/poll-1.2"
+        xmlns:poll="http://www.eurid.eu/xml/epp/poll-1.2"
+        xmlns="http://www.w3.org/2001/XMLSchema"
+        elementFormDefault="qualified">
+
+  <annotation>
+    <documentation>
+      Extensible Provisioning Protocol v1.0
+      EURid specific extension for display poll data.
+    </documentation>
+  </annotation>
+
+  <!--
+  Child response elements.
+  -->
+  <element name="pollData" type="poll:pollDataType"/>
+
+  <!--
+  <poll> response elements.
+  -->
+  <complexType name="pollDataType">
+    <sequence>
+      <element name="context" type="string"/>
+      <element name="objectType" type="string"/>
+      <element name="object" type="string"/>
+      <element name="objectUnicode" type="string" minOccurs="0"/>
+      <element name="action" type="string"/>
+      <element name="code" type="int"/>
+      <element name="detail" type="string" minOccurs="0"/>
+      <element name="registrar" type="string" minOccurs="0"/>
+    </sequence>
+  </complexType>
+
+  <!--
+  End of schema.
+  -->
+</schema>

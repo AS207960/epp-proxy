@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema targetNamespace="http://www.eurid.eu/xml/epp/euridcom-1.0"
+        xmlns="http://www.w3.org/2001/XMLSchema"
+        elementFormDefault="qualified">
+
+  <annotation>
+    <documentation>
+      Extensible Provisioning Protocol v1.0
+      EURid specific common types.
+    </documentation>
+  </annotation>
+
+  <!--
+  Domain name server group type.
+  -->
+  <simpleType name="nsgType">
+    <restriction base="token">
+      <minLength value="1"/>
+      <maxLength value="50"/>
+    </restriction>
+  </simpleType>
+
+  <!--
+  DNSSEC key group type.
+  -->
+  <simpleType name="keyGroupType">
+    <restriction base="token">
+      <minLength value="1"/>
+      <maxLength value="50"/>
+    </restriction>
+  </simpleType>
+
+  <!--
+  Contact type name.
+  -->
+  <simpleType name="contactType">
+    <restriction base="token">
+      <minLength value="1"/>
+      <maxLength value="50"/>
+    </restriction>
+  </simpleType>
+
+  <!--
+  End of schema.
+  -->
+</schema>
+

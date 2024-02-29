@@ -166,8 +166,8 @@ pub fn handle_list(client: &ServerFeatures, _req: &ListRequest) -> HandleReqRetu
     }
 }
 
-pub fn handle_list_response(
-    response: proto::EPPResponse, _metrics: &crate::metrics::ScopedMetrics
+pub fn handle_list_response<M: crate::metrics::Metrics>(
+    response: proto::EPPResponse, _metrics: &M
 ) -> Response<ListResponse> {
     match response.data {
         Some(value) => match value.value {
@@ -229,8 +229,8 @@ pub fn handle_info(client: &ServerFeatures, req: &InfoRequest) -> HandleReqRetur
     }
 }
 
-pub fn handle_info_response(
-    response: proto::EPPResponse, _metrics: &crate::metrics::ScopedMetrics
+pub fn handle_info_response<M: crate::metrics::Metrics>(
+    response: proto::EPPResponse, _metrics: &M
 ) -> Response<InfoResponse> {
     match response.data {
         Some(value) => match value.value {

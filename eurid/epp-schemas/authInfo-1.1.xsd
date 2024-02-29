@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema targetNamespace="http://www.eurid.eu/xml/epp/authInfo-1.1"
+        xmlns:authInfo="http://www.eurid.eu/xml/epp/authInfo-1.1"
+        xmlns="http://www.w3.org/2001/XMLSchema"
+        elementFormDefault="qualified">
+
+  <annotation>
+    <documentation>
+      Extensible Provisioning Protocol v1.1
+      EURid specific extension for domain transfer authorization code.
+    </documentation>
+  </annotation>
+
+  <!--
+  Child elements found in EPP commands.
+  -->
+  <element name="info" type="authInfo:infoType"/>
+
+  <!--
+  Child elements of the <info> command.
+  -->
+  <complexType name="infoType">
+    <sequence>
+      <choice>
+        <element name="request"/>
+        <element name="cancel"/>
+      </choice>
+    </sequence>
+  </complexType>
+
+  <!--
+  Child response elements.
+  -->
+  <element name="infData" type="authInfo:infDataType"/>
+
+  <!--
+  Child elements of the <validity> command.
+  -->
+  <complexType name="infDataType">
+    <sequence>
+      <element name="validUntil" type="dateTime"/>
+    </sequence>
+  </complexType>
+
+  <!--
+  End of schema.
+  -->
+</schema>

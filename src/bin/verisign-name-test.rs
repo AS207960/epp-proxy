@@ -88,7 +88,7 @@ async fn main() {
         storage,
         &conf,
         &pkcs11_engine,
-        epp_proxy::metrics::Metrics::null(),
+        epp_proxy::metrics::DummyMetrics::default(),
         false,
     )
     .await;

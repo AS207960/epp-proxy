@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema targetNamespace="http://www.eurid.eu/xml/epp/global-1.0"
+        xmlns="http://www.w3.org/2001/XMLSchema"
+        elementFormDefault="qualified">
+
+  <import namespace="urn:ietf:params:xml:ns:eppcom-1.0"
+          schemaLocation="eppcom-1.0.xsd"/>
+  <import namespace="urn:ietf:params:xml:ns:epp-1.0"
+          schemaLocation="epp-1.0.xsd"/>
+  <import namespace="urn:ietf:params:xml:ns:contact-1.0"
+          schemaLocation="contact-1.0.xsd"/>
+  <import namespace="http://www.eurid.eu/xml/epp/contact-ext-1.3"
+          schemaLocation="contact-ext-1.3.xsd"/>
+  <import namespace="http://www.eurid.eu/xml/epp/contact-ext-1.4"
+          schemaLocation="contact-ext-1.4.xsd"/>
+  <import namespace="urn:ietf:params:xml:ns:domain-1.0"
+          schemaLocation="domain-1.0.xsd"/>
+  <import namespace="urn:ietf:params:xml:ns:host-1.0"
+          schemaLocation="host-1.0.xsd"/>
+  <import namespace="urn:ietf:params:xml:ns:secDNS-1.1"
+          schemaLocation="secDNS-1.1.xsd"/>
+  <import namespace="http://www.eurid.eu/xml/epp/nsgroup-1.1"
+          schemaLocation="nsgroup-1.1.xsd"/>
+  <import namespace="http://www.eurid.eu/xml/epp/euridcom-1.0"
+          schemaLocation="euridcom-1.0.xsd"/>
+  <import namespace="http://www.eurid.eu/xml/epp/domain-ext-2.5"
+          schemaLocation="domain-ext-2.5.xsd"/>
+  <import namespace="http://www.eurid.eu/xml/epp/domain-ext-2.6"
+          schemaLocation="domain-ext-2.6.xsd"/>
+  <import namespace="http://www.eurid.eu/xml/epp/idn-1.0"
+          schemaLocation="idn-1.0.xsd"/>
+  <import namespace="http://www.eurid.eu/xml/epp/keygroup-1.1"
+          schemaLocation="keygroup-1.1.xsd"/>
+  <import namespace="http://www.eurid.eu/xml/epp/dnsQuality-2.0"
+          schemaLocation="dnsQuality-2.0.xsd"/>
+  <import namespace="http://www.eurid.eu/xml/epp/authInfo-1.1"
+          schemaLocation="authInfo-1.1.xsd"/>
+  <import namespace="http://www.eurid.eu/xml/epp/poll-1.2"
+          schemaLocation="poll-1.2.xsd"/>
+  <import namespace="http://www.eurid.eu/xml/epp/registrarFinance-1.0"
+          schemaLocation="registrarFinance-1.0.xsd"/>
+  <import namespace="http://www.eurid.eu/xml/epp/registrarHitPoints-1.0"
+          schemaLocation="registrarHitPoints-1.0.xsd"/>
+  <import namespace="http://www.eurid.eu/xml/epp/registrationLimit-1.1"
+          schemaLocation="registrationLimit-1.1.xsd"/>
+  <import namespace="http://www.eurid.eu/xml/epp/homoglyph-1.0"
+          schemaLocation="homoglyph-1.0.xsd"/>
+  <import namespace="http://www.eurid.eu/xml/epp/dnssecEligibility-1.0"
+          schemaLocation="dnssecEligibility-1.0.xsd"/>
+
+</schema>
