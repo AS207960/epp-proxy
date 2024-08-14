@@ -104,6 +104,7 @@ pub enum DomainCreateTLD {
     Name(DomainName),
     RS(DomainCreateRS),
     US(DomainCreateUS),
+    Tel(DomainCreateTel),
 }
 
 #[derive(Debug)]
@@ -115,6 +116,7 @@ pub enum DomainUpdateTLD {
     Name(DomainName),
     RS(DomainUpdateRS),
     US(DomainUpdateUS),
+    Tel(DomainUpdateTel),
 }
 
 #[derive(Debug)]
@@ -126,6 +128,7 @@ pub enum DomainInfoTLD {
     Name(DomainName),
     RS(DomainUpdateRS),
     US(DomainCreateUS),
+    Tel(DomainCreateTel),
 }
 
 #[derive(Debug)]
@@ -222,6 +225,18 @@ pub struct DomainUpdateUS {
     pub purpose: Option<USPurpose>,
     pub category: Option<USCategory>,
     pub validator: Option<String>,
+}
+
+#[derive(Debug)]
+pub struct DomainCreateTel {
+    pub publish_whois: bool,
+    pub whois_type: TelWhoisType
+}
+
+#[derive(Debug)]
+pub struct DomainUpdateTel {
+    pub publish_whois: Option<bool>,
+    pub whois_type: Option<TelWhoisType>
 }
 
 #[derive(Debug, Eq, PartialEq)]
@@ -348,4 +363,10 @@ pub enum USCategory {
     USOrganisation,
     RegularActivity,
     OfficeOrFacility,
+}
+
+#[derive(Debug, Eq, PartialEq)]
+pub enum TelWhoisType {
+    NaturalPerson,
+    LegalPerson,
 }

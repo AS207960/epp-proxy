@@ -266,6 +266,17 @@ pub struct DomainCreate {
     )]
     pub us_validator: Option<String>,
     #[serde(
+        rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:el-whoistype",
+        skip_serializing_if = "Option::is_none",
+        serialize_with = "super::serialize_opt_bool"
+    )]
+    pub tel_publish_whois: Option<bool>,
+    #[serde(
+        rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:tel-whoistype",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub tel_whois_type: Option<TelWhoisType>,
+    #[serde(
         rename = "{http://www.key-systems.net/epp/keysys-1.0}renewalmode",
         skip_serializing_if = "Option::is_none"
     )]
@@ -403,6 +414,17 @@ pub struct DomainUpdate {
         skip_serializing_if = "Option::is_none"
     )]
     pub us_validator: Option<String>,
+    #[serde(
+        rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:el-whoistype",
+        skip_serializing_if = "Option::is_none",
+        serialize_with = "super::serialize_opt_bool"
+    )]
+    pub tel_publish_whois: Option<bool>,
+    #[serde(
+        rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:tel-whoistype",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub tel_whois_type: Option<TelWhoisType>,
     #[serde(
         rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:renewalmode",
         skip_serializing_if = "Option::is_none"
@@ -546,6 +568,17 @@ pub struct DomainInfoData {
         default
     )]
     pub us_validator: Option<String>,
+    #[serde(
+        rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:el-whoistype",
+        skip_serializing_if = "Option::is_none",
+        serialize_with = "super::serialize_opt_bool"
+    )]
+    pub tel_publish_whois: Option<bool>,
+    #[serde(
+        rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:tel-whoistype",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub tel_whois_type: Option<TelWhoisType>,
     #[serde(
         rename = "{http://www.key-systems.net/epp/keysys-1.0}renewalmode",
         default
@@ -930,4 +963,12 @@ pub enum USCategory {
     RegularActivity,
     #[serde(rename = "C32")]
     OfficeOrFacility,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub enum TelWhoisType {
+    #[serde(rename = "Natural")]
+    NaturalPerson,
+    #[serde(rename = "Legal")]
+    LegalPerson,
 }

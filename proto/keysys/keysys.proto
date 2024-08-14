@@ -45,6 +45,7 @@ message DomainCreate {
     DomainInfoName name = 14;
     DomainInfoRS rs = 15;
     DomainInfoUS us = 16;
+    DomainInfoTel tel = 17;
   }
 }
 
@@ -94,6 +95,7 @@ message DomainUpdate {
     DomainInfoName name = 13;
     DomainInfoRS rs = 14;
     DomainInfoUS us = 15;
+    DomainInfoTel tel = 16;
   }
 }
 
@@ -136,6 +138,7 @@ message DomainInfo {
     DomainInfoName name = 13;
     DomainInfoRS rs = 14;
     DomainInfoUS us = 15;
+    DomainInfoTel tel = 16;
   }
 }
 
@@ -310,4 +313,15 @@ enum USCategory {
   USOrganisation = 3;
   RegularActivity = 4;
   OfficeOrFacility = 5;
+}
+
+message DomainInfoTel {
+  google.protobuf.BoolValue publish_whois = 1;
+  TelWhoisType whois_type = 2;
+}
+
+enum TelWhoisType {
+  TelUnknownType = 0;
+  TelNatural = 1;
+  TelLegal = 2;
 }

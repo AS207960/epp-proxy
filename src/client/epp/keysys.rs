@@ -387,6 +387,27 @@ impl std::convert::TryFrom<&super::proto::keysys::DomainInfoData>
                         validator: from.us_validator.clone(),
                     },
                 ))
+            } else if from.tel_whois_type.is_some()
+                || from.tel_publish_whois.is_some()
+            {
+                Some(super::super::keysys::DomainInfoTLD::Tel(
+                    super::super::keysys::DomainCreateTel {
+                        publish_whois: from.tel_publish_whois.unwrap_or_default(),
+                        whois_type: match from.tel_whois_type {
+                            Some(super::proto::keysys::TelWhoisType::NaturalPerson) => {
+                                super::super::keysys::TelWhoisType::NaturalPerson
+                            }
+                            Some(super::proto::keysys::TelWhoisType::LegalPerson) => {
+                                super::super::keysys::TelWhoisType::LegalPerson
+                            }
+                            None => {
+                                return Err(super::super::Error::Err(
+                                    "Tel WHOIS type is missing".to_string(),
+                                ))
+                            }
+                        }
+                    }
+                ))
             } else {
                 None
             },

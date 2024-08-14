@@ -482,6 +482,32 @@ impl TryFrom<epp_proto::keysys::DomainCreate> for client::keysys::DomainCreate {
                             validator: t.validator,
                         })
                     }
+                    epp_proto::keysys::domain_create::Tld::Tel(t) => {
+                        client::keysys::DomainCreateTLD::Tel(client::keysys::DomainCreateTel {
+                            publish_whois: match t.publish_whois {
+                                Some(v) => v,
+                                None => {
+                                    return Err(client::Error::Err(
+                                        "Tel publish WHOIS required".to_string(),
+                                    ))
+                                }
+                            },
+                            whois_type: match epp_proto::keysys::TelWhoisType::try_from(t.whois_type) {
+                                Err(_) => {
+                                    return Err(client::Error::Err(
+                                        "Tel WHOIS type".to_string(),
+                                    ))
+                                },
+                                Ok(epp_proto::keysys::TelWhoisType::TelUnknownType) => {
+                                    return Err(client::Error::Err(
+                                        "Tel WHOIS type".to_string(),
+                                    ))
+                                },
+                                Ok(epp_proto::keysys::TelWhoisType::TelNatural) => client::keysys::TelWhoisType::NaturalPerson,
+                                Ok(epp_proto::keysys::TelWhoisType::TelLegal) => client::keysys::TelWhoisType::LegalPerson,
+                            }
+                        })
+                    }
                 })
             }) {
                 None => None,
@@ -578,6 +604,17 @@ impl From<epp_proto::keysys::DomainUpdate> for client::keysys::DomainUpdate {
                         purpose: map_us_purpose(t.purpose),
                         category: map_us_category(t.category),
                         validator: t.validator,
+                    })
+                }
+                epp_proto::keysys::domain_update::Tld::Tel(t) => {
+                    client::keysys::DomainUpdateTLD::Tel(client::keysys::DomainUpdateTel {
+                        publish_whois: t.publish_whois,
+                        whois_type: match epp_proto::keysys::TelWhoisType::try_from(t.whois_type) {
+                            Err(_) => None,
+                            Ok(epp_proto::keysys::TelWhoisType::TelUnknownType) => None,
+                            Ok(epp_proto::keysys::TelWhoisType::TelNatural) => Some(client::keysys::TelWhoisType::NaturalPerson),
+                            Ok(epp_proto::keysys::TelWhoisType::TelLegal) => Some(client::keysys::TelWhoisType::LegalPerson),
+                        }
                     })
                 }
             }),
@@ -740,7 +777,14 @@ impl From<client::keysys::DomainInfo> for epp_proto::keysys::DomainInfo {
                 }),
                 client::keysys::DomainInfoTLD::Name(t) => epp_proto::keysys::domain_info::Tld::Name(epp_proto::keysys::DomainInfoName {
                     email_forward: t.email_forward
-                })
+                }),
+                client::keysys::DomainInfoTLD::Tel(t) => epp_proto::keysys::domain_info::Tld::Tel(epp_proto::keysys::DomainInfoTel {
+                    publish_whois: Some(t.publish_whois),
+                    whois_type: match t.whois_type {
+                        client::keysys::TelWhoisType::NaturalPerson => epp_proto::keysys::TelWhoisType::TelNatural,
+                        client::keysys::TelWhoisType::LegalPerson => epp_proto::keysys::TelWhoisType::TelLegal,
+                    }.into()
+                }),
             })
         }
     }

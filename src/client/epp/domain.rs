@@ -1531,6 +1531,8 @@ pub fn handle_create(
                 us_purpose: None,
                 us_category: None,
                 us_validator: None,
+                tel_whois_type: None,
+                tel_publish_whois: None,
                 renewal_mode: Some(match keysys.renewal_mode {
                     super::super::keysys::RenewalMode::Default => {
                         proto::keysys::RenewalMode::Default
@@ -1844,6 +1846,17 @@ pub fn handle_create(
                         }
                     });
                     e.us_validator = d.validator.as_ref().cloned();
+                }
+                Some(super::super::keysys::DomainCreateTLD::Tel(d)) => {
+                    e.tel_publish_whois = Some(d.publish_whois);
+                    e.tel_whois_type = Some(match d.whois_type {
+                        super::super::keysys::TelWhoisType::NaturalPerson => {
+                            proto::keysys::TelWhoisType::NaturalPerson
+                        }
+                        super::super::keysys::TelWhoisType::LegalPerson => {
+                            proto::keysys::TelWhoisType::LegalPerson
+                        }
+                    })
                 }
             }
 
@@ -2381,6 +2394,8 @@ pub fn handle_update(
                 us_purpose: None,
                 us_category: None,
                 us_validator: None,
+                tel_publish_whois: None,
+                tel_whois_type: None,
                 renewal_mode: keysys.renewal_mode.as_ref().map(|m| match m {
                     super::super::keysys::RenewalMode::Default => {
                         proto::keysys::RenewalMode::Default
@@ -2696,6 +2711,17 @@ pub fn handle_update(
                         }
                     });
                     e.us_validator = d.validator.as_ref().cloned();
+                }
+                Some(super::super::keysys::DomainUpdateTLD::Tel(d)) => {
+                    e.tel_publish_whois = d.publish_whois;
+                    e.tel_whois_type = d.whois_type.as_ref().map(|t| match t {
+                        super::super::keysys::TelWhoisType::NaturalPerson => {
+                            proto::keysys::TelWhoisType::NaturalPerson
+                        }
+                        super::super::keysys::TelWhoisType::LegalPerson => {
+                            proto::keysys::TelWhoisType::LegalPerson
+                        }
+                    })
                 }
             }
 
