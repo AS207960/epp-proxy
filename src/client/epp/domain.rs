@@ -3096,7 +3096,7 @@ pub fn handle_transfer_request(
             ext.push(proto::EPPCommandExtensionType::EURIDDomain26Transfer(
                 eurid_data.into(),
             ))
-        } if client.eurid_domain_25_support {
+        } else if client.eurid_domain_25_support {
             ext.push(proto::EPPCommandExtensionType::EURIDDomain25Transfer(
                 eurid_data.into(),
             ))

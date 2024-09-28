@@ -217,7 +217,7 @@ pub enum EPPCommandExtensionType {
     #[serde(rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.6}domain-ext:transfer")]
     EURIDDomain26Transfer(eurid::EURIDDomain26Transfer),
     #[serde(rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.5}domain-ext:delete")]
-    EURIDDomain25Delete(eurid::EURIDDomain26Delete),
+    EURIDDomain25Delete(eurid::EURIDDomain25Delete),
     #[serde(rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.6}domain-ext:delete")]
     EURIDDomain26Delete(eurid::EURIDDomain26Delete),
     #[serde(rename = "{urn:ietf:params:xml:ns:qualifiedLawyer-1.0}qualifiedLawyer:create")]
