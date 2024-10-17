@@ -609,7 +609,7 @@ pub struct EURIDContactUpdate {
 #[derive(Debug, Serialize)]
 pub struct EURIDContactUpdateInfo {
     #[serde(
-        rename = "{http://www.eurid.eu/xml/epp/contact-ext-1.4}contact-ext:whoisEmial",
+        rename = "{http://www.eurid.eu/xml/epp/contact-ext-1.4}contact-ext:whoisEmail",
         skip_serializing_if = "Option::is_none"
     )]
     pub whois_email: Option<String>,
