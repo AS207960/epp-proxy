@@ -356,7 +356,7 @@ async fn main() {
 
     let reflection_svc = tonic_reflection::server::Builder::configure()
         .register_encoded_file_descriptor_set(epp_proxy::grpc::epp_proto::FILE_DESCRIPTOR_SET)
-        .build()
+        .build_v1()
         .unwrap();
 
     let metrics_route = warp::path!("metrics").and_then(metrics_handler);
@@ -439,12 +439,12 @@ struct AuthService<T> {
     auth: std::sync::Arc<Box<dyn Auth + Send + Sync>>,
 }
 
-impl<T> tower_service::Service<http::Request<tonic::transport::Body>> for AuthService<T>
+impl<T> tower_service::Service<tonic::codegen::http::Request<tonic::body::Body>> for AuthService<T>
 where
-    T: tower_service::Service<http::Request<tonic::transport::Body>> + Send + Clone + 'static,
+    T: tower_service::Service<tonic::codegen::http::Request<tonic::body::Body>> + Send + Clone + 'static,
     T::Future: Send + 'static,
     T::Error: 'static,
-    T::Response: From<http::response::Response<tonic::body::BoxBody>> + 'static,
+    T::Response: From<tonic::codegen::http::Response<tonic::body::Body>> + 'static,
 {
     type Response = T::Response;
     type Error = T::Error;
@@ -457,7 +457,7 @@ where
         self.inner.poll_ready(cx).map_err(Into::into)
     }
 
-    fn call(&mut self, req: http::Request<tonic::transport::Body>) -> Self::Future {
+    fn call(&mut self, req: tonic::codegen::http::Request<tonic::body::Body>) -> Self::Future {
         let headers = req.headers().to_owned();
         let auth = self.auth.clone();
         let mut inner = self.inner.clone();
@@ -485,25 +485,25 @@ where
             match res {
                 Ok(r) => Ok(r),
                 Err(status) => {
-                    let mut res = http::Response::new(());
+                    let mut res = tonic::codegen::http::Response::new(());
 
-                    *res.version_mut() = http::Version::HTTP_2;
+                    *res.version_mut() = tonic::codegen::http::Version::HTTP_2;
 
                     let (mut parts, _body) = res.into_parts();
 
                     parts.headers.insert(
-                        http::header::CONTENT_TYPE,
-                        http::header::HeaderValue::from_static("application/grpc"),
+                        tonic::codegen::http::header::CONTENT_TYPE,
+                        tonic::codegen::http::header::HeaderValue::from_static("application/grpc"),
                     );
 
                     parts
                         .headers
-                        .insert("grpc-status", http::HeaderValue::from_static("16"));
-                    if let Ok(v) = http::HeaderValue::from_str(status) {
+                        .insert("grpc-status", tonic::codegen::http::HeaderValue::from_static("16"));
+                    if let Ok(v) = tonic::codegen::http::HeaderValue::from_str(status) {
                         parts.headers.insert("grpc-message", v);
                     }
 
-                    Ok(http::Response::from_parts(parts, tonic::body::empty_body()).into())
+                    Ok(tonic::codegen::http::Response::from_parts(parts, tonic::body::Body::empty()).into())
                 }
             }
         })

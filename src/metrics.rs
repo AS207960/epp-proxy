@@ -82,12 +82,12 @@ impl Metrics for ScopedMetrics {
     }
 
     fn poll_received(&self, command: &str) {
-        self.metrics.poll_result_count.with_label_values(&[&self.id, command]).inc();
+        self.metrics.poll_result_count.with_label_values([&self.id, command].as_slice()).inc();
     }
 
     fn record_response_time(&self, command: &str) -> Option<prometheus::HistogramTimer> {
         Some(self.metrics.response_time
-            .with_label_values(&[&self.id, command])
+            .with_label_values([&self.id, command].as_slice())
             .start_timer())
     }
 

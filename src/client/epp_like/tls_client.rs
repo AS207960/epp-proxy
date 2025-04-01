@@ -247,7 +247,7 @@ impl TLSClient {
             Ok(std::pin::Pin::new(&mut cx).connect().await.map(|_| cx))
         } {
             Ok(s) => match s {
-                Ok(c) => Ok(c),
+                Ok(c) => Ok::<_, ()>(c),
                 Err(err) => {
                     error!("Unable to start TLS session to {}: {}", self.host, err);
                     return Err(());

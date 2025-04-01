@@ -56,7 +56,7 @@ pub fn handle_trex_activate(
                         trex_renew: None,
                     })
                 })
-                .collect::<Result<Vec<_>, _>>()?,
+                .collect::<Result<Vec<_>, Result<_, Error>>>()?,
             case: None,
         }),
     };
@@ -102,7 +102,7 @@ pub fn handle_trex_renew(
                         }),
                     })
                 })
-                .collect::<Result<Vec<_>, _>>()?,
+                .collect::<Result<Vec<_>, Result<_, Error>>>()?,
             case: None,
         }),
     };
