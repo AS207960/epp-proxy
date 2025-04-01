@@ -162,22 +162,6 @@ pub struct DomainCreate {
     )]
     pub ca_trademark: Option<bool>,
     #[serde(
-        rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:eu-accept-trustee-tac",
-        skip_serializing_if = "Option::is_none",
-        serialize_with = "super::serialize_opt_bool"
-    )]
-    pub eu_accept_trustee_tac: Option<bool>,
-    #[serde(
-        rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:eu-registrant-lang",
-        skip_serializing_if = "Option::is_none"
-    )]
-    pub eu_registrant_lang: Option<EULanguage>,
-    #[serde(
-        rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:eu-registrant-citizenship",
-        skip_serializing_if = "Option::is_none"
-    )]
-    pub eu_registrant_citizenship: Option<EUCountry>,
-    #[serde(
         rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:de-abuse-contact",
         skip_serializing_if = "Option::is_none"
     )]
@@ -198,6 +182,22 @@ pub struct DomainCreate {
         serialize_with = "super::serialize_opt_bool"
     )]
     pub de_holder_person: Option<bool>,
+    #[serde(
+        rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:eu-accept-trustee-tac",
+        skip_serializing_if = "Option::is_none",
+        serialize_with = "super::serialize_opt_bool"
+    )]
+    pub eu_accept_trustee_tac: Option<bool>,
+    #[serde(
+        rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:eu-registrant-lang",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub eu_registrant_lang: Option<EULanguage>,
+    #[serde(
+        rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:eu-registrant-citizenship",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub eu_registrant_citizenship: Option<EUCountry>,
     #[serde(
         rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:fr-accept-trustee-tac",
         skip_serializing_if = "Option::is_none",
@@ -220,6 +220,11 @@ pub struct DomainCreate {
         skip_serializing_if = "Option::is_none"
     )]
     pub name_emailforward: Option<String>,
+    #[serde(
+        rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:renewalmode",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub renewal_mode: Option<RenewalMode>,
     #[serde(
         rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:rs-owner-idcard",
         skip_serializing_if = "Option::is_none"
@@ -251,6 +256,22 @@ pub struct DomainCreate {
     )]
     pub rs_tech_company_number: Option<String>,
     #[serde(
+        rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:tel-whoistype",
+        skip_serializing_if = "Option::is_none",
+        serialize_with = "super::serialize_opt_bool"
+    )]
+    pub tel_publish_whois: Option<bool>,
+    #[serde(
+        rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:tel-whoistype",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub tel_whois_type: Option<TelWhoisType>,
+    #[serde(
+        rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:transfermode",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub transfer_mode: Option<TransferMode>,
+    #[serde(
         rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:us-nexus-apppurpose",
         skip_serializing_if = "Option::is_none"
     )]
@@ -266,43 +287,22 @@ pub struct DomainCreate {
     )]
     pub us_validator: Option<String>,
     #[serde(
-        rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:el-whoistype",
-        skip_serializing_if = "Option::is_none",
-        serialize_with = "super::serialize_opt_bool"
-    )]
-    pub tel_publish_whois: Option<bool>,
-    #[serde(
-        rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:tel-whoistype",
-        skip_serializing_if = "Option::is_none"
-    )]
-    pub tel_whois_type: Option<TelWhoisType>,
-    #[serde(
-        rename = "{http://www.key-systems.net/epp/keysys-1.0}renewalmode",
-        skip_serializing_if = "Option::is_none"
-    )]
-    pub renewal_mode: Option<RenewalMode>,
-    #[serde(
-        rename = "{http://www.key-systems.net/epp/keysys-1.0}transfermode",
-        skip_serializing_if = "Option::is_none"
-    )]
-    pub transfer_mode: Option<TransferMode>,
-    #[serde(
-        rename = "{http://www.key-systems.net/epp/keysys-1.0}whois-banner0",
+        rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:whois-banner0",
         skip_serializing_if = "Option::is_none"
     )]
     pub whois_banner_0: Option<String>,
     #[serde(
-        rename = "{http://www.key-systems.net/epp/keysys-1.0}whois-banner1",
+        rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:whois-banner1",
         skip_serializing_if = "Option::is_none"
     )]
     pub whois_banner_1: Option<String>,
     #[serde(
-        rename = "{http://www.key-systems.net/epp/keysys-1.0}whois-rsp",
+        rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:whois-rsp",
         skip_serializing_if = "Option::is_none"
     )]
     pub whois_rsp: Option<String>,
     #[serde(
-        rename = "{http://www.key-systems.net/epp/keysys-1.0}whois-url",
+        rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:whois-url",
         skip_serializing_if = "Option::is_none"
     )]
     pub whois_url: Option<String>,
