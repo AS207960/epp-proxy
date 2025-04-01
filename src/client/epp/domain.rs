@@ -1559,17 +1559,17 @@ pub fn handle_create(
                         proto::keysys::RenewalMode::RenewOnce
                     }
                 }),
-                transfer_mode: Some(match keysys.transfer_mode {
+                transfer_mode: match keysys.transfer_mode {
                     super::super::keysys::TransferMode::Default => {
-                        proto::keysys::TransferMode::Default
+                        None
                     }
                     super::super::keysys::TransferMode::AutoApprove => {
-                        proto::keysys::TransferMode::AutoApprove
+                        Some(proto::keysys::TransferMode::AutoApprove)
                     }
                     super::super::keysys::TransferMode::AutoDeny => {
-                        proto::keysys::TransferMode::AutoDeny
+                        Some(proto::keysys::TransferMode::AutoDeny)
                     }
-                }),
+                },
                 whois_banner_0: keysys.whois_banner.get(0).cloned(),
                 whois_banner_1: keysys.whois_banner.get(1).cloned(),
                 whois_rsp: keysys.whois_rsp.as_ref().cloned(),
