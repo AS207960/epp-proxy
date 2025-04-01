@@ -1533,32 +1533,32 @@ pub fn handle_create(
                 us_validator: None,
                 tel_whois_type: None,
                 tel_publish_whois: None,
-                renewal_mode: Some(match keysys.renewal_mode {
+                renewal_mode: match keysys.renewal_mode {
                     super::super::keysys::RenewalMode::Default => {
-                        proto::keysys::RenewalMode::Default
+                        None
                     }
                     super::super::keysys::RenewalMode::AutoDelete => {
-                        proto::keysys::RenewalMode::AutoDelete
+                        Some(proto::keysys::RenewalMode::AutoDelete)
                     }
                     super::super::keysys::RenewalMode::AutoExpire => {
-                        proto::keysys::RenewalMode::AutoExpire
+                        Some(proto::keysys::RenewalMode::AutoExpire)
                     }
                     super::super::keysys::RenewalMode::AutoRenew => {
-                        proto::keysys::RenewalMode::AutoRenew
+                        Some(proto::keysys::RenewalMode::AutoRenew)
                     }
                     super::super::keysys::RenewalMode::AutoRenewQuarterly => {
-                        proto::keysys::RenewalMode::AutoRenewQuarterly
+                        Some(proto::keysys::RenewalMode::AutoRenewQuarterly)
                     }
                     super::super::keysys::RenewalMode::AutoRenewMonthly => {
-                        proto::keysys::RenewalMode::AutoRenewMonthly
+                        Some(proto::keysys::RenewalMode::AutoRenewMonthly)
                     }
                     super::super::keysys::RenewalMode::ExpireAuction => {
-                        proto::keysys::RenewalMode::ExpireAuction
+                        Some(proto::keysys::RenewalMode::ExpireAuction)
                     }
                     super::super::keysys::RenewalMode::RenewOnce => {
-                        proto::keysys::RenewalMode::RenewOnce
+                        Some(proto::keysys::RenewalMode::RenewOnce)
                     }
-                }),
+                },
                 transfer_mode: match keysys.transfer_mode {
                     super::super::keysys::TransferMode::Default => {
                         None
