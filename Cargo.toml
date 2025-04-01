@@ -43,6 +43,7 @@ aws-credential-types = "1"
 prometheus = "0.14.0"
 warp = "0.3.6"
 uuid = { version = "1.16.0", features = ["v4"] }
+rustls = { version = "0.23.25", default-features = false, features = ["ring", "std"] }
 
 [target.'cfg(target_os = "linux")'.dependencies]
 systemd-journal-logger = "2"

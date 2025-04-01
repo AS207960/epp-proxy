@@ -96,6 +96,8 @@ impl clap::ValueEnum for AuthMethod {
 async fn main() {
     setup_logging();
     openssl::init();
+    rustls::crypto::ring::default_provider().install_default()
+        .expect("failed to install ring crypto provider");
 
     let matches = clap::Command::new("epp-proxy")
         .version(env!("CARGO_PKG_VERSION"))
