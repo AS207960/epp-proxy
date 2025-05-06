@@ -384,7 +384,7 @@ pub(crate) fn check_email<T>(id: &str) -> Result<(), Response<T>> {
     if RE.is_match(id) {
         Ok(())
     } else {
-        Err(Err(Error::Err("invalid email".to_string())))
+        Err(Err(Error::InvalidRequest("invalid email".to_string())))
     }
 }
 
@@ -392,7 +392,7 @@ pub(crate) fn check_pass<T>(id: &str) -> Result<(), Response<T>> {
     if let 6..=32 = id.len() {
         Ok(())
     } else {
-        Err(Err(Error::Err(
+        Err(Err(Error::InvalidRequest(
             "passwords have a min length of 6 and a max length of 32".to_string(),
         )))
     }
@@ -1048,7 +1048,7 @@ pub fn handle_update(
         req.new_registrant.is_none() && req.new_auth_info.is_none() && req.new_forward_to.is_none();
 
     if req.add.is_empty() && req.remove.is_empty() && is_not_change {
-        return Err(Err(Error::Err(
+        return Err(Err(Error::InvalidRequest(
             "at least one operation must be specified".to_string(),
         )));
     }

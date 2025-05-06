@@ -47,7 +47,14 @@ pub fn proto_to_chrono(
 impl From<client::Error> for tonic::Status {
     fn from(err: client::Error) -> Self {
         match err {
-            client::Error::Err(s) => tonic::Status::invalid_argument(s),
+            client::Error::Err { text, is_server_error, message, code } => {
+                let mut e =  tonic::Status::invalid_argument(text);
+                e.metadata_mut().insert("server-error", is_server_error.to_string().parse().unwrap());
+                e.metadata_mut().insert("error-code", code.to_string().parse().unwrap());
+                e.metadata_mut().insert("error-message", message.to_string().parse().unwrap());
+                e
+            },
+            client::Error::InvalidRequest(s) => tonic::Status::invalid_argument(s),
             client::Error::NotReady => tonic::Status::unavailable("not yet ready"),
             client::Error::Unsupported => {
                 tonic::Status::unimplemented("unsupported operation for registrar")

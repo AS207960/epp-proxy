@@ -85,7 +85,7 @@ impl std::convert::TryFrom<&super::proto::keysys::DomainInfoData>
                         Some(super::proto::keysys::CALegalType::TradeMark) => super::super::keysys::CALegalType::TradeMark,
                         Some(super::proto::keysys::CALegalType::TradeUnion) => super::super::keysys::CALegalType::TradeUnion,
                         Some(super::proto::keysys::CALegalType::Trust) => super::super::keysys::CALegalType::Trust,
-                        None => return Err(super::super::Error::Err("CA legal type is not set".to_string())),
+                        None => return Err(super::super::Error::InvalidRequest("CA legal type is not set".to_string())),
                     },
                     trademark: from.ca_trademark,
                 }))
@@ -357,7 +357,7 @@ impl std::convert::TryFrom<&super::proto::keysys::DomainInfoData>
                                 super::super::keysys::USPurpose::Personal
                             }
                             None => {
-                                return Err(super::super::Error::Err(
+                                return Err(super::super::Error::InvalidRequest(
                                     "US purpose is missing".to_string(),
                                 ))
                             }
@@ -379,7 +379,7 @@ impl std::convert::TryFrom<&super::proto::keysys::DomainInfoData>
                                 super::super::keysys::USCategory::USOrganisation
                             }
                             None => {
-                                return Err(super::super::Error::Err(
+                                return Err(super::super::Error::InvalidRequest(
                                     "US category is missing".to_string(),
                                 ))
                             }
@@ -401,7 +401,7 @@ impl std::convert::TryFrom<&super::proto::keysys::DomainInfoData>
                                 super::super::keysys::TelWhoisType::LegalPerson
                             }
                             None => {
-                                return Err(super::super::Error::Err(
+                                return Err(super::super::Error::InvalidRequest(
                                     "Tel WHOIS type is missing".to_string(),
                                 ))
                             }

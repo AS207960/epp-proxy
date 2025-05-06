@@ -305,7 +305,7 @@ pub(crate) fn check_id<T>(id: &str) -> Result<(), Response<T>> {
     if let 3..=32 = id.len() {
         Ok(())
     } else {
-        Err(Err(Error::Err(
+        Err(Err(Error::InvalidRequest(
             "contact id has a min length of 3 and a max length of 32".to_string(),
         )))
     }
@@ -617,46 +617,46 @@ pub fn handle_create(
     }
     check_id(&req.id)?;
     if req.email.is_empty() {
-        return Err(Err(Error::Err("contact email cannot be empty".to_string())));
+        return Err(Err(Error::InvalidRequest("contact email cannot be empty".to_string())));
     }
     let phone_re = Regex::new(r"^\+\d+\.\d+$").unwrap();
     if let Some(phone) = &req.phone {
         if !phone_re.is_match(&phone.number) {
-            return Err(Err(Error::Err("invalid phone number format".to_string())));
+            return Err(Err(Error::InvalidRequest("invalid phone number format".to_string())));
         }
     }
     if let Some(fax) = &req.fax {
         if !phone_re.is_match(&fax.number) {
-            return Err(Err(Error::Err("invalid fax number format".to_string())));
+            return Err(Err(Error::InvalidRequest("invalid fax number format".to_string())));
         }
     }
     if req.local_address.is_none() && req.internationalised_address.is_none() {
-        return Err(Err(Error::Err(
+        return Err(Err(Error::InvalidRequest(
             "either a local or internationalised address must be specified format".to_string(),
         )));
     }
 
     let map_addr = |a: &Address, t: proto::contact::EPPContactPostalInfoType| {
         if a.name.is_empty() {
-            return Err(Err(Error::Err("contact name cannot be empty".to_string())));
+            return Err(Err(Error::InvalidRequest("contact name cannot be empty".to_string())));
         }
         if a.city.is_empty() {
-            return Err(Err(Error::Err("contact city cannot be empty".to_string())));
+            return Err(Err(Error::InvalidRequest("contact city cannot be empty".to_string())));
         }
         if a.country_code.len() != 2 {
-            return Err(Err(Error::Err(
+            return Err(Err(Error::InvalidRequest(
                 "contact country code must be of length 2".to_string(),
             )));
         }
         if let Some(pc) = &a.postal_code {
             if pc.len() > 16 {
-                return Err(Err(Error::Err(
+                return Err(Err(Error::InvalidRequest(
                     "contact postal code has a max length of 16".to_string(),
                 )));
             }
         }
         if a.streets.is_empty() {
-            return Err(Err(Error::Err(
+            return Err(Err(Error::InvalidRequest(
                 "contact streets cannot be empty".to_string(),
             )));
         }
@@ -781,7 +781,7 @@ pub fn handle_create(
         }
         None => {
             if client.eurid_contact_support {
-                return Err(Err(Error::Err(
+                return Err(Err(Error::InvalidRequest(
                     "contact extension required for EURid".to_string(),
                 )));
             }
@@ -1028,7 +1028,7 @@ pub fn handle_update(
             && is_not_qualified_lawyer_change
             && is_not_isnic_change
         {
-            return Err(Err(Error::Err(
+            return Err(Err(Error::InvalidRequest(
                 "at least one operation must be specified".to_string(),
             )));
         } else {
@@ -1049,29 +1049,29 @@ pub fn handle_update(
     let phone_re = Regex::new(r"^\+\d+\.\d+$").unwrap();
     if let Some(phone) = &req.new_phone {
         if !phone_re.is_match(&phone.number) && !phone.number.is_empty() {
-            return Err(Err(Error::Err("invalid phone number format".to_string())));
+            return Err(Err(Error::InvalidRequest("invalid phone number format".to_string())));
         }
     }
     if let Some(fax) = &req.new_fax {
         if !phone_re.is_match(&fax.number) && !fax.number.is_empty() {
-            return Err(Err(Error::Err("invalid fax number format".to_string())));
+            return Err(Err(Error::InvalidRequest("invalid fax number format".to_string())));
         }
     }
     let mut postal_info = vec![];
     let map_addr = |a: &Address, t: proto::contact::EPPContactPostalInfoType| {
         if a.name.is_empty() {
-            return Err(Err(Error::Err("contact name cannot be empty".to_string())));
+            return Err(Err(Error::InvalidRequest("contact name cannot be empty".to_string())));
         }
         if a.city.is_empty() {
-            return Err(Err(Error::Err("contact city cannot be empty".to_string())));
+            return Err(Err(Error::InvalidRequest("contact city cannot be empty".to_string())));
         }
         if a.country_code.len() != 2 {
-            return Err(Err(Error::Err(
+            return Err(Err(Error::InvalidRequest(
                 "contact country code must be of length 2".to_string(),
             )));
         }
         if a.streets.is_empty() {
-            return Err(Err(Error::Err(
+            return Err(Err(Error::InvalidRequest(
                 "contact streets cannot be empty".to_string(),
             )));
         }
@@ -1199,7 +1199,7 @@ pub fn handle_update(
             return Err(Err(Error::Unsupported));
         }
     } else if client.isnic_domain_supported {
-        return Err(Err(Error::Err(
+        return Err(Err(Error::InvalidRequest(
             "contact extension required for ISNIC".to_string(),
         )));
     }

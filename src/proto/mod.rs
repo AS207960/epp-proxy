@@ -324,6 +324,20 @@ impl EPPResponse {
         }
     }
 
+    pub fn response_code(&self) -> &'static str {
+        match self.results.first() {
+            Some(r) => r.code.name(),
+            None => "",
+        }
+    }
+    
+    pub fn message(&self) -> &str {
+        match self.results.first() {
+            Some(r) => &r.message,
+            None => "",
+        }
+    }
+
     pub fn response_msg(&self) -> String {
         let mut output = vec![];
         for r in &self.results {
@@ -446,6 +460,46 @@ impl EPPResultCode {
                 | EPPResultCode::AuthenticationServerClosingConnection
                 | EPPResultCode::SessionLimitExceededServerClosingConnection
         )
+    }
+    
+    fn name(&self) -> &'static str {
+        match self {
+            EPPResultCode::Success => "success",
+            EPPResultCode::SuccessActionPending => "success-action-pending",
+            EPPResultCode::SuccessNoMessages => "success-no-messages",
+            EPPResultCode::SuccessAckToDequeue => "success-ack-to-dequeue",
+            EPPResultCode::SuccessEndingSession => "success-end-session",
+            EPPResultCode::UnknownCommand => "unknown-command",
+            EPPResultCode::CommandSyntaxError => "command-syntax-error",
+            EPPResultCode::CommandUseError => "command-use-error",
+            EPPResultCode::RequiredParameterMissing => "required-parameter-missing",
+            EPPResultCode::ParameterValueRangeError => "parameter-value-range-error",
+            EPPResultCode::ParameterValueSyntaxError => "parameter-value-syntax-error",
+            EPPResultCode::UnimplementedProtocolVersion => "unimplemented-protocol-version",
+            EPPResultCode::UnimplementedCommand => "unimplemented-command",
+            EPPResultCode::UnimplementedOption => "unimplemented-option",
+            EPPResultCode::UnimplementedExtension => "unimplemented-extension",
+            EPPResultCode::BillingFailure => "billing-failure",
+            EPPResultCode::ObjectNotEligibleForRenewal => "object-not-eligible-for-renwal",
+            EPPResultCode::ObjectNotEligibleForTransfer => "object-not-eligible-for-transfer",
+            EPPResultCode::AuthenticationError => "authentication-error",
+            EPPResultCode::AuthorizationError => "authorization-error",
+            EPPResultCode::InvalidAuthorization => "invalid-authorization",
+            EPPResultCode::ObjectPendingTransfer => "object-pending-transfer",
+            EPPResultCode::ObjectNotPendingTransfer => "object-not-pending-transfer",
+            EPPResultCode::ObjectExists => "object-exists",
+            EPPResultCode::ObjectDoesNotExist => "object-does-not-exist",
+            EPPResultCode::ObjectStatusProhibitsOperation => "object-status-prohibits-operation",
+            EPPResultCode::ObjectAssociationProhibitsOperation => "object-association-prohibits-operation",
+            EPPResultCode::ParameterValuePolicyError => "parameter-value-policy-error",
+            EPPResultCode::UnimplementedObjectService => "unimplemented-object-service",
+            EPPResultCode::DataManagementPolicyViolation => "data-management-policy-violation",
+            EPPResultCode::CommandFailed => "command-failed",
+            EPPResultCode::CommandFailedServerClosingConnection => "command-failed-server-closing-connection",
+            EPPResultCode::AuthenticationServerClosingConnection => "authentication-server-closing-connection",
+            EPPResultCode::SessionLimitExceededServerClosingConnection => "session-limited-server-closing-connection",
+            EPPResultCode::Other(_) => "other",
+        }
     }
 }
 

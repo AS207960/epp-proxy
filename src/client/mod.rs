@@ -113,8 +113,15 @@ pub enum Error {
     ServerInternal,
     /// The EPP server didn't respond in time to the request
     Timeout,
+    /// The request can't be fowraded to the EPP server
+    InvalidRequest(String),
     /// The EPP server returned an error message (probably invalid parameters)
-    Err(String),
+    Err {
+        text: String,
+        is_server_error: bool,
+        code: String,
+        message: String,
+    }
 }
 
 #[derive(PartialEq, Debug)]

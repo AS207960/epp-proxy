@@ -20,7 +20,7 @@ pub(crate) fn check_mark_id<T>(id: &str) -> Result<(), Response<T>> {
     if RE.is_match(id) {
         Ok(())
     } else {
-        Err(Err(Error::Err("invalid mark_id".to_string())))
+        Err(Err(Error::InvalidRequest("invalid mark_id".to_string())))
     }
 }
 
@@ -31,7 +31,7 @@ pub(crate) fn check_case_id<T>(id: &str) -> Result<(), Response<T>> {
     if RE.is_match(id) {
         Ok(())
     } else {
-        Err(Err(Error::Err("invalid case_id".to_string())))
+        Err(Err(Error::InvalidRequest("invalid case_id".to_string())))
     }
 }
 
@@ -359,7 +359,7 @@ impl TryFrom<&Period> for tmch_proto::TMCHPeriod {
             unit: match from.unit {
                 PeriodUnit::Years => tmch_proto::TMCHPeriodUnit::Years,
                 PeriodUnit::Months => {
-                    return Err(Error::Err(
+                    return Err(Error::InvalidRequest(
                         "month based periods are not valid for TMCH".to_string(),
                     ))
                 }

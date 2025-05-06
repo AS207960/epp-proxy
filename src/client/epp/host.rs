@@ -83,7 +83,7 @@ fn check_host<T>(id: &str) -> Result<(), Response<T>> {
     if !id.is_empty() {
         Ok(())
     } else {
-        Err(Err(Error::Err(
+        Err(Err(Error::InvalidRequest(
             "host name has a min length of 1".to_string(),
         )))
     }
@@ -190,7 +190,7 @@ pub fn handle_create(
                     address: if let 3..=45 = a.address.len() {
                         a.address.clone()
                     } else {
-                        return Err(Err(Error::Err(
+                        return Err(Err(Error::InvalidRequest(
                             "address has a min length of 3 and a max length of 45".to_string(),
                         )));
                     },
@@ -300,14 +300,14 @@ pub fn handle_update(
 
     super::verisign::handle_verisign_namestore_erratum(client, &mut ext);
     if req.add.is_empty() && req.remove.is_empty() && req.new_name.is_none() {
-        return Err(Err(Error::Err(
+        return Err(Err(Error::InvalidRequest(
             "at least one operation must be specified".to_string(),
         )));
     }
     match &req.new_name {
         Some(n) => {
             if n.is_empty() {
-                return Err(Err(Error::Err(
+                return Err(Err(Error::InvalidRequest(
                     "new host name has a min length of 1".to_string(),
                 )));
             }
@@ -324,7 +324,7 @@ pub fn handle_update(
                     address: if let 3..=45 = addr.address.len() {
                         addr.address.clone()
                     } else {
-                        return Err(Err(Error::Err(
+                        return Err(Err(Error::InvalidRequest(
                             "address has a min length of 3 and a max length of 45".to_string(),
                         )));
                     },

@@ -370,7 +370,7 @@ impl TryFrom<epp_proto::keysys::DomainCreate> for client::keysys::DomainCreate {
                             legal_type: match map_ca_legal_type(t.legal_type) {
                                 Some(legal_type) => legal_type,
                                 None => {
-                                    return Err(client::Error::Err(
+                                    return Err(client::Error::InvalidRequest(
                                         "CA legal type required".to_string(),
                                     ))
                                 }
@@ -428,7 +428,7 @@ impl TryFrom<epp_proto::keysys::DomainCreate> for client::keysys::DomainCreate {
                         client::keysys::DomainCreateTLD::RS(client::keysys::DomainCreateRS {
                             admin: match t.admin {
                                 None => {
-                                    return Err(client::Error::Err("RS admin required".to_string()))
+                                    return Err(client::Error::InvalidRequest("RS admin required".to_string()))
                                 }
                                 Some(epp_proto::keysys::domain_info_rs::Admin::AdminIdCard(n)) => {
                                     client::keysys::RsId::IDCard(n)
@@ -439,7 +439,7 @@ impl TryFrom<epp_proto::keysys::DomainCreate> for client::keysys::DomainCreate {
                             },
                             tech: match t.tech {
                                 None => {
-                                    return Err(client::Error::Err("RS tech required".to_string()))
+                                    return Err(client::Error::InvalidRequest("RS tech required".to_string()))
                                 }
                                 Some(epp_proto::keysys::domain_info_rs::Tech::TechIdCard(n)) => {
                                     client::keysys::RsId::IDCard(n)
@@ -450,7 +450,7 @@ impl TryFrom<epp_proto::keysys::DomainCreate> for client::keysys::DomainCreate {
                             },
                             owner: match t.owner {
                                 None => {
-                                    return Err(client::Error::Err("RS owner required".to_string()))
+                                    return Err(client::Error::InvalidRequest("RS owner required".to_string()))
                                 }
                                 Some(epp_proto::keysys::domain_info_rs::Owner::OwnerIdCard(n)) => {
                                     client::keysys::RsId::IDCard(n)
@@ -466,7 +466,7 @@ impl TryFrom<epp_proto::keysys::DomainCreate> for client::keysys::DomainCreate {
                             category: match map_us_category(t.category) {
                                 Some(c) => c,
                                 None => {
-                                    return Err(client::Error::Err(
+                                    return Err(client::Error::InvalidRequest(
                                         "US category required".to_string(),
                                     ))
                                 }
@@ -474,7 +474,7 @@ impl TryFrom<epp_proto::keysys::DomainCreate> for client::keysys::DomainCreate {
                             purpose: match map_us_purpose(t.purpose) {
                                 Some(p) => p,
                                 None => {
-                                    return Err(client::Error::Err(
+                                    return Err(client::Error::InvalidRequest(
                                         "US purpose required".to_string(),
                                     ))
                                 }
@@ -487,19 +487,19 @@ impl TryFrom<epp_proto::keysys::DomainCreate> for client::keysys::DomainCreate {
                             publish_whois: match t.publish_whois {
                                 Some(v) => v,
                                 None => {
-                                    return Err(client::Error::Err(
+                                    return Err(client::Error::InvalidRequest(
                                         "Tel publish WHOIS required".to_string(),
                                     ))
                                 }
                             },
                             whois_type: match epp_proto::keysys::TelWhoisType::try_from(t.whois_type) {
                                 Err(_) => {
-                                    return Err(client::Error::Err(
+                                    return Err(client::Error::InvalidRequest(
                                         "Tel WHOIS type".to_string(),
                                     ))
                                 },
                                 Ok(epp_proto::keysys::TelWhoisType::TelUnknownType) => {
-                                    return Err(client::Error::Err(
+                                    return Err(client::Error::InvalidRequest(
                                         "Tel WHOIS type".to_string(),
                                     ))
                                 },

@@ -510,6 +510,20 @@ impl TMCHResponse {
         }
     }
 
+    pub fn response_code(&self) -> &'static str {
+        match self.results.first() {
+            Some(r) => r.code.name(),
+            None => "",
+        }
+    }
+
+    pub fn message(&self) -> &str {
+        match self.results.first() {
+            Some(r) => &r.message,
+            None => "",
+        }
+    }
+
     pub fn response_msg(&self) -> String {
         let mut output = vec![];
         for r in &self.results {
@@ -603,6 +617,22 @@ impl TMCHResultCode {
 
     fn is_server_error(&self) -> bool {
         matches!(self, TMCHResultCode::CommandFailed)
+    }
+
+    fn name(&self) -> &'static str {
+        match self {
+            TMCHResultCode::Success => "success",
+            TMCHResultCode::SuccessNoMessages => "success-no-messages",
+            TMCHResultCode::SuccessAckToDequeue => "success-ack-to-dequeue",
+            TMCHResultCode::SuccessEndingSession => "success-end-session",
+            TMCHResultCode::CommandSyntaxError => "command-syntax-error",
+            TMCHResultCode::AuthorizationError => "authorization-error",
+            TMCHResultCode::InvalidAuthorization => "invalid-authorization",
+            TMCHResultCode::ObjectDoesNotExist => "object-does-not-exist",
+            TMCHResultCode::ParameterValuePolicyError => "parameter-value-policy-error",
+            TMCHResultCode::CommandFailed => "command-failed",
+            TMCHResultCode::Other(_) => "other",
+        }
     }
 }
 

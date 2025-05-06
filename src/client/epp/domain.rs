@@ -733,7 +733,7 @@ pub(crate) fn check_domain<T>(id: &str) -> Result<(), Response<T>> {
     if !id.is_empty() {
         Ok(())
     } else {
-        Err(Err(Error::Err(
+        Err(Err(Error::InvalidRequest(
             "domain name has a min length of 1".to_string(),
         )))
     }
@@ -743,7 +743,7 @@ pub(crate) fn check_pass<T>(id: &str) -> Result<(), Response<T>> {
     if id.len() > 6 {
         Ok(())
     } else {
-        Err(Err(Error::Err(
+        Err(Err(Error::InvalidRequest(
             "passwords have a min length of 6".to_string(),
         )))
     }
@@ -1426,13 +1426,13 @@ pub fn handle_create(
                 for info in launch_create.core_nic.iter() {
                     if let Some(info_type) = &info.info_type {
                         if info_type.is_empty() || info_type.len() > 64 {
-                            return Err(Err(Error::Err(
+                            return Err(Err(Error::InvalidRequest(
                                 "application info type has a min length of 1 and a max length of 64".to_string(),
                             )));
                         }
                     }
                     if info.info.is_empty() || info.info.len() > 2048 {
-                        return Err(Err(Error::Err(
+                        return Err(Err(Error::InvalidRequest(
                             "application info has a min length of 1 and a max length of 2048"
                                 .to_string(),
                         )));
@@ -1486,7 +1486,7 @@ pub fn handle_create(
         }
         None => {
             if client.isnic_domain_supported {
-                return Err(Err(Error::Err(
+                return Err(Err(Error::InvalidRequest(
                     "payment extension required for ISNIC".to_string(),
                 )));
             }
@@ -2212,7 +2212,7 @@ pub fn handle_update(
         && is_not_keysys_change
         && is_not_nominet_change
     {
-        return Err(Err(Error::Err(
+        return Err(Err(Error::InvalidRequest(
             "at least one operation must be specified".to_string(),
         )));
     }
@@ -2927,7 +2927,7 @@ pub fn handle_renew(client: &ServerFeatures, req: &RenewRequest) -> HandleReqRet
         }
         None => {
             if client.isnic_domain_supported {
-                return Err(Err(Error::Err(
+                return Err(Err(Error::InvalidRequest(
                     "payment extension required for ISNIC".to_string(),
                 )));
             }

@@ -30,11 +30,17 @@ macro_rules! router {
                     response: Self::Response, metrics: &M
                 ) {
                     let _ = if !response.is_success() {
-                        if response.is_server_error() {
-                            return_path.send(Err(Error::Err(format!("Server error: {}", response.response_msg()))))
+                        let text = if response.is_server_error() {
+                            format!("Server error: {}", response.response_msg())
                         } else {
-                            return_path.send(Err(Error::Err(response.response_msg())))
-                        }
+                            response.response_msg()
+                        };
+                        return_path.send(Err(Error::Err {
+                            text,
+                            is_server_error: response.is_server_error(),
+                            code: response.response_code().to_string(),
+                            message: response.message().to_string(),
+                        }))
                     } else {
                         let trans_id = router::CommandTransactionID {
                             client: response.transaction_id.client_transaction_id.as_deref().unwrap_or_default().to_owned(),

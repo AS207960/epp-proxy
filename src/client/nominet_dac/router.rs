@@ -115,7 +115,12 @@ macro_rules! router {
                         }));
                     },
                     super::proto::DACResponse::Aub(b) => {
-                        let _ = return_path.send(Err(Error::Err(format!("Acceptable usage block, please try again in {} seconds", b.delay))));
+                        let _ = return_path.send(Err(Error::Err {
+                            text: format!("Acceptable usage block, please try again in {} seconds", b.delay),
+                            is_server_error: false,
+                            code: "aub".to_string(),
+                            message: String::default(),
+                        }));
                     },
                     _ => {
                         let _ = return_path.send(Err(Error::ServerInternal));
@@ -181,7 +186,12 @@ macro_rules! router {
                         }));
                     },
                     super::proto::DACResponse::Aub(b) => {
-                        let _ = return_path.send(Err(Error::Err(format!("Acceptable usage block, please try again in {} seconds", b.delay))));
+                        let _ = return_path.send(Err(Error::Err {
+                            text: format!("Acceptable usage block, please try again in {} seconds", b.delay),
+                            is_server_error: false,
+                            code: "aub".to_string(),
+                            message: String::default(),
+                        }));
                     },
                     _ => {
                         let _ = return_path.send(Err(Error::ServerInternal));
@@ -213,7 +223,12 @@ macro_rules! router {
                         }));
                     },
                     super::proto::DACResponse::Aub(b) => {
-                        let _ = return_path.send(Err(Error::Err(format!("Acceptable usage block, please try again in {} seconds", b.delay))));
+                        let _ = return_path.send(Err(Error::Err {
+                            text: format!("Acceptable usage block, please try again in {} seconds", b.delay),
+                            is_server_error: false,
+                            code: "aub".to_string(),
+                            message: String::default(),
+                        }));
                     },
                     _ => {
                         let _ = return_path.send(Err(Error::ServerInternal));
@@ -245,7 +260,12 @@ macro_rules! router {
                         }));
                     },
                     super::proto::DACResponse::Aub(b) => {
-                        let _ = return_path.send(Err(Error::Err(format!("Acceptable usage block, please try again in {} seconds", b.delay))));
+                        let _ = return_path.send(Err(Error::Err {
+                            text: format!("Acceptable usage block, please try again in {} seconds", b.delay),
+                            is_server_error: false,
+                            code: "aub".to_string(),
+                            message: String::default(),
+                        }));
                     },
                     _ => {
                         let _ = return_path.send(Err(Error::ServerInternal));
