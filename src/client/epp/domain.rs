@@ -2185,6 +2185,7 @@ pub fn handle_update(
                 && e.tld.is_none()
                 && e.renewal_mode.is_none()
                 && e.transfer_mode.is_none()
+                && e.request_auth_code.is_none()
         }
         None => true,
     };
