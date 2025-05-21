@@ -370,6 +370,12 @@ pub struct DomainUpdate {
     )]
     pub name_emailforward: Option<String>,
     #[serde(
+        rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:request-authcode",
+        skip_serializing_if = "Option::is_none",
+        serialize_with = "super::serialize_opt_bool"
+    )]
+    pub request_authcode: Option<bool>,
+    #[serde(
         rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:rs-owner-idcard",
         skip_serializing_if = "Option::is_none"
     )]

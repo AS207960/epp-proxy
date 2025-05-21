@@ -46,6 +46,7 @@ pub struct DomainUpdate {
     pub whois_banner: Vec<String>,
     pub whois_rsp: Option<String>,
     pub whois_url: Option<String>,
+    pub request_auth_code: Option<bool>,
     pub tld: Option<DomainUpdateTLD>,
 }
 

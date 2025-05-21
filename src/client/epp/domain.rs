@@ -2396,6 +2396,7 @@ pub fn handle_update(
                 us_validator: None,
                 tel_publish_whois: None,
                 tel_whois_type: None,
+                request_authcode: keysys.request_auth_code,
                 renewal_mode: keysys.renewal_mode.as_ref().map(|m| match m {
                     super::super::keysys::RenewalMode::Default => {
                         proto::keysys::RenewalMode::Default

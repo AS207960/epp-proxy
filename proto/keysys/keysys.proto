@@ -87,6 +87,7 @@ message DomainUpdate {
   repeated string whois_banner = 3;
   google.protobuf.StringValue whois_rsp = 4;
   google.protobuf.StringValue whois_url = 5;
+  google.protobuf.BoolValue request_auth_code = 17;
   oneof tld {
     DomainUpdateCA ca = 9;
     DomainUpdateDE de = 10;

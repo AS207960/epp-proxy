@@ -521,6 +521,7 @@ impl TryFrom<epp_proto::keysys::DomainCreate> for client::keysys::DomainCreate {
 impl From<epp_proto::keysys::DomainUpdate> for client::keysys::DomainUpdate {
     fn from(res: epp_proto::keysys::DomainUpdate) -> Self {
         client::keysys::DomainUpdate {
+            request_auth_code: res.request_auth_code,
             renewal_mode: map_renewal_mode(res.renewal_mode),
             transfer_mode: map_transfer_mode(res.transfer_mode),
             whois_banner: res.whois_banner,
