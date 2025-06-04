@@ -36,6 +36,7 @@ message DomainCreate {
   repeated string whois_banner = 6;
   string whois_rsp = 7;
   string whois_url = 8;
+  string intended_use = 18;
   oneof tld {
     DomainInfoCA ca = 9;
     DomainInfoDE de = 10;

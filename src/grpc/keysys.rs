@@ -363,6 +363,11 @@ impl TryFrom<epp_proto::keysys::DomainCreate> for client::keysys::DomainCreate {
             } else {
                 Some(res.whois_url)
             },
+            intended_use: if res.intended_use.is_empty() {
+                None
+            } else {
+                Some(res.intended_use)
+            },
             tld: match res.tld.map(|t| {
                 Ok(match t {
                     epp_proto::keysys::domain_create::Tld::Ca(t) => {

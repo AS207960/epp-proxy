@@ -36,6 +36,7 @@ pub struct DomainCreate {
     pub whois_banner: Vec<String>,
     pub whois_rsp: Option<String>,
     pub whois_url: Option<String>,
+    pub intended_use: Option<String>,
     pub tld: Option<DomainCreateTLD>,
 }
 
