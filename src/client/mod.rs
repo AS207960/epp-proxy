@@ -37,7 +37,7 @@ pub use router::{CommandResponse, RequestMessage, RequestSender, Response, Sende
 
 pub enum ClientCertConf<'a> {
     /// PCKS#12 file path for client identity
-    PKCS12(&'a str),
+    PKCS12 { file: &'a str, password: &'a str },
     /// PCKS#11 HSM details
     PKCS11 {
         key_id: &'a str,

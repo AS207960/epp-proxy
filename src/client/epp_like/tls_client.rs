@@ -25,7 +25,12 @@ impl<'a, C: Into<Option<&'a str>>, M: crate::metrics::Metrics> From<&super::supe
         Self {
             host: conf.host.to_string(),
             client_cert: conf.client_cert.as_ref().map(|c| match c {
-                super::super::ClientCertConf::PKCS12(s) => ClientCertConf::PKCS12(s.to_string()),
+                super::super::ClientCertConf::PKCS12 { file, password } => {
+                    ClientCertConf::PKCS12 { 
+                        file: file.to_string(), 
+                        password: password.to_string()
+                    }
+                },
                 super::super::ClientCertConf::PKCS11 { cert_chain, key_id } => {
                     ClientCertConf::PKCS11 {
                         key_id: key_id.to_string(),
@@ -43,7 +48,7 @@ impl<'a, C: Into<Option<&'a str>>, M: crate::metrics::Metrics> From<&super::supe
 
 pub enum ClientCertConf {
     /// PCKS#12 file path for client identity
-    PKCS12(String),
+    PKCS12 { file: String, password: String },
     /// PCKS#11 HSM details
     PKCS11 { key_id: String, cert_chain: String },
 }
@@ -116,9 +121,9 @@ impl TLSClient {
 
         if let Some(client_cert) = conf.client_cert {
             match client_cert {
-                ClientCertConf::PKCS12(pkcs12_file) => {
-                    let pkcs = tokio::fs::read(pkcs12_file).await?;
-                    let identity = openssl::pkcs12::Pkcs12::from_der(&pkcs)?.parse2("")?;
+                ClientCertConf::PKCS12 { file, password } => {
+                    let pkcs = tokio::fs::read(&file).await?;
+                    let identity = openssl::pkcs12::Pkcs12::from_der(&pkcs)?.parse2(&password)?;
                     if let Some(cert) = &identity.cert {
                         context_builder.set_certificate(cert)?;
                     }

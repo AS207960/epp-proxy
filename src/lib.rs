@@ -21,6 +21,7 @@ pub mod built_info {
 #[serde(untagged)]
 enum ClientCertConfig {
     PKCS12(String),
+    PKCS12WithPassword { file: String, password: String },
     PKCS11 { key_id: String, cert_chain: String },
 }
 
@@ -294,7 +295,12 @@ pub async fn create_client<M: metrics::Metrics<Subordinate = M> + 'static>(
         metrics_registry,
         keepalive,
         client_cert: match &config.client_cert {
-            Some(ClientCertConfig::PKCS12(s)) => Some(client::ClientCertConf::PKCS12(s)),
+            Some(ClientCertConfig::PKCS12(s)) => {
+                Some(client::ClientCertConf::PKCS12 { file: s, password: "" })
+            },
+            Some(ClientCertConfig::PKCS12WithPassword { file, password}) => {
+                Some(client::ClientCertConf::PKCS12 { file, password })
+            },
             Some(ClientCertConfig::PKCS11 { key_id, cert_chain }) => {
                 Some(client::ClientCertConf::PKCS11 { key_id, cert_chain })
             }

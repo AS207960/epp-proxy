@@ -78,3 +78,45 @@ spec:
     name: epp-ca-issuer
     kind: Issuer
     group: cert-manager.io
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: epp-client-cert
+spec:
+  secretName: epp-client-tls
+  duration: 8760h
+  renewBefore: 360h
+  commonName: as207960-registrar
+  subject:
+    countries:
+      - GB
+    localities:
+      - Cymru
+    organizations:
+      - AS207960 Cyfyngedig
+  isCA: false
+  privateKey:
+    size: 4096
+    algorithm: RSA
+    encoding: PKCS1
+  usages:
+    - client auth
+  issuerRef:
+    name: epp-client-issuer
+    kind: Issuer
+    group: cert-manager.io
+  keystores:
+    pkcs12:
+      create: true
+      profile: Modern2023
+      passwordSecretRef:
+        name: epp-client-tls-password
+        key: password
+---
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: epp-client-issuer
+spec:
+  selfSigned: {}
