@@ -123,7 +123,7 @@ pub fn handle_poll_response<M: crate::metrics::Metrics>(
                                 }
                                 proto::EPPResultDataValue::EPPHostInfoResult(host_info) => {
                                     PollData::HostInfoData {
-                                        data: Box::new((*host_info).try_into()?),
+                                        data: Box::new((*host_info, &response.extension).try_into()?),
                                         change_data: change_data_from_response(&response.extension)?,
                                     }
                                 }

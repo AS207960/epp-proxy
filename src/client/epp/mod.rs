@@ -26,6 +26,7 @@ pub mod rgp;
 pub mod router;
 pub mod traficom;
 pub mod verisign;
+mod ttl;
 
 use crate::proto::EPPServiceExtension;
 
@@ -124,6 +125,8 @@ pub struct ServerFeatures {
     maintenance_supported: bool,
     /// urn:ietf:params:xml:ns:maintenance-0.2 support
     maintenance_02_supported: bool,
+    /// urn:ietf:params:xml:ns:epp:ttl-1.0 support
+    ttl_supported: bool,
     /// RFC8807 support
     login_sec_supported: bool,
     /// http://www.eurid.eu/xml/epp/contact-ext-1.4 support
@@ -907,9 +910,9 @@ impl<M: crate::metrics::Metrics<Subordinate = M> + 'static> EPPClient<M> {
         self.features.login_sec_supported = greeting
             .service_menu
             .supports_ext("urn:ietf:params:xml:ns:epp:loginSec-1.0");
-        self.features.login_sec_supported = greeting
+        self.features.ttl_supported = greeting
             .service_menu
-            .supports_ext("urn:ietf:params:xml:ns:epp:loginSec-1.0");
+            .supports_ext("urn:ietf:params:xml:ns:epp:ttl-1.0");
         self.features.eurid_contact_support = greeting
             .service_menu
             .supports_ext("http://www.eurid.eu/xml/epp/contact-ext-1.4");
@@ -1082,6 +1085,9 @@ impl<M: crate::metrics::Metrics<Subordinate = M> + 'static> EPPClient<M> {
             }
             if self.features.login_sec_supported {
                 ext_objects.push("urn:ietf:params:xml:ns:epp:loginSec-1.0".to_string())
+            }
+            if self.features.ttl_supported {
+                ext_objects.push("urn:ietf:params:xml:ns:epp:ttl-1.0".to_string())
             }
             if self.features.maintenance_supported {
                 objects.push("urn:ietf:params:xml:ns:epp:maintenance-1.0".to_string())

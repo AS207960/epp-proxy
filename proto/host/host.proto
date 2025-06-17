@@ -6,6 +6,7 @@ import "google/protobuf/timestamp.proto";
 import "google/protobuf/wrappers.proto";
 import "common/common.proto";
 import "isnic/isnic.proto";
+import "ttl/ttl.proto";
 
 enum HostStatus {
     ClientDeleteProhibited = 0;
@@ -47,6 +48,7 @@ message HostInfoReply {
     google.protobuf.StringValue last_updated_client = 8;
     google.protobuf.Timestamp last_updated_date = 9;
     google.protobuf.Timestamp last_transfer_date = 10;
+    ttl.TTLInfo ttl = 12;
     common.CommandResponse cmd_resp = 11;
 }
 
@@ -55,6 +57,7 @@ message HostCreateRequest {
     repeated common.IPAddress addresses = 2;
     string registry_name = 3;
     isnic.HostInfo isnic_info = 4;
+    ttl.TTLSet ttl = 5;
 }
 
 message HostCreateReply {
@@ -90,6 +93,7 @@ message HostUpdateRequest {
     google.protobuf.StringValue new_name = 4;
     string registry_name = 5;
     isnic.HostInfo isnic_info = 6;
+    ttl.TTLSet ttl = 7;
 }
 
 message HostUpdateReply {

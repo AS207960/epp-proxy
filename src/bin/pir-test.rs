@@ -385,7 +385,7 @@ async fn main() {
 
     // 2.3.1.15 Create Name Server (Foreign Registry)
     info!("Creating nameserver");
-    epp_proxy::client::host::create("ns1.example.com", vec![], None, &mut cmd_tx)
+    epp_proxy::client::host::create("ns1.example.com", vec![], None, None, &mut cmd_tx)
         .await
         .unwrap();
 
@@ -397,7 +397,7 @@ async fn main() {
 
     // 2.3.1.17 Create Name Server (Foreign Registry)
     info!("Creating nameserver");
-    epp_proxy::client::host::create("ns2.example.com", vec![], None, &mut cmd_tx)
+    epp_proxy::client::host::create("ns2.example.com", vec![], None, None, &mut cmd_tx)
         .await
         .unwrap();
 
@@ -445,6 +445,7 @@ async fn main() {
             personal_registration: None,
             keysys: None,
             nominet_ext: None,
+            ttl: None,
         },
         &mut cmd_tx,
     )
@@ -478,6 +479,7 @@ async fn main() {
             ip_version: epp_proxy::client::host::AddressVersion::IPv4,
         }],
         None,
+        None,
         &mut cmd_tx,
     )
     .await
@@ -510,6 +512,7 @@ async fn main() {
             ip_version: epp_proxy::client::host::AddressVersion::IPv4,
         }],
         None,
+        None,
         &mut cmd_tx,
     )
     .await
@@ -528,6 +531,7 @@ async fn main() {
         vec![],
         None,
         None,
+        None,
         &mut cmd_tx,
     )
     .await
@@ -544,6 +548,7 @@ async fn main() {
                 ip_version: epp_proxy::client::host::AddressVersion::IPv4,
             },
         )],
+        None,
         None,
         None,
         &mut cmd_tx,
@@ -595,6 +600,7 @@ async fn main() {
             personal_registration: None,
             keysys: None,
             nominet_ext: None,
+            ttl: None,
         },
         &mut cmd_tx,
     )
@@ -806,6 +812,7 @@ async fn main() {
             personal_registration: None,
             keysys: None,
             nominet_ext: None,
+            ttl: None,
         },
         &mut cmd_tx
     )
@@ -850,6 +857,7 @@ async fn main() {
             personal_registration: None,
             keysys: None,
             nominet_ext: None,
+            ttl: None,
         },
         &mut cmd_tx
     )
@@ -894,6 +902,7 @@ async fn main() {
             personal_registration: None,
             keysys: None,
             nominet_ext: None,
+            ttl: None,
         },
         &mut cmd_tx
     )
@@ -956,6 +965,7 @@ async fn main() {
             personal_registration: None,
             keysys: None,
             nominet_ext: None,
+            ttl: None,
         },
         &mut cmd_tx
     )
@@ -1036,6 +1046,7 @@ async fn main() {
             personal_registration: None,
             keysys: None,
             nominet_ext: None,
+            ttl: None,
         },
         &mut cmd_tx,
     )
@@ -1098,6 +1109,7 @@ async fn main() {
             personal_registration: None,
             keysys: None,
             nominet_ext: None,
+            ttl: None,
         },
         &mut cmd_tx,
     )

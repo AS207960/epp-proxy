@@ -2,21 +2,21 @@
 
 use chrono::prelude::*;
 
-use super::{fee, keysys, launch, CommandResponse, RequestMessage, Sender};
+use super::{CommandResponse, RequestMessage, Sender};
 
 #[derive(Debug)]
 pub struct CheckRequest {
     pub(super) name: String,
-    pub(super) fee_check: Option<fee::FeeCheck>,
-    pub(super) launch_check: Option<launch::LaunchAvailabilityCheck>,
-    pub(super) keysys: Option<keysys::DomainCheck>,
+    pub(super) fee_check: Option<super::fee::FeeCheck>,
+    pub(super) launch_check: Option<super::launch::LaunchAvailabilityCheck>,
+    pub(super) keysys: Option<super::keysys::DomainCheck>,
     pub return_path: Sender<CheckResponse>,
 }
 
 #[derive(Debug)]
 pub struct ClaimsCheckRequest {
     pub(super) name: String,
-    pub(super) launch_check: launch::LaunchClaimsCheck,
+    pub(super) launch_check: super::launch::LaunchClaimsCheck,
     pub return_path: Sender<ClaimsCheckResponse>,
 }
 
@@ -34,8 +34,8 @@ pub struct CheckResponse {
     /// An optional reason for the domain's status
     pub reason: Option<String>,
     /// Fee information (if supplied by the registry)
-    pub fee_check: Option<fee::FeeCheckData>,
-    pub donuts_fee_check: Option<fee::DonutsFeeData>,
+    pub fee_check: Option<super::fee::FeeCheckData>,
+    pub donuts_fee_check: Option<super::fee::DonutsFeeData>,
     pub eurid_check: Option<super::eurid::DomainCheck>,
     pub eurid_idn: Option<super::eurid::Idn>,
 }
@@ -46,7 +46,7 @@ pub struct ClaimsCheckResponse {
     /// Does a trademark claim exist
     pub exists: bool,
     /// Claims key for this domain
-    pub claims_key: Vec<launch::LaunchClaimKey>,
+    pub claims_key: Vec<super::launch::LaunchClaimKey>,
 }
 
 #[derive(Debug)]
@@ -61,7 +61,7 @@ pub enum InfoHost {
 pub struct InfoRequest {
     pub(super) name: String,
     pub(super) auth_info: Option<String>,
-    pub(super) launch_info: Option<launch::LaunchInfo>,
+    pub(super) launch_info: Option<super::launch::LaunchInfo>,
     pub(super) hosts: Option<InfoHost>,
     pub(super) eurid_data: Option<super::eurid::DomainInfoRequest>,
     pub return_path: Sender<InfoResponse>,
@@ -103,8 +103,8 @@ pub struct InfoResponse {
     pub auth_info: Option<String>,
     /// DNSSEC data
     pub sec_dns: Option<SecDNSData>,
-    pub launch_info: Option<launch::LaunchInfoData>,
-    pub donuts_fee_data: Option<fee::DonutsFeeData>,
+    pub launch_info: Option<super::launch::LaunchInfoData>,
+    pub donuts_fee_data: Option<super::fee::DonutsFeeData>,
     pub whois_info: Option<super::verisign::InfoWhois>,
     pub isnic_info: Option<super::isnic::DomainInfo>,
     pub eurid_data: Option<super::eurid::DomainInfo>,
@@ -112,6 +112,7 @@ pub struct InfoResponse {
     pub personal_registration: Option<super::personal_registration::PersonalRegistrationInfo>,
     pub keysys: Option<super::keysys::DomainInfo>,
     pub nominet_ext: Option<super::nominet::DomainInfo>,
+    pub ttl: Option<super::ttl::TTLInfo>,
 }
 
 /// Additional contact associated with a domain
@@ -175,15 +176,16 @@ pub struct CreateRequest {
     pub(super) nameservers: Vec<InfoNameserver>,
     pub(super) auth_info: String,
     pub(super) sec_dns: Option<SecDNSData>,
-    pub(super) launch_create: Option<launch::LaunchCreate>,
-    pub(super) fee_agreement: Option<fee::FeeAgreement>,
-    pub(super) donuts_fee_agreement: Option<fee::DonutsFeeData>,
+    pub(super) launch_create: Option<super::launch::LaunchCreate>,
+    pub(super) fee_agreement: Option<super::fee::FeeAgreement>,
+    pub(super) donuts_fee_agreement: Option<super::fee::DonutsFeeData>,
     pub(super) eurid_data: Option<super::eurid::DomainCreate>,
     pub(super) isnic_payment: Option<super::isnic::PaymentInfo>,
     pub(super) personal_registration:
         Option<super::personal_registration::PersonalRegistrationInfo>,
     pub(super) keysys: Option<super::keysys::DomainCreate>,
     pub(super) nominet_ext: Option<super::nominet::DomainCreate>,
+    pub(super) ttl: Option<super::ttl::TTLSet>,
     pub return_path: Sender<CreateResponse>,
 }
 
@@ -193,9 +195,9 @@ pub struct CreateResponse {
     pub pending: bool,
     pub data: CreateData,
     /// Fee information (if supplied by the registry)
-    pub fee_data: Option<fee::FeeData>,
-    pub donuts_fee_data: Option<fee::DonutsFeeData>,
-    pub launch_create: Option<launch::LaunchCreateData>,
+    pub fee_data: Option<super::fee::FeeData>,
+    pub donuts_fee_data: Option<super::fee::DonutsFeeData>,
+    pub launch_create: Option<super::launch::LaunchCreateData>,
 }
 
 #[derive(Debug)]
@@ -213,8 +215,8 @@ pub struct CreateData {
 #[derive(Debug)]
 pub struct DeleteRequest {
     pub(super) name: String,
-    pub(super) launch_info: Option<launch::LaunchUpdate>,
-    pub(super) donuts_fee_agreement: Option<fee::DonutsFeeData>,
+    pub(super) launch_info: Option<super::launch::LaunchUpdate>,
+    pub(super) donuts_fee_agreement: Option<super::fee::DonutsFeeData>,
     pub(super) eurid_data: Option<super::eurid::DomainDelete>,
     pub(super) keysys: Option<super::keysys::DomainDelete>,
     pub return_path: Sender<DeleteResponse>,
@@ -225,7 +227,7 @@ pub struct DeleteResponse {
     /// Was the request completed instantly or not
     pub pending: bool,
     /// Fee information (if supplied by the registry)
-    pub fee_data: Option<fee::FeeData>,
+    pub fee_data: Option<super::fee::FeeData>,
     pub eurid_idn: Option<super::eurid::Idn>,
 }
 
@@ -237,13 +239,14 @@ pub struct UpdateRequest {
     pub(super) new_registrant: Option<String>,
     pub(super) new_auth_info: Option<String>,
     pub(super) sec_dns: Option<UpdateSecDNS>,
-    pub(super) launch_info: Option<launch::LaunchUpdate>,
-    pub(super) fee_agreement: Option<fee::FeeAgreement>,
-    pub(super) donuts_fee_agreement: Option<fee::DonutsFeeData>,
+    pub(super) launch_info: Option<super::launch::LaunchUpdate>,
+    pub(super) fee_agreement: Option<super::fee::FeeAgreement>,
+    pub(super) donuts_fee_agreement: Option<super::fee::DonutsFeeData>,
     pub(super) eurid_data: Option<super::eurid::DomainUpdate>,
     pub(super) isnic_info: Option<super::isnic::DomainUpdate>,
     pub(super) keysys: Option<super::keysys::DomainUpdate>,
     pub(super) nominet_ext: Option<super::nominet::DomainUpdate>,
+    pub(super) ttl: Option<super::ttl::TTLSet>,
     pub return_path: Sender<UpdateResponse>,
 }
 
@@ -273,8 +276,8 @@ pub struct UpdateResponse {
     /// Was the request completed instantly or not
     pub pending: bool,
     /// Fee information (if supplied by the registry)
-    pub fee_data: Option<fee::FeeData>,
-    pub donuts_fee_data: Option<fee::DonutsFeeData>,
+    pub fee_data: Option<super::fee::FeeData>,
+    pub donuts_fee_data: Option<super::fee::DonutsFeeData>,
 }
 
 #[derive(Debug)]
@@ -290,8 +293,8 @@ pub struct RenewRequest {
     pub(super) name: String,
     pub(super) add_period: Option<super::Period>,
     pub(super) cur_expiry_date: DateTime<Utc>,
-    pub(super) fee_agreement: Option<fee::FeeAgreement>,
-    pub(super) donuts_fee_agreement: Option<fee::DonutsFeeData>,
+    pub(super) fee_agreement: Option<super::fee::FeeAgreement>,
+    pub(super) donuts_fee_agreement: Option<super::fee::DonutsFeeData>,
     pub(super) isnic_payment: Option<super::isnic::PaymentInfo>,
     pub(super) keysys: Option<super::keysys::DomainRenew>,
     pub return_path: Sender<RenewResponse>,
@@ -303,8 +306,8 @@ pub struct RenewResponse {
     pub pending: bool,
     pub data: RenewData,
     /// Fee information (if supplied by the registry)
-    pub fee_data: Option<fee::FeeData>,
-    pub donuts_fee_data: Option<fee::DonutsFeeData>,
+    pub fee_data: Option<super::fee::FeeData>,
+    pub donuts_fee_data: Option<super::fee::DonutsFeeData>,
 }
 
 #[derive(Debug)]
@@ -328,8 +331,8 @@ pub struct TransferRequestRequest {
     pub(super) name: String,
     pub(super) auth_info: String,
     pub(super) add_period: Option<super::Period>,
-    pub(super) fee_agreement: Option<fee::FeeAgreement>,
-    pub(super) donuts_fee_agreement: Option<fee::DonutsFeeData>,
+    pub(super) fee_agreement: Option<super::fee::FeeAgreement>,
+    pub(super) donuts_fee_agreement: Option<super::fee::DonutsFeeData>,
     pub(super) eurid_data: Option<super::eurid::DomainTransfer>,
     pub(super) keysys: Option<super::keysys::DomainTransfer>,
     pub return_path: Sender<TransferResponse>,
@@ -348,8 +351,8 @@ pub struct TransferResponse {
     pub pending: bool,
     pub data: TransferData,
     /// Fee information (if supplied by the registry)
-    pub fee_data: Option<fee::FeeData>,
-    pub donuts_fee_data: Option<fee::DonutsFeeData>,
+    pub fee_data: Option<super::fee::FeeData>,
+    pub donuts_fee_data: Option<super::fee::DonutsFeeData>,
 }
 
 #[derive(Debug)]
@@ -409,9 +412,9 @@ pub struct PanData {
 /// * `client_sender` - Reference to the tokio channel into the client
 pub async fn check(
     domain: &str,
-    fee_check: Option<fee::FeeCheck>,
-    launch_check: Option<launch::LaunchAvailabilityCheck>,
-    keysys: Option<keysys::DomainCheck>,
+    fee_check: Option<super::fee::FeeCheck>,
+    launch_check: Option<super::launch::LaunchAvailabilityCheck>,
+    keysys: Option<super::keysys::DomainCheck>,
     client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<CheckResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
@@ -437,7 +440,7 @@ pub async fn check(
 /// * `client_sender` - Reference to the tokio channel into the client
 pub async fn launch_claims_check(
     domain: &str,
-    launch_check: launch::LaunchClaimsCheck,
+    launch_check: super::launch::LaunchClaimsCheck,
     client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<ClaimsCheckResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
@@ -483,7 +486,7 @@ pub async fn info(
     domain: &str,
     auth_info: Option<&str>,
     hosts: Option<InfoHost>,
-    launch_info: Option<launch::LaunchInfo>,
+    launch_info: Option<super::launch::LaunchInfo>,
     eurid_data: Option<super::eurid::DomainInfoRequest>,
     client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<InfoResponse>, super::Error> {
@@ -511,14 +514,15 @@ pub struct CreateInfo<'a> {
     pub nameservers: Vec<InfoNameserver>,
     pub auth_info: &'a str,
     pub sec_dns: Option<SecDNSData>,
-    pub launch_create: Option<launch::LaunchCreate>,
-    pub fee_agreement: Option<fee::FeeAgreement>,
-    pub donuts_fee_agreement: Option<fee::DonutsFeeData>,
+    pub launch_create: Option<super::launch::LaunchCreate>,
+    pub fee_agreement: Option<super::fee::FeeAgreement>,
+    pub donuts_fee_agreement: Option<super::fee::DonutsFeeData>,
     pub eurid_data: Option<super::eurid::DomainCreate>,
     pub isnic_payment: Option<super::isnic::PaymentInfo>,
     pub personal_registration: Option<super::personal_registration::PersonalRegistrationInfo>,
     pub keysys: Option<super::keysys::DomainCreate>,
     pub nominet_ext: Option<super::nominet::DomainCreate>,
+    pub ttl: Option<super::ttl::TTLSet>,
 }
 
 /// Registers a new domain
@@ -554,6 +558,7 @@ pub async fn create(
             personal_registration: info.personal_registration,
             keysys: info.keysys,
             nominet_ext: info.nominet_ext,
+            ttl: info.ttl,
             return_path: sender,
         })),
         receiver,
@@ -568,8 +573,8 @@ pub async fn create(
 /// * `client_sender` - Reference to the tokio channel into the client
 pub async fn delete(
     domain: &str,
-    launch_info: Option<launch::LaunchUpdate>,
-    donuts_fee_agreement: Option<fee::DonutsFeeData>,
+    launch_info: Option<super::launch::LaunchUpdate>,
+    donuts_fee_agreement: Option<super::fee::DonutsFeeData>,
     eurid_data: Option<super::eurid::DomainDelete>,
     keysys: Option<super::keysys::DomainDelete>,
     client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
@@ -598,13 +603,14 @@ pub struct UpdateInfo<'a> {
     pub new_registrant: Option<&'a str>,
     pub new_auth_info: Option<&'a str>,
     pub sec_dns: Option<UpdateSecDNS>,
-    pub launch_info: Option<launch::LaunchUpdate>,
-    pub fee_agreement: Option<fee::FeeAgreement>,
-    pub donuts_fee_agreement: Option<fee::DonutsFeeData>,
+    pub launch_info: Option<super::launch::LaunchUpdate>,
+    pub fee_agreement: Option<super::fee::FeeAgreement>,
+    pub donuts_fee_agreement: Option<super::fee::DonutsFeeData>,
     pub eurid_data: Option<super::eurid::DomainUpdate>,
     pub isnic_info: Option<super::isnic::DomainUpdate>,
     pub keysys: Option<super::keysys::DomainUpdate>,
     pub nominet_ext: Option<super::nominet::DomainUpdate>,
+    pub ttl: Option<super::ttl::TTLSet>,
 }
 
 /// Updates properties of a domain name
@@ -637,6 +643,7 @@ pub async fn update(
             isnic_info: info.isnic_info,
             keysys: info.keysys,
             nominet_ext: info.nominet_ext,
+            ttl: info.ttl,
             return_path: sender,
         })),
         receiver,
@@ -681,8 +688,8 @@ pub async fn renew(
     domain: &str,
     add_period: Option<super::Period>,
     cur_expiry_date: DateTime<Utc>,
-    fee_agreement: Option<fee::FeeAgreement>,
-    donuts_fee_agreement: Option<fee::DonutsFeeData>,
+    fee_agreement: Option<super::fee::FeeAgreement>,
+    donuts_fee_agreement: Option<super::fee::DonutsFeeData>,
     isnic_payment: Option<super::isnic::PaymentInfo>,
     keysys: Option<super::keysys::DomainRenew>,
     client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
@@ -740,8 +747,8 @@ pub async fn transfer_request(
     domain: &str,
     add_period: Option<super::Period>,
     auth_info: &str,
-    fee_agreement: Option<fee::FeeAgreement>,
-    donuts_fee_agreement: Option<fee::DonutsFeeData>,
+    fee_agreement: Option<super::fee::FeeAgreement>,
+    donuts_fee_agreement: Option<super::fee::DonutsFeeData>,
     eurid_data: Option<super::eurid::DomainTransfer>,
     keysys: Option<super::keysys::DomainTransfer>,
     client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,

@@ -240,7 +240,6 @@ impl From<client::domain::InfoResponse> for epp_proto::domain::DomainInfoReply {
                     url: i.url,
                     iris_server: i.iris_server,
                 }),
-            cmd_resp: None,
             eurid_idn: res.eurid_idn.map(Into::into),
             eurid_data: res.eurid_data.map(|d| epp_proto::eurid::DomainInfo {
                 on_hold: d.on_hold,
@@ -270,6 +269,8 @@ impl From<client::domain::InfoResponse> for epp_proto::domain::DomainInfoReply {
             }),
             keysys: res.keysys.map(Into::into),
             nominet_ext: res.nominet_ext.map(Into::into),
+            ttl: res.ttl.map(Into::into),
+            cmd_resp: None,
         }
     }
 }

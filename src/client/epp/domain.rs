@@ -257,6 +257,17 @@ impl
             }
             None => None,
         };
+        
+        let ttl = match extension {
+            Some(ext) => {
+                let i = ext.value.iter().find_map(|p| match p {
+                    proto::EPPResponseExtensionType::EPPTTLInfoData(i) => Some(i),
+                    _ => None,
+                });
+                i.map(Into::into)
+            }
+            None => None,
+        };
 
         let keysys = match extension {
             Some(ext) => {
@@ -362,6 +373,7 @@ impl
             personal_registration,
             keysys,
             nominet_ext,
+            ttl,
         })
     }
 }
@@ -1313,6 +1325,11 @@ pub fn handle_info(client: &ServerFeatures, req: &InfoRequest) -> HandleReqRetur
             proto::verisign::EPPWhoisInfoExt { flag: true },
         ))
     }
+    if client.ttl_supported {
+        exts.push(proto::EPPCommandExtensionType::EPPTTLInfo(
+            proto::ttl::EPPTTLInfoRequest { policy: true }
+        ))
+    }
 
     if let Some(eurid_data) = &req.eurid_data {
         if let Some(euird_auth_info) = eurid_data.into() {
@@ -1497,6 +1514,16 @@ pub fn handle_create(
         if client.personal_registration_supported {
             exts.push(proto::EPPCommandExtensionType::PersonalRegistrationCreate(
                 personal_registration_data.into(),
+            ))
+        } else {
+            return Err(Err(Error::Unsupported));
+        }
+    }
+
+    if let Some(ttl) = &req.ttl {
+        if client.ttl_supported {
+            exts.push(proto::EPPCommandExtensionType::EPPTTLCreate(
+                ttl.into(),
             ))
         } else {
             return Err(Err(Error::Unsupported));
@@ -2208,6 +2235,7 @@ pub fn handle_update(
         && req.remove.is_empty()
         && is_not_change
         && (req.sec_dns.is_none() || !client.secdns_supported)
+        && (req.ttl.is_none() || !client.ttl_supported)
         && is_not_eurid_change
         && is_not_isnic_change
         && is_not_keysys_change
@@ -2360,6 +2388,16 @@ pub fn handle_update(
         if client.isnic_contact_supported {
             exts.push(proto::EPPCommandExtensionType::ISNICDomainUpdate(
                 isnic_info.into(),
+            ))
+        } else {
+            return Err(Err(Error::Unsupported));
+        }
+    }
+
+    if let Some(ttl) = &req.ttl {
+        if client.ttl_supported {
+            exts.push(proto::EPPCommandExtensionType::EPPTTLUpdate(
+                ttl.into(),
             ))
         } else {
             return Err(Err(Error::Unsupported));

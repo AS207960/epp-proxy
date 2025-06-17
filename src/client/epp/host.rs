@@ -46,10 +46,23 @@ impl From<&Status> for proto::host::EPPHostStatusType {
     }
 }
 
-impl TryFrom<proto::host::EPPHostInfoData> for InfoResponse {
+impl TryFrom<(proto::host::EPPHostInfoData, &Option<proto::EPPResponseExtension>)> for InfoResponse {
     type Error = Error;
 
-    fn try_from(host_info: proto::host::EPPHostInfoData) -> Result<Self, Self::Error> {
+    fn try_from(from: (proto::host::EPPHostInfoData, &Option<proto::EPPResponseExtension>)) -> Result<Self, Self::Error> {
+        let (host_info, extension) = from;
+
+        let ttl = match extension {
+            Some(ext) => {
+                let i = ext.value.iter().find_map(|p| match p {
+                    proto::EPPResponseExtensionType::EPPTTLInfoData(i) => Some(i),
+                    _ => None,
+                });
+                i.map(Into::into)
+            }
+            None => None,
+        };
+        
         Ok(InfoResponse {
             name: host_info.name,
             registry_id: host_info.registry_id.unwrap_or_default(),
@@ -75,6 +88,7 @@ impl TryFrom<proto::host::EPPHostInfoData> for InfoResponse {
             last_updated_client: host_info.last_updated_client,
             last_updated_date: host_info.last_updated_date,
             last_transfer_date: host_info.last_transfer_date,
+            ttl,
         })
     }
 }
@@ -138,6 +152,11 @@ pub fn handle_info(client: &ServerFeatures, req: &InfoRequest) -> HandleReqRetur
         name: req.name.clone(),
     });
     let mut ext = vec![];
+    if client.ttl_supported {
+        ext.push(proto::EPPCommandExtensionType::EPPTTLInfo(
+            proto::ttl::EPPTTLInfoRequest { policy: true }
+        ))
+    }
     super::verisign::handle_verisign_namestore_erratum(client, &mut ext);
     Ok((
         proto::EPPCommandType::Info(command),
@@ -153,7 +172,8 @@ pub fn handle_info_response<M: crate::metrics::Metrics>(
 ) -> Response<InfoResponse> {
     match response.data {
         Some(value) => match value.value {
-            proto::EPPResultDataValue::EPPHostInfoResult(host_info) => (*host_info).try_into(),
+            proto::EPPResultDataValue::EPPHostInfoResult(host_info) =>
+                (*host_info, &response.extension).try_into(),
             _ => Err(Error::ServerInternal),
         },
         None => Err(Error::ServerInternal),
@@ -177,6 +197,16 @@ pub fn handle_create(
         ext.push(proto::EPPCommandExtensionType::ISNICHostCreate(
             isnic_info.into(),
         ))
+    }
+
+    if let Some(ttl) = &req.ttl {
+        if client.ttl_supported {
+            ext.push(proto::EPPCommandExtensionType::EPPTTLCreate(
+                ttl.into(),
+            ))
+        } else {
+            return Err(Err(Error::Unsupported));
+        }
     }
 
     super::verisign::handle_verisign_namestore_erratum(client, &mut ext);
@@ -298,8 +328,18 @@ pub fn handle_update(
         ))
     }
 
+    if let Some(ttl) = &req.ttl {
+        if client.ttl_supported {
+            ext.push(proto::EPPCommandExtensionType::EPPTTLUpdate(
+                ttl.into(),
+            ))
+        } else {
+            return Err(Err(Error::Unsupported));
+        }
+    }
+
     super::verisign::handle_verisign_namestore_erratum(client, &mut ext);
-    if req.add.is_empty() && req.remove.is_empty() && req.new_name.is_none() {
+    if req.add.is_empty() && req.remove.is_empty() && req.new_name.is_none() && (req.ttl.is_none() || !client.ttl_supported) {
         return Err(Err(Error::InvalidRequest(
             "at least one operation must be specified".to_string(),
         )));

@@ -19,6 +19,7 @@ mod mark;
 mod nominet;
 mod rgp;
 mod tmch;
+mod ttl;
 mod utils;
 
 pub mod epp_proto {
@@ -105,6 +106,10 @@ pub mod epp_proto {
 
     pub mod keysys {
         tonic::include_proto!("epp.keysys");
+    }
+
+    pub mod ttl {
+        tonic::include_proto!("epp.ttl");
     }
 }
 
@@ -412,6 +417,10 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                         .map(TryInto::try_into)
                         .map_or(Ok(None), |v| v.map(Some))?,
                     nominet_ext: request.nominet_ext.map(Into::into),
+                    ttl: match request.ttl {
+                        Some(i) => Some(TryInto::try_into(i)?),
+                        None => None,
+                    },
                 },
                 &mut sender,
             )
@@ -661,6 +670,10 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                     isnic_info: request.isnic_info.map(Into::into),
                     keysys: request.keysys.map(Into::into),
                     nominet_ext: request.nominet_ext.map(Into::into),
+                    ttl: match request.ttl {
+                        Some(i) => Some(TryInto::try_into(i)?),
+                        None => None,
+                    },
                 },
                 &mut sender,
             )
@@ -999,6 +1012,10 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                 &name,
                 addresses,
                 request.isnic_info.map(Into::into),
+                match request.ttl {
+                    Some(i) => Some(TryInto::try_into(i)?),
+                    None => None,
+                },
                 &mut sender,
             )
             .await?,
@@ -1096,6 +1113,10 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                 remove,
                 request.new_name,
                 request.isnic_info.map(Into::into),
+                match request.ttl {
+                    Some(i) => Some(TryInto::try_into(i)?),
+                    None => None,
+                },
                 &mut sender,
             )
             .await?,

@@ -162,6 +162,7 @@ async fn main() {
             personal_registration: None,
             keysys: None,
             nominet_ext: None,
+            ttl: None,
         },
         &mut cmd_tx_1,
     )
@@ -183,6 +184,7 @@ async fn main() {
                 ip_version: epp_proxy::client::host::AddressVersion::IPv4,
             }],
             None,
+            None,
             &mut cmd_tx_1
         )
         .await
@@ -202,6 +204,7 @@ async fn main() {
                 address: "1.0.0.1".to_string(),
                 ip_version: epp_proxy::client::host::AddressVersion::IPv4,
             }],
+            None,
             None,
             &mut cmd_tx_1
         )
@@ -244,6 +247,7 @@ async fn main() {
                 eurid_data: None,
                 keysys: None,
                 nominet_ext: None,
+                ttl: None,
             },
             &mut cmd_tx_1
         )
@@ -286,7 +290,8 @@ async fn main() {
                 isnic_info: None,
                 eurid_data: None,
                 keysys: None,
-                nominet_ext: None
+                nominet_ext: None,
+                ttl: None,
             },
             &mut cmd_tx_1
         )
@@ -341,7 +346,8 @@ async fn main() {
                 isnic_info: None,
                 eurid_data: None,
                 keysys: None,
-                nominet_ext: None
+                nominet_ext: None,
+                ttl: None,
             },
             &mut cmd_tx_1
         )
@@ -383,6 +389,7 @@ async fn main() {
                 eurid_data: None,
                 keysys: None,
                 nominet_ext: None,
+                ttl: None,
             },
             &mut cmd_tx_1
         )
@@ -411,6 +418,7 @@ async fn main() {
                     ip_version: epp_proxy::client::host::AddressVersion::IPv4,
                 }
             )],
+            None,
             None,
             None,
             &mut cmd_tx_1

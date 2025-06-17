@@ -269,7 +269,7 @@ async fn main() {
         .await
         .unwrap();
     if res.response.avail {
-        epp_proxy::client::host::create("ns1.as207960.net", vec![], None, &mut cmd_tx_ga_1)
+        epp_proxy::client::host::create("ns1.as207960.net", vec![], None, None, &mut cmd_tx_ga_1)
             .await
             .unwrap();
     }
@@ -277,7 +277,7 @@ async fn main() {
         .await
         .unwrap();
     if res.response.avail {
-        epp_proxy::client::host::create("ns2.as207960.net", vec![], None, &mut cmd_tx_ga_1)
+        epp_proxy::client::host::create("ns2.as207960.net", vec![], None, None, &mut cmd_tx_ga_1)
             .await
             .unwrap();
     }
@@ -338,6 +338,7 @@ async fn main() {
             personal_registration: None,
             keysys: None,
             nominet_ext: None,
+            ttl: None,
         },
         &mut cmd_tx_ga_1,
     )
@@ -406,6 +407,7 @@ async fn main() {
             personal_registration: None,
             keysys: None,
             nominet_ext: None,
+            ttl: None,
         },
         &mut cmd_tx_ga_1,
     )
@@ -520,6 +522,7 @@ async fn main() {
             personal_registration: None,
             keysys: None,
             nominet_ext: None,
+            ttl: None,
         },
         &mut cmd_tx_ga_1,
     )
@@ -616,6 +619,7 @@ async fn main() {
             personal_registration: None,
             keysys: None,
             nominet_ext: None,
+            ttl: None,
         },
         &mut cmd_tx_ga_1,
     )
@@ -644,6 +648,7 @@ async fn main() {
             },
         ],
         None,
+        None,
         &mut cmd_tx_ga_1,
     )
     .await
@@ -660,6 +665,7 @@ async fn main() {
                 ip_version: epp_proxy::client::host::AddressVersion::IPv6,
             },
         ],
+        None,
         None,
         &mut cmd_tx_ga_1,
     )
@@ -690,6 +696,7 @@ async fn main() {
             eurid_data: None,
             keysys: None,
             nominet_ext: None,
+            ttl: None,
         },
         &mut cmd_tx_ga_1,
     )
@@ -720,6 +727,7 @@ async fn main() {
             eurid_data: None,
             keysys: None,
             nominet_ext: None,
+            ttl: None,
         },
         &mut cmd_tx_ga_1,
     )
@@ -752,6 +760,7 @@ async fn main() {
         ],
         None,
         None,
+        None,
         &mut cmd_tx_ga_1,
     )
     .await
@@ -778,6 +787,7 @@ async fn main() {
                 ip_version: epp_proxy::client::host::AddressVersion::IPv6,
             }),
         ],
+        None,
         None,
         None,
         &mut cmd_tx_ga_1,
@@ -857,6 +867,7 @@ async fn main() {
             eurid_data: None,
             keysys: None,
             nominet_ext: None,
+            ttl: None,
         },
         &mut cmd_tx_ga_1,
     )
@@ -1019,6 +1030,7 @@ async fn main() {
             personal_registration: None,
             keysys: None,
             nominet_ext: None,
+            ttl: None,
         },
         &mut cmd_tx_ga_1,
     )
@@ -1100,6 +1112,7 @@ async fn main() {
             personal_registration: None,
             keysys: None,
             nominet_ext: None,
+            ttl: None,
         },
         &mut cmd_tx_ga_1,
     )
@@ -1181,6 +1194,7 @@ async fn main() {
             personal_registration: None,
             keysys: None,
             nominet_ext: None,
+            ttl: None,
         },
         &mut cmd_tx_ga_1,
     )
@@ -1375,6 +1389,7 @@ async fn main() {
             personal_registration: None,
             keysys: None,
             nominet_ext: None,
+            ttl: None,
         },
         &mut cmd_tx_sunrise,
     )

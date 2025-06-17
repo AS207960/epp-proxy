@@ -1,0 +1,40 @@
+syntax = "proto3";
+package epp.ttl;
+option go_package = "github.com/as207960/epp-proxy/gen/go/epp/ttl";
+
+import "google/protobuf/wrappers.proto";
+
+message TTLInfo {
+  repeated TTL ttl = 1;
+}
+
+message TTL {
+  google.protobuf.UInt32Value ttl = 1;
+  oneof record {
+    Record wk_record = 2;
+    string custom_record = 3;
+  }
+  google.protobuf.UInt32Value min = 4;
+  google.protobuf.UInt32Value max = 5;
+  google.protobuf.UInt32Value default = 6;
+}
+
+enum Record {
+  NS = 0;
+  DS = 1;
+  DNAME = 2;
+  A = 3;
+  AAAA = 4;
+}
+
+message TTLSet {
+  repeated TTLCommand ttl = 1;
+}
+
+message TTLCommand {
+  google.protobuf.UInt32Value ttl = 1;
+  oneof record {
+    Record wk_record = 2;
+    string custom_record = 3;
+  }
+}

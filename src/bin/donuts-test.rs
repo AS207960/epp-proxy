@@ -330,6 +330,7 @@ async fn main() {
             personal_registration: None,
             keysys: None,
             nominet_ext: None,
+            ttl: None,
         },
         &mut cmd_tx_1,
     )
@@ -381,6 +382,7 @@ async fn main() {
                 personal_registration: None,
                 keysys: None,
                 nominet_ext: None,
+                ttl: None,
             },
             &mut cmd_tx_1,
         )
@@ -488,6 +490,7 @@ async fn main() {
             personal_registration: None,
             keysys: None,
             nominet_ext: None,
+            ttl: None,
         },
         &mut cmd_tx_1,
     )
@@ -540,6 +543,7 @@ async fn main() {
             personal_registration: None,
             keysys: None,
             nominet_ext: None,
+            ttl: None,
         },
         &mut cmd_tx_1,
     )
@@ -592,6 +596,7 @@ async fn main() {
             personal_registration: None,
             keysys: None,
             nominet_ext: None,
+            ttl: None,
         },
         &mut cmd_tx_1,
     )
@@ -661,6 +666,7 @@ async fn main() {
             personal_registration: None,
             keysys: None,
             nominet_ext: None,
+            ttl: None,
         },
         &mut cmd_tx_1,
     )
@@ -735,6 +741,7 @@ async fn main() {
             personal_registration: None,
             keysys: None,
             nominet_ext: None,
+            ttl: None,
         },
         &mut cmd_tx_1,
     )
@@ -807,6 +814,7 @@ async fn main() {
             personal_registration: None,
             keysys: None,
             nominet_ext: None,
+            ttl: None,
         },
         &mut cmd_tx_1,
     )
@@ -874,6 +882,7 @@ async fn main() {
             personal_registration: None,
             keysys: None,
             nominet_ext: None,
+            ttl: None,
         },
         &mut cmd_tx_1,
     )

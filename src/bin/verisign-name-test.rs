@@ -160,7 +160,7 @@ async fn main() {
     info!("Creating out of zone nameserver");
     info!(
         "{:#?}",
-        epp_proxy::client::host::create(&out_of_zone_ns, vec![], None, &mut cmd_tx)
+        epp_proxy::client::host::create(&out_of_zone_ns, vec![], None, None, &mut cmd_tx)
             .await
             .unwrap()
     );
@@ -211,6 +211,7 @@ async fn main() {
             personal_registration: None,
             keysys: None,
             nominet_ext: None,
+            ttl: None,
         },
         &mut cmd_tx,
     )
@@ -229,6 +230,7 @@ async fn main() {
                 address: "1.1.1.1".to_string(),
                 ip_version: epp_proxy::client::host::AddressVersion::IPv4,
             }],
+            None,
             None,
             &mut cmd_tx
         )
@@ -293,6 +295,7 @@ async fn main() {
                 eurid_data: None,
                 keysys: None,
                 nominet_ext: None,
+                ttl: None,
             },
             &mut cmd_tx
         )
@@ -366,6 +369,7 @@ async fn main() {
             personal_registration: None,
             keysys: None,
             nominet_ext: None,
+            ttl: None,
         },
         &mut cmd_tx,
     )
@@ -384,6 +388,7 @@ async fn main() {
                 address: "1.1.1.1".to_string(),
                 ip_version: epp_proxy::client::host::AddressVersion::IPv4,
             }],
+            None,
             None,
             &mut cmd_tx
         )
@@ -448,6 +453,7 @@ async fn main() {
                 eurid_data: None,
                 keysys: None,
                 nominet_ext: None,
+                ttl: None,
             },
             &mut cmd_tx
         )

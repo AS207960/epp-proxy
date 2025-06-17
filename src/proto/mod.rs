@@ -30,6 +30,7 @@ pub mod tmch;
 pub mod traficom;
 pub mod united_tld;
 pub mod verisign;
+pub(crate) mod ttl;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub enum EPPMessageType {
@@ -194,6 +195,12 @@ pub enum EPPCommandExtensionType {
     EPPLaunchUpdate(launch::EPPLaunchInfo),
     #[serde(rename = "{urn:ietf:params:xml:ns:launch-1.0}launch:delete")]
     EPPLaunchDelete(launch::EPPLaunchInfo),
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp:ttl-1.0}ttl:info")]
+    EPPTTLInfo(ttl::EPPTTLInfoRequest),
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp:ttl-1.0}ttl:create")]
+    EPPTTLCreate(ttl::EPPTTLSet),
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp:ttl-1.0}ttl:update")]
+    EPPTTLUpdate(ttl::EPPTTLSet),
     #[serde(rename = "{http://www.unitedtld.com/epp/charge-1.0}charge:agreement")]
     EPPDonutsChargeAgreement(united_tld::EPPChargeData),
     #[serde(rename = "{urn:ietf:params:xml:ns:epp:loginSec-1.0}loginSec:loginSec")]
@@ -958,6 +965,8 @@ pub enum EPPResponseExtensionType {
     EPPLaunchInfoData(launch::EPPLaunchInfoData),
     #[serde(rename = "{urn:ietf:params:xml:ns:launch-1.0}creData")]
     EPPLaunchCreateData(launch::EPPLaunchCreateData),
+    #[serde(rename = "{urn:ietf:params:xml:ns:epp:ttl-1.0}infData")]
+    EPPTTLInfoData(ttl::EPPTTLInfoData),
     #[serde(rename = "{http://www.unitedtld.com/epp/charge-1.0}chkData")]
     EPPDonutsChargeCheckData(united_tld::EPPChargeCheckData),
     #[serde(rename = "{http://www.unitedtld.com/epp/charge-1.0}infData")]

@@ -14,6 +14,7 @@ import "isnic/isnic.proto";
 import "personal_registration/personal_registration.proto";
 import "keysys/keysys.proto";
 import "nominet_ext/nominet_ext.proto";
+import "ttl/ttl.proto";
 
 message Contact {
     string id = 1;
@@ -109,13 +110,14 @@ message DomainInfoReply {
     launch.LaunchInfoData launch_info = 19;
     fee.DonutsFeeData donuts_fee_data = 20;
     VerisignWhoisInfo verisign_whois_info = 21;
-    common.CommandResponse cmd_resp = 22;
     eurid.IDN eurid_idn = 23;
     eurid.DomainInfo eurid_data = 24;
     isnic.DomainInfo isnic_info = 25;
     personal_registration.PersonalRegistrationInfo personal_registration = 26;
     keysys.DomainInfo keysys = 27;
     nominet_ext.DomainInfo nominet_ext = 28;
+    ttl.TTLInfo ttl = 29;
+    common.CommandResponse cmd_resp = 22;
 }
 
 message DomainCreateRequest {
@@ -135,6 +137,7 @@ message DomainCreateRequest {
     personal_registration.PersonalRegistrationInfo personal_registration = 14;
     keysys.DomainCreate keysys = 15;
     nominet_ext.DomainCreate nominet_ext = 28;
+    ttl.TTLSet ttl = 16;
 }
 
 message DomainCreateReply {
@@ -193,6 +196,7 @@ message DomainUpdateRequest {
     isnic.DomainUpdate isnic_info = 12;
     keysys.DomainUpdate keysys = 13;
     nominet_ext.DomainUpdate nominet_ext = 28;
+    ttl.TTLSet ttl = 14;
 }
 
 message DomainSyncRequest {
