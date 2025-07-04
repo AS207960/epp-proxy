@@ -922,6 +922,9 @@ impl<M: crate::metrics::Metrics<Subordinate = M> + 'static> EPPClient<M> {
         self.features.eurid_domain_26_support = greeting
             .service_menu
             .supports_ext("http://www.eurid.eu/xml/epp/domain-ext-2.6");
+        self.features.eurid_auth_info_supported = greeting
+            .service_menu
+            .supports_ext("http://www.eurid.eu/xml/epp/authInfo-1.1");
         self.features.eurid_hit_points_supported = greeting
             .service_menu
             .supports("http://www.eurid.eu/xml/epp/registrarHitPoints-1.0");
@@ -1126,6 +1129,9 @@ impl<M: crate::metrics::Metrics<Subordinate = M> + 'static> EPPClient<M> {
             }
             if self.features.eurid_idn_supported {
                 ext_objects.push("http://www.eurid.eu/xml/epp/idn-1.0".to_string())
+            }
+            if self.features.eurid_auth_info_supported {
+                ext_objects.push("http://www.eurid.eu/xml/epp/authInfo-1.1".to_string())
             }
             if self.features.qualified_lawyer_supported {
                 ext_objects.push("urn:ietf:params:xml:ns:qualifiedLawyer-1.0".to_string())
