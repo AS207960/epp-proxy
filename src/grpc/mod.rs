@@ -1696,9 +1696,10 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                                         pending_acks.pop().unwrap()
                                     } else if let Some(m) = match request.message().await {
                                         Ok(m) => m,
-                                        Err(err) => match tx.send(Err(err)).await {
-                                            Ok(_) => continue,
-                                            Err(_) => break,
+                                        Err(err) => {
+                                            warn!("Error received from client in place of poll acknowledgement: {}", err);
+                                            let _ = tx.send(Err(err)).await;
+                                            break;
                                         },
                                     } {
                                         m
@@ -1707,8 +1708,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                                     };
                                     match client::poll::poll_ack(&msg.msg_id, &mut sender).await {
                                         Ok(resp) => {
-                                            let (resp, _cmd_resp) = utils::map_command_response(resp);
-                                            if let Some(count) = resp.count {
+                                            if let Some(count) = resp.response.count {
                                                 should_delay = count <= 0;
                                             } else {
                                                 should_delay = true;
