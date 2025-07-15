@@ -415,6 +415,10 @@ impl std::convert::TryFrom<&super::proto::keysys::DomainInfoData>
     }
 }
 
+static NAME_RE: once_cell::sync::Lazy<regex::Regex> = once_cell::sync::Lazy::new(|| {
+    regex::Regex::new(r"^(?:\{(?P<n>[^;]+)(?:;(?P<l>.*))?})?(?:(?P<p>.+):)?(?P<e>.+)$").unwrap()
+});
+
 pub fn poll_data_from_response(
     from: &Option<super::proto::EPPResponseExtension>,
 ) -> Result<Option<super::super::keysys::PollData>, super::super::Error> {
@@ -424,7 +428,14 @@ pub fn poll_data_from_response(
             _ => None,
         }) {
             Some(e) => Ok(Some(super::super::keysys::PollData {
-                data: e.data.as_ref().map(|d| d.clone()).unwrap_or_default(),
+                data: e.data.as_ref().map(|d| {
+                    d.iter().map(|(k, v)| {
+                        match NAME_RE.captures(k) {
+                            Some(c) => (c.name("e").unwrap().as_str().to_string(), v.to_string()),
+                            None => (k.to_string(), v.to_string()),
+                        }
+                    }).collect()
+                }).unwrap_or_default(),
                 info: e.info.clone()
             })),
             None => Ok(None),
