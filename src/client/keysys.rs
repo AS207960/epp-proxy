@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use chrono::prelude::*;
 
 #[derive(Debug)]
@@ -371,4 +372,10 @@ pub enum USCategory {
 pub enum TelWhoisType {
     NaturalPerson,
     LegalPerson,
+}
+
+#[derive(Debug)]
+pub struct PollData {
+    pub data: HashMap<String, String>,
+    pub info: Option<String>,
 }

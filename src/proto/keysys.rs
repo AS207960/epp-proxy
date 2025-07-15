@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use chrono::prelude::*;
 
 #[derive(Debug, Serialize)]
@@ -54,9 +55,9 @@ pub enum ResultData {
 #[derive(Debug, Deserialize)]
 pub struct Poll {
     #[serde(rename = "{http://www.key-systems.net/epp/keysys-1.0}data", default)]
-    data: Option<PollData>,
+    pub data: Option<HashMap<String, String>>,
     #[serde(rename = "{http://www.key-systems.net/epp/keysys-1.0}info", default)]
-    info: Option<String>,
+    pub info: Option<String>,
 }
 
 #[derive(Debug, Serialize)]
@@ -620,22 +621,6 @@ pub struct DomainInfoData {
         default
     )]
     pub whois_url: Option<String>,
-}
-
-#[derive(Debug, Deserialize)]
-pub struct PollData {
-    #[serde(rename = "{urn:ietf:params:xml:ns:epp-1.0}domain", default)]
-    pub domain: Option<String>,
-    #[serde(rename = "{urn:ietf:params:xml:ns:epp-1.0}contact", default)]
-    pub contact: Option<String>,
-    #[serde(rename = "{urn:ietf:params:xml:ns:epp-1.0}period", default)]
-    pub period: Option<u32>,
-    #[serde(rename = "{urn:ietf:params:xml:ns:epp-1.0}autorenew", default)]
-    pub auto_renew: bool,
-    #[serde(rename = "{urn:ietf:params:xml:ns:epp-1.0}autodelete", default)]
-    pub auto_delete: bool,
-    #[serde(rename = "{urn:ietf:params:xml:ns:epp-1.0}svtrid", default)]
-    pub server_transaction_id: Option<String>,
 }
 
 #[derive(Debug, Serialize)]

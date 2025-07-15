@@ -40,6 +40,7 @@ pub enum PollData {
     DomainTransferData {
         data: super::domain::TransferResponse,
         change_data: Option<ChangeData>,
+        keysys_data: Option<super::keysys::PollData>,
     },
     ContactTransferData {
         data: super::contact::TransferResponse,
@@ -52,14 +53,17 @@ pub enum PollData {
     DomainPanData {
         data: super::domain::PanData,
         change_data: Option<ChangeData>,
+        keysys_data: Option<super::keysys::PollData>,
     },
     ContactPanData {
         data: super::contact::PanData,
         change_data: Option<ChangeData>,
+        keysys_data: Option<super::keysys::PollData>,
     },
     DomainRenewData {
         data: super::domain::RenewResponse,
         change_data: Option<ChangeData>,
+        keysys_data: Option<super::keysys::PollData>,
     },
     NominetDomainCancelData {
         data: super::nominet::CancelData,

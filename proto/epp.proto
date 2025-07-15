@@ -381,6 +381,7 @@ message PollReply {
         host.HostInfoReply host_info = 26;
     }
     ChangeData change_data = 10;
+    KeysysPoll keysys = 27;
     common.CommandResponse cmd_resp = 23;
 }
 
@@ -427,6 +428,11 @@ message ChangeData {
     string who = 5;
     CaseID case_id = 6;
     google.protobuf.StringValue reason = 7;
+}
+
+message KeysysPoll {
+    google.protobuf.StringValue info = 1;
+    map<string, string> data = 2;
 }
 
 message BalanceReply {

@@ -131,6 +131,7 @@ pub fn handle_poll_response<M: crate::metrics::Metrics>(
                                     PollData::DomainTransferData {
                                         data: (domain_transfer, &response.extension).try_into()?,
                                         change_data: change_data_from_response(&response.extension)?,
+                                        keysys_data: super::keysys::poll_data_from_response(&response.extension)?,
                                     }
                                 }
                                 proto::EPPResultDataValue::EPPContactTransferResult(
@@ -149,6 +150,7 @@ pub fn handle_poll_response<M: crate::metrics::Metrics>(
                                     PollData::DomainRenewData {
                                         data: (domain_renew, &response.extension).try_into()?,
                                         change_data: change_data_from_response(&response.extension)?,
+                                        keysys_data: super::keysys::poll_data_from_response(&response.extension)?,
                                     }
                                 }
                                 proto::EPPResultDataValue::EPPDomainPendingActionNotification(
@@ -156,12 +158,14 @@ pub fn handle_poll_response<M: crate::metrics::Metrics>(
                                 ) => PollData::DomainPanData {
                                     data: (&domain_data).into(),
                                     change_data: change_data_from_response(&response.extension)?,
+                                    keysys_data: super::keysys::poll_data_from_response(&response.extension)?,
                                 },
                                 proto::EPPResultDataValue::EPPContactPendingActionNotification(
                                     contact_data,
                                 ) => PollData::ContactPanData {
                                     data: (&contact_data).into(),
                                     change_data: change_data_from_response(&response.extension)?,
+                                    keysys_data: super::keysys::poll_data_from_response(&response.extension)?,
                                 },
                                 proto::EPPResultDataValue::NominetCancelData(canc_data) => {
                                     PollData::NominetDomainCancelData {
@@ -309,6 +313,7 @@ mod poll_tests {
             super::PollData::DomainTransferData {
                 data: _,
                 change_data: None,
+                keysys_data: None,
             } => {}
             _ => unreachable!(),
         }
@@ -1228,6 +1233,7 @@ mod poll_tests {
             super::PollData::DomainTransferData {
                 data: trn_data,
                 change_data: None,
+                keysys_data: None,
             } => {
                 assert_eq!(trn_data.data.name, "example.uk.com");
                 assert_eq!(
@@ -1279,6 +1285,7 @@ mod poll_tests {
             super::PollData::DomainTransferData {
                 data: trn_data,
                 change_data: None,
+                keysys_data: None,
             } => {
                 assert_eq!(trn_data.data.name, "example.uk.com");
                 assert_eq!(
@@ -1379,6 +1386,7 @@ mod poll_tests {
             super::PollData::DomainRenewData {
                 data: ren_data,
                 change_data: None,
+                keysys_data: None,
             } => {
                 assert_eq!(ren_data.data.name, "siatki.eu");
             }
@@ -1387,7 +1395,7 @@ mod poll_tests {
     }
 
     #[test]
-    fn rrpproxy_domain_pan_failed() {
+    fn rrpproxy_domain_pan_failed_1() {
         const XML_DATA: &str = r#"
 <?xml version="1.0" encoding="UTF-8"?>
 <epp xmlns="urn:ietf:params:xml:ns:epp-1.0">
@@ -1427,6 +1435,7 @@ mod poll_tests {
             super::PollData::DomainPanData {
                 data: pan_data,
                 change_data: None,
+                keysys_data: None,
             } => {
                 assert_eq!(pan_data.name, "example.com");
                 assert!(!pan_data.result);
@@ -1437,6 +1446,96 @@ mod poll_tests {
                 assert_eq!(
                     pan_data.client_transaction_id.unwrap(),
                     "ECA21919-4B41-40BB-8A9F-ED6849950154"
+                );
+            }
+            _ => unreachable!(),
+        }
+    }
+
+    #[test]
+    fn rrpproxy_domain_pan_failed_2() {
+        const XML_DATA: &str = r#"
+<?xml version="1.0" encoding="UTF-8"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0">
+  <response>
+    <result code="1301">
+      <msg>Command completed successfully; ack to dequeue</msg>
+    </result>
+    <msgQ id="1454" count="267">
+      <qDate>2025-02-17T12:49:54.0Z</qDate>
+      <msg>DOMAIN_MODIFICATION_FAILED</msg>
+    </msgQ>
+    <resData>
+      <domain:panData xmlns:domain="urn:ietf:params:xml:ns:domain-1.0">
+        <domain:name paResult="0">example.at</domain:name>
+        <domain:paTRID>
+          <clTRID>7A241265-8434-4192-80D4-C32502DE96EA</clTRID>
+          <svTRID>D1A4929B-70CE-4D74-AEFA-7485F83317EB</svTRID>
+        </domain:paTRID>
+        <domain:paDate>2025-02-17T12:49:54.0Z</domain:paDate>
+      </domain:panData>
+    </resData>
+    <extension>
+      <keysys:poll xmlns:keysys="http://www.key-systems.net/epp/keysys-1.0">
+        <keysys:data>
+          <domain>example.at</domain>
+          <jobid>2755015162</jobid>
+          <cltrid>7A241265-8434-4192-80D4-C32502DE96EA</cltrid>
+          <svtrid>D1A4929B-70CE-4D74-AEFA-7485F83317EB</svtrid>
+          <ownerchange_status>registry operation failed</ownerchange_status>
+          <losing_registrant>P-GZS7019</losing_registrant>
+          <gaining_registrant>P-HXS7596</gaining_registrant>
+          <domain>example.at</domain>
+          <reason>ownerchange failed: 541 Invalid attribute value [Contact [HS14319895-NICAT]</reason>
+        </keysys:data>
+        <keysys:info>ownerchange failed: 541 Invalid attribute value [Contact [HS14319895-NICAT]</keysys:info>
+      </keysys:poll>
+    </extension>
+    <trID>
+      <clTRID>38327140-f6c1-4b67-b295-e236490b263d</clTRID>
+      <svTRID>35337ea0-7895-4f8b-99ca-d1938d20e8eb</svTRID>
+    </trID>
+  </response>
+</epp>"#;
+        let res: super::proto::EPPMessage = xml_serde::from_str(XML_DATA.trim()).unwrap();
+        let res = match res.message {
+            super::proto::EPPMessageType::Response(r) => r,
+            _ => unreachable!(),
+        };
+        let data = super::handle_poll_response(
+            *res, &crate::metrics::DummyMetrics::default()).unwrap().unwrap();
+        assert_eq!(data.message, "DOMAIN_MODIFICATION_FAILED");
+        match data.data {
+            super::PollData::DomainPanData {
+                data: pan_data,
+                change_data: None,
+                keysys_data: Some(keysys_data),
+            } => {
+                assert_eq!(pan_data.name, "example.at");
+                assert!(!pan_data.result);
+                assert_eq!(
+                    pan_data.server_transaction_id.unwrap(),
+                    "D1A4929B-70CE-4D74-AEFA-7485F83317EB"
+                );
+                assert_eq!(
+                    pan_data.client_transaction_id.unwrap(),
+                    "7A241265-8434-4192-80D4-C32502DE96EA"
+                );
+                assert_eq!(
+                    keysys_data.info.unwrap(),
+                    "ownerchange failed: 541 Invalid attribute value [Contact [HS14319895-NICAT]"
+                );
+                assert_eq!(
+                    keysys_data.data.get("{urn:ietf:params:xml:ns:epp-1.0}domain").unwrap(),
+                    "example.at"
+                );
+                assert_eq!(
+                    keysys_data.data.get("{urn:ietf:params:xml:ns:epp-1.0}svtrid").unwrap(),
+                    "D1A4929B-70CE-4D74-AEFA-7485F83317EB"
+                );
+                assert_eq!(
+                    keysys_data.data.get("{urn:ietf:params:xml:ns:epp-1.0}cltrid").unwrap(),
+                    "7A241265-8434-4192-80D4-C32502DE96EA"
                 );
             }
             _ => unreachable!(),

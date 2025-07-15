@@ -415,6 +415,24 @@ impl std::convert::TryFrom<&super::proto::keysys::DomainInfoData>
     }
 }
 
+pub fn poll_data_from_response(
+    from: &Option<super::proto::EPPResponseExtension>,
+) -> Result<Option<super::super::keysys::PollData>, super::super::Error> {
+    match from {
+        Some(ext) => match ext.value.iter().find_map(|p| match p {
+            super::proto::EPPResponseExtensionType::KeysysPoll(i) => Some(i),
+            _ => None,
+        }) {
+            Some(e) => Ok(Some(super::super::keysys::PollData {
+                data: e.data.as_ref().map(|d| d.clone()).unwrap_or_default(),
+                info: e.info.clone()
+            })),
+            None => Ok(None),
+        },
+        None => Ok(None),
+    }
+}
+
 #[cfg(test)]
 mod domain_tests {
     #[test_log::test]

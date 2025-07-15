@@ -1522,6 +1522,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                                 client::poll::PollData::DomainTransferData {
                                     change_data: ref c,
                                     data: _,
+                                    keysys_data: _
                                 } => c,
                                 client::poll::PollData::DomainCreateData {
                                     change_data: ref c,
@@ -1530,10 +1531,12 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                                 client::poll::PollData::DomainPanData {
                                     change_data: ref c,
                                     data: _,
+                                    keysys_data: _,
                                 } => c,
                                 client::poll::PollData::DomainRenewData {
                                     change_data: ref c,
                                     data: _,
+                                    keysys_data: _,
                                 } => c,
                                 client::poll::PollData::NominetDomainCancelData {
                                     change_data: ref c,
@@ -1566,6 +1569,24 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                                 client::poll::PollData::NominetRegistrantTransferData {
                                     change_data: ref c,
                                     data: _,
+                                } => c,
+                                _ => &None,
+                            };
+                            let keysys_data = match message.data {
+                                client::poll::PollData::DomainTransferData {
+                                    change_data: _,
+                                    data: _,
+                                    keysys_data: ref c,
+                                } => c,
+                                client::poll::PollData::DomainPanData {
+                                    change_data: _,
+                                    data: _,
+                                    keysys_data: ref c,
+                                } => c,
+                                client::poll::PollData::DomainRenewData {
+                                    change_data: _,
+                                    data: _,
+                                    keysys_data: ref c,
                                 } => c,
                                 _ => &None,
                             };
@@ -1609,6 +1630,10 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                                         }),
                                         reason: c.reason.clone(),
                                     }),
+                                    keysys: keysys_data.as_ref().map(|d| epp_proto::KeysysPoll {
+                                        info: d.info.clone(),
+                                        data: d.data.clone()
+                                    }),
                                     data: match message.data {
                                         client::poll::PollData::DomainInfoData {
                                             change_data: _,
@@ -1624,10 +1649,12 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                                         } => Some(epp_proto::poll_reply::Data::HostInfo((*i).into())),
                                         client::poll::PollData::DomainTransferData {
                                             change_data: _,
+                                            keysys_data: _,
                                             data: i
                                         } => Some(epp_proto::poll_reply::Data::DomainTransfer(i.into())),
                                         client::poll::PollData::DomainRenewData {
                                             change_data: _,
+                                            keysys_data: _,
                                             data: i
                                         } => Some(epp_proto::poll_reply::Data::DomainRenew(i.into())),
                                         client::poll::PollData::ContactTransferData {
@@ -1640,10 +1667,12 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                                         } => Some(epp_proto::poll_reply::Data::DomainCreate(i.into())),
                                         client::poll::PollData::DomainPanData {
                                             change_data: _,
+                                            keysys_data: _,
                                             data: i
                                         } => Some(epp_proto::poll_reply::Data::DomainPan(i.into())),
                                         client::poll::PollData::ContactPanData {
                                             change_data: _,
+                                            keysys_data: _,
                                             data: i
                                         } => Some(epp_proto::poll_reply::Data::ContactPan(i.into())),
                                         client::poll::PollData::NominetDomainCancelData {
