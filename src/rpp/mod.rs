@@ -1,4 +1,6 @@
 mod domain;
+mod contact;
+mod host;
 
 use crate::client;
 
@@ -18,6 +20,15 @@ impl RPPProxy {
             .mount("/", rocket::routes![
                 domain::domain_check,
                 domain::domain_create,
+                domain::domain_delete,
+
+                contact::contact_check,
+                contact::contact_create,
+                contact::contact_delete,
+
+                host::host_check,
+                host::host_create,
+                host::host_delete,
             ])
             .launch()
             .await
@@ -155,6 +166,11 @@ impl<'r> rocket::request::FromRequest<'r> for Authorized {
             rocket::request::Outcome::Error((rocket::http::Status::Unauthorized, ()))
         }
     }
+}
+
+#[derive(serde::Deserialize)]
+pub struct AuthInfo {
+    pw: String,
 }
 
 #[macro_export]

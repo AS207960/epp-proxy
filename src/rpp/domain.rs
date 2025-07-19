@@ -11,7 +11,7 @@ pub struct DomainCreate {
     contacts: Vec<DomainContactReference>,
     // TODO: dnsSEC
     #[serde(rename = "authInfo")]
-    auth_info: DomainAuthInfo,
+    auth_info: super::AuthInfo,
 }
 
 #[derive(serde::Deserialize)]
@@ -61,16 +61,11 @@ enum ContactType {
     Billing,
 }
 
-#[derive(serde::Deserialize)]
-struct DomainAuthInfo {
-    pw: String,
-}
-
 crate::rpp_method!(
     name = domain_check,
     method = HEAD,
     url = "/rpp/v0/<registry_id>/domains/<domain>",
-    return_type = &'static str,
+    return_type = (),
     handler = |mut c, h: HeaderInfo, domain| async move {
         let res = client::domain::check(domain, None, None, None, h.client_transaction_id, &mut c).await?;
         let mut resp = Response::from(&res);
@@ -80,13 +75,12 @@ crate::rpp_method!(
     args = domain: &str
 );
 
-
 crate::rpp_method!(
     name = domain_create,
     method = POST,
     url = "/rpp/v0/<registry_id>/domains",
     data_type = DomainCreate,
-    return_type = &'static str,
+    return_type = (),
     handler = |mut c, h: HeaderInfo, request: DomainCreate| async move {
         let registrant = request.contacts.iter()
             .filter(|c| c.contact_type.contains(&ContactType::Registrant))
@@ -168,4 +162,16 @@ crate::rpp_method!(
         let resp = Response::from(&res);
         Ok(resp)
     }
+);
+
+crate::rpp_method!(
+    name = domain_delete,
+    method = DELETE,
+    url = "/rpp/v0/<registry_id>/domains/<domain>",
+    return_type = (),
+    handler = |mut c, h: HeaderInfo, domain| async move {
+        let res = client::domain::delete(domain, None, None, None, None, h.client_transaction_id, &mut c).await?;
+        Ok(Response::from(&res))
+    },
+    args = domain: &str
 );
