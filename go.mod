@@ -4,7 +4,7 @@ go 1.15
 
 require (
 	github.com/as207960/epp-proxy/gen/go/epp v0.0.0
-	github.com/golang/glog v1.2.2
+	github.com/golang/glog v1.2.4
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.21.0
 	google.golang.org/grpc v1.65.0
 	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.5.1
