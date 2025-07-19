@@ -177,6 +177,7 @@ pub struct PollAckResponse {
 /// # Arguments
 /// * `client_sender` - Reference to the tokio channel into the client
 pub async fn poll(
+    client_transaction_id: Option<String>,
     client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<Option<PollResponse>>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
@@ -184,7 +185,7 @@ pub async fn poll(
         client_sender,
         RequestMessage::Poll(Box::new(PollRequest {
             return_path: sender,
-        })),
+        }), client_transaction_id),
         receiver,
     )
     .await
@@ -197,6 +198,7 @@ pub async fn poll(
 /// * `client_sender` - Reference to the tokio channel into the client
 pub async fn poll_ack(
     id: &str,
+    client_transaction_id: Option<String>,
     client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<PollAckResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
@@ -205,7 +207,7 @@ pub async fn poll_ack(
         RequestMessage::PollAck(Box::new(PollAckRequest {
             id: id.to_string(),
             return_path: sender,
-        })),
+        }), client_transaction_id),
         receiver,
     )
     .await

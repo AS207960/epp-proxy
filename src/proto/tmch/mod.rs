@@ -510,6 +510,13 @@ impl TMCHResponse {
         }
     }
 
+    pub fn result_code(&self) -> TMCHResultCode {
+        match self.results.first() {
+            Some(r) => r.code,
+            None => TMCHResultCode::CommandFailed,
+        }
+    }
+
     pub fn response_code(&self) -> &'static str {
         match self.results.first() {
             Some(r) => r.code.name(),
@@ -585,7 +592,7 @@ pub struct TMCHResult {
     pub extra_values: Option<Vec<TMCHResultExtraValue>>,
 }
 
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Debug, Eq, PartialEq, Copy, Clone)]
 pub enum TMCHResultCode {
     Success,
     SuccessNoMessages,
@@ -650,6 +657,24 @@ impl From<u16> for TMCHResultCode {
             2306 => TMCHResultCode::ParameterValuePolicyError,
             2400 => TMCHResultCode::CommandFailed,
             o => TMCHResultCode::Other(o),
+        }
+    }
+}
+
+impl From<TMCHResultCode> for crate::proto::EPPResultCode {
+    fn from(value: TMCHResultCode) -> crate::proto::EPPResultCode {
+        match value {
+            TMCHResultCode::Success => crate::proto::EPPResultCode::Success,
+            TMCHResultCode::SuccessNoMessages => crate::proto::EPPResultCode::SuccessNoMessages,
+            TMCHResultCode::SuccessAckToDequeue => crate::proto::EPPResultCode::SuccessAckToDequeue,
+            TMCHResultCode::SuccessEndingSession => crate::proto::EPPResultCode::SuccessEndingSession,
+            TMCHResultCode::CommandSyntaxError => crate::proto::EPPResultCode::CommandSyntaxError,
+            TMCHResultCode::AuthorizationError => crate::proto::EPPResultCode::AuthorizationError,
+            TMCHResultCode::InvalidAuthorization => crate::proto::EPPResultCode::InvalidAuthorization,
+            TMCHResultCode::ObjectDoesNotExist => crate::proto::EPPResultCode::ObjectDoesNotExist,
+            TMCHResultCode::ParameterValuePolicyError => crate::proto::EPPResultCode::ParameterValuePolicyError,
+            TMCHResultCode::CommandFailed => crate::proto::EPPResultCode::CommandFailed,
+            TMCHResultCode::Other(o) => crate::proto::EPPResultCode::Other(o),
         }
     }
 }

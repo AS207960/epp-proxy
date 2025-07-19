@@ -256,7 +256,7 @@ impl<M: crate::metrics::Metrics + 'static> DACClient<M> {
             }
         };
 
-        self.router.handle_response(&command_id, res);
+        self.router.handle_response(command_id, res);
         Ok(false)
     }
 
@@ -275,7 +275,7 @@ impl<M: crate::metrics::Metrics + 'static> DACClient<M> {
             }
         };
 
-        self.router.handle_response(&command_id, res);
+        self.router.handle_response(command_id, res);
         Ok(false)
     }
 

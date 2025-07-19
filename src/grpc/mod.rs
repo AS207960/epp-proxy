@@ -172,6 +172,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                 res.fee_check.map(Into::into),
                 None,
                 res.keysys.map(Into::into),
+                None,
                 &mut sender,
             )
             .await?,
@@ -200,7 +201,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
             }
         };
         let (res, cmd_resp) = utils::map_command_response(
-            client::domain::launch_claims_check(&res.name, launch_check.into(), &mut sender)
+            client::domain::launch_claims_check(&res.name, launch_check.into(), None, &mut sender)
                 .await?,
         );
 
@@ -222,7 +223,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let (mut sender, registry_name) =
             client_by_domain_or_id(&self.client_router, &res.name, res.registry_name)?;
         let (res, cmd_resp) = utils::map_command_response(
-            client::domain::launch_trademark_check(&res.name, &mut sender).await?,
+            client::domain::launch_trademark_check(&res.name, None, &mut sender).await?,
         );
 
         let reply = epp_proto::domain::DomainClaimsCheckReply {
@@ -268,6 +269,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                     None => None,
                 },
                 req.eurid_data.map(Into::into),
+                None,
                 &mut sender,
             )
             .await?,
@@ -422,6 +424,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                         None => None,
                     },
                 },
+                None,
                 &mut sender,
             )
             .await?,
@@ -454,6 +457,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                     .map_or(Ok(None), |v| v.map(Some))?,
                 request.eurid_data.and_then(Into::into),
                 request.keysys.map(Into::into),
+                None,
                 &mut sender,
             )
             .await?,
@@ -675,6 +679,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                         None => None,
                     },
                 },
+                None,
                 &mut sender,
             )
             .await?,
@@ -696,7 +701,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
             client_by_domain_or_id(&self.client_router, &request.name, request.registry_name)?;
 
         let (res, cmd_resp) = utils::map_command_response(
-            client::domain::verisign_sync(&request.name, request.month, request.day, &mut sender)
+            client::domain::verisign_sync(&request.name, request.month, request.day, None, &mut sender)
                 .await?,
         );
 
@@ -734,6 +739,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                     .map_or(Ok(None), |v| v.map(Some))?,
                 request.isnic_payment.and_then(Into::into),
                 request.keysys.map(Into::into),
+                None,
                 &mut sender,
             )
             .await?,
@@ -754,7 +760,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let (mut sender, registry_name) =
             client_by_domain_or_id(&self.client_router, &req.name, req.registry_name)?;
         let (res, cmd_resp) = utils::map_command_response(
-            client::domain::transfer_query(&req.name, req.auth_info.as_deref(), &mut sender)
+            client::domain::transfer_query(&req.name, req.auth_info.as_deref(), None, &mut sender)
                 .await?,
         );
 
@@ -784,6 +790,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                     .map_or(Ok(None), |v| v.map(Some))?,
                 request.eurid_data.map(Into::into),
                 request.keysys.map(Into::into),
+                None,
                 &mut sender,
             )
             .await?,
@@ -804,7 +811,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let (mut sender, registry_name) =
             client_by_domain_or_id(&self.client_router, &request.name, request.registry_name)?;
         let (res, cmd_resp) = utils::map_command_response(
-            client::domain::transfer_cancel(&request.name, Some(&request.auth_info), &mut sender)
+            client::domain::transfer_cancel(&request.name, Some(&request.auth_info), None, &mut sender)
                 .await?,
         );
 
@@ -823,7 +830,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let (mut sender, registry_name) =
             client_by_domain_or_id(&self.client_router, &request.name, request.registry_name)?;
         let (res, cmd_resp) = utils::map_command_response(
-            client::domain::transfer_accept(&request.name, Some(&request.auth_info), &mut sender)
+            client::domain::transfer_accept(&request.name, Some(&request.auth_info), None, &mut sender)
                 .await?,
         );
 
@@ -842,7 +849,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let (mut sender, registry_name) =
             client_by_domain_or_id(&self.client_router, &request.name, request.registry_name)?;
         let (res, cmd_resp) = utils::map_command_response(
-            client::domain::transfer_reject(&request.name, Some(&request.auth_info), &mut sender)
+            client::domain::transfer_reject(&request.name, Some(&request.auth_info), None, &mut sender)
                 .await?,
         );
 
@@ -866,6 +873,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                 res.donuts_fee_agreement
                     .map(TryInto::try_into)
                     .map_or(Ok(None), |v| v.map(Some))?,
+                None,
                 &mut sender,
             )
             .await?,
@@ -928,6 +936,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                         .map(TryInto::try_into)
                         .map_or(Ok(None), |v| v.map(Some))?,
                 },
+                None,
                 &mut sender,
             )
             .await?,
@@ -951,7 +960,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let name: String = request.name;
         let mut sender = client_by_id(&self.client_router, &request.registry_name)?;
         let (res, cmd_resp) =
-            utils::map_command_response(client::host::check(&name, &mut sender).await?);
+            utils::map_command_response(client::host::check(&name, None, &mut sender).await?);
 
         let reply = epp_proto::host::HostCheckReply {
             available: res.avail,
@@ -970,7 +979,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let name: String = request.name;
         let mut sender = client_by_id(&self.client_router, &request.registry_name)?;
         let (res, cmd_resp) =
-            utils::map_command_response(client::host::info(&name, &mut sender).await?);
+            utils::map_command_response(client::host::info(&name, None, &mut sender).await?);
 
         let mut reply: epp_proto::host::HostInfoReply = res.into();
         reply.cmd_resp = Some(cmd_resp);
@@ -1016,6 +1025,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                     Some(i) => Some(TryInto::try_into(i)?),
                     None => None,
                 },
+                None,
                 &mut sender,
             )
             .await?,
@@ -1039,7 +1049,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let name: String = request.name;
         let mut sender = client_by_id(&self.client_router, &request.registry_name)?;
         let (res, cmd_resp) =
-            utils::map_command_response(client::host::delete(&name, &mut sender).await?);
+            utils::map_command_response(client::host::delete(&name, None, &mut sender).await?);
 
         let reply = epp_proto::host::HostDeleteReply {
             pending: res.pending,
@@ -1117,6 +1127,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                     Some(i) => Some(TryInto::try_into(i)?),
                     None => None,
                 },
+                None,
                 &mut sender,
             )
             .await?,
@@ -1138,7 +1149,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let id: String = request.id;
         let mut sender = client_by_id(&self.client_router, &request.registry_name)?;
         let (res, cmd_resp) =
-            utils::map_command_response(client::contact::check(&id, &mut sender).await?);
+            utils::map_command_response(client::contact::check(&id, None, &mut sender).await?);
 
         let reply = epp_proto::contact::ContactCheckReply {
             available: res.avail,
@@ -1157,7 +1168,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let id: String = request.id;
         let mut sender = client_by_id(&self.client_router, &request.registry_name)?;
         let (res, cmd_resp) =
-            utils::map_command_response(client::contact::info(&id, &mut sender).await?);
+            utils::map_command_response(client::contact::info(&id, None, &mut sender).await?);
 
         let mut reply: epp_proto::contact::ContactInfoReply = res.into();
         reply.cmd_resp = Some(cmd_resp);
@@ -1205,6 +1216,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                     qualified_lawyer: request.qualified_lawyer.map(Into::into),
                     keysys: request.keysys.map(Into::into),
                 },
+                None,
                 &mut sender,
             )
             .await?,
@@ -1228,7 +1240,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let mut sender = client_by_id(&self.client_router, &request.registry_name)?;
 
         let (res, cmd_resp) =
-            utils::map_command_response(client::contact::delete(&request.id, &mut sender).await?);
+            utils::map_command_response(client::contact::delete(&request.id, None, &mut sender).await?);
 
         let reply = epp_proto::contact::ContactDeleteReply {
             pending: res.pending,
@@ -1280,6 +1292,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                     qualified_lawyer: request.qualified_lawyer.map(Into::into),
                     keysys: request.keysys.map(Into::into),
                 },
+                None,
                 &mut sender,
             )
             .await?,
@@ -1300,7 +1313,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let request = request.into_inner();
         let mut sender = client_by_id(&self.client_router, &request.registry_name)?;
         let (res, cmd_resp) = utils::map_command_response(
-            client::contact::transfer_query(&request.id, &mut sender).await?,
+            client::contact::transfer_query(&request.id, None, &mut sender).await?,
         );
 
         let mut reply: epp_proto::contact::ContactTransferReply = res.into();
@@ -1317,7 +1330,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let mut sender = client_by_id(&self.client_router, &request.registry_name)?;
 
         let (res, cmd_resp) = utils::map_command_response(
-            client::contact::transfer_request(&request.id, &request.auth_info, &mut sender).await?,
+            client::contact::transfer_request(&request.id, &request.auth_info, None, &mut sender).await?,
         );
 
         let mut reply: epp_proto::contact::ContactTransferReply = res.into();
@@ -1333,7 +1346,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let request = request.into_inner();
         let mut sender = client_by_id(&self.client_router, &request.registry_name)?;
         let (res, cmd_resp) = utils::map_command_response(
-            client::contact::transfer_accept(&request.id, &request.auth_info, &mut sender).await?,
+            client::contact::transfer_accept(&request.id, &request.auth_info, None, &mut sender).await?,
         );
 
         let mut reply: epp_proto::contact::ContactTransferReply = res.into();
@@ -1349,7 +1362,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let request = request.into_inner();
         let mut sender = client_by_id(&self.client_router, &request.registry_name)?;
         let (res, cmd_resp) = utils::map_command_response(
-            client::contact::transfer_reject(&request.id, &request.auth_info, &mut sender).await?,
+            client::contact::transfer_reject(&request.id, &request.auth_info, None, &mut sender).await?,
         );
 
         let mut reply: epp_proto::contact::ContactTransferReply = res.into();
@@ -1365,7 +1378,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let request = request.into_inner();
         let mut sender = client_by_id(&self.client_router, &request.registry_name)?;
         let (res, cmd_resp) =
-            utils::map_command_response(client::maintenance::info(&request.id, &mut sender).await?);
+            utils::map_command_response(client::maintenance::info(&request.id, None, &mut sender).await?);
 
         let mut reply: epp_proto::maintenance::MaintenanceInfoReply = res.into();
         reply.cmd_resp = Some(cmd_resp);
@@ -1380,7 +1393,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let request = request.into_inner();
         let mut sender = client_by_id(&self.client_router, &request.registry_name)?;
         let (res, cmd_resp) =
-            utils::map_command_response(client::maintenance::list(&mut sender).await?);
+            utils::map_command_response(client::maintenance::list(None, &mut sender).await?);
 
         let reply = epp_proto::maintenance::MaintenanceListReply {
             items: res
@@ -1408,7 +1421,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let request = request.into_inner();
         let mut sender = client_by_id(&self.client_router, &request.registry_name)?;
         let (res, cmd_resp) =
-            utils::map_command_response(client::eurid::hit_points_info(&mut sender).await?);
+            utils::map_command_response(client::eurid::hit_points_info(None, &mut sender).await?);
 
         let reply = epp_proto::eurid::HitPointsReply {
             hit_points: res.hit_points,
@@ -1427,7 +1440,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let request = request.into_inner();
         let mut sender = client_by_id(&self.client_router, &request.registry_name)?;
         let (res, cmd_resp) =
-            utils::map_command_response(client::eurid::registration_limit_info(&mut sender).await?);
+            utils::map_command_response(client::eurid::registration_limit_info(None, &mut sender).await?);
 
         let reply = epp_proto::eurid::RegistrationLimitReply {
             monthly_registrations: res.monthly_registrations,
@@ -1447,7 +1460,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let (mut sender, registry_name) =
             client_by_domain_or_id(&self.client_router, &request.name, request.registry_name)?;
         let (res, cmd_resp) = utils::map_command_response(
-            client::eurid::dns_quality_info(&request.name, &mut sender).await?,
+            client::eurid::dns_quality_info(&request.name, None, &mut sender).await?,
         );
 
         let reply = epp_proto::eurid::DnsQualityReply {
@@ -1468,7 +1481,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let (mut sender, registry_name) =
             client_by_domain_or_id(&self.client_router, &request.name, request.registry_name)?;
         let (res, cmd_resp) = utils::map_command_response(
-            client::eurid::dnssec_eligibility_info(&request.name, &mut sender).await?,
+            client::eurid::dnssec_eligibility_info(&request.name, None, &mut sender).await?,
         );
 
         let reply = epp_proto::eurid::DnssecEligibilityReply {
@@ -1505,7 +1518,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
             let mut should_delay = true;
             let mut pending_acks: Vec<_> = vec![];
             loop {
-                match client::poll::poll(&mut sender).await {
+                match client::poll::poll(None, &mut sender).await {
                     Ok(resp) => {
                         let (resp, cmd_resp) = utils::map_command_response(resp);
                         if let Some(message) = resp {
@@ -1735,7 +1748,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                                     } else {
                                         break;
                                     };
-                                    match client::poll::poll_ack(&msg.msg_id, &mut sender).await {
+                                    match client::poll::poll_ack(&msg.msg_id, None, &mut sender).await {
                                         Ok(resp) => {
                                             if let Some(count) = resp.response.count {
                                                 should_delay = count <= 0;
@@ -1781,7 +1794,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let mut sender = client_by_id(&self.client_router, &request.registry_name)?;
 
         let (resp, cmd_resp) =
-            utils::map_command_response(client::nominet::tag_list(&mut sender).await?);
+            utils::map_command_response(client::nominet::tag_list(None, &mut sender).await?);
 
         let reply = epp_proto::nominet::NominetTagListReply {
             tags: resp
@@ -1808,7 +1821,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let mut sender = client_by_id(&self.client_router, &request.registry_name)?;
 
         let (_resp, cmd_resp) = utils::map_command_response(
-            client::nominet::contact_validate(&request.contact_id, &mut sender).await?,
+            client::nominet::contact_validate(&request.contact_id, None, &mut sender).await?,
         );
 
         let reply = epp_proto::nominet::ContactValidateReply {
@@ -1849,6 +1862,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                     }
                 },
                 &request.lock_type,
+                None,
                 &mut sender,
             )
             .await?,
@@ -1892,6 +1906,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                     }
                 },
                 &request.lock_type,
+                None,
                 &mut sender,
             )
             .await?,
@@ -1915,6 +1930,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
             client::nominet::handshake_accept(
                 &request.case_id,
                 request.registrant.as_deref(),
+                None,
                 &mut sender,
             )
             .await?,
@@ -1934,7 +1950,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let mut sender = client_by_id(&self.client_router, &request.registry_name)?;
 
         let (resp, cmd_resp) = utils::map_command_response(
-            client::nominet::handshake_reject(&request.case_id, &mut sender).await?,
+            client::nominet::handshake_reject(&request.case_id, None, &mut sender).await?,
         );
 
         let mut reply: epp_proto::nominet::HandshakeReply = resp.into();
@@ -1974,6 +1990,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                         ));
                     }
                 },
+                None,
                 &mut sender,
             )
             .await?,
@@ -1996,7 +2013,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let mut sender = client_by_id(&self.client_router, &request.registry_name)?;
 
         let (resp, cmd_resp) =
-            utils::map_command_response(client::balance::balance_info(&mut sender).await?);
+            utils::map_command_response(client::balance::balance_info(None, &mut sender).await?);
 
         let mut reply: epp_proto::BalanceReply = resp.into();
         reply.cmd_resp = Some(cmd_resp);
@@ -2012,7 +2029,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let id: String = request.id;
         let mut sender = client_by_id(&self.client_router, &request.registry_name)?;
         let (res, cmd_resp) =
-            utils::map_command_response(client::tmch::check(&id, &mut sender).await?);
+            utils::map_command_response(client::tmch::check(&id, None, &mut sender).await?);
 
         let mut reply: epp_proto::tmch::MarkCheckResponse = res.into();
         reply.cmd_resp = Some(cmd_resp);
@@ -2036,6 +2053,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                 request.documents.into_iter().map(Into::into).collect(),
                 request.labels.into_iter().map(Into::into).collect(),
                 request.variations,
+                None,
                 &mut sender,
             )
             .await?,
@@ -2055,7 +2073,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let id: String = request.id;
         let mut sender = client_by_id(&self.client_router, &request.registry_name)?;
         let (res, cmd_resp) =
-            utils::map_command_response(client::tmch::mark_info(&id, &mut sender).await?);
+            utils::map_command_response(client::tmch::mark_info(&id, None, &mut sender).await?);
 
         let mut reply: epp_proto::tmch::MarkInfoResponse = res.into();
         reply.cmd_resp = Some(cmd_resp);
@@ -2071,7 +2089,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let id: String = request.id;
         let mut sender = client_by_id(&self.client_router, &request.registry_name)?;
         let (res, cmd_resp) =
-            utils::map_command_response(client::tmch::mark_smd_info(&id, &mut sender).await?);
+            utils::map_command_response(client::tmch::mark_smd_info(&id, None, &mut sender).await?);
 
         let mut reply: epp_proto::tmch::MarkSmdInfoResponse = res.into();
         reply.cmd_resp = Some(cmd_resp);
@@ -2087,7 +2105,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let id: String = request.id;
         let mut sender = client_by_id(&self.client_router, &request.registry_name)?;
         let (res, cmd_resp) = utils::map_command_response(
-            client::tmch::mark_encoded_smd_info(&id, &mut sender).await?,
+            client::tmch::mark_encoded_smd_info(&id, None, &mut sender).await?,
         );
 
         let mut reply: epp_proto::tmch::MarkSmdInfoResponse = res.into();
@@ -2104,7 +2122,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let id: String = request.id;
         let mut sender = client_by_id(&self.client_router, &request.registry_name)?;
         let (res, cmd_resp) =
-            utils::map_command_response(client::tmch::mark_file_info(&id, &mut sender).await?);
+            utils::map_command_response(client::tmch::mark_file_info(&id, None, &mut sender).await?);
 
         let mut reply: epp_proto::tmch::MarkSmdInfoResponse = res.into();
         reply.cmd_resp = Some(cmd_resp);
@@ -2163,6 +2181,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                 },
                 request.update_labels.into_iter().map(Into::into).collect(),
                 request.update_cases.into_iter().map(Into::into).collect(),
+                None,
                 &mut sender,
             )
             .await?,
@@ -2193,6 +2212,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
                 &request.id,
                 cur_expiry_date.unwrap(),
                 request.add_period.map(Into::into),
+                None,
                 &mut sender,
             )
             .await?,
@@ -2211,7 +2231,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let request = request.into_inner();
         let mut sender = client_by_id(&self.client_router, &request.registry_name)?;
         let (res, cmd_resp) = utils::map_command_response(
-            client::tmch::transfer_initiate(&request.id, &mut sender).await?,
+            client::tmch::transfer_initiate(&request.id, None, &mut sender).await?,
         );
 
         let mut reply: epp_proto::tmch::MarkTransferInitiateResponse = res.into();
@@ -2227,7 +2247,7 @@ impl epp_proto::epp_proxy_server::EppProxy for EPPProxy {
         let request = request.into_inner();
         let mut sender = client_by_id(&self.client_router, &request.registry_name)?;
         let (res, cmd_resp) = utils::map_command_response(
-            client::tmch::transfer(&request.id, &request.auth_info, &mut sender).await?,
+            client::tmch::transfer(&request.id, &request.auth_info, None, &mut sender).await?,
         );
 
         let mut reply: epp_proto::tmch::MarkTransferResponse = res.into();

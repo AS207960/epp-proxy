@@ -114,14 +114,15 @@ pub enum Error {
     ServerInternal,
     /// The EPP server didn't respond in time to the request
     Timeout,
-    /// The request can't be fowraded to the EPP server
+    /// The request can't be forwarded to the EPP server
     InvalidRequest(String),
     /// The EPP server returned an error message (probably invalid parameters)
     Err {
         text: String,
-        is_server_error: bool,
         code: String,
         message: String,
+        result_code: proto::EPPResultCode,
+        transaction_id: Option<router::CommandTransactionID>,
     }
 }
 
@@ -167,6 +168,7 @@ pub struct BlankRequest {
 /// # Arguments
 /// * `client_sender` - Reference to the tokio channel into the client
 pub async fn logout(
+    client_transaction_id: Option<String>,
     mut client_sender: futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<()>, Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
@@ -174,7 +176,7 @@ pub async fn logout(
         &mut client_sender,
         RequestMessage::Logout(Box::new(BlankRequest {
             return_path: sender,
-        })),
+        }), client_transaction_id),
         receiver,
     )
     .await

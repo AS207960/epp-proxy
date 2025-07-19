@@ -230,6 +230,7 @@ pub struct DataQualityData {
 pub async fn handshake_accept(
     case_id: &str,
     registrant: Option<&str>,
+    client_transaction_id: Option<String>,
     client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<HandshakeResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
@@ -239,7 +240,7 @@ pub async fn handshake_accept(
             case_id: case_id.to_owned(),
             registrant: registrant.map(Into::into),
             return_path: sender,
-        })),
+        }), client_transaction_id),
         receiver,
     )
     .await
@@ -252,6 +253,7 @@ pub async fn handshake_accept(
 /// * `client_sender` - Reference to the tokio channel into the client
 pub async fn handshake_reject(
     case_id: &str,
+    client_transaction_id: Option<String>,
     client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<HandshakeResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
@@ -260,7 +262,7 @@ pub async fn handshake_reject(
         RequestMessage::NominetReject(Box::new(HandshakeRejectRequest {
             case_id: case_id.to_owned(),
             return_path: sender,
-        })),
+        }), client_transaction_id),
         receiver,
     )
     .await
@@ -275,6 +277,7 @@ pub async fn handshake_reject(
 pub async fn release(
     registrar_tag: &str,
     object: Object,
+    client_transaction_id: Option<String>,
     client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<ReleaseResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
@@ -284,7 +287,7 @@ pub async fn release(
             registrar_tag: registrar_tag.to_owned(),
             object,
             return_path: sender,
-        })),
+        }), client_transaction_id),
         receiver,
     )
     .await
@@ -295,6 +298,7 @@ pub async fn release(
 /// # Arguments
 /// * `client_sender` - Reference to the tokio channel into the client
 pub async fn tag_list(
+    client_transaction_id: Option<String>,
     client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<TagListResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
@@ -302,7 +306,7 @@ pub async fn tag_list(
         client_sender,
         RequestMessage::NominetTagList(Box::new(TagListRequest {
             return_path: sender,
-        })),
+        }), client_transaction_id),
         receiver,
     )
     .await
@@ -315,6 +319,7 @@ pub async fn tag_list(
 /// * `client_sender` - Reference to the tokio channel into the client
 pub async fn contact_validate(
     id: &str,
+    client_transaction_id: Option<String>,
     client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<ContactValidateResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
@@ -323,7 +328,7 @@ pub async fn contact_validate(
         RequestMessage::NominetContactValidate(Box::new(ContactValidateRequest {
             contact_id: id.to_string(),
             return_path: sender,
-        })),
+        }), client_transaction_id),
         receiver,
     )
     .await
@@ -338,6 +343,7 @@ pub async fn contact_validate(
 pub async fn lock(
     object: Object,
     lock_type: &str,
+    client_transaction_id: Option<String>,
     client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<LockResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
@@ -347,7 +353,7 @@ pub async fn lock(
             object,
             lock_type: lock_type.to_string(),
             return_path: sender,
-        })),
+        }), client_transaction_id),
         receiver,
     )
     .await
@@ -362,6 +368,7 @@ pub async fn lock(
 pub async fn unlock(
     object: Object,
     lock_type: &str,
+    client_transaction_id: Option<String>,
     client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<LockResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
@@ -371,7 +378,7 @@ pub async fn unlock(
             object,
             lock_type: lock_type.to_string(),
             return_path: sender,
-        })),
+        }), client_transaction_id),
         receiver,
     )
     .await

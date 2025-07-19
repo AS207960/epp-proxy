@@ -493,9 +493,9 @@ impl<M: crate::metrics::Metrics<Subordinate = M> + 'static> EPPClient<M> {
         }
     }
 
-    async fn _handle_request<W: std::marker::Unpin + tokio::io::AsyncWrite>(
+    async fn _handle_request<W: Unpin + tokio::io::AsyncWrite>(
         &mut self,
-        req: outer_router::RequestMessage,
+        req: RequestMessage,
         sock_write: &mut W,
     ) -> Result<(), ()> {
         match (
@@ -503,13 +503,13 @@ impl<M: crate::metrics::Metrics<Subordinate = M> + 'static> EPPClient<M> {
             self.nominet_tag_list_subordinate,
             &mut self.nominet_dac_subordinate_client,
         ) {
-            (outer_router::RequestMessage::NominetTagList(t), false, _) => {
+            (RequestMessage::NominetTagList(t, _), false, _) => {
                 let client = match &mut self.nominet_tag_list_subordinate_client {
                     Some(c) => c,
                     None => return Err(()),
                 };
                 match client
-                    .send(outer_router::RequestMessage::NominetTagList(t))
+                    .send(RequestMessage::NominetTagList(t, None))
                     .await
                 {
                     Ok(_) => Ok(()),
@@ -519,8 +519,8 @@ impl<M: crate::metrics::Metrics<Subordinate = M> + 'static> EPPClient<M> {
                     }
                 }
             }
-            (outer_router::RequestMessage::DomainCheck(t), _, Some(dac_client)) => match dac_client
-                .send(outer_router::RequestMessage::DomainCheck(t))
+            (RequestMessage::DomainCheck(t, _), _, Some(dac_client)) => match dac_client
+                .send(RequestMessage::DomainCheck(t, None))
                 .await
             {
                 Ok(_) => Ok(()),
@@ -529,9 +529,9 @@ impl<M: crate::metrics::Metrics<Subordinate = M> + 'static> EPPClient<M> {
                     Err(())
                 }
             },
-            (outer_router::RequestMessage::DACDomain(t), _, Some(dac_client)) => {
+            (RequestMessage::DACDomain(t, _), _, Some(dac_client)) => {
                 match dac_client
-                    .send(outer_router::RequestMessage::DACDomain(t))
+                    .send(RequestMessage::DACDomain(t, None))
                     .await
                 {
                     Ok(_) => Ok(()),
@@ -541,9 +541,9 @@ impl<M: crate::metrics::Metrics<Subordinate = M> + 'static> EPPClient<M> {
                     }
                 }
             }
-            (outer_router::RequestMessage::DACUsage(t), _, Some(dac_client)) => {
+            (RequestMessage::DACUsage(t, _), _, Some(dac_client)) => {
                 match dac_client
-                    .send(outer_router::RequestMessage::DACUsage(t))
+                    .send(RequestMessage::DACUsage(t, None))
                     .await
                 {
                     Ok(_) => Ok(()),
@@ -553,9 +553,9 @@ impl<M: crate::metrics::Metrics<Subordinate = M> + 'static> EPPClient<M> {
                     }
                 }
             }
-            (outer_router::RequestMessage::DACLimits(t), _, Some(dac_client)) => {
+            (RequestMessage::DACLimits(t, _), _, Some(dac_client)) => {
                 match dac_client
-                    .send(outer_router::RequestMessage::DACLimits(t))
+                    .send(RequestMessage::DACLimits(t, None))
                     .await
                 {
                     Ok(_) => Ok(()),
@@ -565,16 +565,16 @@ impl<M: crate::metrics::Metrics<Subordinate = M> + 'static> EPPClient<M> {
                     }
                 }
             }
-            (outer_router::RequestMessage::Hello(_), _, _) => {
+            (RequestMessage::Hello(_, _), _, _) => {
                 match &mut self.nominet_tag_list_subordinate_client {
                     Some(client) => {
                         let (sender, _) = futures::channel::oneshot::channel();
                         match client
-                            .send(outer_router::RequestMessage::Hello(Box::new(
+                            .send(RequestMessage::Hello(Box::new(
                                 BlankRequest {
                                     return_path: sender,
                                 },
-                            )))
+                            ), None))
                             .await
                         {
                             Ok(_) => {}
@@ -604,16 +604,16 @@ impl<M: crate::metrics::Metrics<Subordinate = M> + 'static> EPPClient<M> {
                 self.metrics_registry.request_sent();
                 Ok(())
             }
-            (outer_router::RequestMessage::Logout(t), _, _) => {
+            (RequestMessage::Logout(t, _), _, _) => {
                 match &mut self.nominet_tag_list_subordinate_client {
                     Some(client) => {
                         let (sender, _) = futures::channel::oneshot::channel();
                         match client
-                            .send(outer_router::RequestMessage::Logout(Box::new(
+                            .send(RequestMessage::Logout(Box::new(
                                 BlankRequest {
                                     return_path: sender,
                                 },
-                            )))
+                            ), None))
                             .await
                         {
                             Ok(_) => {}
@@ -629,11 +629,11 @@ impl<M: crate::metrics::Metrics<Subordinate = M> + 'static> EPPClient<M> {
                     Some(dac_client) => {
                         let (sender, _) = futures::channel::oneshot::channel();
                         match dac_client
-                            .send(outer_router::RequestMessage::Logout(Box::new(
+                            .send(RequestMessage::Logout(Box::new(
                                 BlankRequest {
                                     return_path: sender,
                                 },
-                            )))
+                            ), None))
                             .await
                         {
                             Ok(_) => {}
@@ -648,7 +648,7 @@ impl<M: crate::metrics::Metrics<Subordinate = M> + 'static> EPPClient<M> {
                 self.is_closing = true;
                 match self
                     .router
-                    .handle_request(&self.features, outer_router::RequestMessage::Logout(t))
+                    .handle_request(&self.features, RequestMessage::Logout(t, None))
                 {
                     Some(((command, extension), command_id)) => {
                         self.is_awaiting_response = true;
@@ -702,17 +702,7 @@ impl<M: crate::metrics::Metrics<Subordinate = M> + 'static> EPPClient<M> {
                     }
                 };
                 let is_closing = response.is_closing();
-                let transaction_id = match uuid::Uuid::parse_str(transaction_id) {
-                    Ok(i) => i,
-                    Err(e) => {
-                        error!(
-                            "Received response with invalid transaction UUID from {} ({}): {}",
-                            self.server_id, self.host, e
-                        );
-                        return Err(());
-                    }
-                };
-                self.router.handle_response(&transaction_id, *response);
+                self.router.handle_response(transaction_id.clone(), *response);
                 Ok(is_closing)
             }
             proto::EPPMessageType::Greeting(greeting) => {
@@ -1359,7 +1349,7 @@ impl<M: crate::metrics::Metrics<Subordinate = M> + 'static> EPPClient<M> {
 
     async fn _send_command<
         W: std::marker::Unpin + tokio::io::AsyncWrite,
-        I: Into<Option<uuid::Uuid>>,
+        I: Into<Option<String>>,
         E: Into<Option<Vec<proto::EPPCommandExtensionType>>>,
     >(
         &self,
@@ -1367,17 +1357,14 @@ impl<M: crate::metrics::Metrics<Subordinate = M> + 'static> EPPClient<M> {
         extension: E,
         sock: &mut W,
         message_id: I,
-    ) -> Result<uuid::Uuid, ()> {
-        let message_id = match message_id.into() {
-            Some(m) => m,
-            None => uuid::Uuid::new_v4(),
-        };
+    ) -> Result<String, ()> {
+        let message_id = message_id.into().unwrap_or_else(|| uuid::Uuid::new_v4().hyphenated().to_string());
         let command = proto::EPPCommand {
             command,
             extension: extension
                 .into()
                 .map(|e| proto::EPPCommandExtension { value: e }),
-            client_transaction_id: Some(message_id.hyphenated().to_string()),
+            client_transaction_id: Some(message_id.clone())
         };
         let message = proto::EPPMessage {
             message: proto::EPPMessageType::Command(Box::new(command)),

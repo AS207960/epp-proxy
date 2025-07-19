@@ -331,6 +331,13 @@ impl EPPResponse {
         }
     }
 
+    pub fn result_code(&self) -> EPPResultCode {
+        match self.results.first() {
+            Some(r) => r.code,
+            None => EPPResultCode::CommandFailed,
+        }
+    }
+
     pub fn response_code(&self) -> &'static str {
         match self.results.first() {
             Some(r) => r.code.name(),
@@ -398,7 +405,7 @@ pub struct EPPResult {
     pub extra_values: Option<Vec<EPPResultExtraValue>>,
 }
 
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Debug, Eq, PartialEq, Copy, Clone)]
 pub enum EPPResultCode {
     Success,
     SuccessActionPending,
@@ -438,7 +445,7 @@ pub enum EPPResultCode {
 }
 
 impl EPPResultCode {
-    fn is_success(&self) -> bool {
+    pub fn is_success(&self) -> bool {
         matches!(
             self,
             EPPResultCode::Success
@@ -449,7 +456,7 @@ impl EPPResultCode {
         )
     }
 
-    fn is_closing(&self) -> bool {
+    pub fn is_closing(&self) -> bool {
         matches!(
             self,
             EPPResultCode::SuccessEndingSession
@@ -459,7 +466,7 @@ impl EPPResultCode {
         )
     }
 
-    fn is_server_error(&self) -> bool {
+    pub fn is_server_error(&self) -> bool {
         matches!(
             self,
             EPPResultCode::CommandFailed
@@ -469,7 +476,7 @@ impl EPPResultCode {
         )
     }
     
-    fn name(&self) -> &'static str {
+    pub fn name(&self) -> &'static str {
         match self {
             EPPResultCode::Success => "success",
             EPPResultCode::SuccessActionPending => "success-action-pending",
@@ -548,6 +555,48 @@ impl From<u16> for EPPResultCode {
             2501 => EPPResultCode::AuthenticationServerClosingConnection,
             2502 => EPPResultCode::SessionLimitExceededServerClosingConnection,
             o => EPPResultCode::Other(o),
+        }
+    }
+}
+
+impl From<EPPResultCode> for u16 {
+    fn from(value: EPPResultCode) -> u16 {
+        match value {
+            EPPResultCode::Success => 1000,
+            EPPResultCode::SuccessActionPending => 1001,
+            EPPResultCode::SuccessNoMessages => 1300,
+            EPPResultCode::SuccessAckToDequeue => 1301,
+            EPPResultCode::SuccessEndingSession => 1500,
+            EPPResultCode::UnknownCommand => 2000,
+            EPPResultCode::CommandSyntaxError => 2001,
+            EPPResultCode::CommandUseError => 2002,
+            EPPResultCode::RequiredParameterMissing => 2003,
+            EPPResultCode::ParameterValueRangeError => 2004,
+            EPPResultCode::ParameterValueSyntaxError => 2005,
+            EPPResultCode::UnimplementedProtocolVersion => 2100,
+            EPPResultCode::UnimplementedCommand => 2101,
+            EPPResultCode::UnimplementedOption => 2102,
+            EPPResultCode::UnimplementedExtension => 2103,
+            EPPResultCode::BillingFailure => 2104,
+            EPPResultCode::ObjectNotEligibleForRenewal => 2105,
+            EPPResultCode::ObjectNotEligibleForTransfer => 2106,
+            EPPResultCode::AuthenticationError => 2200,
+            EPPResultCode::AuthorizationError => 2201,
+            EPPResultCode::InvalidAuthorization => 2202,
+            EPPResultCode::ObjectPendingTransfer => 2300,
+            EPPResultCode::ObjectNotPendingTransfer => 2301,
+            EPPResultCode::ObjectExists => 2302,
+            EPPResultCode::ObjectDoesNotExist => 2303,
+            EPPResultCode::ObjectStatusProhibitsOperation => 2304,
+            EPPResultCode::ObjectAssociationProhibitsOperation => 2305,
+            EPPResultCode::ParameterValuePolicyError => 2306,
+            EPPResultCode::UnimplementedObjectService => 2307,
+            EPPResultCode::DataManagementPolicyViolation => 2308,
+            EPPResultCode::CommandFailed => 2400,
+            EPPResultCode::CommandFailedServerClosingConnection => 2500,
+            EPPResultCode::AuthenticationServerClosingConnection => 2510,
+            EPPResultCode::SessionLimitExceededServerClosingConnection => 2511,
+            EPPResultCode::Other(o) => o,
         }
     }
 }

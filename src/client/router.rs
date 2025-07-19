@@ -22,6 +22,7 @@ pub struct CommandTransactionID {
 #[derive(Debug)]
 pub struct CommandResponse<T> {
     pub response: T,
+    pub result_code: super::proto::EPPResultCode,
     pub extra_values: Vec<CommandExtraValue>,
     pub transaction_id: Option<CommandTransactionID>,
 }
@@ -30,7 +31,7 @@ macro_rules! router {
     ($($n:ident, $req:ty, $res:ty);*) => {
         #[derive(Debug)]
         pub enum RequestMessage {
-            $($n(Box<$req>),)*
+            $($n(Box<$req>, Option<String>),)*
         }
 
         #[allow(non_snake_case)]
@@ -39,7 +40,7 @@ macro_rules! router {
             _marker: std::marker::PhantomData<T>,
             pub inner: Box<I>,
             metrics_registry: M,
-            $($n: HashMap<uuid::Uuid, (Sender<$res>, Option<prometheus::HistogramTimer>)>,)*
+            $($n: HashMap<String, (Sender<$res>, Option<prometheus::HistogramTimer>)>,)*
         }
 
         paste! {
@@ -53,7 +54,7 @@ macro_rules! router {
                 type Request;
                 type Response;
 
-                $(fn [<$n _request>](&mut self, client: &T, req: &$req, command_id: uuid::Uuid) -> Result<Self::Request, Response<$res>>;)*
+                $(fn [<$n _request>](&mut self, client: &T, req: &$req, command_id: &str) -> Result<Self::Request, Response<$res>>;)*
                 $(fn [<$n _response>](&mut self, return_path: Sender<$res>, response: Self::Response, metrics: &M);)*
             }
         }
@@ -70,7 +71,7 @@ macro_rules! router {
 
             pub fn reject_request(req: RequestMessage) {
                 match req {
-                    $(RequestMessage::$n(req) => {let _ = req.return_path.send(Err(Error::NotReady));},)*
+                    $(RequestMessage::$n(req, _) => {let _ = req.return_path.send(Err(Error::NotReady));},)*
                 };
             }
 
@@ -81,20 +82,21 @@ macro_rules! router {
             }
 
             pub fn handle_request(&mut self, client: &T, req: RequestMessage) ->
-             Option<(I::Request, uuid::Uuid)> {
+             Option<(I::Request, String)> {
                 match req {
-                    $(RequestMessage::$n(req) => {
-                        let command_id = uuid::Uuid::new_v4();
+                    $(RequestMessage::$n(req, command_id) => {
+                        let command_id = command_id.unwrap_or_else(|| uuid::Uuid::new_v4().hyphenated().to_string());
                         let timer =  self.metrics_registry.record_response_time(stringify!($n));
                         paste! {
-                            let res = match I::[<$n _request>](&mut self.inner, client, &req, command_id.clone()) {
+                            let res = match I::[<$n _request>](&mut self.inner, client, &req, &command_id) {
                                 Ok(c) => c,
                                 Err(e) => {
                                     let _ = req.return_path.send(match e {
                                         Ok(r) => Ok(CommandResponse {
                                             response: r,
                                             extra_values: vec![],
-                                            transaction_id: None
+                                            transaction_id: None,
+                                            result_code: super::proto::EPPResultCode::CommandFailed,
                                         }),
                                         Err(e) => Err(e)
                                     });
@@ -102,14 +104,14 @@ macro_rules! router {
                                 }
                             };
                         }
-                        self.$n.insert(command_id, (req.return_path, timer));
+                        self.$n.insert(command_id.clone(), (req.return_path, timer));
                         Some((res, command_id))
                     },)*
                 }
             }
 
-            pub fn handle_response(&mut self, transaction_id: &uuid::Uuid, response: I::Response) {
-                $(if let Some((return_path, timer)) = self.$n.remove(transaction_id) {
+            pub fn handle_response(&mut self, transaction_id: String, response: I::Response) {
+                $(if let Some((return_path, timer)) = self.$n.remove(&transaction_id) {
                     paste! {
                         if let Some(timer) = timer {
                             timer.observe_duration();

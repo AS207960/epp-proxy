@@ -133,7 +133,7 @@ async fn main() {
     // Using your OT&E1 account, perform a CHECK domain command until you find an available domain
     info!(
         "{:#?}",
-        epp_proxy::client::domain::check(domain, None, None, None, &mut cmd_tx_1)
+        epp_proxy::client::domain::check(domain, None, None, None, None, &mut cmd_tx_1)
             .await
             .unwrap()
     );
@@ -164,6 +164,7 @@ async fn main() {
             nominet_ext: None,
             ttl: None,
         },
+        None,
         &mut cmd_tx_1,
     )
     .await
@@ -185,6 +186,7 @@ async fn main() {
             }],
             None,
             None,
+            None,
             &mut cmd_tx_1
         )
         .await
@@ -204,6 +206,7 @@ async fn main() {
                 address: "1.0.0.1".to_string(),
                 ip_version: epp_proxy::client::host::AddressVersion::IPv4,
             }],
+            None,
             None,
             None,
             &mut cmd_tx_1
@@ -249,6 +252,7 @@ async fn main() {
                 nominet_ext: None,
                 ttl: None,
             },
+            None,
             &mut cmd_tx_1
         )
         .await
@@ -293,6 +297,7 @@ async fn main() {
                 nominet_ext: None,
                 ttl: None,
             },
+            None,
             &mut cmd_tx_1
         )
         .await
@@ -306,7 +311,7 @@ async fn main() {
     info!("Getting domain info");
     info!(
         "{:#?}",
-        epp_proxy::client::domain::info(domain, None, None, None, None, &mut cmd_tx_1)
+        epp_proxy::client::domain::info(domain, None, None, None, None, None, &mut cmd_tx_1)
             .await
             .unwrap()
     );
@@ -349,6 +354,7 @@ async fn main() {
                 nominet_ext: None,
                 ttl: None,
             },
+            None,
             &mut cmd_tx_1
         )
         .await
@@ -362,7 +368,7 @@ async fn main() {
     info!("Getting domain info");
     info!(
         "{:#?}",
-        epp_proxy::client::domain::info(domain, None, None, None, None, &mut cmd_tx_1)
+        epp_proxy::client::domain::info(domain, None, None, None, None, None, &mut cmd_tx_1)
             .await
             .unwrap()
     );
@@ -391,6 +397,7 @@ async fn main() {
                 nominet_ext: None,
                 ttl: None,
             },
+            None,
             &mut cmd_tx_1
         )
         .await
@@ -421,6 +428,7 @@ async fn main() {
             None,
             None,
             None,
+            None,
             &mut cmd_tx_1
         )
         .await
@@ -434,7 +442,7 @@ async fn main() {
             epp_proxy::client::BlankRequest {
                 return_path: sender,
             },
-        )))
+        ), None))
         .unwrap();
 
     // Renew your newly created domain for 2 years using the RENEW domain command with your OT&E1
@@ -449,6 +457,7 @@ async fn main() {
             value: 2,
         }),
         domain_create_res.response.data.expiration_date.unwrap(),
+        None,
         None,
         None,
         None,
@@ -478,6 +487,7 @@ async fn main() {
             None,
             None,
             None,
+            None,
             &mut cmd_tx_2
         )
         .await
@@ -499,6 +509,7 @@ async fn main() {
             None,
             None,
             None,
+            None,
             &mut cmd_tx_2
         )
         .await
@@ -511,7 +522,7 @@ async fn main() {
     info!("Querying transfer status");
     info!(
         "{:#?}",
-        epp_proxy::client::domain::transfer_query(domain, Some("test_auth2"), &mut cmd_tx_2)
+        epp_proxy::client::domain::transfer_query(domain, Some("test_auth2"), None, &mut cmd_tx_2)
             .await
             .unwrap()
     );
@@ -522,7 +533,7 @@ async fn main() {
     info!("Accepting transfer request");
     info!(
         "{:#?}",
-        epp_proxy::client::domain::transfer_accept(domain, None, &mut cmd_tx_1)
+        epp_proxy::client::domain::transfer_accept(domain, None, None, &mut cmd_tx_1)
             .await
             .unwrap()
     );
@@ -532,7 +543,7 @@ async fn main() {
 
     info!("======");
     info!("Polling 1 message");
-    let poll_msg = epp_proxy::client::poll::poll(&mut cmd_tx_1).await.unwrap();
+    let poll_msg = epp_proxy::client::poll::poll(None, &mut cmd_tx_1).await.unwrap();
     info!("{:#?}", poll_msg);
 
     // Acknowledge the first poll message using the POLL-ACK command with your OT&E1 account logon
@@ -541,7 +552,7 @@ async fn main() {
     info!("Acknowledging message");
     info!(
         "{:#?}",
-        epp_proxy::client::poll::poll_ack(&poll_msg.response.unwrap().id, &mut cmd_tx_1)
+        epp_proxy::client::poll::poll_ack(&poll_msg.response.unwrap().id, None, &mut cmd_tx_1)
             .await
             .unwrap()
     );
@@ -561,6 +572,7 @@ async fn main() {
             None,
             None,
             None,
+            None,
             &mut cmd_tx_1
         )
         .await
@@ -573,7 +585,7 @@ async fn main() {
     info!("Querying transfer status");
     info!(
         "{:#?}",
-        epp_proxy::client::domain::transfer_query(domain, None, &mut cmd_tx_2)
+        epp_proxy::client::domain::transfer_query(domain, None, None, &mut cmd_tx_2)
             .await
             .unwrap()
     );
@@ -585,7 +597,7 @@ async fn main() {
     info!("Rejecting transfer request");
     info!(
         "{:#?}",
-        epp_proxy::client::domain::transfer_reject(domain, None, &mut cmd_tx_2)
+        epp_proxy::client::domain::transfer_reject(domain, None, None, &mut cmd_tx_2)
             .await
             .unwrap()
     );
@@ -601,14 +613,15 @@ async fn main() {
             domain,
             (renew_res.response.data.new_expiry_date.unwrap().month() % 12) + 1,
             15,
+            None,
             &mut cmd_tx_2
         )
         .await
         .unwrap()
     );
 
-    epp_proxy::client::logout(cmd_tx_1).await.unwrap();
-    let final_cmd = epp_proxy::client::logout(cmd_tx_2).await.unwrap();
+    epp_proxy::client::logout(None, cmd_tx_1).await.unwrap();
+    let final_cmd = epp_proxy::client::logout(None, cmd_tx_2).await.unwrap();
 
     println!("Final command transaction: {:#?}", final_cmd.transaction_id);
 }

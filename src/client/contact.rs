@@ -280,6 +280,7 @@ pub struct PanData {
 /// * `client_sender` - Reference to the tokio channel into the client
 pub async fn check(
     id: &str,
+    client_transaction_id: Option<String>,
     client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<CheckResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
@@ -288,7 +289,7 @@ pub async fn check(
         RequestMessage::ContactCheck(Box::new(CheckRequest {
             id: id.to_string(),
             return_path: sender,
-        })),
+        }), client_transaction_id),
         receiver,
     )
     .await
@@ -301,6 +302,7 @@ pub async fn check(
 /// * `client_sender` - Reference to the tokio channel into the client
 pub async fn info(
     id: &str,
+    client_transaction_id: Option<String>,
     client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<InfoResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
@@ -309,7 +311,7 @@ pub async fn info(
         RequestMessage::ContactInfo(Box::new(InfoRequest {
             id: id.to_string(),
             return_path: sender,
-        })),
+        }), client_transaction_id),
         receiver,
     )
     .await
@@ -354,6 +356,7 @@ pub struct NewContactData {
 pub async fn create(
     id: &str,
     data: NewContactData,
+    client_transaction_id: Option<String>,
     client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<CreateResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
@@ -376,7 +379,7 @@ pub async fn create(
             qualified_lawyer: data.qualified_lawyer,
             keysys: data.keysys,
             return_path: sender,
-        })),
+        }), client_transaction_id),
         receiver,
     )
     .await
@@ -389,6 +392,7 @@ pub async fn create(
 /// * `client_sender` - Reference to the tokio channel into the client
 pub async fn delete(
     id: &str,
+    client_transaction_id: Option<String>,
     client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<DeleteResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
@@ -397,7 +401,7 @@ pub async fn delete(
         RequestMessage::ContactDelete(Box::new(DeleteRequest {
             id: id.to_string(),
             return_path: sender,
-        })),
+        }), client_transaction_id),
         receiver,
     )
     .await
@@ -446,6 +450,7 @@ pub async fn update(
     add_statuses: Vec<Status>,
     remove_statuses: Vec<Status>,
     new_data: UpdateContactData,
+    client_transaction_id: Option<String>,
     client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<UpdateResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
@@ -470,7 +475,7 @@ pub async fn update(
             qualified_lawyer: new_data.qualified_lawyer,
             keysys: new_data.keysys,
             return_path: sender,
-        })),
+        }), client_transaction_id),
         receiver,
     )
     .await
@@ -483,6 +488,7 @@ pub async fn update(
 /// * `client_sender` - Reference to the tokio channel into the client
 pub async fn transfer_query(
     id: &str,
+    client_transaction_id: Option<String>,
     client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<TransferResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
@@ -491,7 +497,7 @@ pub async fn transfer_query(
         RequestMessage::ContactTransferQuery(Box::new(TransferQueryRequest {
             id: id.to_string(),
             return_path: sender,
-        })),
+        }), client_transaction_id),
         receiver,
     )
     .await
@@ -506,6 +512,7 @@ pub async fn transfer_query(
 pub async fn transfer_request(
     id: &str,
     auth_info: &str,
+    client_transaction_id: Option<String>,
     client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<TransferResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
@@ -515,7 +522,7 @@ pub async fn transfer_request(
             id: id.to_string(),
             auth_info: auth_info.to_string(),
             return_path: sender,
-        })),
+        }), client_transaction_id),
         receiver,
     )
     .await
@@ -530,6 +537,7 @@ pub async fn transfer_request(
 pub async fn transfer_accept(
     id: &str,
     auth_info: &str,
+    client_transaction_id: Option<String>,
     client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<TransferResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
@@ -539,7 +547,7 @@ pub async fn transfer_accept(
             id: id.to_string(),
             auth_info: auth_info.to_string(),
             return_path: sender,
-        })),
+        }), client_transaction_id),
         receiver,
     )
     .await
@@ -554,6 +562,7 @@ pub async fn transfer_accept(
 pub async fn transfer_reject(
     id: &str,
     auth_info: &str,
+    client_transaction_id: Option<String>,
     client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<TransferResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
@@ -563,7 +572,7 @@ pub async fn transfer_reject(
             id: id.to_string(),
             auth_info: auth_info.to_string(),
             return_path: sender,
-        })),
+        }), client_transaction_id),
         receiver,
     )
     .await

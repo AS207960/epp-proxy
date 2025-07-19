@@ -881,7 +881,7 @@ pub fn handle_create(
                     && contains_int_org
                     && !suppress_int_org;
 
-                d.sort_unstable_by_key(|a| (*a as i32));
+                d.sort_unstable_by_key(|a| *a as i32);
                 let elements: Vec<_> = d
                     .iter()
                     .filter(|d| match d {
@@ -1140,7 +1140,7 @@ pub fn handle_update(
                 disclose: match client.switch_balance {
                     true => None,
                     false => req.new_disclosure.clone().and_then(|mut d| {
-                        d.sort_unstable_by_key(|a| (*a as i32));
+                        d.sort_unstable_by_key(|a| *a as i32);
                         let elements: Vec<_> = d.iter().map(|e| e.into()).collect();
                         if elements.is_empty() {
                             None

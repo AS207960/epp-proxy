@@ -415,6 +415,7 @@ pub async fn check(
     fee_check: Option<super::fee::FeeCheck>,
     launch_check: Option<super::launch::LaunchAvailabilityCheck>,
     keysys: Option<super::keysys::DomainCheck>,
+    client_transaction_id: Option<String>,
     client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<CheckResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
@@ -426,7 +427,7 @@ pub async fn check(
             launch_check,
             keysys,
             return_path: sender,
-        })),
+        }), client_transaction_id),
         receiver,
     )
     .await
@@ -441,6 +442,7 @@ pub async fn check(
 pub async fn launch_claims_check(
     domain: &str,
     launch_check: super::launch::LaunchClaimsCheck,
+    client_transaction_id: Option<String>,
     client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<ClaimsCheckResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
@@ -450,7 +452,7 @@ pub async fn launch_claims_check(
             name: domain.to_string(),
             launch_check,
             return_path: sender,
-        })),
+        }), client_transaction_id),
         receiver,
     )
     .await
@@ -463,6 +465,7 @@ pub async fn launch_claims_check(
 /// * `client_sender` - Reference to the tokio channel into the client
 pub async fn launch_trademark_check(
     domain: &str,
+    client_transaction_id: Option<String>,
     client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<ClaimsCheckResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
@@ -471,7 +474,7 @@ pub async fn launch_trademark_check(
         RequestMessage::DomainTrademarkCheck(Box::new(TrademarkCheckRequest {
             name: domain.to_string(),
             return_path: sender,
-        })),
+        }), client_transaction_id),
         receiver,
     )
     .await
@@ -488,6 +491,7 @@ pub async fn info(
     hosts: Option<InfoHost>,
     launch_info: Option<super::launch::LaunchInfo>,
     eurid_data: Option<super::eurid::DomainInfoRequest>,
+    client_transaction_id: Option<String>,
     client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<InfoResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
@@ -500,7 +504,7 @@ pub async fn info(
             launch_info,
             eurid_data,
             return_path: sender,
-        })),
+        }), client_transaction_id),
         receiver,
     )
     .await
@@ -537,6 +541,7 @@ pub struct CreateInfo<'a> {
 /// * `client_sender` - Reference to the tokio channel into the client
 pub async fn create(
     info: CreateInfo<'_>,
+    client_transaction_id: Option<String>,
     client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<CreateResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
@@ -560,7 +565,7 @@ pub async fn create(
             nominet_ext: info.nominet_ext,
             ttl: info.ttl,
             return_path: sender,
-        })),
+        }), client_transaction_id),
         receiver,
     )
     .await
@@ -577,6 +582,7 @@ pub async fn delete(
     donuts_fee_agreement: Option<super::fee::DonutsFeeData>,
     eurid_data: Option<super::eurid::DomainDelete>,
     keysys: Option<super::keysys::DomainDelete>,
+    client_transaction_id: Option<String>,
     client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<DeleteResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
@@ -589,7 +595,7 @@ pub async fn delete(
             eurid_data,
             keysys,
             return_path: sender,
-        })),
+        }), client_transaction_id),
         receiver,
     )
     .await
@@ -624,6 +630,7 @@ pub struct UpdateInfo<'a> {
 /// * `client_sender` - Reference to the tokio channel into the client
 pub async fn update(
     info: UpdateInfo<'_>,
+    client_transaction_id: Option<String>,
     client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<UpdateResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
@@ -645,7 +652,7 @@ pub async fn update(
             nominet_ext: info.nominet_ext,
             ttl: info.ttl,
             return_path: sender,
-        })),
+        }), client_transaction_id),
         receiver,
     )
     .await
@@ -661,6 +668,7 @@ pub async fn verisign_sync(
     domain: &str,
     month: u32,
     day: u32,
+    client_transaction_id: Option<String>,
     client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<UpdateResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
@@ -671,7 +679,7 @@ pub async fn verisign_sync(
             month,
             day,
             return_path: sender,
-        })),
+        }), client_transaction_id),
         receiver,
     )
     .await
@@ -692,6 +700,7 @@ pub async fn renew(
     donuts_fee_agreement: Option<super::fee::DonutsFeeData>,
     isnic_payment: Option<super::isnic::PaymentInfo>,
     keysys: Option<super::keysys::DomainRenew>,
+    client_transaction_id: Option<String>,
     client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<RenewResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
@@ -706,7 +715,7 @@ pub async fn renew(
             isnic_payment,
             keysys,
             return_path: sender,
-        })),
+        }), client_transaction_id),
         receiver,
     )
     .await
@@ -721,6 +730,7 @@ pub async fn renew(
 pub async fn transfer_query(
     domain: &str,
     auth_info: Option<&str>,
+    client_transaction_id: Option<String>,
     client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<TransferResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
@@ -730,7 +740,7 @@ pub async fn transfer_query(
             name: domain.to_string(),
             auth_info: auth_info.map(|s| s.into()),
             return_path: sender,
-        })),
+        }), client_transaction_id),
         receiver,
     )
     .await
@@ -751,6 +761,7 @@ pub async fn transfer_request(
     donuts_fee_agreement: Option<super::fee::DonutsFeeData>,
     eurid_data: Option<super::eurid::DomainTransfer>,
     keysys: Option<super::keysys::DomainTransfer>,
+    client_transaction_id: Option<String>,
     client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<TransferResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
@@ -765,7 +776,7 @@ pub async fn transfer_request(
             eurid_data,
             keysys,
             return_path: sender,
-        })),
+        }), client_transaction_id),
         receiver,
     )
     .await
@@ -780,6 +791,7 @@ pub async fn transfer_request(
 pub async fn transfer_cancel(
     domain: &str,
     auth_info: Option<&str>,
+    client_transaction_id: Option<String>,
     client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<TransferResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
@@ -789,7 +801,7 @@ pub async fn transfer_cancel(
             name: domain.to_string(),
             auth_info: auth_info.map(|s| s.into()),
             return_path: sender,
-        })),
+        }), client_transaction_id),
         receiver,
     )
     .await
@@ -804,6 +816,7 @@ pub async fn transfer_cancel(
 pub async fn transfer_accept(
     domain: &str,
     auth_info: Option<&str>,
+    client_transaction_id: Option<String>,
     client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<TransferResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
@@ -813,7 +826,7 @@ pub async fn transfer_accept(
             name: domain.to_string(),
             auth_info: auth_info.map(|s| s.into()),
             return_path: sender,
-        })),
+        }), client_transaction_id),
         receiver,
     )
     .await
@@ -828,6 +841,7 @@ pub async fn transfer_accept(
 pub async fn transfer_reject(
     domain: &str,
     auth_info: Option<&str>,
+    client_transaction_id: Option<String>,
     client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<TransferResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
@@ -837,7 +851,7 @@ pub async fn transfer_reject(
             name: domain.to_string(),
             auth_info: auth_info.map(|s| s.into()),
             return_path: sender,
-        })),
+        }), client_transaction_id),
         receiver,
     )
     .await

@@ -102,7 +102,7 @@ async fn main() {
 
     // 2.1.2.2 Poll Request command
     info!("Polling 1 message");
-    let poll_msg = epp_proxy::client::poll::poll(&mut cmd_tx).await.unwrap();
+    let poll_msg = epp_proxy::client::poll::poll(None, &mut cmd_tx).await.unwrap();
     info!("{:#?}", poll_msg);
 
     // 2.1.2.3 Poll Acknowledge command
@@ -110,7 +110,7 @@ async fn main() {
     info!("Acknowledging message");
     info!(
         "{:#?}",
-        epp_proxy::client::poll::poll_ack("12345", &mut cmd_tx).await
+        epp_proxy::client::poll::poll_ack(&poll_msg.response.unwrap().id, None, &mut cmd_tx).await
     );
 
     // 2.1.2.4 Add Contact
@@ -149,6 +149,7 @@ async fn main() {
                 qualified_lawyer: None,
                 keysys: None
             },
+            None,
             &mut cmd_tx,
         )
         .await
@@ -160,7 +161,7 @@ async fn main() {
     info!("Creating out of zone nameserver");
     info!(
         "{:#?}",
-        epp_proxy::client::host::create(&out_of_zone_ns, vec![], None, None, &mut cmd_tx)
+        epp_proxy::client::host::create(&out_of_zone_ns, vec![], None, None, None, &mut cmd_tx)
             .await
             .unwrap()
     );
@@ -170,7 +171,7 @@ async fn main() {
     info!("Checking second level domain");
     info!(
         "{:#?}",
-        epp_proxy::client::domain::check(&test_2ld, None, None, None, &mut cmd_tx)
+        epp_proxy::client::domain::check(&test_2ld, None, None, None, None, &mut cmd_tx)
             .await
             .unwrap()
     );
@@ -213,6 +214,7 @@ async fn main() {
             nominet_ext: None,
             ttl: None,
         },
+        None,
         &mut cmd_tx,
     )
     .await
@@ -232,6 +234,7 @@ async fn main() {
             }],
             None,
             None,
+            None,
             &mut cmd_tx
         )
         .await
@@ -243,7 +246,7 @@ async fn main() {
     info!("Deleting in zone nameserver");
     info!(
         "{:#?}",
-        epp_proxy::client::host::delete(&format!("ns1.{}", &test_2ld), &mut cmd_tx)
+        epp_proxy::client::host::delete(&format!("ns1.{}", &test_2ld), None, &mut cmd_tx)
             .await
             .unwrap()
     );
@@ -258,6 +261,7 @@ async fn main() {
             value: 2,
         }),
         domain_create_res.response.data.expiration_date.unwrap(),
+        None,
         None,
         None,
         None,
@@ -297,6 +301,7 @@ async fn main() {
                 nominet_ext: None,
                 ttl: None,
             },
+            None,
             &mut cmd_tx
         )
         .await
@@ -308,7 +313,7 @@ async fn main() {
     info!("Getting second level domain info");
     info!(
         "{:#?}",
-        epp_proxy::client::domain::info(&test_2ld, None, None, None, None, &mut cmd_tx)
+        epp_proxy::client::domain::info(&test_2ld, None, None, None, None, None, &mut cmd_tx)
             .await
             .unwrap()
     );
@@ -318,7 +323,7 @@ async fn main() {
     info!("Deleting second level domain");
     info!(
         "{:#?}",
-        epp_proxy::client::domain::delete(&test_2ld, None, None, None, None, &mut cmd_tx)
+        epp_proxy::client::domain::delete(&test_2ld, None, None, None, None, None, &mut cmd_tx)
             .await
             .unwrap()
     );
@@ -328,7 +333,7 @@ async fn main() {
     info!("Checking third level domain");
     info!(
         "{:#?}",
-        epp_proxy::client::domain::check(&test_3ld, None, None, None, &mut cmd_tx)
+        epp_proxy::client::domain::check(&test_3ld, None, None, None, None, &mut cmd_tx)
             .await
             .unwrap()
     );
@@ -371,6 +376,7 @@ async fn main() {
             nominet_ext: None,
             ttl: None,
         },
+        None,
         &mut cmd_tx,
     )
     .await
@@ -390,6 +396,7 @@ async fn main() {
             }],
             None,
             None,
+            None,
             &mut cmd_tx
         )
         .await
@@ -401,7 +408,7 @@ async fn main() {
     info!("Deleting in zone nameserver");
     info!(
         "{:#?}",
-        epp_proxy::client::host::delete(&format!("ns1.{}", &test_3ld), &mut cmd_tx)
+        epp_proxy::client::host::delete(&format!("ns1.{}", &test_3ld), None, &mut cmd_tx)
             .await
             .unwrap()
     );
@@ -416,6 +423,7 @@ async fn main() {
             value: 2,
         }),
         domain_create_res.response.data.expiration_date.unwrap(),
+        None,
         None,
         None,
         None,
@@ -455,6 +463,7 @@ async fn main() {
                 nominet_ext: None,
                 ttl: None,
             },
+            None,
             &mut cmd_tx
         )
         .await
@@ -466,7 +475,7 @@ async fn main() {
     info!("Getting third level domain info");
     info!(
         "{:#?}",
-        epp_proxy::client::domain::info(&test_3ld, None, None, None, None, &mut cmd_tx)
+        epp_proxy::client::domain::info(&test_3ld, None, None, None, None, None, &mut cmd_tx)
             .await
             .unwrap()
     );
@@ -476,7 +485,7 @@ async fn main() {
     info!("Deleting third level domain");
     info!(
         "{:#?}",
-        epp_proxy::client::domain::delete(&test_3ld, None, None, None, None, &mut cmd_tx)
+        epp_proxy::client::domain::delete(&test_3ld, None, None, None, None, None, &mut cmd_tx)
             .await
             .unwrap()
     );
@@ -511,6 +520,7 @@ async fn main() {
             fee_agreement: None,
             personal_registration: None,
         },
+        None,
         &mut cmd_tx,
     )
     .await
@@ -528,6 +538,7 @@ async fn main() {
         }),
         email_create_res.response.data.expiration_date.unwrap(),
         None,
+        None,
         &mut cmd_tx,
     )
     .await
@@ -539,7 +550,7 @@ async fn main() {
     info!("Deleting email forwarding");
     info!(
         "{:#?}",
-        epp_proxy::client::email_forward::delete(&test_email, &mut cmd_tx)
+        epp_proxy::client::email_forward::delete(&test_email, None, &mut cmd_tx)
             .await
             .unwrap()
     );
@@ -549,7 +560,7 @@ async fn main() {
     info!("Deleting contact");
     info!(
         "{:#?}",
-        epp_proxy::client::contact::delete(&contact_id, &mut cmd_tx)
+        epp_proxy::client::contact::delete(&contact_id, None, &mut cmd_tx)
             .await
             .unwrap()
     );
@@ -559,11 +570,11 @@ async fn main() {
     info!("Deleting out of zone nameserver");
     info!(
         "{:#?}",
-        epp_proxy::client::host::delete(&out_of_zone_ns, &mut cmd_tx)
+        epp_proxy::client::host::delete(&out_of_zone_ns, None, &mut cmd_tx)
             .await
             .unwrap()
     );
 
-    let final_cmd = epp_proxy::client::logout(cmd_tx).await.unwrap();
+    let final_cmd = epp_proxy::client::logout(None, cmd_tx).await.unwrap();
     println!("Final command transaction: {:#?}", final_cmd.transaction_id);
 }

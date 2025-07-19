@@ -305,7 +305,7 @@ impl<M: crate::metrics::Metrics + 'static> TMCHClient<M> {
         req: outer_router::RequestMessage,
         sock_write: &mut W,
     ) -> Result<(), ()> {
-        if let outer_router::RequestMessage::Logout(_) = req {
+        if let outer_router::RequestMessage::Logout(_, _) = req {
             self.is_closing = true;
         }
         match self.router.handle_request(&(), req) {
@@ -342,17 +342,7 @@ impl<M: crate::metrics::Metrics + 'static> TMCHClient<M> {
                     }
                 };
                 let is_closing = response.is_closing();
-                let transaction_id = match uuid::Uuid::parse_str(transaction_id) {
-                    Ok(i) => i,
-                    Err(e) => {
-                        error!(
-                            "Received response with invalid transaction UUID from {}: {}",
-                            self.server_id, e
-                        );
-                        return Err(());
-                    }
-                };
-                self.router.handle_response(&transaction_id, *response);
+                self.router.handle_response(transaction_id.to_string(), *response);
                 Ok(is_closing)
             }
             tmch_proto::TMCHMessageType::Greeting(greeting) => {
@@ -492,20 +482,17 @@ impl<M: crate::metrics::Metrics + 'static> TMCHClient<M> {
 
     async fn _send_command<
         W: std::marker::Unpin + tokio::io::AsyncWrite,
-        I: Into<Option<uuid::Uuid>>,
+        I: Into<Option<String>>,
     >(
         &self,
         command: tmch_proto::TMCHCommandType,
         sock: &mut W,
         message_id: I,
-    ) -> Result<uuid::Uuid, ()> {
-        let message_id = match message_id.into() {
-            Some(m) => m,
-            None => uuid::Uuid::new_v4(),
-        };
+    ) -> Result<String, ()> {
+        let message_id = message_id.into().unwrap_or_else(|| uuid::Uuid::new_v4().hyphenated().to_string());
         let command = tmch_proto::TMCHCommand {
             command,
-            client_transaction_id: Some(message_id.hyphenated().to_string()),
+            client_transaction_id: Some(message_id.clone()),
             extension: None,
         };
         let message = tmch_proto::TMCHMessage {

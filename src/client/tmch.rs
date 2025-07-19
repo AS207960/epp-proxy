@@ -341,6 +341,7 @@ pub struct BalanceData {
 /// * `client_sender` - Reference to the tokio channel into the client
 pub async fn check(
     id: &str,
+    client_transaction_id: Option<String>,
     client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<CheckResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
@@ -349,7 +350,7 @@ pub async fn check(
         RequestMessage::TMCHCheck(Box::new(CheckRequest {
             id: id.to_string(),
             return_path: sender,
-        })),
+        }), client_transaction_id),
         receiver,
     )
     .await
@@ -370,6 +371,7 @@ pub async fn create(
     documents: Vec<Document>,
     labels: Vec<CreateLabel>,
     variations: Vec<String>,
+    client_transaction_id: Option<String>,
     client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<CreateResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
@@ -382,7 +384,7 @@ pub async fn create(
             labels,
             variations,
             return_path: sender,
-        })),
+        }), client_transaction_id),
         receiver,
     )
     .await
@@ -395,6 +397,7 @@ pub async fn create(
 /// * `client_sender` - Reference to the tokio channel into the client
 pub async fn mark_info(
     id: &str,
+    client_transaction_id: Option<String>,
     client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<MarkInfoResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
@@ -403,7 +406,7 @@ pub async fn mark_info(
         RequestMessage::TMCHMarkInfo(Box::new(MarkInfoRequest {
             id: id.to_string(),
             return_path: sender,
-        })),
+        }), client_transaction_id),
         receiver,
     )
     .await
@@ -416,6 +419,7 @@ pub async fn mark_info(
 /// * `client_sender` - Reference to the tokio channel into the client
 pub async fn mark_smd_info(
     id: &str,
+    client_transaction_id: Option<String>,
     client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<MarkSMDInfoResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
@@ -424,7 +428,7 @@ pub async fn mark_smd_info(
         RequestMessage::TMCHMarkSMDInfo(Box::new(MarkSMDInfoRequest {
             id: id.to_string(),
             return_path: sender,
-        })),
+        }), client_transaction_id),
         receiver,
     )
     .await
@@ -437,6 +441,7 @@ pub async fn mark_smd_info(
 /// * `client_sender` - Reference to the tokio channel into the client
 pub async fn mark_encoded_smd_info(
     id: &str,
+    client_transaction_id: Option<String>,
     client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<MarkSMDInfoResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
@@ -445,7 +450,7 @@ pub async fn mark_encoded_smd_info(
         RequestMessage::TMCHMarkEncodedSMDInfo(Box::new(MarkSMDInfoRequest {
             id: id.to_string(),
             return_path: sender,
-        })),
+        }), client_transaction_id),
         receiver,
     )
     .await
@@ -458,6 +463,7 @@ pub async fn mark_encoded_smd_info(
 /// * `client_sender` - Reference to the tokio channel into the client
 pub async fn mark_file_info(
     id: &str,
+    client_transaction_id: Option<String>,
     client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<MarkSMDInfoResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
@@ -466,7 +472,7 @@ pub async fn mark_file_info(
         RequestMessage::TMCHMarkEncodedSMDInfo(Box::new(MarkSMDInfoRequest {
             id: id.to_string(),
             return_path: sender,
-        })),
+        }), client_transaction_id),
         receiver,
     )
     .await
@@ -484,6 +490,7 @@ pub async fn update(
     new_mark: Option<super::mark::Mark>,
     update_labels: Vec<CreateLabel>,
     update_cases: Vec<CaseUpdate>,
+    client_transaction_id: Option<String>,
     client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<UpdateResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
@@ -497,7 +504,7 @@ pub async fn update(
             update_labels,
             update_cases,
             return_path: sender,
-        })),
+        }), client_transaction_id),
         receiver,
     )
     .await
@@ -514,6 +521,7 @@ pub async fn renew(
     id: &str,
     cur_expiry_date: DateTime<Utc>,
     add_period: Option<super::Period>,
+    client_transaction_id: Option<String>,
     client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<RenewResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
@@ -524,7 +532,7 @@ pub async fn renew(
             add_period,
             cur_expiry_date,
             return_path: sender,
-        })),
+        }), client_transaction_id),
         receiver,
     )
     .await
@@ -537,6 +545,7 @@ pub async fn renew(
 /// * `client_sender` - Reference to the tokio channel into the client
 pub async fn transfer_initiate(
     id: &str,
+    client_transaction_id: Option<String>,
     client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<TransferInitiateResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
@@ -545,7 +554,7 @@ pub async fn transfer_initiate(
         RequestMessage::TMCHTransferInitiate(Box::new(TransferInitiateRequest {
             id: id.to_string(),
             return_path: sender,
-        })),
+        }), client_transaction_id),
         receiver,
     )
     .await
@@ -560,6 +569,7 @@ pub async fn transfer_initiate(
 pub async fn transfer(
     id: &str,
     auth_code: &str,
+    client_transaction_id: Option<String>,
     client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<TransferResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
@@ -569,7 +579,7 @@ pub async fn transfer(
             id: id.to_string(),
             auth_info: auth_code.to_string(),
             return_path: sender,
-        })),
+        }), client_transaction_id),
         receiver,
     )
     .await

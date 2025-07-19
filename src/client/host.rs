@@ -116,6 +116,7 @@ pub enum Status {
 
 pub async fn check(
     host: &str,
+    client_transaction_id: Option<String>,
     client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<CheckResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
@@ -124,7 +125,7 @@ pub async fn check(
         RequestMessage::HostCheck(Box::new(CheckRequest {
             name: host.to_string(),
             return_path: sender,
-        })),
+        }), client_transaction_id),
         receiver,
     )
     .await
@@ -132,6 +133,7 @@ pub async fn check(
 
 pub async fn info(
     host: &str,
+    client_transaction_id: Option<String>,
     client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<InfoResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
@@ -140,7 +142,7 @@ pub async fn info(
         RequestMessage::HostInfo(Box::new(InfoRequest {
             name: host.to_string(),
             return_path: sender,
-        })),
+        }), client_transaction_id),
         receiver,
     )
     .await
@@ -151,6 +153,7 @@ pub async fn create(
     addresses: Vec<Address>,
     isnic_info: Option<super::isnic::HostInfo>,
     ttl: Option<super::ttl::TTLSet>,
+    client_transaction_id: Option<String>,
     client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<CreateResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
@@ -162,7 +165,7 @@ pub async fn create(
             isnic_info,
             ttl,
             return_path: sender,
-        })),
+        }), client_transaction_id),
         receiver,
     )
     .await
@@ -170,6 +173,7 @@ pub async fn create(
 
 pub async fn delete(
     host: &str,
+    client_transaction_id: Option<String>,
     client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<DeleteResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
@@ -178,7 +182,7 @@ pub async fn delete(
         RequestMessage::HostDelete(Box::new(DeleteRequest {
             name: host.to_string(),
             return_path: sender,
-        })),
+        }), client_transaction_id),
         receiver,
     )
     .await
@@ -191,6 +195,7 @@ pub async fn update<N: Into<Option<String>>>(
     new_name: N,
     isnic_info: Option<super::isnic::HostInfo>,
     ttl: Option<super::ttl::TTLSet>,
+    client_transaction_id: Option<String>,
     client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<UpdateResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
@@ -204,7 +209,7 @@ pub async fn update<N: Into<Option<String>>>(
             isnic_info,
             ttl,
             return_path: sender,
-        })),
+        }), client_transaction_id),
         receiver,
     )
     .await

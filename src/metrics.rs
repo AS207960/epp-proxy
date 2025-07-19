@@ -1,3 +1,5 @@
+use warp::Filter;
+
 #[derive(Debug)]
 pub struct PrometheusMetrics {
     connection_up: prometheus::IntGaugeVec,
@@ -115,4 +117,31 @@ impl Metrics for DummyMetrics {
     fn subordinate(&self, _extra: &str) -> Self {
         DummyMetrics::default()
     }
+}
+
+
+pub fn start_metrics_server(addr: std::net::SocketAddr) {
+    let metrics_route = warp::path!("metrics").and_then(metrics_handler);
+
+    info!("Starting metrics server on {}", addr);
+    tokio::task::spawn(async move {
+        warp::serve(metrics_route).run(addr).await;
+    });
+}
+
+async fn metrics_handler() -> Result<impl warp::Reply, warp::Rejection> {
+    use prometheus::Encoder;
+
+    let mut buffer = Vec::new();
+    let encoder = prometheus::TextEncoder::new();
+    if let Err(e) = encoder.encode(&prometheus::gather(), &mut buffer) {
+        eprintln!("could not encode custom metrics: {}", e);
+    };
+
+    let res = String::from_utf8(buffer.clone()).unwrap_or_else(|e| {
+        eprintln!("custom metrics could not be from_utf8'd: {}", e);
+        String::default()
+    });
+
+    Ok(res)
 }

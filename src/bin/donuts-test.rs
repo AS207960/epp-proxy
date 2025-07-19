@@ -225,7 +225,7 @@ async fn main() {
     let mut contact_id_i = 1;
     let contact_id = loop {
         let contact_id = format!("STACLAR-{}", contact_id_i);
-        let res = epp_proxy::client::contact::check(&contact_id, &mut cmd_tx_1)
+        let res = epp_proxy::client::contact::check(&contact_id, None, &mut cmd_tx_1)
             .await
             .unwrap();
         if res.response.avail {
@@ -267,6 +267,7 @@ async fn main() {
             qualified_lawyer: None,
             keysys: None,
         },
+        None,
         &mut cmd_tx_1,
     )
     .await
@@ -276,6 +277,7 @@ async fn main() {
     info!("Domain check");
     epp_proxy::client::domain::check(
         &format!("{}.test1ga", nanoid::nanoid!(16, &ALPHABET)),
+        None,
         None,
         None,
         None,
@@ -332,6 +334,7 @@ async fn main() {
             nominet_ext: None,
             ttl: None,
         },
+        None,
         &mut cmd_tx_1,
     )
     .await
@@ -384,6 +387,7 @@ async fn main() {
                 nominet_ext: None,
                 ttl: None,
             },
+            None,
             &mut cmd_tx_1,
         )
         .await
@@ -402,12 +406,13 @@ async fn main() {
             None,
             None,
             None,
+            None,
             &mut cmd_tx_2,
         )
         .await
         .unwrap();
 
-        epp_proxy::client::domain::transfer_accept(domain.as_str(), None, &mut cmd_tx_1)
+        epp_proxy::client::domain::transfer_accept(domain.as_str(), None, None, &mut cmd_tx_1)
             .await
             .unwrap();
     }
@@ -423,6 +428,7 @@ async fn main() {
                 phase_name: None,
             },
         },
+        None,
         &mut cmd_tx_1,
     )
     .await
@@ -492,6 +498,7 @@ async fn main() {
             nominet_ext: None,
             ttl: None,
         },
+        None,
         &mut cmd_tx_1,
     )
     .await
@@ -545,6 +552,7 @@ async fn main() {
             nominet_ext: None,
             ttl: None,
         },
+        None,
         &mut cmd_tx_1,
     )
     .await
@@ -598,6 +606,7 @@ async fn main() {
             nominet_ext: None,
             ttl: None,
         },
+        None,
         &mut cmd_tx_1,
     )
     .await
@@ -606,7 +615,7 @@ async fn main() {
     // Register an Early Access domain
     info!("Create early access domain");
     info!("EAP domain: {}", eap_domain);
-    let eap_check = epp_proxy::client::domain::check(&eap_domain, None, None, None, &mut cmd_tx_1)
+    let eap_check = epp_proxy::client::domain::check(&eap_domain, None, None, None, None, &mut cmd_tx_1)
         .await
         .unwrap();
     let eap_fee = eap_check
@@ -668,6 +677,7 @@ async fn main() {
             nominet_ext: None,
             ttl: None,
         },
+        None,
         &mut cmd_tx_1,
     )
     .await
@@ -676,7 +686,7 @@ async fn main() {
     // Register a Premium domain name for 3 separate premium price points
     info!("Create 3 premium domains");
     let premium_check_1 =
-        epp_proxy::client::domain::check(premium_domain_1, None, None, None, &mut cmd_tx_1)
+        epp_proxy::client::domain::check(premium_domain_1, None, None, None, None, &mut cmd_tx_1)
             .await
             .unwrap();
     let premium_fee_1 = premium_check_1
@@ -743,13 +753,14 @@ async fn main() {
             nominet_ext: None,
             ttl: None,
         },
+        None,
         &mut cmd_tx_1,
     )
     .await
     .unwrap();
 
     let premium_check_2 =
-        epp_proxy::client::domain::check(premium_domain_2, None, None, None, &mut cmd_tx_1)
+        epp_proxy::client::domain::check(premium_domain_2, None, None, None, None, &mut cmd_tx_1)
             .await
             .unwrap();
     let premium_fee_2 = premium_check_2
@@ -816,13 +827,14 @@ async fn main() {
             nominet_ext: None,
             ttl: None,
         },
+        None,
         &mut cmd_tx_1,
     )
     .await
     .unwrap();
 
     let premium_check_3 =
-        epp_proxy::client::domain::check(premium_domain_3, None, None, None, &mut cmd_tx_1)
+        epp_proxy::client::domain::check(premium_domain_3, None, None, None, None, &mut cmd_tx_1)
             .await
             .unwrap();
     let premium_fee_3 = premium_check_3
@@ -884,6 +896,7 @@ async fn main() {
             nominet_ext: None,
             ttl: None,
         },
+        None,
         &mut cmd_tx_1,
     )
     .await
@@ -909,12 +922,13 @@ async fn main() {
         }),
         None,
         None,
+        None,
         &mut cmd_tx_2,
     )
     .await
     .unwrap();
 
-    epp_proxy::client::domain::transfer_accept(premium_domain_1, None, &mut cmd_tx_1)
+    epp_proxy::client::domain::transfer_accept(premium_domain_1, None, None, &mut cmd_tx_1)
         .await
         .unwrap();
 
@@ -945,6 +959,7 @@ async fn main() {
         }),
         None,
         None,
+        None,
         &mut cmd_tx_1,
     )
     .await
@@ -953,7 +968,7 @@ async fn main() {
     // Delete and Restore a Premium name
     info!("Deleting and restoring premiun name");
     let premium_check_dr =
-        epp_proxy::client::domain::check(premium_domain_dr, None, None, None, &mut cmd_tx_1)
+        epp_proxy::client::domain::check(premium_domain_dr, None, None, None, None, &mut cmd_tx_1)
             .await
             .unwrap();
     let premium_fee_dr = premium_check_dr
@@ -973,7 +988,7 @@ async fn main() {
         })
         .unwrap();
 
-    epp_proxy::client::domain::delete(premium_domain_dr, None, None, None, None, &mut cmd_tx_1)
+    epp_proxy::client::domain::delete(premium_domain_dr, None, None, None, None, None, &mut cmd_tx_1)
         .await
         .unwrap();
 
@@ -990,14 +1005,15 @@ async fn main() {
                 }],
             }],
         }),
+        None,
         &mut cmd_tx_1,
     )
     .await
     .unwrap();
 
     info!("Logging out of accounts");
-    let final_cmd_1 = epp_proxy::client::logout(cmd_tx_1).await.unwrap();
-    let final_cmd_2 = epp_proxy::client::logout(cmd_tx_2).await.unwrap();
+    let final_cmd_1 = epp_proxy::client::logout(None, cmd_tx_1).await.unwrap();
+    let final_cmd_2 = epp_proxy::client::logout(None, cmd_tx_2).await.unwrap();
 
     println!(
         "Final command transaction: {:#?}",

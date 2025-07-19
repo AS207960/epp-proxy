@@ -217,7 +217,7 @@ async fn main() {
     let mut contact_id_i = 1;
     let contact_id = loop {
         let contact_id = format!("STACLAR-{}", contact_id_i);
-        let res = epp_proxy::client::contact::check(&contact_id, &mut cmd_tx_ga_1)
+        let res = epp_proxy::client::contact::check(&contact_id, None, &mut cmd_tx_ga_1)
             .await
             .unwrap();
         if res.response.avail {
@@ -259,32 +259,33 @@ async fn main() {
             qualified_lawyer: None,
             keysys: None,
         },
+        None,
         &mut cmd_tx_ga_1,
     )
     .await
     .unwrap();
 
     info!("Creating nameservers");
-    let res = epp_proxy::client::host::check("ns1.as207960.net", &mut cmd_tx_ga_1)
+    let res = epp_proxy::client::host::check("ns1.as207960.net", None, &mut cmd_tx_ga_1)
         .await
         .unwrap();
     if res.response.avail {
-        epp_proxy::client::host::create("ns1.as207960.net", vec![], None, None, &mut cmd_tx_ga_1)
+        epp_proxy::client::host::create("ns1.as207960.net", vec![], None, None, None, &mut cmd_tx_ga_1)
             .await
             .unwrap();
     }
-    let res = epp_proxy::client::host::check("ns2.as207960.net", &mut cmd_tx_ga_1)
+    let res = epp_proxy::client::host::check("ns2.as207960.net", None, &mut cmd_tx_ga_1)
         .await
         .unwrap();
     if res.response.avail {
-        epp_proxy::client::host::create("ns2.as207960.net", vec![], None, None, &mut cmd_tx_ga_1)
+        epp_proxy::client::host::create("ns2.as207960.net", vec![], None, None, None, &mut cmd_tx_ga_1)
             .await
             .unwrap();
     }
 
     // 2.2.2 - Perform a check to see that an ASCII domain label is available.
     info!("Finding available domain");
-    epp_proxy::client::domain::check(&ga_domain, None, None, None, &mut cmd_tx_ga_1)
+    epp_proxy::client::domain::check(&ga_domain, None, None, None, None, &mut cmd_tx_ga_1)
         .await
         .unwrap();
 
@@ -340,6 +341,7 @@ async fn main() {
             nominet_ext: None,
             ttl: None,
         },
+        None,
         &mut cmd_tx_ga_1,
     )
     .await
@@ -347,13 +349,13 @@ async fn main() {
 
     // 2.2.4 - Perform a check and verify that the ASCII domain label is no longer available
     info!("Checking domain was registered");
-    epp_proxy::client::domain::check(&ga_domain, None, None, None, &mut cmd_tx_ga_1)
+    epp_proxy::client::domain::check(&ga_domain, None, None, None, None, &mut cmd_tx_ga_1)
         .await
         .unwrap();
 
     // 2.3.2 - Perform a check to see that a Japanese IDN domain label is available
     info!("Finding available IDN domain");
-    epp_proxy::client::domain::check(&ga_domain_idn, None, None, None, &mut cmd_tx_ga_1)
+    epp_proxy::client::domain::check(&ga_domain_idn, None, None, None, None, &mut cmd_tx_ga_1)
         .await
         .unwrap();
 
@@ -409,6 +411,7 @@ async fn main() {
             nominet_ext: None,
             ttl: None,
         },
+        None,
         &mut cmd_tx_ga_1,
     )
     .await
@@ -416,13 +419,13 @@ async fn main() {
 
     // 2.3.4 - Perform a check and verify that the Japanese IDN domain label is no longer available
     info!("Checking IDN domain was registered");
-    epp_proxy::client::domain::check(&ga_domain_idn, None, None, None, &mut cmd_tx_ga_1)
+    epp_proxy::client::domain::check(&ga_domain_idn, None, None, None, None, &mut cmd_tx_ga_1)
         .await
         .unwrap();
 
     // 2.4.2 - Perform a check to see that domain name “test‑and‑validate.<registrar name>‑ga” is available
     info!("Finding available claims domain");
-    epp_proxy::client::domain::check(&ga_domain_claims, None, None, None, &mut cmd_tx_ga_1)
+    epp_proxy::client::domain::check(&ga_domain_claims, None, None, None, None, &mut cmd_tx_ga_1)
         .await
         .unwrap();
 
@@ -436,6 +439,7 @@ async fn main() {
                 phase_name: None,
             },
         },
+        None,
         &mut cmd_tx_ga_1,
     )
     .await
@@ -524,6 +528,7 @@ async fn main() {
             nominet_ext: None,
             ttl: None,
         },
+        None,
         &mut cmd_tx_ga_1,
     )
     .await
@@ -531,7 +536,7 @@ async fn main() {
 
     // 2.4.6 - Perform a check and verify that the domain name “test‑and‑validate.<registrar name>‑ga” is no longer available
     info!("Checking claims domain was registered");
-    epp_proxy::client::domain::check(&ga_domain_claims, None, None, None, &mut cmd_tx_ga_1)
+    epp_proxy::client::domain::check(&ga_domain_claims, None, None, None, None, &mut cmd_tx_ga_1)
         .await
         .unwrap();
 
@@ -551,6 +556,7 @@ async fn main() {
                 sub_phase: None,
             }],
         }),
+        None,
         None,
         None,
         &mut cmd_tx_ga_1,
@@ -621,6 +627,7 @@ async fn main() {
             nominet_ext: None,
             ttl: None,
         },
+        None,
         &mut cmd_tx_ga_1,
     )
     .await
@@ -628,7 +635,7 @@ async fn main() {
 
     // 2.5.4 - Perform a check and verify that the domain name “rich.<registrar name>‑ga” is no longer available.
     info!("Checking premium domain was registered");
-    epp_proxy::client::domain::check(&ga_domain_premium, None, None, None, &mut cmd_tx_ga_1)
+    epp_proxy::client::domain::check(&ga_domain_premium, None, None, None, None, &mut cmd_tx_ga_1)
         .await
         .unwrap();
 
@@ -649,6 +656,7 @@ async fn main() {
         ],
         None,
         None,
+        None,
         &mut cmd_tx_ga_1,
     )
     .await
@@ -665,6 +673,7 @@ async fn main() {
                 ip_version: epp_proxy::client::host::AddressVersion::IPv6,
             },
         ],
+        None,
         None,
         None,
         &mut cmd_tx_ga_1,
@@ -698,6 +707,7 @@ async fn main() {
             nominet_ext: None,
             ttl: None,
         },
+        None,
         &mut cmd_tx_ga_1,
     )
     .await
@@ -729,6 +739,7 @@ async fn main() {
             nominet_ext: None,
             ttl: None,
         },
+        None,
         &mut cmd_tx_ga_1,
     )
     .await
@@ -761,6 +772,7 @@ async fn main() {
         None,
         None,
         None,
+        None,
         &mut cmd_tx_ga_1,
     )
     .await
@@ -790,6 +802,7 @@ async fn main() {
         None,
         None,
         None,
+        None,
         &mut cmd_tx_ga_1,
     )
     .await
@@ -797,17 +810,17 @@ async fn main() {
 
     // 2.7.4 - Delete the subordinate host objects
     info!("Deleting host objects");
-    epp_proxy::client::host::delete(&ga_domain_ns1, &mut cmd_tx_ga_1)
+    epp_proxy::client::host::delete(&ga_domain_ns1, None, &mut cmd_tx_ga_1)
         .await
         .unwrap();
-    epp_proxy::client::host::delete(&ga_domain_ns2, &mut cmd_tx_ga_1)
+    epp_proxy::client::host::delete(&ga_domain_ns2, None, &mut cmd_tx_ga_1)
         .await
         .unwrap();
 
     info!("Waiting for host pending delete to expire");
     loop {
         tokio::time::sleep(std::time::Duration::from_secs(60)).await;
-        let res = epp_proxy::client::host::check(&ga_domain_ns1, &mut cmd_tx_ga_1)
+        let res = epp_proxy::client::host::check(&ga_domain_ns1, None, &mut cmd_tx_ga_1)
             .await
             .unwrap();
         if res.response.avail {
@@ -815,7 +828,7 @@ async fn main() {
         }
     }
     loop {
-        let res = epp_proxy::client::host::check(&ga_domain_ns2, &mut cmd_tx_ga_1)
+        let res = epp_proxy::client::host::check(&ga_domain_ns2, None, &mut cmd_tx_ga_1)
             .await
             .unwrap();
         if res.response.avail {
@@ -869,6 +882,7 @@ async fn main() {
             nominet_ext: None,
             ttl: None,
         },
+        None,
         &mut cmd_tx_ga_1,
     )
     .await
@@ -876,19 +890,19 @@ async fn main() {
 
     // 2.9.2 - Query the info of the domain created in Step 2.2 and verify that it is still in the add grace period
     info!("Checking domain in AGP");
-    epp_proxy::client::domain::info(&ga_domain, None, None, None, None, &mut cmd_tx_ga_1)
+    epp_proxy::client::domain::info(&ga_domain, None, None, None, None, None, &mut cmd_tx_ga_1)
         .await
         .unwrap();
 
     // 2.9.3 - Delete domain created in Step 2.2
     info!("Deleting domain");
-    epp_proxy::client::domain::delete(&ga_domain, None, None, None, None, &mut cmd_tx_ga_1)
+    epp_proxy::client::domain::delete(&ga_domain, None, None, None, None, None, &mut cmd_tx_ga_1)
         .await
         .unwrap();
 
     // 2.9.4 - Perform a check and verify that the domain label is now available
     info!("Checking domain now available");
-    epp_proxy::client::domain::check(&ga_domain, None, None, None, &mut cmd_tx_ga_1)
+    epp_proxy::client::domain::check(&ga_domain, None, None, None, None, &mut cmd_tx_ga_1)
         .await
         .unwrap();
 
@@ -898,6 +912,7 @@ async fn main() {
         tokio::time::sleep(std::time::Duration::from_secs(60)).await;
         let res = epp_proxy::client::domain::info(
             &ga_domain_idn,
+            None,
             None,
             None,
             None,
@@ -917,44 +932,44 @@ async fn main() {
 
     // 2.10.3 - Query the info of the domain created in Step 2.3 and verify that it is not in the add grace period
     info!("Checking IDN domain not in AGP");
-    epp_proxy::client::domain::info(&ga_domain_idn, None, None, None, None, &mut cmd_tx_ga_1)
+    epp_proxy::client::domain::info(&ga_domain_idn, None, None, None, None, None, &mut cmd_tx_ga_1)
         .await
         .unwrap();
 
     // 2.10.4 - Delete domain created in Step 2.3
     info!("Deleting IDN domain");
-    epp_proxy::client::domain::delete(&ga_domain_idn, None, None, None, None, &mut cmd_tx_ga_1)
+    epp_proxy::client::domain::delete(&ga_domain_idn, None, None, None, None, None, &mut cmd_tx_ga_1)
         .await
         .unwrap();
 
     // 2.10.5 - Perform a check and verify that the domain label is still not available
     info!("Checking domain still not available");
-    epp_proxy::client::domain::check(&ga_domain_idn, None, None, None, &mut cmd_tx_ga_1)
+    epp_proxy::client::domain::check(&ga_domain_idn, None, None, None, None, &mut cmd_tx_ga_1)
         .await
         .unwrap();
 
     // 2.11.2 - Query the info of the domain used in Step 2.10 and verify that it has pending delete
     // status and is in the redemption grace period
     info!("Checking IDN domain in RGP");
-    epp_proxy::client::domain::info(&ga_domain_idn, None, None, None, None, &mut cmd_tx_ga_1)
+    epp_proxy::client::domain::info(&ga_domain_idn, None, None, None, None, None, &mut cmd_tx_ga_1)
         .await
         .unwrap();
 
     // 2.11.3 - Restore the domain. Note that no restore report is required
     info!("Restoring IDN domain");
-    epp_proxy::client::rgp::request(&ga_domain_idn, None, &mut cmd_tx_ga_1)
+    epp_proxy::client::rgp::request(&ga_domain_idn, None, None, &mut cmd_tx_ga_1)
         .await
         .unwrap();
 
     // 2.11.4 - Query the info of the domain again verify that it no longer has pending delete status
     info!("Checking IDN domain no longer in RGP");
-    epp_proxy::client::domain::info(&ga_domain_idn, None, None, None, None, &mut cmd_tx_ga_1)
+    epp_proxy::client::domain::info(&ga_domain_idn, None, None, None, None, None, &mut cmd_tx_ga_1)
         .await
         .unwrap();
 
     // 2.12.2 - Delete the domain used in Step 2.11
     info!("Deleting IDN domain");
-    epp_proxy::client::domain::delete(&ga_domain_idn, None, None, None, None, &mut cmd_tx_ga_1)
+    epp_proxy::client::domain::delete(&ga_domain_idn, None, None, None, None, None, &mut cmd_tx_ga_1)
         .await
         .unwrap();
 
@@ -963,7 +978,7 @@ async fn main() {
     loop {
         tokio::time::sleep(std::time::Duration::from_secs(60)).await;
         let res =
-            epp_proxy::client::domain::check(&ga_domain_idn, None, None, None, &mut cmd_tx_ga_1)
+            epp_proxy::client::domain::check(&ga_domain_idn, None, None, None, None, &mut cmd_tx_ga_1)
                 .await
                 .unwrap();
         if res.response.avail {
@@ -973,10 +988,10 @@ async fn main() {
 
     // 2.12.4 - Perform a poll command and verify the receipt of a poll message announcing the release of the domain
     info!("Polling deletion message");
-    let poll_msg = epp_proxy::client::poll::poll(&mut cmd_tx_ga_1)
+    let poll_msg = epp_proxy::client::poll::poll(None, &mut cmd_tx_ga_1)
         .await
         .unwrap();
-    epp_proxy::client::poll::poll_ack(&poll_msg.response.unwrap().id, &mut cmd_tx_ga_1)
+    epp_proxy::client::poll::poll_ack(&poll_msg.response.unwrap().id, None, &mut cmd_tx_ga_1)
         .await
         .unwrap();
 
@@ -986,7 +1001,7 @@ async fn main() {
     let trans_domain_1 = loop {
         let trans_domain = format!("staclar-{}.{}", trans_domain_i, ga_tld);
         let res =
-            epp_proxy::client::domain::check(&trans_domain, None, None, None, &mut cmd_tx_ga_1)
+            epp_proxy::client::domain::check(&trans_domain, None, None, None, None, &mut cmd_tx_ga_1)
                 .await
                 .unwrap();
         if res.response.avail {
@@ -1032,6 +1047,7 @@ async fn main() {
             nominet_ext: None,
             ttl: None,
         },
+        None,
         &mut cmd_tx_ga_1,
     )
     .await
@@ -1047,6 +1063,7 @@ async fn main() {
         None,
         None,
         None,
+        None,
         &mut cmd_tx_ga_2,
     )
     .await
@@ -1057,6 +1074,7 @@ async fn main() {
     epp_proxy::client::domain::transfer_query(
         &trans_domain_1,
         Some("test_auth1"),
+        None,
         &mut cmd_tx_ga_2,
     )
     .await
@@ -1068,7 +1086,7 @@ async fn main() {
     let trans_domain_2 = loop {
         let trans_domain = format!("staclar-{}.{}", trans_domain_i, ga_tld);
         let res =
-            epp_proxy::client::domain::check(&trans_domain, None, None, None, &mut cmd_tx_ga_1)
+            epp_proxy::client::domain::check(&trans_domain, None, None, None, None, &mut cmd_tx_ga_1)
                 .await
                 .unwrap();
         if res.response.avail {
@@ -1114,6 +1132,7 @@ async fn main() {
             nominet_ext: None,
             ttl: None,
         },
+        None,
         &mut cmd_tx_ga_1,
     )
     .await
@@ -1129,6 +1148,7 @@ async fn main() {
         None,
         None,
         None,
+        None,
         &mut cmd_tx_ga_2,
     )
     .await
@@ -1139,6 +1159,7 @@ async fn main() {
     epp_proxy::client::domain::transfer_query(
         &trans_domain_2,
         Some("test_auth1"),
+        None,
         &mut cmd_tx_ga_2,
     )
     .await
@@ -1150,7 +1171,7 @@ async fn main() {
     let trans_domain_3 = loop {
         let trans_domain = format!("staclar-{}.{}", trans_domain_i, ga_tld);
         let res =
-            epp_proxy::client::domain::check(&trans_domain, None, None, None, &mut cmd_tx_ga_1)
+            epp_proxy::client::domain::check(&trans_domain, None, None, None, None, &mut cmd_tx_ga_1)
                 .await
                 .unwrap();
         if res.response.avail {
@@ -1196,6 +1217,7 @@ async fn main() {
             nominet_ext: None,
             ttl: None,
         },
+        None,
         &mut cmd_tx_ga_1,
     )
     .await
@@ -1211,6 +1233,7 @@ async fn main() {
         None,
         None,
         None,
+        None,
         &mut cmd_tx_ga_2,
     )
     .await
@@ -1221,6 +1244,7 @@ async fn main() {
     epp_proxy::client::domain::transfer_query(
         &trans_domain_3,
         Some("test_auth1"),
+        None,
         &mut cmd_tx_ga_2,
     )
     .await
@@ -1229,7 +1253,7 @@ async fn main() {
     // 2.16.1 - Using account <registrar name>‑3 approve a pending transfer away from this registrar
     // on the domain created in Step 2.13
     info!("Accepting transfer");
-    epp_proxy::client::domain::transfer_accept(&trans_domain_1, None, &mut cmd_tx_ga_1)
+    epp_proxy::client::domain::transfer_accept(&trans_domain_1, None, None, &mut cmd_tx_ga_1)
         .await
         .unwrap();
 
@@ -1238,6 +1262,7 @@ async fn main() {
     epp_proxy::client::domain::transfer_query(
         &trans_domain_1,
         Some("test_auth1"),
+        None,
         &mut cmd_tx_ga_1,
     )
     .await
@@ -1246,22 +1271,22 @@ async fn main() {
     // 2.16.2 - Using account <registrar name>‑4 perform a poll command and verify the receipt of a
     // poll message announcing the approval of the transfer of the domain
     info!("Polling transfer message");
-    let poll_msg = epp_proxy::client::poll::poll(&mut cmd_tx_ga_2)
+    let poll_msg = epp_proxy::client::poll::poll(None, &mut cmd_tx_ga_2)
         .await
         .unwrap();
-    epp_proxy::client::poll::poll_ack(&poll_msg.response.unwrap().id, &mut cmd_tx_ga_2)
+    epp_proxy::client::poll::poll_ack(&poll_msg.response.unwrap().id, None, &mut cmd_tx_ga_2)
         .await
         .unwrap();
 
     // 2.16.2.b - Do an info on the domain and verify its sponsoring client is now set to <registrar name>‑4
     info!("Checking domain sponsorship changed");
-    epp_proxy::client::domain::info(&trans_domain_1, None, None, None, None, &mut cmd_tx_ga_2)
+    epp_proxy::client::domain::info(&trans_domain_1, None, None, None, None, None, &mut cmd_tx_ga_2)
         .await
         .unwrap();
 
     // 2.17.1 - Using account <registrar name>‑3 deny a pending transfer away from this registrar on the domain created in Step 2.14
     info!("Denying transfer");
-    epp_proxy::client::domain::transfer_reject(&trans_domain_2, None, &mut cmd_tx_ga_1)
+    epp_proxy::client::domain::transfer_reject(&trans_domain_2, None, None, &mut cmd_tx_ga_1)
         .await
         .unwrap();
 
@@ -1270,6 +1295,7 @@ async fn main() {
     epp_proxy::client::domain::transfer_query(
         &trans_domain_2,
         Some("test_auth1"),
+        None,
         &mut cmd_tx_ga_1,
     )
     .await
@@ -1278,10 +1304,10 @@ async fn main() {
     // 2.17.2 - Using account <registrar name>‑4 perform a poll command and verify the receipt of a
     // poll message announcing the denial of the transfer of the domain
     info!("Polling transfer message");
-    let poll_msg = epp_proxy::client::poll::poll(&mut cmd_tx_ga_2)
+    let poll_msg = epp_proxy::client::poll::poll(None, &mut cmd_tx_ga_2)
         .await
         .unwrap();
-    epp_proxy::client::poll::poll_ack(&poll_msg.response.unwrap().id, &mut cmd_tx_ga_2)
+    epp_proxy::client::poll::poll_ack(&poll_msg.response.unwrap().id, None, &mut cmd_tx_ga_2)
         .await
         .unwrap();
 
@@ -1293,6 +1319,7 @@ async fn main() {
         None,
         None,
         None,
+        None,
         &mut cmd_tx_ga_2,
     )
     .await
@@ -1300,7 +1327,7 @@ async fn main() {
 
     // 2.18.1 - Using account <registrar name>‑4 cancel the pending transfer on the domain created in Step 2.15
     info!("Canceling transfer");
-    epp_proxy::client::domain::transfer_cancel(&trans_domain_3, None, &mut cmd_tx_ga_2)
+    epp_proxy::client::domain::transfer_cancel(&trans_domain_3, None, None, &mut cmd_tx_ga_2)
         .await
         .unwrap();
 
@@ -1309,6 +1336,7 @@ async fn main() {
     epp_proxy::client::domain::transfer_query(
         &trans_domain_3,
         Some("test_auth1"),
+        None,
         &mut cmd_tx_ga_1,
     )
     .await
@@ -1317,16 +1345,16 @@ async fn main() {
     // 2.18.2 - Using account <registrar name>‑3 perform a poll command and verify the receipt of a
     // poll message announcing the cancellation of the transfer of the domain
     info!("Polling transfer message");
-    let poll_msg = epp_proxy::client::poll::poll(&mut cmd_tx_ga_1)
+    let poll_msg = epp_proxy::client::poll::poll(None, &mut cmd_tx_ga_1)
         .await
         .unwrap();
-    epp_proxy::client::poll::poll_ack(&poll_msg.response.unwrap().id, &mut cmd_tx_ga_1)
+    epp_proxy::client::poll::poll_ack(&poll_msg.response.unwrap().id, None, &mut cmd_tx_ga_1)
         .await
         .unwrap();
 
     info!("Logging out of GA accounts");
-    let final_cmd_ga_1 = epp_proxy::client::logout(cmd_tx_ga_1).await.unwrap();
-    let final_cmd_ga_2 = epp_proxy::client::logout(cmd_tx_ga_2).await.unwrap();
+    let final_cmd_ga_1 = epp_proxy::client::logout(None, cmd_tx_ga_1).await.unwrap();
+    let final_cmd_ga_2 = epp_proxy::client::logout(None, cmd_tx_ga_2).await.unwrap();
 
     println!(
         "Final command transaction: {:#?}",
@@ -1391,13 +1419,14 @@ async fn main() {
             nominet_ext: None,
             ttl: None,
         },
+        None,
         &mut cmd_tx_sunrise,
     )
     .await
     .unwrap();
 
     info!("Logging out of sunrise account");
-    let final_cmd_sunrise = epp_proxy::client::logout(cmd_tx_sunrise).await.unwrap();
+    let final_cmd_sunrise = epp_proxy::client::logout(None, cmd_tx_sunrise).await.unwrap();
     println!(
         "Final command transaction: {:#?}",
         final_cmd_sunrise.transaction_id

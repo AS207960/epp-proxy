@@ -103,6 +103,7 @@ pub enum Description {
 /// # Arguments
 /// * `client_sender` - Reference to the tokio channel into the client
 pub async fn list(
+    client_transaction_id: Option<String>,
     client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<ListResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
@@ -110,7 +111,7 @@ pub async fn list(
         client_sender,
         RequestMessage::MaintenanceList(Box::new(ListRequest {
             return_path: sender,
-        })),
+        }), client_transaction_id),
         receiver,
     )
     .await
@@ -123,6 +124,7 @@ pub async fn list(
 /// * `client_sender` - Reference to the tokio channel into the client
 pub async fn info(
     id: &str,
+    client_transaction_id: Option<String>,
     client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<InfoResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
@@ -131,7 +133,7 @@ pub async fn info(
         RequestMessage::MaintenanceInfo(Box::new(InfoRequest {
             id: id.to_string(),
             return_path: sender,
-        })),
+        }), client_transaction_id),
         receiver,
     )
     .await

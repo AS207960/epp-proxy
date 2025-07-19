@@ -21,7 +21,7 @@ macro_rules! router {
             type Response = super::proto::EPPResponse;
 
             paste! {
-                $(fn [<$n _request>](&mut self, client: &super::ServerFeatures, req: &router::[<$n Request>], _command_id: uuid::Uuid) -> HandleReqReturn<router::[<$n Response>]> {
+                $(fn [<$n _request>](&mut self, client: &super::ServerFeatures, req: &router::[<$n Request>], _command_id: &str) -> HandleReqReturn<router::[<$n Response>]> {
                     $req_handle(client, &req)
                 })*
 
@@ -29,6 +29,11 @@ macro_rules! router {
                     &mut self, return_path: router::Sender<router::[<$n Response>]>,
                     response: Self::Response, metrics: &M
                 ) {
+                    let result_code = response.result_code();
+                    let trans_id = router::CommandTransactionID {
+                        client: response.transaction_id.client_transaction_id.as_deref().unwrap_or_default().to_owned(),
+                        server: response.transaction_id.server_transaction_id.as_deref().unwrap_or_default().to_owned(),
+                    };
                     let _ = if !response.is_success() {
                         let text = if response.is_server_error() {
                             format!("Server error: {}", response.response_msg())
@@ -37,20 +42,18 @@ macro_rules! router {
                         };
                         return_path.send(Err(Error::Err {
                             text,
-                            is_server_error: response.is_server_error(),
                             code: response.response_code().to_string(),
                             message: response.message().to_string(),
+                            transaction_id: Some(trans_id),
+                            result_code: result_code,
                         }))
                     } else {
-                        let trans_id = router::CommandTransactionID {
-                            client: response.transaction_id.client_transaction_id.as_deref().unwrap_or_default().to_owned(),
-                            server: response.transaction_id.server_transaction_id.as_deref().unwrap_or_default().to_owned(),
-                        };
                         match $res_handle(response, metrics) {
                             Ok(r) => return_path.send(Ok(router::CommandResponse {
                                 response: r,
                                 extra_values: vec![],
-                                 transaction_id: Some(trans_id)
+                                transaction_id: Some(trans_id),
+                                result_code,
                             })),
                             Err(e) => return_path.send(Err(e))
                         }

@@ -11,6 +11,9 @@ pub mod client;
 pub mod grpc;
 pub mod metrics;
 pub mod proto;
+pub mod rpp;
+pub mod cmd_common;
+pub mod auth;
 
 #[allow(missing_docs)]
 pub mod built_info {

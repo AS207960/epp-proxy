@@ -97,7 +97,7 @@ async fn main() {
     info!("Changing password");
 
     info!("Logging out of account");
-    let final_cmd = epp_proxy::client::logout(cmd_tx).await.unwrap();
+    let final_cmd = epp_proxy::client::logout(None, cmd_tx).await.unwrap();
     println!("Final command transaction: {:#?}", final_cmd.transaction_id);
 
     conf.new_password = Some("bar-FOO2#123".to_string());
@@ -118,7 +118,7 @@ async fn main() {
 
     // 2.3.1.1 Check Contact OTE-C1 (Contact Available)
     info!("Checking contact available");
-    epp_proxy::client::contact::check("OTE-C1", &mut cmd_tx)
+    epp_proxy::client::contact::check("OTE-C1", None, &mut cmd_tx)
         .await
         .unwrap();
 
@@ -158,6 +158,7 @@ async fn main() {
             qualified_lawyer: None,
             keysys: None,
         },
+        None,
         &mut cmd_tx,
     )
     .await
@@ -165,19 +166,19 @@ async fn main() {
 
     // 2.3.1.3 Check Contact (Contact Not Available)
     info!("Checking contact not available");
-    epp_proxy::client::contact::check("OTE-C1", &mut cmd_tx)
+    epp_proxy::client::contact::check("OTE-C1", None, &mut cmd_tx)
         .await
         .unwrap();
 
     // 2.3.1.4 Query Contact OTE-C1
     info!("Getting contact info");
-    epp_proxy::client::contact::info("OTE-C1", &mut cmd_tx)
+    epp_proxy::client::contact::info("OTE-C1", None, &mut cmd_tx)
         .await
         .unwrap();
 
     // 2.3.1.5 Check Contact OTE-C2 (Contact Available)
     info!("Checking contact available");
-    epp_proxy::client::contact::check("OTE-C2", &mut cmd_tx)
+    epp_proxy::client::contact::check("OTE-C2", None, &mut cmd_tx)
         .await
         .unwrap();
 
@@ -217,6 +218,7 @@ async fn main() {
             qualified_lawyer: None,
             keysys: None,
         },
+        None,
         &mut cmd_tx,
     )
     .await
@@ -224,7 +226,7 @@ async fn main() {
 
     // 2.3.1.7 Check Contact OTE-C3 (Contact Available)
     info!("Checking contact available");
-    epp_proxy::client::contact::check("OTE-C3", &mut cmd_tx)
+    epp_proxy::client::contact::check("OTE-C3", None, &mut cmd_tx)
         .await
         .unwrap();
 
@@ -264,6 +266,7 @@ async fn main() {
             qualified_lawyer: None,
             keysys: None,
         },
+        None,
         &mut cmd_tx,
     )
     .await
@@ -271,7 +274,7 @@ async fn main() {
 
     // 2.3.1.9 Check Contact OTE-C4 (Contact Available)
     info!("Checking contact available");
-    epp_proxy::client::contact::check("OTE-C4", &mut cmd_tx)
+    epp_proxy::client::contact::check("OTE-C4", None, &mut cmd_tx)
         .await
         .unwrap();
 
@@ -311,6 +314,7 @@ async fn main() {
             qualified_lawyer: None,
             keysys: None,
         },
+        None,
         &mut cmd_tx,
     )
     .await
@@ -336,6 +340,7 @@ async fn main() {
             }),
             ..Default::default()
         },
+        None,
         &mut cmd_tx,
     )
     .await
@@ -354,6 +359,7 @@ async fn main() {
             }),
             ..Default::default()
         },
+        None,
         &mut cmd_tx,
     )
     .await
@@ -372,6 +378,7 @@ async fn main() {
             }),
             ..Default::default()
         },
+        None,
         &mut cmd_tx,
     )
     .await
@@ -379,31 +386,31 @@ async fn main() {
 
     // 2.3.1.14 Check Name Server (Foreign Registry - Available)
     info!("Checking nameserver");
-    epp_proxy::client::host::check("ns1.example.com", &mut cmd_tx)
+    epp_proxy::client::host::check("ns1.example.com", None, &mut cmd_tx)
         .await
         .unwrap();
 
     // 2.3.1.15 Create Name Server (Foreign Registry)
     info!("Creating nameserver");
-    epp_proxy::client::host::create("ns1.example.com", vec![], None, None, &mut cmd_tx)
+    epp_proxy::client::host::create("ns1.example.com", vec![], None, None, None, &mut cmd_tx)
         .await
         .unwrap();
 
     // 2.3.1.16 Check Name Server (Foreign Registry - Available)
     info!("Checking nameserver");
-    epp_proxy::client::host::check("ns2.example.com", &mut cmd_tx)
+    epp_proxy::client::host::check("ns2.example.com", None, &mut cmd_tx)
         .await
         .unwrap();
 
     // 2.3.1.17 Create Name Server (Foreign Registry)
     info!("Creating nameserver");
-    epp_proxy::client::host::create("ns2.example.com", vec![], None, None, &mut cmd_tx)
+    epp_proxy::client::host::create("ns2.example.com", vec![], None, None, None, &mut cmd_tx)
         .await
         .unwrap();
 
     // 2.3.1.18 Check Domain (Domain Available for Registration)
     info!("Checking domain");
-    epp_proxy::client::domain::check("example.org", None, None, None, &mut cmd_tx)
+    epp_proxy::client::domain::check("example.org", None, None, None, None, &mut cmd_tx)
         .await
         .unwrap();
 
@@ -447,6 +454,7 @@ async fn main() {
             nominet_ext: None,
             ttl: None,
         },
+        None,
         &mut cmd_tx,
     )
     .await
@@ -454,19 +462,19 @@ async fn main() {
 
     // 2.3.1.20 Check Domain (Domain Not Available for Registration)
     info!("Checking domain not available");
-    epp_proxy::client::domain::check("example.org", None, None, None, &mut cmd_tx)
+    epp_proxy::client::domain::check("example.org", None, None, None, None, &mut cmd_tx)
         .await
         .unwrap();
 
     // 2.3.1.21 Query Domain
     info!("Querying domain");
-    epp_proxy::client::domain::info("example.org", None, None, None, None, &mut cmd_tx)
+    epp_proxy::client::domain::info("example.org", None, None, None, None, None, &mut cmd_tx)
         .await
         .unwrap();
 
     // 2.3.1.22 Check Name Server (Available)
     info!("Checking nameserver");
-    epp_proxy::client::host::check("ns1.example.org", &mut cmd_tx)
+    epp_proxy::client::host::check("ns1.example.org", None, &mut cmd_tx)
         .await
         .unwrap();
 
@@ -480,6 +488,7 @@ async fn main() {
         }],
         None,
         None,
+        None,
         &mut cmd_tx,
     )
     .await
@@ -487,19 +496,19 @@ async fn main() {
 
     // 2.3.1.24 Check Name Server (Unavailable)
     info!("Checking nameserver unavailable");
-    epp_proxy::client::host::check("ns1.example.org", &mut cmd_tx)
+    epp_proxy::client::host::check("ns1.example.org", None, &mut cmd_tx)
         .await
         .unwrap();
 
     // 2.3.1.25 Query Name Server
     info!("Querying nameserver");
-    epp_proxy::client::host::info("ns1.example.org", &mut cmd_tx)
+    epp_proxy::client::host::info("ns1.example.org", None, &mut cmd_tx)
         .await
         .unwrap();
 
     // 2.3.1.26 Check Name Server (Available)
     info!("Checking nameserver");
-    epp_proxy::client::host::check("ns2.example.org", &mut cmd_tx)
+    epp_proxy::client::host::check("ns2.example.org", None, &mut cmd_tx)
         .await
         .unwrap();
 
@@ -511,6 +520,7 @@ async fn main() {
             address: "203.171.1.94".to_string(),
             ip_version: epp_proxy::client::host::AddressVersion::IPv4,
         }],
+        None,
         None,
         None,
         &mut cmd_tx,
@@ -529,6 +539,7 @@ async fn main() {
             },
         )],
         vec![],
+        None,
         None,
         None,
         None,
@@ -551,6 +562,7 @@ async fn main() {
         None,
         None,
         None,
+        None,
         &mut cmd_tx,
     )
     .await
@@ -558,7 +570,7 @@ async fn main() {
 
     // 2.3.1.30 Check Domain (Domain Available for Registration)
     info!("Checking domain");
-    epp_proxy::client::domain::check("domain.org", None, None, None, &mut cmd_tx)
+    epp_proxy::client::domain::check("domain.org", None, None, None, None, &mut cmd_tx)
         .await
         .unwrap();
 
@@ -602,6 +614,7 @@ async fn main() {
             nominet_ext: None,
             ttl: None,
         },
+        None,
         &mut cmd_tx,
     )
     .await
@@ -610,7 +623,7 @@ async fn main() {
     // 2.3.1.32 Query Domain
     info!("Querying domain");
     let domain_info =
-        epp_proxy::client::domain::info("domain.org", None, None, None, None, &mut cmd_tx)
+        epp_proxy::client::domain::info("domain.org", None, None, None, None, None, &mut cmd_tx)
             .await
             .unwrap();
 
@@ -623,6 +636,7 @@ async fn main() {
             value: 3,
         }),
         domain_info.response.expiry_date.unwrap(),
+        None,
         None,
         None,
         None,
@@ -663,6 +677,7 @@ async fn main() {
             ],
             ..Default::default()
         },
+        None,
         &mut cmd_tx,
     )
     .await
@@ -687,6 +702,7 @@ async fn main() {
             )],
             ..Default::default()
         },
+        None,
         &mut cmd_tx,
     )
     .await
@@ -700,6 +716,7 @@ async fn main() {
             new_auth_info: Some("new_secret1"),
             ..Default::default()
         },
+        None,
         &mut cmd_tx,
     )
     .await
@@ -715,6 +732,7 @@ async fn main() {
             )],
             ..Default::default()
         },
+        None,
         &mut cmd_tx,
     )
     .await
@@ -722,25 +740,25 @@ async fn main() {
 
     // 2.3.2.1 Contact Transfer Request
     info!("Requesting contact transfer");
-    epp_proxy::client::contact::transfer_request("OTE-C5", "my_secret1", &mut cmd_tx)
+    epp_proxy::client::contact::transfer_request("OTE-C5", "my_secret1", None, &mut cmd_tx)
         .await
         .unwrap();
 
     // 2.3.2.2 Query Contact Transfer
     info!("Querying contact transfer");
-    epp_proxy::client::contact::transfer_query("OTE-C5", &mut cmd_tx)
+    epp_proxy::client::contact::transfer_query("OTE-C5", None, &mut cmd_tx)
         .await
         .unwrap();
 
     // 2.3.2.3 Approve Contact Transfer
     info!("Approving contact transfer");
-    epp_proxy::client::contact::transfer_accept("OTE-C6", "my_secret1", &mut cmd_tx)
+    epp_proxy::client::contact::transfer_accept("OTE-C6", "my_secret1", None, &mut cmd_tx)
         .await
         .unwrap();
 
     // 2.3.2.4 Reject Contact Transfer
     info!("Rejecting contact transfer");
-    epp_proxy::client::contact::transfer_reject("OTE-C7", "my_secret1", &mut cmd_tx)
+    epp_proxy::client::contact::transfer_reject("OTE-C7", "my_secret1", None, &mut cmd_tx)
         .await
         .unwrap();
 
@@ -754,6 +772,7 @@ async fn main() {
         None,
         None,
         None,
+        None,
         &mut cmd_tx,
     )
     .await
@@ -761,16 +780,16 @@ async fn main() {
 
     // 2.3.2.6 Approve Domain Transfer
     info!("Approving domain transfer");
-    epp_proxy::client::domain::transfer_query("transfer2.org", Some("my_secret1X"), &mut cmd_tx)
+    epp_proxy::client::domain::transfer_query("transfer2.org", Some("my_secret1X"), None, &mut cmd_tx)
         .await
         .unwrap();
-    epp_proxy::client::domain::transfer_accept("transfer2.org", Some("my_secret1X"), &mut cmd_tx)
+    epp_proxy::client::domain::transfer_accept("transfer2.org", Some("my_secret1X"), None, &mut cmd_tx)
         .await
         .unwrap();
 
     // 2.3.2.7 Reject Domain Transfer
     info!("Rejecting domain transfer");
-    epp_proxy::client::domain::transfer_reject("transfer1.org", Some("my_secret1X"), &mut cmd_tx)
+    epp_proxy::client::domain::transfer_reject("transfer1.org", Some("my_secret1X"), None, &mut cmd_tx)
         .await
         .unwrap();
 
@@ -814,6 +833,7 @@ async fn main() {
             nominet_ext: None,
             ttl: None,
         },
+        None,
         &mut cmd_tx
     )
     .await
@@ -859,6 +879,7 @@ async fn main() {
             nominet_ext: None,
             ttl: None,
         },
+        None,
         &mut cmd_tx
     )
     .await
@@ -904,6 +925,7 @@ async fn main() {
             nominet_ext: None,
             ttl: None,
         },
+        None,
         &mut cmd_tx
     )
     .await
@@ -918,6 +940,7 @@ async fn main() {
             value: 1
         }),
         Utc.with_ymd_and_hms(2011, 6, 21, 0, 0, 0).unwrap(),
+        None,
         None,
         None,
         None,
@@ -967,6 +990,7 @@ async fn main() {
             nominet_ext: None,
             ttl: None,
         },
+        None,
         &mut cmd_tx
     )
     .await
@@ -974,7 +998,7 @@ async fn main() {
 
     // 2.3.3.6 Correctly Handle 2305 Exception
     info!("Causing 2305 error");
-    assert!(epp_proxy::client::contact::delete("OTE-C2", &mut cmd_tx)
+    assert!(epp_proxy::client::contact::delete("OTE-C2", None, &mut cmd_tx)
         .await
         .is_err());
 
@@ -986,6 +1010,7 @@ async fn main() {
         None,
         None,
         None,
+        None,
         &mut cmd_tx
     )
     .await
@@ -993,7 +1018,7 @@ async fn main() {
 
     // 2.4.1.1 Check Domain (Domain Available for Registration)
     info!("Checking DNSSEC domain");
-    epp_proxy::client::domain::check("dsdomain1.org", None, None, None, &mut cmd_tx)
+    epp_proxy::client::domain::check("dsdomain1.org", None, None, None, None, &mut cmd_tx)
         .await
         .unwrap();
 
@@ -1048,6 +1073,7 @@ async fn main() {
             nominet_ext: None,
             ttl: None,
         },
+        None,
         &mut cmd_tx,
     )
     .await
@@ -1111,6 +1137,7 @@ async fn main() {
             nominet_ext: None,
             ttl: None,
         },
+        None,
         &mut cmd_tx,
     )
     .await
@@ -1118,7 +1145,7 @@ async fn main() {
 
     // 2.4.1.4 Query domain that has DS Data
     info!("Querying DNSSEC domain");
-    epp_proxy::client::domain::info("dsdomain1.org", None, None, None, None, &mut cmd_tx)
+    epp_proxy::client::domain::info("dsdomain1.org", None, None, None, None, None, &mut cmd_tx)
         .await
         .unwrap();
 
@@ -1143,6 +1170,7 @@ async fn main() {
             }),
             ..Default::default()
         },
+        None,
         &mut cmd_tx,
     )
     .await
@@ -1179,6 +1207,7 @@ async fn main() {
             }),
             ..Default::default()
         },
+        None,
         &mut cmd_tx,
     )
     .await
@@ -1227,6 +1256,7 @@ async fn main() {
             }),
             ..Default::default()
         },
+        None,
         &mut cmd_tx,
     )
     .await
@@ -1262,6 +1292,7 @@ async fn main() {
             }),
             ..Default::default()
         },
+        None,
         &mut cmd_tx,
     )
     .await
@@ -1290,6 +1321,7 @@ async fn main() {
             }),
             ..Default::default()
         },
+        None,
         &mut cmd_tx,
     )
     .await
@@ -1342,6 +1374,7 @@ async fn main() {
             }),
             ..Default::default()
         },
+        None,
         &mut cmd_tx,
     )
     .await
@@ -1360,6 +1393,7 @@ async fn main() {
             }),
             ..Default::default()
         },
+        None,
         &mut cmd_tx,
     )
     .await
@@ -1387,6 +1421,7 @@ async fn main() {
             }),
             ..Default::default()
         },
+        None,
         &mut cmd_tx,
     )
     .await
@@ -1415,6 +1450,7 @@ async fn main() {
             }),
             ..Default::default()
         },
+        None,
         &mut cmd_tx
     )
     .await
@@ -1442,6 +1478,7 @@ async fn main() {
             }),
             ..Default::default()
         },
+        None,
         &mut cmd_tx
     )
     .await
@@ -1449,61 +1486,61 @@ async fn main() {
 
     // 2.4.3.1 Delete a Domain (dsdomain1.org)
     info!("Deleting DNSSEC domain");
-    epp_proxy::client::domain::delete("dsdomain1.org", None, None, None, None, &mut cmd_tx)
+    epp_proxy::client::domain::delete("dsdomain1.org", None, None, None, None, None, &mut cmd_tx)
         .await
         .unwrap();
 
     // 2.4.3.2 Delete a Domain (dsdomain2.org)
     info!("Deleting DNSSEC domain");
-    epp_proxy::client::domain::delete("dsdomain2.org", None, None, None, None, &mut cmd_tx)
+    epp_proxy::client::domain::delete("dsdomain2.org", None, None, None, None, None, &mut cmd_tx)
         .await
         .unwrap();
 
     // 2.6.1 Delete Domain (example.org)
     info!("Deleting domain");
-    epp_proxy::client::domain::delete("example.org", None, None, None, None, &mut cmd_tx)
+    epp_proxy::client::domain::delete("example.org", None, None, None, None, None, &mut cmd_tx)
         .await
         .unwrap();
 
     // 2.6.2 Delete Domain (domain.org)
     info!("Deleting domain");
-    epp_proxy::client::domain::delete("domain.org", None, None, None, None, &mut cmd_tx)
+    epp_proxy::client::domain::delete("domain.org", None, None, None, None, None, &mut cmd_tx)
         .await
         .unwrap();
 
     // 2.6.3 Delete Contact (OTE-C1)
     info!("Deleting contact");
-    epp_proxy::client::contact::delete("OTE-C1", &mut cmd_tx)
+    epp_proxy::client::contact::delete("OTE-C1", None, &mut cmd_tx)
         .await
         .unwrap();
 
     // 2.6.4 Delete Contact (OTE-C2)
     info!("Deleting contact");
-    epp_proxy::client::contact::delete("OTE-C2", &mut cmd_tx)
+    epp_proxy::client::contact::delete("OTE-C2", None, &mut cmd_tx)
         .await
         .unwrap();
 
     // 2.6.5 Delete Contact (OTE-C3)
     info!("Deleting contact");
-    epp_proxy::client::contact::delete("OTE-C3", &mut cmd_tx)
+    epp_proxy::client::contact::delete("OTE-C3", None, &mut cmd_tx)
         .await
         .unwrap();
 
     // 2.6.6 Delete Contact (OTE-C4)
     info!("Deleting contact");
-    epp_proxy::client::contact::delete("OTE-C4", &mut cmd_tx)
+    epp_proxy::client::contact::delete("OTE-C4", None, &mut cmd_tx)
         .await
         .unwrap();
 
     // 2.6.7 Delete Name Server (ns1.example.com)
     info!("Deleting host");
-    epp_proxy::client::host::delete("ns1.example.com", &mut cmd_tx)
+    epp_proxy::client::host::delete("ns1.example.com", None, &mut cmd_tx)
         .await
         .unwrap();
 
     // 2.6.8 Delete Name Server (ns2.example.com)
     info!("Deleting host");
-    epp_proxy::client::host::delete("ns2.example.com", &mut cmd_tx)
+    epp_proxy::client::host::delete("ns2.example.com", None, &mut cmd_tx)
         .await
         .unwrap();
 
@@ -1513,16 +1550,16 @@ async fn main() {
 
     // 2.7.2 Request Message Queue Information
     info!("Requesting first message from queue");
-    let poll_msg = epp_proxy::client::poll::poll(&mut cmd_tx).await.unwrap();
+    let poll_msg = epp_proxy::client::poll::poll(None, &mut cmd_tx).await.unwrap();
 
     // 2.7.3 Ack Queued Message
     info!("Acking message");
-    epp_proxy::client::poll::poll_ack(&poll_msg.response.unwrap().id, &mut cmd_tx)
+    epp_proxy::client::poll::poll_ack(&poll_msg.response.unwrap().id, None, &mut cmd_tx)
         .await
         .unwrap();
 
     // 2.8 End Session
     info!("Logging out");
-    let final_cmd = epp_proxy::client::logout(cmd_tx).await.unwrap();
+    let final_cmd = epp_proxy::client::logout(None, cmd_tx).await.unwrap();
     println!("Final command transaction: {:#?}", final_cmd.transaction_id);
 }

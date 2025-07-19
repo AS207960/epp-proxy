@@ -65,6 +65,7 @@ pub struct RestoreReportResponse {
 pub async fn request(
     domain: &str,
     donuts_fee_agreement: Option<fee::DonutsFeeData>,
+    client_transaction_id: Option<String>,
     client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<RestoreResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
@@ -74,7 +75,7 @@ pub async fn request(
             name: domain.to_string(),
             donuts_fee_agreement,
             return_path: sender,
-        })),
+        }), client_transaction_id),
         receiver,
     )
     .await
@@ -99,6 +100,7 @@ pub struct RestoreReportInfo<'a> {
 /// * `client_sender` - Reference to the tokio channel into the client
 pub async fn report(
     info: RestoreReportInfo<'_>,
+    client_transaction_id: Option<String>,
     client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<RestoreReportResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
@@ -116,7 +118,7 @@ pub async fn report(
             other_information: info.other_information.map(|s| s.to_string()),
             donuts_fee_agreement: info.donuts_fee_agreement,
             return_path: sender,
-        })),
+        }), client_transaction_id),
         receiver,
     )
     .await

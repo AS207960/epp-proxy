@@ -30,18 +30,18 @@ macro_rules! router {
     ($($n:ident);*) => {
         #[derive(Default, Debug)]
         pub struct Router {
-            pub(super) command_map: std::collections::HashMap<DACKey, uuid::Uuid>
+            pub(super) command_map: std::collections::HashMap<DACKey, String>
         }
 
         impl<M: crate::metrics::Metrics> router::InnerRouter<(), M> for Router {
             type Request = (super::proto::DACRequest, DACEnv);
             type Response = super::proto::DACResponse;
 
-            fn Logout_request(&mut self, _client: &(), _req: &router::LogoutRequest, command_id: uuid::Uuid) -> HandleReqReturn<router::LogoutResponse> {
+            fn Logout_request(&mut self, _client: &(), _req: &router::LogoutRequest, command_id: &str) -> HandleReqReturn<router::LogoutResponse> {
                 self.command_map.insert(DACKey {
                     env: DACEnv::Both,
                     cmd: "#exit".to_string(),
-                }, command_id);
+                }, command_id.to_string());
                 Ok((super::proto::DACRequest::Exit, DACEnv::Both))
             }
 
@@ -53,10 +53,11 @@ macro_rules! router {
                     response: (),
                     extra_values: vec![],
                     transaction_id: None,
+                    result_code: crate::proto::EPPResultCode::SuccessEndingSession,
                 }));
             }
 
-            fn DomainCheck_request(&mut self, _client: &(), req: &router::DomainCheckRequest, command_id: uuid::Uuid) -> HandleReqReturn<router::DomainCheckResponse> {
+            fn DomainCheck_request(&mut self, _client: &(), req: &router::DomainCheckRequest, command_id: &str) -> HandleReqReturn<router::DomainCheckResponse> {
                 if req.fee_check.is_some() {
                     return Err(Err(Error::Unsupported));
                 }
@@ -67,7 +68,7 @@ macro_rules! router {
                 self.command_map.insert(DACKey {
                     env: DACEnv::RealTime,
                     cmd: req.name.clone(),
-                }, command_id);
+                }, command_id.to_string());
                 Ok((super::proto::DACRequest::Domain(req.name.clone()), DACEnv::RealTime))
             }
 
@@ -88,6 +89,7 @@ macro_rules! router {
                             },
                             extra_values: vec![],
                             transaction_id: None,
+                            result_code: crate::proto::EPPResultCode::Success,
                         }));
                     },
                     super::proto::DACResponse::DomainTD(d) => {
@@ -112,14 +114,16 @@ macro_rules! router {
                             },
                             extra_values: vec![],
                             transaction_id: None,
+                            result_code: crate::proto::EPPResultCode::Success,
                         }));
                     },
                     super::proto::DACResponse::Aub(b) => {
                         let _ = return_path.send(Err(Error::Err {
                             text: format!("Acceptable usage block, please try again in {} seconds", b.delay),
-                            is_server_error: false,
                             code: "aub".to_string(),
                             message: String::default(),
+                            transaction_id: None,
+                            result_code: crate::proto::EPPResultCode::CommandUseError
                         }));
                     },
                     _ => {
@@ -128,11 +132,11 @@ macro_rules! router {
                 }
             }
 
-            fn DACDomain_request(&mut self, _client: &(), req: &router::DACDomainRequest, command_id: uuid::Uuid) -> HandleReqReturn<router::DACDomainResponse> {
+            fn DACDomain_request(&mut self, _client: &(), req: &router::DACDomainRequest, command_id: &str) -> HandleReqReturn<router::DACDomainResponse> {
                 self.command_map.insert(DACKey {
                     env: req.env.into(),
                     cmd: req.domain.clone()
-                }, command_id);
+                }, command_id.to_string());
                 Ok((super::proto::DACRequest::Domain(req.domain.clone()), req.env.into()))
             }
 
@@ -158,6 +162,7 @@ macro_rules! router {
                             },
                             extra_values: vec![],
                             transaction_id: None,
+                            result_code: crate::proto::EPPResultCode::Success,
                         }));
                     },
                     super::proto::DACResponse::DomainTD(d) => {
@@ -183,14 +188,16 @@ macro_rules! router {
                             },
                             extra_values: vec![],
                             transaction_id: None,
+                            result_code: crate::proto::EPPResultCode::Success,
                         }));
                     },
                     super::proto::DACResponse::Aub(b) => {
                         let _ = return_path.send(Err(Error::Err {
                             text: format!("Acceptable usage block, please try again in {} seconds", b.delay),
-                            is_server_error: false,
                             code: "aub".to_string(),
                             message: String::default(),
+                            transaction_id: None,
+                            result_code: crate::proto::EPPResultCode::CommandUseError
                         }));
                     },
                     _ => {
@@ -199,11 +206,11 @@ macro_rules! router {
                 }
             }
 
-            fn DACUsage_request(&mut self, _client: &(), req: &router::DACUsageRequest, command_id: uuid::Uuid) -> HandleReqReturn<router::DACUsageResponse> {
+            fn DACUsage_request(&mut self, _client: &(), req: &router::DACUsageRequest, command_id: &str) -> HandleReqReturn<router::DACUsageResponse> {
                 self.command_map.insert(DACKey {
                     env: req.env.into(),
                     cmd: "#usage".to_string()
-                }, command_id);
+                }, command_id.to_string());
                 Ok((super::proto::DACRequest::Usage, req.env.into()))
             }
 
@@ -220,14 +227,16 @@ macro_rules! router {
                             },
                             extra_values: vec![],
                             transaction_id: None,
+                            result_code: crate::proto::EPPResultCode::Success,
                         }));
                     },
                     super::proto::DACResponse::Aub(b) => {
                         let _ = return_path.send(Err(Error::Err {
                             text: format!("Acceptable usage block, please try again in {} seconds", b.delay),
-                            is_server_error: false,
                             code: "aub".to_string(),
                             message: String::default(),
+                            transaction_id: None,
+                            result_code: crate::proto::EPPResultCode::CommandUseError
                         }));
                     },
                     _ => {
@@ -236,11 +245,11 @@ macro_rules! router {
                 }
             }
 
-            fn DACLimits_request(&mut self, _client: &(), req: &router::DACLimitsRequest, command_id: uuid::Uuid) -> HandleReqReturn<router::DACLimitsResponse> {
+            fn DACLimits_request(&mut self, _client: &(), req: &router::DACLimitsRequest, command_id: &str) -> HandleReqReturn<router::DACLimitsResponse> {
                 self.command_map.insert(DACKey {
                     env: req.env.into(),
                     cmd: "#limits".to_string()
-                }, command_id);
+                }, command_id.to_string());
                 Ok((super::proto::DACRequest::Limits, req.env.into()))
             }
 
@@ -257,14 +266,16 @@ macro_rules! router {
                             },
                             extra_values: vec![],
                             transaction_id: None,
+                            result_code: crate::proto::EPPResultCode::Success,
                         }));
                     },
                     super::proto::DACResponse::Aub(b) => {
                         let _ = return_path.send(Err(Error::Err {
                             text: format!("Acceptable usage block, please try again in {} seconds", b.delay),
-                            is_server_error: false,
                             code: "aub".to_string(),
                             message: String::default(),
+                            transaction_id: None,
+                            result_code: crate::proto::EPPResultCode::CommandUseError
                         }));
                     },
                     _ => {
@@ -274,7 +285,7 @@ macro_rules! router {
             }
 
             paste! {
-                $(fn [<$n _request>](&mut self, _client: &(), _req: &router::[<$n Request>], _command_id: uuid::Uuid) -> HandleReqReturn<router::[<$n Response>]> {
+                $(fn [<$n _request>](&mut self, _client: &(), _req: &router::[<$n Request>], _command_id: &str) -> HandleReqReturn<router::[<$n Response>]> {
                     Err(Response::Err(Error::Unsupported))
                 })*
 

@@ -210,6 +210,7 @@ pub struct DomainRenewInfo {
 /// # Arguments
 /// * `client_sender` - Reference to the tokio channel into the client
 pub async fn hit_points_info(
+    client_transaction_id: Option<String>,
     client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<HitPointsResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
@@ -217,7 +218,7 @@ pub async fn hit_points_info(
         client_sender,
         RequestMessage::EURIDHitPoints(Box::new(HitPointsRequest {
             return_path: sender,
-        })),
+        }), client_transaction_id),
         receiver,
     )
     .await
@@ -228,6 +229,7 @@ pub async fn hit_points_info(
 /// # Arguments
 /// * `client_sender` - Reference to the tokio channel into the client
 pub async fn registration_limit_info(
+    client_transaction_id: Option<String>,
     client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<RegistrationLimitResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
@@ -235,7 +237,7 @@ pub async fn registration_limit_info(
         client_sender,
         RequestMessage::EURIDRegistrationLimit(Box::new(RegistrationLimitRequest {
             return_path: sender,
-        })),
+        }), client_transaction_id),
         receiver,
     )
     .await
@@ -247,6 +249,7 @@ pub async fn registration_limit_info(
 /// * `client_sender` - Reference to the tokio channel into the client
 pub async fn dnssec_eligibility_info(
     name: &str,
+    client_transaction_id: Option<String>,
     client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<DNSSECEligibilityResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
@@ -255,7 +258,7 @@ pub async fn dnssec_eligibility_info(
         RequestMessage::EURIDDNSSECEligibility(Box::new(DNSSECEligibilityRequest {
             name: name.to_string(),
             return_path: sender,
-        })),
+        }), client_transaction_id),
         receiver,
     )
     .await
@@ -267,6 +270,7 @@ pub async fn dnssec_eligibility_info(
 /// * `client_sender` - Reference to the tokio channel into the client
 pub async fn dns_quality_info(
     name: &str,
+    client_transaction_id: Option<String>,
     client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<DNSQualityResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
@@ -275,7 +279,7 @@ pub async fn dns_quality_info(
         RequestMessage::EURIDDNSQuality(Box::new(DNSQualityRequest {
             name: name.to_string(),
             return_path: sender,
-        })),
+        }), client_transaction_id),
         receiver,
     )
     .await

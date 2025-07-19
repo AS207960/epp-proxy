@@ -27,6 +27,7 @@ pub enum CreditThreshold {
 /// # Arguments
 /// * `client_sender` - Reference to the tokio channel into the client
 pub async fn balance_info(
+    client_transaction_id: Option<String>,
     client_sender: &mut futures::channel::mpsc::Sender<RequestMessage>,
 ) -> Result<CommandResponse<BalanceResponse>, super::Error> {
     let (sender, receiver) = futures::channel::oneshot::channel();
@@ -34,7 +35,7 @@ pub async fn balance_info(
         client_sender,
         RequestMessage::Balance(Box::new(BalanceRequest {
             return_path: sender,
-        })),
+        }), client_transaction_id),
         receiver,
     )
     .await
