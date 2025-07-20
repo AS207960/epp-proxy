@@ -13,7 +13,7 @@ pub struct HostCreate {
 crate::rpp_method!(
     name = host_check,
     method = HEAD,
-    url = "/rpp/v0/<registry_id>/hosts/<host>",
+    url = "/<registry_id>/hosts/<host>",
     return_type = (),
     handler = |mut c, h: HeaderInfo, host| async move {
         let res = client::host::check(host, h.client_transaction_id, &mut c).await?;
@@ -27,7 +27,7 @@ crate::rpp_method!(
 crate::rpp_method!(
     name = host_create,
     method = POST,
-    url = "/rpp/v0/<registry_id>/hosts",
+    url = "/<registry_id>/hosts",
     data_type = HostCreate,
     return_type = (),
     handler = |mut c, h: HeaderInfo, request: HostCreate| async move {
@@ -54,7 +54,7 @@ crate::rpp_method!(
 crate::rpp_method!(
     name = host_delete,
     method = DELETE,
-    url = "/rpp/v0/<registry_id>/hosts/<host>",
+    url = "/<registry_id>/hosts/<host>",
     return_type = (),
     handler = |mut c, h: HeaderInfo, host| async move {
         let res = client::host::delete(host, h.client_transaction_id, &mut c).await?;

@@ -36,7 +36,7 @@ pub struct Address {
 crate::rpp_method!(
     name = contact_check,
     method = HEAD,
-    url = "/rpp/v0/<registry_id>/contacts/<id>",
+    url = "/<registry_id>/contacts/<id>",
     return_type = (),
     handler = |mut c, h: HeaderInfo, id| async move {
         let res = client::contact::check(id, h.client_transaction_id, &mut c).await?;
@@ -50,7 +50,7 @@ crate::rpp_method!(
 crate::rpp_method!(
     name = contact_create,
     method = POST,
-    url = "/rpp/v0/<registry_id>/contacts",
+    url = "/<registry_id>/contacts",
     data_type = ContactCreate,
     return_type = (),
     handler = |mut c, h: HeaderInfo, request: ContactCreate| async move {
@@ -94,7 +94,7 @@ crate::rpp_method!(
 crate::rpp_method!(
     name = contact_delete,
     method = DELETE,
-    url = "/rpp/v0/<registry_id>/contacts/<id>",
+    url = "/<registry_id>/contacts/<id>",
     return_type = (),
     handler = |mut c, h: HeaderInfo, id| async move {
         let res = client::contact::delete(id, h.client_transaction_id, &mut c).await?;

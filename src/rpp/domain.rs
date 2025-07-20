@@ -64,7 +64,7 @@ enum ContactType {
 crate::rpp_method!(
     name = domain_check,
     method = HEAD,
-    url = "/rpp/v0/<registry_id>/domains/<domain>",
+    url = "/<registry_id>/domains/<domain>",
     return_type = (),
     handler = |mut c, h: HeaderInfo, domain| async move {
         let res = client::domain::check(domain, None, None, None, h.client_transaction_id, &mut c).await?;
@@ -78,7 +78,7 @@ crate::rpp_method!(
 crate::rpp_method!(
     name = domain_create,
     method = POST,
-    url = "/rpp/v0/<registry_id>/domains",
+    url = "/<registry_id>/domains",
     data_type = DomainCreate,
     return_type = (),
     handler = |mut c, h: HeaderInfo, request: DomainCreate| async move {
@@ -167,7 +167,7 @@ crate::rpp_method!(
 crate::rpp_method!(
     name = domain_delete,
     method = DELETE,
-    url = "/rpp/v0/<registry_id>/domains/<domain>",
+    url = "/<registry_id>/domains/<domain>",
     return_type = (),
     handler = |mut c, h: HeaderInfo, domain| async move {
         let res = client::domain::delete(domain, None, None, None, None, h.client_transaction_id, &mut c).await?;

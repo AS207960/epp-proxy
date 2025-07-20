@@ -362,8 +362,7 @@ impl EPPResponse {
             }) {
                 Some(extra) => {
                     output.push(format!(
-                        "({:?}) {}: {}",
-                        r.code,
+                        "{}; {}",
                         r.message,
                         extra.join(", ")
                     ));
@@ -380,16 +379,16 @@ impl EPPResponse {
                             .collect::<Vec<_>>()
                     }) {
                         Some(v) => {
-                            output.push(format!("({:?}) {}: {}", r.code, r.message, v.join(", ")));
+                            output.push(format!("{}; {}", r.message, v.join(", ")));
                         }
                         None => {
-                            output.push(format!("({:?}) {}", r.code, r.message));
+                            output.push(r.message.clone());
                         }
                     }
                 }
             }
         }
-        output.join(", ")
+        output.join("\n")
     }
 }
 
