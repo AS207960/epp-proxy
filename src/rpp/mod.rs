@@ -23,6 +23,7 @@ impl RPPProxy {
             .mount("/rpp/v0", rocket::routes![
                 domain::domain_check,
                 domain::domain_create,
+                domain::domain_info,
                 domain::domain_delete,
 
                 contact::contact_check,
@@ -231,11 +232,6 @@ impl<'r> rocket::request::FromRequest<'r> for Authorized {
     }
 }
 
-#[derive(serde::Deserialize)]
-pub struct AuthInfo {
-    pw: String,
-}
-
 pub(crate) fn get_client(client: &RPPProxy, registry_id: &str) -> Result<client::RequestSender, ErrorResponse> {
     match client.client_router.client_by_id(registry_id) {
         Some(client) => Ok(client),
@@ -324,6 +320,12 @@ fn unauthorized_catcher() -> ErrorResponse {
         server_transaction_id: None,
         client_transaction_id: None,
     }
+}
+
+#[derive(serde::Serialize, serde::Deserialize)]
+pub struct AuthInfo {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pw: Option<String>,
 }
 
 #[macro_export]

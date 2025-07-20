@@ -80,7 +80,7 @@ crate::rpp_method!(
             trading_name: None,
             company_number: None,
             disclosure: None,
-            auth_info: request.auth_info.pw,
+            auth_info: request.auth_info.pw.unwrap_or_default(),
             eurid_info: None,
             isnic_info: None,
             qualified_lawyer: None,

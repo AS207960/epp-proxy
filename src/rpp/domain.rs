@@ -14,7 +14,90 @@ pub struct DomainCreate {
     auth_info: super::AuthInfo,
 }
 
-#[derive(serde::Deserialize)]
+#[derive(serde::Serialize)]
+pub struct DomainInfo {
+    name: String,
+    ns: DomainHosts,
+    contacts: Vec<DomainContactReference>,
+    auth_info: super::AuthInfo,
+    status: Vec<DomainStatus>,
+    #[serde(rename = "crDate", skip_serializing_if = "Option::is_none")]
+    creation_date: Option<chrono::DateTime<chrono::Utc>>,
+    #[serde(rename = "exDate", skip_serializing_if = "Option::is_none")]
+    expiry_date: Option<chrono::DateTime<chrono::Utc>>,
+    #[serde(rename = "upDate", skip_serializing_if = "Option::is_none")]
+    update_date: Option<chrono::DateTime<chrono::Utc>>,
+    #[serde(rename = "trDate", skip_serializing_if = "Option::is_none")]
+    transfer_date: Option<chrono::DateTime<chrono::Utc>>,
+    #[serde(rename = "clId")]
+    client_id: String,
+    #[serde(rename = "crId", skip_serializing_if = "Option::is_none")]
+    client_created_id: Option<String>,
+}
+
+#[derive(serde::Serialize, serde::Deserialize)]
+pub enum DomainStatus {
+    #[serde(rename = "clientDeleteProhibited")]
+    ClientDeleteProhibited,
+    #[serde(rename = "clientHold")]
+    ClientHold,
+    #[serde(rename = "clientRenewProhibited")]
+    ClientRenewProhibited,
+    #[serde(rename = "clientTransferProhibited")]
+    ClientTransferProhibited,
+    #[serde(rename = "clientUpdateProhibited")]
+    ClientUpdateProhibited,
+    #[serde(rename = "inactive")]
+    Inactive,
+    #[serde(rename = "ok")]
+    Ok,
+    #[serde(rename = "pendingCreate")]
+    PendingCreate,
+    #[serde(rename = "pendingDelete")]
+    PendingDelete,
+    #[serde(rename = "pendingRenew")]
+    PendingRenew,
+    #[serde(rename = "pendingTransfer")]
+    PendingTransfer,
+    #[serde(rename = "pendingUpdate")]
+    PendingUpdate,
+    #[serde(rename = "serverDeleteProhibited")]
+    ServerDeleteProhibited,
+    #[serde(rename = "serverHold")]
+    ServerHold,
+    #[serde(rename = "serverRenewProhibited")]
+    ServerRenewProhibited,
+    #[serde(rename = "serverTransferProhibited")]
+    ServerTransferProhibited,
+    #[serde(rename = "serverUpdateProhibited")]
+    ServerUpdateProhibited,
+}
+
+impl From<client::domain::Status> for DomainStatus {
+    fn from(status: client::domain::Status) -> Self {
+        match status {
+            client::domain::Status::ClientDeleteProhibited => DomainStatus::ClientDeleteProhibited,
+            client::domain::Status::ClientHold => DomainStatus::ClientHold,
+            client::domain::Status::ClientRenewProhibited => DomainStatus::ClientRenewProhibited,
+            client::domain::Status::ClientTransferProhibited => DomainStatus::ClientTransferProhibited,
+            client::domain::Status::ClientUpdateProhibited => DomainStatus::ClientUpdateProhibited,
+            client::domain::Status::Inactive => DomainStatus::Inactive,
+            client::domain::Status::Ok => DomainStatus::Ok,
+            client::domain::Status::PendingCreate => DomainStatus::PendingCreate,
+            client::domain::Status::PendingDelete => DomainStatus::PendingDelete,
+            client::domain::Status::PendingRenew => DomainStatus::PendingRenew,
+            client::domain::Status::PendingTransfer => DomainStatus::PendingTransfer,
+            client::domain::Status::PendingUpdate => DomainStatus::PendingUpdate,
+            client::domain::Status::ServerDeleteProhibited => DomainStatus::ServerDeleteProhibited,
+            client::domain::Status::ServerHold => DomainStatus::ServerHold,
+            client::domain::Status::ServerRenewProhibited => DomainStatus::ServerRenewProhibited,
+            client::domain::Status::ServerTransferProhibited => DomainStatus::ServerTransferProhibited,
+            client::domain::Status::ServerUpdateProhibited => DomainStatus::ServerUpdateProhibited,
+        }
+    }
+}
+
+#[derive(serde::Serialize, serde::Deserialize)]
 enum DomainHosts {
     #[serde(rename = "hostObj")]
     HostObject(Vec<DomainHostObject>),
@@ -28,12 +111,12 @@ impl Default for DomainHosts {
     }
 }
 
-#[derive(serde::Deserialize)]
+#[derive(serde::Serialize, serde::Deserialize)]
 struct DomainHostObject {
     name: String,
 }
 
-#[derive(serde::Deserialize)]
+#[derive(serde::Serialize, serde::Deserialize)]
 struct DomainHostAttr {
     name: String,
     #[serde(default)]
@@ -42,14 +125,14 @@ struct DomainHostAttr {
     ipv6: Vec<String>,
 }
 
-#[derive(serde::Deserialize)]
+#[derive(serde::Serialize, serde::Deserialize)]
 struct DomainContactReference {
     value: String,
     #[serde(rename = "type")]
     contact_type: Vec<ContactType>,
 }
 
-#[derive(serde::Deserialize, Eq, PartialEq)]
+#[derive(serde::Serialize, serde::Deserialize, Eq, PartialEq, Hash, Copy, Clone)]
 enum ContactType {
     #[serde(rename = "registrant")]
     Registrant,
@@ -70,6 +153,93 @@ crate::rpp_method!(
         let res = client::domain::check(domain, None, None, None, h.client_transaction_id, &mut c).await?;
         let mut resp = Response::from(&res);
         resp.check_availability = Some(res.response.avail);
+        Ok(resp)
+    },
+    args = domain: &str
+);
+
+crate::rpp_method!(
+    name = domain_info,
+    method = GET,
+    url = "/<registry_id>/domains/<domain>",
+    return_type = DomainInfo,
+    handler = |mut c, h: HeaderInfo, domain| async move {
+        let res = client::domain::info(domain, None, None, None, None, h.client_transaction_id, &mut c).await?;
+        let mut resp = Response::from(&res);
+
+        let ns = if res.response.nameservers.is_empty() {
+            Default::default()
+        } else if matches!(res.response.nameservers[0], client::domain::InfoNameserver::HostAndAddress { .. }) {
+            DomainHosts::HostAttr(res.response.nameservers.into_iter().map(|h| match h {
+                client::domain::InfoNameserver::HostAndAddress { host: name, addresses, .. } => {
+                    let mut ipv4 = vec![];
+                    let mut ipv6 = vec![];
+
+                    for addr in addresses {
+                        match addr.ip_version {
+                            client::host::AddressVersion::IPv4 => ipv4.push(addr.address),
+                            client::host::AddressVersion::IPv6 => ipv6.push(addr.address),
+                        }
+                    }
+
+                    DomainHostAttr {
+                        name,
+                        ipv4,
+                        ipv6
+                    }
+                },
+                _ => unreachable!()
+            }).collect())
+        } else if matches!(res.response.nameservers[0], client::domain::InfoNameserver::HostOnly(_)) {
+            DomainHosts::HostObject(res.response.nameservers.into_iter().map(|h| match h {
+                client::domain::InfoNameserver::HostOnly(name) => DomainHostObject {
+                    name
+                },
+                _ => unreachable!()
+            }).collect())
+        } else {
+            unreachable!();
+        };
+
+        let mut contacts = std::collections::HashMap::<String, std::collections::HashSet<ContactType>>::new();
+        contacts.insert(res.response.registrant, {
+            let mut s = std::collections::HashSet::new();
+            s.insert(ContactType::Registrant);
+            s
+        });
+
+        for contact in res.response.contacts {
+            let contact_type = match contact.contact_type.as_str() {
+                "admin" => ContactType::Admin,
+                "tech" => ContactType::Tech,
+                "billing" => ContactType::Billing,
+                _ => continue
+            };
+            contacts.entry(contact.contact_id)
+                .or_insert_with(std::collections::HashSet::new)
+                .insert(contact_type);
+        }
+
+        resp.body = Some(DomainInfo {
+            name: res.response.name,
+            ns,
+            contacts: contacts.into_iter().map(|(k, v)| {
+                DomainContactReference {
+                    value: k,
+                    contact_type: v.into_iter().collect()
+                }
+            }).collect(),
+            auth_info: super::AuthInfo {
+                pw: res.response.auth_info
+            },
+            status: res.response.statuses.into_iter().map(Into::into).collect(),
+            creation_date: res.response.creation_date,
+            expiry_date: res.response.expiry_date,
+            update_date: res.response.last_updated_date,
+            transfer_date: res.response.last_transfer_date,
+            client_id: res.response.client_id,
+            client_created_id: res.response.client_created_id,
+        });
         Ok(resp)
     },
     args = domain: &str
@@ -147,7 +317,7 @@ crate::rpp_method!(
             registrant,
             contacts,
             nameservers,
-            auth_info: &request.auth_info.pw,
+            auth_info: request.auth_info.pw.as_deref().unwrap_or_default(),
             sec_dns: None,
             launch_create: None,
             fee_agreement: None,
