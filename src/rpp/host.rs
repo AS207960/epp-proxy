@@ -14,14 +14,14 @@ crate::rpp_method!(
     name = host_check,
     method = HEAD,
     url = "/<registry_id>/hosts/<host>",
+    args = (host: &str),
     return_type = (),
     handler = |mut c, h: HeaderInfo, host| async move {
         let res = client::host::check(host, h.client_transaction_id, &mut c).await?;
         let mut resp = Response::from(&res);
         resp.check_availability = Some(res.response.avail);
         Ok(resp)
-    },
-    args = host: &str
+    }
 );
 
 crate::rpp_method!(
@@ -55,10 +55,10 @@ crate::rpp_method!(
     name = host_delete,
     method = DELETE,
     url = "/<registry_id>/hosts/<host>",
+    args = (host: &str),
     return_type = (),
     handler = |mut c, h: HeaderInfo, host| async move {
         let res = client::host::delete(host, h.client_transaction_id, &mut c).await?;
         Ok(Response::from(&res))
-    },
-    args = host: &str
+    }
 );

@@ -100,6 +100,7 @@ impl<'r, R: rocket::serde::Serialize> rocket::response::Responder<'r, 'static> f
         resp.raw_header("rpp-svtrid", self.server_transaction_id);
         resp.raw_header("rpp-cltrid", self.client_transaction_id);
         resp.raw_header("rpp-code", u16::from(self.response_code).to_string());
+        resp.raw_header("rpp-code-text", self.response_code.name());
         if let Some(check_availability) = self.check_availability {
             resp.raw_header("rpp-check-avail", check_availability.to_string());
         }
@@ -337,7 +338,7 @@ macro_rules! rpp_method {
         return_type = $ret:ty,
         handler = $call:expr
     ) => {
-        crate::rpp_method!(name = $name, method = $method, url = $url, return_type = $ret, handler = $call, args = );
+        crate::rpp_method!(name = $name, method = $method, url = $url, args = (), return_type = $ret, handler = $call);
     };
     (
         name = $name:ident,
@@ -347,15 +348,15 @@ macro_rules! rpp_method {
         return_type = $ret:ty,
         handler = $call:expr
     ) => {
-        crate::rpp_method!(name = $name, method = $method, url = $url, data_type = $body, return_type = $ret, handler = $call, args = );
+        crate::rpp_method!(name = $name, method = $method, url = $url, args = (), data_type = $body, return_type = $ret, handler = $call);
     };
     (
         name = $name:ident,
         method = $method:ident,
         url = $url:literal,
+        args = ($($param:ident: $param_type:ty),*),
         return_type = $ret:ty,
-        handler = $call:expr,
-        args = $($param:ident: $param_type:ty),*
+        handler = $call:expr
     ) => {
         #[rocket::route($method, uri = $url)]
         pub async fn $name(
@@ -370,10 +371,10 @@ macro_rules! rpp_method {
         name = $name:ident,
         method = $method:ident,
         url = $url:literal,
+        args = ($($param:ident: $param_type:ty),*),
         data_type = $body:ty,
         return_type = $ret:ty,
-        handler = $call:expr,
-        args = $($param:ident: $param_type:ty),*
+        handler = $call:expr
     ) => {
         #[rocket::route($method, uri = $url, data = "<data>")]
         pub async fn $name(

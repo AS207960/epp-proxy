@@ -37,14 +37,14 @@ crate::rpp_method!(
     name = contact_check,
     method = HEAD,
     url = "/<registry_id>/contacts/<id>",
+    args = (id: &str),
     return_type = (),
     handler = |mut c, h: HeaderInfo, id| async move {
         let res = client::contact::check(id, h.client_transaction_id, &mut c).await?;
         let mut resp = Response::from(&res);
         resp.check_availability = Some(res.response.avail);
         Ok(resp)
-    },
-    args = id: &str
+    }
 );
 
 crate::rpp_method!(
@@ -95,10 +95,10 @@ crate::rpp_method!(
     name = contact_delete,
     method = DELETE,
     url = "/<registry_id>/contacts/<id>",
+    args = (id: &str),
     return_type = (),
     handler = |mut c, h: HeaderInfo, id| async move {
         let res = client::contact::delete(id, h.client_transaction_id, &mut c).await?;
         Ok(Response::from(&res))
-    },
-    args = id: &str
+    }
 );

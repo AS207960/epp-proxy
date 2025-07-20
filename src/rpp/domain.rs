@@ -19,6 +19,7 @@ pub struct DomainInfo {
     name: String,
     ns: DomainHosts,
     contacts: Vec<DomainContactReference>,
+    // TODO: dnsSEC
     auth_info: super::AuthInfo,
     status: Vec<DomainStatus>,
     #[serde(rename = "crDate", skip_serializing_if = "Option::is_none")]
@@ -148,20 +149,21 @@ crate::rpp_method!(
     name = domain_check,
     method = HEAD,
     url = "/<registry_id>/domains/<domain>",
+    args = (domain: &str),
     return_type = (),
     handler = |mut c, h: HeaderInfo, domain| async move {
         let res = client::domain::check(domain, None, None, None, h.client_transaction_id, &mut c).await?;
         let mut resp = Response::from(&res);
         resp.check_availability = Some(res.response.avail);
         Ok(resp)
-    },
-    args = domain: &str
+    }
 );
 
 crate::rpp_method!(
     name = domain_info,
     method = GET,
     url = "/<registry_id>/domains/<domain>",
+    args = (domain: &str),
     return_type = DomainInfo,
     handler = |mut c, h: HeaderInfo, domain| async move {
         let res = client::domain::info(domain, None, None, None, None, h.client_transaction_id, &mut c).await?;
@@ -241,8 +243,7 @@ crate::rpp_method!(
             client_created_id: res.response.client_created_id,
         });
         Ok(resp)
-    },
-    args = domain: &str
+    }
 );
 
 crate::rpp_method!(
@@ -338,10 +339,10 @@ crate::rpp_method!(
     name = domain_delete,
     method = DELETE,
     url = "/<registry_id>/domains/<domain>",
+    args = (domain: &str),
     return_type = (),
     handler = |mut c, h: HeaderInfo, domain| async move {
         let res = client::domain::delete(domain, None, None, None, None, h.client_transaction_id, &mut c).await?;
         Ok(Response::from(&res))
-    },
-    args = domain: &str
+    }
 );
