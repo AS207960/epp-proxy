@@ -20,6 +20,7 @@ pub struct DomainInfo {
     ns: DomainHosts,
     contacts: Vec<DomainContactReference>,
     // TODO: dnsSEC
+    #[serde(rename = "authInfo")]
     auth_info: super::AuthInfo,
     status: Vec<DomainStatus>,
     #[serde(rename = "crDate", skip_serializing_if = "Option::is_none")]
