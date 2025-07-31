@@ -493,7 +493,7 @@ impl EPPResultCode {
             EPPResultCode::UnimplementedOption => "unimplemented-option",
             EPPResultCode::UnimplementedExtension => "unimplemented-extension",
             EPPResultCode::BillingFailure => "billing-failure",
-            EPPResultCode::ObjectNotEligibleForRenewal => "object-not-eligible-for-renwal",
+            EPPResultCode::ObjectNotEligibleForRenewal => "object-not-eligible-for-renewal",
             EPPResultCode::ObjectNotEligibleForTransfer => "object-not-eligible-for-transfer",
             EPPResultCode::AuthenticationError => "authentication-error",
             EPPResultCode::AuthorizationError => "authorization-error",
@@ -632,7 +632,6 @@ impl<'de> serde::Deserialize<'de> for EPPResultCode {
             where
                 E: serde::de::Error,
             {
-                use std::u16;
                 if value >= u32::from(u16::MIN) && value <= u32::from(u16::MAX) {
                     Ok(value as u16)
                 } else {
@@ -644,7 +643,6 @@ impl<'de> serde::Deserialize<'de> for EPPResultCode {
             where
                 E: serde::de::Error,
             {
-                use std::u16;
                 if value >= u64::from(u16::MIN) && value <= u64::from(u16::MAX) {
                     Ok(value as u16)
                 } else {

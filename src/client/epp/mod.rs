@@ -293,14 +293,16 @@ impl<M: crate::metrics::Metrics<Subordinate = M> + 'static> EPPClient<M> {
         mut ready_sender: futures::channel::mpsc::UnboundedSender<CommandTransactionID>,
     ) {
         let mut receiver = receiver.fuse();
-        loop {
+        'main: loop {
             self.is_closing = false;
             self.is_awaiting_response = false;
 
             let mut sock = {
                 trace!("Getting connection for {}", self.host);
                 let connect_fut = self.tls_client.connect().fuse();
+                let timeout_fut = tokio::time::sleep(tokio::time::Duration::new(60, 0)).fuse();
                 futures::pin_mut!(connect_fut);
+                futures::pin_mut!(timeout_fut);
 
                 loop {
                     futures::select! {
@@ -316,6 +318,10 @@ impl<M: crate::metrics::Metrics<Subordinate = M> + 'static> EPPClient<M> {
                         s = connect_fut => {
                             break s;
                         }
+                        _ = timeout_fut => {
+                            warn!("Opening TLS connection to {} timed out", self.host);
+                            continue 'main;
+                        }
                     }
                 }
             };
@@ -323,9 +329,12 @@ impl<M: crate::metrics::Metrics<Subordinate = M> + 'static> EPPClient<M> {
 
             let setup_res = {
                 let exit_str = format!("All senders for {} dropped, exiting...", self.host);
+                let timeout_str = format!("Setting up connection to {} timed out", self.host);
                 trace!("Setting up connection to {}", self.host);
                 let setup_fut = self._setup_connection(&mut sock).fuse();
+                let timeout_fut = tokio::time::sleep(tokio::time::Duration::new(60, 0)).fuse();
                 futures::pin_mut!(setup_fut);
+                futures::pin_mut!(timeout_fut);
                 match loop {
                     futures::select! {
                         x = receiver.next() => {
@@ -339,6 +348,10 @@ impl<M: crate::metrics::Metrics<Subordinate = M> + 'static> EPPClient<M> {
                         }
                         s = setup_fut => {
                             break s;
+                        }
+                        _ = timeout_fut => {
+                            warn!("{}", timeout_str);
+                            continue 'main;
                         }
                     }
                 } {

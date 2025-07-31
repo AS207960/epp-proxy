@@ -711,7 +711,6 @@ impl<'de> serde::Deserialize<'de> for TMCHResultCode {
             where
                 E: serde::de::Error,
             {
-                use std::u16;
                 if value >= u32::from(u16::MIN) && value <= u32::from(u16::MAX) {
                     Ok(value as u16)
                 } else {
@@ -723,7 +722,6 @@ impl<'de> serde::Deserialize<'de> for TMCHResultCode {
             where
                 E: serde::de::Error,
             {
-                use std::u16;
                 if value >= u64::from(u16::MIN) && value <= u64::from(u16::MAX) {
                     Ok(value as u16)
                 } else {

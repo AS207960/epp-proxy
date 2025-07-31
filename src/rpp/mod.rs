@@ -99,7 +99,7 @@ impl<'r, R: rocket::serde::Serialize> rocket::response::Responder<'r, 'static> f
         };
         resp.raw_header("rpp-svtrid", self.server_transaction_id);
         resp.raw_header("rpp-cltrid", self.client_transaction_id);
-        resp.raw_header("rpp-code", u16::from(self.response_code).to_string());
+        resp.raw_header("rpp-code", format!("{:05}", u16::from(self.response_code)));
         resp.raw_header("rpp-code-text", self.response_code.name());
         if let Some(check_availability) = self.check_availability {
             resp.raw_header("rpp-check-avail", check_availability.to_string());
