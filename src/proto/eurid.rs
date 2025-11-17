@@ -149,17 +149,17 @@ pub struct EURIDDomain26Update {
 #[derive(Debug, Serialize)]
 pub struct EURIDDomain26UpdateAddRemove {
     #[serde(
-        rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.5}domain-ext:contact",
+        rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.6}domain-ext:contact",
         skip_serializing_if = "Vec::is_empty"
     )]
     pub contacts: Vec<EURIDDomainContact>,
     #[serde(
-        rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.5}domain-ext:nsgroup",
+        rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.6}domain-ext:nsgroup",
         skip_serializing_if = "Vec::is_empty"
     )]
     pub nsgroups: Vec<String>,
     #[serde(
-        rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.5}domain-ext:keygroup",
+        rename = "{http://www.eurid.eu/xml/epp/domain-ext-2.6}domain-ext:keygroup",
         skip_serializing_if = "Option::is_none"
     )]
     pub keygroup: Option<String>,
