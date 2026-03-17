@@ -129,7 +129,7 @@ pub struct EPPContactPostalInfo {
     #[serde(
         rename = "{urn:ietf:params:xml:ns:contact-1.0}contact:isfinnish",
         skip_serializing_if = "Option::is_none",
-        serialize_with = "serialize_flag_bool",
+        serialize_with = "serialize_flag_bool_opt",
         default
     )]
     pub traficom_is_finnish: Option<bool>,
@@ -206,7 +206,7 @@ pub enum EPPContactPostalInfoType {
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct EPPContactDisclosure {
-    #[serde(rename = "$attr:flag", default)]
+    #[serde(rename = "$attr:flag", serialize_with = "serialize_flag_bool", default)]
     pub flag: bool,
     #[serde(rename = "$value")]
     pub elements: Vec<EPPContactDisclosureItem>,
@@ -449,7 +449,19 @@ pub struct EPPContactPanContact {
 }
 
 #[allow(clippy::trivially_copy_pass_by_ref)]
-fn serialize_flag_bool<S>(d: &Option<bool>, s: S) -> Result<S::Ok, S::Error>
+fn serialize_flag_bool<S>(d: &bool, s: S) -> Result<S::Ok, S::Error>
+where
+    S: serde::ser::Serializer,
+{
+    if *d {
+        s.serialize_str("1")
+    } else {
+        s.serialize_str("0")
+    }
+}
+
+#[allow(clippy::trivially_copy_pass_by_ref)]
+fn serialize_flag_bool_opt<S>(d: &Option<bool>, s: S) -> Result<S::Ok, S::Error>
 where
     S: serde::ser::Serializer,
 {

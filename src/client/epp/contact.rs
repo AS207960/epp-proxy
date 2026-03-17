@@ -670,6 +670,8 @@ pub fn handle_create(
                 } else {
                     Some(a.organisation.clone().unwrap_or_else(|| a.name.clone()))
                 }
+            } else if client.has_erratum("traficom") {
+                Some(a.organisation.clone().unwrap_or_default())
             } else {
                 a.organisation.clone()
             },
@@ -684,7 +686,7 @@ pub fn handle_create(
                 None
             },
             traficom_register_number: if client.has_erratum("traficom") {
-                req.company_number.clone()
+                Some(req.company_number.clone().unwrap_or_default())
             } else {
                 None
             },
@@ -726,7 +728,15 @@ pub fn handle_create(
                 None
             },
             address: proto::contact::EPPContactAddress {
-                streets: a.streets.clone(),
+                streets: if client.has_erratum("traficom") {
+                    let mut v = a.streets.clone();
+                    for _ in 0..(3-v.len()) {
+                        v.push("".to_string());
+                    }
+                    v
+                } else {
+                    a.streets.clone()
+                },
                 city: a.city.clone(),
                 province: a.province.clone(),
                 postal_code: if client.has_erratum("traficom") {
