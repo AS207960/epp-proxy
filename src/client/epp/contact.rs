@@ -343,7 +343,7 @@ impl
                 postal_code: p.address.postal_code.clone(),
                 country_code: p.address.country_code.clone(),
                 identity_number: p.traficom_identity.clone(),
-                birth_date: p.traficom_birth_date,
+                birth_date: p.traficom_birth_date.map(|d| d.date_naive()),
             })
         };
         let contact_ext_info =
@@ -700,7 +700,7 @@ pub fn handle_create(
                         is_entity_finnish(&req.entity_type),
                     ) {
                         (proto::traficom::EPPContactTraficomType::PrivatePerson, false) => {
-                            a.birth_date
+                            a.birth_date.and_then(|d| d.and_hms_opt(0, 0, 0)).map(|d| d.and_utc())
                         }
                         _ => None,
                     },
@@ -841,8 +841,12 @@ pub fn handle_create(
         phone: req.phone.as_ref().map(|p| p.into()),
         fax: req.fax.as_ref().map(|p| p.into()),
         email: req.email.clone(),
-        auth_info: proto::contact::EPPContactAuthInfo {
-            password: Some(req.auth_info.clone()),
+        auth_info: if client.has_erratum("traficom") {
+            None
+        } else {
+            Some(proto::contact::EPPContactAuthInfo {
+                password: Some(req.auth_info.clone()),
+            })
         },
         disclose: match client.switch_balance {
             true => None,

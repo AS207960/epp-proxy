@@ -126,8 +126,13 @@ pub struct EPPContactPhone {
 pub struct EPPContactPostalInfo {
     #[serde(rename = "$attr:type")]
     pub addr_type: EPPContactPostalInfoType,
-    #[serde(rename = "{urn:ietf:params:xml:ns:contact-1.0}contact:name", default)]
-    pub name: Option<String>,
+    #[serde(
+        rename = "{urn:ietf:params:xml:ns:contact-1.0}contact:isfinnish",
+        skip_serializing_if = "Option::is_none",
+        serialize_with = "serialize_flag_bool",
+        default
+    )]
+    pub traficom_is_finnish: Option<bool>,
     #[serde(
         rename = "{urn:ietf:params:xml:ns:contact-1.0}contact:firstname",
         skip_serializing_if = "Option::is_none",
@@ -140,6 +145,8 @@ pub struct EPPContactPostalInfo {
         default
     )]
     pub traficom_last_name: Option<String>,
+    #[serde(rename = "{urn:ietf:params:xml:ns:contact-1.0}contact:name", default)]
+    pub name: Option<String>,
     #[serde(
         rename = "{urn:ietf:params:xml:ns:contact-1.0}contact:org",
         skip_serializing_if = "Option::is_none",
@@ -147,17 +154,12 @@ pub struct EPPContactPostalInfo {
     )]
     pub organisation: Option<String>,
     #[serde(
-        rename = "{urn:ietf:params:xml:ns:contact-1.0}contact:infinnish",
+        rename = "{urn:ietf:params:xml:ns:contact-1.0}contact:birthDate",
+        deserialize_with = "super::deserialize_datetime_opt",
         skip_serializing_if = "Option::is_none",
         default
     )]
-    pub traficom_is_finnish: Option<bool>,
-    #[serde(
-        rename = "{urn:ietf:params:xml:ns:contact-1.0}contact:registernumber",
-        skip_serializing_if = "Option::is_none",
-        default
-    )]
-    pub traficom_register_number: Option<String>,
+    pub traficom_birth_date: Option<DateTime<Utc>>,
     #[serde(
         rename = "{urn:ietf:params:xml:ns:contact-1.0}contact:identity",
         skip_serializing_if = "Option::is_none",
@@ -165,13 +167,11 @@ pub struct EPPContactPostalInfo {
     )]
     pub traficom_identity: Option<String>,
     #[serde(
-        rename = "{urn:ietf:params:xml:ns:contact-1.0}contact:birthDate",
-        deserialize_with = "super::deserialize_date_opt",
-        serialize_with = "super::serialize_date_opt",
+        rename = "{urn:ietf:params:xml:ns:contact-1.0}contact:registernumber",
         skip_serializing_if = "Option::is_none",
         default
     )]
-    pub traficom_birth_date: Option<NaiveDate>,
+    pub traficom_register_number: Option<String>,
     #[serde(rename = "{urn:ietf:params:xml:ns:contact-1.0}contact:addr")]
     pub address: EPPContactAddress,
 }
@@ -299,8 +299,11 @@ pub struct EPPContactCreate {
         skip_serializing_if = "Option::is_none"
     )]
     pub traficom_legal_email: Option<String>,
-    #[serde(rename = "{urn:ietf:params:xml:ns:contact-1.0}contact:authInfo")]
-    pub auth_info: EPPContactAuthInfo,
+    #[serde(
+        rename = "{urn:ietf:params:xml:ns:contact-1.0}contact:authInfo",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub auth_info: Option<EPPContactAuthInfo>,
     #[serde(
         rename = "{urn:ietf:params:xml:ns:contact-1.0}contact:disclose",
         skip_serializing_if = "Option::is_none"
@@ -443,4 +446,21 @@ pub struct EPPContactPanContact {
     pub result: bool,
     #[serde(rename = "$value")]
     pub contact: String,
+}
+
+#[allow(clippy::trivially_copy_pass_by_ref)]
+fn serialize_flag_bool<S>(d: &Option<bool>, s: S) -> Result<S::Ok, S::Error>
+where
+    S: serde::ser::Serializer,
+{
+    match d {
+        Some(d) => {
+            if *d {
+                s.serialize_str("1")
+            } else {
+                s.serialize_str("0")
+            }
+        }
+        None => s.serialize_none(),
+    }
 }
