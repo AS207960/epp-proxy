@@ -1,7 +1,7 @@
 //! EPP commands relating to contact objects
 
 use std::convert::{TryFrom, TryInto};
-
+use futures::TryFutureExt;
 use regex::Regex;
 
 use super::super::contact::{
@@ -672,6 +672,8 @@ pub fn handle_create(
                 }
             } else if client.has_erratum("traficom") {
                 Some(a.organisation.clone().unwrap_or_default())
+            } else if client.isnic_contact_supported {
+                None
             } else {
                 a.organisation.clone()
             },
@@ -1092,7 +1094,17 @@ pub fn handle_update(
         Ok(proto::contact::EPPContactUpdatePostalInfo {
             addr_type: t,
             name: Some(a.name.clone()),
-            organisation: a.organisation.clone(),
+            organisation: if client.eurid_contact_support {
+                if super::super::eurid::is_entity_natural_person(req.entity_type.as_ref()) {
+                    None
+                } else {
+                    a.organisation.clone()
+                }
+            } else if client.isnic_contact_supported {
+                None
+            } else {
+                a.organisation.clone()
+            },
             address: Some(proto::contact::EPPContactAddress {
                 streets: a.streets.clone(),
                 city: a.city.clone(),
