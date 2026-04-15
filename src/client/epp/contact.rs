@@ -1094,13 +1094,7 @@ pub fn handle_update(
         Ok(proto::contact::EPPContactUpdatePostalInfo {
             addr_type: t,
             name: Some(a.name.clone()),
-            organisation: if client.eurid_contact_support {
-                if super::super::eurid::is_entity_natural_person(req.entity_type.as_ref()) {
-                    None
-                } else {
-                    a.organisation.clone()
-                }
-            } else if client.isnic_contact_supported {
+            organisation: if client.isnic_contact_supported {
                 None
             } else {
                 a.organisation.clone()
