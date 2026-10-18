@@ -41,6 +41,9 @@ spec:
         - name: tls-client-keys
           secret:
             secretName: epp-client-tls
+        - name: tls-google-keys
+          secret:
+            secretName: epp-google-tls
         - name: priv-keys
           secret:
             secretName: epp-proxy-priv
@@ -58,6 +61,8 @@ spec:
               name: tls-keys
             - mountPath: "/tls-client"
               name: tls-client-keys
+            - mountPath: "/tls-google"
+              name: tls-google-keys
             - mountPath: "/priv"
               name: priv-keys
           env:

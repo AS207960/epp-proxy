@@ -1,7 +1,6 @@
 //! EPP commands relating to contact objects
 
 use std::convert::{TryFrom, TryInto};
-use futures::TryFutureExt;
 use regex::Regex;
 
 use super::super::contact::{

@@ -207,6 +207,17 @@ service EPPProxy {
             post: "/poll"
         };
     }
+    rpc PollSingle               (RegistryInfo)                             returns (PollReply) {
+        option (google.api.http) = {
+            get: "/poll-single/{registry_name}"
+        };
+    }
+    rpc AckPoll                  (PollAckSingle)                            returns (PollAckReply) {
+        option (google.api.http) = {
+            post: "/poll-ack/{registry_name}"
+            body: "*"
+        };
+    }
     rpc NominetTagList           (RegistryInfo)                             returns (nominet.NominetTagListReply) {
         option (google.api.http) = {
             get: "/nominet/{registry_name}/tag_list"
@@ -353,8 +364,20 @@ message PollAck {
     string msg_id = 1;
 }
 
+message PollAckSingle {
+    string msg_id = 1;
+    string registry_name = 2;
+}
+
+message PollAckReply {
+    uint64 count = 1;
+    string next_msg_id = 2;
+    common.CommandResponse cmd_resp = 3;
+}
+
 message PollReply {
     string msg_id = 1;
+    uint64 count = 28;
     google.protobuf.Timestamp enqueue_date = 2;
     string message = 3;
     oneof data {

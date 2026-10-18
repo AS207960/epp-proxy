@@ -165,7 +165,7 @@ pub struct PollAckRequest {
 #[derive(Debug)]
 pub struct PollAckResponse {
     /// Messages in the queue
-    pub count: Option<u64>,
+    pub count: u64,
     /// ID of the message next in the queue
     pub next_id: Option<String>,
 }

@@ -50,11 +50,11 @@ pub fn handle_poll_ack_response<M: crate::metrics::Metrics>(
 ) -> Response<PollAckResponse> {
     match response.message_queue {
         Some(value) => Response::Ok(PollAckResponse {
-            count: Some(value.count),
+            count: value.count,
             next_id: Some(value.id),
         }),
         None => Response::Ok(PollAckResponse {
-            count: None,
+            count: 0,
             next_id: None,
         }),
     }
