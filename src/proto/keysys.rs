@@ -37,7 +37,7 @@ pub enum Renew {
 
 #[derive(Debug, Serialize)]
 pub enum Transfer {
-    #[serde(rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:transfer")]
+    #[serde(rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:domain")]
     Domain(DomainTransfer),
 }
 
