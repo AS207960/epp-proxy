@@ -259,7 +259,7 @@ pub enum EPPCommandExtensionType {
     KeysysDelete(keysys::Delete),
     #[serde(rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:renew")]
     KeysysRenew(keysys::Renew),
-    #[serde(rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:trasfer")]
+    #[serde(rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:transfer")]
     KeysysTransfer(keysys::Transfer),
 }
 
