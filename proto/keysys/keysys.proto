@@ -62,6 +62,10 @@ message DomainTransfer {
   bool at_request_authcode = 5;
   bool be_request_authcode = 6;
   string promotion_code = 7;
+  string owner_contact = 8;
+  string admin_contact = 9;
+  string tech_contact = 10;
+  string billing_contact = 11;
 }
 
 message DomainDelete {

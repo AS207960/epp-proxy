@@ -659,6 +659,21 @@ pub struct DomainTransfer {
     )]
     pub accept_trade: Option<bool>,
     #[serde(
+        rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:admincontact0",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub admin_contact_0: Option<String>,
+    #[serde(
+        rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:admincontact1",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub admin_contact_1: Option<String>,
+    #[serde(
+        rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:admincontact2",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub admin_contact_2: Option<String>,
+    #[serde(
         rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:allocation-token",
         skip_serializing_if = "Option::is_none"
     )]
@@ -676,6 +691,21 @@ pub struct DomainTransfer {
     )]
     pub be_request_authcode: Option<bool>,
     #[serde(
+        rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:billingcontact0",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub billing_contact_0: Option<String>,
+    #[serde(
+        rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:billingcontact1",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub billing_contact_1: Option<String>,
+    #[serde(
+        rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:billingcontact2",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub billing_contact_2: Option<String>,
+    #[serde(
         rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:eu-accept-trustee-tac",
         skip_serializing_if = "Option::is_none",
         serialize_with = "super::serialize_opt_bool"
@@ -692,10 +722,30 @@ pub struct DomainTransfer {
     )]
     pub eu_registrant_citizenship: Option<EUCountry>,
     #[serde(
+        rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:ownercontact0",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub owner_contact: Option<String>,
+    #[serde(
         rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:promotion-code",
         skip_serializing_if = "Option::is_none"
     )]
     pub promotion_code: Option<String>,
+    #[serde(
+        rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:techcontact0",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub tech_contact_0: Option<String>,
+    #[serde(
+        rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:techcontact1",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub tech_contact_1: Option<String>,
+    #[serde(
+        rename = "{http://www.key-systems.net/epp/keysys-1.0}keysys:techcontact2",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub tech_contact_2: Option<String>,
 }
 
 #[derive(Debug, Serialize)]

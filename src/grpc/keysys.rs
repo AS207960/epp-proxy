@@ -106,6 +106,26 @@ impl From<epp_proto::keysys::DomainTransfer> for client::keysys::DomainTransfer 
             } else {
                 Some(res.promotion_code)
             },
+            owner_contact: if res.owner_contact.is_empty() {
+                None
+            } else {
+                Some(res.owner_contact)
+            },
+            admin_contact: if res.admin_contact.is_empty() {
+                None
+            } else {
+                Some(res.admin_contact)
+            },
+            billing_contact: if res.billing_contact.is_empty() {
+                None
+            } else {
+                Some(res.billing_contact)
+            },
+            tech_contact: if res.tech_contact.is_empty() {
+                None
+            } else {
+                Some(res.tech_contact)
+            }
         }
     }
 }

@@ -3121,6 +3121,16 @@ pub fn handle_transfer_request(
                     eu_registrant_lang: None,
                     eu_registrant_citizenship: None,
                     promotion_code: keysys.promotion_code.as_ref().cloned(),
+                    owner_contact: keysys.owner_contact.as_ref().cloned(),
+                    admin_contact_0: keysys.admin_contact.as_ref().cloned(),
+                    admin_contact_1: None,
+                    admin_contact_2: None,
+                    billing_contact_0: keysys.billing_contact.as_ref().cloned(),
+                    billing_contact_1: None,
+                    billing_contact_2: None,
+                    tech_contact_0: keysys.tech_contact.as_ref().cloned(),
+                    tech_contact_1: None,
+                    tech_contact_2: None,
                 }),
             ));
         } else {

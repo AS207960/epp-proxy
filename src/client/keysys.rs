@@ -80,6 +80,10 @@ pub struct DomainTransfer {
     pub at_request_authcode: bool,
     pub be_request_authcode: bool,
     pub promotion_code: Option<String>,
+    pub owner_contact: Option<String>,
+    pub admin_contact: Option<String>,
+    pub billing_contact: Option<String>,
+    pub tech_contact: Option<String>,
 }
 
 #[derive(Debug)]
