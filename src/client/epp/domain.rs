@@ -67,30 +67,51 @@ impl From<&Status> for proto::domain::EPPDomainStatusType {
     }
 }
 
-impl From<&InfoNameserver> for proto::domain::EPPDomainInfoNameserver {
-    fn from(from: &InfoNameserver) -> Self {
+impl TryFrom<&InfoNameserver> for proto::domain::EPPDomainInfoNameserver {
+    type Error = Error;
+
+    fn try_from(from: &InfoNameserver) -> Result<Self, Self::Error> {
         match from {
             InfoNameserver::HostOnly(h) => {
-                proto::domain::EPPDomainInfoNameserver::HostOnly(h.to_string())
+                if h.is_empty() {
+                    return Err(Error::InvalidRequest(
+                        "nameserver has a minimum length of 1".to_string(),
+                    ))
+                }
+                Ok(proto::domain::EPPDomainInfoNameserver::HostOnly(h.to_string()))
             }
             InfoNameserver::HostAndAddress {
                 host, addresses, ..
-            } => proto::domain::EPPDomainInfoNameserver::HostAndAddress {
-                host: host.to_string(),
-                addresses: addresses
-                    .iter()
-                    .map(|addr| proto::domain::EPPDomainInfoNameserverAddress {
-                        address: addr.address.to_string(),
-                        ip_version: match addr.ip_version {
-                            super::super::host::AddressVersion::IPv4 => {
-                                proto::domain::EPPDomainInfoNameserverAddressVersion::IPv4
+            } => {
+                if host.is_empty() {
+                    return Err(Error::InvalidRequest(
+                        "nameserver has a minimum length of 1".to_string(),
+                    ))
+                }
+                Ok(proto::domain::EPPDomainInfoNameserver::HostAndAddress {
+                    host: host.to_string(),
+                    addresses: addresses
+                        .iter()
+                        .map(|addr| {
+                            if addr.address.is_empty() {
+                                return Err(Error::InvalidRequest(
+                                    "nameserver address has a minimum length of 1".to_string(),
+                                ))
                             }
-                            super::super::host::AddressVersion::IPv6 => {
-                                proto::domain::EPPDomainInfoNameserverAddressVersion::IPv6
-                            }
-                        },
-                    })
-                    .collect(),
+                            Ok(proto::domain::EPPDomainInfoNameserverAddress {
+                                address: addr.address.to_string(),
+                                ip_version: match addr.ip_version {
+                                    super::super::host::AddressVersion::IPv4 => {
+                                        proto::domain::EPPDomainInfoNameserverAddressVersion::IPv4
+                                    }
+                                    super::super::host::AddressVersion::IPv6 => {
+                                        proto::domain::EPPDomainInfoNameserverAddressVersion::IPv6
+                                    }
+                                },
+                            })
+                        })
+                        .collect::<Result<Vec<_>, _>>()?,
+                })
             },
         }
     }
@@ -1918,7 +1939,9 @@ pub fn handle_create(
         nameservers: match req.nameservers.len() {
             0 => None,
             _ => Some(proto::domain::EPPDomainInfoNameservers {
-                servers: req.nameservers.iter().map(|n| n.into()).collect(),
+                servers: req.nameservers.iter().map(|n| n.try_into())
+                    .collect::<Result<Vec<_>, _>>()
+                    .map_err(Err)?,
             }),
         },
         registrant: if no_registrant {
@@ -2147,7 +2170,7 @@ pub fn handle_update(
                     },
                 ))
             }
-            UpdateObject::Nameserver(n) => add_ns.push(n.into()),
+            UpdateObject::Nameserver(n) => add_ns.push(n.try_into().map_err(Err)?),
         }
     }
     for rem in &req.remove {
@@ -2167,7 +2190,7 @@ pub fn handle_update(
                     },
                 ))
             }
-            UpdateObject::Nameserver(n) => rem_ns.push(n.into()),
+            UpdateObject::Nameserver(n) => rem_ns.push(n.try_into().map_err(Err)?),
         }
     }
     if !add_ns.is_empty() {
